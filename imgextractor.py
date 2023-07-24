@@ -134,7 +134,7 @@ class Extractor(object):
                     scan_dir(entry_inode, entry_inode_path)
                     if cap == '' and con == '':
                         tmppath = self.DIR + entry_inode_path
-                        if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                        if tmppath.find(' ', 1, len(tmppath)) > 0:
                             spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                             if not os.path.isfile(spaces_file):
                                 f = open(spaces_file, 'tw', encoding='utf-8')
@@ -149,7 +149,7 @@ class Extractor(object):
                     else:
                         if cap == '':
                             tmppath = self.DIR + entry_inode_path
-                            if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                            if tmppath.find(' ', 1, len(tmppath)) > 0:
                                 spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                 if not os.path.isfile(spaces_file):
                                     f = open(spaces_file, 'tw', encoding='utf-8')
@@ -167,7 +167,7 @@ class Extractor(object):
                         else:
                             if con == '':
                                 tmppath = self.DIR + entry_inode_path
-                                if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                     if not os.path.isfile(spaces_file):
                                         f = open(spaces_file, 'tw', encoding='utf-8')
@@ -182,7 +182,7 @@ class Extractor(object):
                                         '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
                             else:
                                 tmppath = self.DIR + entry_inode_path
-                                if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                     if not os.path.isfile(spaces_file):
                                         f = open(spaces_file, 'tw', encoding='utf-8')
@@ -226,7 +226,7 @@ class Extractor(object):
                             os.chown(file_target, uid, gid)
                     if cap == '' and con == '':
                         tmppath = self.DIR + entry_inode_path
-                        if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                        if tmppath.find(' ', 1, len(tmppath)) > 0:
                             spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                             if not os.path.isfile(spaces_file):
                                 f = open(spaces_file, 'tw', encoding='utf-8')
@@ -241,7 +241,7 @@ class Extractor(object):
                     else:
                         if cap == '':
                             tmppath = self.DIR + entry_inode_path
-                            if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                            if tmppath.find(' ', 1, len(tmppath)) > 0:
                                 spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                 if not os.path.isfile(spaces_file):
                                     f = open(spaces_file, 'tw', encoding='utf-8')
@@ -259,7 +259,7 @@ class Extractor(object):
                         else:
                             if con == '':
                                 tmppath = self.DIR + entry_inode_path
-                                if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                     if not os.path.isfile(spaces_file):
                                         f = open(spaces_file, 'tw', encoding='utf-8')
@@ -274,7 +274,7 @@ class Extractor(object):
                                         '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
                             else:
                                 tmppath = self.DIR + entry_inode_path
-                                if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                     if not os.path.isfile(spaces_file):
                                         f = open(spaces_file, 'tw', encoding='utf-8')
@@ -296,7 +296,7 @@ class Extractor(object):
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                         if cap == '' and con == '':
                             tmppath = self.DIR + entry_inode_path
-                            if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                            if tmppath.find(' ', 1, len(tmppath)) > 0:
                                 spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                 if not os.path.isfile(spaces_file):
                                     f = open(spaces_file, 'tw', encoding='utf-8')
@@ -312,7 +312,7 @@ class Extractor(object):
                         else:
                             if cap == '':
                                 tmppath = self.DIR + entry_inode_path
-                                if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                     if not os.path.isfile(spaces_file):
                                         f = open(spaces_file, 'tw', encoding='utf-8')
@@ -326,12 +326,12 @@ class Extractor(object):
                                     self.fsconfig.append(
                                         '%s %s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode, link_target))
                                 for fuk_symb in fuking_symbols:
-                                    tmppath = tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                                    tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                                 self.context.append('/%s %s' % (tmppath, con))
                             else:
                                 if con == '':
                                     tmppath = self.DIR + entry_inode_path
-                                    if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                    if tmppath.find(' ', 1, len(tmppath)) > 0:
                                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                         if not os.path.isfile(spaces_file):
                                             f = open(spaces_file, 'tw', encoding='utf-8')
@@ -347,7 +347,7 @@ class Extractor(object):
                                             self.DIR + entry_inode_path, uid, gid, mode + cap, link_target))
                                 else:
                                     tmppath = self.DIR + entry_inode_path
-                                    if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                    if tmppath.find(' ', 1, len(tmppath)) > 0:
                                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                         if not os.path.isfile(spaces_file):
                                             f = open(spaces_file, 'tw', encoding='utf-8')
@@ -416,7 +416,7 @@ class Extractor(object):
                                 else:
                                     if cap == '':
                                         tmppath = self.DIR + entry_inode_path
-                                        if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                        if tmppath.find(' ', 1, len(tmppath)) > 0:
                                             spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                             if not os.path.isfile(spaces_file):
                                                 f = open(spaces_file, 'tw', encoding='utf-8')
@@ -452,7 +452,7 @@ class Extractor(object):
                                                     self.DIR + entry_inode_path, uid, gid, mode + cap, link_target))
                                         else:
                                             tmppath = self.DIR + entry_inode_path
-                                            if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                            if tmppath.find(' ', 1, len(tmppath)) > 0:
                                                 spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                                 if not os.path.isfile(spaces_file):
                                                     f = open(spaces_file, 'tw', encoding='utf-8')
@@ -579,10 +579,10 @@ class Extractor(object):
         self.OUTPUT_IMAGE_FILE = target.replace(".img", ".raw.img")
 
     def fixmoto(self, input_file):
-        if os.path.exists(input_file) == False:
+        if not os.path.exists(input_file):
             return
         output_file = input_file + "_"
-        if os.path.exists(output_file) == True:
+        if os.path.exists(output_file):
             try:
                 os.remove(output_file)
             except:
