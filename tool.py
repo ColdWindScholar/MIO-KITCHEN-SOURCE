@@ -48,7 +48,7 @@ setfile = elocal + os.sep + "bin" + os.sep + "setting.ini"
 modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
 win = Tk()
 start = dti()
-win.title('MIO-KITCHEN')
+win.title('OPEN-MIO-KITCHEN')
 dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -87,15 +87,6 @@ class lang(object):
     def __init__(self):
         pass
 
-    """
-    恭喜你 破解了本软件！但是，您的行为已经违反了用户协议，如果传播，分享本软件源码，
-    你将会负有法律责任，请于24小时内删除本程序破解文件及相关源码
-    ——————————————————————————————————————————————————————————————————
-    Congratulations on cracking this software! However, your behavior has violated the user agreement.
-    If you spread or share the source code of this software,
-    You will bear legal responsibility. 
-    Please delete the cracked files and related source code of this program within 24 hours.
-    """
 
 
 def load(name):
