@@ -1858,10 +1858,7 @@ def gettype(file) -> str:
     def compare(header: bytes, number: int = 0) -> int:
         with open(file, 'rb') as f:
             f.seek(number)
-            if f.read(len(header)) == header:
-                return 1
-            else:
-                return 0
+            return f.read(len(header)) == header
 
     def is_super(fil) -> any:
         with open(fil, 'rb') as file_:
