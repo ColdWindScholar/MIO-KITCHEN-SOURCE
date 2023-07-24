@@ -14,7 +14,7 @@ class handle:
         with open(self.file_, 'r', encoding='utf-8') as f:
             return f.readlines()
 
-    def write(self, new_data):
+    def write(self, new_data) -> int:
         if len(new_data) == len(self.data):
             print("No need to handle")
             return 1
