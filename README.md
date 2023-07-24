@@ -13,7 +13,7 @@ The Rom Tool Use python language
 python tool.py
 # if you want pack as exe
 # you can
-pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
+# pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
 ```
 # About
 ### Written by MIO-KITCHEN-TEAM
