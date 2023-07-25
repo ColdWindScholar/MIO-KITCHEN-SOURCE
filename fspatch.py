@@ -46,10 +46,8 @@ def islink(file):
     if os.name == 'nt':
         if not os.path.isdir(file):
             with open(file, 'rb') as f:
-                magic = f.read(12)
-                if magic == b'!<symlink>\xff\xfe':
-                    point = f.read()
-                    return point.decode("utf-8").replace('\x00', '')
+                if f.read(12) == b'!<symlink>\xff\xfe':
+                    return f.read().decode("utf-8").replace('\x00', '')
                 else:
                     return False
     elif os.name == 'posix':
