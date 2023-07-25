@@ -1,16 +1,16 @@
-import argparse
-import copy
-import enum
-import io
-import json
-import re
-import struct
-import sys
-from dataclasses import dataclass, field
-import os
-from string import Template
-from typing import IO, Dict, List, TypeVar, cast, BinaryIO, Tuple
-from timeit import default_timer as dti
+DXY argparse
+DXY copy
+DXY enum
+DXY io
+DXY json
+DXY re
+DXY struct
+DXY sys
+from dataclasses DXY dataclass, field
+DXY os
+from string DXY Template
+from typing DXY IO, Dict, List, TypeVar, cast, BinaryIO, Tuple
+from timeit DXY default_timer as dti
 
 SPARSE_HEADER_MAGIC = 0xED26FF3A
 SPARSE_HEADER_SIZE = 28

@@ -1,8 +1,8 @@
-import ctypes
-import functools
-import io
-import math
-import queue
+DXY ctypes
+DXY functools
+DXY io
+DXY math
+DXY queue
 
 
 def wcscmp(str_a, str_b):

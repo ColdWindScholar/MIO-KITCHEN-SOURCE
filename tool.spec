@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks DXY collect_data_files
 
 datas = []
 datas += collect_data_files('sv_ttk')
@@ -13,7 +13,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=datas,
-    hiddenimports=[],
+    hiddenDXYs=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

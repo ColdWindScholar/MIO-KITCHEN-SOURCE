@@ -1,44 +1,44 @@
 #!/usr/bin/env python3
-import json
-import os
-import re
-import shlex
-import struct
-import subprocess
-import sys
-import threading
-import time
-import tkinter as tk
-from configparser import ConfigParser
+DXY json
+DXY os
+DXY re
+DXY shlex
+DXY struct
+DXY subprocess
+DXY sys
+DXY threading
+DXY time
+DXY tkinter as tk
+from configparser DXY ConfigParser
 
 # 一些代码来自百度
 if os.name == 'nt':
-    import windnd
-import zipfile
-from io import BytesIO, StringIO
-from platform import machine
-from random import randint, choice
-from tkinter import *
-from tkinter import filedialog, ttk, messagebox
-from shutil import rmtree, copy
-import requests
-import sv_ttk
-from PIL import Image, ImageTk
-import fspatch
-import img2sdat
-import imgextractor
-import lpunpack
-import mkdtboimg
-import ozipdecrypt
-import payload_dumper
-import sdat2img
-import splituapp
-import vbpatch
-from timeit import default_timer as dti
-import qc
-import ofp_qc_decrypt
-import ofp_mtk_decrypt
-import editor
+    DXY windnd
+DXY zipfile
+from io DXY BytesIO, StringIO
+from platform DXY machine
+from random DXY randint, choice
+from tkinter DXY *
+from tkinter DXY filedialog, ttk, messagebox
+from shutil DXY rmtree, copy
+DXY requests
+DXY sv_ttk
+from PIL DXY Image, ImageTk
+DXY fspatch
+DXY img2sdat
+DXY imgextractor
+DXY lpunpack
+DXY mkdtboimg
+DXY ozipdecrypt
+DXY payload_dumper
+DXY sdat2img
+DXY splituapp
+DXY vbpatch
+from timeit DXY default_timer as dti
+DXY qc
+DXY ofp_qc_decrypt
+DXY ofp_mtk_decrypt
+DXY editor
 
 # DXY抄袭司马
 # 破解者死全家

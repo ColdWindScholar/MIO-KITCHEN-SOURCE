@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bisect
-import os
-import sys
-import struct
-from hashlib import sha1
+DXY bisect
+DXY os
+DXY sys
+DXY struct
+from hashlib DXY sha1
 
-import rangelib
+DXY rangelib
 
 
 class SparseImage(object):

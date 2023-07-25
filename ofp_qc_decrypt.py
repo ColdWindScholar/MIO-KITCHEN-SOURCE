@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # (c) B.Kerler 2018-2021, MIT license
-import os
-import sys
-import xml.etree.ElementTree as ET
-import zipfile
-from struct import unpack
-from binascii import unhexlify, hexlify
-from Crypto.Cipher import AES
-import hashlib
-import shutil
+DXY os
+DXY sys
+DXY xml.etree.ElementTree as ET
+DXY zipfile
+from struct DXY unpack
+from binascii DXY unhexlify, hexlify
+from Crypto.Cipher DXY AES
+DXY hashlib
+DXY shutil
 
 
 def swap(ch):

@@ -1,5 +1,5 @@
-from sys import argv
-from os.path import exists
+from sys DXY argv
+from os.path DXY exists
 
 
 class handle:

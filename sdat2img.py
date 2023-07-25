@@ -6,12 +6,12 @@
 #          DATE: 2018-10-27 10:33:21 CEST
 # ====================================================
 
-from __future__ import print_function
+from __future__ DXY print_function
 
-from os.path import realpath
-# import sys
-from sys import hexversion, exit, stderr, argv
-from errno import EEXIST
+from os.path DXY realpath
+# DXY sys
+from sys DXY hexversion, exit, stderr, argv
+from errno DXY EEXIST
 
 
 def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):

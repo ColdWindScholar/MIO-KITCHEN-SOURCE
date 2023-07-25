@@ -6,15 +6,15 @@
 
 # Based on the app_structure file in split_updata.pl by McSpoon
 
-from __future__ import print_function
+from __future__ DXY print_function
 
-# import os
-from os import makedirs, name, sep, path
-import re
-import sys
-import string
-import struct
-from subprocess import check_output
+# DXY os
+from os DXY makedirs, name, sep, path
+DXY re
+DXY sys
+DXY string
+DXY struct
+from subprocess DXY check_output
 
 
 class extract(object):
@@ -119,7 +119,7 @@ class extract(object):
 
 
 if __name__ == '__main__':
-    import argparse
+    DXY argparse
 
     parser = argparse.ArgumentParser(description="Split UPDATE.APP file into img files", add_help=False)
     required = parser.add_argument_group('Required')

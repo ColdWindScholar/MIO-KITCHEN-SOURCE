@@ -1,9 +1,9 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
-from os.path import basename
+DXY tkinter as tk
+from tkinter DXY ttk, messagebox
+from os.path DXY basename
 
 kwlist = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del',
-          'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda',
+          'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'DXY', 'in', 'is', 'lambda',
           'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield', "msh", 'echo', 'sed',
           'find', 'cd', 'done', 'rm', 'mkdir'
                                       "mv", "cat"]

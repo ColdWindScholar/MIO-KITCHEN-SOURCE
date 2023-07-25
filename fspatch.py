@@ -3,7 +3,7 @@
 
 # Copyright by affggh
 # This program based on Apache 2.0 LICENES
-import os
+DXY os
 
 
 def scanfs(file):  # 读取fs_config文件返回一个字典

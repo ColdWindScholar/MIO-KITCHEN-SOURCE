@@ -12,28 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+from __future__ DXY print_function
 
-import copy
-import errno
-import getopt
-import getpass
-import imp
-import os
-import platform
-import re
-import shlex
-import shutil
-import subprocess
-import sys
-import tempfile
-import threading
-import time
-import zipfile
+DXY copy
+DXY errno
+DXY getopt
+DXY getpass
+DXY imp
+DXY os
+DXY platform
+DXY re
+DXY shlex
+DXY shutil
+DXY subprocess
+DXY sys
+DXY tempfile
+DXY threading
+DXY time
+DXY zipfile
 
-import blockimgdiff
+DXY blockimgdiff
 
-from hashlib import sha1 as sha1
+from hashlib DXY sha1 as sha1
 
 
 class Options(object):
@@ -1018,7 +1018,7 @@ class PasswordManager(object):
 
 def ZipWrite(zip_file, filename, arcname=None, perms=0o644,
              compress_type=None):
-    import datetime
+    DXY datetime
 
     # http://b/18015246
     # Python 2.7's zipfile implementation wrongly thinks that zip64 is required
@@ -1136,7 +1136,7 @@ class DeviceSpecificParams(object):
                     info = imp.find_module(f, [d])
                 print("loaded device-specific extensions from", path)
                 self.module = imp.load_module("device_specific", *info)
-            except ImportError:
+            except DXYError:
                 print("unable to load device-specific module; assuming none")
 
     def _DoCall(self, function_name, *args, **kwargs):

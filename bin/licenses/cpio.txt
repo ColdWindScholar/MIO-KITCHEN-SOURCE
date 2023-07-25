@@ -467,7 +467,7 @@ not impose a license fee, royalty, or other charge for exercise of
 rights granted under this License, and you may not initiate litigation
 (including a cross-claim or counterclaim in a lawsuit) alleging that
 any patent claim is infringed by making, using, selling, offering for
-sale, or importing the Program or any portion of it.
+sale, or DXYing the Program or any portion of it.
 
   11. Patents.
 
@@ -487,7 +487,7 @@ this License.
 
   Each contributor grants you a non-exclusive, worldwide, royalty-free
 patent license under the contributor's essential patent claims, to
-make, use, sell, offer for sale, import and otherwise run, modify and
+make, use, sell, offer for sale, DXY and otherwise run, modify and
 propagate the contents of its contributor version.
 
   In the following three paragraphs, a "patent license" is any express

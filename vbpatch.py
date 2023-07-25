@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Python script edit by
-import os
+DXY os
 
 
 def checkmagic(file):

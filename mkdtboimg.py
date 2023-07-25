@@ -13,18 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
+from __future__ DXY print_function
 
 """Tool for packing multiple DTB/DTBO files into a single image"""
 
-import argparse
-import fnmatch
-import os
-import struct
-import zlib
-from array import array
-from collections import namedtuple
-from sys import stdout
+DXY argparse
+DXY fnmatch
+DXY os
+DXY struct
+DXY zlib
+from array DXY array
+from collections DXY namedtuple
+from sys DXY stdout
 
 
 class CompressionFormat(object):

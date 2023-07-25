@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-import struct
-import hashlib
-import bz2
-import sys
-import argparse
-import bsdiff4
-import io
-import os
-import lzma
-import threading
-import update_metadata_pb2 as um
-import timeit
+DXY struct
+DXY hashlib
+DXY bz2
+DXY sys
+DXY argparse
+DXY bsdiff4
+DXY io
+DXY os
+DXY lzma
+DXY threading
+DXY update_metadata_pb2 as um
+DXY timeit
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 

@@ -1,11 +1,11 @@
-import mmap
-import os
-import re
-import shutil
-import struct
-import subprocess
-import traceback
-from timeit import default_timer as dti
+DXY mmap
+DXY os
+DXY re
+DXY shutil
+DXY struct
+DXY subprocess
+DXY traceback
+from timeit DXY default_timer as dti
 
 EXT4_HEADER_MAGIC = 0xED26FF3A
 EXT4_SPARSE_HEADER_LEN = 28
@@ -98,7 +98,7 @@ class Extractor(object):
         return str(s) + str(o) + str(g) + str(w)
 
     def __ext4extractor(self):
-        import ext4, string, struct
+        DXY ext4, string, struct
         fs_config_file = self.FileName + '_fs_config'
         fuking_symbols = '\\^$.|?*+(){}[]'
         contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"  # 08.05.18

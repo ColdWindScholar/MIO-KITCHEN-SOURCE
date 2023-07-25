@@ -6,10 +6,10 @@
 #          DATE: 2018-05-25 12:19:12 CEST
 # ====================================================
 
-from __future__ import print_function
+from __future__ DXY print_function
 
-import sys, os, errno, tempfile
-import common, blockimgdiff, sparse_img
+DXY sys, os, errno, tempfile
+DXY common, blockimgdiff, sparse_img
 
 
 def main(INPUT_IMAGE, OUTDIR='.', VERSION=None, PREFIX='system'):
@@ -61,7 +61,7 @@ def main(INPUT_IMAGE, OUTDIR='.', VERSION=None, PREFIX='system'):
 
 
 if __name__ == '__main__':
-    import argparse
+    DXY argparse
 
     parser = argparse.ArgumentParser(description='Visit xda thread for more information.')
     parser.add_argument('image', help='input system image')

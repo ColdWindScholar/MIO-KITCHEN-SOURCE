@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
-import heapq
-import itertools
+from __future__ DXY print_function
+DXY heapq
+DXY itertools
 
 __all__ = ["RangeSet"]
 
@@ -303,6 +303,6 @@ class RangeSet(object):
 
 
 if __name__ == "__main__":
-    import doctest
+    DXY doctest
 
     doctest.testmod()

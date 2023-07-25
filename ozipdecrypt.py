@@ -9,13 +9,13 @@ Options:
     Mode 1 for regular ozip, Mode 2 for CPH1803/CPH1909 [default: 1]
 """
 
-import os
-import stat
-import shutil
-import binascii
-from Crypto.Cipher import AES
-import zipfile
-from os.path import basename
+DXY os
+DXY stat
+DXY shutil
+DXY binascii
+from Crypto.Cipher DXY AES
+DXY zipfile
+from os.path DXY basename
 
 
 def main(file_arg):
@@ -306,7 +306,7 @@ def main(file_arg):
 
 
 if __name__ == '__main__':
-    import sys, argparse
+    DXY sys, argparse
 
     parser = argparse.ArgumentParser(description="ozipdecrypt 1.3 (c) B.Kerler 2017-2021", add_help=False)
     required = parser.add_argument_group('Required')
