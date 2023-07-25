@@ -42,7 +42,7 @@ def scanfsdir(folder) -> bool and list:  # 读取解包的目录，返回一个�
     return allfile
 
 
-def islink(file):
+def islink(file) -> str and bool:
     if os.name == 'nt':
         if not os.path.isdir(file):
             with open(file, 'rb') as f:
