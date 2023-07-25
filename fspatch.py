@@ -20,7 +20,7 @@ def scanfs(file):  # 读取fs_config文件返回一个字典
     return fsconfig
 
 
-def scanfsdir(folder):  # 读取解包的目录，返回一个字典
+def scanfsdir(folder) -> bool and list:  # 读取解包的目录，返回一个字典
     allfile = ['/']
     if os.name == 'nt':
         allfile.append(os.path.basename(folder).replace('\\', ''))
@@ -28,7 +28,7 @@ def scanfsdir(folder):  # 读取解包的目录，返回一个字典
         allfile.append(os.path.basename(folder).replace('/', ''))
     else:
         return False
-    for root, dirs, files in os.walk(folder):
+    for root, dirs, files in os.walk(folder, topdown=True):
         for dir in dirs:
             if os.name == 'nt':
                 allfile.append(os.path.join(root, dir).replace(folder, os.path.basename(folder)).replace('\\', '/'))
