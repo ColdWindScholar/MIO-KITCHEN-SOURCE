@@ -66,9 +66,9 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i)
             if os.path.isdir(filepath):
                 uid = '0'
-                if i.find("system/bin") != -1 or i.find("system/xbin") != -1:
+                if "system/bin" in i or "system/xbin" in i:
                     gid = '2000'
-                elif i.find("vendor/bin") != -1:
+                elif "vendor/bin" in i:
                     gid = '2000'
                 else:
                     gid = '0'
@@ -76,7 +76,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 config = [uid, gid, mode]
             elif islink(filepath):
                 uid = '0'
-                if (i.find("system/bin") != -1) or (i.find("system/xbin") != -1) or (i.find("vendor/bin") != -1):
+                if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
                     gid = '2000'
                 else:
                     gid = '0'
