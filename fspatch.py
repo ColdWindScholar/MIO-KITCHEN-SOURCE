@@ -80,7 +80,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                     gid = '2000'
                 else:
                     gid = '0'
-                if (i.find("/bin") != -1) or (i.find("/xbin") != -1):
+                if ("/bin" in i) or ("/xbin" in i):
                     mode = '0755'
                 elif i.find(".sh") != -1:
                     mode = "0750"
@@ -88,9 +88,9 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                     mode = "0644"
                 link = islink(filepath)
                 config = [uid, gid, mode, link]
-            elif (i.find("/bin") != -1) or (i.find("/xbin") != -1):
+            elif ("/bin" in i) or ("/xbin" in i):
                 uid = '0'
-                if (i.find("system/bin") != -1) or (i.find("system/xbin") != -1) or (i.find("vendor/bin") != -1):
+                if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
                     gid = '2000'
                 else:
                     gid = '0'
@@ -100,7 +100,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 else:
                     for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemonsu", "ext/.su", "install-recovery",
                               'installed_su_daemon']:
-                        if i.find(s) != -1:
+                        if s in i:
                             mode = "0755"
                 config = [uid, gid, mode]
             else:
