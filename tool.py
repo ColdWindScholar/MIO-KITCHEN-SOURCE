@@ -83,10 +83,7 @@ class jzxs(object):
 
 
 # 打包设置变量
-class lang(object):
-    def __init__(self):
-        pass
-
+class lang(object):pass
 
 
 def load(name):
