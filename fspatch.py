@@ -1,30 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright by affggh
+# Copyright by affggh MIO
 # This program based on Apache 2.0 LICENES
 import os
 
 
 def scanfs(file):  # 读取fs_config文件返回一个字典
-    fsfile = open(file, "r")
     fsconfig = {}
-    for i in fsfile.readlines():
-        filepath = i.split(' ')[0]
-        uid = i.split(' ')[1]
-        gid = i.split(' ')[2]
-        mode = i.split(' ')[3]
-        if len(i.split(' ')) > 4:
-            link = i.split(' ')[4].replace('\n', '')
-            fsconfig[filepath] = [uid, gid, mode, link]
-        else:
-            fsconfig[filepath] = [uid, gid, mode.replace('\n', '')]
+    with open(file, "r") as fsfile:
+        for i in fsfile.readlines():
+            i_ = i.replace('\n', '')
+            if len(i.split()) > 4:
+                filepath, uid, gid, mode, link = i_.split()
+                fsconfig[filepath] = [uid, gid, mode, link]
+            else:
+                filepath, uid, gid, mode = i_.split()
+                fsconfig[filepath] = [uid, gid, mode]
     return fsconfig
 
 
 def scanfsdir(folder):  # 读取解包的目录，返回一个字典
-    allfile = []
-    allfile.append('/')
+    allfile = ['/']
     if os.name == 'nt':
         allfile.append(os.path.basename(folder).replace('\\', ''))
     elif os.name == 'posix':
@@ -55,7 +52,7 @@ def islink(file):
                     return point.decode("utf-8").replace('\x00', '')
                 else:
                     return False
-    if os.name == 'posix':
+    elif os.name == 'posix':
         if os.path.islink(file):
             return os.readlink(file)
         else:
@@ -106,7 +103,8 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 if i.find(".sh") != -1:
                     mode = "0750"
                 else:
-                    for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemonsu", "ext/.su", "install-recovery", 'installed_su_daemon']:
+                    for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemonsu", "ext/.su", "install-recovery",
+                              'installed_su_daemon']:
                         if i.find(s) != -1:
                             mode = "0755"
                 config = [uid, gid, mode]
