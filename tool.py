@@ -39,7 +39,7 @@ import qc
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
-
+# 欢迎各位大佬提PR
 config = ConfigParser()
 elocal = os.getcwd()
 setfile = elocal + os.sep + "bin" + os.sep + "setting.ini"
