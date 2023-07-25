@@ -115,11 +115,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
 def writetofile(file, newfsconfig):
     with open(file, "w") as f:
         for i in list(sorted(newfsconfig.keys())):
-            if len(newfsconfig[i]) < 4:
-                fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]}\n'
-            else:
-                fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]} {newfsconfig[i][3]}\n'
-            f.write(fs)
+            f.write(' '.join(newfsconfig[i])+'\n')
 
 
 def main(dirpath, fsconfig):
