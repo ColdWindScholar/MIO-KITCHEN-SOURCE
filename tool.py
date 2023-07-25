@@ -2404,16 +2404,12 @@ ttk.Button(rzf, text=lang.text107, command=lambda: CallZ(handle_log().uploadlog)
 rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
 # 项目列表的控件
 sys.stdout = StdoutRedirector(show)
-zyf = ttk.LabelFrame(tab, text='天气')
-zyf.pack(padx=10, pady=10)
 zyf1 = ttk.LabelFrame(tab, text=lang.text9)
 zyf1.pack(padx=10, pady=10)
 ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(side='left',
                                                                               padx=10,
                                                                               pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: CallZ(DownloadFile)).pack(side='left', padx=10, pady=10)
-# ttk.Label(tab,text=requests.get("https://v1.hitokoto.cn/?c=f&encode=text").content.decode(),font=('楷书',
-# 10)).pack(padx=10, pady=10) 项目菜单的控件
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
 info = ttk.LabelFrame(tab2, text="Rom信息")
 frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
