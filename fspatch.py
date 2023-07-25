@@ -122,7 +122,6 @@ def writetofile(file, newfsconfig):
                 fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]}\n'
             else:
                 fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]} {newfsconfig[i][3]}\n'
-            print(f"Add {fs}")
             f.write(fs)
 
 
