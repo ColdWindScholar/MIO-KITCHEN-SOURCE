@@ -48,7 +48,7 @@ setfile = elocal + os.sep + "bin" + os.sep + "setting.ini"
 modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
 win = Tk()
 start = dti()
-win.title('MIO-KITCHEN')
+win.title('DXY-KITCHEN')
 dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -231,7 +231,7 @@ def upgrade():
     ck.title("检查更新")
     data = requests.get(update_url + "update.json").content.decode()
     up = json.loads(data)
-    Label(ck, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=5, pady=5)
+    Label(ck, text="DXY-KITCHEN", font=('楷书', 30)).pack(padx=5, pady=5)
     ttk.Separator(ck, orient=HORIZONTAL).pack(padx=30, fill=X)
     if up['version'] != VERSION:
         Label(ck, text="发现新版本：%s" % (up['version']), font=('楷书', 15), fg='green').pack(padx=5, pady=5)
@@ -1481,7 +1481,7 @@ class StdoutRedirector(object):
 
     @staticmethod
     def flush() -> str:
-        return "MIO-KITCHEN"
+        return "DXY-KITCHEN"
 
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
@@ -2402,7 +2402,7 @@ def sdxz(n):
 
 notepad.pack(fill=BOTH)
 rzf = ttk.Frame(subwin3)
-tsk = Label(subwin3, text="MIO-KITCHEN", font=('楷书', 15))
+tsk = Label(subwin3, text="DXY-KITCHEN", font=('楷书', 15))
 tsk.bind('<Button-1>')
 tsk.pack(padx=10, pady=10, side='top')
 tr = ttk.LabelFrame(subwin3, text=lang.text131)
@@ -2528,7 +2528,7 @@ sf1.pack(padx=10, pady=10, fill='both')
 sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
 # 关于我们
-Label(tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
+Label(tab4, text="DXY-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
 Label(tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
 ttk.Separator(tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
 Label(tab4,
