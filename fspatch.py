@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-# Copyright by affggh MIO
-# This program based on Apache 2.0 LICENES
 import os
 
 
