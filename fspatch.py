@@ -119,10 +119,9 @@ def writetofile(file, newfsconfig):
     with open(file, "w") as f:
         for i in list(sorted(newfsconfig.keys())):
             if len(newfsconfig[i]) < 4:
-                fs = i + ' ' + newfsconfig[i][0] + ' ' + newfsconfig[i][1] + ' ' + newfsconfig[i][2] + "\n"
+                fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]}\n'
             else:
-                fs = i + ' ' + newfsconfig[i][0] + ' ' + newfsconfig[i][1] + ' ' + newfsconfig[i][2] + ' ' + \
-                     newfsconfig[i][3] + "\n"
+                fs = f'{i} {newfsconfig[i][0]} {newfsconfig[i][1]} {newfsconfig[i][2]} {newfsconfig[i][3]}\n'
             f.write(fs)
 
 

@@ -40,8 +40,6 @@ import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
 
-# DXY抄袭司马
-# 破解者死全家
 config = ConfigParser()
 elocal = os.getcwd()
 setfile = elocal + os.sep + "bin" + os.sep + "setting.ini"
