@@ -869,25 +869,18 @@ class mpkman(object):
             def exit(value):
                 raise ModuleError(value)
 
-            def sif(self, mode, var, other):
-                if mode == 'exist':
-                    if os.path.exists(var):
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-                elif mode == '!exist':
-                    if not os.path.exists(var):
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-                elif mode == "equ":
-                    if var.split('--')[0] == var.split('--')[1]:
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-                elif mode == "!equ":
-                    if var.split('--')[0] != var.split('--')[1]:
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-                elif mode == "gettype":
-                    if gettype(var.split('--')[0]) == var.split('--')[1]:
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-                elif mode == "!gettype":
-                    if gettype(var.split('--')[0]) != var.split('--')[1]:
-                        getattr(self, other.split()[0])(other[other.index(' ') + 1:])
+            def sif(self, mode, var_, other):
+                modes = {
+                    'exist': lambda var: os.path.exists(var),
+                    '!exist': lambda var: not os.path.exists(var),
+                    'equ': lambda var: var.split('--')[0] == var.split('--')[1],
+                    '!equ': lambda var: var.split('--')[0] != var.split('--')[1],
+                    'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1],
+                    '!gettype': lambda var: gettype(var.split('--')[0]) != var.split('--')[1]
+                }
+
+                if modes[mode](var_):
+                    getattr(self, other.split()[0])(other[other.index(' ') + 1:])
 
         class parse(Toplevel):
 
