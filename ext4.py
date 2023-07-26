@@ -629,7 +629,7 @@ class Inode:
                 xattr_value = raw_data[
                               xattr_entry.e_value_offs + offset: xattr_entry.e_value_offs + offset + xattr_entry.e_value_size]
 
-            yield (xattr_name, xattr_value)
+            yield xattr_name, xattr_value
 
             i += xattr_entry._size
 

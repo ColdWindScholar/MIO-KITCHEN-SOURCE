@@ -9,13 +9,13 @@ Options:
     Mode 1 for regular ozip, Mode 2 for CPH1803/CPH1909 [default: 1]
 """
 
-import os
-import stat
-import shutil
 import binascii
-from Crypto.Cipher import AES
+import os
+import shutil
+import stat
 import zipfile
-from os.path import basename
+
+from Crypto.Cipher import AES
 
 
 def main(file_arg):

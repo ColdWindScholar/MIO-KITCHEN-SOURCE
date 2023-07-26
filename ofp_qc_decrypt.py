@@ -292,7 +292,7 @@ def main(filename, outdir):
         if rf.read(2) == b"PK":
             pk = True
 
-    if pk == True:
+    if pk:
         print("Zip file detected, trying to decrypt files")
         zippw = bytes("flash@realme$50E7F7D847732396F1582CD62DD385ED7ABB0897", 'utf-8')
         with zipfile.ZipFile(filename) as file:
