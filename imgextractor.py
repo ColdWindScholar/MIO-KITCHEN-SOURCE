@@ -400,7 +400,7 @@ class Extractor(object):
                             if link_target and all(c in string.printable for c in link_target):
                                 if cap == '' and con == '':
                                     tmppath = self.DIR + entry_inode_path
-                                    if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                    if tmppath.find(' ', 1, len(tmppath)) > 0:
                                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                         if not os.path.isfile(spaces_file):
                                             f = open(spaces_file, 'tw', encoding='utf-8')
@@ -436,7 +436,7 @@ class Extractor(object):
                                     else:
                                         if con == '':
                                             tmppath = self.DIR + entry_inode_path
-                                            if (tmppath).find(' ', 1, len(tmppath)) > 0:
+                                            if tmppath.find(' ', 1, len(tmppath)) > 0:
                                                 spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                                 if not os.path.isfile(spaces_file):
                                                     f = open(spaces_file, 'tw', encoding='utf-8')

@@ -101,7 +101,7 @@ class SparseImage(object):
             elif chunk_type == 0xCAC3:
                 if data_sz != 0:
                     raise ValueError("Don't care chunk input size is non-zero (%u)" %
-                                     (data_sz))
+                                     data_sz)
                 else:
                     pos += chunk_sz
 
