@@ -421,7 +421,7 @@ class Extractor(object):
                                             if not os.path.isfile(spaces_file):
                                                 f = open(spaces_file, 'tw', encoding='utf-8')
                                                 self.__appendf(tmppath, spaces_file)
-                                                f.close
+                                                f.close()
                                             else:
                                                 self.__appendf(tmppath, spaces_file)
                                             tmppath = tmppath.replace(' ', '_')
@@ -441,7 +441,7 @@ class Extractor(object):
                                                 if not os.path.isfile(spaces_file):
                                                     f = open(spaces_file, 'tw', encoding='utf-8')
                                                     self.__appendf(tmppath, spaces_file)
-                                                    f.close
+                                                    f.close()
                                                 else:
                                                     self.__appendf(tmppath, spaces_file)
                                                 tmppath = tmppath.replace(' ', '_')
@@ -457,7 +457,7 @@ class Extractor(object):
                                                 if not os.path.isfile(spaces_file):
                                                     f = open(spaces_file, 'tw', encoding='utf-8')
                                                     self.__appendf(tmppath, spaces_file)
-                                                    f.close
+                                                    f.close()
                                                 else:
                                                     self.__appendf(tmppath, spaces_file)
                                                 tmppath = tmppath.replace(' ', '_')
