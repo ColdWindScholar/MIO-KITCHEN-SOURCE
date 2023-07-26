@@ -39,6 +39,7 @@ import qc
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
+
 # 欢迎各位大佬提PR
 config = ConfigParser()
 elocal = os.getcwd()
@@ -81,7 +82,7 @@ class jzxs(object):
 
 
 # 打包设置变量
-class lang(object):pass
+class lang(object): pass
 
 
 def load(name):

@@ -1089,7 +1089,8 @@ class BlockImageDiff(object):
                             intersections.add(b)
 
             for b in intersections:
-                if a is b: continue
+                if a is b:
+                    continue
 
                 # If the blocks written by A are read by B, then B needs to go before A.
                 i = a.tgt_ranges.intersect(b.src_ranges)
