@@ -844,7 +844,7 @@ class mpkman(object):
             def msh(cmd):
                 try:
                     cmd_, argv = cmd.split()
-                except:
+                except Exception:
                     raise ModuleError("MSH解释器: 不支持的命令 %s" % cmd)
                 if cmd_ == 'run':
                     if not os.path.exists(argv.replace("\\", '/')):
@@ -2389,7 +2389,8 @@ tr = ttk.LabelFrame(subwin3, text=lang.text131)
 Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
 tr.bind('<Button-1>', sdxz)
 tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
-if os.name == 'nt': windnd.hook_dropfiles(tr, func=dndfile)
+if os.name == 'nt':
+    windnd.hook_dropfiles(tr, func=dndfile)
 show = Text(rzf)
 show.pack(side=LEFT, fill=BOTH, expand=True)
 ttk.Button(rzf, text=lang.text105, command=lambda: show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
