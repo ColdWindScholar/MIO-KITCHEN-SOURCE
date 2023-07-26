@@ -385,7 +385,7 @@ class LpMetadataBlockDevice(LpMetadataBase):
 
               Alignment is normally determined at runtime when growing or adding
               partitions. If for some reason the alignment cannot be determined, then
-              this predefined alignment in the geometry is used instead. By default it is set to 1MiB.
+              this predefined alignment in the geometry is used instead. By default, it is set to 1MiB.
 
     Offset 12: Alignment offset for "stacked" devices. For example, if the "super"
                partition itself is not aligned within the parent block device's
@@ -872,7 +872,7 @@ def create_parser():
         '-p',
         '--partition',
         dest='NAME',
-        type=lambda x: re.split("\W+", x),
+        type=lambda x: re.split("\w+", x),
         help='Extract the named partition. This can be specified multiple times or through the delimiter [","  ":"]'
     )
     _parser.add_argument(

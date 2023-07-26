@@ -441,7 +441,7 @@ class BlockImageDiff(object):
                         stashes[sh] -= 1
                         if stashes[sh] == 0:
                             free_size += sr.size()
-                            free_string.append("free %s\n" % (sh))
+                            free_string.append("free %s\n" % sh)
                             stashes.pop(sh)
                     heapq.heappush(free_stash_ids, sid)
 
