@@ -20,9 +20,9 @@ __all__ = ["RangeSet"]
 
 
 class RangeSet(object):
-    """A RangeSet represents a set of nonoverlapping ranges on the
+    """A RangeSet represents a set of non-overlapping ranges on the
   integers (ie, a set of integers, but efficient when the set contains
-  lots of runs."""
+  lots of runs.)"""
 
     def __init__(self, data=None):
         self.monotonic = False
@@ -62,7 +62,7 @@ class RangeSet(object):
         """Parse a text string consisting of a space-separated list of
     blocks and ranges, eg "10-20 30 35-40".  Ranges are interpreted to
     include both their ends (so the above example represents 18
-    individual blocks.  Returns a RangeSet object.
+    individual blocks.  Returns a RangeSet object.)
 
     If the input has all its blocks in increasing order, then returned
     RangeSet will have an extra attribute 'monotonic' that is set to
