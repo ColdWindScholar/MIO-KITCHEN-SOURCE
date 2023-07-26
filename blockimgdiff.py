@@ -14,10 +14,7 @@
 
 from __future__ import print_function
 
-from collections import deque, OrderedDict
-from hashlib import sha1
 import array
-import common
 import functools
 import heapq
 import itertools
@@ -25,10 +22,12 @@ import multiprocessing
 import os
 import re
 import subprocess
-import threading
-import time
 import tempfile
+import threading
+from collections import deque, OrderedDict
+from hashlib import sha1
 
+import common
 from rangelib import RangeSet
 
 __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
@@ -1074,7 +1073,7 @@ class BlockImageDiff(object):
                         source_ranges[i] = b
                     else:
                         if not isinstance(source_ranges[i], set):
-                            source_ranges[i] = set([source_ranges[i]])
+                            source_ranges[i] = {source_ranges[i]}
                         source_ranges[i].add(b)
 
         for a in self.transfers:
