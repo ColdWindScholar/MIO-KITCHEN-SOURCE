@@ -19,10 +19,6 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
 
     if hexversion < 0x02070000:
         print(stderr, "Python 2.7 or newer is required.")
-        try:
-            input = input
-        except NameError:
-            pass
         input('Press ENTER to exit...')
         exit(1)
     else:

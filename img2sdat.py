@@ -29,10 +29,6 @@ def main(INPUT_IMAGE, OUTDIR='.', VERSION=None, PREFIX='system'):
             3. Android Marshmallow 6.0
             4. Android Nougat 7.0/7.1/8.0/8.1
             ''')
-            try:
-                input = input
-            except NameError:
-                pass
             item = input('Choose system version: ')
             if item == '1':
                 VERSION = 1
