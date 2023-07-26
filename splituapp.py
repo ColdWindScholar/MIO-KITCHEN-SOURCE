@@ -21,8 +21,7 @@ class extract(object):
     def __init__(self, source, flist):
         def cmd(command):
             try:
-                test1 = check_output(command)
-                test1 = test1.strip().decode()
+                test1 = check_output(command).strip().decode()
             except:
                 test1 = ''
 
