@@ -3,5 +3,5 @@ Pillow
 protobuf==3.20.1
 pycryptodome==3.18.0
 Requests==2.31.0
-sv_ttk==2.5.1
-windnd==1.0.7
+sv_ttk
+windnd
