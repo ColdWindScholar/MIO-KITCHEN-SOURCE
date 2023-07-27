@@ -57,7 +57,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            tag_name: CI_BUILD
+            tag_name: "CI_BUILD_${{ github.run_number }}"
             name: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
             body: |
                  Changelog: ${{ steps.commit_message.outputs.message }}
