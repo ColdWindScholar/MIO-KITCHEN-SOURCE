@@ -30,7 +30,15 @@ jobs:
       - name: Install Packages
         run: pip install -r requirements.txt
       - name: Pack tool
-        run: pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
+        run: |
+             pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
+             move dist/tool.exe ./
+             del *.py
+             del bin/posix_x86_64
+      - name: Build Docker image
+        uses: actions/docker/cli@master
+        with:
+            args: build . -t tool
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -42,5 +50,4 @@ jobs:
             draft: false
             prerelease: false
             files: |
-              dist/tool.exe
-              bin
+              tool.tar
