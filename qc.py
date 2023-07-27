@@ -2,7 +2,7 @@ from sys import argv
 from os.path import exists
 
 
-def handle(file_):
+def handle(file_) -> None:
     if not exists(file_):
         return
     with open(file_, 'rw', encoding='utf-8', newline='\n') as f:
@@ -10,7 +10,7 @@ def handle(file_):
         new_data = sorted(set(data), key=data.index)
         if len(new_data) == len(data):
             print("No need to handle")
-            return 1
+            return
         f.writelines(new_data)
     del data, new_data
 
