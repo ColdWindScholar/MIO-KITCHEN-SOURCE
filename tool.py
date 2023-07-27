@@ -1998,7 +1998,6 @@ def unpack(chose, form: any = None):
                     with open(work + "config" + os.sep + dname + "_fs_config", 'a', encoding='utf-8',
                               newline='\n') as fs:
                         fs.write("/lost+found 0 0 0777\r\n")
-                        fs.close()
                 if os.path.exists(work + dname):
                     try:
                         os.remove(work + dname + ".img")
