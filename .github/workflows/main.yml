@@ -34,10 +34,8 @@ jobs:
              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
              move dist/tool.exe ./
              del *.py
-             del bin/posix_x86_64
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r MIO-KITCHEN.zip .
+             Remove-Item bin/posix_x86_64 -Recurse
+             Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -49,4 +47,4 @@ jobs:
             draft: false
             prerelease: false
             files: |
-              tool.tar
+              MIO-KITCHEN.zip
