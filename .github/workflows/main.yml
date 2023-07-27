@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    with: python-version:3.8.10-i386
     steps:
       - uses: actions/checkout@v3
       - name: "Install Python 3.8.10"
