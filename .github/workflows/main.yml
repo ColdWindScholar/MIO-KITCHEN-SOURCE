@@ -50,7 +50,9 @@ jobs:
       - name: Get last commit message
         id: commit_message
         run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
-
+      - name: Get Version
+        id: tool_version
+        run: echo "::set-output name=version::$(cat G:\pytool\bin\setting.ini | findstr version)"
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         env:
@@ -58,7 +60,10 @@ jobs:
         with:
             tag_name: CI_BUILD
             name: "MIO-KITCHEN-${{ github.run_number }}"
-            body: "${{ steps.commit_message.outputs.message }}"
+            body: |
+                  "Changelog: ${{ steps.commit_message.outputs.message }}"
+                  "Build time: ${{ github.run_number }}"
+                  "${{ steps.tool_version.outputs.version }}"
             #body_path: CHANGELOG.txt
             draft: false
             prerelease: false
