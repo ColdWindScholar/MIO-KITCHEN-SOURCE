@@ -42,6 +42,7 @@ jobs:
              Remove-Item .github -Recurse
              del *.spec
              del *.ico
+             del *.bat
              ls
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Get last commit SHA
