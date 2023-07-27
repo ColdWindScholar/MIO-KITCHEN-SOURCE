@@ -52,7 +52,7 @@ jobs:
         run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
       - name: Get Version
         id: tool_version
-        run: echo "::set-output name=version::$(cat bin\setting.ini | findstr version).Split()[2]"
+        run: echo "::set-output name=version::$(pwsh -c (cat bin\setting.ini | findstr version).Split()[2])"
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         env:
