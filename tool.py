@@ -573,7 +573,6 @@ class mpkman(object):
         rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
         rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
 
-
         class new_(Toplevel):
             def __init__(self):
                 super().__init__()
@@ -2185,7 +2184,7 @@ class handle_log:
     @staticmethod
     def putlog():
         log = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-        with open(local + os.sep + log + v_code() + '.txt', 'w',encoding='utf-8',newline='\n') as f:
+        with open(local + os.sep + log + v_code() + '.txt', 'w', encoding='utf-8', newline='\n') as f:
             f.write(show.get(1.0, END))
         show.delete(1.0, END)
         print(lang.text95 + local + os.sep + log + v_code() + ".txt")
@@ -2260,6 +2259,8 @@ def get_all_file_paths(directory) -> Ellipsis:
 
     # 返回所有文件路径
     return file_paths
+
+
 def setf(n, w):
     config.read(setfile)
     config.set("setting", "%s" % n, "%s" % w)
@@ -2356,7 +2357,7 @@ def dndfile(files):
             print(fi + lang.text84)
 
 
-def sdxz(n):
+def sdxz(**other):
     dndfile(filedialog.askopenfilename().split())
 
 
@@ -2467,7 +2468,8 @@ LB2.bind('<<ComboboxSelected>>', set_theme)
 
 
 def startwjjj(self):
-    if os.name == 'nt': os.startfile(slocal.get())
+    if os.name == 'nt':
+        os.startfile(slocal.get())
 
 
 ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
@@ -2528,7 +2530,7 @@ class format_conversion(Toplevel):
         self.f.pack(side='left', padx=5)
         self.list_b = Listbox(self, highlightthickness=0, activestyle='dotbox', selectmode=MULTIPLE)
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
-        self.relist(self)
+        self.relist()
         ttk.Button(self, text=lang.ok, command=lambda: CallZ(self.conversion)).pack(side=BOTTOM, fill=BOTH)
         jzxs(self)
 
