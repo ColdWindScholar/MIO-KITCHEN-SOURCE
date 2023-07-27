@@ -633,6 +633,7 @@ class Inode:
 
             i += xattr_entry._size
 
+    @staticmethod
     def directory_entry_comparator(dir_a, dir_b):
         file_name_a, _, file_type_a = dir_a
         file_name_b, _, file_type_b = dir_b
@@ -662,7 +663,7 @@ class Inode:
             file_name, inode_idx, file_type = next(
                 filter(lambda entry: entry[0] == part, current_inode.open_dir(decode_name)), (None, None, None))
 
-            if inode_idx == None:
+            if inode_idx is None:
                 current_path = "/".join(relative_path[:i])
                 raise FileNotFoundError("{part!r:s} not found in {current_path!r:s} (Inode {inode:d}).".format(
                     current_path=current_path,
@@ -758,7 +759,7 @@ class Inode:
 
     def open_dir(self, decode_name=None):
         # Parse args
-        if decode_name == None:
+        if decode_name is None:
             decode_name = lambda raw: raw.decode("utf8")
 
         if not self.volume.ignore_flags and not self.is_dir:
