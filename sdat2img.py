@@ -9,7 +9,6 @@
 from __future__ import print_function
 
 from os.path import realpath
-# import sys
 from sys import hexversion, exit, stderr, argv
 from errno import EEXIST
 
@@ -132,10 +131,6 @@ if __name__ == '__main__':
         print('    <system_new_file>: system new dat file')
         print('    [system_img]: output system image\n\n')
         print('Visit xda thread for more information.\n')
-        try:
-            input = input
-        except NameError:
-            pass
         input('Press ENTER to exit...')
         exit()
 

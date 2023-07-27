@@ -8,10 +8,7 @@ def checkmagic(file):
         magic = b'AVB0'
         with open(file, "rb") as f:
             buf = f.read(4)
-            if magic == buf:
-                return True
-            else:
-                return False
+            return magic == buf
     else:
         print("File dose not exist!")
 

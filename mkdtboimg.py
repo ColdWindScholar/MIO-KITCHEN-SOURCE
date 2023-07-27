@@ -790,13 +790,13 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
     if not list:
         raise ValueError('List of dtimages to add to DTBO not provided')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--id',type=str,default=id,action='store')
-    parser.add_argument('--rev',type=str,default=rev,action='store')
-    parser.add_argument('--flags',type=str,default=flags,action='store')
-    parser.add_argument('--custom0',type=str,default=custom0,action='store')
-    parser.add_argument('--custom1',type=str,default=custom1,action='store')
-    parser.add_argument('--custom2',type=str,default=custom2,action='store')
-    parser.add_argument('--custom3',type=str,default=custom3,action='store')
+    parser.add_argument('--id', type=str, default=id, action='store')
+    parser.add_argument('--rev', type=str, default=rev, action='store')
+    parser.add_argument('--flags', type=str, default=flags, action='store')
+    parser.add_argument('--custom0', type=str, default=custom0, action='store')
+    parser.add_argument('--custom1', type=str, default=custom1, action='store')
+    parser.add_argument('--custom2', type=str, default=custom2, action='store')
+    parser.add_argument('--custom3', type=str, default=custom3, action='store')
     parser.add_argument('--version', type=int, default=version, action='store')
     global_args = parser.parse_args()
     dt_entries = parse_dt_entries(global_args, list)
@@ -845,8 +845,7 @@ def create_dtbo_image_from_config(fout, argv):
                                              _DT_KEYS, _GLOBAL_KEY_TYPES)
     version = global_args['version']
 
-    params = {}
-    params['version'] = version
+    params = {'version': version}
     dt_entries = []
     for dt_arg in dt_args:
         filepath = dt_arg['filename']
@@ -877,11 +876,8 @@ def print_default_usage(progname):
     Args:
         progname: This program's name.
     """
-    sb = []
-    sb.append('  ' + progname + ' help all')
-    sb.append('  ' + progname + ' help <command>\n')
-    sb.append('    commands:')
-    sb.append('      help, dump, create, cfg_create')
+    sb = ['  ' + progname + ' help all', '  ' + progname + ' help <command>\n', '    commands:',
+          '      help, dump, create, cfg_create']
     print('\n'.join(sb))
 
 
@@ -891,13 +887,11 @@ def print_dump_usage(progname):
     Args:
         progname: This program's name.
     """
-    sb = []
-    sb.append('  ' + progname + ' dump <image_file> (<option>...)\n')
-    sb.append('    options:')
-    sb.append('      -o, --output <filename>  Output file name.')
-    sb.append('                               Default is output to stdout.')
-    sb.append('      -b, --dtb <filename>     Dump dtb/dtbo files from image.')
-    sb.append('                               Will output to <filename>.0, <filename>.1, etc.')
+    sb = ['  ' + progname + ' dump <image_file> (<option>...)\n', '    options:',
+          '      -o, --output <filename>  Output file name.',
+          '                               Default is output to stdout.',
+          '      -b, --dtb <filename>     Dump dtb/dtbo files from image.',
+          '                               Will output to <filename>.0, <filename>.1, etc.']
     print('\n'.join(sb))
 
 
@@ -907,11 +901,9 @@ def print_cfg_create_usage(progname):
     Args:
         progname: This program's name.
     """
-    sb = []
-    sb.append('  ' + progname + ' cfg_create <image_file> <config_file> (<option>...)\n')
-    sb.append('    options:')
-    sb.append('      -d, --dtb-dir <dir>      The path to load dtb files.')
-    sb.append('                               Default is load from the current path.')
+    sb = ['  ' + progname + ' cfg_create <image_file> <config_file> (<option>...)\n', '    options:',
+          '      -d, --dtb-dir <dir>      The path to load dtb files.',
+          '                               Default is load from the current path.']
     print('\n'.join(sb))
 
 
@@ -960,7 +952,6 @@ def main():
                                type=argparse.FileType('wb'))
     config_parser.set_defaults(func=create_dtbo_image_from_config)
 
-
     (subcmd, subcmd_args) = parser.parse_known_args()
     subcmd.func(subcmd.argfile, subcmd_args)
 
@@ -970,6 +961,6 @@ def dump_dtbo(file, out):
         dump_dtbo_image(f, out)
 
 
-def create_dtbo(out, list,page_size):
+def create_dtbo(out, list, page_size):
     with open(out, 'wb') as f:
         create_dtbo_image(f, list, page_size)

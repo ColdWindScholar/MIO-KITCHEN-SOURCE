@@ -168,8 +168,7 @@ def main(file_arg):
                             zipObj.extract(zi, temp)
                             zi.filename = orgfilename
                             with open(os.path.join(temp, "out"), 'rb') as rr:
-                                magic = rr.read(12)
-                                if magic == b"OPPOENCRYPT!":
+                                if rr.read(12) == b"OPPOENCRYPT!":
                                     rr.seek(0x50)
                                     data = rr.read(16)
                                     key = keytest(data)
@@ -193,8 +192,7 @@ def main(file_arg):
                             zipObj.extract(zi, temp)
                             zi.filename = orgfilename
                             with open(os.path.join(temp, "out"), 'rb') as rr:
-                                magic = rr.read(12)
-                                if magic == b"OPPOENCRYPT!":
+                                if rr.read(12) == b"OPPOENCRYPT!":
                                     print("Decrypting " + orgfilename)
                                     if decryptfile2(key, os.path.join(temp, "out"),
                                                     os.path.join(temp, "out") + ".dec") == 1:

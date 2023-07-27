@@ -70,7 +70,7 @@ class extract(object):
                     if filename in img_files:
                         filename = filename + '_2'
 
-                    print('Extracting ' + filename + '.img ...')
+                    print(f'Extracting {filename}.img ...')
 
                     chunk = 10240
 
@@ -101,10 +101,10 @@ class extract(object):
                                     crcval.append('%02X' % i)
 
                             crcval = ''.join(crcval)
-                            crcact = cmd('./crc output/' + filename + '.img')
+                            crcact = cmd('./crc output/{0}.img'.format(filename))
 
                             if crcval != crcact:
-                                print('ERROR: crc value for ' + filename + '.img does not match\n')
+                                print('ERROR: crc value for {0}.img does not match\n'.format(filename))
                                 return
                 else:
                     f.seek(filesize, 1)
