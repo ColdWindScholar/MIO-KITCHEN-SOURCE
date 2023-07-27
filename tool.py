@@ -2498,7 +2498,6 @@ Label(tab4,
       font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
 ttk.Separator(tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
 tab4_1 = ttk.LabelFrame(tab4, text=lang.text9)
-# tab4_2 = ttk.LabelFrame(tab4, text="隐私政策")
 Label(tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
 # ttk.Button(tab4_1, text="检查更新", command=lambda: CallZ(upgrade())).pack(padx=10, pady=10)
 tab4_1.pack(padx=10, pady=10)
