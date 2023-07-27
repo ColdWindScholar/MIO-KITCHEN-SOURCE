@@ -2196,7 +2196,7 @@ class handle_log:
     @staticmethod
     def putlog():
         log = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-        with open(local + os.sep + log + v_code() + '.txt', 'w') as f:
+        with open(local + os.sep + log + v_code() + '.txt', 'w',encoding='utf-8',newline='\n') as f:
             f.write(show.get(1.0, END))
         show.delete(1.0, END)
         print(lang.text95 + local + os.sep + log + v_code() + ".txt")
