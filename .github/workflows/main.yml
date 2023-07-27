@@ -1,4 +1,7 @@
 name: "Build Tool"
+permissions:
+  contents: write
+  discussions: write
 on:
   push:
     paths:
@@ -37,8 +40,6 @@ jobs:
              Remove-Item bin/posix_x86_64 -Recurse
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Create Release and Upload Release Asset
-        permissions:
-          contents: write
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
