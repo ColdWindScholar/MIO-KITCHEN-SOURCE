@@ -1123,15 +1123,14 @@ class mpkman(object):
                                                                                     padx=10)
 
             def lfdep(self):
-                for i in os.listdir(moduledir):
-                    if os.path.isdir(moduledir + os.sep + i):
-                        with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
-                            data = json.load(f)
-                            for n in data['depend'].split():
-                                if self.value == n:
-                                    self.arr.append(i)
-                                    self.arr2.append(data['name'])
-                                    break
+                for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
+                    with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                        data = json.load(f)
+                        for n in data['depend'].split():
+                            if self.value == n:
+                                self.arr.append(i)
+                                self.arr2.append(data['name'])
+                                break
 
             def unloop(self):
                 self.ck.destroy()
@@ -2179,9 +2178,6 @@ def mke2fs(name, work, sparse):
 
 
 class handle_log:
-    def __init__(self):
-        pass
-
     @staticmethod
     def uploadlog():
         da = {'JXK_Myname': 'MKC',
