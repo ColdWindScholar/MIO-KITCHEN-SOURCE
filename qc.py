@@ -2,24 +2,16 @@ from sys import argv
 from os.path import exists
 
 
-class handle:
-    def __init__(self, file_) -> None:
-        if not exists(file_):
-            return
-        self.file_ = file_
-        self.data = self.read_()
-        self.write(sorted(set(self.data), key=self.data.index))
-
-    def read_(self) -> Ellipsis:
-        with open(self.file_, 'r', encoding='utf-8') as f:
-            return f.readlines()
-
-    def write(self, new_data) -> int:
-        if len(new_data) == len(self.data):
+def handle(file_):
+    if not exists(file_):
+        return
+    with open(file_, 'rw', encoding='utf-8', newline='\n') as f:
+        data = f.readlines()
+        new_data = sorted(set(data), key=data.index)
+        if len(new_data) == len(data):
             print("No need to handle")
             return 1
-        with open(self.file_, 'w+', encoding='utf-8', newline='\n') as f:
-            f.writelines(new_data)
+        f.writelines(new_data)
 
 
 if __name__ == "__main__":
