@@ -41,6 +41,7 @@ jobs:
         with:
             #tag_name: ${{ github.ref }}
             #name: ${{ github.ref }}
+            token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
             body: TODO New Release.
             #body_path: CHANGELOG.txt
             draft: false
