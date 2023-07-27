@@ -10,7 +10,7 @@ import threading
 import time
 import tkinter as tk
 from configparser import ConfigParser
-
+import pyscreeze
 # 一些代码来自百度
 if os.name == 'nt':
     import windnd
