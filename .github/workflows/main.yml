@@ -65,7 +65,7 @@ jobs:
             name: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
             body: |
                  Changelog: ${{ steps.commit_message.outputs.message }}
-                 Build time: ${{ github.run_number }}
+                 Build times: ${{ github.run_number }}
                  Version: ${{ steps.tool_version.outputs.version }}
                  Author: MIO-KITCHEN-TEAM
             #body_path: CHANGELOG.txt
