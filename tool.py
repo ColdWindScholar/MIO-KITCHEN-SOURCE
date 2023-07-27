@@ -573,16 +573,6 @@ class mpkman(object):
         rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
         rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
 
-        def get_all_file_paths(directory) -> Ellipsis:
-            # 初始化文件路径列表
-            file_paths = []
-            for root, directories, files in os.walk(directory):
-                for filename in files:
-                    # 连接字符串形成完整的路径
-                    file_paths.append(os.path.join(root, filename))
-
-            # 返回所有文件路径
-            return file_paths
 
         class new_(Toplevel):
             def __init__(self):
@@ -2260,6 +2250,16 @@ def newp():
     listdir()
 
 
+def get_all_file_paths(directory) -> Ellipsis:
+    # 初始化文件路径列表
+    file_paths = []
+    for root, directories, files in os.walk(directory):
+        for filename in files:
+            # 连接字符串形成完整的路径
+            file_paths.append(os.path.join(root, filename))
+
+    # 返回所有文件路径
+    return file_paths
 def setf(n, w):
     config.read(setfile)
     config.set("setting", "%s" % n, "%s" % w)
@@ -2290,16 +2290,6 @@ def set_language(self):
 
 class zip_file(object):
     def __init__(self, file, dst_dir):
-        def get_all_file_paths(directory) -> Ellipsis:
-            # 初始化文件路径列表
-            file_paths = []
-            for root, directories, files in os.walk(directory):
-                for filename in files:
-                    # 连接字符串形成完整的路径
-                    file_paths.append(os.path.join(root, filename))
-
-            # 返回所有文件路径
-            return file_paths
 
         relpath = os.path.abspath(file)
         os.chdir(dst_dir)
