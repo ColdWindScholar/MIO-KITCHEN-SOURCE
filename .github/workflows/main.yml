@@ -35,10 +35,9 @@ jobs:
              move dist/tool.exe ./
              del *.py
              del bin/posix_x86_64
-      - name: Build Docker image
-        uses: actions/docker/cli@master
+      - uses: montudor/action-zip@v1
         with:
-            args: build . -t tool
+          args: zip -qq -r MIO-KITCHEN.zip .
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
