@@ -2356,7 +2356,7 @@ def dndfile(files):
             print(fi + lang.text84)
 
 
-def sdxz(**other):
+def sdxz(other):
     dndfile(filedialog.askopenfilename().split())
 
 
