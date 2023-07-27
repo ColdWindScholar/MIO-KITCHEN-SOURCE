@@ -62,11 +62,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             tag_name: CI_BUILD
-            name: "MIO-KITCHEN-${{ github.run_number }}"
+            name: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
             body: |
                  Changelog: ${{ steps.commit_message.outputs.message }}
                  Build time: ${{ github.run_number }}
-                 ${{ steps.tool_version.outputs.version }}
+                 Version: ${{ steps.tool_version.outputs.version }}
             #body_path: CHANGELOG.txt
             draft: false
             prerelease: false
