@@ -44,7 +44,7 @@ jobs:
              del *.ico
              del *.bat
              ls
-             Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN-${{ steps.tool_version.outputs.version }}.zip
+             Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Get last commit SHA
         run: echo "::set-output name=sha::$(git rev-parse HEAD)"
       - name: Get last commit message
@@ -67,8 +67,9 @@ jobs:
                  Changelog: ${{ steps.commit_message.outputs.message }}
                  Build time: ${{ github.run_number }}
                  Version: ${{ steps.tool_version.outputs.version }}
+                 Author: MIO-KITCHEN-TEAM
             #body_path: CHANGELOG.txt
             draft: false
             prerelease: false
             files: |
-              MIO-KITCHEN-${{ steps.tool_version.outputs.version }}.zip
+              MIO-KITCHEN.zip
