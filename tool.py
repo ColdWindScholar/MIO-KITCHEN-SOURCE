@@ -1437,8 +1437,11 @@ def packsuper(sparse, dbfz, size, set_, lb):
     car.set(1)
 
 
-def returnoutput(cmd):
-    comd = elocal + os.sep + "bin" + os.sep + os.name + '_' + machine() + os.sep + cmd
+def returnoutput(cmd, kz=1):
+    if kz == 1:
+        comd = elocal + os.sep + "bin" + os.sep + os.name + '_' + machine() + os.sep + cmd
+    else:
+        comd = cmd
     if os.name == 'posix':
         comd = comd.split()
     else:
