@@ -12,6 +12,7 @@ def handle(file_):
             print("No need to handle")
             return 1
         f.writelines(new_data)
+    del data, new_data
 
 
 if __name__ == "__main__":
