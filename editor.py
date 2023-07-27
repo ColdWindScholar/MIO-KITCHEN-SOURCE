@@ -5,8 +5,7 @@ from os.path import basename
 kwlist = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del',
           'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda',
           'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield', "msh", 'echo', 'sed',
-          'find', 'cd', 'done', 'rm', 'mkdir'
-                                      "mv", "cat"]
+          'find', 'cd', 'done', 'rm', 'mkdir', "mv", "cat"]
 
 
 class PythonEditor(tk.Frame):

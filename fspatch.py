@@ -76,11 +76,11 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 config = [uid, gid, mode]
             elif islink(filepath):
                 uid = '0'
-                if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
+                if any([("system/bin" in i), ("system/xbin" in i), ("vendor/bin" in i)]):
                     gid = '2000'
                 else:
                     gid = '0'
-                if ("/bin" in i) or ("/xbin" in i):
+                if any([("/bin" in i), ("/xbin" in i)]):
                     mode = '0755'
                 elif i.find(".sh") != -1:
                     mode = "0750"
@@ -90,7 +90,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 config = [uid, gid, mode, link]
             elif ("/bin" in i) or ("/xbin" in i):
                 uid = '0'
-                if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
+                if any([("system/bin" in i), ("system/xbin" in i), ("vendor/bin" in i)]):
                     gid = '2000'
                 else:
                     gid = '0'
@@ -115,7 +115,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
 def writetofile(file, newfsconfig):
     with open(file, "w") as f:
         for i in list(sorted(newfsconfig.keys())):
-            f.write(' '.join(newfsconfig[i])+'\n')
+            f.write(' '.join(newfsconfig[i]) + '\n')
 
 
 def main(dirpath, fsconfig):

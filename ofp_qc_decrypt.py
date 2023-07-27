@@ -287,12 +287,9 @@ def main(filename, outdir):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
 
-    pk = False
     with open(filename, "rb") as rf:
-        if rf.read(2) == b"PK":
-            pk = True
-
-    if pk:
+        mag = rf.read(2)
+    if mag == b'PK':
         print("Zip file detected, trying to decrypt files")
         zippw = bytes("flash@realme$50E7F7D847732396F1582CD62DD385ED7ABB0897", 'utf-8')
         with zipfile.ZipFile(filename) as file:
@@ -326,12 +323,10 @@ def main(filename, outdir):
         os.mkdir(path)
 
     print("Saving ProFile.xml")
-    file_handle = open(path + os.sep + "ProFile.xml", mode="w")
-    file_handle.write(xml)
-    file_handle.close()
+    with open(path + os.sep + "ProFile.xml", mode="w") as file_handle:
+        file_handle.write(xml)
 
-    root = ET.fromstring(xml)
-    for child in root:
+    for child in ET.fromstring(xml):
         for item in child:
             if "Path" not in item.attrib and "filename" not in item.attrib:
                 for subitem in item:

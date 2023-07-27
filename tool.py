@@ -11,6 +11,7 @@ import time
 import tkinter as tk
 from configparser import ConfigParser
 import pyscreeze
+
 # 一些代码来自百度
 if os.name == 'nt':
     import windnd
@@ -488,12 +489,10 @@ def logopack() -> int:
 
 
 # 绘制界面
-
 subwin2 = ttk.LabelFrame(win, text=lang.text9)
 subwin3 = ttk.LabelFrame(win, text=lang.text10)
 subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
 subwin2.pack(fill=BOTH, side=LEFT, expand=True)
-
 notepad = ttk.Notebook(subwin2)
 tab = ttk.Frame(notepad)
 tab2 = ttk.Frame(notepad)
@@ -532,10 +531,7 @@ def getframe(title):
 
 # 子进程运行 防卡死
 def CallZ(func, *args):  # 传入函数名和参数
-    # 创建线程
-    t = threading.Thread(target=func, args=args)
-    t.daemon = True
-    t.start()
+    threading.Thread(target=func, args=args, daemon=True).start()
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
