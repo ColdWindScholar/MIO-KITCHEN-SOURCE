@@ -4,11 +4,7 @@ permissions:
   discussions: write
 on:
   push:
-    paths:
-      - ".github/workflows/main.yml"
   pull_request:
-    paths:
-      - ".github/workflows/main.yml"
   workflow_dispatch:
 jobs:
   build:
