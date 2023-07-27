@@ -38,6 +38,10 @@ jobs:
              move dist/tool.exe ./
              del *.py
              Remove-Item bin/posix_x86_64 -Recurse
+             Remove-Item build -Recurse
+             Remove-Item .github -Recurse
+             del *.spec
+             del *.ico
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
