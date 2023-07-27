@@ -500,7 +500,7 @@ class Extractor(object):
             scan_dir(root)
             for c in self.fsconfig:
                 if dirr == 'vendor':
-                    self.fsconfig.insert(0, '/' + ' 0 2000 0755')
+                    self.fsconfig.insert(0, '/ 0 2000 0755')
                     self.fsconfig.insert(1, dirr + ' 0 2000 0755')
                 elif dirr == 'system':
                     self.fsconfig.insert(0, '/' + ' 0 0 0755')
@@ -578,7 +578,8 @@ class Extractor(object):
                     total_chunks -= 1
         self.OUTPUT_IMAGE_FILE = target.replace(".img", ".raw.img")
 
-    def fixmoto(self, input_file):
+    @staticmethod
+    def fixmoto(input_file):
         if not os.path.exists(input_file):
             return
         output_file = input_file + "_"

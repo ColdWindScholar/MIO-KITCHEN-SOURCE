@@ -30,18 +30,8 @@ def main(INPUT_IMAGE, OUTDIR='.', VERSION=None, PREFIX='system'):
             4. Android Nougat 7.0/7.1/8.0/8.1
             ''')
             item = input('Choose system version: ')
-            if item == '1':
-                VERSION = 1
-                break
-            elif item == '2':
-                VERSION = 2
-                break
-            elif item == '3':
-                VERSION = 3
-                break
-            elif item == '4':
-                VERSION = 4
-                break
+            if 1 <= item <= 4 and item is int:
+                VERSION = item
             else:
                 return
 
