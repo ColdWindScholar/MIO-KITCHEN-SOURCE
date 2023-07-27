@@ -365,8 +365,7 @@ class DUMPCFG:
 
 class BMPHEAD(object):
     def __init__(self, buf: bytes = None):  # Read bytes buf and use this struct to parse
-        if buf is None:
-            raise SyntaxError(f"buf Should be bytes not {type(buf)}")
+        assert buf is not None, f"buf Should be bytes not {type(buf)}"
         # print(buf)
         self.structstr = "<H6I"
         (
@@ -399,8 +398,7 @@ class LOGODUMPER(object):
         self.chkimg(img)
 
     def chkimg(self, img: str):
-        if not os.access(img, os.F_OK):
-            raise FileNotFoundError(f"{img} does not found!")
+        assert os.access(img, os.F_OK), f"{img} does not found!"
         with open(img, 'rb') as f:
             f.seek(self.cfg.headoff, 0)
             self.magic = struct.unpack(
@@ -416,10 +414,8 @@ class LOGODUMPER(object):
                 else:
                     break
         # print(self.magic)
-        if self.magic != b"LOGO!!!!":
-            raise TypeError("File does not match xiaomi logo magic!")
-        else:
-            print("Xiaomi LOGO!!!! format check pass!")
+        assert self.magic == b"LOGO!!!!", "File does not match xiaomi logo magic!"
+        print("Xiaomi LOGO!!!! format check pass!")
 
     def unpack(self):
         with open(self.img, 'rb') as f:
