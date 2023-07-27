@@ -29,3 +29,5 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       - name: Install Packages
         run: pip install -r requirements.txt
+      - name: Pack tool
+        run: pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
