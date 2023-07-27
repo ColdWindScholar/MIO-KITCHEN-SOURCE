@@ -2296,8 +2296,7 @@ class zip_file(object):
             for root, directories, files in os.walk(directory):
                 for filename in files:
                     # 连接字符串形成完整的路径
-                    filepath = os.path.join(root, filename)
-                    file_paths.append(filepath)
+                    file_paths.append(os.path.join(root, filename))
 
             # 返回所有文件路径
             return file_paths
