@@ -38,10 +38,11 @@ jobs:
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             tag_name: CI_BUILD
             name: MIO-KITCHEN
-            token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
             body: TODO New Release.
             #body_path: CHANGELOG.txt
             draft: false
