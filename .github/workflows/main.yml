@@ -1,4 +1,4 @@
-name: "Build Tool"
+name: "Build Tool Win"
 permissions:
   contents: write
   discussions: write
@@ -42,15 +42,22 @@ jobs:
              Remove-Item .github -Recurse
              del *.spec
              del *.ico
+             ls
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
+      - name: Get last commit SHA
+        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+      - name: Get last commit message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
+
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             tag_name: CI_BUILD
-            name: MIO-KITCHEN
-            body: TODO New Release.
+            name: "MIO-KITCHEN-${{ github.run_number }}"
+            body: "${{ steps.commit_message.outputs.message }}"
             #body_path: CHANGELOG.txt
             draft: false
             prerelease: false
