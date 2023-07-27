@@ -1,0 +1,15 @@
+name: "Build Tool"
+on:
+  push:
+    paths:
+      - ".github/workflows/main.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/main.yml"
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: "Install Python 3.8.10"
