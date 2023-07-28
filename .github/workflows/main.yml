@@ -37,7 +37,6 @@ jobs:
           allowUpdates: true
           omitBodyDuringUpdate: true
           removeArtifacts: true
-          token: ${{ secrets.ACCESS_TOKEN }}
           name: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
           tag: "CI_BUILD_${{ github.run_number }}"
           body: |
