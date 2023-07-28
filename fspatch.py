@@ -114,9 +114,9 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
 
 
 def write_file(file, new_fs_config):
-    with open(file, "w") as f:
+    with open(file, "w", encoding='utf-8') as f:
         for i in sorted(new_fs_config.keys()):
-            f.write(i+" "+" ".join(new_fs_config[i]) + "\n")
+            f.write(i + " " + " ".join(new_fs_config[i]) + "\n")
 
 
 def main(dir_path, fs_config):
