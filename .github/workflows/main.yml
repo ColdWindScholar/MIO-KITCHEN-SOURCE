@@ -30,9 +30,11 @@ jobs:
       - name: Rename Tool
         run: |
           cd MIO-KITCHEN-win
+          ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-win.zip
           cd ..
           cd MIO-KITCHEN-linux
+          ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux.zip
           cd ..
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
