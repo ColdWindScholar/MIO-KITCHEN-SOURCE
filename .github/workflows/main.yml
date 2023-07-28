@@ -21,6 +21,11 @@ jobs:
             set ver $(cat bin\setting.ini | findstr version).Split()[2]
             echo $ver
             echo "::set-output name=version::$ver"
+      - name: Get last commit SHA
+        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+      - name: Get last commit message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
       - name: Rename Tool
         run: |
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
@@ -63,17 +68,6 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       - name: Install Packages
         run: pip install -r requirements.txt
-      - name: Get last commit SHA
-        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
-      - name: Get last commit message
-        id: commit_message
-        run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
-      - name: Get Version
-        id: tool_version
-        run: |
-          set ver $(cat bin\setting.ini | findstr version).Split()[2]
-          echo $ver
-          echo "::set-output name=version::$ver"
       - name: Pack tool
         run: |
              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --strip
@@ -89,8 +83,6 @@ jobs:
              del *.md
              ls
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN-win.zip
-      - name: Rename Tool
-        run: "move MIO-KITCHEN.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip"
       - name: Upload Win Build
         if: success()
         uses: actions/upload-artifact@v3
@@ -107,7 +99,6 @@ jobs:
           # Semantic version range syntax or exact version of a Python version
           python-version: '3.8.10'
           # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x64'
       - name: Install Packages
         run: |
             python3 -m pip install -U --force-reinstall pip
