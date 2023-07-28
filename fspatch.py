@@ -7,13 +7,11 @@ def scanfs(file):  # 读取fs_config文件返回一个字典
     fsconfig = {}
     with open(file, "r") as fsfile:
         for i in fsfile.readlines():
-            i_ = i.replace('\n', '')
-            if len(i.split()) > 4:
-                filepath, uid, gid, mode, link = i_.split()
-                fsconfig[filepath] = [uid, gid, mode, link]
-            else:
-                filepath, uid, gid, mode = i_.split()
-                fsconfig[filepath] = [uid, gid, mode]
+            i_ = i.strip()
+            filepath, *other = i_.split()
+            fsconfig[filepath] = other
+            if len(i_.split()) > 5:
+                print(f"Warn:{i_} has too much data.")
     return fsconfig
 
 
@@ -26,11 +24,11 @@ def scanfsdir(folder) -> bool and list:  # 读取解包的目录，返回一个�
     else:
         return False
     for root, dirs, files in os.walk(folder, topdown=True):
-        for dir in dirs:
+        for dir_ in dirs:
             if os.name == 'nt':
-                allfile.append(os.path.join(root, dir).replace(folder, os.path.basename(folder)).replace('\\', '/'))
+                allfile.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)).replace('\\', '/'))
             elif os.name == 'posix':
-                allfile.append(os.path.join(root, dir).replace(folder, os.path.basename(folder)))
+                allfile.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)))
         for file in files:
             if os.name == 'nt':
                 allfile.append(os.path.join(root, file).replace(folder, os.path.basename(folder)).replace('\\', '/'))
@@ -64,6 +62,8 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i.replace('/', '\\'))
             elif os.name == 'posix':
                 filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i)
+            else:
+                filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i)
             if os.path.isdir(filepath):
                 uid = '0'
                 if "system/bin" in i or "system/xbin" in i:
@@ -90,6 +90,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 config = [uid, gid, mode, link]
             elif ("/bin" in i) or ("/xbin" in i):
                 uid = '0'
+                mode = '0644'
                 if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
                     gid = '2000'
                 else:
@@ -114,8 +115,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
 
 def writetofile(file, newfsconfig):
     with open(file, "w") as f:
-        for i in list(sorted(newfsconfig.keys())):
-            f.write(' '.join(newfsconfig[i]) + '\n')
+        f.writelines([newfsconfig[i] + "\n" for i in sorted(newfsconfig.keys())])
 
 
 def main(dirpath, fsconfig):
@@ -123,6 +123,6 @@ def main(dirpath, fsconfig):
     allfile = scanfsdir(os.path.abspath(dirpath))
     newfs = fspatch(origfs, allfile, dirpath)
     writetofile(fsconfig, newfs)
-    print("Load origin %d" % (len(origfs.keys())) + " entrys")
-    print("Detect totsl %d" % (len(allfile)) + " entrys")
-    print("New fs_config %d" % (len(newfs.keys())) + " entrys")
+    print("Load origin %d" % (len(origfs.keys())) + " entries")
+    print("Detect total %d" % (len(allfile)) + " entries")
+    print("New fs_config %d" % (len(newfs.keys())) + " entries")
