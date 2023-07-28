@@ -8,42 +8,11 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    needs: [build-win]
+    needs: [build-win,build-linux]
     runs-on: windows-latest
     strategy:
       matrix:
         python-version: ["3.8.10"]
-    steps:
-      - name: Get last commit SHA
-        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
-      - name: Get last commit message
-        id: commit_message
-        run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
-      - name: Get Version
-        id: tool_version
-        run: |
-          set ver $(cat bin\setting.ini | findstr version).Split()[2]
-          echo $ver
-          echo "::set-output name=version::$ver"
-      - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: "CI_BUILD_${{ github.run_number }}"
-          name: "[win]MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
-          body: |
-            Changelog: ${{ steps.commit_message.outputs.message }}
-            Build times: ${{ github.run_number }}
-            Version: ${{ steps.tool_version.outputs.version }}
-            Author: MIO-KITCHEN-TEAM
-            Minimum support: Windows Vista (32bit)
-          #body_path: CHANGELOG.txt
-          draft: false
-          prerelease: false
-          files: |
-                 "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip"
-                 "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip"
   build-win:
     runs-on: windows-latest
     steps:
@@ -62,6 +31,17 @@ jobs:
         run: python -c "import sys; print(sys.version)"
       - name: Install Packages
         run: pip install -r requirements.txt
+      - name: Get last commit SHA
+        run: echo "::set-output name=sha::$(git rev-parse HEAD)"
+      - name: Get last commit message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
+      - name: Get Version
+        id: tool_version
+        run: |
+          set ver $(cat bin\setting.ini | findstr version).Split()[2]
+          echo $ver
+          echo "::set-output name=version::$ver"
       - name: Pack tool
         run: |
              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --strip
@@ -79,6 +59,23 @@ jobs:
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Rename Tool
         run: "move MIO-KITCHEN.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip"
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "CI_BUILD_${{ github.run_number }}"
+          name: "[win]MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
+          body: |
+            Changelog: ${{ steps.commit_message.outputs.message }}
+            Build times: ${{ github.run_number }}
+            Version: ${{ steps.tool_version.outputs.version }}
+            Author: MIO-KITCHEN-TEAM
+            Minimum support: Windows Vista (32bit)
+          #body_path: CHANGELOG.txt
+          draft: false
+          prerelease: false
+          files: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip"
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -89,7 +86,7 @@ jobs:
           # Semantic version range syntax or exact version of a Python version
           python-version: '3.8.10'
           # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x86'
+          architecture: 'x64'
       - name: Install Packages
         run: |
             python3 -m pip install -U --force-reinstall pip
@@ -105,3 +102,20 @@ jobs:
              zip -q -r MIO-KITCHEN.zip ./*
       - name: Rename Tool
         run: "mv MIO-KITCHEN.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip"
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "CI_BUILD_${{ github.run_number }}"
+          name: "[linux]MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
+          body: |
+            Changelog: ${{ steps.commit_message.outputs.message }}
+            Build times: ${{ github.run_number }}
+            Version: ${{ steps.tool_version.outputs.version }}
+            Author: MIO-KITCHEN-TEAM
+            Minimum support: Ubuntu 22.04 (64bit)
+          #body_path: CHANGELOG.txt
+          draft: false
+          prerelease: false
+          files: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip"
