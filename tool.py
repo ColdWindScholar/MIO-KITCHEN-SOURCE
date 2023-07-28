@@ -547,6 +547,7 @@ def subp(com: int = 1, title: str = lang.text18, master: any = None):
 
 
 class mpkman(object):
+
     def __init__(self) -> None:
         if not dn.get():
             messpop(lang.warn1)
@@ -573,6 +574,7 @@ class mpkman(object):
         class new_(Toplevel):
             def __init__(self):
                 super().__init__()
+                jzxs(self)
                 self.resizable(False, False)
                 self.title(lang.text115)
                 ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
@@ -601,7 +603,6 @@ class mpkman(object):
                 self.intro = Text(self)
                 self.intro.pack(fill=BOTH, padx=5, pady=5, expand=1)
                 ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
-                jzxs(self)
 
             def create(self):
                 iden = v_code()
@@ -868,6 +869,7 @@ class mpkman(object):
                     getattr(self, other.split()[0])(other[other.index(' ') + 1:])
 
         class parse(Toplevel):
+            gavs = {}
 
             def __init__(self, jsons, msh=False):
                 super().__init__()
@@ -886,14 +888,14 @@ class mpkman(object):
                 def generate_sh():
                     sh_content = ""
                     for va in self.value:
-                        if globals()[va].get():
-                            if os.path.isabs(globals()[va].get()) and os.name == 'nt':
-                                if "\\" in globals()[va].get():
-                                    gva = globals()[va].get().replace('\\', '/')
+                        if self.gavs[va].get():
+                            if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
+                                if "\\" in self.gavs[va].get():
+                                    gva = self.gavs[va].get().replace('\\', '/')
                                 else:
-                                    gva = globals()[va].get()
+                                    gva = self.gavs[va].get()
                             else:
-                                gva = globals()[va].get()
+                                gva = self.gavs[va].get()
                             sh_content += f"export {va}={gva}\n"
                     temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
                     if not os.path.exists(temp):
@@ -906,19 +908,20 @@ class mpkman(object):
                             (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\', '/')))
                         f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
                     self.destroy()
+                    self.gavs.clear()
 
                 def generate_msh():
                     for va in self.value:
-                        if globals()[va].get():
-                            if os.path.isabs(globals()[va].get()) and os.name == 'nt':
-                                if '\\' in globals()[va].get():
-                                    msh_parse.envs[va] = globals()[va].get().replace("\\", '/')
+                        if self.gavs[va].get():
+                            if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
+                                if '\\' in self.gavs[va].get():
+                                    msh_parse.envs[va] = self.gavs[va].get().replace("\\", '/')
                                 else:
-                                    msh_parse.envs[va] = globals()[va].get()
+                                    msh_parse.envs[va] = self.gavs[va].get()
                             else:
-                                msh_parse.envs[va] = globals()[va].get()
+                                msh_parse.envs[va] = self.gavs[va].get()
                     self.destroy()
-
+                    self.gavs.clear()
                 with open(jsons, 'r', encoding='UTF-8') as f:
                     try:
                         data = json.load(f)
@@ -957,39 +960,39 @@ class mpkman(object):
                                     ft = ttk.Frame(group_frame)
                                     ft.pack(fill=X)
                                     file_var_name = con['set']
-                                    globals()[file_var_name] = StringVar()
+                                    self.gavs[file_var_name] = StringVar()
                                     file_label = ttk.Label(ft, text=con['text'])
                                     file_label.pack(side='left', padx=10, pady=10)
-                                    file_entry = ttk.Entry(ft, textvariable=globals()[file_var_name])
+                                    file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
                                     file_entry.pack(side='left', padx=5, pady=5)
                                     file_button = ttk.Button(ft, text=lang.text28,
-                                                             command=lambda: globals()[file_var_name].set(
+                                                             command=lambda: self.gavs[file_var_name].set(
                                                                  filedialog.askopenfilename()))
                                     file_button.pack(side='left', padx=10, pady=10)
                                 elif con["type"] == "radio":
                                     radio_var_name = con['set']
-                                    globals()[radio_var_name] = StringVar()
+                                    self.gavs[radio_var_name] = StringVar()
                                     options = con['opins'].split()
                                     pft1 = ttk.Frame(group_frame)
                                     pft1.pack(padx=10, pady=10)
                                     for option in options:
                                         text, value = option.split('|')
-                                        globals()[radio_var_name].set(value)
-                                        ttk.Radiobutton(pft1, text=text, variable=globals()[radio_var_name],
+                                        self.gavs[radio_var_name].set(value)
+                                        ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
                                                         value=value).pack(side=con['side'])
                                 elif con["type"] == 'input':
                                     input_var_name = con['set']
-                                    globals()[input_var_name] = StringVar()
-                                    ttk.Entry(group_frame, textvariable=globals()[input_var_name]).pack(pady=5, padx=5,
+                                    self.gavs[input_var_name] = StringVar()
+                                    ttk.Entry(group_frame, textvariable=self.gavs[input_var_name]).pack(pady=5, padx=5,
                                                                                                         fill=BOTH)
                                 elif con['type'] == 'checkbutton':
                                     b_var_name = con['set']
-                                    globals()[b_var_name] = IntVar()
+                                    self.gavs[b_var_name] = IntVar()
                                     if not 'text' in con:
                                         text = 'M.K.C'
                                     else:
                                         text = con['text']
-                                    ttk.Checkbutton(group_frame, text=text, variable=globals()[b_var_name], onvalue=1,
+                                    ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
                                                     offvalue=0,
                                                     style="Switch.TCheckbutton").pack(
                                         padx=5, pady=5, fill=BOTH)
