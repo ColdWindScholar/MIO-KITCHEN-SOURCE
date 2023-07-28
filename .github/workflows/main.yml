@@ -39,6 +39,8 @@ jobs:
              del *.spec
              del *.ico
              del *.bat
+             del *.txt
+             del *.md
              ls
              Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN.zip
       - name: Get last commit SHA
@@ -52,6 +54,8 @@ jobs:
              set ver $(cat bin\setting.ini | findstr version).Split()[2]
              echo $ver
              echo "::set-output name=version::$ver"
+      - name: Rename Tool
+        run: "move MIO-KITCHEN.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}.zip"
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         env:
@@ -67,5 +71,4 @@ jobs:
             #body_path: CHANGELOG.txt
             draft: false
             prerelease: false
-            files: |
-              MIO-KITCHEN.zip
+            files: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}.zip"
