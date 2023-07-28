@@ -66,9 +66,7 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             if os.path.isdir(filepath):
                 uid = '0'
-                if "system/bin" in i or "system/xbin" in i:
-                    gid = '2000'
-                elif "vendor/bin" in i:
+                if "system/bin" in i or "system/xbin" in i or "vendor/bin" in i:
                     gid = '2000'
                 else:
                     gid = '0'
@@ -82,7 +80,7 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                     gid = '0'
                 if ("/bin" in i) or ("/xbin" in i):
                     mode = '0755'
-                elif i.find(".sh") != -1:
+                elif ".sh" in i:
                     mode = "0750"
                 else:
                     mode = "0644"
@@ -90,13 +88,13 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                 config = [uid, gid, mode, link]
             elif ("/bin" in i) or ("/xbin" in i):
                 uid = '0'
-                mode = '0644'
+                mode = '0755'
                 if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
                     gid = '2000'
                 else:
                     gid = '0'
                     mode = '0755'
-                if i.find(".sh") != -1:
+                if ".sh" in i:
                     mode = "0750"
                 else:
                     for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemon", "ext/.su", "install-recovery",

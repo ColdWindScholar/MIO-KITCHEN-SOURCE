@@ -493,7 +493,7 @@ def logopack() -> int:
 subwin2 = ttk.LabelFrame(win, text=lang.text9)
 subwin3 = ttk.LabelFrame(win, text=lang.text10)
 subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
-subwin2.pack(fill=BOTH, side=LEFT, expand=True)
+subwin2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
 notepad = ttk.Notebook(subwin2)
 tab = ttk.Frame(notepad)
 tab2 = ttk.Frame(notepad)
@@ -1332,7 +1332,12 @@ class packss:
 
         # 自动设置
         #
-        supersz.set(1)
+        if os.path.exists(rwork() + 'supersz'):
+            with open(rwork() + 'supersz', 'r') as f:
+                try:
+                    supersz.set(int(f.read()))
+                except:
+                    supersz.set(1)
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
@@ -1556,9 +1561,9 @@ def jboot(bn: str = 'boot'):
             f.write(comp)
         if comp != "unknow":
             os.rename(work + f"{bn}" + os.sep + "ramdisk.cpio",
-                      work + f"{bn}" + os.sep + "ramdisk.cpio.%s" % comp)
+                      work + f"{bn}" + os.sep + "ramdisk.cpio.comp")
             if call("magiskboot decompress %s %s" % (
-                    work + f"{bn}" + os.sep + "ramdisk.cpio." + comp,
+                    work + f"{bn}" + os.sep + "ramdisk.cpio.comp",
                     work + f"{bn}" + os.sep + "ramdisk.cpio")) != 0:
                 print("Decompress Ramdisk Fail...")
                 car.set(1)
@@ -1601,9 +1606,8 @@ def dboot():
         cpio = findfile("cpio", elocal + os.sep + "bin" + os.sep + os.name + "_" + machine())
     call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
     os.chdir(work + "boot" + os.sep)
-    compf = open(work + "boot" + os.sep + "comp", "r", encoding='utf-8')
-    comp = compf.read()
-    compf.close()
+    with open(work + "boot" + os.sep + "comp", "r", encoding='utf-8') as compf:
+        comp = compf.read()
     print("Compressing:%s" % comp)
     if comp != "unknow":
         if call("magiskboot compress=%s ramdisk-new.cpio") != 0:
@@ -1886,9 +1890,7 @@ def unpack(chose, form: any = None):
                 print(lang.text83 % (fd1, os.path.basename(fd).rsplit('.', 1)[0]))
                 with open(work + fd1, 'rb') as nfd:
                     ofd.write(nfd.read())
-                nfd.close()
                 os.remove(work + fd1)
-        ofd.close()
     if os.access(work + "UPDATE.APP", os.F_OK):
         print(lang.text79 + "UPDATE.APP")
         splituapp.extract(work + "UPDATE.APP", "")
@@ -1967,10 +1969,10 @@ def unpack(chose, form: any = None):
                                 os.remove(work + wjm)
                     # end
                     with open(work + "supersz", 'a+', encoding='utf-8', newline='\n') as f:
-                        f.write("2\n")
+                        f.write("2")
                 else:
                     with open(work + "supersz", 'a+', encoding='utf-8', newline='\n') as f:
-                        f.write("1\n")
+                        f.write("1")
             ftype = gettype(work + dname + ".img")
             if ftype == "ext":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
@@ -2021,7 +2023,6 @@ def patch_context(context, dname):
         with open(context, 'a+', encoding='utf-8',
                   newline='\n') as fs:
             fs.writelines(patch)
-            fs.close()
 
 
 def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
@@ -2184,7 +2185,6 @@ class handle_log:
             f.write(show.get(1.0, END))
         show.delete(1.0, END)
         print(lang.text95 + local + os.sep + log + v_code() + ".txt")
-        f.close()
 
 
 def selectp(self):
@@ -2722,4 +2722,5 @@ CallZ(gettime)
 if int(oobe) < 4:
     welcome()
 print(lang.text134 % (dti() - start))
+win.update()
 win.mainloop(0)
