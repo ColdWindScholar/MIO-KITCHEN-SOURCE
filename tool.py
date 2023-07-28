@@ -10,6 +10,7 @@ import threading
 import time
 import tkinter as tk
 from configparser import ConfigParser
+
 try:
     import pyscreeze
 except:
@@ -71,7 +72,8 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\x89PNG', 'png'])
 
 
-class ModuleError(Exception): pass
+class ModuleError(Exception):
+    pass
 
 
 class jzxs(object):

@@ -14,9 +14,7 @@ def checkmagic(file):
 
 
 def readflag(file):
-    if checkmagic(file):
-        pass
-    else:
+    if not checkmagic(file):
         return False
     if os.access(file, os.F_OK):
         with open(file, "rb") as f:
