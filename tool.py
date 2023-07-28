@@ -1335,12 +1335,6 @@ class packss:
 
         # 自动设置
         #
-        if os.path.exists(rwork() + 'supersz'):
-            with open(rwork() + 'supersz', 'r') as f:
-                try:
-                    supersz.set(int(f.read()))
-                except:
-                    supersz.set(1)
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
@@ -1971,11 +1965,10 @@ def unpack(chose, form: any = None):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
                     # end
-                    with open(work + "supersz", 'a+', encoding='utf-8', newline='\n') as f:
-                        f.write("2")
+                    # supersz :2
                 else:
-                    with open(work + "supersz", 'a+', encoding='utf-8', newline='\n') as f:
-                        f.write("1")
+                    # supersz :1
+                    pass
             ftype = gettype(work + dname + ".img")
             if ftype == "ext":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
