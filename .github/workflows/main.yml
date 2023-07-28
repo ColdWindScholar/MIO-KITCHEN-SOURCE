@@ -78,12 +78,6 @@ jobs:
              Remove-Item build -Recurse
              Remove-Item dist -Recurse
              Remove-Item .github -Recurse
-             $CONFIG_PATH=".git"
-             $TRUE_FALSE=(Test-Path $CONFIG_PATH)
-            if($TRUE_FALSE -eq "True")
-           {
-           remove-Item -Recurse -Force $CONFIG_PATH
-            }
              del *.spec
              del *.ico
              del *.bat
