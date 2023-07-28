@@ -1,20 +1,30 @@
-# MIO-KITCHEN-SOURCE
+# MIO-KITCHEN-SOURCE #
+
 The Rom Tool Use python language
 # This tool uses many open source projects. Pay tribute to the developers!
+***
 # Functions
-1. Unpack boot dtbo ext4 erofs payload logo and so on
-2. Pack boot dtbo ext4 erofs payload logo and so on
+* Unpack boot dtbo ext4 erofs payload logo and so on 
+* Pack boot dtbo ext4 erofs payload logo and so on
+***
 # Advantages
-1. Automatically repair CONTEXT
-2. GUI graphical interface
-3. Graphical parsing of plugins supports plugin editing, plugin installation, plugin export
+* Automatically repair CONTEXT
+* GUI graphical interface
+* Graphical parsing of plugins supports plugin editing, plugin installation, plugin export
+***
 # Usage
 ``` python
+pip install -r requirements.txt
 python tool.py
 # if you want to package it into exe
 # you can
-# pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
+pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
 ```
+***
+# Contact Us
+### Developer's Email: 3590361911@qq.com
+### QQ Group: 879232506
+***
 # About
 ### Written by MIO-KITCHEN-TEAM
 #### ColdWindScholar(3590361911@qq.com) All rights reserved.
