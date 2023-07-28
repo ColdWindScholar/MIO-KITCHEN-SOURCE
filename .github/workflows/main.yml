@@ -47,8 +47,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-             "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip"
-             "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip"
+             MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
+             MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
 
   build-win:
     runs-on: windows-latest
@@ -109,6 +109,7 @@ jobs:
              rm -rf bin/nt_*
              rm -rf *.*
              rm -rf build
+             rm -rf dist
              ls
              zip -q -r MIO-KITCHEN-linux.zip ./*
       - name: Upload Linux Build
