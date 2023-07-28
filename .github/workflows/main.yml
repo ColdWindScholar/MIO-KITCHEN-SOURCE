@@ -30,9 +30,8 @@ jobs:
       - name: Rename Tool
         run: |
           cd MIO-KITCHEN-win
-          ls
           Remove-Item .git -Recurse
-          del .git
+          ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-win.zip
           cd ..
           cd MIO-KITCHEN-linux
