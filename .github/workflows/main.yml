@@ -29,8 +29,8 @@ jobs:
         run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
       - name: Rename Tool
         run: |
-          move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
-          move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
+          move MIO-KITCHEN-win MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
+          move MIO-KITCHEN-linux MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         env:
@@ -44,7 +44,6 @@ jobs:
             Version: ${{ steps.tool_version.outputs.version }}
             Author: MIO-KITCHEN-TEAM
             Minimum support: Ubuntu 22.04 (64bit),Windows Vista (32bit)
-          #body_path: CHANGELOG.txt
           draft: false
           prerelease: false
           files: |
@@ -65,8 +64,6 @@ jobs:
       # You can test your matrix by printing the current Python version
       - name: Update pip
         run:  python -m pip install -U --force-reinstall pip
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
       - name: Install Packages
         run: pip install -r requirements.txt
       - name: Pack tool
