@@ -4,37 +4,37 @@ import os
 
 
 def scanfs(file):  # 读取fs_config文件返回一个字典
-    fsconfig = {}
-    with open(file, "r") as fsfile:
-        for i in fsfile.readlines():
+    filesystem_config = {}
+    with open(file, "r") as file_:
+        for i in file_.readlines():
             i_ = i.strip()
             filepath, *other = i_.split()
-            fsconfig[filepath] = other
+            filesystem_config[filepath] = other
             if len(i_.split()) > 5:
                 print(f"Warn:{i_} has too much data.")
-    return fsconfig
+    return filesystem_config
 
 
-def scanfsdir(folder) -> bool and list:  # 读取解包的目录，返回一个字典
-    allfile = ['/']
+def scan_dir(folder) -> bool and list:  # 读取解包的目录，返回一个字典
+    allfiles = ['/']
     if os.name == 'nt':
-        allfile.append(os.path.basename(folder).replace('\\', ''))
+        allfiles.append(os.path.basename(folder).replace('\\', ''))
     elif os.name == 'posix':
-        allfile.append(os.path.basename(folder).replace('/', ''))
+        allfiles.append(os.path.basename(folder).replace('/', ''))
     else:
         return False
     for root, dirs, files in os.walk(folder, topdown=True):
         for dir_ in dirs:
             if os.name == 'nt':
-                allfile.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)).replace('\\', '/'))
+                allfiles.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)).replace('\\', '/'))
             elif os.name == 'posix':
-                allfile.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)))
+                allfiles.append(os.path.join(root, dir_).replace(folder, os.path.basename(folder)))
         for file in files:
             if os.name == 'nt':
-                allfile.append(os.path.join(root, file).replace(folder, os.path.basename(folder)).replace('\\', '/'))
+                allfiles.append(os.path.join(root, file).replace(folder, os.path.basename(folder)).replace('\\', '/'))
             elif os.name == 'posix':
-                allfile.append(os.path.join(root, file).replace(folder, os.path.basename(folder)))
-    return allfile
+                allfiles.append(os.path.join(root, file).replace(folder, os.path.basename(folder)))
+    return allfiles
 
 
 def islink(file) -> str and bool:
@@ -52,18 +52,18 @@ def islink(file) -> str and bool:
             return False
 
 
-def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
-    newfs = {}
+def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
+    new_fs = {}
     for i in filename:
-        if fsfile.get(i):
-            newfs.update({i: fsfile[i]})
+        if fs_file.get(i):
+            new_fs.update({i: fs_file[i]})
         else:
             if os.name == 'nt':
-                filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i.replace('/', '\\'))
+                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
             elif os.name == 'posix':
-                filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i)
+                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             else:
-                filepath = os.path.abspath(dirpath + os.sep + ".." + os.sep + i)
+                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             if os.path.isdir(filepath):
                 uid = '0'
                 if "system/bin" in i or "system/xbin" in i:
@@ -99,7 +99,7 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 if i.find(".sh") != -1:
                     mode = "0750"
                 else:
-                    for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemonsu", "ext/.su", "install-recovery",
+                    for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemon", "ext/.su", "install-recovery",
                               'installed_su_daemon']:
                         if s in i:
                             mode = "0755"
@@ -109,20 +109,20 @@ def fspatch(fsfile, filename, dirpath):  # 接收两个字典对比
                 gid = '0'
                 mode = '0644'
                 config = [uid, gid, mode]
-            newfs.update({i: config})
-    return newfs
+            new_fs.update({i: config})
+    return new_fs
 
 
-def writetofile(file, newfsconfig):
+def write_file(file, new_fs_config):
     with open(file, "w") as f:
-        f.writelines([newfsconfig[i] + "\n" for i in sorted(newfsconfig.keys())])
+        f.writelines([new_fs_config[i] + "\n" for i in sorted(new_fs_config.keys())])
 
 
-def main(dirpath, fsconfig):
-    origfs = scanfs(os.path.abspath(fsconfig))
-    allfile = scanfsdir(os.path.abspath(dirpath))
-    newfs = fspatch(origfs, allfile, dirpath)
-    writetofile(fsconfig, newfs)
-    print("Load origin %d" % (len(origfs.keys())) + " entries")
-    print("Detect total %d" % (len(allfile)) + " entries")
-    print("New fs_config %d" % (len(newfs.keys())) + " entries")
+def main(dir_path, fs_config):
+    origin_fs = scanfs(os.path.abspath(fs_config))
+    allfiles = scan_dir(os.path.abspath(dir_path))
+    new_fs = fs_patch(origin_fs, allfiles, dir_path)
+    write_file(fs_config, new_fs)
+    print("Load origin %d" % (len(origin_fs.keys())) + " entries")
+    print("Detect total %d" % (len(allfiles)) + " entries")
+    print("New fs_config %d" % (len(new_fs.keys())) + " entries")
