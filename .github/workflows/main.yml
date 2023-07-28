@@ -31,24 +31,22 @@ jobs:
         run: |
           move MIO-KITCHEN-win MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           move MIO-KITCHEN-linux MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
-      - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload release
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: "CI_BUILD_${{ github.run_number }}"
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          removeArtifacts: true
+          token: ${{ secrets.ACCESS_TOKEN }}
           name: "MIO-KITCHEN-${{ steps.tool_version.outputs.version }}"
+          tag: "CI_BUILD_${{ github.run_number }}"
           body: |
             Changelog: ${{ steps.commit_message.outputs.message }}
             Build times: ${{ github.run_number }}
             Version: ${{ steps.tool_version.outputs.version }}
             Author: MIO-KITCHEN-TEAM
             Minimum support: Ubuntu 22.04 (64bit),Windows Vista (32bit)
-          draft: false
-          prerelease: false
-          files: |
-             MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
-             MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
+          artifacts: "*.zip"
 
   build-win:
     runs-on: windows-latest
