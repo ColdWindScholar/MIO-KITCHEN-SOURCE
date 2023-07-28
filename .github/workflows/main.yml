@@ -78,13 +78,12 @@ jobs:
              del *.txt
              del *.md
              ls
-             Compress-Archive -Path ./* -DestinationPath ./MIO-KITCHEN-win.zip
       - name: Upload Win Build
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: MIO-KITCHEN-win
-          path: './MIO-KITCHEN-win.zip'
+          name: MIO-KITCHEN-win.zip
+          path: './*'
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -99,7 +98,7 @@ jobs:
         run: |
             python3 -m pip install -U --force-reinstall pip
             pip3 install -r requirements.txt
-            sudo apt update -y && sudo apt install python3-tk zip -y
+            sudo apt update -y && sudo apt install python3-tk -y
       - name: Pack Tool
         run: |
              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --strip
@@ -109,10 +108,9 @@ jobs:
              rm -rf build
              rm -rf dist
              ls
-             zip -q -r MIO-KITCHEN-linux.zip ./*
       - name: Upload Linux Build
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: MIO-KITCHEN-linux
-          path: './MIO-KITCHEN-linux.zip'
+          name: MIO-KITCHEN-linux.zip
+          path: './*'
