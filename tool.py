@@ -10,7 +10,10 @@ import threading
 import time
 import tkinter as tk
 from configparser import ConfigParser
-import pyscreeze
+try:
+    import pyscreeze
+except:
+    pass
 
 # 一些代码来自百度
 if os.name == 'nt':
