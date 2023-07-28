@@ -8,12 +8,11 @@
 
 from __future__ import print_function
 
-# import os
-from os import makedirs, name, sep, path
-import re
-import sys
 import string
 import struct
+import sys
+# import os
+from os import makedirs, name, sep, path
 from subprocess import check_output
 
 
@@ -82,8 +81,8 @@ class extract(object):
 
                                 o.write(f.read(chunk))
                                 filesize -= chunk
-                    except:
-                        print('ERROR: Failed to create ' + filename + '.img\n')
+                    except Exception as e:
+                        print('ERROR: Failed to create ' + filename + '.img:%s\n' % e)
                         return
 
                     img_files.append(filename)
@@ -95,7 +94,7 @@ class extract(object):
                             crcval = []
                             if py2:
                                 for i in crcdata:
-                                    crcval.append('%02X' % ord(i))
+                                    crcval.append('%02X' % int(i))
                             else:
                                 for i in crcdata:
                                     crcval.append('%02X' % i)

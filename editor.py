@@ -1,3 +1,4 @@
+import logging
 import tkinter as tk
 from tkinter import ttk, messagebox
 from os.path import basename
@@ -30,8 +31,8 @@ class PythonEditor(tk.Frame):
                     self.text.delete(0.0, tk.END)
                     self.text.insert(tk.END, f.read())
                     self.highlight()
-            except:
-                pass
+            except Exception as e:
+                logging.debug(e)
             self.parent.title(f"{basename(self.file_)} - Editor")
 
     def save(self):
@@ -40,6 +41,8 @@ class PythonEditor(tk.Frame):
         messagebox.showinfo("已保存", f"{basename(self.file_)} 已保存")
 
     def highlight(self, event=None):
+        if event:
+            pass
         self.text.tag_remove("keyword", "1.0", "end")
         self.text.tag_remove("builtin", "1.0", "end")
         self.text.tag_remove("string", "1.0", "end")
@@ -66,22 +69,22 @@ class PythonEditor(tk.Frame):
                 start = end
 
         start = "1.0"
-        countVar = tk.StringVar()
+        countvar = tk.StringVar()
         while True:
-            start = self.text.search("@[^@]+@", start, stopindex="end", regexp=True, count=countVar)
+            start = self.text.search("@[^@]+@", start, stopindex="end", regexp=True, count=countvar)
             if not start:
                 break
-            end = "{}+{}c".format(start, countVar.get())
+            end = "{}+{}c".format(start, countvar.get())
             self.text.tag_add("string", start, end)
             start = end
 
         start = "1.0"
-        countVar = tk.StringVar()
+        countvar = tk.StringVar()
         while True:
-            start = self.text.search('"[^"]+@"', start, stopindex="end", regexp=True, count=countVar)
+            start = self.text.search('"[^"]+@"', start, stopindex="end", regexp=True, count=countvar)
             if not start:
                 break
-            end = "{}+{}c".format(start, countVar.get())
+            end = "{}+{}c".format(start, countvar.get())
             self.text.tag_add("string", start, end)
             start = end
 
