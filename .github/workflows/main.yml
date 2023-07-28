@@ -84,7 +84,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-win
-          path: 'MIO-KITCHEN-win.zip'
+          path: './MIO-KITCHEN-win.zip'
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -115,4 +115,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-linux
-          path: 'MIO-KITCHEN-linux.zip'
+          path: './MIO-KITCHEN-linux.zip'
