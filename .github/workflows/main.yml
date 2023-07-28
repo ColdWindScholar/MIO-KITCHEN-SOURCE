@@ -78,6 +78,7 @@ jobs:
              Remove-Item build -Recurse
              Remove-Item dist -Recurse
              Remove-Item .github -Recurse
+             Remove-Item .git -Recurse
              del *.spec
              del *.ico
              del *.bat
@@ -109,6 +110,8 @@ jobs:
         run: |
              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --strip
              mv dist/* ./
+             rm -rf .git
+             rm -rf .github
              rm -rf bin/nt_*
              rm -rf *.*
              rm -rf build
