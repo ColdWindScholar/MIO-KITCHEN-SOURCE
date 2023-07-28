@@ -111,17 +111,12 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
     return new_fs
 
 
-def write_file(file, new_fs_config):
-    with open(file, "w", encoding='utf-8') as f:
-        for i in sorted(new_fs_config.keys()):
-            f.write(i + " " + " ".join(new_fs_config[i]) + "\n")
-
-
 def main(dir_path, fs_config):
     origin_fs = scanfs(os.path.abspath(fs_config))
     allfiles = scan_dir(os.path.abspath(dir_path))
     new_fs = fs_patch(origin_fs, allfiles, dir_path)
-    write_file(fs_config, new_fs)
+    with open(fs_config, "w", encoding='utf-8') as f:
+        f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin_fs.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")
     print("New fs_config %d" % (len(new_fs.keys())) + " entries")
