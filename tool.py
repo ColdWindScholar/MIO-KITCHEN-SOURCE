@@ -16,7 +16,6 @@ try:
 except:
     pass
 
-# 一些代码来自百度
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -88,7 +87,8 @@ class jzxs(object):
 
 
 # 打包设置变量
-class lang(object): pass
+class lang(object):
+    pass
 
 
 def load(name):
@@ -215,10 +215,6 @@ class welcome(object):
             side='top', fill=BOTH, padx=10, pady=10)
         ttk.Button(self.ck, text=lang.text34, command=self.ck.destroy).pack(fill=BOTH, side='bottom')
 
-    def clos(self):
-        pass
-
-
 def upgrade():
     ck = Toplevel()
     ck.title("检查更新")
@@ -267,7 +263,6 @@ def loadset():
         load(language.get())
 
 
-# win.attributes("-toolwindow", True)
 if os.path.exists(setfile):
     loadset()
 else:
@@ -443,7 +438,6 @@ class LOGODUMPER(object):
                 with open(os.path.join(self.dir, "%d.bmp" % i), 'rb') as b:
                     bhead = BMPHEAD(b.read(26))
                     b.seek(0, 0)
-                    # print("%x" %off)
                     self.cfg.imgblkszs[i] = (bhead.fsize >> 0xc) + 1
                     self.cfg.imgblkoffs[i] = off
 
@@ -451,11 +445,8 @@ class LOGODUMPER(object):
                     o.write(b.read(bhead.fsize))
 
                     off += self.cfg.imgblkszs[i]
-            # self.cfg.imgblkoffs[0] = 0x5   # override
             o.seek(self.cfg.headoff)
             o.write(self.magic)
-            # print(self.cfg.imgblkoffs)
-            # print(self.cfg.imgblkszs)
             for i in range(self.cfg.imgnum):
                 o.write(struct.pack("<I", self.cfg.imgblkoffs[i]))
                 o.write(struct.pack("<I", self.cfg.imgblkszs[i]))
@@ -531,7 +522,7 @@ def getframe(title):
 
 
 # 子进程运行 防卡死
-def CallZ(func, *args):  # 传入函数名和参数
+def CallZ(func, *args):
     threading.Thread(target=func, args=args, daemon=True).start()
 
 
@@ -922,6 +913,7 @@ class mpkman(object):
                                 msh_parse.envs[va] = self.gavs[va].get()
                     self.destroy()
                     self.gavs.clear()
+
                 with open(jsons, 'r', encoding='UTF-8') as f:
                     try:
                         data = json.load(f)
@@ -1334,7 +1326,6 @@ class packss:
         lf3.pack(fill=BOTH)
 
         # 自动设置
-        #
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
@@ -2441,7 +2432,6 @@ ttk.Button(frame3, text=lang.text123, command=lambda: CallZ(packss)).pack(side="
 ttk.Button(frame3, text=lang.text19, command=lambda: CallZ(mpkman)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.t13, command=lambda: CallZ(format_conversion)).pack(side="left", padx=10, pady=10)
 xmcd.pack(padx=5, pady=5)
-# info.pack(padx=10, pady=10)
 frame1.pack(padx=5, pady=5)
 frame2.pack(padx=5, pady=5)
 frame3.pack(padx=5, pady=5)
