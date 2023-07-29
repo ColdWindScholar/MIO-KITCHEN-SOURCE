@@ -110,7 +110,7 @@ jobs:
             sudo apt update -y && sudo apt install python3-tk -y
       - name: Pack Tool
         run: |
-             pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --strip
+             pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --strip
              mv dist/* ./
              rm -rf .git
              rm -rf .github
