@@ -8,31 +8,24 @@
 
 from __future__ import print_function
 
-import sys, os, errno, tempfile
-import common, blockimgdiff, sparse_img
+import os
+import tempfile
+
+import blockimgdiff
+import sparse_img
 
 
-def main(INPUT_IMAGE, OUTDIR='.', VERSION=None, PREFIX='system'):
-    __version__ = '1.7'
-    print('img2sdat binary - version: %s\n' % __version__)
-    if not os.path.isdir(OUTDIR):
-        os.makedirs(OUTDIR)
+def main(input_image, out_dir='.', VERSION=None, prefix='system'):
+    print('img2sdat binary - version: %s\n' % 1.7)
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir)
+        '''            
+        1. Android Lollipop 5.0
+        2. Android Lollipop 5.1
+        3. Android Marshmallow 6.0
+        4. Android Nougat 7.0/7.1/8.0/8.1
+        '''
 
-    OUTDIR = OUTDIR + '/' + PREFIX
-
-    if not VERSION:
-        while True:
-            print('''            1. Android Lollipop 5.0
-            2. Android Lollipop 5.1
-            3. Android Marshmallow 6.0
-            4. Android Nougat 7.0/7.1/8.0/8.1
-            ''')
-            item = input('Choose system version: ')
-            if 1 <= item <= 4 and item is int:
-                VERSION = item
-            else:
-                VERSION = 4
-
-    blockimgdiff.BlockImageDiff(sparse_img.SparseImage(INPUT_IMAGE, tempfile.mkstemp()[1], '0'), None, VERSION).Compute(OUTDIR)
-    print('Done! Output files: %s' % os.path.dirname(OUTDIR))
-    return
+    blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, VERSION).Compute(
+        out_dir + '/' + prefix)
+    print('Done! Output files: %s' % os.path.dirname(prefix))
