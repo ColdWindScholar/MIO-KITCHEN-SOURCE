@@ -8,14 +8,11 @@
 
 from __future__ import print_function
 
-import os
-import tempfile
-
-import blockimgdiff
-import sparse_img
+import sys, os, errno, tempfile
+import common, blockimgdiff, sparse_img
 
 
-def main(input_image, out_dir='.', VERSION=None, prefix='system'):
+def main(input_image, out_dir='.', version=None, prefix='system'):
     print('img2sdat binary - version: %s\n' % 1.7)
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
@@ -26,6 +23,6 @@ def main(input_image, out_dir='.', VERSION=None, prefix='system'):
         4. Android Nougat 7.0/7.1/8.0/8.1
         '''
 
-    blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, VERSION).Compute(
+    blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
     print('Done! Output files: %s' % os.path.dirname(prefix))
