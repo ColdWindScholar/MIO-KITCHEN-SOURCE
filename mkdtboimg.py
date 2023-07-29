@@ -787,8 +787,8 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
         fout: Output file handle to write to.
         argv: list of command line arguments.
     """
-    if not list:
-        raise ValueError('List of dtimages to add to DTBO not provided')
+
+    assert list, 'List of dt_images to add to DTBO not provided'
     parser = argparse.ArgumentParser()
     parser.add_argument('--id', type=str, default=id, action='store')
     parser.add_argument('--rev', type=str, default=rev, action='store')

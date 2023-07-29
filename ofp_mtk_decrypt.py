@@ -168,12 +168,4 @@ def main(filename, outdir):
     print(f"Files successfully decrypted to subdirectory {outdir}")
 
 
-if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Oppo MTK OFP decrypt tool 1.1 (c) B.Kerler 2020-2022\n")
-        print("Usage: %s <filename> <directory to extract>" % __file__)
-        sys.exit(1)
-
-    filename = sys.argv[1]
-    outdir = sys.argv[2]
-    main(filename, outdir)
+    #main(filename, outdir)

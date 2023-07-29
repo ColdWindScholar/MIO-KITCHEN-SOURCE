@@ -1,4 +1,3 @@
-from sys import argv
 from os.path import exists
 
 
@@ -13,10 +12,3 @@ def handle(file_) -> None:
             return
         f.writelines(new_data)
     del data, new_data
-
-
-if __name__ == "__main__":
-    if len(argv) < 2:
-        print("Usage: {} file".format(argv[0]))
-    else:
-        handle(argv[1])

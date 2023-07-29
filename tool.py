@@ -2544,7 +2544,7 @@ class format_conversion(Toplevel):
                     a.append(i)
         return a
 
-    def conversion(self):  # hget =需要 #fget =转换后
+    def conversion(self):
         work = rwork()
         fget = self.f.get()
         hget = self.h.get()

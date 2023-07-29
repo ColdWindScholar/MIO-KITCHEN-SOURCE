@@ -53,7 +53,7 @@ jobs:
             Build times: ${{ github.run_number }}
             Version: ${{ steps.tool_version.outputs.version }}
             Author: MIO-KITCHEN-TEAM
-            Minimum support: Ubuntu 22.04 (64bit),Windows Vista (32bit)
+            Minimum support: Ubuntu 18.04 (64bit),Windows Vista (32bit)
           artifacts: "*.zip"
 
   build-win:
@@ -94,7 +94,7 @@ jobs:
           name: MIO-KITCHEN-win
           path: './*'
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.8.10

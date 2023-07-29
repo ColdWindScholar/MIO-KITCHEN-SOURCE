@@ -62,7 +62,6 @@ class Extractor(object):
     def __file_name(self, file_path):
         name = os.path.basename(file_path).split('.')[0]
         name = name.split('-')[0]
-        # name = name.split('_')[0]
         name = name.split(' ')[0]
         name = name.split('+')[0]
         name = name.split('{')[0]
@@ -384,7 +383,6 @@ class Extractor(object):
                                 out.write(tmp + struct.pack('xx'))
                                 subprocess.Popen('attrib +s "%s"' % target.replace('/', os.sep), shell=True,
                                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                                # call('attrib +s "%s"' % target.replace('/', os.sep))
                         if not all(c in string.printable for c in link_target):
                             pass
                         if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
@@ -477,8 +475,6 @@ class Extractor(object):
                                         for index in list(link_target):
                                             tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                         out.write(tmp + struct.pack('xx'))
-                                        # call('attrib +s %s' % target.replace('/', os.sep))
-                                        # subprocess.Popen('attrib +s "%s"' % target.replace('/', os.sep), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                             else:
                                 pass
                         except:

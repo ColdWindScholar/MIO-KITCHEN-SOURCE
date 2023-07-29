@@ -114,17 +114,3 @@ class extract(object):
 
         print('\nExtraction complete')
         return
-
-
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Split UPDATE.APP file into img files", add_help=False)
-    required = parser.add_argument_group('Required')
-    required.add_argument("-f", "--filename", required=True, help="Path to update.app file")
-    optional = parser.add_argument_group('Optional')
-    optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
-    optional.add_argument("-l", "--list", nargs="*", metavar=('img1', 'img2'), help="List of img files to extract")
-    args = parser.parse_args()
-
-    extract(args.filename, args.list)

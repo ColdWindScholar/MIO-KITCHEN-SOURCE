@@ -348,13 +348,4 @@ def main(filename, outdir):
     print("\nDone. Extracted files to " + path)
     exit(0)
 
-
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Oppo MTK QC decrypt tool 1.1 (c) B.Kerler 2020-2022\n")
-        print("Usage: ./ofp_qc_extract.py [Filename.ofp] [Directory to extract files to]")
-        sys.exit(1)
-
-    filename_ = sys.argv[1]
-    outdir_ = sys.argv[2]
-    main(filename_, outdir_)
+    # main(filename_, outdir_)

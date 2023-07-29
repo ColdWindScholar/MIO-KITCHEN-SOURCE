@@ -7,11 +7,10 @@ def scanfs(file):  # 读取fs_config文件返回一个字典
     filesystem_config = {}
     with open(file, "r") as file_:
         for i in file_.readlines():
-            i_ = i.strip()
-            filepath, *other = i_.split()
+            filepath, *other = i.strip().split()
             filesystem_config[filepath] = other
-            if len(i_.split()) > 5:
-                print(f"Warn:{i_} has too much data.")
+            if len(i.split()) > 5:
+                print(f"Warn:{i[0]} has too much data.")
     return filesystem_config
 
 
@@ -119,4 +118,4 @@ def main(dir_path, fs_config):
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin_fs.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")
-    print("New fs_config %d" % (len(new_fs.keys())) + " entries")
+    print('Add %d' % (len(new_fs.keys()) - len(origin_fs.keys())) + " entries")
