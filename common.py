@@ -688,7 +688,7 @@ def GetMinSdkVersionInt(apk_name, codename_to_api_level_map):
 
 
 def SignFile(input_name, output_name, key, password, min_api_level=None,
-             codename_to_api_level_map=dict(),
+             codename_to_api_level_map: dict = None,
              whole_file=False):
     """Sign the input_name zip/jar/apk, producing output_name.  Use the
   given key and password (the latter may be None if the key does not
@@ -1004,7 +1004,7 @@ class PasswordManager(object):
                 line = line.strip()
                 if not line or line[0] == '#':
                     continue
-                m = re.match(r"^\[\[\[\s*(.*?)\s*\]\]\]\s*(\S+)$", line)
+                m = re.match(r"^\[\[\[\s*(.*?)\s*]]]\s*(\S+)$", line)
                 if not m:
                     print("failed to parse password file: ", line)
                 else:
