@@ -9,7 +9,7 @@ def scanfs(file) -> dict:  # 读取fs_config文件返回一个字典
         for i in file_.readlines():
             filepath, *other = i.strip().split()
             filesystem_config[filepath] = other
-            if len(i.split()) > 5:
+            if len(other) > 4:
                 print(f"Warn:{i[0]} has too much data.")
     return filesystem_config
 
