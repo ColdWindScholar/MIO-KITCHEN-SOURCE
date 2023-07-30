@@ -106,6 +106,7 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                 gid = '0'
                 mode = '0644'
                 config = [uid, gid, mode]
+            print(f'Add [{i}:{config}]')
             new_fs.update({i: config})
     return new_fs
 
