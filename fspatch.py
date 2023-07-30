@@ -6,7 +6,7 @@ import os
 def scanfs(file) -> dict:  # 读取fs_config文件返回一个字典
     filesystem_config = {}
     with open(file, "r") as file_:
-        for i in file_.readlines():
+        for i in file_.readlines():  # other:uid gid mode link cap
             filepath, *other = i.strip().split()
             filesystem_config[filepath] = other
             if len(other) > 4:
