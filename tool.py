@@ -15,6 +15,7 @@ try:
     import pyscreeze
 except:
     pass
+import contextpatch
 
 if os.name == 'nt':
     import windnd
@@ -214,6 +215,7 @@ class welcome(object):
         ttk.Label(self.frame, text=lang.t5, font=("宋体", 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10)
         ttk.Button(self.ck, text=lang.text34, command=self.ck.destroy).pack(fill=BOTH, side='bottom')
+
 
 def upgrade():
     ck = Toplevel()
@@ -1676,7 +1678,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                     rmdir(findfolder(work, "com.google.android.apps.nbu"))
                 fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
                 qc.handle(work + "config" + os.sep + dname + "_fs_config")
-                patch_context(work + "config" + os.sep + dname + "_file_contexts", dname)
+                contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
                 qc.handle(work + "config" + os.sep + dname + "_file_contexts")
             except Exception as e:
                 print(e)
@@ -1992,24 +1994,6 @@ def unpack(chose, form: any = None):
 
     car.set(1)
     print(lang.text8)
-
-
-def patch_context(context, dname):
-    if os.access(context, os.F_OK):
-        with open(context, 'r+', encoding='utf-8',
-                  newline='\n') as f:
-            attrib_ = f.readlines()[0].replace('\n', '').split()[1]
-            date = f.readlines()
-            patch = [f"/lost\\+found {attrib_}\n",
-                     f"/{dname}/lost\\+found {attrib_}\n",
-                     f"/{dname}/ {attrib_}\n"]
-            for u in patch:
-                if u in date:
-                    patch.remove(u)
-            del date
-        with open(context, 'a+', encoding='utf-8',
-                  newline='\n') as fs:
-            fs.writelines(patch)
 
 
 def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
