@@ -3,7 +3,7 @@
 import os
 
 
-def scanfs(file):  # 读取fs_config文件返回一个字典
+def scanfs(file) -> dict:  # 读取fs_config文件返回一个字典
     filesystem_config = {}
     with open(file, "r") as file_:
         for i in file_.readlines():
@@ -51,7 +51,7 @@ def islink(file) -> str and bool:
             return False
 
 
-def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
+def fs_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
     new_fs = {}
     for i in filename:
         if fs_file.get(i):
@@ -111,11 +111,11 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
     return new_fs
 
 
-def main(dir_path, fs_config):
+def main(dir_path, fs_config) -> None:
     origin_fs = scanfs(os.path.abspath(fs_config))
     allfiles = scan_dir(os.path.abspath(dir_path))
     new_fs = fs_patch(origin_fs, allfiles, dir_path)
-    with open(fs_config, "w", encoding='utf-8') as f:
+    with open(fs_config, "w", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin_fs.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")

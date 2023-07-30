@@ -3,7 +3,7 @@
 import os
 
 
-def scan_context(file):  # 读取context文件返回一个字典
+def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
     with open(file, "r") as file_:
         for i in file_.readlines():
@@ -31,7 +31,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
     return sorted(set(allfiles), key=allfiles.index)
 
 
-def context_patch(fs_file, filename, dir_path):  # 接收两个字典对比
+def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
     new_fs = {}
     permission = fs_file[0].split()[1]
     for i in filename:
@@ -54,11 +54,11 @@ def context_patch(fs_file, filename, dir_path):  # 接收两个字典对比
     return new_fs
 
 
-def main(dir_path, fs_config):
+def main(dir_path, fs_config) -> None:
     origin = scan_context(os.path.abspath(fs_config))
     allfiles = scan_dir(os.path.abspath(dir_path))
     new_fs = context_patch(origin, allfiles, dir_path)
-    with open(fs_config, "w", encoding='utf-8') as f:
+    with open(fs_config, "w", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")
