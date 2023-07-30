@@ -48,6 +48,7 @@ def context_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                 for e in fs_file:
                     if os.path.dirname(filepath) in e:
                         permission = e.split()[1]
+                        return
             print(f'Add [{i}:{permission}]')
             new_fs.update({i: permission})
     return new_fs
