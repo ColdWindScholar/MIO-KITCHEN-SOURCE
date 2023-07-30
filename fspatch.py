@@ -55,7 +55,7 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
     new_fs = {}
     for i in filename:
         if fs_file.get(i):
-            new_fs.update({i: fs_file[i]})
+            new_fs[i] = fs_file[i]
         else:
             if os.name == 'nt':
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
@@ -107,7 +107,7 @@ def fs_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                 mode = '0644'
                 config = [uid, gid, mode]
             print(f'Add [{i}:{config}]')
-            new_fs.update({i: config})
+            new_fs[i] = config
     return new_fs
 
 

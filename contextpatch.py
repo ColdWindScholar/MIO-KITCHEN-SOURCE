@@ -36,7 +36,7 @@ def context_patch(fs_file, filename, dir_path):  # 接收两个字典对比
     permission = fs_file[0].split()[1]
     for i in filename:
         if fs_file.get(i):
-            new_fs.update({i: fs_file[i]})
+            new_fs[i] = fs_file[i]
         else:
             if os.name == 'nt':
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
@@ -50,7 +50,7 @@ def context_patch(fs_file, filename, dir_path):  # 接收两个字典对比
                         permission = e.split()[1]
                         break
             print(f'Add [{i}:{permission}]')
-            new_fs.update({i: permission})
+            new_fs[i] = permission
     return new_fs
 
 
