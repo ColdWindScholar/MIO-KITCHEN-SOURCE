@@ -2313,6 +2313,7 @@ def modpath():
 def cmm():
     if not dn.get():
         print(lang.warn1)
+        return
     inputvar = input_(lang.text102 + dn.get(), dn.get())
     if os.path.exists(local + os.sep + inputvar):
         print(lang.text103)
