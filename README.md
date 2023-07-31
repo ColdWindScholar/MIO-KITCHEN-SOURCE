@@ -26,7 +26,7 @@ pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
 ### QQ Group: 879232506
 ***
 # Partners
-### ᴇvᎥ𝔩eye https://github.com/786-shaaim
+### Shaaim https://github.com/786-shaaim
 ***
 # About
 ### Written by MIO-KITCHEN-TEAM

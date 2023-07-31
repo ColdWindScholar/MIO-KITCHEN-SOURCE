@@ -3,10 +3,10 @@
 import os
 
 
-def scanfs(file) -> dict:  # 读取fs_config文件返回一个字典
+def scanfs(file) -> dict:
     filesystem_config = {}
     with open(file, "r") as file_:
-        for i in file_.readlines():  # other:uid gid mode link cap
+        for i in file_.readlines():
             filepath, *other = i.strip().split()
             filesystem_config[filepath] = other
             if len(other) > 4:
@@ -14,7 +14,7 @@ def scanfs(file) -> dict:  # 读取fs_config文件返回一个字典
     return filesystem_config
 
 
-def scan_dir(folder) -> bool and list:  # 读取解包的目录，返回一个字典
+def scan_dir(folder) -> bool and list:
     allfiles = ['/']
     if os.name == 'nt':
         allfiles.append(os.path.basename(folder).replace('\\', ''))

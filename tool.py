@@ -1821,7 +1821,6 @@ def unpackrom(ifile) -> int:
 
 
 def gettype(file) -> str:
-    # header des offseed
     if not os.path.exists(file):
         return "fne"
 
