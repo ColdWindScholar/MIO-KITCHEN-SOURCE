@@ -11,7 +11,7 @@ import time
 import tkinter as tk
 from configparser import ConfigParser
 import extra
-
+from extra import *
 try:
     import pyscreeze
 except:
