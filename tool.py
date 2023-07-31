@@ -1170,8 +1170,7 @@ class installmpk(Toplevel):
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
-        label = Label(self, image=pyt)
-        label.pack(padx=10, pady=10)
+        Label(self, image=pyt).pack(padx=10, pady=10)
         Label(self, text="%s" % (self.mconf.get('module', 'name')), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
@@ -1185,7 +1184,7 @@ class installmpk(Toplevel):
         self.state = Label(self, text=lang.text40, font=('黑体', 12))
         self.state.pack(padx=10, pady=10)
         self.installb = ttk.Button(self, text=lang.text41, command=lambda: CallZ(self.install))
-        self.installb.pack(padx=10, pady=10, expand=True)
+        self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
         self.wait_window()
 
@@ -1977,7 +1976,7 @@ def unpack(chose, form: any = None):
                         messpop(lang.warn11.format(dname + ".img:" + e))
             if ftype == "erofs":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
-                call(exe="extract.erofs -i " + local + os.sep + dn.get() + "/" + dname + ".img -o " + work + " -x",
+                call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
                      out=1)
                 with open(work + "config" + os.sep + dname + "_erofs", 'w') as f:
                     f.write("erofs")
