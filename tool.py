@@ -14,7 +14,6 @@ import extra
 from extra import *
 import contextpatch
 
-
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -1340,7 +1339,7 @@ class packss:
         lf2.pack(fill=BOTH)
         lf3 = ttk.LabelFrame(ck, text=lang.text55)
         lf3.pack(fill=BOTH)
-
+        supersz.set(1)
         # 自动设置
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
@@ -1902,9 +1901,8 @@ def unpack(chose, form: any = None):
         return 1
     if form == 'payload':
         print(lang.text79 + "payload")
-        pay = open(work + "payload.bin", 'rb')
-        payload_dumper.ota_payload_dumper( pay, work, 'store_true', 'old', chose)
-        pay.close()
+        with open(work + "payload.bin", 'rb') as pay:
+            payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', chose)
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
