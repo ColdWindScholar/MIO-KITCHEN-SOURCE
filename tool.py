@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import json
 import re
 import shlex
@@ -9,8 +10,7 @@ import threading
 import time
 import tkinter as tk
 from configparser import ConfigParser
-
-from extra import *
+import extra
 
 try:
     import pyscreeze
@@ -762,6 +762,17 @@ class mpkman(object):
                     print("赋值异常：%s\n语句：%s" % (e, cmd))
                     return 1
                 self.envs[vn] = va
+
+            def run_ex(self, cmd):
+                try:
+                    vn, va = shlex.split(cmd)
+                except Exception as e:
+                    print("运行异常:%s\n语句:run_ma %s" % (e, cmd))
+                    return 1
+                try:
+                    getattr(extra, vn)(va.split())
+                except:
+                    print("调用失败! %s " % va)
 
             @staticmethod
             def echo(cmd):
