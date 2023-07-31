@@ -8,18 +8,12 @@ import bsdiff4
 import io
 import os
 import lzma
-import threading
 import update_metadata_pb2 as um
 import timeit
+from threading import Thread
+from time import sleep
 
 flatten = lambda l: [item for sublist in l for item in sublist]
-
-
-def CallZ(func, *args):  # 传入函数名和参数
-    # 创建线程
-    t = threading.Thread(target=func, args=args)
-    t.daemon = True
-    t.start()
 
 
 def u32(x):
@@ -43,8 +37,8 @@ def verify_contiguous(exts):
 
 
 def data_for_op(op, out_file, old_file):
-    args.payloadfile.seek(data_offset + op.data_offset)
-    data = args.payloadfile.read(op.data_length)
+    payloadfile.seek(data_offset + op.data_offset)
+    data = payloadfile.read(op.data_length)
 
     # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
 
@@ -84,7 +78,7 @@ def data_for_op(op, out_file, old_file):
         old_data = tmp_buff.read()
         tmp_buff.seek(0)
         tmp_buff.write(bsdiff4.patch(old_data, data))
-        n = 0;
+        n = 0
         tmp_buff.seek(0)
         for ext in op.dst_extents:
             tmp_buff.seek(n * block_size)
@@ -120,47 +114,44 @@ def dump_part(part):
         print("%s:[%s]" % (part.partition_name, timeit.default_timer() - start))
 
 
-def ota_payload_dumper(payloadfile, out='output', diff='store_true', old='old', images='', command: int = 1):
+def ota_payload_dumper(payloadfile_, out='output', diff='store_true', old='old', images='', command: int = 1):
     parser = argparse.ArgumentParser(description='OTA payload dumper')
-    parser.add_argument('payloadfile', type=argparse.FileType('rb'))
     parser.add_argument('--out', default=out)
     parser.add_argument('--diff', action=diff)
     parser.add_argument('--old', default=old)
     parser.add_argument('--images', default=images)
     global args
-    args = parser.parse_args([payloadfile])
+    args = parser.parse_args()
+    global payloadfile
+    payloadfile = payloadfile_
+    args.payload = payloadfile
     if not os.path.exists(args.out):
         os.makedirs(args.out)
-    magic = args.payloadfile.read(4)
+    magic = payloadfile.read(4)
     assert magic == b'CrAU'
-    file_format_version = u64(args.payloadfile.read(8))
+    file_format_version = u64(payloadfile.read(8))
     assert file_format_version == 2
-    manifest_size = u64(args.payloadfile.read(8))
+    manifest_size = u64(payloadfile.read(8))
     metadata_signature_size = 0
     if file_format_version > 1:
-        metadata_signature_size = u32(args.payloadfile.read(4))
-    manifest = args.payloadfile.read(manifest_size)
-    metadata_signature = args.payloadfile.read(metadata_signature_size)
+        metadata_signature_size = u32(payloadfile.read(4))
+    manifest = payloadfile.read(manifest_size)
+    metadata_signature = payloadfile.read(metadata_signature_size)
     global data_offset
-    data_offset = args.payloadfile.tell()
+    data_offset = payloadfile.tell()
     dam = um.DeltaArchiveManifest()
     dam.ParseFromString(manifest)
     global block_size
     block_size = dam.block_size
     if command == 0:
         return dam.partitions
-    if args.images == "":
-        for part in dam.partitions:
-            dump_part(part)
-    else:
-        if ',' in args.images:
-            images = args.images.split(",")
-        else:
-            images = args.images
-        for image in images:
-            partition = [part for part in dam.partitions if part.partition_name == image]
-            if partition:
-                dump_part(partition[0])
-            else:
-                sys.stderr.write("Partition %s not found in payload!\n" % image)
-    args.payloadfile.close()
+    tasks = []
+    for image in args.images:
+        partition = [part for part in dam.partitions if part.partition_name == image]
+        assert partition, "Partition %s not found in payload!\n" % image
+        tasks += [Thread(target=dump_part, args=(partition[0],), daemon=True)]
+    print(len(tasks))
+    for t in tasks:
+        t.start()
+    for t in tasks:
+        t.join()

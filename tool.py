@@ -14,6 +14,7 @@ import extra
 from extra import *
 import contextpatch
 
+
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -1901,7 +1902,9 @@ def unpack(chose, form: any = None):
         return 1
     if form == 'payload':
         print(lang.text79 + "payload")
-        payload_dumper.ota_payload_dumper(work + "payload.bin", work, 'store_true', 'old', chose)
+        pay = open(work + "payload.bin", 'rb')
+        payload_dumper.ota_payload_dumper( pay, work, 'store_true', 'old', chose)
+        pay.close()
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
@@ -2409,9 +2412,10 @@ class unpackg(object):
         else:
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
-                    for i in payload_dumper.ota_payload_dumper(work + "payload.bin", work, 'store_true', 'old', '',
-                                                               0):
-                        self.lsg.insert(END, i.partition_name)
+                    with open(work + "payload.bin", 'rb') as pay:
+                        for i in payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', '',
+                                                                   0):
+                            self.lsg.insert(END, i.partition_name)
 
     def close_(self):
         lbs = [self.lsg.get(index) for index in self.lsg.curselection()]
