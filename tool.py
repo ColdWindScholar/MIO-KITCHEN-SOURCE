@@ -217,6 +217,9 @@ class welcome(object):
             side='top', fill=BOTH, padx=10, pady=10)
         ttk.Button(self.ck, text=lang.text34, command=self.ck.destroy).pack(fill=BOTH, side='bottom')
 
+    def clos(self):
+        pass
+
 
 def upgrade():
     ck = Toplevel()
@@ -2502,7 +2505,7 @@ class format_conversion(Toplevel):
         ttk.Button(self, text=lang.ok, command=lambda: CallZ(self.conversion)).pack(side=BOTTOM, fill=BOTH)
         jzxs(self)
 
-    def relist(self, **other):
+    def relist(self, *other):
         work = rwork()
         self.list_b.delete(0, "end")
         if self.h.get() == "br":
