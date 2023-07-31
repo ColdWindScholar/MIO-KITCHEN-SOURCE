@@ -46,6 +46,8 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             if filepath:
                 for e in fs_file:
+                    if filepath.endswith('/'):
+                        filepath = filepath[:-1]
                     if os.path.dirname(filepath) in e:
                         permission = e.split()[1]
                         break
