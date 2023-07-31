@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import os
 import re
 import shlex
 import struct
@@ -10,7 +9,9 @@ import threading
 import time
 import tkinter as tk
 from configparser import ConfigParser
+
 from extra import *
+
 try:
     import pyscreeze
 except:
@@ -1104,13 +1105,16 @@ class mpkman(object):
                                                                                     pady=10,
                                                                                     padx=10)
 
-            def lfdep(self):
+            def lfdep(self, name=None):
+                if not name:
+                    name = self.value
                 for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
                     with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
                         data = json.load(f)
                         for n in data['depend'].split():
-                            if self.value == n:
+                            if name == n:
                                 self.arr.append(i)
+                                self.lfdep(i)
                                 self.arr2.append(data['name'])
                                 break
 
