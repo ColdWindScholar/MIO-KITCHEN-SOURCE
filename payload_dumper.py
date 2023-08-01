@@ -10,8 +10,6 @@ import os
 import lzma
 import update_metadata_pb2 as um
 import timeit
-from threading import Thread
-from time import sleep
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
@@ -145,13 +143,7 @@ def ota_payload_dumper(payloadfile_, out='output', diff='store_true', old='old',
     block_size = dam.block_size
     if command == 0:
         return dam.partitions
-    tasks = []
     for image in args.images:
         partition = [part for part in dam.partitions if part.partition_name == image]
         assert partition, "Partition %s not found in payload!\n" % image
-        tasks += [Thread(target=dump_part, args=(partition[0],), daemon=True)]
-    print(len(tasks))
-    for t in tasks:
-        t.start()
-    for t in tasks:
-        t.join()
+        dump_part(partition[0])
