@@ -1430,22 +1430,6 @@ def packsuper(sparse, dbfz, size, set_, lb):
     car.set(1)
 
 
-def returnoutput(cmd, kz=1):
-    if kz == 1:
-        comd = elocal + os.sep + "bin" + os.sep + os.name + '_' + machine() + os.sep + cmd
-    else:
-        comd = cmd
-    if os.name == 'posix':
-        comd = comd.split()
-    else:
-        comd = cmd
-    try:
-        ret = subprocess.check_output(comd, shell=False, stderr=subprocess.STDOUT)
-        return ret.decode()
-    except subprocess.CalledProcessError as e:
-        return e.decode()
-
-
 class StdoutRedirector(object):
     def __init__(self, text_widget):
         self.text_space = text_widget

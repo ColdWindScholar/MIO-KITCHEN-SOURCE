@@ -1,4 +1,6 @@
 import os
+import subprocess
+from platform import machine
 
 
 def clink(link: str, target: str):
@@ -12,6 +14,22 @@ def clink(link: str, target: str):
         from ctypes import windll
         attrib = windll.kernel32.SetFileAttributesA
         attrib(LPCSTR(link.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+
+
+def returnoutput(cmd, elocal, kz=1):
+    if kz == 1:
+        comd = elocal + os.sep + "bin" + os.sep + os.name + '_' + machine() + os.sep + cmd
+    else:
+        comd = cmd
+    if os.name == 'posix':
+        comd = comd.split()
+    else:
+        comd = cmd
+    try:
+        ret = subprocess.check_output(comd, shell=False, stderr=subprocess.STDOUT)
+        return ret.decode()
+    except subprocess.CalledProcessError as e:
+        return e.decode()
 
 
 class prop_utils(object):
