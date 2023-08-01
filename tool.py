@@ -2047,9 +2047,9 @@ class dirsize(object):
             elif size <= 1073741824:
                 bs = 1.1258
             elif size <= 536870912:
-                bs = 1.1558
+                bs = 1.1358
             elif size <= 104857600:
-                bs = 1.4058
+                bs = 1.1458
             else:
                 bs = 1.258
         if self.get == 3:

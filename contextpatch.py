@@ -17,18 +17,18 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
 
 def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
     part_name = os.path.basename(folder)
-    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}',f'/{part_name}/']
+    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}', f'/{part_name}/']
     for root, dirs, files in os.walk(folder, topdown=True):
         for dir_ in dirs:
             if os.name == 'nt':
-                allfiles.append(os.path.join(root, dir_).replace(folder, '/'+part_name).replace('\\', '/'))
+                allfiles.append(os.path.join(root, dir_).replace(folder, '/' + part_name).replace('\\', '/'))
             elif os.name == 'posix':
-                allfiles.append(os.path.join(root, dir_).replace(folder, '/'+part_name))
+                allfiles.append(os.path.join(root, dir_).replace(folder, '/' + part_name))
         for file in files:
             if os.name == 'nt':
-                allfiles.append(os.path.join(root, file).replace(folder, '/'+part_name).replace('\\', '/'))
+                allfiles.append(os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/'))
             elif os.name == 'posix':
-                allfiles.append(os.path.join(root, file).replace(folder, '/'+part_name))
+                allfiles.append(os.path.join(root, file).replace(folder, '/' + part_name))
     return sorted(set(allfiles), key=allfiles.index)
 
 
