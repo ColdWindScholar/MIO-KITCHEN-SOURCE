@@ -22,18 +22,6 @@ def u64(x):
     return struct.unpack('>Q', x)[0]
 
 
-def verify_contiguous(exts):
-    blocks = 0
-
-    for ext in exts:
-        if ext.start_block != blocks:
-            return False
-
-        blocks += ext.num_blocks
-
-    return True
-
-
 def data_for_op(op, out_file, old_file):
     payloadfile.seek(data_offset + op.data_offset)
     data = payloadfile.read(op.data_length)

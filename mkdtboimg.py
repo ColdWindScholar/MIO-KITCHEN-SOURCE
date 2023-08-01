@@ -115,15 +115,12 @@ class DtEntry(object):
             self.__custom3 = self.__get_number_or_prop(kwargs['custom3'])
 
     def __str__(self):
-        sb = []
-        sb.append('{key:>20} = {value:d}'.format(key='dt_size',
-                                                 value=self.__dt_size))
-        sb.append('{key:>20} = {value:d}'.format(key='dt_offset',
-                                                 value=self.__dt_offset))
-        sb.append('{key:>20} = {value:08x}'.format(key='id',
-                                                   value=self.__id))
-        sb.append('{key:>20} = {value:08x}'.format(key='rev',
-                                                   value=self.__rev))
+        sb = ['{key:>20} = {value:d}'.format(key='dt_size',
+                                             value=self.__dt_size), '{key:>20} = {value:d}'.format(key='dt_offset',
+                                                                                                   value=self.__dt_offset),
+              '{key:>20} = {value:08x}'.format(key='id',
+                                               value=self.__id), '{key:>20} = {value:08x}'.format(key='rev',
+                                                                                                  value=self.__rev)]
         if self.__version == 1:
             sb.append('{key:>20} = {value:08x}'.format(key='flags',
                                                        value=self.__flags))
@@ -323,9 +320,7 @@ class Dtbo(object):
             raise ValueError('DTBO DT entries can be added only once')
 
         offset = self.dt_entries_offset // 4
-        params = {}
-        params['version'] = self.version
-        params['dt_file'] = None
+        params = {'version': self.version, 'dt_file': None}
         for i in range(0, self.dt_entry_count):
             dt_table_entry = self.__metadata[offset:offset + self._DT_ENTRY_HEADER_INTS]
             params['dt_size'] = dt_table_entry[0]
@@ -420,8 +415,7 @@ class Dtbo(object):
             self._read_dtbo_image()
 
     def __str__(self):
-        sb = []
-        sb.append('dt_table_header:')
+        sb = ['dt_table_header:']
         _keys = ('magic', 'total_size', 'header_size', 'dt_entry_size',
                  'dt_entry_count', 'dt_entries_offset', 'page_size', 'version')
         for key in _keys:
