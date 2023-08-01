@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
-import re
+from re import sub
 
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
@@ -17,7 +17,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
 
 def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
     part_name = os.path.basename(folder)
-    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}/']
+    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}']
     for root, dirs, files in os.walk(folder, topdown=True):
         for dir_ in dirs:
             if os.name == 'nt':
@@ -37,7 +37,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
     permission = fs_file.get(list(fs_file)[0])
     for i in filename:
         if fs_file.get(i):
-            new_fs[re.sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
+            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
         else:
             if os.name == 'nt':
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
@@ -52,7 +52,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                     if os.path.dirname(filepath) in e:
                         permission = e.split()[1]
                         break
-            new_fs[re.sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
+            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
     return new_fs
 
 
