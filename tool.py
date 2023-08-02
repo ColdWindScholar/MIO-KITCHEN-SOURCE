@@ -22,7 +22,7 @@ from platform import machine
 from random import randint, choice
 from tkinter import *
 from tkinter import filedialog, ttk, messagebox
-from shutil import rmtree, copy
+from shutil import rmtree, copy, move
 import requests
 import sv_ttk
 from PIL import Image, ImageTk
@@ -41,6 +41,7 @@ import qc
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
+import zstandard as zstd
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -1326,6 +1327,42 @@ class packxx(object):
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get())
 
 
+def dbkxyt():
+    if not dn.get():
+        messpop(lang.warn1)
+        return
+    dir_ = rwork()
+    if os.path.exists(dir_ + "firmware-update"):
+        os.rename(dir_ + "firmware-update", dir_ + "images")
+    if not os.path.exists(dir_ + "images"):
+        os.makedirs(dir_ + 'images')
+    if os.path.exists(dir_ + 'META-INF'):
+        rmdir(dir_ + 'META-INF')
+    with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "FlashTool.zip") as zip:
+        zip.extractall(dir_)
+    if os.path.exists(dir_ + "super.img"):
+        with open(dir_ + "super.img", 'rb') as super_, open(dir_ + "images" + os.sep + "super.img.zst", 'wb') as zstd_:
+            print("[DOING] Compress Super.img...")
+            compressor = zstd.ZstdCompressor().stream_writer(zstd_)
+            compressor.write(super_.read())
+            compressor.close()
+        os.remove(dir_ + "super.img")
+
+    with open(dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
+              'r+', encoding='utf-8', newline='\n') as script:
+        lines = script.readlines()
+        for t in os.listdir(dir_ + "images"):
+            if t.endswith('.img'):
+                lines.insert(44, "package_extract_file images/{} /dev/block/by-name/{}\n".format(t, t[:-4]))
+        for t in os.listdir(dir_):
+            print("Add Flash method {} to update-binary".format(t))
+            if os.path.isfile(dir_+t) and t.endswith('.img'):
+                move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
+                if not t.startswith("preloader_"):
+                    lines.insert(44, "package_extract_file images/{} /dev/block/by-name/{}\n".format(t, t[:-4]))
+        script.writelines(lines)
+
+
 class packss:
     def __init__(self):
         ck = subp(com=1, title=lang.text53)
@@ -2278,6 +2315,8 @@ def packzip():
     else:
         load_car(0)
         print(lang.text91 % dn.get())
+        if ask_win("是否打包卡线一体?") == 1:
+            dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
         car.set(1)
 
@@ -2451,6 +2490,7 @@ LB3.bind('<<ComboboxSelected>>', set_language)
 sf1.pack(padx=10, pady=10, fill='both')
 sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
+
 # 关于我们
 Label(tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
 Label(tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
