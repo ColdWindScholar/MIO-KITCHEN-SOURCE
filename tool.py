@@ -1353,13 +1353,15 @@ def dbkxyt():
         lines = script.readlines()
         for t in os.listdir(dir_ + "images"):
             if t.endswith('.img'):
-                lines.insert(44, "package_extract_file images/{} /dev/block/by-name/{}\n".format(t, t[:-4]))
+                lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
         for t in os.listdir(dir_):
-            print("Add Flash method {} to update-binary".format(t))
             if os.path.isfile(dir_+t) and t.endswith('.img'):
+                print("Add Flash method {} to update-binary".format(t))
                 move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
                 if not t.startswith("preloader_"):
-                    lines.insert(44, "package_extract_file images/{} /dev/block/by-name/{}\n".format(t, t[:-4]))
+                    lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+        script.seek(0)
+        script.truncate()
         script.writelines(lines)
 
 
