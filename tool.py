@@ -1338,7 +1338,7 @@ def dbkxyt():
         os.makedirs(dir_ + 'images')
     if os.path.exists(dir_ + 'META-INF'):
         rmdir(dir_ + 'META-INF')
-    with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "FlashTool.zip") as zip:
+    with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip") as zip:
         zip.extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
         with open(dir_ + "super.img", 'rb') as super_, open(dir_ + "images" + os.sep + "super.img.zst", 'wb') as zstd_:
