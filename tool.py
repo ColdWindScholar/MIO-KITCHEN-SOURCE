@@ -1342,7 +1342,6 @@ def dbkxyt():
             call("zstd -5 --rm {} -o {}".format(dir_ + "super.img", dir_ + 'images' + os.sep + "super.img.zst"))
         except Exception as e:
             print("[Fail] Compress Super.img Fail:{}".format(e))
-        os.remove(dir_ + "super.img")
 
     with open(dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
               'r+', encoding='utf-8', newline='\n') as script:
