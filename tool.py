@@ -2317,8 +2317,9 @@ def packzip():
     else:
         load_car(0)
         print(lang.text91 % dn.get())
-        if ask_win("是否打包卡线一体?") == 1:
-            dbkxyt()
+        if os.path.exists(rwork()+"super.img"):
+            if ask_win(lang.t25) == 1:
+                dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
         car.set(1)
 
