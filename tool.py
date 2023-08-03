@@ -563,7 +563,14 @@ class mpkman(object):
         rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
         rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
         rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
-
+        def impk() -> Exception:
+            installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
+            manager.lift()
+            try:
+                listpls()
+            except Exception as e:
+                listpls()
+                return e
         class new_(Toplevel):
             def __init__(self):
                 super().__init__()
@@ -609,7 +616,7 @@ class mpkman(object):
                 }
                 self.destroy()
                 if not os.path.exists(moduledir + os.sep + iden):
-                    os.mkdir(moduledir + os.sep + iden)
+                    os.makedirs(moduledir + os.sep + iden)
                 with open(moduledir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8', newline='\n') as js:
                     js.write(json.dumps(data))
                 listpls()
@@ -711,14 +718,6 @@ class mpkman(object):
 
         listpls()
 
-        def impk() -> Exception:
-            installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
-            manager.lift()
-            try:
-                listpls()
-            except Exception as e:
-                listpls()
-                return e
 
         class msh_parse(object):
             envs = {'version': VERSION,
