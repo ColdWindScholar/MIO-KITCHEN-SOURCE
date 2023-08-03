@@ -563,6 +563,7 @@ class mpkman(object):
         rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
         rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
         rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
+
         def impk() -> Exception:
             installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
             manager.lift()
@@ -571,6 +572,7 @@ class mpkman(object):
             except Exception as e:
                 listpls()
                 return e
+
         class new_(Toplevel):
             def __init__(self):
                 super().__init__()
@@ -717,7 +719,6 @@ class mpkman(object):
                 pass
 
         listpls()
-
 
         class msh_parse(object):
             envs = {'version': VERSION,
@@ -1341,7 +1342,7 @@ def dbkxyt():
     if os.path.exists(dir_ + "super.img"):
         try:
             print("[Compress] Super.img...")
-            call("zstd -5 --rm {} -o {}".format(dir_ + "super.img",dir_+'images'+os.sep+"super.img.zst"))
+            call("zstd -5 --rm {} -o {}".format(dir_ + "super.img", dir_ + 'images' + os.sep + "super.img.zst"))
         except Exception as e:
             print("[Fail] Compress Super.img Fail:{}".format(e))
         os.remove(dir_ + "super.img")
