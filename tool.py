@@ -334,7 +334,7 @@ def padtbo() -> any:
     work = rwork()
     refolder(work + "dtbo" + os.sep + "dtbo")
     load_car(0)
-    if not os.path.exists(work + "dtbo" + os.sep + "dts"):
+    if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work+"dtbo"):
         print(lang.warn5)
         car.set(1)
         return False
