@@ -75,4 +75,4 @@ def returnoutput(cmd, elocal, kz=1):
         ret = subprocess.check_output(comd, shell=False, stderr=subprocess.STDOUT)
         return ret.decode()
     except subprocess.CalledProcessError as e:
-        return e.decode()
+        return str(e).decode()

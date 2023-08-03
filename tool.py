@@ -695,7 +695,6 @@ def mpkman() -> None:
         except:
             pass
 
-
     class msh_parse(object):
         envs = {'version': VERSION,
                 'tool_bin': (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\',
@@ -1367,6 +1366,7 @@ class packss:
         ssparse = IntVar()
         supersz = IntVar()
         sdbfz = StringVar()
+        scywj = IntVar()
         lf1 = ttk.LabelFrame(ck, text=lang.text54)
         lf1.pack(fill=BOTH)
         lf2 = ttk.LabelFrame(ck, text=lang.settings)
@@ -1400,6 +1400,9 @@ class packss:
         ttk.Checkbutton(ck, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
+        ttk.Checkbutton(ck, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=10, pady=10, fill=BOTH)
 
         def versize():
             size = 0
@@ -1420,8 +1423,9 @@ class packss:
                 ask_win(lang.t10)
                 return False
             lbs = [tl.get(index) for index in tl.curselection()]
+            sc = scywj.get()
             subp(com=0, master=ck)
-            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs)
+            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
         ttk.Button(ck, text=lang.pack, command=lambda: CallZ(start_)).pack(side='left',
                                                                            padx=5,
@@ -1431,7 +1435,7 @@ class packss:
                                                                                       expand=True)
 
 
-def packsuper(sparse, dbfz, size, set_, lb):
+def packsuper(sparse, dbfz, size, set_, lb, del_=0):
     if not dn.get():
         messpop(lang.warn1)
         return False
@@ -1459,6 +1463,13 @@ def packsuper(sparse, dbfz, size, set_, lb):
     call(command)
     if os.access(work + "super.img", os.F_OK):
         print(lang.text59 % (work + "super.img"))
+        if del_ == 1:
+            for img in lb:
+                if os.path.exists(work + img + ".img"):
+                    try:
+                        os.remove(work + img + ".img")
+                    except:
+                        pass
     else:
         messpop(lang.warn10)
     car.set(1)
@@ -1695,7 +1706,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
         dname = os.path.basename(i)
         if spatch == 1:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
-                file = str(findfile(j, work))
+                file = findfile(j, work)
                 if file:
                     if vbpatch.checkmagic(file):
                         print(lang.text71 % file)
@@ -2196,7 +2207,7 @@ def selectp(self):
 def listdir():
     array = []
     for f in os.listdir(local + os.sep + "."):
-        if os.path.isdir(local + os.sep + f) and f != 'bin':
+        if os.path.isdir(local + os.sep + f) and f != 'bin' and not f.startswith('.'):
             array.append(f)
     if not array:
         dn.set("")
