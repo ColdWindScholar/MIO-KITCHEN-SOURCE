@@ -543,24 +543,6 @@ def mpkman() -> None:
     if not dn.get():
         messpop(lang.warn1)
         return
-    manager = Toplevel()
-    manager.title(lang.text19)
-    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-    ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-    Label(manager, text=lang.text24).pack(padx=5, pady=5)
-    pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
-    lf2 = ttk.LabelFrame(manager)
-    ttk.Button(lf2, text=lang.text20, command=lambda: CallZ(unmpk)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.text22, command=lambda: CallZ(run)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t14, command=lambda: CallZ(export)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t17, command=lambda: CallZ(editor_)).pack(padx=5, pady=5, fill=BOTH)
-    lf1 = Frame(manager)
-    pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-    lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-    rmenu = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
-    rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
-    rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
 
     def impk() -> Exception:
         installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
@@ -696,10 +678,7 @@ def mpkman() -> None:
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
 
-    pls.bind("<<ListboxSelect>>", relf2)
-    pls.bind("<Button-3>", popup)
     moduledir = elocal + os.sep + "bin" + os.sep + "module"
-    manager.resizable(False, False)
     file = StringVar()
 
     def listpls():
@@ -1149,6 +1128,27 @@ def mpkman() -> None:
             else:
                 messpop(lang.warn2)
 
+    manager = Toplevel()
+    manager.title(lang.text19)
+    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+    ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+    Label(manager, text=lang.text24).pack(padx=5, pady=5)
+    pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
+    lf2 = ttk.LabelFrame(manager)
+    ttk.Button(lf2, text=lang.text20, command=lambda: CallZ(unmpk)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.text22, command=lambda: CallZ(run)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t14, command=lambda: CallZ(export)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t17, command=lambda: CallZ(editor_)).pack(padx=5, pady=5, fill=BOTH)
+    lf1 = Frame(manager)
+    pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
+    lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
+    rmenu = Menu(pls, tearoff=False, borderwidth=0)
+    rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
+    rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
+    rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
+    pls.bind("<<ListboxSelect>>", relf2)
+    pls.bind("<Button-3>", popup)
+    manager.resizable(False, False)
     try:
         listpls()
     except:
