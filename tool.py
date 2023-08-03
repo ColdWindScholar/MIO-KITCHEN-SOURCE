@@ -2319,7 +2319,7 @@ def packzip():
         if os.path.exists(rwork() + "super.img"):
             if ask_win(lang.t25) == 1:
                 if os.name != 'nt':
-                    return
+                    pass
                 else:
                     dbkxyt()
         zip_file(dn.get() + ".zip", rwork())
