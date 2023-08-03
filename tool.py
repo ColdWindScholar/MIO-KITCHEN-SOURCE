@@ -1330,6 +1330,8 @@ def dbkxyt():
     if not dn.get():
         messpop(lang.warn1)
         return
+    if os.name != 'nt':
+        return
     dir_ = rwork()
     if os.path.exists(dir_ + "firmware-update"):
         os.rename(dir_ + "firmware-update", dir_ + "images")
@@ -1341,6 +1343,7 @@ def dbkxyt():
         zip.extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
         try:
+            print("[Compress] Super.img...")
             call("zstd -5 --rm {} -o {}".format(dir_ + "super.img",dir_+'images'+os.sep+"super.img.zst"))
         except Exception as e:
             print("[Fail] Compress Super.img Fail:{}".format(e))
