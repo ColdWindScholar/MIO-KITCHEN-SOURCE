@@ -2083,9 +2083,9 @@ class dirsize(object):
             elif size <= 536870912:
                 bs = 1.0958
             elif size <= 104857600:
-                bs = 1.1058
-            else:
                 bs = 1.1158
+            else:
+                bs = 1.1258
         if self.get == 3:
             self.rsizelist(self.dname, int(size * bs), self.list_f)
         self.rsize_v = int(size * bs / num)
