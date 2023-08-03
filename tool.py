@@ -333,7 +333,7 @@ def undtbo(bn: str = 'dtbo') -> any:
 def padtbo() -> any:
     work = rwork()
     load_car(0)
-    if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work+"dtbo"):
+    if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
         car.set(1)
         return False
@@ -1341,11 +1341,15 @@ def dbkxyt():
     with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip") as zip:
         zip.extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
-        with open(dir_ + "super.img", 'rb') as super_, open(dir_ + "images" + os.sep + "super.img.zst", 'wb') as zstd_:
-            print("[DOING] Compress Super.img...")
-            compressor = zstd.ZstdCompressor().stream_writer(zstd_)
-            compressor.write(super_.read())
-            compressor.close()
+        try:
+            with open(dir_ + "super.img", 'rb') as super_, open(dir_ + "images" + os.sep + "super.img.zst",
+                                                                'wb') as zstd_:
+                print("[DOING] Compress Super.img...")
+                compressor = zstd.ZstdCompressor().stream_writer(zstd_)
+                compressor.write(super_.read())
+                compressor.close()
+        except Exception as e:
+            print("[Fail] Compress Super.img Fail:{}".format(e))
         os.remove(dir_ + "super.img")
 
     with open(dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
@@ -1355,7 +1359,7 @@ def dbkxyt():
             if t.endswith('.img'):
                 lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
         for t in os.listdir(dir_):
-            if os.path.isfile(dir_+t) and t.endswith('.img'):
+            if os.path.isfile(dir_ + t) and t.endswith('.img'):
                 print("Add Flash method {} to update-binary".format(t))
                 move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
                 if not t.startswith("preloader_"):
@@ -2317,7 +2321,7 @@ def packzip():
     else:
         load_car(0)
         print(lang.text91 % dn.get())
-        if os.path.exists(rwork()+"super.img"):
+        if os.path.exists(rwork() + "super.img"):
             if ask_win(lang.t25) == 1:
                 dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
