@@ -1330,8 +1330,6 @@ def dbkxyt():
     if not dn.get():
         messpop(lang.warn1)
         return
-    if os.name != 'nt':
-        return
     dir_ = rwork()
     if os.path.exists(dir_ + "firmware-update"):
         os.rename(dir_ + "firmware-update", dir_ + "images")
@@ -2320,7 +2318,10 @@ def packzip():
         print(lang.text91 % dn.get())
         if os.path.exists(rwork() + "super.img"):
             if ask_win(lang.t25) == 1:
-                dbkxyt()
+                if os.name != 'nt':
+                    return
+                else:
+                    dbkxyt()
         zip_file(dn.get() + ".zip", rwork())
         car.set(1)
 
