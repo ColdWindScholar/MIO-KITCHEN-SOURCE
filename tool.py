@@ -695,7 +695,6 @@ def mpkman() -> None:
         except:
             pass
 
-    listpls()
 
     class msh_parse(object):
         envs = {'version': VERSION,
