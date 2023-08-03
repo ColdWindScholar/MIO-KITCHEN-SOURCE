@@ -539,624 +539,622 @@ def subp(com: int = 1, title: str = lang.text18, master: any = None):
         master.destroy()
 
 
-class mpkman(object):
+def mpkman() -> None:
+    if not dn.get():
+        messpop(lang.warn1)
+        return
+    manager = Toplevel()
+    manager.title(lang.text19)
+    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+    ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+    Label(manager, text=lang.text24).pack(padx=5, pady=5)
+    pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
+    lf2 = ttk.LabelFrame(manager)
+    ttk.Button(lf2, text=lang.text20, command=lambda: CallZ(unmpk)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.text22, command=lambda: CallZ(run)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t14, command=lambda: CallZ(export)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t17, command=lambda: CallZ(editor_)).pack(padx=5, pady=5, fill=BOTH)
+    lf1 = Frame(manager)
+    pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
+    lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
+    rmenu = Menu(pls, tearoff=False, borderwidth=0)
+    rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
+    rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
+    rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
 
-    def __init__(self) -> None:
-        if not dn.get():
-            messpop(lang.warn1)
-            return
-        manager = Toplevel()
-        manager.title(lang.text19)
-        ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-        ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        Label(manager, text=lang.text24).pack(padx=5, pady=5)
-        pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
-        lf2 = ttk.LabelFrame(manager)
-        ttk.Button(lf2, text=lang.text20, command=lambda: CallZ(unmpk)).pack(padx=5, pady=5, fill=BOTH)
-        ttk.Button(lf2, text=lang.text22, command=lambda: CallZ(run)).pack(padx=5, pady=5, fill=BOTH)
-        ttk.Button(lf2, text=lang.t14, command=lambda: CallZ(export)).pack(padx=5, pady=5, fill=BOTH)
-        ttk.Button(lf2, text=lang.t17, command=lambda: CallZ(editor_)).pack(padx=5, pady=5, fill=BOTH)
-        lf1 = Frame(manager)
-        pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-        lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-        rmenu = Menu(pls, tearoff=False, borderwidth=0)
-        rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
-        rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
-        rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
-
-        def impk() -> Exception:
-            installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
-            manager.lift()
-            try:
-                listpls()
-            except Exception as e:
-                listpls()
-                return e
-
-        class new_(Toplevel):
-            def __init__(self):
-                super().__init__()
-                jzxs(self)
-                self.resizable(False, False)
-                self.title(lang.text115)
-                ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
-                ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-                f1 = ttk.Frame(self)
-                ttk.Label(f1, text=lang.t20).pack(side=LEFT, padx=5, pady=5)
-                self.name = ttk.Entry(f1)
-                self.name.pack(padx=5, pady=5, side=LEFT)
-                f1.pack(padx=5, pady=5, fill=X)
-                f2 = ttk.Frame(self)
-                ttk.Label(f2, text=lang.t21).pack(side=LEFT, padx=5, pady=5)
-                self.aou = ttk.Entry(f2)
-                self.aou.pack(padx=5, pady=5, side=LEFT)
-                f2.pack(padx=5, pady=5, fill=X)
-                f3 = ttk.Frame(self)
-                ttk.Label(f3, text=lang.t22).pack(side=LEFT, padx=5, pady=5)
-                self.ver = ttk.Entry(f3)
-                self.ver.pack(padx=5, pady=5, side=LEFT)
-                f3.pack(padx=5, pady=5, fill=X)
-                f4 = ttk.Frame(self)
-                ttk.Label(f4, text=lang.t23).pack(side=LEFT, padx=5, pady=5)
-                self.dep = ttk.Entry(f4)
-                self.dep.pack(padx=5, pady=5, side=LEFT)
-                f4.pack(padx=5, pady=5, fill=X)
-                ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
-                self.intro = Text(self)
-                self.intro.pack(fill=BOTH, padx=5, pady=5, expand=1)
-                ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
-
-            def create(self):
-                iden = v_code()
-                data = {
-                    "name": self.name.get(),
-                    "author": self.aou.get(),
-                    "version": self.ver.get(),
-                    "identifier": iden,
-                    "describe": self.intro.get(1.0, END),
-                    "depend": self.dep.get()
-                }
-                self.destroy()
-                if not os.path.exists(moduledir + os.sep + iden):
-                    os.makedirs(moduledir + os.sep + iden)
-                with open(moduledir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8', newline='\n') as js:
-                    js.write(json.dumps(data))
-                listpls()
-                editor_(iden)
-
-        def editor_(id_=None):
-            if not pls.curselection():
-                messpop(lang.warn2)
-                return 1
-            if id_ is None:
-                id_ = globals()[pls.get(pls.curselection())]
-            if not os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh") and not os.path.exists(
-                    moduledir + os.sep + id_ + os.sep + "main.sh"):
-                ask = ask_win(lang.t18, 'SH', 'MSH')
-                if ask == 1:
-                    s = "main.sh"
-                else:
-                    s = "main.msh"
-                with open(moduledir + os.sep + id_ + os.sep + s, 'w+', encoding='utf-8', newline='\n') as sh:
-                    sh.write("echo hello,world")
-                editor.main(moduledir + os.sep + id_ + os.sep + s)
-            else:
-                if os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh"):
-                    editor.main(moduledir + os.sep + id_ + os.sep + "main.msh")
-                elif os.path.exists(moduledir + os.sep + id_ + os.sep + "main.sh"):
-                    editor.main(moduledir + os.sep + id_ + os.sep + "main.sh")
-
-        def export():
-            if not pls.curselection():
-                messpop(lang.warn2)
-                return 1
-            buffer = BytesIO()
-            buffer2 = StringIO()
-            info_ = ConfigParser()
-            value = globals()[pls.get(pls.curselection())]
-            with open(moduledir + os.sep + value + os.sep + "info.json", 'r', encoding='UTF-8') as f:
-                data = json.load(f)
-                if "describe" in data:
-                    des = data["describe"]
-                else:
-                    des = ''
-                info_['module'] = {
-                    'name': f'{data["name"]}',
-                    'version': f'{data["version"]}',
-                    'author': f'{data["author"]}',
-                    'describe': f'{des}',
-                    'resource': 'main.zip',
-                    'identifier': f'{value}',
-                    'depend': f'{data["depend"]}'
-                }
-                info_.write(buffer2)
-            with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-                os.chdir(moduledir + os.sep + value + os.sep)
-                for i in get_all_file_paths("."):
-                    print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
-                    try:
-                        mpk.write(i)
-                    except Exception as e:
-                        print(lang.text2.format(i, e))
-                os.chdir(elocal)
-            with zipfile.ZipFile(local + os.sep + pls.get(pls.curselection()) + ".mpk", 'w',
-                                 compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
-                mpk2.writestr('main.zip', buffer.getvalue())
-                mpk2.writestr('info', buffer2.getvalue())
-            if os.path.exists(local + os.sep + pls.get(pls.curselection()) + ".mpk"):
-                print(lang.t15 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
-            else:
-                print(lang.t16 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
-
-        def relf2(self):
-            try:
-                lf2.config(text=pls.get(pls.curselection()))
-            except Exception as e:
-                if e:
-                    lf2.config(text="Null")
-
-        def popup(event):
-            rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
-
-        pls.bind("<<ListboxSelect>>", relf2)
-        pls.bind("<Button-3>", popup)
-        moduledir = elocal + os.sep + "bin" + os.sep + "module"
-        manager.resizable(False, False)
-        file = StringVar()
-
-        def listpls():
-            pls.delete(0, "end")
-            for i in os.listdir(moduledir):
-                if os.path.isdir(moduledir + os.sep + i):
-                    with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
-                        data = json.load(f)
-                        pls.insert('end', data['name'])
-                        globals()[data['name']] = data['identifier']
-            try:
-                pls.selection_set(0)
-                relf2(self)
-            except:
-                pass
-
-        listpls()
-
-        class msh_parse(object):
-            envs = {'version': VERSION,
-                    'tool_bin': (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\',
-                                                                                                                '/'),
-                    'project': (local + os.sep + dn.get()).replace('\\', '/'),
-                    'moddir': moduledir.replace('\\', '/')}
-
-            def __init__(self, sh):
-                self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
-                with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
-                    for i in shell.readlines():
-                        for key, value in self.envs.items():
-                            i = i.replace('@{}@'.format(key), value)
-                        try:
-                            if i[:1] != "#":
-                                if i.split()[0] == "if":
-                                    self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
-                                elif i.split()[0] == "for":
-                                    self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
-                                else:
-                                    getattr(self, i.split()[0])(i[i.index(" ") + 1:])
-                        except AttributeError as e:
-                            print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
-                        except ModuleError as e:
-                            print("异常:%s" % e)
-                            return
-                        except Exception as e:
-                            print("运行错误:%s\n错误：%s" % (i, e))
-                        except:
-                            print("运行错误:%s" % i)
-
-            def set(self, cmd):
-                try:
-                    vn, va = cmd.split()
-                except Exception as e:
-                    print("赋值异常：%s\n语句：%s" % (e, cmd))
-                    return 1
-                self.envs[vn] = va
-
-            def run_ex(self, cmd):
-                try:
-                    vn, va = shlex.split(cmd)
-                except Exception as e:
-                    print("运行异常:%s\n语句:run_ma %s" % (e, cmd))
-                    return 1
-                try:
-                    getattr(extra, vn)(va.split())
-                except:
-                    print("调用失败! %s " % va)
-
-            @staticmethod
-            def echo(cmd):
-                print(cmd)
-
-            @staticmethod
-            def gettype(file_):
-                gettype(file_)
-
-            def sfor(self, vn, vs, do):
-                if ',' in vs:
-                    fgf = ','
-                else:
-                    fgf = None
-                for v in vs.split(fgf):
-                    do_ = do.replace(f'@{vn}@', v)
-                    getattr(self, do_.split()[0])(do_[do_.index(' ') + 1:])
-
-            @staticmethod
-            def rmdir(path):
-                rmdir(path, up=1)
-
-            @staticmethod
-            def run(cmd):
-                call(exe=str(cmd), kz='N', shstate=True)
-
-            @staticmethod
-            def packsuper(cmd):
-                supers = IntVar()
-                ssparse = IntVar()
-                supersz = IntVar()
-                sdbfz = StringVar()
-                try:
-                    sparse, dbfz, size, set_, lb = shlex.split(cmd)
-                except:
-                    raise ModuleError("SUPER数据异常")
-                supers.set(int(size))
-                ssparse.set(int(sparse))
-                supersz.set(int(set_))
-                sdbfz.set(dbfz)
-                packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
-
-            def sh(self, cmd):
-                temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
-                file_ = temp + v_code()
-                with open(file_, "w", encoding='UTF-8', newline="\n") as f:
-                    for i in self.envs:
-                        f.write(f'export {i}={self.envs[i]}\n')
-                    f.write("source $1")
-                if os.path.exists(file_):
-                    if os.name == 'posix':
-                        sh = "ash"
-                    else:
-                        sh = "bash"
-                    load_car(0)
-                    call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
-                    try:
-                        os.remove(file_)
-                    except:
-                        pass
-
-            @staticmethod
-            def msh(cmd):
-                try:
-                    cmd_, argv = cmd.split()
-                except Exception:
-                    raise ModuleError("MSH解释器: 不支持的命令 %s" % cmd)
-                if cmd_ == 'run':
-                    if not os.path.exists(argv.replace("\\", '/')):
-                        print("脚本不存在：%s" % argv)
-                        return 1
-                    else:
-                        print("开始执行:%s" % os.path.basename(argv))
-                        msh_parse(argv)
-                        print("执行完成：%s" % os.path.basename(argv))
-                elif cmd_ == "show":
-                    print("----------\nMSH解释器\n----------")
-                    if argv == 'all':
-                        print('版本：1.0\n作者：米欧科技')
-                    elif argv == 'version':
-                        print("版本：1.0")
-                    elif argv == 'author':
-                        print("作者：米欧科技")
-                else:
-                    print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]\nmsh show [all,version,author]')
-
-            @staticmethod
-            def exit(value):
-                raise ModuleError(value)
-
-            def sif(self, mode, var_, other):
-                modes = {
-                    'exist': lambda var: os.path.exists(var),
-                    '!exist': lambda var: not os.path.exists(var),
-                    'equ': lambda var: var.split('--')[0] == var.split('--')[1],
-                    '!equ': lambda var: var.split('--')[0] != var.split('--')[1],
-                    'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1],
-                    '!gettype': lambda var: gettype(var.split('--')[0]) != var.split('--')[1]
-                }
-
-                if modes[mode](var_):
-                    getattr(self, other.split()[0])(other[other.index(' ') + 1:])
-
-        class parse(Toplevel):
-            gavs = {}
-
-            def __init__(self, jsons, msh=False):
-                super().__init__()
-                self.value = []
-
-                def callcmd(cmd):
-                    if cmd.split()[0] == "msg":
-                        messagebox.showinfo(cmd.split()[1], cmd.split()[2])
-                    elif cmd.split()[0] == "start":
-                        CallZ(call(cmd[cmd.index(' ') + 1:], 'N'))
-                    elif cmd.split()[0] == "exec":
-                        exec(cmd[cmd.index(' ') + 1:])
-                    else:
-                        print(lang.text27)
-
-                def generate_sh():
-                    sh_content = ""
-                    for va in self.value:
-                        if self.gavs[va].get():
-                            if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
-                                if "\\" in self.gavs[va].get():
-                                    gva = self.gavs[va].get().replace('\\', '/')
-                                else:
-                                    gva = self.gavs[va].get()
-                            else:
-                                gva = self.gavs[va].get()
-                            sh_content += f"export {va}={gva}\n"
-                    temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
-                    if not os.path.exists(temp):
-                        refolder(temp)
-                    file.set(temp + v_code())
-                    with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                        f.write(sh_content)
-                        f.write('export version={}\n'.format(VERSION))
-                        f.write('export tool_bin={}\n'.format(
-                            (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\', '/')))
-                        f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
-                    self.destroy()
-                    self.gavs.clear()
-
-                def generate_msh():
-                    for va in self.value:
-                        if self.gavs[va].get():
-                            if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
-                                if '\\' in self.gavs[va].get():
-                                    msh_parse.envs[va] = self.gavs[va].get().replace("\\", '/')
-                                else:
-                                    msh_parse.envs[va] = self.gavs[va].get()
-                            else:
-                                msh_parse.envs[va] = self.gavs[va].get()
-                    self.destroy()
-                    self.gavs.clear()
-
-                with open(jsons, 'r', encoding='UTF-8') as f:
-                    try:
-                        data = json.load(f)
-                    except Exception as e:
-                        messpop(lang.text133 + str(e))
-                        print(lang.text133 + str(e))
-                        self.destroy()
-                    self.title(data['main']['info']['title'])
-                    # 设置窗口大小和位置
-                    height = data['main']['info']['height']
-                    width = data['main']['info']['weight']
-                    if height != 'none' and width != 'none':
-                        self.geometry(f"{width}x{height}")
-                    resizable = data['main']['info']['resize']
-                    if resizable == '1':
-                        self.resizable(True, True)
-                    else:
-                        self.resizable(False, False)
-                    for group_name, group_data in data['main'].items():
-                        if group_name != "info":
-                            group_frame = ttk.LabelFrame(self, text=group_data['title'])
-                            group_frame.pack(padx=10, pady=10)
-                            for con in group_data['controls']:
-                                if 'set' in con:
-                                    self.value.append(con['set'])
-                                if con["type"] == "text":
-                                    text_label = ttk.Label(group_frame, text=con['text'],
-                                                           font=(None, int(con['fontsize'])))
-                                    text_label.pack(side=con['side'], padx=5, pady=5)
-                                elif con["type"] == "button":
-                                    button_command = con['command']
-                                    button = ttk.Button(group_frame, text=con['text'],
-                                                        command=lambda: callcmd(button_command))
-                                    button.pack(side='left')
-                                elif con["type"] == "filechose":
-                                    ft = ttk.Frame(group_frame)
-                                    ft.pack(fill=X)
-                                    file_var_name = con['set']
-                                    self.gavs[file_var_name] = StringVar()
-                                    file_label = ttk.Label(ft, text=con['text'])
-                                    file_label.pack(side='left', padx=10, pady=10)
-                                    file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
-                                    file_entry.pack(side='left', padx=5, pady=5)
-                                    file_button = ttk.Button(ft, text=lang.text28,
-                                                             command=lambda: self.gavs[file_var_name].set(
-                                                                 filedialog.askopenfilename()))
-                                    file_button.pack(side='left', padx=10, pady=10)
-                                elif con["type"] == "radio":
-                                    radio_var_name = con['set']
-                                    self.gavs[radio_var_name] = StringVar()
-                                    options = con['opins'].split()
-                                    pft1 = ttk.Frame(group_frame)
-                                    pft1.pack(padx=10, pady=10)
-                                    for option in options:
-                                        text, value = option.split('|')
-                                        self.gavs[radio_var_name].set(value)
-                                        ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
-                                                        value=value).pack(side=con['side'])
-                                elif con["type"] == 'input':
-                                    input_var_name = con['set']
-                                    self.gavs[input_var_name] = StringVar()
-                                    ttk.Entry(group_frame, textvariable=self.gavs[input_var_name]).pack(pady=5, padx=5,
-                                                                                                        fill=BOTH)
-                                elif con['type'] == 'checkbutton':
-                                    b_var_name = con['set']
-                                    self.gavs[b_var_name] = IntVar()
-                                    if not 'text' in con:
-                                        text = 'M.K.C'
-                                    else:
-                                        text = con['text']
-                                    ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
-                                                    offvalue=0,
-                                                    style="Switch.TCheckbutton").pack(
-                                        padx=5, pady=5, fill=BOTH)
-                                else:
-                                    print(lang.warn14.format(con['type']))
-                    if msh:
-                        ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_msh)).pack(fill=X, side='bottom')
-                    else:
-                        ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_sh)).pack(fill=X, side='bottom')
-
-                jzxs(self)
-                self.wait_window()
-
-        def run():
-            if pls.curselection():
-                value = globals()[pls.get(pls.curselection())]
-            else:
-                value = ""
-            if value:
-                if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh") or os.path.exists(
-                        moduledir + os.sep + value + os.sep + "main.msh"):
-                    if os.path.exists(moduledir + os.sep + value + os.sep + "main.json"):
-                        parse(moduledir + os.sep + value + os.sep + "main.json",
-                              (os.path.exists(moduledir + os.sep + value + os.sep + "main.msh")))
-                        if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
-                            if os.path.exists(file.get()):
-                                if os.name == 'posix':
-                                    sh = "ash"
-                                else:
-                                    sh = "bash"
-                                load_car(0)
-                                call("busybox {} {} {}".format(sh, file.get(),
-                                                               (
-                                                                       moduledir + os.sep + value + os.sep + "main.sh").replace(
-                                                                   '\\',
-                                                                   '/')))
-                                car.set(1)
-                                os.remove(file.get())
-                        elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
-                            msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
-
-
-                    # 生成TMP
-                    else:
-                        if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
-                            temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
-                            if not os.path.exists(temp):
-                                refolder(temp)
-                            if not file.get():
-                                file.set(temp + os.sep + v_code())
-                            with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                                f.write('export tool_bin={}\n'.format(
-                                    (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace(
-                                        '\\',
-                                        '/')))
-                                f.write('export version={}\n'.format(VERSION))
-                                f.write(
-                                    "export project={}\nsource $1".format(
-                                        (local + os.sep + dn.get()).replace('\\', '/')))
-                            if os.path.exists(file.get()):
-                                if os.name == 'posix':
-                                    sh = "ash"
-                                else:
-                                    sh = "bash"
-                                load_car(0)
-                                call("busybox {} {} {}".format(sh, file.get(),
-                                                               (
-                                                                       moduledir + os.sep + value + os.sep + "main.sh").replace(
-                                                                   '\\',
-                                                                   '/')))
-                                car.set(1)
-                                os.remove(file.get())
-                        elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
-                            msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
-                else:
-                    if not os.path.exists(moduledir + os.sep + value):
-                        messpop(lang.warn7.format(value))
-                        listpls()
-                        manager.lift()
-                    else:
-                        print(lang.warn8)
-            else:
-                print(lang.warn2)
-
-        class unmpk:
-
-            def __init__(self):
-                self.arr = []
-                self.arr2 = []
-                if pls.curselection():
-                    self.value = globals()[pls.get(pls.curselection())]
-                    self.value2 = pls.get(pls.curselection())
-                    self.lfdep()
-                    self.ask()
-                else:
-                    messpop(lang.warn2)
-
-            def ask(self):
-                self.ck = Toplevel()
-                self.ck.title(lang.t6)
-                jzxs(self.ck)
-                ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                                     expand=True)
-                if self.arr2:
-                    ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-                    ttk.Label(self.ck, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
-                                                                           expand=True)
-                    te = Listbox(self.ck, highlightthickness=0, activestyle='dotbox')
-                    for i in self.arr2:
-                        te.insert("end", i)
-                    te.pack(fill=BOTH, padx=10, pady=10)
-                ttk.Button(self.ck, text=lang.ok, command=self.unloop).pack(fill=X, expand=True, side=LEFT, pady=10,
-                                                                            padx=10)
-                ttk.Button(self.ck, text=lang.cancel, command=self.ck.destroy).pack(fill=X, expand=True, side=LEFT,
-                                                                                    pady=10,
-                                                                                    padx=10)
-
-            def lfdep(self, name=None):
-                if not name:
-                    name = self.value
-                for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
-                    with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
-                        data = json.load(f)
-                        for n in data['depend'].split():
-                            if name == n:
-                                self.arr.append(i)
-                                self.lfdep(i)
-                                self.arr2.append(data['name'])
-                                break
-
-            def unloop(self):
-                self.ck.destroy()
-                for i in self.arr:
-                    self.umpk(i)
-                self.umpk(self.value)
-
-            @staticmethod
-            def umpk(name=None) -> None:
-                if name:
-                    print(lang.text29.format(name))
-                    if os.path.exists(moduledir + os.sep + name):
-                        rmtree(moduledir + os.sep + name)
-                    if os.path.exists(moduledir + os.sep + name):
-                        messpop(lang.warn9, 'red')
-                    else:
-                        print(lang.text30)
-                        try:
-                            listpls()
-                        except:
-                            pass
-                else:
-                    messpop(lang.warn2)
-
+    def impk() -> Exception:
+        installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
+        manager.lift()
         try:
             listpls()
+        except Exception as e:
+            listpls()
+            return e
+
+    class new_(Toplevel):
+        def __init__(self):
+            super().__init__()
+            jzxs(self)
+            self.resizable(False, False)
+            self.title(lang.text115)
+            ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
+            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+            f1 = ttk.Frame(self)
+            ttk.Label(f1, text=lang.t20).pack(side=LEFT, padx=5, pady=5)
+            self.name = ttk.Entry(f1)
+            self.name.pack(padx=5, pady=5, side=LEFT)
+            f1.pack(padx=5, pady=5, fill=X)
+            f2 = ttk.Frame(self)
+            ttk.Label(f2, text=lang.t21).pack(side=LEFT, padx=5, pady=5)
+            self.aou = ttk.Entry(f2)
+            self.aou.pack(padx=5, pady=5, side=LEFT)
+            f2.pack(padx=5, pady=5, fill=X)
+            f3 = ttk.Frame(self)
+            ttk.Label(f3, text=lang.t22).pack(side=LEFT, padx=5, pady=5)
+            self.ver = ttk.Entry(f3)
+            self.ver.pack(padx=5, pady=5, side=LEFT)
+            f3.pack(padx=5, pady=5, fill=X)
+            f4 = ttk.Frame(self)
+            ttk.Label(f4, text=lang.t23).pack(side=LEFT, padx=5, pady=5)
+            self.dep = ttk.Entry(f4)
+            self.dep.pack(padx=5, pady=5, side=LEFT)
+            f4.pack(padx=5, pady=5, fill=X)
+            ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
+            self.intro = Text(self)
+            self.intro.pack(fill=BOTH, padx=5, pady=5, expand=1)
+            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
+
+        def create(self):
+            iden = v_code()
+            data = {
+                "name": self.name.get(),
+                "author": self.aou.get(),
+                "version": self.ver.get(),
+                "identifier": iden,
+                "describe": self.intro.get(1.0, END),
+                "depend": self.dep.get()
+            }
+            self.destroy()
+            if not os.path.exists(moduledir + os.sep + iden):
+                os.makedirs(moduledir + os.sep + iden)
+            with open(moduledir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8', newline='\n') as js:
+                js.write(json.dumps(data))
+            listpls()
+            editor_(iden)
+
+    def editor_(id_=None):
+        if not pls.curselection():
+            messpop(lang.warn2)
+            return 1
+        if id_ is None:
+            id_ = globals()[pls.get(pls.curselection())]
+        if not os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh") and not os.path.exists(
+                moduledir + os.sep + id_ + os.sep + "main.sh"):
+            ask = ask_win(lang.t18, 'SH', 'MSH')
+            if ask == 1:
+                s = "main.sh"
+            else:
+                s = "main.msh"
+            with open(moduledir + os.sep + id_ + os.sep + s, 'w+', encoding='utf-8', newline='\n') as sh:
+                sh.write("echo hello,world")
+            editor.main(moduledir + os.sep + id_ + os.sep + s)
+        else:
+            if os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh"):
+                editor.main(moduledir + os.sep + id_ + os.sep + "main.msh")
+            elif os.path.exists(moduledir + os.sep + id_ + os.sep + "main.sh"):
+                editor.main(moduledir + os.sep + id_ + os.sep + "main.sh")
+
+    def export():
+        if not pls.curselection():
+            messpop(lang.warn2)
+            return 1
+        buffer = BytesIO()
+        buffer2 = StringIO()
+        info_ = ConfigParser()
+        value = globals()[pls.get(pls.curselection())]
+        with open(moduledir + os.sep + value + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+            data = json.load(f)
+            if "describe" in data:
+                des = data["describe"]
+            else:
+                des = ''
+            info_['module'] = {
+                'name': f'{data["name"]}',
+                'version': f'{data["version"]}',
+                'author': f'{data["author"]}',
+                'describe': f'{des}',
+                'resource': 'main.zip',
+                'identifier': f'{value}',
+                'depend': f'{data["depend"]}'
+            }
+            info_.write(buffer2)
+        with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
+            os.chdir(moduledir + os.sep + value + os.sep)
+            for i in get_all_file_paths("."):
+                print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
+                try:
+                    mpk.write(i)
+                except Exception as e:
+                    print(lang.text2.format(i, e))
+            os.chdir(elocal)
+        with zipfile.ZipFile(local + os.sep + pls.get(pls.curselection()) + ".mpk", 'w',
+                             compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
+            mpk2.writestr('main.zip', buffer.getvalue())
+            mpk2.writestr('info', buffer2.getvalue())
+        if os.path.exists(local + os.sep + pls.get(pls.curselection()) + ".mpk"):
+            print(lang.t15 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
+        else:
+            print(lang.t16 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
+
+    def relf2(self):
+        try:
+            lf2.config(text=pls.get(pls.curselection()))
+        except Exception as e:
+            if e:
+                lf2.config(text="Null")
+
+    def popup(event):
+        rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
+
+    pls.bind("<<ListboxSelect>>", relf2)
+    pls.bind("<Button-3>", popup)
+    moduledir = elocal + os.sep + "bin" + os.sep + "module"
+    manager.resizable(False, False)
+    file = StringVar()
+
+    def listpls():
+        pls.delete(0, "end")
+        for i in os.listdir(moduledir):
+            if os.path.isdir(moduledir + os.sep + i):
+                with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                    data = json.load(f)
+                    pls.insert('end', data['name'])
+                    globals()[data['name']] = data['identifier']
+        try:
+            pls.selection_set(0)
+            relf2(qc)
         except:
             pass
-        lf1.pack(padx=10, pady=10)
-        jzxs(manager)
+
+    listpls()
+
+    class msh_parse(object):
+        envs = {'version': VERSION,
+                'tool_bin': (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\',
+                                                                                                            '/'),
+                'project': (local + os.sep + dn.get()).replace('\\', '/'),
+                'moddir': moduledir.replace('\\', '/')}
+
+        def __init__(self, sh):
+            self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
+            with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
+                for i in shell.readlines():
+                    for key, value in self.envs.items():
+                        i = i.replace('@{}@'.format(key), value)
+                    try:
+                        if i[:1] != "#":
+                            if i.split()[0] == "if":
+                                self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
+                            elif i.split()[0] == "for":
+                                self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
+                            else:
+                                getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                    except AttributeError as e:
+                        print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
+                    except ModuleError as e:
+                        print("异常:%s" % e)
+                        return
+                    except Exception as e:
+                        print("运行错误:%s\n错误：%s" % (i, e))
+                    except:
+                        print("运行错误:%s" % i)
+
+        def set(self, cmd):
+            try:
+                vn, va = cmd.split()
+            except Exception as e:
+                print("赋值异常：%s\n语句：%s" % (e, cmd))
+                return 1
+            self.envs[vn] = va
+
+        def run_ex(self, cmd):
+            try:
+                vn, va = shlex.split(cmd)
+            except Exception as e:
+                print("运行异常:%s\n语句:run_ma %s" % (e, cmd))
+                return 1
+            try:
+                getattr(extra, vn)(va.split())
+            except:
+                print("调用失败! %s " % va)
+
+        @staticmethod
+        def echo(cmd):
+            print(cmd)
+
+        @staticmethod
+        def gettype(file_):
+            gettype(file_)
+
+        def sfor(self, vn, vs, do):
+            if ',' in vs:
+                fgf = ','
+            else:
+                fgf = None
+            for v in vs.split(fgf):
+                do_ = do.replace(f'@{vn}@', v)
+                getattr(self, do_.split()[0])(do_[do_.index(' ') + 1:])
+
+        @staticmethod
+        def rmdir(path):
+            rmdir(path, up=1)
+
+        @staticmethod
+        def run(cmd):
+            call(exe=str(cmd), kz='N', shstate=True)
+
+        @staticmethod
+        def packsuper(cmd):
+            supers = IntVar()
+            ssparse = IntVar()
+            supersz = IntVar()
+            sdbfz = StringVar()
+            try:
+                sparse, dbfz, size, set_, lb = shlex.split(cmd)
+            except:
+                raise ModuleError("SUPER数据异常")
+            supers.set(int(size))
+            ssparse.set(int(sparse))
+            supersz.set(int(set_))
+            sdbfz.set(dbfz)
+            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
+
+        def sh(self, cmd):
+            temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
+            file_ = temp + v_code()
+            with open(file_, "w", encoding='UTF-8', newline="\n") as f:
+                for i in self.envs:
+                    f.write(f'export {i}={self.envs[i]}\n')
+                f.write("source $1")
+            if os.path.exists(file_):
+                if os.name == 'posix':
+                    sh = "ash"
+                else:
+                    sh = "bash"
+                load_car(0)
+                call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
+                try:
+                    os.remove(file_)
+                except:
+                    pass
+
+        @staticmethod
+        def msh(cmd):
+            try:
+                cmd_, argv = cmd.split()
+            except Exception:
+                raise ModuleError("MSH解释器: 不支持的命令 %s" % cmd)
+            if cmd_ == 'run':
+                if not os.path.exists(argv.replace("\\", '/')):
+                    print("脚本不存在：%s" % argv)
+                    return 1
+                else:
+                    print("开始执行:%s" % os.path.basename(argv))
+                    msh_parse(argv)
+                    print("执行完成：%s" % os.path.basename(argv))
+            elif cmd_ == "show":
+                print("----------\nMSH解释器\n----------")
+                if argv == 'all':
+                    print('版本：1.0\n作者：米欧科技')
+                elif argv == 'version':
+                    print("版本：1.0")
+                elif argv == 'author':
+                    print("作者：米欧科技")
+            else:
+                print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]\nmsh show [all,version,author]')
+
+        @staticmethod
+        def exit(value):
+            raise ModuleError(value)
+
+        def sif(self, mode, var_, other):
+            modes = {
+                'exist': lambda var: os.path.exists(var),
+                '!exist': lambda var: not os.path.exists(var),
+                'equ': lambda var: var.split('--')[0] == var.split('--')[1],
+                '!equ': lambda var: var.split('--')[0] != var.split('--')[1],
+                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1],
+                '!gettype': lambda var: gettype(var.split('--')[0]) != var.split('--')[1]
+            }
+
+            if modes[mode](var_):
+                getattr(self, other.split()[0])(other[other.index(' ') + 1:])
+
+    class parse(Toplevel):
+        gavs = {}
+
+        def __init__(self, jsons, msh=False):
+            super().__init__()
+            self.value = []
+
+            def callcmd(cmd):
+                if cmd.split()[0] == "msg":
+                    messagebox.showinfo(cmd.split()[1], cmd.split()[2])
+                elif cmd.split()[0] == "start":
+                    CallZ(call(cmd[cmd.index(' ') + 1:], 'N'))
+                elif cmd.split()[0] == "exec":
+                    exec(cmd[cmd.index(' ') + 1:])
+                else:
+                    print(lang.text27)
+
+            def generate_sh():
+                sh_content = ""
+                for va in self.value:
+                    if self.gavs[va].get():
+                        if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
+                            if "\\" in self.gavs[va].get():
+                                gva = self.gavs[va].get().replace('\\', '/')
+                            else:
+                                gva = self.gavs[va].get()
+                        else:
+                            gva = self.gavs[va].get()
+                        sh_content += f"export {va}={gva}\n"
+                temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
+                if not os.path.exists(temp):
+                    refolder(temp)
+                file.set(temp + v_code())
+                with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                    f.write(sh_content)
+                    f.write('export version={}\n'.format(VERSION))
+                    f.write('export tool_bin={}\n'.format(
+                        (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\', '/')))
+                    f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
+                self.destroy()
+                self.gavs.clear()
+
+            def generate_msh():
+                for va in self.value:
+                    if self.gavs[va].get():
+                        if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
+                            if '\\' in self.gavs[va].get():
+                                msh_parse.envs[va] = self.gavs[va].get().replace("\\", '/')
+                            else:
+                                msh_parse.envs[va] = self.gavs[va].get()
+                        else:
+                            msh_parse.envs[va] = self.gavs[va].get()
+                self.destroy()
+                self.gavs.clear()
+
+            with open(jsons, 'r', encoding='UTF-8') as f:
+                try:
+                    data = json.load(f)
+                except Exception as e:
+                    messpop(lang.text133 + str(e))
+                    print(lang.text133 + str(e))
+                    self.destroy()
+                self.title(data['main']['info']['title'])
+                # 设置窗口大小和位置
+                height = data['main']['info']['height']
+                width = data['main']['info']['weight']
+                if height != 'none' and width != 'none':
+                    self.geometry(f"{width}x{height}")
+                resizable = data['main']['info']['resize']
+                if resizable == '1':
+                    self.resizable(True, True)
+                else:
+                    self.resizable(False, False)
+                for group_name, group_data in data['main'].items():
+                    if group_name != "info":
+                        group_frame = ttk.LabelFrame(self, text=group_data['title'])
+                        group_frame.pack(padx=10, pady=10)
+                        for con in group_data['controls']:
+                            if 'set' in con:
+                                self.value.append(con['set'])
+                            if con["type"] == "text":
+                                text_label = ttk.Label(group_frame, text=con['text'],
+                                                       font=(None, int(con['fontsize'])))
+                                text_label.pack(side=con['side'], padx=5, pady=5)
+                            elif con["type"] == "button":
+                                button_command = con['command']
+                                button = ttk.Button(group_frame, text=con['text'],
+                                                    command=lambda: callcmd(button_command))
+                                button.pack(side='left')
+                            elif con["type"] == "filechose":
+                                ft = ttk.Frame(group_frame)
+                                ft.pack(fill=X)
+                                file_var_name = con['set']
+                                self.gavs[file_var_name] = StringVar()
+                                file_label = ttk.Label(ft, text=con['text'])
+                                file_label.pack(side='left', padx=10, pady=10)
+                                file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
+                                file_entry.pack(side='left', padx=5, pady=5)
+                                file_button = ttk.Button(ft, text=lang.text28,
+                                                         command=lambda: self.gavs[file_var_name].set(
+                                                             filedialog.askopenfilename()))
+                                file_button.pack(side='left', padx=10, pady=10)
+                            elif con["type"] == "radio":
+                                radio_var_name = con['set']
+                                self.gavs[radio_var_name] = StringVar()
+                                options = con['opins'].split()
+                                pft1 = ttk.Frame(group_frame)
+                                pft1.pack(padx=10, pady=10)
+                                for option in options:
+                                    text, value = option.split('|')
+                                    self.gavs[radio_var_name].set(value)
+                                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
+                                                    value=value).pack(side=con['side'])
+                            elif con["type"] == 'input':
+                                input_var_name = con['set']
+                                self.gavs[input_var_name] = StringVar()
+                                ttk.Entry(group_frame, textvariable=self.gavs[input_var_name]).pack(pady=5, padx=5,
+                                                                                                    fill=BOTH)
+                            elif con['type'] == 'checkbutton':
+                                b_var_name = con['set']
+                                self.gavs[b_var_name] = IntVar()
+                                if not 'text' in con:
+                                    text = 'M.K.C'
+                                else:
+                                    text = con['text']
+                                ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
+                                                offvalue=0,
+                                                style="Switch.TCheckbutton").pack(
+                                    padx=5, pady=5, fill=BOTH)
+                            else:
+                                print(lang.warn14.format(con['type']))
+                if msh:
+                    ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_msh)).pack(fill=X, side='bottom')
+                else:
+                    ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_sh)).pack(fill=X, side='bottom')
+
+            jzxs(self)
+            self.wait_window()
+
+    def run():
+        if pls.curselection():
+            value = globals()[pls.get(pls.curselection())]
+        else:
+            value = ""
+        if value:
+            if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh") or os.path.exists(
+                    moduledir + os.sep + value + os.sep + "main.msh"):
+                if os.path.exists(moduledir + os.sep + value + os.sep + "main.json"):
+                    parse(moduledir + os.sep + value + os.sep + "main.json",
+                          (os.path.exists(moduledir + os.sep + value + os.sep + "main.msh")))
+                    if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
+                        if os.path.exists(file.get()):
+                            if os.name == 'posix':
+                                sh = "ash"
+                            else:
+                                sh = "bash"
+                            load_car(0)
+                            call("busybox {} {} {}".format(sh, file.get(),
+                                                           (
+                                                                   moduledir + os.sep + value + os.sep + "main.sh").replace(
+                                                               '\\',
+                                                               '/')))
+                            car.set(1)
+                            os.remove(file.get())
+                    elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
+                        msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
+
+
+                # 生成TMP
+                else:
+                    if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
+                        temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
+                        if not os.path.exists(temp):
+                            refolder(temp)
+                        if not file.get():
+                            file.set(temp + os.sep + v_code())
+                        with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                            f.write('export tool_bin={}\n'.format(
+                                (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace(
+                                    '\\',
+                                    '/')))
+                            f.write('export version={}\n'.format(VERSION))
+                            f.write(
+                                "export project={}\nsource $1".format(
+                                    (local + os.sep + dn.get()).replace('\\', '/')))
+                        if os.path.exists(file.get()):
+                            if os.name == 'posix':
+                                sh = "ash"
+                            else:
+                                sh = "bash"
+                            load_car(0)
+                            call("busybox {} {} {}".format(sh, file.get(),
+                                                           (
+                                                                   moduledir + os.sep + value + os.sep + "main.sh").replace(
+                                                               '\\',
+                                                               '/')))
+                            car.set(1)
+                            os.remove(file.get())
+                    elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
+                        msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
+            else:
+                if not os.path.exists(moduledir + os.sep + value):
+                    messpop(lang.warn7.format(value))
+                    listpls()
+                    manager.lift()
+                else:
+                    print(lang.warn8)
+        else:
+            print(lang.warn2)
+
+    class unmpk:
+
+        def __init__(self):
+            self.arr = []
+            self.arr2 = []
+            if pls.curselection():
+                self.value = globals()[pls.get(pls.curselection())]
+                self.value2 = pls.get(pls.curselection())
+                self.lfdep()
+                self.ask()
+            else:
+                messpop(lang.warn2)
+
+        def ask(self):
+            self.ck = Toplevel()
+            self.ck.title(lang.t6)
+            jzxs(self.ck)
+            ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+                                                                                 expand=True)
+            if self.arr2:
+                ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+                ttk.Label(self.ck, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
+                                                                       expand=True)
+                te = Listbox(self.ck, highlightthickness=0, activestyle='dotbox')
+                for i in self.arr2:
+                    te.insert("end", i)
+                te.pack(fill=BOTH, padx=10, pady=10)
+            ttk.Button(self.ck, text=lang.ok, command=self.unloop).pack(fill=X, expand=True, side=LEFT, pady=10,
+                                                                        padx=10)
+            ttk.Button(self.ck, text=lang.cancel, command=self.ck.destroy).pack(fill=X, expand=True, side=LEFT,
+                                                                                pady=10,
+                                                                                padx=10)
+
+        def lfdep(self, name=None):
+            if not name:
+                name = self.value
+            for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
+                with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                    data = json.load(f)
+                    for n in data['depend'].split():
+                        if name == n:
+                            self.arr.append(i)
+                            self.lfdep(i)
+                            self.arr2.append(data['name'])
+                            break
+
+        def unloop(self):
+            self.ck.destroy()
+            for i in self.arr:
+                self.umpk(i)
+            self.umpk(self.value)
+
+        @staticmethod
+        def umpk(name=None) -> None:
+            if name:
+                print(lang.text29.format(name))
+                if os.path.exists(moduledir + os.sep + name):
+                    rmtree(moduledir + os.sep + name)
+                if os.path.exists(moduledir + os.sep + name):
+                    messpop(lang.warn9, 'red')
+                else:
+                    print(lang.text30)
+                    try:
+                        listpls()
+                    except:
+                        pass
+            else:
+                messpop(lang.warn2)
+
+    try:
+        listpls()
+    except:
+        pass
+    lf1.pack(padx=10, pady=10)
+    jzxs(manager)
 
 
 class installmpk(Toplevel):
