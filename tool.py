@@ -41,7 +41,6 @@ import qc
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
-import zstandard as zstd
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -1342,12 +1341,7 @@ def dbkxyt():
         zip.extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
         try:
-            with open(dir_ + "super.img", 'rb') as super_, open(dir_ + "images" + os.sep + "super.img.zst",
-                                                                'wb') as zstd_:
-                print("[DOING] Compress Super.img...")
-                compressor = zstd.ZstdCompressor().stream_writer(zstd_)
-                compressor.write(super_.read())
-                compressor.close()
+            call("zstd -5 --rm {} -o {}".format(dir_ + "super.img",dir_+'images'+os.sep+"super.img.zst"))
         except Exception as e:
             print("[Fail] Compress Super.img Fail:{}".format(e))
         os.remove(dir_ + "super.img")
