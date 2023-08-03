@@ -2324,7 +2324,7 @@ def packzip():
         if os.path.exists(rwork() + "super.img"):
             if ask_win(lang.t25) == 1:
                 dbkxyt()
-        zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
+        zip_file(dn.get() + ".zip", rwork())
         car.set(1)
 
 
