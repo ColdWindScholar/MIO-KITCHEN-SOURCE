@@ -6,6 +6,14 @@ import sys, os, errno, tempfile
 import common, blockimgdiff, sparse_img
 
 
+# -----
+# ====================================================
+#          FUNCTION: img2sdat
+#       AUTHORS: xpirt - luxi78 - howellzhu
+#          DATE: 2018-05-25 12:19:12 CEST
+# ====================================================
+# -----
+
 def qc(file_) -> None:
     if not exists(file_):
         return
