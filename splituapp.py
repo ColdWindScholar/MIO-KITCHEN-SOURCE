@@ -8,8 +8,8 @@
 
 from __future__ import print_function
 
-import string
-import struct
+from string import printable
+from struct import unpack
 import sys
 # import os
 from os import makedirs, name, sep, path
@@ -41,16 +41,16 @@ class extract(object):
                     continue
 
                 headersize = f.read(bytenum)
-                headersize = list(struct.unpack('<L', headersize))[0]
+                headersize = list(unpack('<L', headersize))[0]
                 f.seek(16, 1)
                 filesize = f.read(bytenum)
-                filesize = list(struct.unpack('<L', filesize))[0]
+                filesize = list(unpack('<L', filesize))[0]
                 f.seek(32, 1)
                 filename = f.read(16)
 
                 try:
                     filename = str(filename.decode())
-                    filename = ''.join(f for f in filename if f in string.printable).lower()
+                    filename = ''.join(f for f in filename if f in printable).lower()
                 except:
                     filename = ''
 
