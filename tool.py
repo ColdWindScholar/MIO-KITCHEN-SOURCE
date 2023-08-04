@@ -27,7 +27,6 @@ import requests
 import sv_ttk
 from PIL import Image, ImageTk
 import fspatch
-import img2sdat
 import imgextractor
 import lpunpack
 import mkdtboimg
@@ -35,7 +34,6 @@ import ozipdecrypt
 import payload_dumper
 import sdat2img
 import splituapp
-import vbpatch
 from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
@@ -1707,9 +1705,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                 file = findfile(j, work)
                 if file:
-                    if vbpatch.checkmagic(file):
+                    if gettype(file) == 'vbmeta':
                         print(lang.text71 % file)
-                        vbpatch.disavb(file)
+                        utils.vbpatch(file).disavb()
         if os.access(work + "config" + os.sep + "%s_fs_config" % dname, os.F_OK):
             try:
                 folder = findfolder(work, "com.google.android.apps.nbu.")
@@ -1969,7 +1967,7 @@ def unpack(chose, form: any = None):
                 logodump(dname)
             if gettype(work + dname + ".img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{dname}")
-                vbpatch.disavb(work + dname + ".img")
+                utils.vbpatch(work + dname + ".img").disavb()
             ftype = gettype(work + dname + ".img")
             if ftype == "sparse":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
@@ -2121,7 +2119,7 @@ class dirsize(object):
 
 def datbr(work, name, brl):
     print(lang.text86 % (name, name))
-    img2sdat.main(work + name + ".img", work, 4, name)
+    utils.img2sdat(work + name + ".img", work, 4, name)
     if os.access(work + name + ".new.dat", os.F_OK):
         try:
             os.remove(work + name + ".img")
