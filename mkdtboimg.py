@@ -800,7 +800,7 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
     fout.close()
 
 
-def dump_dtbo_image(fin, dtfilename, decompress=False, outfile=stdout):
+def dump_dtbo_image(fin, dtfilename, decompress=False, outfile=None):
     """Dump DTBO file.
 
     Dump Device Tree Blob Overlay metadata as output and the device
@@ -817,8 +817,7 @@ def dump_dtbo_image(fin, dtfilename, decompress=False, outfile=stdout):
         for idx in range(0, num_entries):
             with open(dtfilename + '.{:d}'.format(idx), 'wb') as fout:
                 dtbo.extract_dt_file(idx, fout, decompress)
-    outfile.write(str(dtbo) + '\n')
-    outfile.close()
+    print(str(dtbo) + '\n')
 
 
 def create_dtbo_image_from_config(fout, argv):
