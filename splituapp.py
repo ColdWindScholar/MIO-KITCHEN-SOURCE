@@ -13,18 +13,10 @@ import struct
 import sys
 # import os
 from os import makedirs, name, sep, path
-from subprocess import check_output
 
 
 class extract(object):
     def __init__(self, source, flist):
-        def cmd(command):
-            try:
-                test1 = check_output(command).strip().decode()
-            except:
-                test1 = ''
-
-            return test1
 
         bytenum = 4
         outdir = 'output'
