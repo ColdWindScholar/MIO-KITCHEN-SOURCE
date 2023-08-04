@@ -10,5 +10,7 @@ def handle(file_) -> None:
         if len(new_data) == len(data):
             print("No need to handle")
             return
+        f.seek(0)
+        f.truncate()
         f.writelines(new_data)
     del data, new_data
