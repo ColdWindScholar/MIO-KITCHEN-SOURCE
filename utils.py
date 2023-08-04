@@ -13,7 +13,6 @@ import common, blockimgdiff, sparse_img
 #          DATE: 2018-05-25 12:19:12 CEST
 # ====================================================
 # -----
-
 def qc(file_) -> None:
     if not exists(file_):
         return
