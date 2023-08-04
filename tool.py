@@ -37,7 +37,6 @@ import sdat2img
 import splituapp
 import vbpatch
 from timeit import default_timer as dti
-import qc
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
@@ -691,7 +690,7 @@ def mpkman() -> None:
                     globals()[data['name']] = data['identifier']
         try:
             pls.selection_set(0)
-            relf2(qc)
+            relf2(None)
         except:
             pass
 
@@ -1719,9 +1718,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                                                                   "com.google.android.apps.nbu")))
                     rmdir(findfolder(work, "com.google.android.apps.nbu"))
                 fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
-                qc.handle(work + "config" + os.sep + dname + "_fs_config")
+                utils.qc(work + "config" + os.sep + dname + "_fs_config")
                 contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
-                qc.handle(work + "config" + os.sep + dname + "_file_contexts")
+                utils.qc(work + "config" + os.sep + dname + "_file_contexts")
             except Exception as e:
                 print(e)
             if os.access(work + "config" + os.sep + "%s_erofs" % dname, os.F_OK):
