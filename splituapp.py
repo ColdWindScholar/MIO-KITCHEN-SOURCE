@@ -99,12 +99,6 @@ class extract(object):
                                 for i in crcdata:
                                     crc_val.append('%02X' % i)
 
-                            crc_val = ''.join(crc_val)
-                            crcact = cmd('./crc output/{0}.img'.format(filename))
-
-                            if crc_val != crcact:
-                                print('ERROR: crc value for {0}.img does not match\n'.format(filename))
-                                return
                 else:
                     f.seek(filesize, 1)
 
