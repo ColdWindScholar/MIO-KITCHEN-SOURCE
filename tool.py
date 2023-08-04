@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import re
 import shlex
 import sys
@@ -10,7 +11,8 @@ import extra
 from extra import *
 import contextpatch
 import utils
-from utils import CallZ, formats
+from utils import CallZ, formats, jzxs
+
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -51,20 +53,8 @@ var1 = IntVar()
 car = IntVar()
 
 
-
 class ModuleError(Exception):
     pass
-
-
-class jzxs(object):
-    def __init__(self, master):
-        self.master = master
-        self.sf = self.master.after(20, self.set)
-
-    def set(self):
-        self.master.geometry('+{}+{}'.format(int(self.master.winfo_screenwidth() / 2 - self.master.winfo_width() / 2),
-                                             int(self.master.winfo_screenheight() / 2 - self.master.winfo_height() / 2)))
-        self.master.after_cancel(self.sf)
 
 
 # 打包设置变量
@@ -278,7 +268,7 @@ def v_code() -> str:
 
 def refolder(path) -> None:
     if os.path.exists(path):
-        rmdir(path)
+        rmdir(path,1)
         os.mkdir(path)
     else:
         os.mkdir(path)
@@ -308,7 +298,10 @@ def undtbo(bn: str = 'dtbo') -> any:
                                                         work + f"{bn}" + os.sep + "dts" + os.sep + "dts." +
                                                         os.path.basename(dtbo).rsplit('.', 1)[1]), out=1)
     print(lang.text5)
-    os.remove(dtboimg)
+    try:
+        os.remove(dtboimg)
+    except:
+        pass
     rmdir(work + "dtbo" + os.sep + "dtbo", 1)
     car.set(1)
 
@@ -408,7 +401,6 @@ def getframe(title):
 
 
 # 子进程运行 防卡死
-
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
@@ -1237,8 +1229,7 @@ def dbkxyt():
                 move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
                 if not t.startswith("preloader_"):
                     lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
-        script.seek(0)
-        script.truncate()
+        script.truncate(0)
         script.writelines(lines)
 
 
@@ -1451,16 +1442,16 @@ def jboot(bn: str = 'boot'):
     if not boot:
         print(lang.warn3.format(bn))
         car.set(1)
-        return False
+        return
     if not os.path.exists(boot):
         messpop(lang.warn3.format(bn))
         car.set(1)
-        return False
+        return
     if os.path.exists(work + f"{bn}"):
         if rmdir((work + f"{bn}")) != 0:
             print(lang.text69)
             car.set(1)
-            return False
+            return
     refolder(work + f"{bn}")
     os.chdir(work + f"{bn}")
     if call("magiskboot unpack -h %s" % boot) != 0:
@@ -1468,7 +1459,7 @@ def jboot(bn: str = 'boot'):
         os.chdir(elocal)
         rmtree((work + f"{bn}"))
         car.set(1)
-        return False
+        return
     if os.access(work + f"{bn}" + os.sep + "ramdisk.cpio", os.F_OK):
         comp = gettype(work + f"{bn}" + os.sep + "ramdisk.cpio")
         print("Ramdisk is %s" % comp)
@@ -1482,7 +1473,7 @@ def jboot(bn: str = 'boot'):
                     work + f"{bn}" + os.sep + "ramdisk.cpio")) != 0:
                 print("Decompress Ramdisk Fail...")
                 car.set(1)
-                return False
+                return
         if not os.path.exists(work + f"{bn}" + os.sep + "ramdisk"):
             os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
         os.chdir(work + f"{bn}" + os.sep)
@@ -1508,13 +1499,13 @@ def dboot():
     if not os.path.exists(work + "boot"):
         print("Cannot Find Boot...")
         car.set(1)
-        return False
+        return
     try:
         os.chdir(work + "boot" + os.sep + "ramdisk")
     except Exception as e:
         print("Ramdisk Not Found.. %s" % e)
         car.set(1)
-        return False
+        return
     if os.name != 'posix':
         cpio = findfile("cpio.exe", elocal + os.sep + "bin" + os.sep).replace('\\', "/")
     else:
@@ -1529,7 +1520,7 @@ def dboot():
             print("Pack Ramdisk Fail...")
             os.remove("ramdisk-new.cpio")
             car.set(1)
-            return False
+            return
         else:
             print("Pack Ramdisk Successful..")
             os.remove("ramdisk.cpio")
@@ -1542,7 +1533,7 @@ def dboot():
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
         car.set(1)
-        return False
+        return
     else:
         os.remove(work + "boot.img")
         os.rename(work + "boot" + os.sep + "new-boot.img", work + "boot.img")
@@ -1583,7 +1574,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
             return False
     load_car(0)
     work = rwork()
-
+    if os.path.exists(work + "config" + os.sep + "parts_info"):
+        with open(work + "config" + os.sep + "parts_info",'r+',encoding='utf-8') as fff:
+            parts_dict = json.loads(fff.read())
     for i in parts:
         print(i)
         dname = os.path.basename(i)
@@ -1607,7 +1600,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                 utils.qc(work + "config" + os.sep + dname + "_file_contexts")
             except Exception as e:
                 print(e)
-            if os.access(work + "config" + os.sep + "%s_erofs" % dname, os.F_OK):
+            if parts_dict[dname] == 'erofs':
                 mkerofs(dname, "%s" % (edbgs.get()), work)
                 if dely == 1:
                     rdi(work, dname)
@@ -1796,6 +1789,11 @@ def unpack(chose, form: any = None):
             return False
     load_car(0)
     work = rwork()
+    if os.path.exists(work + "config" + os.sep + "parts_info"):
+        with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
+            parts = json.loads(pf.read())
+    else:
+        parts = {}
     for fd in [f for f in os.listdir(work) if re.search(r'\.new\.dat\.\d+', f)]:
         with open(work + os.path.basename(fd).rsplit('.', 1)[0], 'ab') as ofd:
             for fd1 in sorted(
@@ -1825,7 +1823,7 @@ def unpack(chose, form: any = None):
         return 1
 
     for i in chose:
-        dname = os.path.basename(i).split('.')[0]
+        dname = os.path.basename(i).rsplit('.', 1)[0]
         if os.access(work + dname + ".new.dat.br", os.F_OK):
             print(lang.text79 + dname + ".new.dat.br")
             call("brotli -dj " + work + dname + ".new.dat.br")
@@ -1845,6 +1843,12 @@ def unpack(chose, form: any = None):
                     else:
                         print("transferpath" + lang.text84)
         if os.access(work + dname + ".img", os.F_OK):
+            try:
+                parts.pop(dname)
+            except KeyError:
+                pass
+            if gettype(work + dname + ".img") != 'sparse':
+                parts[dname] = gettype(work + dname + ".img")
             if gettype(work + dname + ".img") == 'dtbo':
                 undtbo(dname)
             if gettype(work + dname + ".img") == 'boot' or gettype(work + dname + ".img") == 'vendor_boot':
@@ -1863,6 +1867,8 @@ def unpack(chose, form: any = None):
                     os.rename(work + dname + ".rimg", work + dname + ".img")
                 except:
                     messpop(lang.warn11.format(dname + ".img"))
+            if dname not in parts.keys():
+                parts[dname] = gettype(work + dname + ".img")
             if gettype(work + dname + ".img") == 'super':
                 print(lang.text79 + dname + ".img")
                 if gettype(work + dname + ".img") == "sparse":
@@ -1905,8 +1911,6 @@ def unpack(chose, form: any = None):
                 print(lang.text79 + dname + ".img [%s]" % ftype)
                 call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
                      out=1)
-                with open(work + "config" + os.sep + dname + "_erofs", 'w') as f:
-                    f.write("erofs")
                 if os.access(work + "config" + os.sep + dname + "_fs_config", os.F_OK):
                     with open(work + "config" + os.sep + dname + "_fs_config", 'a', encoding='utf-8',
                               newline='\n') as fs:
@@ -1916,6 +1920,11 @@ def unpack(chose, form: any = None):
                         os.remove(work + dname + ".img")
                     except:
                         messpop(lang.warn11.format(dname + ".img"))
+    if not os.path.exists(work + "config"):
+        os.makedirs(work + "config")
+    with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8',newline='\n') as ff:
+        ff.write(json.dumps(parts))
+    parts.clear()
 
     car.set(1)
     print(lang.text8)
@@ -2028,7 +2037,7 @@ def datbr(work, name, brl):
 def mkerofs(name, level, work):
     print(lang.text90 % (name, level, "1.6"))
     call(
-        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}")
+        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}",out=1)
 
 
 def make_ext4fs(name, work, sparse):

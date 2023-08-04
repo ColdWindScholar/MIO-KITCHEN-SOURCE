@@ -13,6 +13,7 @@ from threading import Thread
 #          DATE: 2018-05-25 12:19:12 CEST
 # ====================================================
 # -----
+# ----VALUES
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
            [b"AVB0", "vbmeta"], [b'\xd7\xb7\xab\x1e', "dtbo"],
@@ -27,6 +28,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo'])
 
 
+# ----DEFS
 def qc(file_) -> None:
     if not exists(file_):
         return
@@ -36,8 +38,7 @@ def qc(file_) -> None:
         if len(new_data) == len(data):
             print("No need to handle")
             return
-        f.seek(0)
-        f.truncate()
+        f.truncate(0)
         f.writelines(new_data)
     del data, new_data
 
@@ -60,6 +61,18 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
     print('Done! Output files: %s' % os.path.dirname(prefix))
+
+
+# ----CLASSES
+class jzxs(object):
+    def __init__(self, master):
+        self.master = master
+        self.sf = self.master.after(20, self.set)
+
+    def set(self):
+        self.master.geometry('+{}+{}'.format(int(self.master.winfo_screenwidth() / 2 - self.master.winfo_width() / 2),
+                                             int(self.master.winfo_screenheight() / 2 - self.master.winfo_height() / 2)))
+        self.master.after_cancel(self.sf)
 
 
 class vbpatch:
