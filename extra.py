@@ -35,7 +35,8 @@ class proputil:
         recive key and return value or None
         """
         for i in self.prop:
-            if key in i: return i.rstrip().split('=')[1]
+            if key in i:
+                return i.rstrip().split('=')[1]
         return None
 
     def setprop(self, key, value) -> None:
@@ -75,4 +76,4 @@ def returnoutput(cmd, elocal, kz=1):
         ret = subprocess.check_output(comd, shell=False, stderr=subprocess.STDOUT)
         return ret.decode()
     except subprocess.CalledProcessError as e:
-        return str(e).decode()
+        return e
