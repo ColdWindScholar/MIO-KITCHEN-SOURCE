@@ -275,12 +275,10 @@ def refolder(path) -> None:
 
 
 def undtbo(bn: str = 'dtbo') -> any:
-    load_car(0)
     work = rwork()
     dtboimg = findfile(f"{bn}.img", work)
     if not dtboimg:
         print(lang.warn3.format(bn))
-        car.set(1)
         return False
     refolder(work + f"{bn}")
     refolder(work + f"{bn}" + os.sep + "dtbo")
@@ -303,7 +301,6 @@ def undtbo(bn: str = 'dtbo') -> any:
     except:
         pass
     rmdir(work + "dtbo" + os.sep + "dtbo", 1)
-    car.set(1)
 
 
 def padtbo() -> any:
