@@ -324,6 +324,7 @@ def undtbo(bn: str = 'dtbo') -> any:
     print(lang.text5)
     os.remove(dtboimg)
     rmdir(work + "dtbo" + os.sep + "dtbo", 1)
+    car.set(1)
 
 
 def padtbo() -> any:
