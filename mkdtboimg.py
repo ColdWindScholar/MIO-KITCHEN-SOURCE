@@ -24,7 +24,7 @@ import struct
 import zlib
 from array import array
 from collections import namedtuple
-from sys import stdout
+
 
 
 class CompressionFormat(object):
