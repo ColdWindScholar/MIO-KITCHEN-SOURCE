@@ -61,9 +61,8 @@ class Entry(object):
 
         """Prepare string formatted"""
 
-        return "{}\t\t{}\t{}".format(self.regex,
-                                     self.mode,
-                                     self.context)
+        return "{}\t{}".format(self.regex,
+                               self.context)
 
     @classmethod
     def convert_binary_mode(cls, mode_bits):
@@ -229,4 +228,3 @@ def main(input_f, outfile, debug=False):
     out_file.close()
 
     return 0
-

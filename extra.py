@@ -2,6 +2,7 @@ import os
 import subprocess
 from platform import machine
 from typing import Optional
+import re
 
 
 def clink(link: str, target: str):
@@ -15,6 +16,37 @@ def clink(link: str, target: str):
         from ctypes import windll
         attrib = windll.kernel32.SetFileAttributesA
         attrib(LPCSTR(link.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+
+
+class updaterutil:
+    def __init__(self, fd):
+        # self.path = Path(path)
+        self.fd = fd
+        if not self.fd:
+            raise IOError("fd is not valid!")
+        self.content = self.__parse_commands
+
+    @property
+    def __parse_commands(self):  # This part code from @libchara-dev
+        self.fd.seek(0, 0)  # set seek from start
+        commands = re.findall(r'(\w+)\((.*?)\)', self.fd.read().replace('\n', ''))
+        parsed_commands = [
+            [command, *(arg[0] or arg[1] or arg[2] for arg in re.findall(r'(?:"([^"]+)"|(\b\d+\b)|(\b\S+\b))', args))]
+            for command, args in commands]
+        return parsed_commands
+
+# This Function copy from affggh mtk-porttool(https://gitee.com/affggh/mtk-garbage-porttool)
+def script2fs_context():
+    fs_label = []
+    fc_label = []
+    fs_label.append(
+        ["/", '0', '0', '0755'])
+    fs_label.append(
+        ["/lost\\+found", '0', '0', '0700'])
+    fc_label.append(
+        ['/', 'u:object_r:system_file:s0'])
+    fc_label.append(
+        ['/system(/.*)?', 'u:object_r:system_file:s0'])
 
 
 class proputil:
