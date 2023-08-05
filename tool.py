@@ -2168,9 +2168,7 @@ def packzip():
         print(lang.text91 % dn.get())
         if os.path.exists(rwork() + "super.img"):
             if ask_win(lang.t25) == 1:
-                if os.name != 'nt':
-                    pass
-                else:
+                if os.name == 'nt':
                     dbkxyt()
         zip_file(dn.get() + ".zip", rwork())
         car.set(1)
