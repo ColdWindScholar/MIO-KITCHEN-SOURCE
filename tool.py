@@ -1251,7 +1251,7 @@ class packss:
         work = rwork()
         for file_name in os.listdir(work):
             if file_name.endswith(".img"):
-                if gettype(work + file_name) == "ext" or gettype(work + file_name) == "erofs":
+                if gettype(work + file_name) in ["ext", 'erofs']:
                     tl.insert(END, file_name[:-4])
         tl.pack(padx=10, pady=10, fill=BOTH)
 
@@ -1801,7 +1801,7 @@ def unpack(chose, form: any = None):
                 parts[dname] = gettype(work + dname + ".img")
             if gettype(work + dname + ".img") == 'dtbo':
                 undtbo(dname)
-            if gettype(work + dname + ".img") == 'boot' or gettype(work + dname + ".img") == 'vendor_boot':
+            if gettype(work + dname + ".img") in ['boot', 'vendor_boot']:
                 jboot(dname)
             if dname == 'logo':
                 logodump(dname)
@@ -2409,7 +2409,7 @@ class format_conversion(Toplevel):
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
                 if os.path.isfile(work + i):
-                    if gettype(work + i) == 'ext' or gettype(work + i) == 'erofs' or gettype(work + i) == 'super':
+                    if gettype(work + i) in ['ext',  'erofs',  'super']:
                         self.list_b.insert('end', i)
 
     @staticmethod
@@ -2471,7 +2471,7 @@ class format_conversion(Toplevel):
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
                         call("brotli -dj " + work + i)
-                if hget == 'dat' or hget == 'br':
+                if hget in ['dat', 'br']:
                     if os.path.exists(work):
                         if hget == 'br':
                             i = i.replace('.br', '')
@@ -2508,7 +2508,7 @@ class format_conversion(Toplevel):
                             os.rename(work + i + 's', work + i)
                         except Exception as e:
                             print(e)
-                if hget == 'raw' or hget == 'sparse':
+                if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if hget == 'br':
                     print(lang.text79 + i)
@@ -2525,7 +2525,7 @@ class format_conversion(Toplevel):
                             os.rename(work + i + 's', work + i)
                         except Exception as e:
                             print(e)
-                if hget == 'raw' or hget == 'sparse':
+                if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget == 'dat':
                     print(lang.text88 % os.path.basename(i).split('.')[0])
