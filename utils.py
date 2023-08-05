@@ -7,6 +7,7 @@ import common, blockimgdiff, sparse_img
 from threading import Thread
 from random import randint, choice
 from sefcontext_parser import main as sef_parse
+
 # -----
 # ====================================================
 #          FUNCTION: img2sdat
@@ -65,6 +66,8 @@ def gettype(file) -> str:
             if compare(f_[0], f_[2]):
                 return f_[1]
     return "unknow"
+
+
 def v_code(num=6) -> str:
     ret = ""
     for i in range(num):
@@ -109,6 +112,25 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
     print('Done! Output files: %s' % os.path.dirname(prefix))
+
+
+def findfile(file, dir_) -> str:
+    for root, dirs, files in os.walk(dir_, topdown=True):
+        if file in files:
+            if os.name == 'nt':
+                return (root + os.sep + file).replace("\\", '/')
+            else:
+                return root + os.sep + file
+        else:
+            pass
+
+
+def findfolder(dir__, folder_name):
+    for root, dirnames, filenames in os.walk(dir__):
+        for dirname in dirnames:
+            if dirname == folder_name:
+                return os.path.join(root, dirname).replace("\\", '/')
+    return None
 
 
 # ----CLASSES

@@ -9,7 +9,7 @@ import extra
 from extra import *
 import contextpatch
 import utils
-from utils import CallZ, jzxs, v_code, gettype
+from utils import CallZ, jzxs, v_code, gettype,findfile,findfolder
 
 if os.name == 'nt':
     import windnd
@@ -187,6 +187,7 @@ class welcome(object):
         pass
 
 
+'''
 def upgrade():
     ck = Toplevel()
     ck.title("检查更新")
@@ -206,6 +207,7 @@ def upgrade():
         Label(ck, text="已是最新版本：%s" % VERSION, font=('华文行楷', 15)).pack(padx=5, pady=5)
         ttk.Button(ck, text="确定", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
         ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
+'''
 
 
 def loadset():
@@ -1526,24 +1528,7 @@ def dboot():
         car.set(1)
 
 
-def findfile(file, dir_) -> str:
-    for root, dirs, files in os.walk(dir_, topdown=True):
-        if file in files:
-            print(lang.text70 % root + os.sep + file)
-            if os.name == 'nt':
-                return (root + os.sep + file).replace("\\", '/')
-            else:
-                return root + os.sep + file
-        else:
-            pass
 
-
-def findfolder(dir__, folder_name):
-    for root, dirnames, filenames in os.walk(dir__):
-        for dirname in dirnames:
-            if dirname == folder_name:
-                return os.path.join(root, dirname).replace("\\", '/')
-    return None
 
 
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
