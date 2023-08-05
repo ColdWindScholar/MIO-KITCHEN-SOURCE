@@ -1574,9 +1574,13 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
     if os.path.exists(work + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
             parts_dict = json.loads(fff.read())
+    else:
+        parts_dict = {}
     for i in parts:
         print(i)
         dname = os.path.basename(i)
+        if not dname in parts_dict.keys():
+            parts_dict[dname] = 'ext'
         if spatch == 1:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                 file = findfile(j, work)
@@ -1698,7 +1702,8 @@ def unpackrom(ifile) -> None:
         if os.path.exists(
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"):
             extra.script2fs_context(
-                findfile("updater-script",local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
+                findfile("updater-script",
+                         local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
             )
@@ -1867,7 +1872,7 @@ def unpack(chose, form: any = None):
                 parts[dname] = gettype(work + dname + ".img")
             if gettype(work + dname + ".img") == 'dtbo':
                 undtbo(dname)
-            if gettype(work + dname + ".img") == 'boot' or gettype(work+dname+".img") == 'vendor_boot':
+            if gettype(work + dname + ".img") == 'boot' or gettype(work + dname + ".img") == 'vendor_boot':
                 jboot(dname)
             if dname == 'logo':
                 logodump(dname)
@@ -2475,7 +2480,7 @@ class format_conversion(Toplevel):
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
                 if os.path.isfile(work + i):
-                    if gettype(work + i) == 'ext' or gettype(work+i) == 'erofs' or gettype(work+i) == 'super':
+                    if gettype(work + i) == 'ext' or gettype(work + i) == 'erofs' or gettype(work + i) == 'super':
                         self.list_b.insert('end', i)
 
     @staticmethod
@@ -2574,7 +2579,7 @@ class format_conversion(Toplevel):
                             os.rename(work + i + 's', work + i)
                         except Exception as e:
                             print(e)
-                if hget == 'raw' or hget=='sparse':
+                if hget == 'raw' or hget == 'sparse':
                     datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if hget == 'br':
                     print(lang.text79 + i)
@@ -2591,7 +2596,7 @@ class format_conversion(Toplevel):
                             os.rename(work + i + 's', work + i)
                         except Exception as e:
                             print(e)
-                if hget == 'raw' or hget=='sparse':
+                if hget == 'raw' or hget == 'sparse':
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget == 'dat':
                     print(lang.text88 % os.path.basename(i).split('.')[0])
