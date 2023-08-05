@@ -36,6 +36,7 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
+import sefcontext_parser
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -267,7 +268,7 @@ def v_code() -> str:
 
 def refolder(path) -> None:
     if os.path.exists(path):
-        rmdir(path,1)
+        rmdir(path, 1)
         os.mkdir(path)
     else:
         os.mkdir(path)
@@ -1571,7 +1572,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
     load_car(0)
     work = rwork()
     if os.path.exists(work + "config" + os.sep + "parts_info"):
-        with open(work + "config" + os.sep + "parts_info",'r+',encoding='utf-8') as fff:
+        with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
             parts_dict = json.loads(fff.read())
     for i in parts:
         print(i)
@@ -1672,11 +1673,15 @@ def input_(title: str = lang.text76, text: str = "") -> str:
     return inputvar.get()
 
 
-def unpackrom(ifile) -> int:
+def unpackrom(ifile) -> None:
     zip_src = ifile
     print(lang.text77 + zip_src)
     ftype = gettype(ifile)
     load_car(0)
+    if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config"):
+        os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config")
     if ftype == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
@@ -1690,8 +1695,14 @@ def unpackrom(ifile) -> int:
             ofp_mtk_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+        if os.path.exists(
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
+            sefcontext_parser.main(
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin",
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "config" + os.sep + "system_file_contexts")
         car.set(1)
-        return 0
+        return
     if zipfile.is_zipfile(zip_src):
         fz = zipfile.ZipFile(zip_src, 'r')
         for fi in fz.namelist():
@@ -1716,6 +1727,12 @@ def unpackrom(ifile) -> int:
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
             listdir()
+    if os.path.exists(
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
+        sefcontext_parser.main(
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin",
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config" + os.sep + "system_file_contexts")
     else:
         if ftype != 'unknow':
             if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
@@ -1918,7 +1935,7 @@ def unpack(chose, form: any = None):
                         messpop(lang.warn11.format(dname + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
-    with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8',newline='\n') as ff:
+    with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
         ff.write(json.dumps(parts))
     parts.clear()
 
@@ -2033,7 +2050,8 @@ def datbr(work, name, brl):
 def mkerofs(name, level, work):
     print(lang.text90 % (name, level, "1.6"))
     call(
-        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}",out=1)
+        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}",
+        out=1)
 
 
 def make_ext4fs(name, work, sparse):
