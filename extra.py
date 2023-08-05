@@ -92,7 +92,7 @@ def script2fs_context(input_f, outdir, project):
             src, *targets = args
             for target in targets:
                 __symlink(src, str(os.path.join(project, target.lstrip('/'))))
-        elif command is 'set_metadata' or command == 'set_metadata_recursive':
+        elif command == 'set_metadata' or command == 'set_metadata_recursive':
             print(args)
             dirmode = False if command == 'set_metadata' else True
             fpath, *fargs = args

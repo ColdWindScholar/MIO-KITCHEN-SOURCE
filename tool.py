@@ -1696,11 +1696,12 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
-            sefcontext_parser.main(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin",
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "config" + os.sep + "system_file_contexts")
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"):
+            extra.script2fs_context(
+                findfile("updater-script",local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+            )
         car.set(1)
         return
     if zipfile.is_zipfile(zip_src):
@@ -1728,11 +1729,13 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
     if os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
-        sefcontext_parser.main(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin",
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config" + os.sep + "system_file_contexts")
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"):
+        extra.script2fs_context(
+            findfile("updater-script",
+                     local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+        )
     else:
         if ftype != 'unknow':
             if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
