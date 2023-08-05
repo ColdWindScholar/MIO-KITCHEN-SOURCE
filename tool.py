@@ -2035,8 +2035,8 @@ class handle_log:
 
     @staticmethod
     def putlog():
-        log = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-        with open(local + os.sep + log + v_code() + '.txt', 'w', encoding='utf-8', newline='\n') as f:
+        with open(local + os.sep + (log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
+                  'w', encoding='utf-8', newline='\n') as f:
             f.write(show.get(1.0, END))
         show.delete(1.0, END)
         print(lang.text95 + local + os.sep + log + v_code() + ".txt")
@@ -2091,8 +2091,7 @@ def rmdir(path, up=0):
 
 
 def newp():
-    inputvar = input_()
-    if not inputvar:
+    if not (inputvar := input_()):
         messpop(lang.warn12)
     else:
         print(lang.text99 % inputvar)
@@ -2142,11 +2141,10 @@ def set_language(self):
 
 class zip_file(object):
     def __init__(self, file, dst_dir):
-
-        relpath = os.path.abspath(file)
         os.chdir(dst_dir)
         file_paths_ = get_all_file_paths('.')
-        with zipfile.ZipFile(relpath, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zip_:
+        with zipfile.ZipFile(relpath := os.path.abspath(file), 'w', compression=zipfile.ZIP_DEFLATED,
+                             allowZip64=True) as zip_:
             # 遍历写入文件
             for file in file_paths_:
                 print(f"{lang.text1}:%s" % file)
@@ -2174,8 +2172,7 @@ def packzip():
 
 
 def modpath():
-    folder = filedialog.askdirectory()
-    if not folder:
+    if not (folder := filedialog.askdirectory()):
         return False
     setf("path", folder)
     slocal.set(folder)
@@ -2186,8 +2183,7 @@ def cmm():
     if not dn.get():
         print(lang.warn1)
         return
-    inputvar = input_(lang.text102 + dn.get(), dn.get())
-    if os.path.exists(local + os.sep + inputvar):
+    if os.path.exists(local + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
         print(lang.text103)
         return False
     if inputvar != dn.get():
