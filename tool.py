@@ -9,7 +9,7 @@ import extra
 from extra import *
 import contextpatch
 import utils
-from utils import CallZ, jzxs, v_code, gettype,findfile,findfolder
+from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder
 
 if os.name == 'nt':
     import windnd
@@ -1528,9 +1528,6 @@ def dboot():
         car.set(1)
 
 
-
-
-
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
     if not dn.get():
         messpop(lang.warn1)
@@ -1550,7 +1547,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
         print(i)
         dname = os.path.basename(i)
         if not dname in parts_dict.keys():
-            parts_dict[dname] = 'ext'
+            parts_dict[dname] = 'unknow'
         if spatch == 1:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                 file = findfile(j, work)
@@ -1576,7 +1573,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                 if dely == 1:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
-                if dbgs.get() == "dat" or dbgs.get() == "br" or dbgs.get() == "sparse":
+                if dbgs.get() in ["dat", "br", "sparse"]:
                     call('img2simg {}.img {}.simg'.format(work + dname, work + dname))
                     if os.path.exists(work + dname + ".simg"):
                         os.remove(work + dname + ".img")
@@ -1588,8 +1585,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                     else:
                         print(lang.text3.format(dname))
             else:
-
-                if dbgs.get() == "dat" or dbgs.get() == "br" or dbgs.get() == "sparse":
+                if dbgs.get() in ["dat", "br", "sparse"]:
                     if dbfs.get() == "make_ext4fs":
                         make_ext4fs(dname, work, "-s")
                     else:
