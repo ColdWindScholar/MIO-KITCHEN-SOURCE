@@ -5,7 +5,8 @@ from os.path import exists
 import sys, os, errno, tempfile
 import common, blockimgdiff, sparse_img
 from threading import Thread
-
+from random import randint, choice
+from sefcontext_parser import main as sef_parse
 # -----
 # ====================================================
 #          FUNCTION: img2sdat
@@ -29,6 +30,53 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 
 
 # ----DEFS
+def gettype(file) -> str:
+    if not os.path.exists(file):
+        return "fne"
+
+    def compare(header: bytes, number: int = 0) -> int:
+        with open(file, 'rb') as f:
+            f.seek(number)
+            return f.read(len(header)) == header
+
+    def is_super(fil) -> any:
+        with open(fil, 'rb') as file_:
+            buf = bytearray(file_.read(4))
+            if len(buf) < 4:
+                return False
+            file_.seek(0, 0)
+
+            while buf[0] == 0x00:
+                buf = bytearray(file_.read(1))
+            try:
+                file_.seek(-1, 1)
+            except:
+                return False
+            buf += bytearray(file_.read(4))
+        return buf[1:] == b'\x67\x44\x6c\x61'
+
+    if is_super(file):
+        return "super"
+    for f_ in formats:
+        if len(f_) == 2:
+            if compare(f_[0]):
+                return f_[1]
+        elif len(f_) == 3:
+            if compare(f_[0], f_[2]):
+                return f_[1]
+    return "unknow"
+def v_code(num=6) -> str:
+    ret = ""
+    for i in range(num):
+        num = randint(0, 9)
+        # num = chr(random.randint(48,57))#ASCII表示数字
+        letter = chr(randint(97, 122))  # 取小写字母
+        Letter = chr(randint(65, 90))  # 取大写字母
+        s = str(choice([num, letter, Letter]))
+        ret += s
+    return ret
+
+
 def qc(file_) -> None:
     if not exists(file_):
         return

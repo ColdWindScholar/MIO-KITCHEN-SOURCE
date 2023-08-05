@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import re
 import shlex
 import sys
 import time
@@ -10,14 +9,13 @@ import extra
 from extra import *
 import contextpatch
 import utils
-from utils import CallZ, formats, jzxs
+from utils import CallZ, jzxs, v_code, gettype
 
 if os.name == 'nt':
     import windnd
 import zipfile
 from io import BytesIO, StringIO
 from platform import machine
-from random import randint, choice
 from tkinter import *
 from tkinter import filedialog, ttk, messagebox
 from shutil import rmtree, copy, move
@@ -36,7 +34,6 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
-import sefcontext_parser
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -252,18 +249,6 @@ def messpop(message, color='orange') -> None:
 def gettime() -> None:
     tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
     tsk.after(1000, gettime)
-
-
-def v_code() -> str:
-    ret = ""
-    for i in range(6):
-        num = randint(0, 9)
-        # num = chr(random.randint(48,57))#ASCII表示数字
-        letter = chr(randint(97, 122))  # 取小写字母
-        Letter = chr(randint(65, 90))  # 取大写字母
-        s = str(choice([num, letter, Letter]))
-        ret += s
-    return ret
 
 
 def refolder(path) -> None:
@@ -1757,43 +1742,6 @@ def unpackrom(ifile) -> None:
         else:
             print(lang.text82 % ftype)
     car.set(1)
-
-
-def gettype(file) -> str:
-    if not os.path.exists(file):
-        return "fne"
-
-    def compare(header: bytes, number: int = 0) -> int:
-        with open(file, 'rb') as f:
-            f.seek(number)
-            return f.read(len(header)) == header
-
-    def is_super(fil) -> any:
-        with open(fil, 'rb') as file_:
-            buf = bytearray(file_.read(4))
-            if len(buf) < 4:
-                return False
-            file_.seek(0, 0)
-
-            while buf[0] == 0x00:
-                buf = bytearray(file_.read(1))
-            try:
-                file_.seek(-1, 1)
-            except:
-                return False
-            buf += bytearray(file_.read(4))
-        return buf[1:] == b'\x67\x44\x6c\x61'
-
-    if is_super(file):
-        return "super"
-    for f_ in formats:
-        if len(f_) == 2:
-            if compare(f_[0]):
-                return f_[1]
-        elif len(f_) == 3:
-            if compare(f_[0], f_[2]):
-                return f_[1]
-    return "unknow"
 
 
 def rwork() -> str:
