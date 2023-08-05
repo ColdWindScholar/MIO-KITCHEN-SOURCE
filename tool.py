@@ -958,8 +958,8 @@ def mpkman() -> None:
                     for n in data['depend'].split():
                         if name == n:
                             self.arr.append(i)
-                            self.lfdep(i)
                             self.arr2.append(data['name'])
+                            self.lfdep(i)
                             break
 
         def unloop(self):
@@ -1646,13 +1646,12 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 def unpackrom(ifile) -> None:
     zip_src = ifile
     print(lang.text77 + zip_src)
-    ftype = gettype(ifile)
     load_car(0)
     if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
         0] + os.sep + "config"):
         os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
             0] + os.sep + "config")
-    if ftype == "ozip":
+    if (ftype := gettype(ifile)) == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
         try:
@@ -2027,8 +2026,8 @@ class handle_log:
         da = {'JXK_Myname': 'MKC',
               'JXK_Content': "%s" % (show.get(1.0, 'end-1c').encode('UTF-8'))
               }
-        ret = requests.post('http://xzz.web3v.vip/bugreport/book/List.asp?Action=save', data=da)
-        print(lang.text92 + str(ret.status_code))
+        print(lang.text92 + str(
+            (ret := requests.post('http://xzz.web3v.vip/bugreport/book/List.asp?Action=save', data=da)).status_code))
         if ret.status_code != 200:
             messpop(lang.text93)
         else:
@@ -2407,7 +2406,7 @@ class format_conversion(Toplevel):
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
                 if os.path.isfile(work + i):
-                    if gettype(work + i) in ['ext',  'erofs',  'super']:
+                    if gettype(work + i) in ['ext', 'erofs', 'super']:
                         self.list_b.insert('end', i)
 
     @staticmethod
