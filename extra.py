@@ -1,8 +1,13 @@
 import os
+import os.path as op
+import re
 import subprocess
+from os import walk, symlink, readlink, name as osname
 from platform import machine
 from typing import Optional
-import re
+
+if os.name == 'nt':
+    from ctypes import wintypes, windll
 
 
 def clink(link: str, target: str):
@@ -31,12 +36,41 @@ class updaterutil:
         self.fd.seek(0, 0)  # set seek from start
         commands = re.findall(r'(\w+)\((.*?)\)', self.fd.read().replace('\n', ''))
         parsed_commands = [
-            [command, *(arg[0] or arg[1] or arg[2] for arg in re.findall(r'(?:"([^"]+)"|(\b\d+\b)|(\b\S+\b))', args))]
+            [command, *(arg[0] or arg[1] or arg[2] for arg in re.findall(r'"([^"]+)"|(\b\d+\b)|(\b\S+\b)', args))]
             for command, args in commands]
         return parsed_commands
 
+
 # This Function copy from affggh mtk-porttool(https://gitee.com/affggh/mtk-garbage-porttool)
-def script2fs_context():
+def script2fs_context(input_f, outdir, project):
+    def __readlink(dest: str):
+        if os.name == 'nt':
+            with open(dest, 'rb') as f:
+                if f.read(10) == b'!<symlink>':
+                    return f.read().decode('utf-16').rstrip('\0')
+                else:
+                    return None
+        else:
+            try:
+                readlink(dest)
+            except:
+                return None
+
+    def __symlink(src: str, dest: str):
+        def setSystemAttrib(path: str) -> wintypes.BOOL:
+            return windll.kernel32.SetFileAttributesA(path.encode('gb2312'), wintypes.DWORD(0x4))
+
+        print(f"创建软链接 [{src}] -> [{dest}]")
+        if not os.path.exists(os.path.dirname(dest)):
+            os.makedirs(os.path.dirname(dest))
+        if osname == 'nt':
+            with open(dest, 'wb') as f:
+                f.write(
+                    b"!<symlink>" + src.encode('utf-16') + b'\0\0')
+            setSystemAttrib(dest)
+        else:
+            symlink(src, dest)
+
     fs_label = []
     fc_label = []
     fs_label.append(
@@ -47,6 +81,90 @@ def script2fs_context():
         ['/', 'u:object_r:system_file:s0'])
     fc_label.append(
         ['/system(/.*)?', 'u:object_r:system_file:s0'])
+    print("分析刷机脚本...")
+    with open(input_f, 'r', encoding='utf-8') as updater:
+        contents = updaterutil(updater).content
+    last_fpath = ''
+    for content in contents:
+        command, *args = content
+
+        if command == 'symlink':
+            src, *targets = args
+            for target in targets:
+                __symlink(src, str(os.path.join(project, target.lstrip('/'))))
+        elif command is 'set_metadata' or 'set_metadata_recursive':
+            print(args)
+            dirmode = False if command == 'set_metadata' else True
+            fpath, *fargs = args
+            fpath = fpath.replace("+", "\\+").replace("[", "\\[").replace('//', '/')
+            if fpath == last_fpath:
+                continue  # skip same path
+            # initial
+            uid, gid, mode, extra = '0', '0', '644', ''
+            selable = 'u:object_r:system_file:s0'  # common system selable
+            for index, farg in enumerate(fargs):
+                print(farg)
+                if farg == 'uid':
+                    uid = fargs[index + 1]
+                elif farg == 'gid':
+                    gid = fargs[index + 1]
+                elif farg == 'mode' or 'fmode' or 'dmode':
+                    if dirmode and farg == 'dmode':
+                        mode = fargs[index + 1]
+                    else:
+                        mode = fargs[index + 1]
+                elif farg == 'capabilities':
+                    # continue
+                    if fargs[index + 1] == '0x0':
+                        extra = ''
+                    else:
+                        extra = 'capabilities=' + fargs[index + 1]
+                elif farg == 'selabel':
+                    selable = fargs[index + 1]
+            fs_label.append(
+                [fpath.lstrip('/'), uid, gid, mode, extra])
+            fc_label.append(
+                [fpath, selable])
+            last_fpath = fpath
+
+    # Patch fs_config
+    print("添加缺失的文件和权限")
+    fs_files = [i[0] for i in fs_label]
+    for root, dirs, files in walk(project + os.sep + "system"):
+        if project + os.sep + "install" in root.replace('\\', '/'): continue  # skip lineage spec
+        for dir in dirs:
+            unix_path = op.join(
+                op.join("/system", op.relpath(op.join(root, dir), project + os.sep + "system")).replace("\\", "/")
+            ).replace("[", "\\[")
+            if not unix_path in fs_files:
+                fs_label.append([unix_path.lstrip('/'), '0', '0', '0755'])
+        for file in files:
+            unix_path = op.join(
+                op.join("/system", op.relpath(op.join(root, file), project + os.sep + "system")).replace("\\", "/")
+            ).replace("[", "\\[")
+            if not unix_path in fs_files:
+                link = __readlink(op.join(root, file))
+                if link:
+                    fs_label.append(
+                        [unix_path.lstrip('/'), '0', '2000', '0755', link])
+                else:
+                    if "bin/" in unix_path:
+                        mode = '0755'
+                    else:
+                        mode = '0644'
+                    fs_label.append(
+                        [unix_path.lstrip('/'), '0', '2000', mode])
+
+    # generate config
+    print("生成fs_config 和 file_contexts")
+    fs_label.sort()
+    fc_label.sort()
+    with open(os.path.join(outdir, "system_fs_config"), 'w', newline='\n') as fs_config, open(
+            os.path.join(outdir, "system_file_contexts"), 'w', newline='\n') as file_contexts:
+        for fs in fs_label:
+            fs_config.write(" ".join(fs) + '\n')
+        for fc in fc_label:
+            file_contexts.write(" ".join(fc) + '\n')
 
 
 class proputil:
