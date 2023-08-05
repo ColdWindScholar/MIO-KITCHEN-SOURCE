@@ -37,8 +37,7 @@ import editor
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
-elocal = os.getcwd()
-setfile = elocal + os.sep + "bin" + os.sep + "setting.ini"
+setfile = (elocal := os.getcwd()) + os.sep + "bin" + os.sep + "setting.ini"
 modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
 win = Tk()
 start = dti()
@@ -166,9 +165,8 @@ class welcome(object):
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        te = Text(self.frame)
         with open(elocal + os.sep + "bin" + os.sep + "licenses" + os.sep + "private.txt", 'r', encoding='UTF-8') as f:
-            te.insert('insert', f.read())
+            (te := Text(self.frame)).insert('insert', f.read())
         te.pack(fill=BOTH)
         ttk.Label(self.frame, text=lang.t3).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
@@ -262,8 +260,7 @@ def refolder(path) -> None:
 
 
 def undtbo(bn: str = 'dtbo') -> any:
-    work = rwork()
-    dtboimg = findfile(f"{bn}.img", work)
+    dtboimg = findfile(f"{bn}.img", work := rwork())
     if not dtboimg:
         print(lang.warn3.format(bn))
         return False
@@ -2407,12 +2404,11 @@ class format_conversion(Toplevel):
 
     @staticmethod
     def refile(f):
-        work = rwork()
         a = []
-        for i in os.listdir(work):
+        for i in os.listdir(work := rwork()):
             if i.endswith(f):
                 if os.path.isfile(work + i):
-                    a.append(i)
+                    (a := []).append(i)
         return a
 
     def conversion(self):
@@ -2564,8 +2560,7 @@ class load_car(object):
         car.set(0)
 
 
-gifl = Label(rzf)
-gifl.pack(padx=10, pady=10)
+(gifl := Label(rzf)).pack(padx=10, pady=10)
 load_car(0)
 car.set(1)
 print(lang.text108)
