@@ -102,7 +102,6 @@ def script2fs_context(input_f, outdir, project):
             uid, gid, mode, extra = '0', '0', '644', ''
             selable = 'u:object_r:system_file:s0'  # common system selable
             for index, farg in enumerate(fargs):
-                print(farg)
                 if farg == 'uid':
                     uid = fargs[index + 1]
                 elif farg == 'gid':
