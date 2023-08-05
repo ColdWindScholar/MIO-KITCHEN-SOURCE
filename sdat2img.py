@@ -9,59 +9,46 @@
 from __future__ import print_function
 
 from os.path import realpath
-from sys import hexversion, exit, stderr, argv
 from errno import EEXIST
 
 
 def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     __version__ = '1.2'
 
-    if hexversion < 0x02070000:
-        print(stderr, "Python 2.7 or newer is required.")
-        input('Press ENTER to exit...')
-        exit(1)
-    else:
-        print('sdat2img binary - version: {}\n'.format(__version__))
+    print('sdat2img binary - version: {}\n'.format(__version__))
 
     def rangeset(src):
         src_set = src.split(',')
         num_set = [int(item) for item in src_set]
         if len(num_set) != num_set[0] + 1:
-            print('Error on parsing following data to rangeset:\n{}'.format(src), file=stderr)
-            exit(1)
+            print('Error on parsing following data to rangeset:\n{}'.format(src))
+            return
 
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
 
     def parse_transfer_list_file(path):
-        trans_list = open(TRANSFER_LIST_FILE, 'r')
-
-        # First line in transfer list is the version number
-        version = int(trans_list.readline())
-
-        # Second line in transfer list is the total number of blocks we expect to write
-        new_blocks = int(trans_list.readline())
-
-        if version >= 2:
-            # Third line is how many stash entries are needed simultaneously
-            trans_list.readline()
-            # Fourth line is the maximum number of blocks that will be stashed simultaneously
-            trans_list.readline()
-
-        # Subsequent lines are all individual transfer commands
-        commands = []
-        for line in trans_list:
-            line = line.split(' ')
-            cmd = line[0]
-            if cmd in ['erase', 'new', 'zero']:
-                commands.append([cmd, rangeset(line[1])])
-            else:
-                # Skip lines starting with numbers, they are not commands anyway
-                if not cmd[0].isdigit():
-                    print('Command "{}" is not valid.'.format(cmd), file=stderr)
-                    trans_list.close()
-                    exit(1)
-
-        trans_list.close()
+        with open(TRANSFER_LIST_FILE, 'r') as trans_list:
+            # First line in transfer list is the version number
+            version = int(trans_list.readline())
+            # Second line in transfer list is the total number of blocks we expect to write
+            new_blocks = int(trans_list.readline())
+            if version >= 2:
+                # Third line is how many stash entries are needed simultaneously
+                trans_list.readline()
+                # Fourth line is the maximum number of blocks that will be stashed simultaneously
+                trans_list.readline()
+            # Subsequent lines are all individual transfer commands
+            commands = []
+            for line in trans_list:
+                line = line.split(' ')
+                cmd = line[0]
+                if cmd in ['erase', 'new', 'zero']:
+                    commands.append([cmd, rangeset(line[1])])
+                else:
+                    # Skip lines starting with numbers, they are not commands anyway
+                    if not cmd[0].isdigit():
+                        print('Command "{}" is not valid.'.format(cmd))
+                        return
         return version, new_blocks, commands
 
     BLOCK_SIZE = 4096
@@ -84,9 +71,9 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
         output_img = open(OUTPUT_IMAGE_FILE, 'wb')
     except IOError as e:
         if e.errno == EEXIST:
-            print('Error: the output file "{}" already exists'.format(e.filename), file=stderr)
-            print('Remove it, rename it, or choose a different file name.', file=stderr)
-            exit(e.errno)
+            print('Error: the output file "{}" already exists'.format(e.filename))
+            print('Remove it, rename it, or choose a different file name.')
+            return e.errno
         else:
             raise
 
