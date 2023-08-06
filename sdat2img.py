@@ -61,7 +61,7 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     elif version == 4:
         print('Android Nougat 7.x / Oreo 8.x detected!\n')
     else:
-        print('Unknown Android version!\n')
+        print(f'Unknown Android version:{version}!\n')
 
     # Don't clobber existing files to avoid accidental data loss
     try:
