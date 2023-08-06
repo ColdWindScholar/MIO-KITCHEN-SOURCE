@@ -39,7 +39,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
         permission_d = 'u:object_r:system_file:s0'
     for i in filename:
         if fs_file.get(i):
-            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)]  = fs_file[i]
+            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
         else:
             if os.name == 'nt':
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
