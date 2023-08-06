@@ -29,10 +29,9 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     def parse_transfer_list_file(path):
         with open(TRANSFER_LIST_FILE, 'r') as trans_list:
             # First line in transfer list is the version number
-            version = int(trans_list.readline())
             # Second line in transfer list is the total number of blocks we expect to write
             new_blocks = int(trans_list.readline())
-            if version >= 2:
+            if version := int(trans_list.readline()) >= 2:
                 # Third line is how many stash entries are needed simultaneously
                 trans_list.readline()
                 # Fourth line is the maximum number of blocks that will be stashed simultaneously
@@ -50,8 +49,6 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
                         print('Command "{}" is not valid.'.format(cmd))
                         return
         return version, new_blocks, commands
-
-    BLOCK_SIZE = 4096
 
     version, new_blocks, commands = parse_transfer_list_file(TRANSFER_LIST_FILE)
 
@@ -79,7 +76,7 @@ def main(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
 
     new_data_file = open(NEW_DATA_FILE, 'rb')
     all_block_sets = [i for command in commands for i in command[1]]
-    max_file_size = max(pair[1] for pair in all_block_sets) * BLOCK_SIZE
+    max_file_size = max(pair[1] for pair in all_block_sets) * (BLOCK_SIZE := 4096)
 
     for command in commands:
         if command[0] == 'new':
