@@ -321,11 +321,9 @@ def logodump(bn: str = 'logo'):
 
 
 def logopack() -> int:
-    work = rwork()
-    orlogo = findfile('logo.img', work)
+    orlogo = findfile('logo.img', work := rwork())
     logo = work + "logo-new.img"
-    dir_ = work + "logo"
-    if not os.path.exists(dir_):
+    if not os.path.exists(dir_:=work+"logo"):
         print(lang.warn6)
         return 1
     if not os.path.exists(orlogo):
