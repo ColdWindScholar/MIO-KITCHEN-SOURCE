@@ -128,7 +128,7 @@ class welcome(object):
         ttk.Label(self.frame, text=lang.text129, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         LB3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
-                            value=[i.rsplit('.',1)[0] for i in
+                            value=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         LB3_.pack(padx=10, pady=10, side='top')
         LB3_.bind('<<ComboboxSelected>>', set_language)
@@ -260,8 +260,7 @@ def refolder(path) -> None:
 
 
 def undtbo(bn: str = 'dtbo') -> any:
-    dtboimg = findfile(f"{bn}.img", work := rwork())
-    if not dtboimg:
+    if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
         print(lang.warn3.format(bn))
         return False
     refolder(work + f"{bn}")
@@ -314,9 +313,7 @@ def padtbo() -> any:
 
 
 def logodump(bn: str = 'logo'):
-    work = rwork()
-    logo = findfile(f'{bn}.img', work)
-    if not logo:
+    if not (logo := findfile(f'{bn}.img', work := rwork())):
         messpop(lang.warn3.format(bn))
         return False
     refolder(work + f"{bn}")
@@ -1641,7 +1638,9 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin") and os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "file_contexts.bin") and os.path.exists(
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
@@ -1675,7 +1674,9 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
     if os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin") and os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "file_contexts.bin") and os.path.exists(
+        local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
         extra.script2fs_context(
             findfile("updater-script",
                      local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
@@ -2251,7 +2252,7 @@ class unpackg(object):
         if self.fm.get() != 'payload' and self.fm.get() != 'super':
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.rsplit('.',1)[0])
+                    self.lsg.insert(END, file_name.rsplit('.', 1)[0])
         else:
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
@@ -2306,7 +2307,7 @@ ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, p
 
 ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
 LB3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
-                   value=[i.rsplit('.',1)[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+                   value=[i.rsplit('.', 1)[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
 LB3.pack(padx=10, pady=10, side='left')
 LB3.bind('<<ComboboxSelected>>', set_language)
 sf1.pack(padx=10, pady=10, fill='both')
