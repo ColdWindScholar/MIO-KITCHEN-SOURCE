@@ -1351,8 +1351,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 
 
 def DownloadFile():
-    url = input_(title=lang.text60)
-    down = getframe(lang.text61 + os.path.basename(url))
+    down = getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
