@@ -467,8 +467,7 @@ def mpkman() -> None:
             id_ = globals()[pls.get(pls.curselection())]
         if not os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh") and not os.path.exists(
                 moduledir + os.sep + id_ + os.sep + "main.sh"):
-            ask = ask_win(lang.t18, 'SH', 'MSH')
-            if ask == 1:
+            if ask_win(lang.t18, 'SH', 'MSH') == 1:
                 s = "main.sh"
             else:
                 s = "main.msh"
@@ -634,8 +633,8 @@ def mpkman() -> None:
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
 
         def sh(self, cmd):
-            file_ = (elocal + os.sep + "bin" + os.sep + "temp" + os.sep) + v_code()
-            with open(file_, "w", encoding='UTF-8', newline="\n") as f:
+            with open(file_ := (elocal + os.sep + "bin" + os.sep + "temp" + os.sep) + v_code(), "w", encoding='UTF-8',
+                      newline="\n") as f:
                 for i in self.envs:
                     f.write(f'export {i}={self.envs[i]}\n')
                 f.write("source $1")
@@ -864,8 +863,7 @@ def mpkman() -> None:
                 # 生成TMP
                 else:
                     if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
-                        temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
-                        if not os.path.exists(temp):
+                        if not os.path.exists(temp := elocal + os.sep + "bin" + os.sep + "temp" + os.sep):
                             refolder(temp)
                         if not file.get():
                             file.set(temp + os.sep + v_code())
@@ -891,8 +889,8 @@ def mpkman() -> None:
                                                                '/')))
                             car.set(1)
                             os.remove(file.get())
-                    elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
-                        msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
+                    elif os.path.exists(msh_tmp := moduledir + os.sep + value + os.sep + "main.msh"):
+                        msh_parse(msh_tmp)
             else:
                 if not os.path.exists(moduledir + os.sep + value):
                     messpop(lang.warn7.format(value))
