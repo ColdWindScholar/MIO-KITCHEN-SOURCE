@@ -443,12 +443,11 @@ def mpkman() -> None:
             ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
 
         def create(self):
-            iden = v_code()
             data = {
                 "name": self.name.get(),
                 "author": self.aou.get(),
                 "version": self.ver.get(),
-                "identifier": iden,
+                "identifier": (iden := v_code()),
                 "describe": self.intro.get(1.0, END),
                 "depend": self.dep.get()
             }
@@ -486,17 +485,14 @@ def mpkman() -> None:
         if not pls.curselection():
             messpop(lang.warn2)
             return 1
-        buffer = BytesIO()
-        buffer2 = StringIO()
-        info_ = ConfigParser()
-        value = globals()[pls.get(pls.curselection())]
-        with open(moduledir + os.sep + value + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+        with open(moduledir + os.sep + (value := globals()[pls.get(pls.curselection())]) + os.sep + "info.json", 'r',
+                  encoding='UTF-8') as f:
             data = json.load(f)
             if "describe" in data:
                 des = data["describe"]
             else:
                 des = ''
-            info_['module'] = {
+            (info_ := ConfigParser())['module'] = {
                 'name': f'{data["name"]}',
                 'version': f'{data["version"]}',
                 'author': f'{data["author"]}',
@@ -505,8 +501,8 @@ def mpkman() -> None:
                 'identifier': f'{value}',
                 'depend': f'{data["depend"]}'
             }
-            info_.write(buffer2)
-        with zipfile.ZipFile(buffer, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
+            info_.write((buffer2 := StringIO()))
+        with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
             os.chdir(moduledir + os.sep + value + os.sep)
             for i in get_all_file_paths("."):
                 print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
@@ -615,8 +611,7 @@ def mpkman() -> None:
             else:
                 fgf = None
             for v in vs.split(fgf):
-                do_ = do.replace(f'@{vn}@', v)
-                getattr(self, do_.split()[0])(do_[do_.index(' ') + 1:])
+                getattr(self, (do_ := do.replace(f'@{vn}@', v)).split()[0])(do_[do_.index(' ') + 1:])
 
         @staticmethod
         def rmdir(path):
@@ -628,23 +623,18 @@ def mpkman() -> None:
 
         @staticmethod
         def packsuper(cmd):
-            supers = IntVar()
-            ssparse = IntVar()
-            supersz = IntVar()
-            sdbfz = StringVar()
             try:
                 sparse, dbfz, size, set_, lb = shlex.split(cmd)
             except:
-                raise ModuleError("SUPER数据异常")
-            supers.set(int(size))
-            ssparse.set(int(sparse))
-            supersz.set(int(set_))
-            sdbfz.set(dbfz)
+                raise ModuleError("打包SUPER参数异常")
+            (supers := IntVar()).set(int(size))
+            (ssparse := IntVar()).set(int(sparse))
+            (supersz := IntVar()).set(int(set_))
+            (sdbfz := StringVar()).set(dbfz)
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
 
         def sh(self, cmd):
-            temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
-            file_ = temp + v_code()
+            file_ = (elocal + os.sep + "bin" + os.sep + "temp" + os.sep) + v_code()
             with open(file_, "w", encoding='UTF-8', newline="\n") as f:
                 for i in self.envs:
                     f.write(f'export {i}={self.envs[i]}\n')
