@@ -2385,7 +2385,7 @@ class format_conversion(Toplevel):
         for i in os.listdir(work := rwork()):
             if i.endswith(f):
                 if os.path.isfile(work + i):
-                    (a := []).append(i)
+                    a.append(i)
         return a
 
     def conversion(self):
