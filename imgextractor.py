@@ -60,7 +60,7 @@ class Extractor(object):
         return '\n'.join(tb_lines)
 
     def __file_name(self, file_path):
-        name = os.path.basename(file_path).split('.')[0]
+        name = os.path.basename(file_path).rsplit('.',1)[0]
         name = name.split('-')[0]
         name = name.split(' ')[0]
         name = name.split('+')[0]
