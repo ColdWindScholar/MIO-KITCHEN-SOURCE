@@ -99,11 +99,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.8.10
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           # Semantic version range syntax or exact version of a Python version
-          python-version: '3.8'
+          python-version: '3.10'
           # Optional - x64 or x86 architecture, defaults to x64
       - name: Install Packages
         run: |
