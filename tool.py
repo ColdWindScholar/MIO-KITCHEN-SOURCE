@@ -1169,8 +1169,7 @@ def dbkxyt():
     if not dn.get():
         messpop(lang.warn1)
         return
-    dir_ = rwork()
-    if os.path.exists(dir_ + "firmware-update"):
+    if os.path.exists((dir_ := rwork()) + "firmware-update"):
         os.rename(dir_ + "firmware-update", dir_ + "images")
     if not os.path.exists(dir_ + "images"):
         os.makedirs(dir_ + 'images')
@@ -1361,9 +1360,8 @@ def DownloadFile():
     messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
-    jd = StringVar()
     var1.set(0)
-    ttk.Label(down, textvariable=jd).pack(padx=10, pady=10)
+    ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
     c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=1, offvalue=0)
     c1.pack(padx=10, pady=10)
     start_time = time.time()
@@ -1405,9 +1403,7 @@ def DownloadFile():
 
 
 def jboot(bn: str = 'boot'):
-    work = rwork()
-    boot = findfile(f"{bn}.img", work)
-    if not boot:
+    if not (boot := findfile(f"{bn}.img", (work := rwork()))):
         print(lang.warn3.format(bn))
         car.set(1)
         return
@@ -1521,8 +1517,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
             messpop(lang.warn1, "red")
             return False
     load_car(0)
-    work = rwork()
-    if os.path.exists(work + "config" + os.sep + "parts_info"):
+    if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
             parts_dict = json.loads(fff.read())
     else:
@@ -1541,8 +1536,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                         utils.vbpatch(file).disavb()
         if os.access(work + "config" + os.sep + "%s_fs_config" % dname, os.F_OK):
             try:
-                folder = findfolder(work, "com.google.android.apps.nbu.")
-                if folder:
+                if folder := findfolder(work, "com.google.android.apps.nbu."):
                     call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
                                                                   "com.google.android.apps.nbu")))
                     rmdir(findfolder(work, "com.google.android.apps.nbu"))
@@ -1628,11 +1622,9 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 
 
 def unpackrom(ifile) -> None:
-    zip_src = ifile
-    print(lang.text77 + zip_src)
+    print(lang.text77 + (zip_src := ifile))
     load_car(0)
-    if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-        0] + os.sep + "config"):
+    if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
         os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
             0] + os.sep + "config")
     if (ftype := gettype(ifile)) == "ozip":
@@ -1721,8 +1713,7 @@ def unpack(chose, form: any = None):
             messpop(lang.warn1, "red")
             return False
     load_car(0)
-    work = rwork()
-    if os.path.exists(work + "config" + os.sep + "parts_info"):
+    if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
             parts = json.loads(pf.read())
     else:
@@ -1826,8 +1817,7 @@ def unpack(chose, form: any = None):
                 else:
                     # supersz :1
                     pass
-            ftype = gettype(work + dname + ".img")
-            if ftype == "ext":
+            if (ftype := gettype(work + dname + ".img")) == "ext":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
                 try:
                     imgextractor.Extractor().main(work + dname + ".img", work + dname, work)
