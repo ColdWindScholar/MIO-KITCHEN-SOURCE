@@ -10,7 +10,6 @@ from extra import *
 import contextpatch
 import utils
 from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder
-
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -551,9 +550,9 @@ def mpkman() -> None:
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
-                for l in shell.readlines():
+                for li in shell.readlines():
                     for key, value in self.envs.items():
-                        i = l.replace('@{}@'.format(key), value)
+                        i = li.replace('@{}@'.format(key), value)
                     try:
                         if i[:1] != "#":
                             if i.split()[0] == "if":

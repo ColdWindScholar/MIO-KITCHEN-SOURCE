@@ -167,8 +167,7 @@ def script2fs_context(input_f, outdir, project):
 
 class proputil:
     def __init__(self, propfile: str):
-        proppath = os.path.abspath(propfile)
-        if os.path.exists(proppath):
+        if os.path.exists(os.path.abspath(propfile)):
             self.propfd = open(propfile, 'r+')
         else:
             raise FileExistsError(f"File {propfile} does not exist!")
