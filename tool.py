@@ -1641,7 +1641,7 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin") and os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
@@ -1675,7 +1675,7 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
     if os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin"):
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "file_contexts.bin") and os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
         extra.script2fs_context(
             findfile("updater-script",
                      local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
