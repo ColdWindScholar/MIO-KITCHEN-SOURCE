@@ -232,10 +232,10 @@ class XIAOMI_BLKSTRUCT(object):
 
 
 class LOGODUMPER(object):
-    def __init__(self, img: str, out: str, dir: str = "pic"):
+    def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.out = out
         self.img = img
-        self.dir = dir
+        self.dir = dir__
         self.structstr = "<8s"
         self.cfg = DUMPCFG()
         self.chkimg(img)
@@ -250,7 +250,6 @@ class LOGODUMPER(object):
             while True:
                 m = XIAOMI_BLKSTRUCT(f.read(8))
                 if m.imgoff != 0:
-                    # print(blksz<<0xc)
                     self.cfg.imgblkszs.append(m.blksz << 0xc)
                     self.cfg.imgblkoffs.append(m.imgoff << 0xc)
                     self.cfg.imgnum += 1
