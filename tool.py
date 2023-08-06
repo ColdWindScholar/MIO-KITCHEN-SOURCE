@@ -10,6 +10,7 @@ from extra import *
 import contextpatch
 import utils
 from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder
+
 if os.name == 'nt':
     import windnd
 import zipfile
@@ -1646,7 +1647,7 @@ def unpackrom(ifile) -> None:
             )
         car.set(1)
         return
-    if zipfile.is_zipfile(zip_src):
+    if gettype(zip_src) == 'zip':
         fz = zipfile.ZipFile(zip_src, 'r')
         for fi in fz.namelist():
             try:
@@ -1670,16 +1671,16 @@ def unpackrom(ifile) -> None:
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
             listdir()
-    if os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "file_contexts.bin") and os.path.exists(
-        local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
-        extra.script2fs_context(
-            findfile("updater-script",
-                     local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
-        )
+        if os.path.exists(
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "file_contexts.bin") and os.path.exists(
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
+            extra.script2fs_context(
+                findfile("updater-script",
+                         local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+            )
     else:
         if ftype != 'unknow':
             if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
