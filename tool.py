@@ -1321,8 +1321,8 @@ class StdoutRedirector(object):
         self.text_space.yview('end')
 
     @staticmethod
-    def flush() -> str:
-        return "MIO-KITCHEN"
+    def flush() -> None:
+        pass
 
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
