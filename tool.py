@@ -2250,7 +2250,7 @@ class unpackg(object):
         if self.fm.get() != 'payload' and self.fm.get() != 'super':
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.rsplit('.', 1)[0])
+                    self.lsg.insert(END, file_name.split('.')[0])
         else:
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
