@@ -1147,9 +1147,8 @@ class packxx(object):
         self.refs()
 
     def refs(self):
-        work = rwork()
         self.lsg.delete(0, END)
-        if not os.path.exists(work):
+        if not os.path.exists(work := rwork()):
             messpop(lang.warn1)
             return False
         for i in os.listdir(work):
