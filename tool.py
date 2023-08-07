@@ -149,7 +149,8 @@ class welcome(object):
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
         LB.bind('<<ComboboxSelected>>', loadlice)
         LB.current(0)
-        ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH, expand=True)
+        ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
+                                                                         expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         LB.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
@@ -570,6 +571,7 @@ def mpkman() -> None:
                         print("运行错误:%s\n错误：%s" % (i, e))
                     except:
                         print("运行错误:%s" % i)
+            self.envs.clear()
 
         def set(self, cmd):
             try:
