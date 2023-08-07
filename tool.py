@@ -1192,7 +1192,8 @@ def dbkxyt():
                 move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
                 if not t.startswith("preloader_"):
                     lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
-        script.truncate(0)
+        script.seek(0)
+        script.truncate()
         script.writelines(lines)
 
 
@@ -2140,7 +2141,7 @@ def packzip():
             if ask_win(lang.t25) == 1:
                 if os.name == 'nt':
                     dbkxyt()
-        zip_file(dn.get() + ".zip", rwork())
+        zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
         car.set(1)
 
 
