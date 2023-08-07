@@ -550,9 +550,9 @@ def mpkman() -> None:
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
-                for li in shell.readlines():
+                for i in shell.readlines():
                     for key, value in self.envs.items():
-                        i = li.replace('@{}@'.format(key), value)
+                        i = i.replace('@{}@'.format(key), value)
                     try:
                         if i[:1] != "#":
                             if i.split()[0] == "if":
@@ -570,7 +570,6 @@ def mpkman() -> None:
                         print("运行错误:%s\n错误：%s" % (i, e))
                     except:
                         print("运行错误:%s" % i)
-            self.envs.clear()
 
         def set(self, cmd):
             try:
