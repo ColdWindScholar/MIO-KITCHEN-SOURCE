@@ -942,6 +942,8 @@ def mpkman() -> None:
                             self.arr2.append(data['name'])
                             self.lfdep(i)
                             break
+                    self.arr = sorted(set(self.arr),key=self.arr.index)
+                    self.arr2 = sorted(set(self.arr2), key=self.arr2.index)
 
         def unloop(self):
             self.ck.destroy()
