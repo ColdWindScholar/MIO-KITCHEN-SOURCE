@@ -555,7 +555,7 @@ def mpkman() -> None:
                     for key, value in self.envs.items():
                         i = i.replace('@{}@'.format(key), value)
                     try:
-                        if i[:1] != "#":
+                        if i[:1] != "#" and i not in ["", '\n']:
                             if i.split()[0] == "if":
                                 self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
                             elif i.split()[0] == "for":
