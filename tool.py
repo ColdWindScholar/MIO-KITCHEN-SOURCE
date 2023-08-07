@@ -2116,11 +2116,10 @@ def set_language(self):
 class zip_file(object):
     def __init__(self, file, dst_dir):
         os.chdir(dst_dir)
-        file_paths_ = get_all_file_paths('.')
-        with zipfile.ZipFile(relpath := os.path.abspath(file), 'w', compression=zipfile.ZIP_DEFLATED,
+        with zipfile.ZipFile(relpath := local + os.sep + file, 'w', compression=zipfile.ZIP_DEFLATED,
                              allowZip64=True) as zip_:
             # 遍历写入文件
-            for file in file_paths_:
+            for file in get_all_file_paths('.'):
                 print(f"{lang.text1}:%s" % file)
                 try:
                     zip_.write(file)
@@ -2141,7 +2140,7 @@ def packzip():
             if ask_win(lang.t25) == 1:
                 if os.name == 'nt':
                     dbkxyt()
-        zip_file(dn.get() + ".zip", local + os.sep + dn.get() + os.sep)
+        zip_file(dn.get() + ".zip", local + os.sep + dn.get())
         car.set(1)
 
 
