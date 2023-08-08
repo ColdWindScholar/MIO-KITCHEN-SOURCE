@@ -209,11 +209,11 @@ class Extractor(object):
                         if not os.path.isdir(os.path.dirname(file_target)):
                             os.makedirs(os.path.dirname(file_target))
 
-                    try:
-                        with open(file_target, 'wb') as out:
-                            out.write(raw)
-                    except:
-                        print(f"ERROR:Cannot Write {file_target}")
+                        try:
+                            with open(file_target, 'wb') as out:
+                                out.write(raw)
+                        except:
+                            print(f"ERROR:Cannot Write {file_target}")
                     if os.name == 'posix':
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                         if not os.path.isdir(os.path.dirname(file_target)):
