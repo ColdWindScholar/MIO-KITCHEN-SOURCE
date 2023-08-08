@@ -22,8 +22,8 @@ class PythonEditor(tk.Frame):
         self.text.bind("<KeyRelease>", self.highlight)
         self.highlight()
         f1 = ttk.Frame(self.parent)
-        ttk.Button(f1, text="保存", command=self.save).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
-        ttk.Button(f1, text="关闭", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
+        ttk.Button(f1, text="保存 | Save", command=self.save).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
+        ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         if self.file_:
             try:
