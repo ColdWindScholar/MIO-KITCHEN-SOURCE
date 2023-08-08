@@ -2206,6 +2206,7 @@ ttk.Button(rzf, text=lang.text107, command=lambda: CallZ(handle_log().uploadlog)
 rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
 # 项目列表的控件
 sys.stdout = StdoutRedirector(show)
+sys.stderr = StdoutRedirector(show)
 zyf1 = ttk.LabelFrame(tab, text=lang.text9)
 zyf1.pack(padx=10, pady=10)
 ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(side='left',
