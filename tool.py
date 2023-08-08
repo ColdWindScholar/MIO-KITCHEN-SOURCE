@@ -1041,7 +1041,9 @@ class installmpk(Toplevel):
         if auto == 1:
             self.install()
             self.destroy()
-        self.wait_window()
+            print(lang.text39+mpk)
+        else:
+            self.wait_window()
 
     def install(self):
         if self.installb.cget('text') == lang.text34:
