@@ -1040,8 +1040,7 @@ class installmpk(Toplevel):
         jzxs(self)
         if auto == 1:
             self.install()
-            self.installb['text'] = lang.text34
-            self.install()
+            self.destroy()
         self.wait_window()
 
     def install(self):
