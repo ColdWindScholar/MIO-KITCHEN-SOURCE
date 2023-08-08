@@ -1614,9 +1614,6 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 def unpackrom(ifile) -> None:
     print(lang.text77 + (zip_src := ifile))
     load_car(0)
-    if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
-        os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-            0] + os.sep + "config")
     if (ftype := gettype(ifile)) == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
@@ -1632,6 +1629,9 @@ def unpackrom(ifile) -> None:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
+            if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
+                os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "config")
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
@@ -1666,6 +1666,9 @@ def unpackrom(ifile) -> None:
             listdir()
         if os.path.exists(
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
+            if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
+                os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "config")
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
