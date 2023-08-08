@@ -10,7 +10,7 @@ import contextpatch
 import extra
 import utils
 from extra import *
-from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder
+from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 if os.name == 'nt':
     import windnd
@@ -29,7 +29,6 @@ import lpunpack
 import mkdtboimg
 import ozipdecrypt
 import payload_dumper
-import sdat2img
 import splituapp
 from timeit import default_timer as dti
 import ofp_qc_decrypt
