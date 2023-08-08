@@ -1875,7 +1875,7 @@ class dirsize(object):
     # 1 - retun True value of dir size
     # 2 - return Rsize value of dir size
     # 3 - return Rsize value of dir size and modify dynampic_partition_list
-    def __init__(self, dir: str, num: int = 1, get=2, list_f: str = None):
+    def __init__(self, dir: str, num: int = 1, get: int = 2, list_f: str = None):
         self.rsize_v: int
         self.num = num
         self.get = get
@@ -1933,7 +1933,7 @@ class dirsize(object):
                 ff.write(content)
 
 
-def datbr(work, name, brl):
+def datbr(work, name, brl: any):
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, 4, name)
     if os.access(work + name + ".new.dat", os.F_OK):
