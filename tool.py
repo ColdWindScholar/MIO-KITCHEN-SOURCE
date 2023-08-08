@@ -2350,7 +2350,7 @@ class format_conversion(Toplevel):
         self.h.current(0)
         self.h.bind("<<ComboboxSelected>>", self.relist)
         self.h.pack(side='left', padx=5)
-        Label(self.f, text='==》').pack(side='left', padx=5)
+        Label(self.f, text='>>>>>>').pack(side='left', padx=5)
         self.f = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
         self.f.current(0)
         self.f.pack(side='left', padx=5)
