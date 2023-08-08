@@ -10,7 +10,7 @@ import contextpatch
 import extra
 import utils
 from extra import *
-from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 if os.name == 'nt':
     import windnd
@@ -699,7 +699,7 @@ def mpkman() -> None:
                 if cmd.split()[0] == "msg":
                     messagebox.showinfo(cmd.split()[1], cmd.split()[2])
                 elif cmd.split()[0] == "start":
-                    CallZ(call(cmd[cmd.index(' ') + 1:], 'N'))
+                    cz(call(cmd[cmd.index(' ') + 1:], 'N'))
                 elif cmd.split()[0] == "exec":
                     exec(cmd[cmd.index(' ') + 1:])
                 else:
@@ -820,9 +820,9 @@ def mpkman() -> None:
                             else:
                                 print(lang.warn14.format(con['type']))
                 if msh:
-                    ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_msh)).pack(fill=X, side='bottom')
+                    ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh)).pack(fill=X, side='bottom')
                 else:
-                    ttk.Button(self, text=lang.ok, command=lambda: CallZ(generate_sh)).pack(fill=X, side='bottom')
+                    ttk.Button(self, text=lang.ok, command=lambda: cz(generate_sh)).pack(fill=X, side='bottom')
 
             jzxs(self)
             self.wait_window()
@@ -975,17 +975,17 @@ def mpkman() -> None:
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
     pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
     lf2 = ttk.LabelFrame(manager)
-    ttk.Button(lf2, text=lang.text20, command=lambda: CallZ(unmpk)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.text22, command=lambda: CallZ(run)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t14, command=lambda: CallZ(export)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t17, command=lambda: CallZ(editor_)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.text20, command=lambda: cz(unmpk)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.text22, command=lambda: cz(run)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t14, command=lambda: cz(export)).pack(padx=5, pady=5, fill=BOTH)
+    ttk.Button(lf2, text=lang.t17, command=lambda: cz(editor_)).pack(padx=5, pady=5, fill=BOTH)
     lf1 = Frame(manager)
     pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
     lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu.add_command(label=lang.text21, command=lambda: CallZ(impk))
-    rmenu.add_command(label=lang.text23, command=lambda: CallZ(listpls))
-    rmenu.add_command(label=lang.text115, command=lambda: CallZ(new_))
+    rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
+    rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
+    rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
     pls.bind("<<ListboxSelect>>", relf2)
     pls.bind("<Button-3>", popup)
     manager.resizable(False, False)
@@ -1035,7 +1035,7 @@ class installmpk(Toplevel):
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=('黑体', 12))
         self.state.pack(padx=10, pady=10)
-        self.installb = ttk.Button(self, text=lang.text41, command=lambda: CallZ(self.install))
+        self.installb = ttk.Button(self, text=lang.text41, command=lambda: cz(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
         self.wait_window()
@@ -1134,9 +1134,9 @@ class packxx(object):
         dbfss.current(0)
         dbgss.current(0)
         edbgss.current(0)
-        ttk.Button(self.ck, text=lang.pack, command=lambda: CallZ(self.start_)).pack(side='left', padx=2, pady=2,
-                                                                                     fill=X,
-                                                                                     expand=True)
+        ttk.Button(self.ck, text=lang.pack, command=lambda: cz(self.start_)).pack(side='left', padx=2, pady=2,
+                                                                                  fill=X,
+                                                                                  expand=True)
         ttk.Button(self.ck, text=lang.cancel, command=lambda: subp(com=0, master=self.ck)).pack(side='left', padx=2,
                                                                                                 pady=2,
                                                                                                 fill=X,
@@ -1259,9 +1259,9 @@ class packss:
             subp(com=0, master=ck)
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
-        ttk.Button(ck, text=lang.pack, command=lambda: CallZ(start_)).pack(side='left',
-                                                                           padx=5,
-                                                                           pady=5, fill=X, expand=True)
+        ttk.Button(ck, text=lang.pack, command=lambda: cz(start_)).pack(side='left',
+                                                                        padx=5,
+                                                                        pady=5, fill=X, expand=True)
         ttk.Button(ck, text=lang.cancel, command=lambda: subp(com=0, master=ck)).pack(side='left', padx=10, pady=10,
                                                                                       fill=X,
                                                                                       expand=True)
@@ -2167,7 +2167,7 @@ def dndfile(files):
             if os.path.basename(fi).endswith(".mpk"):
                 installmpk(fi)
             else:
-                CallZ(unpackrom, fi)
+                cz(unpackrom, fi)
         else:
             print(fi + lang.text84)
 
@@ -2192,8 +2192,8 @@ show.pack(side=LEFT, fill=BOTH, expand=True)
 ttk.Button(rzf, text=lang.text105, command=lambda: show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
                                                                                expand=True)
 ttk.Button(rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5, expand=True)
-ttk.Button(rzf, text=lang.text107, command=lambda: CallZ(handle_log().uploadlog)).pack(side='bottom', padx=10, pady=5,
-                                                                                       expand=True)
+ttk.Button(rzf, text=lang.text107, command=lambda: cz(handle_log().uploadlog)).pack(side='bottom', padx=10, pady=5,
+                                                                                    expand=True)
 rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
 # 项目列表的控件
 sys.stdout = StdoutRedirector(show)
@@ -2203,7 +2203,7 @@ zyf1.pack(padx=10, pady=10)
 ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(side='left',
                                                                               padx=10,
                                                                               pady=10)
-ttk.Button(zyf1, text=lang.text114, command=lambda: CallZ(DownloadFile)).pack(side='left', padx=10, pady=10)
+ttk.Button(zyf1, text=lang.text114, command=lambda: cz(DownloadFile)).pack(side='left', padx=10, pady=10)
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
 info = ttk.LabelFrame(tab2, text="Rom信息")
 frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
@@ -2214,8 +2214,8 @@ LB1.pack(side="top", padx=10, pady=10, fill=X)
 LB1.bind('<<ComboboxSelected>>', selectp)
 ttk.Button(xmcd, text=lang.text23, command=listdir).pack(side="left", padx=10, pady=10)
 ttk.Button(xmcd, text=lang.text115, command=newp).pack(side="left", padx=10, pady=10)
-ttk.Button(xmcd, text=lang.text116, command=lambda: CallZ(delwork)).pack(side="left", padx=10, pady=10)
-ttk.Button(xmcd, text=lang.text117, command=lambda: CallZ(cmm)).pack(side="left", padx=10, pady=10)
+ttk.Button(xmcd, text=lang.text116, command=lambda: cz(delwork)).pack(side="left", padx=10, pady=10)
+ttk.Button(xmcd, text=lang.text117, command=lambda: cz(cmm)).pack(side="left", padx=10, pady=10)
 
 
 class unpackg(object):
@@ -2229,7 +2229,7 @@ class unpackg(object):
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
         ttk.Separator(ck, orient=HORIZONTAL).pack(padx=50, fill=X)
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(ck, text=lang.unpack, command=lambda: CallZ(self.close_)).pack(padx=5, pady=5, side='left')
+        ttk.Button(ck, text=lang.unpack, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
 
     def refs(self, N=None):
@@ -2257,14 +2257,14 @@ class unpackg(object):
 
 
 unpackg()
-ttk.Button(frame2, text=lang.text118, command=lambda: CallZ(packxx)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text119, command=lambda: CallZ(dboot)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text120, command=lambda: CallZ(padtbo)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text121, command=lambda: CallZ(logopack)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.text122, command=lambda: CallZ(packzip)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.text123, command=lambda: CallZ(packss)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.text19, command=lambda: CallZ(mpkman)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.t13, command=lambda: CallZ(format_conversion)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame2, text=lang.text118, command=lambda: cz(packxx)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame2, text=lang.text119, command=lambda: cz(dboot)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame2, text=lang.text120, command=lambda: cz(padtbo)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame2, text=lang.text121, command=lambda: cz(logopack)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame3, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame3, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame3, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
+ttk.Button(frame3, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 xmcd.pack(padx=5, pady=5)
 frame1.pack(padx=5, pady=5)
 frame2.pack(padx=5, pady=5)
@@ -2347,7 +2347,7 @@ class format_conversion(Toplevel):
         self.list_b = Listbox(self, highlightthickness=0, activestyle='dotbox', selectmode=MULTIPLE)
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         self.relist()
-        ttk.Button(self, text=lang.ok, command=lambda: CallZ(self.conversion)).pack(side=BOTTOM, fill=BOTH)
+        ttk.Button(self, text=lang.ok, command=lambda: cz(self.conversion)).pack(side=BOTTOM, fill=BOTH)
         jzxs(self)
 
     def relist(self, *other):
@@ -2537,7 +2537,7 @@ if os.name == "posix":
 else:
     win.iconphoto(True, tk.PhotoImage(file=elocal + os.sep + "bin" + os.sep + "images" + os.sep + "icon.png"))
 jzxs(win)
-CallZ(gettime)
+cz(gettime)
 if int(oobe) < 4:
     welcome()
 print(lang.text134 % (dti() - start))

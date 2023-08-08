@@ -193,7 +193,7 @@ def qc(file_) -> None:
     del data, new_data
 
 
-def CallZ(func, *args):
+def cz(func, *args):
     Thread(target=func, args=args, daemon=True).start()
 
 
