@@ -1039,6 +1039,7 @@ class installmpk(Toplevel):
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
         if auto == 1:
+            print(lang.text38.format(mpk))
             self.install()
             self.destroy()
             print(lang.text39+mpk)
