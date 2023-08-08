@@ -1754,7 +1754,7 @@ def unpack(chose, form: any = None):
             if os.path.getsize(work + dname + ".new.dat") != 0:
                 transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
                 if os.access(transferpath, os.F_OK):
-                    sdat2img.main(transferpath, work + dname + ".new.dat", work + dname + ".img")
+                    sdat2img(transferpath, work + dname + ".new.dat", work + dname + ".img")
                     if os.access(work + dname + ".img", os.F_OK):
                         os.remove(work + dname + ".new.dat")
                         os.remove(transferpath)
