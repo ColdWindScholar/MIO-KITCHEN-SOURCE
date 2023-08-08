@@ -1200,13 +1200,12 @@ def dbkxyt():
 
 class packss:
     def __init__(self):
-        ck = subp(com=1, title=lang.text53)
         supers = IntVar()
         ssparse = IntVar()
         supersz = IntVar()
         sdbfz = StringVar()
         scywj = IntVar()
-        (lf1 := ttk.LabelFrame(ck, text=lang.text54)).pack(fill=BOTH)
+        (lf1 := ttk.LabelFrame((ck := subp(com=1, title=lang.text53)), text=lang.text54)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(ck, text=lang.settings)).pack(fill=BOTH)
         (lf3 := ttk.LabelFrame(ck, text=lang.text55)).pack(fill=BOTH)
         supersz.set(1)
@@ -1215,17 +1214,14 @@ class packss:
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
-        sdbfzs = ttk.Combobox(lf2, textvariable=sdbfz)
-        sdbfzs.pack(side='left', padx=10, pady=10, fill='both')
+        (sdbfzs := ttk.Combobox(lf2, textvariable=sdbfz)).pack(side='left', padx=10, pady=10, fill='both')
         sdbfzs['value'] = ("qti_dynamic_partitions", "main")
         sdbfzs.current(0)
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
         supers.set(9126805504)
-        ent = ttk.Entry(lf2, textvariable=supers)
-        ent.pack(side='left', padx=10, pady=10)
+        (ttk.Entry(lf2, textvariable=supers)).pack(side='left', padx=10, pady=10)
 
-        tl = Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')
-        tl.config(highlightthickness=0)
+        (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
         work = rwork()
         for file_name in os.listdir(work):
             if file_name.endswith(".img"):
@@ -1487,7 +1483,8 @@ def dboot():
         print("Pack Ramdisk Successful..")
         os.remove("ramdisk.cpio")
         os.rename("ramdisk-new.cpio", "ramdisk.cpio")
-    if comp == "cpio": flag = "-n"
+    if comp == "cpio":
+        flag = "-n"
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
         car.set(1)
@@ -1602,8 +1599,7 @@ def rdi(work, dname) -> any:
 
 
 def input_(title: str = lang.text76, text: str = "") -> str:
-    inputvar = StringVar()
-    inputvar.set(text)
+    (inputvar := StringVar()).set(text)
     input__ = Toplevel()
     input__.geometry("300x180")
     input__.resizable(False, False)
