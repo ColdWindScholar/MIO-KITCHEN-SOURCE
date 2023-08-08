@@ -218,8 +218,11 @@ class Extractor(object):
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                         if not os.path.isdir(os.path.dirname(file_target)):
                             os.makedirs(os.path.dirname(file_target))
-                        with open(file_target, 'wb') as out:
-                            out.write(raw)
+                        try:
+                            with open(file_target, 'wb') as out:
+                                out.write(raw)
+                        except:
+                            print(f'ERROR:Cannot Write {file_target}')
                         if os.geteuid() == 0:
                             os.chmod(file_target, int(mode, 8))
                             os.chown(file_target, uid, gid)
