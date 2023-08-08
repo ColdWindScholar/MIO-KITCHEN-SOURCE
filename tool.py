@@ -610,7 +610,7 @@ def mpkman() -> None:
 
         @staticmethod
         def rmdir(path):
-            rmdir(path, up=1)
+            rmdir(path.strip(), up=1)
 
         @staticmethod
         def run(cmd):
