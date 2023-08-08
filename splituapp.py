@@ -11,7 +11,6 @@ from __future__ import print_function
 from string import printable
 from struct import unpack
 import sys
-# import os
 from os import makedirs, name, sep, path
 
 
