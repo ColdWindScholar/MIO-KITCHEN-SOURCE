@@ -998,7 +998,7 @@ def mpkman() -> None:
 
 
 class installmpk(Toplevel):
-    def __init__(self, mpk):
+    def __init__(self, mpk, auto=0):
         super().__init__()
         self.mconf = ConfigParser()
         if not mpk:
@@ -1038,6 +1038,10 @@ class installmpk(Toplevel):
         self.installb = ttk.Button(self, text=lang.text41, command=lambda: cz(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
+        if auto == 1:
+            self.install()
+            self.installb['text'] = lang.text34
+            self.install()
         self.wait_window()
 
     def install(self):
@@ -2165,7 +2169,7 @@ def dndfile(files):
 
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
-                installmpk(fi)
+                installmpk(fi, auto=1)
             else:
                 cz(unpackrom, fi)
         else:
