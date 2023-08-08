@@ -1119,7 +1119,6 @@ class packxx(object):
         edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs)
         edbgss.pack(side='left', padx=5, pady=5)
         edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
-        Label(lf2, text=lang.text51).pack(side='left', padx=5, pady=5)
         scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal", command=self.update_label, variable=self.scale)
         self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
         self.label.pack(side='left', padx=5, pady=5)
