@@ -57,7 +57,7 @@ def script2fs_context(input_f, outdir, project):
                 return None
 
     def __symlink(src: str, dest: str):
-        def setSystemAttrib(path: str) -> wintypes.BOOL:
+        def set_attrib(path: str) -> wintypes.BOOL:
             return windll.kernel32.SetFileAttributesA(path.encode('gb2312'), wintypes.DWORD(0x4))
 
         print(f"创建软链接 [{src}] -> [{dest}]")
@@ -67,7 +67,7 @@ def script2fs_context(input_f, outdir, project):
             with open(dest, 'wb') as f:
                 f.write(
                     b"!<symlink>" + src.encode('utf-16') + b'\0\0')
-            setSystemAttrib(dest)
+            set_attrib(dest)
         else:
             symlink(src, dest)
 
