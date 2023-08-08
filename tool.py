@@ -553,7 +553,7 @@ def mpkman() -> None:
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
                 for i in shell.readlines():
                     for key, value in self.envs.items():
-                        i = i.replace('@{}@'.format(key), value)
+                        i = i.replace('@{}@'.format(key), value).strip()
                     try:
                         if i[:1] != "#" and i not in ["", '\n']:
                             if i.split()[0] == "if":
