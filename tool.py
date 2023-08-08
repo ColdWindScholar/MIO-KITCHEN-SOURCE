@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os
 import shlex
 import sys
 import time
@@ -942,7 +943,7 @@ def mpkman() -> None:
                             self.arr2.append(data['name'])
                             self.lfdep(i)
                             break
-                    self.arr = sorted(set(self.arr),key=self.arr.index)
+                    self.arr = sorted(set(self.arr), key=self.arr.index)
                     self.arr2 = sorted(set(self.arr2), key=self.arr2.index)
 
         def unloop(self):
@@ -1639,9 +1640,7 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "file_contexts.bin") and os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
@@ -1675,9 +1674,7 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "file_contexts.bin") and os.path.exists(
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system"):
+                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
             extra.script2fs_context(
                 findfile("updater-script",
                          local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
