@@ -612,7 +612,7 @@ class Inode:
 
             if xattr_entry.e_value_inum != 0:
                 # external xattr
-                xattr_inode = self.volume.get_inode(xattr.e_value_inum, InodeType.FILE)
+                xattr_inode = self.volume.get_inode(xattr_entry.e_value_inum, InodeType.FILE)
 
                 if not self.volume.ignore_flags and (xattr_inode.inode.i_flags & ext4_inode.EXT4_EA_INODE_FL) != 0:
                     raise Ext4Error(
