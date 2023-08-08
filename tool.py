@@ -1672,6 +1672,8 @@ def unpackrom(ifile) -> None:
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
             )
+        car.set(1)
+        return
     else:
         if ftype != 'unknow':
             if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
