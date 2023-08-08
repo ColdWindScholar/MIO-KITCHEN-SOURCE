@@ -36,19 +36,19 @@ def scan_dir(folder) -> bool and list:
     return allfiles
 
 
-def islink(file) -> str and bool:
+def islink(file) -> str and None:
     if os.name == 'nt':
         if not os.path.isdir(file):
             with open(file, 'rb') as f:
                 if f.read(12) == b'!<symlink>\xff\xfe':
                     return f.read().decode("utf-8").replace('\x00', '')
                 else:
-                    return False
+                    return
     elif os.name == 'posix':
         if os.path.islink(file):
             return os.readlink(file)
         else:
-            return False
+            return
 
 
 def fs_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
@@ -97,7 +97,7 @@ def fs_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
                     mode = "0750"
                 else:
                     for s in ["/bin/su", "/xbin/su", "disable_selinux.sh", "daemon", "ext/.su", "install-recovery",
-                              'installed_su_daemon']:
+                              'installed_su']:
                         if s in i:
                             mode = "0755"
                 config = [uid, gid, mode]
@@ -106,7 +106,7 @@ def fs_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
                 gid = '0'
                 mode = '0644'
                 config = [uid, gid, mode]
-            print(f'Add [{i}:{config}]')
+            print(f'Add [{i}{config}]')
             new_fs[i] = config
     return new_fs
 
