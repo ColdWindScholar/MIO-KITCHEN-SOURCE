@@ -2409,7 +2409,7 @@ class format_conversion(Toplevel):
                         if os.path.getsize(work + i) != 0:
                             transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
                             if os.access(transferpath, os.F_OK):
-                                sdat2img.main(transferpath, work + i, work + dname + ".img")
+                                sdat2img(transferpath, work + i, work + dname + ".img")
                                 if os.access(work + dname + ".img", os.F_OK):
                                     os.remove(work + i)
                                     os.remove(transferpath)
@@ -2443,7 +2443,7 @@ class format_conversion(Toplevel):
                         if os.path.getsize(work + i) != 0:
                             transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
                             if os.access(transferpath, os.F_OK):
-                                sdat2img.main(transferpath, work + i, work + dname + ".img")
+                                sdat2img(transferpath, work + i, work + dname + ".img")
                                 if os.access(work + dname + ".img", os.F_OK):
                                     try:
                                         os.remove(work + i)
