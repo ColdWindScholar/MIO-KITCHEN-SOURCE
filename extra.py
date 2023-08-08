@@ -6,7 +6,7 @@ from os import walk, symlink, readlink, name as osname
 from platform import machine
 from typing import Optional
 
-if os.name == 'nt':
+if osname == 'nt':
     from ctypes import wintypes, windll
 
 
@@ -14,7 +14,7 @@ def clink(link: str, target: str):
     with open(link, 'wb') as f:
         f.write(b'!<symlink>')
         f.write(target.encode('utf-16'))
-    if os.name == 'nt':
+    if osname == 'nt':
         from ctypes.wintypes import LPCSTR
         from ctypes.wintypes import DWORD
         from stat import FILE_ATTRIBUTE_SYSTEM
@@ -56,20 +56,20 @@ def script2fs_context(input_f, outdir, project):
             except:
                 return None
 
-    def __symlink(src: str, dest: str):
+    def __symlink(src_l: str, dest: str):
         def set_attrib(path: str) -> wintypes.BOOL:
             return windll.kernel32.SetFileAttributesA(path.encode('gb2312'), wintypes.DWORD(0x4))
 
-        print(f"创建软链接 [{src}] -> [{dest}]")
+        print(f"创建软链接 [{src_l}] -> [{dest}]")
         if not os.path.exists(os.path.dirname(dest)):
             os.makedirs(os.path.dirname(dest))
         if osname == 'nt':
             with open(dest, 'wb') as f:
                 f.write(
-                    b"!<symlink>" + src.encode('utf-16') + b'\0\0')
+                    b"!<symlink>" + src_l.encode('utf-16') + b'\0\0')
             set_attrib(dest)
         else:
-            symlink(src, dest)
+            symlink(src_l, dest)
 
     fs_label = []
     fc_label = []

@@ -26,7 +26,6 @@ from array import array
 from collections import namedtuple
 
 
-
 class CompressionFormat(object):
     """Enum representing DT compression format for a DT entry.
     """
