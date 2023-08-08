@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 import json
-import os
 import shlex
 import sys
 import time
 import tkinter as tk
 from configparser import ConfigParser
-import extra
-from extra import *
+
 import contextpatch
+import extra
 import utils
+from extra import *
 from utils import CallZ, jzxs, v_code, gettype, findfile, findfolder
 
 if os.name == 'nt':
