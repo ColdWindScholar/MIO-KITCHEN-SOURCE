@@ -36,7 +36,11 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
 
 def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
     new_fs = {}
-    permission_d = fs_file.get(list(fs_file)[0])
+    permission_d = None
+    try:
+        permission_d = fs_file.get(list(fs_file)[0])
+    except IndexError:
+        pass
     if not permission_d:
         permission_d = 'u:object_r:system_file:s0'
     for i in filename:
