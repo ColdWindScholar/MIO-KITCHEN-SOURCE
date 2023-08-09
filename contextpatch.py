@@ -42,7 +42,7 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
     except IndexError:
         pass
     if not permission_d:
-        permission_d = 'u:object_r:system_file:s0'
+        permission_d = ['u:object_r:system_file:s0']
     for i in filename:
         if fs_file.get(i):
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
@@ -66,8 +66,7 @@ def main(dir_path, fs_config) -> None:
     allfiles = scan_dir(os.path.abspath(dir_path))
     new_fs = context_patch(origin, allfiles)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
-        f.writelines([i + " " + new_fs[i] + "\n" for
-                      i in sorted(new_fs.keys())])
+        f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")
     print('Add %d' % (len(new_fs.keys()) - len(origin.keys())) + " entries")
