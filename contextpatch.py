@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from re import sub
+
 fix_permission = {"/vendor/bin/hw/android.hardware.wifi@1.0": "u:object_r:hal_wifi_default_exec:s0"}
 
 
@@ -50,6 +51,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             permission = permission_d
             if filepath:
+                filepath.replace(dir_path, '').replace("\\", '')
                 if filepath in fix_permission.keys():
                     permission = fix_permission[filepath]
                 else:
