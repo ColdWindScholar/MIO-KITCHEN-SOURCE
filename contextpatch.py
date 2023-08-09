@@ -51,7 +51,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             permission = permission_d
             if filepath:
-                filepath = filepath.replace(dir_path, '').replace("\\", '')
+                print(filepath)
                 if filepath in fix_permission.keys():
                     permission = fix_permission[filepath]
                 else:
@@ -59,7 +59,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                         if os.path.dirname(filepath) in e:
                             permission = e.split()[1]
                             break
-            print(f"ADD [{filepath}:{permission}]")
+            print(f"ADD [{i}:{permission}]")
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
     return new_fs
 
