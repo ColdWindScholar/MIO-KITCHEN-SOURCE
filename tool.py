@@ -1178,6 +1178,12 @@ def dbkxyt():
     with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip") as zip:
         zip.extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
+        if gettype(dir_ + "super.img") == "sparse":
+            print("[INFO] Super is (sparse), converting to (raw)")
+            call("img2simg {} {}".format(dir_ + "super.img", dir_ + "super.raw"))
+            if os.path.exists(dir_ + "super.raw"):
+                os.remove(dir_ + "super.img")
+                os.rename(dir_+"super.raw", dir_ + "super.img")
         try:
             print("[Compress] Super.img...")
             call("zstd -5 --rm {} -o {}".format(dir_ + "super.img", dir_ + 'images' + os.sep + "super.img.zst"))
