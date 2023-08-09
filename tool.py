@@ -529,12 +529,15 @@ def mpkman() -> None:
 
     def listpls():
         pls.delete(0, "end")
-        for i in os.listdir(moduledir):
-            if os.path.isdir(moduledir + os.sep + i):
-                with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
-                    data = json.load(f)
-                    pls.insert('end', data['name'])
-                    globals()[data['name']] = data['identifier']
+        try:
+            for i in os.listdir(moduledir):
+                if os.path.isdir(moduledir + os.sep + i):
+                    with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                        data = json.load(f)
+                        pls.insert('end', data['name'])
+                        globals()[data['name']] = data['identifier']
+        except:
+            pass
         try:
             pls.selection_set(0)
             relf2(None)
