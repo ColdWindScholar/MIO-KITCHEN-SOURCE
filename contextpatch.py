@@ -34,7 +34,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
     return sorted(set(allfiles), key=allfiles.index)
 
 
-def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对比
+def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
     new_fs = {}
     permission_d = fs_file.get(list(fs_file)[0])
     if not permission_d:
@@ -43,20 +43,13 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
         if fs_file.get(i):
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
         else:
-            if os.name == 'nt':
-                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i.replace('/', '\\'))
-            elif os.name == 'posix':
-                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
-            else:
-                filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             permission = permission_d
-            if filepath:
-                print(filepath)
-                if filepath in fix_permission.keys():
-                    permission = fix_permission[filepath]
+            if i:
+                if i in fix_permission.keys():
+                    permission = fix_permission[i]
                 else:
                     for e in fs_file:
-                        if os.path.dirname(filepath) in e:
+                        if os.path.dirname(i) in e:
                             permission = e.split()[1]
                             break
             print(f"ADD [{i}:{permission}]")
@@ -67,7 +60,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
 def main(dir_path, fs_config) -> None:
     origin = scan_context(os.path.abspath(fs_config))
     allfiles = scan_dir(os.path.abspath(dir_path))
-    new_fs = context_patch(origin, allfiles, dir_path)
+    new_fs = context_patch(origin, allfiles)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin.keys())) + " entries")
