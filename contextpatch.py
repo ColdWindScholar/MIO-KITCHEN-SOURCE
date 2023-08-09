@@ -66,7 +66,8 @@ def main(dir_path, fs_config) -> None:
     allfiles = scan_dir(os.path.abspath(dir_path))
     new_fs = context_patch(origin, allfiles)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
-        f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
+        f.writelines([i + " " + new_fs[i] + "\n" for
+                      i in sorted(new_fs.keys())])
     print("Load origin %d" % (len(origin.keys())) + " entries")
     print("Detect total %d" % (len(allfiles)) + " entries")
     print('Add %d' % (len(new_fs.keys()) - len(origin.keys())) + " entries")
