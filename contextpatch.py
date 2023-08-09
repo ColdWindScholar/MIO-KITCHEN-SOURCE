@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from re import sub
+fix_permission = {"/vendor/bin/hw/android.hardware.wifi@1.0": "u:object_r:hal_wifi_default_exec:s0"}
 
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
@@ -49,10 +50,14 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             permission = permission_d
             if filepath:
-                for e in fs_file:
-                    if os.path.dirname(filepath) in e:
-                        permission = e.split()[1]
-                        break
+                if filepath in fix_permission.keys():
+                    permission = fix_permission[filepath]
+                else:
+                    for e in fs_file:
+                        if os.path.dirname(filepath) in e:
+                            permission = e.split()[1]
+                            break
+            print(f"ADD [{filepath}:{permission}]")
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
     return new_fs
 
