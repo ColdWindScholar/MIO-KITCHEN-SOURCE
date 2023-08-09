@@ -51,7 +51,7 @@ def context_patch(fs_file, filename, dir_path) -> dict:  # 接收两个字典对
                 filepath = os.path.abspath(dir_path + os.sep + ".." + os.sep + i)
             permission = permission_d
             if filepath:
-                filepath.replace(dir_path, '').replace("\\", '')
+                filepath = filepath.replace(dir_path, '').replace("\\", '')
                 if filepath in fix_permission.keys():
                     permission = fix_permission[filepath]
                 else:
