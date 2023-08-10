@@ -2534,9 +2534,13 @@ def loadgif(gif):
 
 loadgif(Image.open("bin/images/loading_%s.gif" % (LB2.get())))
 
+hide_gifl = False
 
 class load_car(object):
     def __init__(self, ind: int = 0):
+        global hide_gifl
+        if hide_gifl:
+            gifl.pack(padx=10,pady=10)
         frame = frames[ind]
         ind += 1
         if ind == len(frames):
@@ -2545,10 +2549,12 @@ class load_car(object):
         self.gifs = gifl.after(30, load_car, ind)
         if car.get() == 1:
             self.endupdate()
-
     def endupdate(self):
+        global hide_gifl
         gifl.after_cancel(self.gifs)
         gifl.configure(image=frames[1])
+        gifl.pack_forget()
+        hide_gifl = True
         car.set(0)
 
 
