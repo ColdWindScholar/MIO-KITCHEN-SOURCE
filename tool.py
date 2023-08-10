@@ -1354,7 +1354,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
     return ret.returncode
 
 
-def DownloadFile():
+def download_file():
     down = getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
@@ -2218,7 +2218,7 @@ zyf1.pack(padx=10, pady=10)
 ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(side='left',
                                                                               padx=10,
                                                                               pady=10)
-ttk.Button(zyf1, text=lang.text114, command=lambda: cz(DownloadFile)).pack(side='left', padx=10, pady=10)
+ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
 info = ttk.LabelFrame(tab2, text="Rom信息")
 frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
