@@ -2554,7 +2554,6 @@ class load_car(object):
     def endupdate(self):
         global hide_gifl
         gifl.after_cancel(self.gifs)
-        gifl.configure(image=frames[1])
         gifl.pack_forget()
         hide_gifl = True
         car.set(0)
