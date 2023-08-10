@@ -1901,25 +1901,25 @@ class dirsize(object):
 
     def rsize(self, size: int, num: int):
         if size <= 1048576:
-            size = 2097152
+            size_ = 2097152
             bs = 1
         else:
-            size = int(size + 10086)
-            if size > 2684354560:
+            size_ = int(size + 10086)
+            if size_ > 2684354560:
                 bs = 1.0658
-            elif size <= 2684354560:
+            elif size_ <= 2684354560:
                 bs = 1.0758
-            elif size <= 1073741824:
+            elif size_ <= 1073741824:
                 bs = 1.0858
-            elif size <= 536870912:
+            elif size_ <= 536870912:
                 bs = 1.0958
-            elif size <= 104857600:
+            elif size_ <= 104857600:
                 bs = 1.1158
             else:
                 bs = 1.1258
         if self.get == 3:
-            self.rsizelist(self.dname, int(size * bs), self.list_f)
-        self.rsize_v = int(size * bs / num)
+            self.rsizelist(self.dname, int(size_ * bs), self.list_f)
+        self.rsize_v = int(size_ * bs / num)
 
     @staticmethod
     def rsizelist(dname, size, file):
