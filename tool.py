@@ -1183,7 +1183,7 @@ def dbkxyt():
             call("img2simg {} {}".format(dir_ + "super.img", dir_ + "super.raw"))
             if os.path.exists(dir_ + "super.raw"):
                 os.remove(dir_ + "super.img")
-                os.rename(dir_+"super.raw", dir_ + "super.img")
+                os.rename(dir_ + "super.raw", dir_ + "super.img")
         try:
             print("[Compress] Super.img...")
             call("zstd -5 --rm {} -o {}".format(dir_ + "super.img", dir_ + 'images' + os.sep + "super.img.zst"))
@@ -1836,7 +1836,7 @@ def unpack(chose, form: any = None):
             if ftype == "erofs":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
                 if call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
-                     out=1) != 0:
+                        out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
                 if os.access(work + "config" + os.sep + dname + "_fs_config", os.F_OK):
