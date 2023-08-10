@@ -1827,8 +1827,7 @@ def unpack(chose, form: any = None):
                     imgextractor.Extractor().main(work + dname + ".img", work + dname, work)
                 except Exception as e:
                     print(f"Unpack Fail..{e}")
-                    car.set(1)
-                    return 0
+                    continue
                 if os.path.exists(work + dname):
                     try:
                         os.remove(work + dname + ".img")
@@ -1836,8 +1835,10 @@ def unpack(chose, form: any = None):
                         messpop(lang.warn11.format(dname + ".img:" + e))
             if ftype == "erofs":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
-                call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
-                     out=1)
+                if call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
+                     out=1) != 0:
+                    print(f'Unpack Fail...')
+                    continue
                 if os.access(work + "config" + os.sep + dname + "_fs_config", os.F_OK):
                     with open(work + "config" + os.sep + dname + "_fs_config", 'a', encoding='utf-8',
                               newline='\n') as fs:
