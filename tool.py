@@ -37,12 +37,12 @@ import editor
 # 欢迎各位大佬提PR
 config = ConfigParser()
 win = Tk()
-import values
 start = dti()
 win.title('OPEN-MIO-KITCHEN')
-setfile = (elocal := values.elocal) + os.sep + "bin" + os.sep + "setting.ini"
+setfile = (elocal := utils.elocal) + os.sep + "bin" + os.sep + "setting.ini"
 modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
-dn = values.dn
+utils.dn = StringVar()
+dn = utils.dn
 theme = StringVar()
 language = StringVar()
 var1 = IntVar()
