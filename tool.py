@@ -1892,10 +1892,10 @@ class dirsize(object):
                               not os.path.islink(os.path.join(root, name))])
         if self.get == 1:
             self.rsize_v = self.size
-        elif self.get == 2 or self.get == 3:
+        elif self.get in [2, 3]:
             self.rsize(self.size, self.num)
         else:
-            self.rsize_v = self.size
+            self.rsize(self.size, self.num)
 
     def rsize(self, size: int, num: int):
         if size <= 1048576:
