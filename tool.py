@@ -1751,7 +1751,7 @@ def unpack(chose, form: any = None):
         return 1
 
     for i in chose:
-        dname = os.path.basename(i).rsplit('.', 1)[0]
+        dname = i
         if os.access(work + dname + ".new.dat.br", os.F_OK):
             print(lang.text79 + dname + ".new.dat.br")
             call("brotli -dj " + work + dname + ".new.dat.br")
@@ -2236,7 +2236,7 @@ ttk.Button(xmcd, text=lang.text117, command=lambda: cz(cmm)).pack(side="left", p
 class unpackg(object):
     def __init__(self):
         ck = frame1
-        self.fm = ttk.Combobox(ck, state="readonly", values=("dat", 'br', 'img', 'payload'))
+        self.fm = ttk.Combobox(ck, state="readonly", values=("new.dat", 'new.dat.br', 'img', 'payload'))
         self.lsg = Listbox(ck, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2248,15 +2248,14 @@ class unpackg(object):
         self.refs()
 
     def refs(self, N=None):
-        work = rwork()
         self.lsg.delete(0, END)
-        if not os.path.exists(work):
+        if not os.path.exists(work := rwork()):
             messpop(lang.warn1)
             return False
-        if self.fm.get() != 'payload' and self.fm.get() != 'super':
+        if not self.fm.get() in ['payload', 'super']:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.split('.')[0])
+                    self.lsg.insert(END, file_name.split("."+self.fm.get())[0])
         else:
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
