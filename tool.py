@@ -34,15 +34,15 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
-
 # 欢迎各位大佬提PR
 config = ConfigParser()
-setfile = (elocal := os.getcwd()) + os.sep + "bin" + os.sep + "setting.ini"
-modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
 win = Tk()
+import values
 start = dti()
 win.title('OPEN-MIO-KITCHEN')
-dn = StringVar()
+setfile = (elocal := values.elocal) + os.sep + "bin" + os.sep + "setting.ini"
+modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
+dn = values.dn
 theme = StringVar()
 language = StringVar()
 var1 = IntVar()
@@ -2255,7 +2255,7 @@ class unpackg(object):
         if not self.fm.get() in ['payload', 'super']:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.split("."+self.fm.get())[0])
+                    self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
         else:
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
