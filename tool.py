@@ -34,6 +34,7 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
+
 # 欢迎各位大佬提PR
 config = ConfigParser()
 win = Tk()
@@ -374,9 +375,6 @@ def getframe(title):
     ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
     upjdt()
     return frame
-
-
-# 子进程运行 防卡死
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
