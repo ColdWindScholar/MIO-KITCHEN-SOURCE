@@ -60,8 +60,16 @@ class Extractor(object):
         return '\n'.join(tb_lines)
 
     def __file_name(self, file_path):
-        #name = os.path.basename(file_path).rsplit('.', 1)[0]
-        name = file_path.split('-')[0]
+        name = os.path.basename(file_path).rsplit('.', 1)[0]
+        name = name.split('-')[0]
+        name = name.split(' ')[0]
+        name = name.split('+')[0]
+        name = name.split('{')[0]
+        name = name.split('(')[0]
+        return name
+    def __out_name(self, file_path):
+        name = file_path
+        name = name.split('-')[0]
         name = name.split(' ')[0]
         name = name.split('+')[0]
         name = name.split('{')[0]
@@ -494,7 +502,7 @@ class Extractor(object):
             dirlist = []
             for file_name, inode_idx, file_type in root.open_dir():
                 dirlist.append(file_name)
-            dirr = self.__file_name(os.path.basename(self.OUTPUT_IMAGE_FILE).split('.')[0])  # 11.05.18
+            dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.',1)[0])  # 11.05.18
             setattr(self, 'DIR', dirr)
             scan_dir(root)
             for c in self.fsconfig:
@@ -637,7 +645,7 @@ class Extractor(object):
     def main(self, target, output_dir, work):
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
         self.BASE_MYDIR = output_dir + os.sep
-        self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__file_name(
+        self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))  # output_dir
         self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
         self.OUTPUT_MYIMAGE_FILE = os.path.basename(target)
