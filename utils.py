@@ -82,14 +82,15 @@ def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
 
     version, new_blocks, commands = parse_transfer_list_file(TRANSFER_LIST_FILE)
 
+    show = "Android {} detected!\n"
     if version == 1:
-        print('Android Lollipop 5.0 detected!\n')
+        print(show.format("Lollipop 5.0"))
     elif version == 2:
-        print('Android Lollipop 5.1 detected!\n')
+        print(show.format("Lollipop 5.1"))
     elif version == 3:
-        print('Android Marshmallow 6.x detected!\n')
+        print(show.format("Marshmallow 6.x"))
     elif version == 4:
-        print('Android Nougat 7.x / Oreo 8.x detected!\n')
+        print(show.format("Nougat 7.x / Oreo 8.x / Pie 9.x"))
     else:
         print(f'Unknown Android version:{version}!\n')
 
@@ -133,6 +134,8 @@ def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     output_img.close()
     new_data_file.close()
     print('Done! Output image: {}'.format(os.path.realpath(output_img.name)))
+
+
 def gettype(file) -> str:
     if not os.path.exists(file):
         return "fne"
