@@ -10,16 +10,9 @@ from sefcontext_parser import main as sef_parse
 
 # -----
 # ====================================================
-#          FUNCTION: img2sdat
+#          FUNCTION: sdat2img img2sdat
 #       AUTHORS: xpirt - luxi78 - howellzhu
-#          DATE: 2018-05-25 12:19:12 CEST
-# ====================================================
-# -----
-# -----
-# ====================================================
-#          FUNCTION: sdat2img
-#       AUTHORS: xpirt - luxi78 - howellzhu
-#          DATE: 2018-10-27 10:33:21 CEST
+#          DATE: 2018-10-27 10:33:21 CEST | 2018-05-25 12:19:12 CEST
 # ====================================================
 # -----
 # ----VALUES
