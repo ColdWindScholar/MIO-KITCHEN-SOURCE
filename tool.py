@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import os.path
 import shlex
 import sys
 import time
@@ -2262,6 +2263,7 @@ class unpackg(object):
             self.refs(None)
         else:
             self.fm.configure(state="disabled")
+            self.refs2()
 
     def refs(self, N=None):
         self.lsg.delete(0, END)
@@ -2285,11 +2287,18 @@ class unpackg(object):
         if not os.path.exists(work := rwork()):
             messpop(lang.warn1)
             return False
+        if os.path.exists(work + "config" + os.sep + "parts_info"):
+            with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
+                parts_dict = json.loads(fff.read())
+        else:
+            parts_dict = {}
         for folder in os.listdir(work):
-            pass
+            if os.path.isdir(work+folder) and folder in parts_dict.keys():
+                self.lsg.insert(END,folder)
+
     def close_(self):
         lbs = [self.lsg.get(index) for index in self.lsg.curselection()]
-        self.refs()
+        self.hd()
         unpack(lbs, self.fm.get())
 
 
