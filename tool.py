@@ -2235,6 +2235,8 @@ ttk.Button(xmcd, text=lang.text117, command=lambda: cz(cmm)).pack(side="left", p
 class unpackg(object):
     def __init__(self):
         ck = frame1
+        self.ch = IntVar()
+        self.ch.set(1)
         self.fm = ttk.Combobox(ck, state="readonly", values=("new.dat", 'new.dat.br', 'img', 'payload'))
         self.lsg = Listbox(ck, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
@@ -2242,9 +2244,24 @@ class unpackg(object):
 
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
         ttk.Separator(ck, orient=HORIZONTAL).pack(padx=50, fill=X)
+        ff1 = ttk.Frame(ck)
+        ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
+                        value=1).pack(padx=5, pady=5, side='left')
+        ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
+                        value=0).pack(padx=5, pady=5, side='left')
+        ff1.pack(padx=5, pady=5, fill=X)
+        ttk.Separator(ck, orient=HORIZONTAL).pack(padx=50, fill=X)
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(ck, text=lang.unpack, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
+        ttk.Button(ck, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
+        self.ch.trace("w", self.hd)
+
+    def hd(self, *args):
+        if self.ch.get() == 1:
+            self.fm.configure(state='readonly')
+            self.refs(None)
+        else:
+            self.fm.configure(state="disabled")
 
     def refs(self, N=None):
         self.lsg.delete(0, END)
