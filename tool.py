@@ -1915,6 +1915,7 @@ class dirsize(object):
                 bs = 1.1158
             else:
                 bs = 1.1258
+        print(f"Multiple:{bs}")
         if self.get == 3:
             self.rsizelist(self.dname, int(size_ * bs), self.list_f)
         self.rsize_v = int(size_ * bs / num)
