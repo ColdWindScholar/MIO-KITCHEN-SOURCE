@@ -2280,6 +2280,13 @@ class unpackg(object):
                                                                    0):
                             self.lsg.insert(END, i.partition_name)
 
+    def refs2(self):
+        self.lsg.delete(0, END)
+        if not os.path.exists(work := rwork()):
+            messpop(lang.warn1)
+            return False
+        for folder in os.listdir(work):
+            pass
     def close_(self):
         lbs = [self.lsg.get(index) for index in self.lsg.curselection()]
         self.refs()
