@@ -1441,17 +1441,17 @@ def jboot(bn: str = 'boot'):
     os.chdir(elocal)
 
 
-def dboot():
+def dboot(nm:str='boot'):
     work = rwork()
     flag = ''
-    boot = findfile("boot.img", work)
+    boot = findfile(f"{nm}.img", work)
     load_car(0)
-    if not os.path.exists(work + "boot"):
-        print("Cannot Find Boot...")
+    if not os.path.exists(work + f"{nm}"):
+        print(f"Cannot Find {nm}...")
         car.set(1)
         return
     try:
-        os.chdir(work + "boot" + os.sep + "ramdisk")
+        os.chdir(work + f"{nm}" + os.sep + "ramdisk")
     except Exception as e:
         print("Ramdisk Not Found.. %s" % e)
         car.set(1)
@@ -1461,8 +1461,8 @@ def dboot():
     else:
         cpio = findfile("cpio", elocal + os.sep + "bin" + os.sep + os.name + "_" + machine())
     call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
-    os.chdir(work + "boot" + os.sep)
-    with open(work + "boot" + os.sep + "comp", "r", encoding='utf-8') as compf:
+    os.chdir(work + f"{nm}" + os.sep)
+    with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
         comp = compf.read()
     print("Compressing:%s" % comp)
     if comp != "unknow":
@@ -1486,11 +1486,11 @@ def dboot():
         car.set(1)
         return
     else:
-        os.remove(work + "boot.img")
-        os.rename(work + "boot" + os.sep + "new-boot.img", work + "boot.img")
+        os.remove(work + f"{nm}.img")
+        os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + f"{nm}.img")
         os.chdir(elocal)
-        if rmdir((work + "boot")) != 0:
-            print(lang.warn11.format("boot"))
+        if rmdir((work + nm)) != 0:
+            print(lang.warn11.format(nm))
         print("Pack Successful...")
         car.set(1)
 
@@ -1570,6 +1570,14 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                         mke2fs(dname, work, "n")
                     if dely == 1:
                         rdi(work, dname)
+        elif parts_dict[i] in ['boot', 'vendor_boot']:
+            dboot(i)
+        elif parts_dict[i] == 'dtbo':
+            padtbo()
+        elif parts_dict[i] == 'logo':
+            logopack()
+        else:
+            print(f"Unsupport {i}:{parts_dict[i]}")
     car.set(1)
 
 
@@ -2210,7 +2218,6 @@ ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
 info = ttk.LabelFrame(tab2, text="Rom信息")
 frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
-frame2 = ttk.LabelFrame(tab2, text=lang.pack)
 frame3 = ttk.LabelFrame(tab2, text=lang.text112)
 LB1 = ttk.Combobox(xmcd, textvariable=dn, state='readonly')
 LB1.pack(side="top", padx=10, pady=10, fill=X)
@@ -2294,17 +2301,12 @@ class unpackg(object):
 
 
 unpackg()
-ttk.Button(frame2, text=lang.text118, command=lambda: cz(packxx)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text119, command=lambda: cz(dboot)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text120, command=lambda: cz(padtbo)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame2, text=lang.text121, command=lambda: cz(logopack)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 xmcd.pack(padx=5, pady=5)
 frame1.pack(padx=5, pady=5)
-frame2.pack(padx=5, pady=5)
 frame3.pack(padx=5, pady=5)
 listdir()
 # 设置的控件
