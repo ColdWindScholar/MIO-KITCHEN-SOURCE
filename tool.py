@@ -2293,13 +2293,16 @@ class unpackg(object):
         else:
             parts_dict = {}
         for folder in os.listdir(work):
-            if os.path.isdir(work+folder) and folder in parts_dict.keys():
-                self.lsg.insert(END,folder)
+            if os.path.isdir(work + folder) and folder in parts_dict.keys():
+                self.lsg.insert(END, folder)
 
     def close_(self):
         lbs = [self.lsg.get(index) for index in self.lsg.curselection()]
         self.hd()
-        unpack(lbs, self.fm.get())
+        if self.ch.get() == 1:
+            unpack(lbs, self.fm.get())
+        else:
+            pass
 
 
 unpackg()
