@@ -1090,13 +1090,14 @@ class installmpk(Toplevel):
 
 
 class packxx(object):
-    def __init__(self):
+    def __init__(self, list_):
         self.dbfs = StringVar()
         self.dbgs = StringVar()
         self.edbgs = StringVar()
         self.scale = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
+        self.lg = list_
         self.ck = subp(com=1, title=lang.text42)
         lf1 = ttk.LabelFrame(self.ck, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
@@ -1131,8 +1132,6 @@ class packxx(object):
         ttk.Checkbutton(lf3, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
-        self.lsg = Listbox(lf4, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
-        self.lsg.pack(fill=BOTH, padx=5, pady=5)
         dbfss.current(0)
         dbgss.current(0)
         edbgss.current(0)
@@ -1143,23 +1142,12 @@ class packxx(object):
                                                                                                 pady=2,
                                                                                                 fill=X,
                                                                                                 expand=True)
-        self.refs()
-
-    def refs(self):
-        self.lsg.delete(0, END)
-        if not os.path.exists(work := rwork()):
-            messpop(lang.warn1)
-            return False
-        for i in os.listdir(work):
-            if os.path.isdir(work + i):
-                if os.access(work + "config" + os.sep + "%s_file_contexts" % i, os.F_OK):
-                    self.lsg.insert(END, i)
 
     def update_label(self, value):
         self.label.config(text=lang.text47.format(int(float(value))))
 
     def start_(self):
-        lg = [self.lsg.get(index) for index in self.lsg.curselection()]
+        lg = self.lg
         subp(com=0, master=self.ck)
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get())
 
@@ -2302,7 +2290,7 @@ class unpackg(object):
         if self.ch.get() == 1:
             unpack(lbs, self.fm.get())
         else:
-            pass
+            packxx(lbs)
 
 
 unpackg()
