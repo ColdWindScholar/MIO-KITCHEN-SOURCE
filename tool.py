@@ -291,7 +291,6 @@ def undtbo(bn: str = 'dtbo') -> any:
 
 def padtbo() -> any:
     work = rwork()
-    load_car(0)
     if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
         car.set(1)
@@ -312,7 +311,6 @@ def padtbo() -> any:
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo", 1)
     print(lang.text8)
-    car.set(1)
 
 
 def logodump(bn: str = 'logo'):
