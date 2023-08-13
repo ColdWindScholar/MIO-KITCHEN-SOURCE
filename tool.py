@@ -1314,8 +1314,10 @@ class StdoutRedirector(object):
     @staticmethod
     def flush():
         pass
+
     def __exit__(self):
         pass
+
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
     if kz == "Y":
@@ -1633,14 +1635,14 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
+                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
             if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
                 os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
                     0] + os.sep + "config")
             extra.script2fs_context(
                 findfile("updater-script",
-                         local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
+                         "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "META-INF"])),
+                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"]),
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
             )
         car.set(1)
