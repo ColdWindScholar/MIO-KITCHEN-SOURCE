@@ -1055,8 +1055,9 @@ class installmpk(Toplevel):
                 self.installb.config(state='normal')
                 return False
         if os.path.exists(
-                elocal + os.sep + "bin" + os.sep + "module" + os.sep + self.mconf.get('module', 'identifier')):
-            rmtree(elocal + os.sep + "bin" + os.sep + "module" + os.sep + self.mconf.get('module', 'identifier'))
+                "".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')])
+        ):
+            rmtree("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
         fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
         uncompress_size = sum((file.file_size for file in fz.infolist()))
         extracted_size = 0
