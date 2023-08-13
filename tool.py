@@ -1163,8 +1163,7 @@ def dbkxyt():
         os.makedirs(dir_ + 'images')
     if os.path.exists(dir_ + 'META-INF'):
         rmdir(dir_ + 'META-INF')
-    with zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip") as zip:
-        zip.extractall(dir_)
+    zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip").extractall(dir_)
     if os.path.exists(dir_ + "super.img"):
         if gettype(dir_ + "super.img") == "sparse":
             print("[INFO] Super is (sparse), converting to (raw)")
