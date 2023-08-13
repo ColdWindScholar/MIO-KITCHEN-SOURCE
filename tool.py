@@ -41,8 +41,8 @@ config = ConfigParser()
 win = Tk()
 start = dti()
 win.title('OPEN-MIO-KITCHEN')
-setfile = (elocal := utils.elocal) + os.sep + "bin" + os.sep + "setting.ini"
-modfile = elocal + os.sep + "bin" + os.sep + "module" + os.sep + "module.json"
+setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini"])
+modfile = ''.join([elocal, os.sep, "bin", os.sep, "module", os.sep, "module.json"])
 utils.dn = StringVar()
 dn = utils.dn
 theme = StringVar()
@@ -142,7 +142,7 @@ class welcome(object):
 
         def loadlice(self):
             te.delete(1.0, END)
-            with open(elocal + os.sep + "bin" + os.sep + "licenses" + os.sep + lce.get() + ".txt", 'r',
+            with open(''.join([elocal, os.sep, "bin", os.sep, "licenses", os.sep, lce.get(), ".txt"]), 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
 
@@ -167,7 +167,8 @@ class welcome(object):
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        with open(elocal + os.sep + "bin" + os.sep + "licenses" + os.sep + "private.txt", 'r', encoding='UTF-8') as f:
+        with open(''.join([elocal, os.sep, "bin", os.sep, "licenses", os.sep, "private.txt"]), 'r',
+                  encoding='UTF-8') as f:
             (te := Text(self.frame)).insert('insert', f.read())
         te.pack(fill=BOTH)
         ttk.Label(self.frame, text=lang.t3).pack()
