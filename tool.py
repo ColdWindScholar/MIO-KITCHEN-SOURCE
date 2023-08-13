@@ -462,17 +462,17 @@ def mpkman() -> None:
             return 1
         if id_ is None:
             id_ = globals()[pls.get(pls.curselection())]
-        if not os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh") and not os.path.exists(
-                moduledir + os.sep + id_ + os.sep + "main.sh"):
+        if not os.path.exists("".join([moduledir, os.sep, id_, os.sep, "main.msh"])) and not os.path.exists(
+                "".join([moduledir, os.sep, id_, os.sep, "main.sh"])):
             if ask_win(lang.t18, 'SH', 'MSH') == 1:
                 s = "main.sh"
             else:
                 s = "main.msh"
-            with open(moduledir + os.sep + id_ + os.sep + s, 'w+', encoding='utf-8', newline='\n') as sh:
-                sh.write("echo hello,world")
-            editor.main(moduledir + os.sep + id_ + os.sep + s)
+            with open("".join([moduledir, os.sep, id_, os.sep, s]), 'w+', encoding='utf-8', newline='\n') as sh:
+                sh.write("echo MIO-KITCHEN")
+            editor.main("".join([moduledir, os.sep, id_, os.sep, s]))
         else:
-            if os.path.exists(moduledir + os.sep + id_ + os.sep + "main.msh"):
+            if os.path.exists("".join([moduledir, os.sep, id_, os.sep, "main.msh"])):
                 editor.main(moduledir + os.sep + id_ + os.sep + "main.msh")
             elif os.path.exists(moduledir + os.sep + id_ + os.sep + "main.sh"):
                 editor.main(moduledir + os.sep + id_ + os.sep + "main.sh")
@@ -481,7 +481,7 @@ def mpkman() -> None:
         if not pls.curselection():
             messpop(lang.warn2)
             return 1
-        with open(moduledir + os.sep + (value := globals()[pls.get(pls.curselection())]) + os.sep + "info.json", 'r',
+        with open("".join([moduledir, os.sep, (value := globals()[pls.get(pls.curselection())]), os.sep, "info.json"]), 'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
             if "describe" in data:
@@ -507,7 +507,7 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(local + os.sep + pls.get(pls.curselection()) + ".mpk", 'w',
+        with zipfile.ZipFile("".join([local, os.sep, pls.get(pls.curselection()), ".mpk"]), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
@@ -548,7 +548,7 @@ def mpkman() -> None:
 
     class msh_parse(object):
         envs = {'version': VERSION,
-                'tool_bin': (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\',
+                'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace('\\',
                                                                                                             '/'),
                 'project': (local + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
@@ -865,13 +865,13 @@ def mpkman() -> None:
                 # 生成TMP
                 else:
                     if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
-                        if not os.path.exists(temp := elocal + os.sep + "bin" + os.sep + "temp" + os.sep):
+                        if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
                             refolder(temp)
                         if not file.get():
                             file.set(temp + os.sep + v_code())
                         with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                             f.write('export tool_bin={}\n'.format(
-                                (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace(
+                                ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
                                     '\\',
                                     '/')))
                             f.write('export version={}\n'.format(VERSION))
