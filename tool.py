@@ -854,8 +854,8 @@ def mpkman() -> None:
                                                                '/')))
                             car.set(1)
                             os.remove(file.get())
-                    elif os.path.exists(moduledir + os.sep + value + os.sep + "main.msh"):
-                        msh_parse(moduledir + os.sep + value + os.sep + "main.msh")
+                    elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
+                        msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
 
 
                 # 生成TMP
