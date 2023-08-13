@@ -279,8 +279,8 @@ def undtbo(bn: str = 'dtbo') -> any:
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(exe="dtc -@ -I dtb -O dts %s -o %s" % (work + f"{bn}" + os.sep + "dtbo" + os.sep + dtbo,
-                                                        work + f"{bn}" + os.sep + "dts" + os.sep + "dts." +
-                                                        os.path.basename(dtbo).rsplit('.', 1)[1]), out=1)
+                                                        "".join([work, f"{bn}", os.sep, "dts", os.sep, "dts." +
+                                                                 os.path.basename(dtbo).rsplit('.', 1)[1]])), out=1)
     print(lang.text5)
     try:
         os.remove(dtboimg)
