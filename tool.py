@@ -941,7 +941,7 @@ def mpkman() -> None:
             if not name:
                 name = self.value
             for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
-                with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                with open("".join([moduledir, os.sep, i, os.sep, "info.json"]), 'r', encoding='UTF-8') as f:
                     data = json.load(f)
                     for n in data['depend'].split():
                         if name == n:
@@ -1025,7 +1025,7 @@ class installmpk(Toplevel):
                         print(e)
                         pyt = ImageTk.PhotoImage(Image.open(elocal + os.sep + "images" + os.sep + "none"))
             except:
-                pyt = ImageTk.PhotoImage(Image.open(elocal + os.sep + "bin" + os.sep + "images" + os.sep + "none"))
+                pyt = ImageTk.PhotoImage(Image.open("".join([elocal, os.sep, "bin", os.sep, "images", os.sep, "none"])))
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
@@ -1053,7 +1053,7 @@ class installmpk(Toplevel):
             return True
         self.installb.config(state=DISABLED)
         for dep in self.mconf.get('module', 'depend').split():
-            if not os.path.isdir(elocal + os.sep + "bin" + os.sep + "module" + os.sep + dep):
+            if not os.path.isdir("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, dep])):
                 self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
                 self.installb['text'] = lang.text37
                 self.installb.config(state='normal')
