@@ -1441,7 +1441,7 @@ def jboot(bn: str = 'boot'):
     os.chdir(elocal)
 
 
-def dboot(nm:str='boot'):
+def dboot(nm: str = 'boot'):
     work = rwork()
     flag = ''
     boot = findfile(f"{nm}.img", work)
