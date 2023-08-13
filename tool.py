@@ -1312,9 +1312,10 @@ class StdoutRedirector(object):
         self.text_space.yview('end')
 
     @staticmethod
-    def flush() -> None:
+    def flush():
         pass
-
+    def __exit__(self):
+        pass
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
     if kz == "Y":
