@@ -1074,7 +1074,7 @@ class installmpk(Toplevel):
             extracted_size += info.file_size
             self.state['text'] = lang.text38.format(file)
             fz.extract(file,
-                       elocal + os.sep + "bin" + os.sep + "module" + os.sep + self.mconf.get('module', 'identifier'))
+                       "".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
             self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
@@ -1086,8 +1086,7 @@ class installmpk(Toplevel):
                  "identifier": "%s" % (self.mconf.get('module', 'identifier')),
                  "describe": "%s" % (self.mconf.get('module', 'describe')),
                  "depend": "%s" % depends}
-        with open(elocal + os.sep + "bin" + os.sep + "module" + os.sep + self.mconf.get('module',
-                                                                                        'identifier') + os.sep + "info.json",
+        with open("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module','identifier'), os.sep, "info.json"]),
                   'w') as f:
             json.dump(minfo, f, indent=2)
         self.state['text'] = lang.text39
