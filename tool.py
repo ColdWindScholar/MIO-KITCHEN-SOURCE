@@ -64,7 +64,7 @@ def load(name):
     if not name and not os.path.exists(elocal + os.sep + f'bin/languages/English.json'):
         error(1)
     elif not os.path.exists(elocal + os.sep + f'bin/languages/{name}.json'):
-        with open(elocal + os.sep + 'bin/languages/English.json', 'r', encoding='utf-8') as f:
+        with open("".join([elocal, os.sep, 'bin/languages/English.json']), 'r', encoding='utf-8') as f:
             _lang = json.load(f)
     else:
         with open(f'{elocal}{os.sep}bin/languages/{name}.json', 'r', encoding='utf-8') as f:
@@ -209,6 +209,10 @@ def upgrade():
         ttk.Button(ck, text="确定", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
         ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
 '''
+
+
+class settings(object):
+    pass
 
 
 def loadset():
@@ -1635,8 +1639,10 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
-                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
-            if not os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
+                "".join(
+                    [local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
+            if not os.path.exists(
+                    "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
                 os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
                     0] + os.sep + "config")
             extra.script2fs_context(
@@ -1672,8 +1678,10 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
         if os.path.exists(
-                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
-            if not os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
+                "".join(
+                    [local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
+            if not os.path.exists(
+                    "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
                 os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
                     0] + os.sep + "config")
             extra.script2fs_context(
