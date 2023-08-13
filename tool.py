@@ -860,7 +860,7 @@ def mpkman() -> None:
 
                 # 生成TMP
                 else:
-                    if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
+                    if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
                         if not os.path.exists(temp := elocal + os.sep + "bin" + os.sep + "temp" + os.sep):
                             refolder(temp)
                         if not file.get():
