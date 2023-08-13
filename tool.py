@@ -1636,7 +1636,7 @@ def unpackrom(ifile) -> None:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         if os.path.exists(
                 "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
-            if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
+            if not os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
                 os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
                     0] + os.sep + "config")
             extra.script2fs_context(
@@ -1666,14 +1666,14 @@ def unpackrom(ifile) -> None:
             finally:
                 pass
         print(lang.text81)
-        if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]):
+        if os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0]])):
             listdir()
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
             listdir()
         if os.path.exists(
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "system" + os.sep + "app"):
-            if not os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config"):
+                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
+            if not os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
                 os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
                     0] + os.sep + "config")
             extra.script2fs_context(
