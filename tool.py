@@ -727,6 +727,7 @@ def mpkman() -> None:
                     f.write('export version={}\n'.format(VERSION))
                     f.write('export tool_bin={}\n'.format(
                         (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\', '/')))
+                    f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
                 self.gavs.clear()
@@ -870,6 +871,7 @@ def mpkman() -> None:
                                     '\\',
                                     '/')))
                             f.write('export version={}\n'.format(VERSION))
+                            f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                             f.write(
                                 "export project={}\nsource $1".format(
                                     (local + os.sep + dn.get()).replace('\\', '/')))
