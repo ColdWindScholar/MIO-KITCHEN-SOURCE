@@ -91,7 +91,10 @@ def script2fs_context(input_f, outdir, project):
         if command == 'symlink':
             src, *targets = args
             for target in targets:
-                __symlink(src, str(os.path.join(project, target.lstrip('/'))))
+                if osname == 'nt':
+                    __symlink(src, str(os.path.join(project, target.lstrip('/'))))
+                else:
+                    os.link(src, str(os.path.join(project, target.lstrip('/'))))
         elif command in ['set_metadata', 'set_metadata_recursive']:
             dirmode = False if command == 'set_metadata' else True
             fpath, *fargs = args
@@ -212,7 +215,7 @@ class proputil:
 
 def returnoutput(cmd, elocal, kz=1):
     if kz == 1:
-        comd = elocal + os.sep + "bin" + os.sep + os.name + '_' + machine() + os.sep + cmd
+        comd = "".join([elocal, os.sep, "bin", os.sep, os.name, '_', machine(), os.sep, cmd])
     else:
         comd = cmd
     if os.name == 'posix':
