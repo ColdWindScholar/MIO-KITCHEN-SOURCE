@@ -185,6 +185,8 @@ class proputil:
         recive key and return value or None
         """
         for i in self.prop:
+            if i[:1] == "#":
+                continue
             if key in i:
                 return i.rstrip().split('=')[1]
         return None
