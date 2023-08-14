@@ -519,13 +519,12 @@ def mpkman() -> None:
         try:
             lf2.config(text=pls.get(pls.curselection()))
         except Exception as e:
-            if e:
-                lf2.config(text="Null")
+            lf2.config(text="Null")
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
 
-    moduledir = elocal + os.sep + "bin" + os.sep + "module"
+    moduledir = "".join([elocal, os.sep, "bin", os.sep, "module"])
     file = StringVar()
 
     def listpls():
@@ -533,7 +532,7 @@ def mpkman() -> None:
         try:
             for i in os.listdir(moduledir):
                 if os.path.isdir(moduledir + os.sep + i):
-                    with open(moduledir + os.sep + i + os.sep + "info.json", 'r', encoding='UTF-8') as f:
+                    with open("".join([moduledir, os.sep, i, os.sep, "info.json"]), 'r', encoding='UTF-8') as f:
                         data = json.load(f)
                         pls.insert('end', data['name'])
                         globals()[data['name']] = data['identifier']
@@ -633,7 +632,7 @@ def mpkman() -> None:
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
 
         def sh(self, cmd):
-            with open(file_ := (elocal + os.sep + "bin" + os.sep + "temp" + os.sep) + v_code(), "w", encoding='UTF-8',
+            with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w", encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
                     f.write(f'export {i}={self.envs[i]}\n')
@@ -729,7 +728,7 @@ def mpkman() -> None:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(VERSION))
                     f.write('export tool_bin={}\n'.format(
-                        (elocal + os.sep + 'bin' + os.sep + os.name + '_' + machine() + os.sep).replace('\\', '/')))
+                        ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace('\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
