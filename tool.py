@@ -69,8 +69,7 @@ def load(name):
     else:
         with open(f'{elocal}{os.sep}bin/languages/{name}.json', 'r', encoding='utf-8') as f:
             _lang = json.load(f)
-    for i in _lang:
-        setattr(lang, i, _lang[i])
+    [setattr(lang, i, _lang[i]) for i in _lang]
 
 
 def error(code, desc="未知错误"):
