@@ -94,7 +94,7 @@ def script2fs_context(input_f, outdir, project):
                 if osname == 'nt':
                     __symlink(src, str(os.path.join(project, target.lstrip('/'))))
                 else:
-                    os.link(src, str(os.path.join(project, target.lstrip('/'))))
+                    os.symlink(src, str(os.path.join(project, target.lstrip('/'))))
         elif command in ['set_metadata', 'set_metadata_recursive']:
             dirmode = False if command == 'set_metadata' else True
             fpath, *fargs = args
