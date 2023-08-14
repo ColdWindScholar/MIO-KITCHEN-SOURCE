@@ -7,7 +7,9 @@ import common, blockimgdiff, sparse_img
 from threading import Thread
 from random import randint, choice
 from sefcontext_parser import main as sef_parse
-
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+import zipfile
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
@@ -17,6 +19,7 @@ from sefcontext_parser import main as sef_parse
 # -----
 # ----VALUES
 from os import getcwd
+
 elocal = getcwd()
 dn = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
@@ -34,6 +37,23 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 
 
 # ----DEFS
+class aesencrypt:
+    @staticmethod
+    def encrypt(key, file_path, outfile):
+        cipher = AES.new(key.encode("utf-8"), AES.MODE_ECB)
+        with open(outfile, "wb") as f, open(file_path, 'rb') as fd:
+            f.write(cipher.encrypt(pad(fd.read(), AES.block_size)))
+
+    @staticmethod
+    def decrypt(key, file_path, outfile):
+        cipher = AES.new(key.encode("utf-8"), AES.MODE_ECB)
+        with open(file_path, "rb") as f:
+            data = cipher.decrypt(f.read())
+        data = data[:-data[-1]]
+        with open(outfile, "wb") as f:
+            f.write(data)
+
+
 def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     __version__ = '1.2'
 
