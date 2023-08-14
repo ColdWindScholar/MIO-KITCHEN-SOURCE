@@ -252,12 +252,12 @@ def messpop(message, color='orange') -> None:
     tsk.config(text=message, bg=color)
 
 
-def gettime() -> None:
+def get_time() -> None:
     tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
-    tsk.after(1000, gettime)
+    tsk.after(1000, get_time)
 
 
-def refolder(path) -> None:
+def re_folder(path) -> None:
     if os.path.exists(path):
         rmdir(path, 1)
         os.mkdir(path)
@@ -265,13 +265,13 @@ def refolder(path) -> None:
         os.mkdir(path)
 
 
-def undtbo(bn: str = 'dtbo') -> any:
+def un_dtbo(bn: str = 'dtbo') -> any:
     if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
         print(lang.warn3.format(bn))
         return False
-    refolder(work + f"{bn}")
-    refolder(work + f"{bn}" + os.sep + "dtbo")
-    refolder(work + f"{bn}" + os.sep + "dts")
+    re_folder(work + f"{bn}")
+    re_folder(work + f"{bn}" + os.sep + "dtbo")
+    re_folder(work + f"{bn}" + os.sep + "dts")
     try:
         mkdtboimg.dump_dtbo(dtboimg, work + f"{bn}" + os.sep + "dtbo" + os.sep + "dtbo")
     except Exception as e:
@@ -298,7 +298,7 @@ def padtbo() -> any:
         print(lang.warn5)
         car.set(1)
         return False
-    refolder(work + "dtbo" + os.sep + "dtbo")
+    re_folder(work + "dtbo" + os.sep + "dtbo")
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:%s" % dts)
@@ -320,7 +320,7 @@ def logodump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
         messpop(lang.warn3.format(bn))
         return False
-    refolder(work + f"{bn}")
+    re_folder(work + f"{bn}")
     utils.LOGODUMPER(logo, work + f"{bn}").unpack()
 
 
@@ -723,7 +723,7 @@ def mpkman() -> None:
                         sh_content += f"export {va}={gva}\n"
                 temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
                 if not os.path.exists(temp):
-                    refolder(temp)
+                    re_folder(temp)
                 file.set(temp + v_code())
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                     f.write(sh_content)
@@ -865,7 +865,7 @@ def mpkman() -> None:
                 else:
                     if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
                         if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
-                            refolder(temp)
+                            re_folder(temp)
                         if not file.get():
                             file.set(temp + os.sep + v_code())
                         with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
@@ -1407,7 +1407,7 @@ def jboot(bn: str = 'boot'):
             print(lang.text69)
             car.set(1)
             return
-    refolder(work + f"{bn}")
+    re_folder(work + f"{bn}")
     os.chdir(work + f"{bn}")
     if call("magiskboot unpack -h %s" % boot) != 0:
         print("Unpack %s Fail..." % boot)
@@ -1782,7 +1782,7 @@ def unpack(chose, form: any = None):
             if gettype(work + dname + ".img") != 'sparse':
                 parts[dname] = gettype(work + dname + ".img")
             if gettype(work + dname + ".img") == 'dtbo':
-                undtbo(dname)
+                un_dtbo(dname)
             if gettype(work + dname + ".img") in ['boot', 'vendor_boot']:
                 jboot(dname)
             if dname == 'logo':
@@ -2602,7 +2602,7 @@ if os.name == "posix":
 else:
     win.iconphoto(True, tk.PhotoImage(file=elocal + os.sep + "bin" + os.sep + "images" + os.sep + "icon.png"))
 jzxs(win)
-cz(gettime)
+cz(get_time)
 if int(oobe) < 4:
     welcome()
 print(lang.text134 % (dti() - start))
