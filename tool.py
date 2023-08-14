@@ -480,7 +480,8 @@ def mpkman() -> None:
         if not pls.curselection():
             messpop(lang.warn2)
             return 1
-        with open("".join([moduledir, os.sep, (value := globals()[pls.get(pls.curselection())]), os.sep, "info.json"]), 'r',
+        with open("".join([moduledir, os.sep, (value := globals()[pls.get(pls.curselection())]), os.sep, "info.json"]),
+                  'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
             if "describe" in data:
@@ -547,7 +548,7 @@ def mpkman() -> None:
     class msh_parse(object):
         envs = {'version': VERSION,
                 'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace('\\',
-                                                                                                            '/'),
+                                                                                                                '/'),
                 'project': (local + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
 
@@ -632,7 +633,8 @@ def mpkman() -> None:
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
 
         def sh(self, cmd):
-            with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w", encoding='UTF-8',
+            with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w",
+                      encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
                     f.write(f'export {i}={self.envs[i]}\n')
@@ -806,10 +808,15 @@ def mpkman() -> None:
                                     ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
                                                     value=value).pack(side=con['side'])
                             elif con["type"] == 'input':
+                                input_frame = Frame(group_frame)
+                                input_frame.pack(fill=X)
                                 input_var_name = con['set']
                                 self.gavs[input_var_name] = StringVar()
-                                ttk.Entry(group_frame, textvariable=self.gavs[input_var_name]).pack(pady=5, padx=5,
-                                                                                                    fill=BOTH)
+                                if 'text' in con:
+                                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
+                                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
+                                                                                                    padx=5,
+                                                                                                    fill=X)
                             elif con['type'] == 'checkbutton':
                                 b_var_name = con['set']
                                 self.gavs[b_var_name] = IntVar()
@@ -1072,7 +1079,8 @@ class installmpk(Toplevel):
             extracted_size += info.file_size
             self.state['text'] = lang.text38.format(file)
             fz.extract(file,
-                       "".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
+                       "".join(
+                           [elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
             self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
@@ -1084,7 +1092,8 @@ class installmpk(Toplevel):
                  "identifier": "%s" % (self.mconf.get('module', 'identifier')),
                  "describe": "%s" % (self.mconf.get('module', 'describe')),
                  "depend": "%s" % depends}
-        with open("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module','identifier'), os.sep, "info.json"]),
+        with open("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier'),
+                           os.sep, "info.json"]),
                   'w') as f:
             json.dump(minfo, f, indent=2)
         self.state['text'] = lang.text39
