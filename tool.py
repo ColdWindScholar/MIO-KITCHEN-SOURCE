@@ -56,7 +56,7 @@ class ModuleError(Exception):
 
 
 # 打包设置变量
-class lang(object):
+class lang:
     pass
 
 
