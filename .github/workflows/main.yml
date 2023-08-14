@@ -54,6 +54,7 @@ jobs:
             Changelog: ${{ steps.commit_message.outputs.message }}
             Build times: ${{ github.run_number }}
             Version: ${{ steps.tool_version.outputs.version }}
+            Note:If u cannot run it in linux,you may need do "chmod a+x ./*"
             Author: MIO-KITCHEN-TEAM
             Minimum support: Ubuntu 20.04 (64bit),Windows Vista (32bit)
           artifacts: "*.zip"
@@ -120,6 +121,8 @@ jobs:
              rm -rf *.*
              rm -rf build
              rm -rf dist
+             find . | xargs chmod a+x 
+             chmod a+x ./*
              ls
       - name: Upload Linux Build
         if: success()
