@@ -67,6 +67,7 @@ class Extractor(object):
         name = name.split('{')[0]
         name = name.split('(')[0]
         return name
+
     def __out_name(self, file_path):
         name = file_path
         name = name.split('-')[0]
@@ -492,7 +493,7 @@ class Extractor(object):
             dirlist = []
             for file_name, inode_idx, file_type in root.open_dir():
                 dirlist.append(file_name)
-            dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.',1)[0])  # 11.05.18
+            dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
             setattr(self, 'DIR', dirr)
             scan_dir(root)
             for c in self.fsconfig:
