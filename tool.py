@@ -1919,13 +1919,13 @@ class dirsize(object):
             size_ = int(size + 10086)
             if size_ > 2684354560:
                 bs = 1.0658
-            elif size_ <= 2684354560:
+            if size_ <= 2684354560:
                 bs = 1.0758
-            elif size_ <= 1073741824:
+            if size_ <= 1073741824:
                 bs = 1.0858
-            elif size_ <= 536870912:
+            if size_ <= 536870912:
                 bs = 1.0958
-            elif size_ <= 104857600:
+            if size_ <= 104857600:
                 bs = 1.1158
             else:
                 bs = 1.1258
