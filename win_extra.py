@@ -10,7 +10,7 @@ def win2wslpath(path):
 
 
 def wsl2winpath(path):
-    if path[:4] != "/mnt":
+    if path[:4] != "/mnt" or len(path) < 5:
         return "\\wsl.localhost\\Ubuntu\\" + path.replace("/", "\\")
     else:
         f, e = path[5:].split("/", 1)
