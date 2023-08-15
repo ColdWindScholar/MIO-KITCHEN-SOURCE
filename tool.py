@@ -78,7 +78,7 @@ def error(code, desc="未知错误"):
     else:
         er = win
     er.protocol("WM_DELETE_WINDOW", sys.exit)
-    er.title("启动错误")
+    er.title("错误")
     er.lift()
     er.resizable(False, False)
     jzxs(er)
