@@ -301,16 +301,3 @@ def main(file_arg):
                 rmrf(os.path.join(outpath, "out"))
                 print("DONE... files decrypted to: " + outzip)
                 return 0
-
-
-if __name__ == '__main__':
-    import sys, argparse
-
-    parser = argparse.ArgumentParser(description="ozipdecrypt 1.3 (c) B.Kerler 2017-2021", add_help=False)
-    required = parser.add_argument_group('Required')
-    required.add_argument("filename", help="Path to ozip file")
-    optional = parser.add_argument_group('Optional')
-    optional.add_argument("-h", "--help", action="help", help="Show this help message and exit")
-    args = parser.parse_args()
-
-    sys.exit(main(args.filename))
