@@ -19,8 +19,8 @@ def wsl2winpath(path):
             f, e = path[4:], ""
         else:
             f, e = path[5:].split("/", 1)
-        if not len(f) > 1:
-            return "".join([f.upper(), ":", e.replace("/", "\\")])
+        if len(f) == 1:
+            return "".join([f.upper(), ":\\", e.replace("/", "\\")])
         else:
             if path[:1] == "/":
                 path = path[1:].replace("/", "\\")
