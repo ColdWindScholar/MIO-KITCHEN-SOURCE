@@ -15,8 +15,8 @@ def wsl2winpath(path):
             path = path[1:].replace("/", "\\")
         return "\\wsl.localhost\\Ubuntu\\" + path
     else:
-        if not "/" in path[5:] and len(path) != 5:
-            f, e = path[4:], ""
+        if not "/" in path[5:]:
+            f, e = path[5:], ""
         else:
             f, e = path[5:].split("/", 1)
         if len(f) == 1:
