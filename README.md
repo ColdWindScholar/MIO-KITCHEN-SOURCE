@@ -33,5 +33,10 @@ pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
 ### Affggh https://github.com/affggh
 ***
 # About
-### Written by MIO-KITCHEN-TEAM
+### MIO-KITCHEN
+```
+Forever free, User first
+Good Tools,In here!
+Written by MIO-KITCHEN-TEAM
+```
 #### ColdWindScholar(3590361911@qq.com) All rights reserved.
