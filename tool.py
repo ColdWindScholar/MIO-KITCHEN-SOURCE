@@ -410,7 +410,6 @@ def mpkman() -> None:
         def __init__(self):
             super().__init__()
             jzxs(self)
-            self.resizable(False, False)
             self.title(lang.text115)
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
@@ -1001,7 +1000,6 @@ def mpkman() -> None:
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
     pls.bind("<<ListboxSelect>>", relf2)
     pls.bind("<Button-3>", popup)
-    manager.resizable(False, False)
     try:
         listpls()
     except:
