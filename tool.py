@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+try:
+    import load_window
+except ModuleNotFoundError:
+    pass
 import json
 import os.path
 import shlex
