@@ -386,7 +386,6 @@ def subp(com: int = 1, title: str = lang.text18, master: any = None):
     if com == 1:
         subpage = Toplevel()
         subpage.title(title)
-        subpage.resizable(False, False)
         jzxs(subpage)
         return subpage
     else:
