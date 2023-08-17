@@ -54,7 +54,11 @@ class askopenfilename(Toplevel):
                 self.show.insert(END, f)
 
     def return_var(self):
-        var = os.path.join(self.path.get(), self.show.get(self.show.curselection()))
+        try:
+            file = self.show.get(self.show.curselection())
+        except:
+            file = ""
+        var = os.path.join(self.path.get(), file)
         self.destroy()
         return var
 
@@ -105,7 +109,11 @@ class askdirectory(Toplevel):
                 self.show.insert(END, f)
 
     def return_var(self):
-        var = os.path.join(self.path.get(), self.show.get(self.show.curselection()))
+        try:
+            file = self.show.get(self.show.curselection())
+        except:
+            file = ""
+        var = os.path.join(self.path.get(), file)
         self.destroy()
         return var
 
