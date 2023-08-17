@@ -255,12 +255,11 @@ def findfolder(dir__, folder_name):
 class jzxs(object):
     def __init__(self, master):
         self.master = master
-        self.sf = self.master.after(20, self.set)
+        self.set()
 
     def set(self):
         self.master.geometry('+{}+{}'.format(int(self.master.winfo_screenwidth() / 2 - self.master.winfo_width() / 2),
                                              int(self.master.winfo_screenheight() / 2 - self.master.winfo_height() / 2)))
-        self.master.after_cancel(self.sf)
 
 
 class vbpatch:

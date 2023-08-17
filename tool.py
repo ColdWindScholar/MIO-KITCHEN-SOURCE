@@ -2625,10 +2625,10 @@ if os.name == "posix":
         print(lang.warn13)
 else:
     win.iconphoto(True, tk.PhotoImage(file="".join([elocal, os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
-jzxs(win)
 cz(get_time)
 if int(oobe) < 4:
     welcome()
 print(lang.text134 % (dti() - start))
 win.update()
+jzxs(win)
 win.mainloop(0)
