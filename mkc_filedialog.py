@@ -8,6 +8,10 @@ def askopenfilename(title="Chose File", filetypes=(("*", "*.*"),)):
     return askopenfilenames(title=title, filetypes=filetypes).file
 
 
+def askdirectory(title="Chose File"):
+    return askdirectorys(title=title).file
+
+
 class askopenfilenames(Toplevel):
     file = ""
 
@@ -74,6 +78,7 @@ class askopenfilenames(Toplevel):
 
 class askdirectorys(Toplevel):
     file = ""
+
     def __init__(self, title="Chose File"):
         super().__init__()
         self.title(title)
