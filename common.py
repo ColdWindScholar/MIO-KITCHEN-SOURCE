@@ -18,10 +18,10 @@ import copy
 import errno
 import getopt
 import getpass
-import imp
 import os
 import platform
 import re
+import importlib as imp
 import shlex
 import shutil
 import subprocess

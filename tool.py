@@ -1944,14 +1944,14 @@ class dirsize(object):
             with open(file, 'r') as f:
                 content = f.read()
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
-                content = re.sub("resize {} \d+".format(dname),
+                content = re.sub("resize {} \\d+".format(dname),
                                  "resize {} {}".format(dname, size), content)
-                content = re.sub("resize {}_a \d+".format(dname),
+                content = re.sub("resize {}_a \\d+".format(dname),
                                  "resize {}_a {}".format(dname, size), content)
-                content = re.sub("# Grow partition {} from 0 to \d+".format(dname),
+                content = re.sub("# Grow partition {} from 0 to \\d+".format(dname),
                                  "# Grow partition {} from 0 to {}".format(dname, size),
                                  content)
-                content = re.sub("# Grow partition {}_a from 0 to \d+".format(dname),
+                content = re.sub("# Grow partition {}_a from 0 to \\d+".format(dname),
                                  "# Grow partition {}_a from 0 to {}".format(dname, size), content)
                 ff.write(content)
 
