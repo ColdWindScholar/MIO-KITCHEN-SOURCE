@@ -99,7 +99,7 @@ class askdirectory(Toplevel):
         if not self.path.get():
             self.path.set("/")
         for f in os.listdir(self.path.get()):
-            if os.path.isdir(os.path.join(self.path.get(),f)):
+            if os.path.isdir(os.path.join(self.path.get(), f)):
                 self.show.insert(END, f)
 
     def return_var(self):
