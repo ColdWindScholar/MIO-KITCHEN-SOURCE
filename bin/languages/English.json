@@ -20,6 +20,7 @@
   "warn12": "Please enter", 
   "warn13": "Warning: You are using a normal user to run the tool, this may cause packet deciphering (hitting) abnormalities",
   "warn14": "Unsupported control：{}",
+  "warn15": "Unsupport System {}",
   "text1": "Writing:", 
   "text2": "Error writing {} :{}", 
   "text3": "Packaging {} succeeded!" , 

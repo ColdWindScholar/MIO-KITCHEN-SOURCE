@@ -16,6 +16,7 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+
 if os.name == 'nt':
     import windnd
     import win_extra as sys_extra
@@ -25,7 +26,12 @@ import zipfile
 from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
-from tkinter import filedialog, ttk, messagebox
+
+if os.name == "nt":
+    from tkinter import filedialog, ttk, messagebox
+else:
+    from tkinter import ttk, messagebox
+    import mkc_filedialog as filedialog
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -1060,6 +1066,13 @@ class installmpk(Toplevel):
             self.destroy()
             return True
         self.installb.config(state=DISABLED)
+        try:
+            supports = self.mconf.get('module', 'supports').split()
+        except:
+            supports = [sys.platform]
+        if sys.platform not in supports:
+            self.state['text'] = lang.warn15.format(sys.platform)
+            return False
         for dep in self.mconf.get('module', 'depend').split():
             if not os.path.isdir("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, dep])):
                 self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
