@@ -872,7 +872,7 @@ def create_parser():
         '-p',
         '--partition',
         dest='NAME',
-        type=lambda x: re.split("\w+", x),
+        type=lambda x: re.split("\\w+", x),
         help='Extract the named partition. This can be specified multiple times or through the delimiter [","  ":"]'
     )
     _parser.add_argument(
