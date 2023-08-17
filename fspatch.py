@@ -10,7 +10,7 @@ def scanfs(file) -> dict:
             filepath, *other = i.strip().split()
             filesystem_config[filepath] = other
             if long := len(other) > 4:
-                print(f"Warn:{i[0]} has too much data-{long}.")
+                print(f"[Warn] {i[0]} has too much data-{long}.")
     return filesystem_config
 
 
