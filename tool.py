@@ -27,7 +27,7 @@ from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 
-if os.name == "nt1":
+if os.name == "nt":
     from tkinter import filedialog, ttk, messagebox
 else:
     from tkinter import ttk, messagebox
