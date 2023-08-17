@@ -4,7 +4,13 @@ from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import *
 
 
-class askopenfilename(Toplevel):
+def askopenfilename(title="Chose File", filetypes=(("*", "*.*"),)):
+    return askopenfilenames(title=title, filetypes=filetypes).file
+
+
+class askopenfilenames(Toplevel):
+    file = ""
+
     def __init__(self, title="Chose File", filetypes=(("*", "*.*"),)):
         super().__init__()
         self.title(title)
@@ -59,15 +65,15 @@ class askopenfilename(Toplevel):
         except:
             file = ""
         var = os.path.join(self.path.get(), file)
+        self.file = var
         self.destroy()
-        return var
 
     def cancel(self):
         self.destroy()
-        return ""
 
 
-class askdirectory(Toplevel):
+class askdirectorys(Toplevel):
+    file = ""
     def __init__(self, title="Chose File"):
         super().__init__()
         self.title(title)
@@ -114,9 +120,8 @@ class askdirectory(Toplevel):
         except:
             file = ""
         var = os.path.join(self.path.get(), file)
+        self.file = var
         self.destroy()
-        return var
 
     def cancel(self):
         self.destroy()
-        return ""
