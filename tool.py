@@ -1179,45 +1179,60 @@ class packxx(object):
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get())
 
 
-def dbkxyt():
-    if not dn.get():
-        messpop(lang.warn1)
-        return
-    if os.path.exists((dir_ := rwork()) + "firmware-update"):
-        os.rename(dir_ + "firmware-update", dir_ + "images")
-    if not os.path.exists(dir_ + "images"):
-        os.makedirs(dir_ + 'images')
-    if os.path.exists(dir_ + 'META-INF'):
-        rmdir(dir_ + 'META-INF')
-    zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip").extractall(dir_)
-    if os.path.exists(dir_ + "super.img"):
-        if gettype(dir_ + "super.img") == "sparse":
-            print("[INFO] Super is (sparse), converting to (raw)")
-            call("img2simg {} {}".format(dir_ + "super.img", dir_ + "super.raw"))
-            if os.path.exists(dir_ + "super.raw"):
-                os.remove(dir_ + "super.img")
-                os.rename(dir_ + "super.raw", dir_ + "super.img")
-        try:
-            print("[Compress] Super.img...")
-            call("zstd -5 --rm {} -o {}".format(dir_ + "super.img", dir_ + 'images' + os.sep + "super.img.zst"))
-        except Exception as e:
-            print("[Fail] Compress Super.img Fail:{}".format(e))
-
-    with open(dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
-              'r+', encoding='utf-8', newline='\n') as script:
-        lines = script.readlines()
-        for t in os.listdir(dir_ + "images"):
-            if t.endswith('.img'):
-                lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
-        for t in os.listdir(dir_):
-            if os.path.isfile(dir_ + t) and t.endswith('.img'):
-                print("Add Flash method {} to update-binary".format(t))
-                move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
+class dbkxyt:
+    def __init__(self):
+        if not dn.get():
+            messpop(lang.warn1)
+            return
+        if os.path.exists((dir_ := rwork()) + "firmware-update"):
+            os.rename(dir_ + "firmware-update", dir_ + "images")
+        if not os.path.exists(dir_ + "images"):
+            os.makedirs(dir_ + 'images')
+        if os.path.exists(dir_ + 'META-INF'):
+            rmdir(dir_ + 'META-INF')
+        zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip").extractall(dir_)
+        with open(
+                dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
+                'r+', encoding='utf-8', newline='\n') as script:
+            lines = script.readlines()
+            for t in os.listdir(dir_ + "images"):
+                if t.endswith('.img'):
+                    print("Add Flash method {} to update-binary".format(t))
+                    if os.path.getsize(dir_ + t) > 209715200:
+                        self.zstd_compress(dir_ + "images" + t)
+                        lines.insert(44,
+                                     'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                    else:
+                        lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+            for t in os.listdir(dir_):
+                if os.path.isfile(dir_ + t) and t.endswith('.img'):
+                    print("Add Flash method {} to update-binary".format(t))
                 if not t.startswith("preloader_"):
-                    lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
-        script.seek(0)
-        script.truncate()
-        script.writelines(lines)
+                    if os.path.getsize(dir_ + t) > 209715200:
+                        self.zstd_compress(dir_ + t)
+                        move(os.path.join(dir_, t + ".zst"), os.path.join(dir_ + "images", t + ".zst"))
+                        lines.insert(44,
+                                     'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                    else:
+                        lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                        move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
+            script.seek(0)
+            script.truncate()
+            script.writelines(lines)
+
+    def zstd_compress(self, path):
+        if os.path.exists(path):
+            if gettype(path) == "sparse":
+                print(f"[INFO] {os.path.basename(path)} is (sparse), converting to (raw)")
+                call("simg2img {} {}".format(path, path + ".raw"))
+                if os.path.exists(path + ".raw"):
+                    os.remove(path)
+                    os.rename(path + ".raw", path)
+            try:
+                print(f"[Compress] {os.path.basename(path)}...")
+                call("zstd -5 --rm {} -o {}".format(path, path + ".zst"))
+            except Exception as e:
+                print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
 
 class packss:
@@ -2170,10 +2185,9 @@ def packzip():
     else:
         load_car(0)
         print(lang.text91 % dn.get())
-        if os.path.exists(rwork() + "super.img"):
+        if os.name == "nt":
             if ask_win(lang.t25) == 1:
-                if os.name == 'nt':
-                    dbkxyt()
+                dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get())
         car.set(1)
 
