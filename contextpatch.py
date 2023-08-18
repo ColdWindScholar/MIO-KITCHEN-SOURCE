@@ -56,7 +56,7 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
                         if os.path.dirname(i) in e:
                             permission = fs_file[e]
                             break
-            print(f"ADD [{i}:{permission}]")
+            print(f"ADD [{i} {permission}]")
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
     return new_fs
 
