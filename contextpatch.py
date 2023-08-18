@@ -13,7 +13,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
             filepath, *other = i.strip().replace('\\', '').split()
             context[filepath] = other
             if len(other) > 1:
-                print(f"Warn:{i[0]} has too much data.")
+                print(f"[Warn] {i[0]} has too much data.")
     return context
 
 
