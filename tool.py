@@ -1207,7 +1207,7 @@ class dbkxyt:
             for t in os.listdir(dir_):
                 if os.path.isfile(dir_ + t) and t.endswith('.img'):
                     print("Add Flash method {} to update-binary".format(t))
-                if not t.startswith("preloader_"):
+                if not t.startswith("preloader_") and t != "images":
                     if os.path.getsize(dir_ + t) > 209715200:
                         self.zstd_compress(dir_ + t)
                         move(os.path.join(dir_, t + ".zst"), os.path.join(dir_ + "images", t + ".zst"))
