@@ -674,16 +674,8 @@ def mpkman() -> None:
                     print("开始执行:%s" % os.path.basename(argv))
                     self.__init__(argv)
                     print("执行完成：%s" % os.path.basename(argv))
-            elif cmd_ == "show":
-                print("----------\nMSH解释器\n----------")
-                if argv == 'all':
-                    print('版本：1.0\n作者：米欧科技')
-                elif argv == 'version':
-                    print("版本：1.0")
-                elif argv == 'author':
-                    print("作者：米欧科技")
             else:
-                print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]\nmsh show [all,version,author]')
+                print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]')
 
         @staticmethod
         def exit(value):
