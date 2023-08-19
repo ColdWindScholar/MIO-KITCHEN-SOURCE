@@ -53,7 +53,9 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
                     permission = fix_permission[i]
                 else:
                     for e in fs_file.keys():
-                        if os.path.dirname(i) in e:
+                        if (path := os.path.dirname(i)) in e:
+                            if e == path:
+                                continue
                             permission = fs_file[e]
                             break
             print(f"ADD [{i} {permission}]")
