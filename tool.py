@@ -661,8 +661,7 @@ def mpkman() -> None:
                 except:
                     pass
 
-        @staticmethod
-        def msh(cmd):
+        def msh(self, cmd):
             try:
                 cmd_, argv = cmd.split()
             except Exception:
@@ -673,7 +672,7 @@ def mpkman() -> None:
                     return 1
                 else:
                     print("开始执行:%s" % os.path.basename(argv))
-                    msh_parse(argv)
+                    self.__init__(argv)
                     print("执行完成：%s" % os.path.basename(argv))
             elif cmd_ == "show":
                 print("----------\nMSH解释器\n----------")
