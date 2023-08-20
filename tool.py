@@ -764,6 +764,10 @@ def mpkman() -> None:
                 if height != 'none' and width != 'none':
                     self.geometry(f"{width}x{height}")
                 resizable = data['main']['info']['resize']
+                try:
+                    self.attributes('-topmost', 'true')
+                except:
+                    pass
                 if resizable == '1':
                     self.resizable(True, True)
                 else:
@@ -982,6 +986,10 @@ def mpkman() -> None:
                 messpop(lang.warn2)
 
     manager = Toplevel()
+    try:
+        manager.attributes('-topmost', 'true')
+    except:
+        pass
     manager.title(lang.text19)
     ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
