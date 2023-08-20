@@ -38,7 +38,7 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
     new_fs = {}
     permission_d = None
     try:
-        permission_d = fs_file.get(list(fs_file)[0])
+        permission_d = fs_file.get(list(fs_file)[5])
     except IndexError:
         pass
     if not permission_d:
@@ -57,6 +57,12 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
                             if e == path:
                                 continue
                             permission = fs_file[e]
+                            break
+                    for i_ in new_fs.keys():
+                        if (path := os.path.dirname(i)) in i_:
+                            if i_ == path:
+                                continue
+                            permission = fs_file[i_]
                             break
             print(f"ADD [{i} {permission}]")
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
