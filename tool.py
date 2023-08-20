@@ -929,6 +929,10 @@ def mpkman() -> None:
 
         def ask(self):
             self.ck = Toplevel()
+            try:
+                self.ck.attributes('-topmost', 'true')
+            except:
+                pass
             self.ck.title(lang.t6)
             jzxs(self.ck)
             ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
