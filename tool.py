@@ -472,19 +472,19 @@ def mpkman() -> None:
         if id_ is None:
             id_ = globals()[pls.get(pls.curselection())]
         path = "".join([moduledir, os.sep, id_, os.sep])
-        if not os.path.exists(path + "main.msh") and not os.path.exists(path+'main.sh'):
+        if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             if ask_win(lang.t18, 'SH', 'MSH') == 1:
                 s = "main.sh"
             else:
                 s = "main.msh"
-            with open(path+s, 'w+', encoding='utf-8', newline='\n') as sh:
+            with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
                 sh.write("echo MIO-KITCHEN")
-            editor.main(path+s)
+            editor.main(path + s)
         else:
             if os.path.exists(path + "main.msh"):
                 editor.main(path + "main.msh")
-            elif os.path.exists(path+'main.sh'):
-                editor.main(path+'main.sh')
+            elif os.path.exists(path + 'main.sh'):
+                editor.main(path + 'main.sh')
 
     def export():
         if not pls.curselection():
