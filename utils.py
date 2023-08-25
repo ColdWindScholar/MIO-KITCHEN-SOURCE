@@ -104,7 +104,7 @@ def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
     elif version == 4:
         print(show.format("Nougat 7.x / Oreo 8.x / Pie 9.x"))
     else:
-        print(f'Unknown Android version:{version}!\n')
+        print(f'Unknown Android version {version}!\n')
 
     # Don't clobber existing files to avoid accidental data loss
     try:

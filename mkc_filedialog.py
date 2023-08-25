@@ -1,7 +1,7 @@
 # File Chose Extra Module For MIO-KITCHEN
 import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
-from tkinter.ttk import *
+from tkinter.ttk import Button, Entry, Frame, Combobox
 
 
 def askopenfilename(title="Chose File", filetypes=(("*", "*.*"),)):

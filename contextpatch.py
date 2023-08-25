@@ -54,13 +54,13 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
                 else:
                     for e in fs_file.keys():
                         if (path := os.path.dirname(i)) in e:
-                            if e == path:
+                            if e == path and e[-1:] == '/':
                                 continue
                             permission = fs_file[e]
                             break
                     for i_ in new_fs.keys():
                         if (path := os.path.dirname(i)) in i_:
-                            if i_ == path:
+                            if i_ == path and i_[-1:] == '/':
                                 continue
                             permission = fs_file[i_]
                             break
