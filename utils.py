@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import struct
 from os.path import exists
-import sys, os, errno, tempfile
+import os, errno, tempfile
 import common, blockimgdiff, sparse_img
 from threading import Thread
 from random import randint, choice
