@@ -22,7 +22,7 @@ import multiprocessing
 import os
 import re
 import subprocess
-import tempfile
+from tempfile import mkstemp
 import threading
 from collections import deque, OrderedDict
 from hashlib import sha1
@@ -34,9 +34,9 @@ __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
 
 
 def compute_patch(src, tgt, imgdiff=False):
-    srcfd, srcfile = tempfile.mkstemp(prefix="src-")
-    tgtfd, tgtfile = tempfile.mkstemp(prefix="tgt-")
-    patchfd, patchfile = tempfile.mkstemp(prefix="patch-")
+    srcfd, srcfile = mkstemp(prefix="src-")
+    tgtfd, tgtfile = mkstemp(prefix="tgt-")
+    patchfd, patchfile = mkstemp(prefix="patch-")
     os.close(patchfd)
 
     try:
