@@ -26,11 +26,10 @@ import zipfile
 from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
-
+from tkinter import ttk, messagebox
 if os.name == "nt":
-    from tkinter import filedialog, ttk, messagebox
+    from tkinter import filedialog
 else:
-    from tkinter import ttk, messagebox
     import mkc_filedialog as filedialog
 from shutil import rmtree, copy, move
 import requests
