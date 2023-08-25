@@ -27,6 +27,7 @@ from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 from tkinter import ttk, messagebox
+
 if os.name == "nt":
     from tkinter import filedialog
 else:
@@ -470,20 +471,20 @@ def mpkman() -> None:
             return 1
         if id_ is None:
             id_ = globals()[pls.get(pls.curselection())]
-        if not os.path.exists("".join([moduledir, os.sep, id_, os.sep, "main.msh"])) and not os.path.exists(
-                "".join([moduledir, os.sep, id_, os.sep, "main.sh"])):
+        path = "".join([moduledir, os.sep, id_, os.sep])
+        if not os.path.exists(path + "main.msh") and not os.path.exists(path+'main.sh'):
             if ask_win(lang.t18, 'SH', 'MSH') == 1:
                 s = "main.sh"
             else:
                 s = "main.msh"
-            with open("".join([moduledir, os.sep, id_, os.sep, s]), 'w+', encoding='utf-8', newline='\n') as sh:
+            with open(path+s, 'w+', encoding='utf-8', newline='\n') as sh:
                 sh.write("echo MIO-KITCHEN")
-            editor.main("".join([moduledir, os.sep, id_, os.sep, s]))
+            editor.main(path+s)
         else:
-            if os.path.exists("".join([moduledir, os.sep, id_, os.sep, "main.msh"])):
-                editor.main(moduledir + os.sep + id_ + os.sep + "main.msh")
-            elif os.path.exists(moduledir + os.sep + id_ + os.sep + "main.sh"):
-                editor.main(moduledir + os.sep + id_ + os.sep + "main.sh")
+            if os.path.exists(path + "main.msh"):
+                editor.main(path + "main.msh")
+            elif os.path.exists(path+'main.sh'):
+                editor.main(path+'main.sh')
 
     def export():
         if not pls.curselection():
@@ -1198,7 +1199,7 @@ class dbkxyt:
                 'r+', encoding='utf-8', newline='\n') as script:
             lines = script.readlines()
             for t in os.listdir(dir_ + "images"):
-                if t.endswith('.img') and not os.path.isdir(dir_+t):
+                if t.endswith('.img') and not os.path.isdir(dir_ + t):
                     print("Add Flash method {} to update-binary".format(t))
                     if os.path.getsize(dir_ + t) > 209715200:
                         self.zstd_compress(dir_ + "images" + t)
@@ -1207,7 +1208,7 @@ class dbkxyt:
                     else:
                         lines.insert(44, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
             for t in os.listdir(dir_):
-                if not t.startswith("preloader_") and not os.path.isdir(dir_+t) and t.endswith('.img'):
+                if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
                     print("Add Flash method {} to update-binary".format(t))
                     if os.path.getsize(dir_ + t) > 209715200:
                         self.zstd_compress(dir_ + t)
