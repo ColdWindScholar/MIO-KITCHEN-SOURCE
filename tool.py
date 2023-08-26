@@ -16,6 +16,7 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+import tempfile
 
 if os.name == 'nt':
     import windnd
@@ -47,6 +48,7 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
+import yaml
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -400,6 +402,24 @@ def subp(com: int = 1, title: str = lang.text18, master: any = None):
         return subpage
     else:
         master.destroy()
+
+
+class Process(Toplevel):
+    def __init__(self, mps):
+        super().__init__()
+        self.prc = None
+        self.dir = tempfile.TemporaryDirectory()
+        self.mps = mps
+        win.withdraw()
+        self.title("Preparing...")
+
+    def prepare(self):
+        zipfile.ZipFile(self.mps).extractall(self.dir.name)
+        with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
+            self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
+
+    def run(self):
+        pass
 
 
 def mpkman() -> None:
@@ -2165,9 +2185,11 @@ def set_language(self):
 
 
 class zip_file(object):
-    def __init__(self, file, dst_dir):
+    def __init__(self, file, dst_dir, path=None):
+        if not path:
+            path = local + os.sep
         os.chdir(dst_dir)
-        with zipfile.ZipFile(relpath := local + os.sep + file, 'w', compression=zipfile.ZIP_DEFLATED,
+        with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED,
                              allowZip64=True) as zip_:
             # 遍历写入文件
             for file in get_all_file_paths('.'):

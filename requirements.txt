@@ -7,3 +7,4 @@ sv_ttk
 windnd
 pyinstaller
 lark
+pyyaml
