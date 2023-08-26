@@ -412,16 +412,19 @@ class Process(Toplevel):
         self.mps = mps
         self.gavs = {}
         self.value = []
+        self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
         try:
             win.withdraw()
         finally:
             pass
-        self.notice = Label(self, text='Preparing...')
-        self.notice.pack()
+        self.notice = Label(self, text='Preparing...', font=(None, 15))
+        self.notice.pack(padx=10, pady=10)
         self.title("Preparing...")
-        self.start = ttk.Button(self, text='Preparing', state='disabled')
+        self.start = ttk.Button(self, text='Preparing', state='disabled', command=self.run)
         self.start.pack(side=BOTTOM, padx=30, pady=30)
+        self.progbar = ttk.Progressbar(self, orient=HORIZONTAL, length=200, mode='indeterminate')
+        self.progbar.pack(side=TOP, fill=X)
         self.prepare()
 
     def prepare(self):
@@ -429,14 +432,63 @@ class Process(Toplevel):
         with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
-        if self.prc['support']['system'] != sys.platform:
-            self.notice.configure(text="未满足系统要求")
-        if self.prc['support']['version'] != VERSION:
-            self.notice.configure(text="未满足版本要求")
+        if "system" in self.prc['support']:
+            if self.prc['support']['system'] != sys.platform:
+                self.notice.configure(text="未满足系统要求", fg='red')
+                self.able = False
+        if "version" in self.prc['support']:
+            if self.prc['support']['version'] != VERSION:
+                self.notice.configure(text="未满足版本要求", fg='red')
+                self.able = False
         self.start.configure(state='normal')
+        if not self.able:
+            self.start.configure(text="退出")
+        else:
+            self.controls()
+            self.notice.configure(text="准备就绪", fg='green')
+            self.start.configure(text="运行")
 
     def controls(self):
-        pass
+        for key in self.prc['inputs']:
+            con = self.prc['inputs'][key]
+            self.value.append(key)
+            if con["type"] == "radio":
+                radio_var_name = key
+                self.gavs[radio_var_name] = StringVar()
+                options = con['opins'].split()
+                if 'text' in con:
+                    pft1 = ttk.LabelFrame(self, text=con['text'])
+                else:
+                    pft1 = ttk.Frame(self)
+                pft1.pack(padx=10, pady=10)
+                for option in options:
+                    text, value = option.split('|')
+                    self.gavs[radio_var_name].set(value)
+                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
+                                    value=value).pack(side=LEFT, padx=5, pady=5)
+            elif con["type"] in ['entry', 'Entry']:
+                input_frame = Frame(self)
+                input_frame.pack(padx=10, pady=10)
+                input_var_name = key
+                self.gavs[input_var_name] = StringVar()
+                if 'text' in con:
+                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
+                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
+                                                                                    padx=5,
+                                                                                    fill=X)
+            elif con['type'] == 'checkbutton':
+                b_var_name = key
+                self.gavs[b_var_name] = IntVar()
+                if not 'text' in con:
+                    text = 'M.K.C'
+                else:
+                    text = con['text']
+                ttk.Checkbutton(self, text=text, variable=self.gavs[b_var_name], onvalue=1,
+                                offvalue=0,
+                                style="Switch.TCheckbutton").pack(
+                    padx=5, pady=5, fill=BOTH)
+            else:
+                print(lang.warn14.format(con['type']))
 
     def run(self):
         pass
