@@ -425,7 +425,7 @@ class Process(Toplevel):
         self.notice = Label(self, text='Preparing...', font=(None, 15))
         self.notice.pack(padx=10, pady=10)
         self.title("Preparing...")
-        self.start = ttk.Button(self, text='Preparing', state='disabled', command=self.run)
+        self.start = ttk.Button(self, text='Preparing', state='disabled', command=lambda: cz(self.run))
         self.start.pack(side=BOTTOM, padx=30, pady=30)
         self.progbar = ttk.Progressbar(self, orient=HORIZONTAL, length=200, mode='indeterminate')
         self.progbar.pack(side=TOP, fill=X)
@@ -500,15 +500,22 @@ class Process(Toplevel):
     def run(self):
         if not self.able:
             self.exit()
+            return
         for c in self.control:
             c.destroy()
         process = Text(self)
         process.pack(fill=BOTH)
         sys.stdout = StdoutRedirector(process)
         sys.stderr = StdoutRedirector(process)
+        self.start.configure(text="正在运行", state='disabled')
         with open(engine := self.dir.name + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
-                en.write(f"export {u}={self.gavs[u]}\n")
+                try:
+                    var = self.gavs[u].get()
+                except:
+                    var = self.gavs[u]
+                en.write(f"export {u}={var}\n")
+            en.write("source $1")
         self.progbar.start()
         for step in self.prc['steps']:
             self.notice.configure(text=step['name'])
@@ -522,6 +529,9 @@ class Process(Toplevel):
                 call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
             else:
                 print(f"Unsupport {step}")
+        self.progbar.stop()
+        self.able = False
+        self.start.configure(text="退出", state='normal')
 
     def exit(self):
         sys.stdout = StdoutRedirector(show)
