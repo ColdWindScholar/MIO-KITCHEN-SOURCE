@@ -528,7 +528,7 @@ class Process(Toplevel):
                     sh = "bash"
                 call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
             else:
-                print(f"Unsupport {step}")
+                print(f"Unsupported {step}")
         self.progbar.stop()
         self.able = False
         self.start.configure(text="退出", state='normal')
