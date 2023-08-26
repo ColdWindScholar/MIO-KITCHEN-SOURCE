@@ -412,6 +412,7 @@ class Process(Toplevel):
         self.mps = mps
         self.gavs = {}
         self.value = []
+        self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
         try:
@@ -460,6 +461,7 @@ class Process(Toplevel):
                     pft1 = ttk.LabelFrame(self, text=con['text'])
                 else:
                     pft1 = ttk.Frame(self)
+                self.control.append(pft1)
                 pft1.pack(padx=10, pady=10)
                 for option in options:
                     text, value = option.split('|')
@@ -469,6 +471,7 @@ class Process(Toplevel):
             elif con["type"] in ['entry', 'Entry']:
                 input_frame = Frame(self)
                 input_frame.pack(padx=10, pady=10)
+                self.control.append(input_frame)
                 input_var_name = key
                 self.gavs[input_var_name] = StringVar()
                 if 'text' in con:
@@ -483,15 +486,17 @@ class Process(Toplevel):
                     text = 'M.K.C'
                 else:
                     text = con['text']
-                ttk.Checkbutton(self, text=text, variable=self.gavs[b_var_name], onvalue=1,
-                                offvalue=0,
-                                style="Switch.TCheckbutton").pack(
+                self.control.append(cb := ttk.Checkbutton(self, text=text, variable=self.gavs[b_var_name], onvalue=1,
+                                                          offvalue=0,
+                                                          style="Switch.TCheckbutton"))
+                cb.pack(
                     padx=5, pady=5, fill=BOTH)
             else:
                 print(lang.warn14.format(con['type']))
 
     def run(self):
-        pass
+        if not self.able:
+            self.exit()
 
     def exit(self):
         self.dir.cleanup()
