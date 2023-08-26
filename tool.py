@@ -410,8 +410,13 @@ class Process(Toplevel):
         self.prc = None
         self.dir = tempfile.TemporaryDirectory()
         self.mps = mps
-        win.withdraw()
+        self.protocol("WM_DELETE_WINDOW", self.exit)
+        try:
+            win.withdraw()
+        finally:
+            pass
         self.title("Preparing...")
+        self.prepare()
 
     def prepare(self):
         zipfile.ZipFile(self.mps).extractall(self.dir.name)
@@ -2253,6 +2258,8 @@ def dndfile(files):
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
                 installmpk(fi)
+            elif os.path.basename(fi).endswith(".mps"):
+                Process(fi)
             else:
                 cz(unpackrom, fi)
         else:
