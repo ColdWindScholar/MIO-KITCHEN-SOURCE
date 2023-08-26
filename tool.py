@@ -502,6 +502,10 @@ class Process(Toplevel):
             self.exit()
         for c in self.control:
             c.destroy()
+        process = Text(self)
+        process.pack(fill=BOTH)
+        sys.stdout = StdoutRedirector(process)
+        sys.stderr = StdoutRedirector(process)
         with open(engine := self.dir.name + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
                 en.write(f"export {u}={self.gavs[u]}\n")
@@ -520,6 +524,8 @@ class Process(Toplevel):
                 print(f"Unsupport {step}")
 
     def exit(self):
+        sys.stdout = StdoutRedirector(show)
+        sys.stderr = StdoutRedirector(show)
         self.dir.cleanup()
         self.destroy()
         win.deiconify()
