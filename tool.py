@@ -417,9 +417,14 @@ class Process(Toplevel):
         zipfile.ZipFile(self.mps).extractall(self.dir.name)
         with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
+        self.title(self.prc['name'])
 
     def run(self):
         pass
+
+    def exit(self):
+        self.destroy()
+        win.deiconify()
 
 
 def mpkman() -> None:
