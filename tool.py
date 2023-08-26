@@ -410,8 +410,11 @@ class Process(Toplevel):
         self.prc = None
         self.dir = tempfile.TemporaryDirectory()
         self.mps = mps
-        self.gavs = {}
-        self.value = []
+        self.gavs = {
+                     'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
+                         '\\',
+                         '/')}
+        self.value = ['tool_bin']
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
@@ -497,6 +500,14 @@ class Process(Toplevel):
     def run(self):
         if not self.able:
             self.exit()
+        for c in self.control:
+            c.destroy()
+        with open(engine := self.dir.name + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
+            for u in self.value:
+                en.write(f"export {u}={self.gavs[u]}\n")
+        self.progbar.start()
+        for step in self.prc['steps']:
+            self.notice.configure(text=step['name'])
 
     def exit(self):
         self.dir.cleanup()
