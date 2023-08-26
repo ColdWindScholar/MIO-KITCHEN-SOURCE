@@ -411,9 +411,9 @@ class Process(Toplevel):
         self.dir = tempfile.TemporaryDirectory()
         self.mps = mps
         self.gavs = {
-                     'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
-                         '\\',
-                         '/')}
+            'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
+                '\\',
+                '/')}
         self.value = ['tool_bin']
         self.control = []
         self.able = True
@@ -508,6 +508,16 @@ class Process(Toplevel):
         self.progbar.start()
         for step in self.prc['steps']:
             self.notice.configure(text=step['name'])
+            if 'run' in step:
+                with open(sh_tmp_file := self.dir.name + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
+                    sh_tmp.writelines(step['run'])
+                if os.name == 'posix':
+                    sh = "ash"
+                else:
+                    sh = "bash"
+                call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
+            else:
+                print(f"Unsupport {step}")
 
     def exit(self):
         self.dir.cleanup()
