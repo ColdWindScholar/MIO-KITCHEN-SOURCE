@@ -410,12 +410,18 @@ class Process(Toplevel):
         self.prc = None
         self.dir = tempfile.TemporaryDirectory()
         self.mps = mps
+        self.gavs = {}
+        self.value = []
         self.protocol("WM_DELETE_WINDOW", self.exit)
         try:
             win.withdraw()
         finally:
             pass
+        self.notice = Label(self, text='Preparing...')
+        self.notice.pack()
         self.title("Preparing...")
+        self.start = ttk.Button(self, text='Preparing', state='disabled')
+        self.start.pack(side=BOTTOM, padx=30, pady=30)
         self.prepare()
 
     def prepare(self):
@@ -423,11 +429,20 @@ class Process(Toplevel):
         with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
+        if self.prc['support']['system'] != sys.platform:
+            self.notice.configure(text="未满足系统要求")
+        if self.prc['support']['version'] != VERSION:
+            self.notice.configure(text="未满足版本要求")
+        self.start.configure(state='normal')
+
+    def controls(self):
+        pass
 
     def run(self):
         pass
 
     def exit(self):
+        self.dir.cleanup()
         self.destroy()
         win.deiconify()
 
