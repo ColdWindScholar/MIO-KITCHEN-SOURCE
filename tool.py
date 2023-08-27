@@ -410,6 +410,8 @@ class Process(Toplevel):
         self.prc = None
         self.dir = tempfile.TemporaryDirectory()
         self.mps = mps
+        self.in_process = False
+        self.error = 1
         self.gavs = {
             'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
                 '\\',
@@ -433,15 +435,16 @@ class Process(Toplevel):
 
     def prepare(self):
         zipfile.ZipFile(self.mps).extractall(self.dir.name)
+        jzxs(self)
         with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
         if "system" in self.prc['support']:
-            if self.prc['support']['system'] != sys.platform:
+            if sys.platform not in self.prc['support']['system']:
                 self.notice.configure(text="未满足系统要求", fg='red')
                 self.able = False
         if "version" in self.prc['support']:
-            if self.prc['support']['version'] != VERSION:
+            if VERSION not in self.prc['support']['version']:
                 self.notice.configure(text="未满足版本要求", fg='red')
                 self.able = False
         self.start.configure(state='normal')
@@ -503,6 +506,7 @@ class Process(Toplevel):
             return
         for c in self.control:
             c.destroy()
+        self.in_process = True
         process = Text(self)
         process.pack(fill=BOTH)
         sys.stdout = StdoutRedirector(process)
@@ -526,14 +530,22 @@ class Process(Toplevel):
                     sh = "ash"
                 else:
                     sh = "bash"
-                call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
+                self.error = call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
+            elif "use" in step:
+                self.use(step)
             else:
                 print(f"Unsupported {step}")
         self.progbar.stop()
         self.able = False
+        self.in_process = False
         self.start.configure(text="退出", state='normal')
 
+    def use(self, step):
+        pass
+
     def exit(self):
+        if self.in_process:
+            return
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
         self.dir.cleanup()
