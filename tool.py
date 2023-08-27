@@ -413,10 +413,11 @@ class Process(Toplevel):
         self.in_process = False
         self.error = 1
         self.gavs = {
+            'bin': self.dir.name,
             'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
                 '\\',
                 '/')}
-        self.value = ['tool_bin']
+        self.value = ['tool_bin', 'bin']
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
@@ -436,6 +437,7 @@ class Process(Toplevel):
     def prepare(self):
         zipfile.ZipFile(self.mps).extractall(self.dir.name)
         jzxs(self)
+        os.chdir(self.dir.name)
         with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
@@ -541,13 +543,54 @@ class Process(Toplevel):
         self.start.configure(text="退出", state='normal')
 
     def use(self, step):
-        pass
+        def download(url):
+            start_time = time.time()
+            try:
+                response = requests.Session().head(url)
+                file_size = int(response.headers.get("Content-Length", 0))
+                response = requests.Session().get(url, stream=True, verify=False)
+                with open(self.dir.name + os.sep + os.path.basename(url), "wb") as f:
+                    chunk_size = 2048576
+                    bytes_downloaded = 0
+                    for data in response.iter_content(chunk_size=chunk_size):
+                        f.write(data)
+                        bytes_downloaded += len(data)
+                        elapsed = time.time() - start_time
+                        speed = bytes_downloaded / (1024 * elapsed)
+                        percentage = int(bytes_downloaded * 100 / file_size)
+                        print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
+            except:
+                self.error = 0
+                pass
+            else:
+                self.error = 1
+
+        def unzip(file, folder):
+            print(f"Unzipping {file}...")
+            with zipfile.ZipFile(file) as zip_:
+                for file_ in zip_.namelist():
+                    try:
+                        file = str(file_).encode('cp437').decode('gbk')
+                    except:
+                        file = str(file_).encode('utf-8').decode('utf-8')
+                    print(lang.text38.format(file_))
+                    zip_.extract(file, folder)
+
+        actions = {
+            'download': lambda url: download(url['url']),
+            'unzip': lambda cmd: unzip(cmd['src'], cmd['dst']),
+            'unpack': lambda cmd: print(cmd),
+            'pack': lambda cmd: print(cmd),
+            'pack_super': lambda cmd: print(cmd)
+        }
+        actions[step['use']](step)
 
     def exit(self):
         if self.in_process:
             return
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
+        os.chdir(elocal)
         self.dir.cleanup()
         self.destroy()
         win.deiconify()
