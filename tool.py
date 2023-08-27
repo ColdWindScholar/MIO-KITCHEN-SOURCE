@@ -578,7 +578,7 @@ class Process(Toplevel):
 
         actions = {
             'download': lambda url: download(url['url']),
-            'unzip': lambda cmd: unzip(cmd['src'], cmd['dst']),
+            'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst'])),
             'unpack': lambda cmd: print(cmd),
             'pack': lambda cmd: print(cmd),
             'pack_super': lambda cmd: print(cmd)
