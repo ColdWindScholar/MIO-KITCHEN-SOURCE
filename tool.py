@@ -412,6 +412,9 @@ class Process(Toplevel):
         self.mps = mps
         self.in_process = False
         self.error = 1
+        global local
+        local = os.path.dirname(self.dir.name)
+        dn.set(os.path.basename(self.dir.name))
         self.gavs = {
             'bin': self.dir.name,
             'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
@@ -534,7 +537,13 @@ class Process(Toplevel):
                     sh = "bash"
                 self.error = call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
             elif "use" in step:
-                self.use(step)
+                try:
+                    self.use(step)
+                except Exception as e:
+                    print(e)
+                    self.error = 0
+                    self.stop()
+                    break
             else:
                 print(f"Unsupported {step}")
         self.progbar.stop()
@@ -576,20 +585,50 @@ class Process(Toplevel):
                     print(lang.text38.format(file_))
                     zip_.extract(file, folder)
 
+        def pack_super(type, dbfz, size, lb, sparse):
+            if type == 'A':
+                set_ = 1
+            elif type == 'VAB':
+                set_ = 2
+            elif type == 'AB':
+                set_ = 3
+            if sparse == "True":
+                sparse = True
+            else:
+                sparse = False
+            (supers := IntVar()).set(int(size))
+            (ssparse := IntVar()).set(int(sparse))
+            (supersz := IntVar()).set(int(set_))
+            (sdbfz := StringVar()).set(dbfz)
+            c = packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb, return_cmd=1)
+            call(c)
+
         actions = {
             'download': lambda url: download(url['url']),
             'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst'])),
             'unpack': lambda cmd: print(cmd),
             'pack': lambda cmd: print(cmd),
-            'pack_super': lambda cmd: print(cmd)
+            'pack_super': lambda cmd: pack_super(cmd['type'], cmd['cluster_name'], cmd['size'],
+                                                 cmd['partition'].split(), cmd['sparse'])
         }
         actions[step['use']](step)
+
+    def stop(self):
+        self.in_process = False
+        self.able = False
+        self.progbar.stop()
+        self.notice.configure(text="错误！", fg='red')
+        self.start.configure(text="退出", state='normal')
 
     def exit(self):
         if self.in_process:
             return
+        loadset()
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
+        global local
+        local = slocal.get()
+        listdir()
         os.chdir(elocal)
         self.dir.cleanup()
         self.destroy()
@@ -1500,11 +1539,12 @@ class packss:
                                                                                       expand=True)
 
 
-def packsuper(sparse, dbfz, size, set_, lb, del_=0):
+def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     if not dn.get():
         messpop(lang.warn1)
         return False
-    load_car(0)
+    if return_cmd == 0:
+        load_car(0)
     work = rwork()
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
@@ -1525,6 +1565,8 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0):
     if sparse.get() == 1:
         command += "--sparse "
     command += " --out %s" % (work + "super.img")
+    if return_cmd == 1:
+        return command
     call(command)
     if os.access(work + "super.img", os.F_OK):
         print(lang.text59 % (work + "super.img"))
@@ -1537,7 +1579,8 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0):
                         pass
     else:
         messpop(lang.warn10)
-    car.set(1)
+    if return_cmd == 0:
+        car.set(1)
 
 
 class StdoutRedirector(object):
