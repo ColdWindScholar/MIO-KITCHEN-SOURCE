@@ -3,13 +3,12 @@ from __future__ import print_function
 import struct
 from os.path import exists
 import os, errno, tempfile
-import common, blockimgdiff, sparse_img
+import common
+import blockimgdiff, sparse_img
 from threading import Thread
 from random import randint, choice
-from sefcontext_parser import main as sef_parse
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-import zipfile
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
