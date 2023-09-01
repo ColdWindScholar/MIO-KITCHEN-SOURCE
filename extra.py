@@ -12,8 +12,8 @@ if osname == 'nt':
 
 def clink(link: str, target: str):
     with open(link, 'wb') as f:
-        f.write(b'!<symlink>')
-        f.write(target.encode('utf-16'))
+        f.write(
+            b"!<symlink>" + target.encode('utf-16') + b'\0\0')
     if osname == 'nt':
         from ctypes.wintypes import LPCSTR
         from ctypes.wintypes import DWORD
