@@ -1427,11 +1427,13 @@ class dbkxyt:
         if os.path.exists(dir_ + 'META-INF'):
             rmdir(dir_ + 'META-INF')
         zipfile.ZipFile(elocal + os.sep + "bin" + os.sep + "extra_flash.zip").extractall(dir_)
+        right_device = input_(lang.t26, 'olive')
+        with open(dir_ + "bin" + os.sep + "right_device", 'w', encoding='gbk') as rd:
+            rd.write(right_device + "\n")
         with open(
                 dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
                 'r+', encoding='utf-8', newline='\n') as script:
             lines = script.readlines()
-            right_device = input_("请输入机型代号", 'olive')
             lines.insert(45, f'right_device="{right_device}"\n')
             for t in os.listdir(dir_ + "images"):
                 if t.endswith('.img') and not os.path.isdir(dir_ + t):
