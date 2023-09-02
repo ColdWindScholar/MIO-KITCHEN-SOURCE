@@ -1653,7 +1653,6 @@ def download_file():
                 progressbar["value"] = percentage
                 jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
                 progressbar.update()
-        progressbar["value"] = 0
         print(lang.text65.format(os.path.basename(url), str(elapsed)))
         down.destroy()
         if var1.get() == 1:
