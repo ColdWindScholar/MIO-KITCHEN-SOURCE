@@ -15,7 +15,7 @@ import contextpatch
 import extra
 import utils
 from extra import *
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img, bootutil
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 import tempfile
 
 if os.name == 'nt':
