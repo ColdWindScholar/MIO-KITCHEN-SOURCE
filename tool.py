@@ -2572,16 +2572,19 @@ class unpackg(object):
                                                                    0):
                             self.lsg.insert(END, i.partition_name)
 
+    def rt_info(self):
+        if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
+            with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
+                return json.loads(fff.read())
+        else:
+            return {}
+
     def refs2(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
             messpop(lang.warn1)
             return False
-        if os.path.exists(work + "config" + os.sep + "parts_info"):
-            with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
-                parts_dict = json.loads(fff.read())
-        else:
-            parts_dict = {}
+        parts_dict = self.rt_info()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(END, folder)
