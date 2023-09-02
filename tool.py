@@ -15,7 +15,7 @@ import contextpatch
 import extra
 import utils
 from extra import *
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img, bootutil
 import tempfile
 
 if os.name == 'nt':
@@ -1732,7 +1732,6 @@ def dboot(nm: str = 'boot'):
     work = rwork()
     flag = ''
     boot = findfile(f"{nm}.img", work)
-    load_car(0)
     if not os.path.exists(work + f"{nm}"):
         print(f"Cannot Find {nm}...")
         car.set(1)
@@ -1753,15 +1752,18 @@ def dboot(nm: str = 'boot'):
         comp = compf.read()
     print("Compressing:%s" % comp)
     if comp != "unknow":
-        if call("magiskboot compress=%s ramdisk-new.cpio") != 0:
+        if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
             print("Pack Ramdisk Fail...")
             os.remove("ramdisk-new.cpio")
             car.set(1)
             return
         else:
             print("Pack Ramdisk Successful..")
-            os.remove("ramdisk.cpio")
-            os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+            try:
+                os.remove("ramdisk.cpio")
+            except:
+                pass
+            os.rename("ramdisk-new.cpio.%s" % comp, "ramdisk.cpio")
     else:
         print("Pack Ramdisk Successful..")
         os.remove("ramdisk.cpio")
@@ -1776,10 +1778,11 @@ def dboot(nm: str = 'boot'):
         os.remove(work + f"{nm}.img")
         os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + f"{nm}.img")
         os.chdir(elocal)
-        if rmdir((work + nm)) != 0:
+        try:
+            rmdir((work + f"{nm}"), up=1)
+        except:
             print(lang.warn11.format(nm))
         print("Pack Successful...")
-        car.set(1)
 
 
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
