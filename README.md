@@ -13,9 +13,10 @@ The Rom Tool Use python language
 * Graphical parsing of plugins supports plugin editing, plugin installation, plugin export
 * Quick updates, secure and stable
 * Unique MSH interpreter that supports running MSH scripts
-* Support installation of ROMs below 8 and packaging as IMG
+* Support installation of ROMs below Android 8 and packaging as IMG
+* Use mkc file chose api On Linux,make use easily
 ***
-# Usage
+# Start To Use
 ``` python
 pip install -r requirements.txt
 python tool.py
