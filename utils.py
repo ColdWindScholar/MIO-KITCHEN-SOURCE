@@ -9,7 +9,6 @@ from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-from bootimg import unpack_bootimg, repack_bootimg
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
