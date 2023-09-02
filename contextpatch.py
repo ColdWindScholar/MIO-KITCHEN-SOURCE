@@ -36,6 +36,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
 
 def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
     new_fs = {}
+    r_new_fs = {}
     permission_d = None
     try:
         permission_d = fs_file.get(list(fs_file)[5])
@@ -52,20 +53,23 @@ def context_patch(fs_file, filename) -> dict:  # 接收两个字典对比
                 if i in fix_permission.keys():
                     permission = fix_permission[i]
                 else:
+                    d_arg = True
                     for e in fs_file.keys():
                         if (path := os.path.dirname(i)) in e:
                             if e == path and e[-1:] == '/':
                                 continue
                             permission = fs_file[e]
+                            d_arg = False
                             break
-                    if not permission:
-                        for i_ in new_fs.keys():
-                            if (path := sub(r'([^-_/a-zA-Z0-9])', r'\\\1', os.path.dirname(i))) in i_:
+                    if d_arg:
+                        for i_ in r_new_fs.keys():
+                            if (path := os.path.dirname(i)) in i_:
                                 if i_ == path and i_[-1:] == '/':
                                     continue
-                                permission = new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)]
+                                permission = r_new_fs[i]
                                 break
             print(f"ADD [{i} {permission}]")
+            r_new_fs[i] = permission
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
     return new_fs
 
