@@ -1877,8 +1877,6 @@ def rdi(work, dname) -> any:
         print(lang.text72 % dname)
         try:
             rmdir(work + dname, 1)
-            if os.access(work + "config" + os.sep + "%s_erofs", os.F_OK):
-                os.remove(work + "config" + os.sep + "%s_erofs" % dname)
             if os.access(work + "config" + os.sep + "%s_size.txt" % dname, os.F_OK):
                 os.remove(work + "config" + os.sep + "%s_size.txt" % dname)
             os.remove(work + "config" + os.sep + "%s_file_contexts" % dname)
