@@ -184,6 +184,26 @@ def gettype(file) -> str:
     return "unknow"
 
 
+def dynamic_list_reader(path):
+    data = {}
+    with open(path, 'r', encoding='utf-8') as l_f:
+        for p in l_f.readlines():
+            if p[:1] == '#':
+                continue
+            tmp = p.strip().split()
+            if tmp[0] == 'remove_all_groups':
+                data.clear()
+            elif tmp[0] == 'add_group':
+                data[tmp[1]] = {}
+                data[tmp[1]]['size'] = tmp[2]
+                data[tmp[1]]['parts'] = []
+            elif tmp[0] == 'add':
+                data[tmp[2]]['parts'].append(tmp[1])
+            else:
+                print(f"Skip {tmp}")
+    return data
+
+
 def v_code(num=6) -> str:
     ret = ""
     for i in range(num):

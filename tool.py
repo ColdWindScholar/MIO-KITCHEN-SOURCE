@@ -1512,6 +1512,24 @@ class packss:
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
 
+        def read_list():
+            if os.path.exists(work + "dynamic_partitions_op_list"):
+                try:
+                    data = utils.dynamic_list_reader(work + "dynamic_partitions_op_list")
+                except:
+                    return
+                if len(data) > 1:
+                    fir, sec = data
+                    if fir[:-2] == sec[:-2]:
+                        sdbfz.set(fir[:-2])
+                        supersz.set(2)
+                        supers.set(int(data[fir]['size']))
+                else:
+                    dbfz, = data
+                    sdbfz.set(dbfz)
+                    supers.set(int(data[dbfz]['size']))
+                    supersz.set(1)
+
         def versize():
             size = 0
             for i in [tl.get(index) for index in tl.curselection()]:
@@ -1541,6 +1559,7 @@ class packss:
         ttk.Button(ck, text=lang.cancel, command=lambda: subp(com=0, master=ck)).pack(side='left', padx=10, pady=10,
                                                                                       fill=X,
                                                                                       expand=True)
+        read_list()
 
 
 def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
