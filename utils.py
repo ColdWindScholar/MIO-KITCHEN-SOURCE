@@ -171,9 +171,11 @@ def gettype(file) -> str:
                 return False
             buf += bytearray(file_.read(4))
         return buf[1:] == b'\x67\x44\x6c\x61'
-
-    if is_super(file):
-        return "super"
+    try:
+        if is_super(file):
+            return 'super'
+    except IndexError:
+        pass
     for f_ in formats:
         if len(f_) == 2:
             if compare(f_[0]):
