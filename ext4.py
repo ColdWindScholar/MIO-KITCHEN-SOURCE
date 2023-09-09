@@ -151,7 +151,8 @@ class ext4_group_descriptor(ext4_struct):
 
 
 class ext4_inode(ext4_struct):
-    EXT2_GOOD_OLD_INODE_SIZE = 128  # Every field passing 128 bytes is "additional data", whose size is specified by i_extra_isize.
+    EXT2_GOOD_OLD_INODE_SIZE = 128
+    # Every field passing 128 bytes is "additional data", whose size is specified by i_extra_isize.
 
     # i_mode
     S_IXOTH = 0x1  # Others can execute
