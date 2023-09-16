@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    needs: [build-win,build-linux]
+    needs: [build-win,build-linux,build-linux-aarch64]
     runs-on: windows-latest
     strategy:
       matrix:
@@ -40,6 +40,10 @@ jobs:
           ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux.zip
           cd ..
+          cd MIO-KITCHEN-linux-aarch64
+          ls
+          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux-aarch64.zip
+          cd ..
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
       - name: Upload release
@@ -56,7 +60,7 @@ jobs:
             Version: ${{ steps.tool_version.outputs.version }}
             Note:If u cannot run it in linux,you may need do "chmod a+x ./*"
             Author: MIO-KITCHEN-TEAM
-            Minimum support: Ubuntu 20.04 (64bit),Windows Vista (32bit)
+            Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit)
           artifacts: "*.zip"
 
   build-win:
@@ -131,4 +135,43 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-linux
+          path: './*'
+  build-linux-aarch64:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        arch: [aarch64]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.10'
+          # Optional - x64 or x86 architecture, defaults to x64
+      - name: Install Packages
+        run: |
+          python3 -m pip install -U --force-reinstall pip
+          pip3 install -r requirements.txt
+          sudo apt update -y && sudo apt install python3-tk -y
+      - name: Pack Tool
+        run: |
+          pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png
+          mv dist/* ./
+          rm -rf .git
+          rm -rf .github
+          rm -rf bin/nt_*
+          rm -rf *.*
+          rm -rf build
+          rm -rf dist
+          rm -rf splash.png
+          find . | xargs chmod a+x 
+          chmod a+x ./*
+          ls
+      - name: Upload Linux Build
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: MIO-KITCHEN-linux-aarch64
           path: './*'
