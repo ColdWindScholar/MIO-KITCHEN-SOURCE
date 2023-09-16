@@ -1463,10 +1463,7 @@ class dbkxyt:
         if os.path.exists(path):
             if gettype(path) == "sparse":
                 print(f"[INFO] {os.path.basename(path)} is (sparse), converting to (raw)")
-                call("simg2img {} {}".format(path, path + ".raw"))
-                if os.path.exists(path + ".raw"):
-                    os.remove(path)
-                    os.rename(path + ".raw", path)
+                utils.simg2img(path)
             try:
                 print(f"[Compress] {os.path.basename(path)}...")
                 call("zstd -5 --rm {} -o {}".format(path, path + ".zst"))
@@ -2093,10 +2090,8 @@ def unpack(chose, form: any = None):
             ftype = gettype(work + dname + ".img")
             if ftype == "sparse":
                 print(lang.text79 + dname + ".img [%s]" % ftype)
-                call("simg2img " + work + dname + ".img " + work + dname + ".rimg")
                 try:
-                    os.remove(work + dname + ".img")
-                    os.rename(work + dname + ".rimg", work + dname + ".img")
+                    utils.simg2img(work + dname + ".img")
                 except:
                     messpop(lang.warn11.format(dname + ".img"))
             if dname not in parts.keys():
@@ -2104,10 +2099,8 @@ def unpack(chose, form: any = None):
             if gettype(work + dname + ".img") == 'super':
                 print(lang.text79 + dname + ".img")
                 if gettype(work + dname + ".img") == "sparse":
-                    call("simg2img " + work + dname + ".img " + work + dname + ".rimg")
                     try:
-                        os.remove(work + dname + ".img")
-                        os.rename(work + dname + ".rimg", work + dname + ".img")
+                        utils.simg2img(work + dname + ".img")
                     except:
                         messpop(lang.warn11.format(dname))
                 lpunpack.unpack(work + dname + ".img", work)
@@ -2528,7 +2521,6 @@ ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(si
                                                                               pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
-info = ttk.LabelFrame(tab2, text="Rom信息")
 frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
 frame3 = ttk.LabelFrame(tab2, text=lang.text112)
 LB1 = ttk.Combobox(xmcd, textvariable=dn, state='readonly')
@@ -2631,8 +2623,7 @@ sf1 = ttk.Frame(tab3)
 sf2 = ttk.Frame(tab3)
 sf3 = ttk.Frame(tab3)
 ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
-LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly')
-LB2["value"] = ["light", "dark"]
+LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
 LB2.pack(padx=10, pady=10, side='left')
 LB2.bind('<<ComboboxSelected>>', set_theme)
 
@@ -2810,13 +2801,7 @@ class format_conversion(Toplevel):
                             else:
                                 print("transferpath" + lang.text84)
                 if hget == 'sparse':
-                    call('simg2img {} {}'.format(work + i, work + i + 'r'))
-                    if os.path.exists(work + i + 'r'):
-                        try:
-                            os.remove(work + i)
-                            os.rename(work + i + 'r', work + i)
-                        except Exception as e:
-                            print(e)
+                    utils.simg2img(work + i)
         elif fget == 'dat':
             for i in selection:
                 print(f'[{hget}->{fget}]{i}')
@@ -2913,4 +2898,4 @@ if int(oobe) < 4:
 print(lang.text134 % (dti() - start))
 win.update()
 jzxs(win)
-win.mainloop(0)
+win.mainloop()

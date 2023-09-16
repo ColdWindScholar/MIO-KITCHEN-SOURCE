@@ -19,6 +19,8 @@ from Crypto.Util.Padding import pad
 # ----VALUES
 from os import getcwd
 
+import imgextractor
+
 elocal = getcwd()
 dn = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
@@ -171,6 +173,7 @@ def gettype(file) -> str:
                 return False
             buf += bytearray(file_.read(4))
         return buf[1:] == b'\x67\x44\x6c\x61'
+
     try:
         if is_super(file):
             return 'super'
@@ -235,6 +238,17 @@ def qc(file_) -> None:
 
 def cz(func, *args):
     Thread(target=func, args=args, daemon=True).start()
+
+
+def simg2img(path):
+    imgextractor.Extractor().converSimgToImg(path)
+    name = path.replace(".img", ".raw.img")
+    try:
+        if os.path.exists(name):
+            os.remove(path)
+            os.rename(name, path)
+    except Exception as e:
+        print(e)
 
 
 def img2sdat(input_image, out_dir='.', version=None, prefix='system'):

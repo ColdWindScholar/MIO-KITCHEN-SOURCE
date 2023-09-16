@@ -527,8 +527,9 @@ class Extractor(object):
                         break
                 self.__appendf('\n'.join(self.context), contexts)  # 11.05.18
 
-    def __converSimgToImg(self, target):
+    def converSimgToImg(self, target):
         with open(target, "rb") as img_file:
+            setattr(self, 'sign_offset', self.checkSignOffset(img_file))
             if self.sign_offset > 0:
                 img_file.seek(self.sign_offset, 0)
             header = ext4_file_header(img_file.read(28))
@@ -648,7 +649,7 @@ class Extractor(object):
         if target_type == 'simg':
             print(".....Convert %s to %s" % (
                 os.path.basename(target), os.path.basename(target).replace(".img", ".raw.img")))
-            self.__converSimgToImg(target)
+            self.converSimgToImg(target)
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
             moto = re.search(b'\x4d\x4f\x54\x4f', data)
