@@ -125,6 +125,7 @@ jobs:
              rm -rf .git
              rm -rf .github
              rm -rf bin/nt_*
+             rm -rf bin/posix_aarch64
              rm -rf *.*
              rm -rf build
              rm -rf dist
@@ -140,10 +141,6 @@ jobs:
           path: './*'
   build-linux-aarch64:
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        arch: [aarch64]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -164,6 +161,7 @@ jobs:
           rm -rf .git
           rm -rf .github
           rm -rf bin/nt_*
+          rm -rf bin/posix_x86_64
           rm -rf *.*
           rm -rf build
           rm -rf dist
