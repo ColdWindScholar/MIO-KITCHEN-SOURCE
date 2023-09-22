@@ -52,9 +52,16 @@ import yaml
 
 # 欢迎各位大佬提PR
 config = ConfigParser()
-win = Tk()
+
+
+class Tool(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title('OPEN-MIO-KITCHEN')
+
+
+win = Tool()
 start = dti()
-win.title('OPEN-MIO-KITCHEN')
 setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini"])
 modfile = ''.join([elocal, os.sep, "bin", os.sep, "module", os.sep, "module.json"])
 utils.dn = StringVar()
