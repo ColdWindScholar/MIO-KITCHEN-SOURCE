@@ -86,6 +86,7 @@ jobs:
              move dist/tool.exe ./
              del *.py
              Remove-Item bin/posix_x86_64 -Recurse
+             Remove-Item bin/posix_aarch64 -Recurse
              Remove-Item build -Recurse
              Remove-Item dist -Recurse
              Remove-Item .github -Recurse
