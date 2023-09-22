@@ -1516,7 +1516,7 @@ class packss:
         ttk.Checkbutton(t_Frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
-        g_b = ttk.Button(t_Frame, text=lang.t27, command=lambda: generate())
+        g_b = ttk.Button(t_Frame, text=lang.t27, command=lambda: cz(generate))
         g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_Frame.pack(fill=X)
 
@@ -1552,6 +1552,8 @@ class packss:
             g_b.config(text=lang.t28, state='disabled')
             utils.generate_dynamic_list(dbfz=sdbfz.get(), size=supers.get(), set_=supersz.get(),
                                         lb=[tl.get(index) for index in tl.curselection()], work=rwork())
+            g_b.config(text=lang.text34)
+            time.sleep(1)
             g_b.config(text=lang.t27, state='normal')
 
         def start_():
