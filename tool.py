@@ -1516,7 +1516,7 @@ class packss:
         ttk.Checkbutton(t_Frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
-        ttk.Button(t_Frame, text="生成list", command=lambda: generate()).pack(side=LEFT,
+        ttk.Button(t_Frame, text=lang.t27, command=lambda: generate()).pack(side=LEFT,
                                                                               padx=10, pady=10, fill=BOTH)
         t_Frame.pack(fill=X)
 
