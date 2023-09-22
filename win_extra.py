@@ -5,7 +5,10 @@ import os
 def win2wslpath(path):
     if not ":" in path:
         path = os.path.abspath(path)
-    f, e = path.split(":")
+    try:
+        f, e = path.split(":")
+    except ValueError:
+        f, e = os.path.abspath(path).replace("\\", "/")
     return "".join([f"/mnt/{f.lower()}", e.replace("\\", "/")])
 
 
