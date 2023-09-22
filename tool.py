@@ -1587,15 +1587,18 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     command += " --out %s" % (work + "super.img")
     if return_cmd == 1:
         return command
-    if os.access(work + "super.img", os.F_OK) and call(command) == 0:
-        print(lang.text59 % (work + "super.img"))
-        if del_ == 1:
-            for img in lb:
-                if os.path.exists(work + img + ".img"):
-                    try:
-                        os.remove(work + img + ".img")
-                    except:
-                        pass
+    if call(command) == 0:
+        if os.access(work + "super.img", os.F_OK):
+            print(lang.text59 % (work + "super.img"))
+            if del_ == 1:
+                for img in lb:
+                    if os.path.exists(work + img + ".img"):
+                        try:
+                            os.remove(work + img + ".img")
+                        except:
+                            pass
+        else:
+            messpop(lang.warn10)
     else:
         messpop(lang.warn10)
     if return_cmd == 0:
