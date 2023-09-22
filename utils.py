@@ -209,6 +209,37 @@ def dynamic_list_reader(path):
     return data
 
 
+def generate_dynamic_list(dbfz, size, set_, lb, work):
+    data = ['# Remove all existing dynamic partitions and groups before applying full OTA', 'remove_all_groups']
+    with open(work + "dynamic_partitions_op_list", 'w', encoding='utf-8', newline='\n') as d_list:
+        if set_ == 1:
+            data.append(f'# Add group {dbfz} with maximum size {size}')
+            data.append(f'add_group {dbfz} {size}')
+        elif set_ in [2, 3]:
+            data.append(f'# Add group {dbfz}_a with maximum size {size}')
+            data.append(f'add_group {dbfz}_a {size}')
+            data.append(f'# Add group {dbfz}_b with maximum size {size}')
+            data.append(f'add_group {dbfz}_b {size}')
+        for part in lb:
+            if set_ == 1:
+                data.append(f'# Add partition {part} to group {dbfz}')
+                data.append(f'add {part} {dbfz}')
+            elif set_ in [2, 3]:
+                data.append(f'# Add partition {part}_a to group {dbfz}_a')
+                data.append(f'add {part}_a {dbfz}_a')
+                data.append(f'# Add partition {part}_b to group {dbfz}_b')
+                data.append(f'add {part}_b {dbfz}_b')
+        for part in lb:
+            if set_ == 1:
+                data.append(f'# Grow partition {part} from 0 to {os.path.getsize(work + part + ".img")}')
+                data.append(f'resize {part} {os.path.getsize(work + part + ".img")}')
+            elif set_ in [2, 3]:
+                data.append(f'# Grow partition {part}_a from 0 to {os.path.getsize(work + part + ".img")}')
+                data.append(f'resize {part}_a {os.path.getsize(work + part + ".img")}')
+        d_list.writelines([key+"\n" for key in data])
+        data.clear()
+
+
 def v_code(num=6) -> str:
     ret = ""
     for i in range(num):

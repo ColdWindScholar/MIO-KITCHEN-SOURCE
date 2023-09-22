@@ -1512,9 +1512,13 @@ class packss:
         ttk.Checkbutton(ck, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
-        ttk.Checkbutton(ck, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=10, pady=10, fill=BOTH)
+        t_Frame = Frame(ck)
+        ttk.Checkbutton(t_Frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(side=LEFT,
+                                                          padx=10, pady=10, fill=BOTH)
+        ttk.Button(t_Frame, text="生成list", command=lambda: generate()).pack(side=LEFT,
+                                                                              padx=10, pady=10, fill=BOTH)
+        t_Frame.pack(fill=X)
 
         def read_list():
             if os.path.exists(work + "dynamic_partitions_op_list"):
@@ -1543,6 +1547,11 @@ class packss:
                 return False
             else:
                 return True
+
+        def generate():
+            utils.generate_dynamic_list(dbfz=sdbfz.get(), size=supers.get(), set_=supersz.get(),
+                                        lb=[tl.get(index) for index in tl.curselection()], work=rwork())
+            pass
 
         def start_():
             try:
