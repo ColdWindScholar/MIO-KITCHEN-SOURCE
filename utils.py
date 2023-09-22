@@ -4,7 +4,8 @@ import struct
 from os.path import exists
 import os, errno, tempfile
 import common
-import blockimgdiff, sparse_img
+import blockimgdiff
+import sparse_img
 from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
@@ -236,7 +237,7 @@ def generate_dynamic_list(dbfz, size, set_, lb, work):
             elif set_ in [2, 3]:
                 data.append(f'# Grow partition {part}_a from 0 to {os.path.getsize(work + part + ".img")}')
                 data.append(f'resize {part}_a {os.path.getsize(work + part + ".img")}')
-        d_list.writelines([key+"\n" for key in data])
+        d_list.writelines([key + "\n" for key in data])
         data.clear()
 
 
