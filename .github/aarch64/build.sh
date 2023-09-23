@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
 if [ "$1" == "build" ];then
-uname -r
+uname -a
 exit 0
 fi
 sudo apt-get update
