@@ -152,10 +152,12 @@ jobs:
             githubToken: ${{ github.token }}
             run: |
               uname -a
+              apt update
               apt install python3
               python3 -m pip install -U --force-reinstall pip
               pip3 install -r requirements.txt
-              apt update -y && sudo apt install python3-tk -y
+              apt update -y 
+              apt install python3-tk -y
               pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png
               mv dist/* ./
               rm -rf .git
