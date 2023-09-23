@@ -154,7 +154,7 @@ jobs:
               uname -a
               apt update
               apt install wget 
-              apt install libffi-dev gcc make openssl openssl-devel
+              apt install libffi-dev gcc make openssl openssl-devel gcc-c++ compat-gcc-34 compat-gcc-34-c++ libffi-devel
               apt-get install zlib*
               wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tar.xz
               tar -xvf Python-3.11.5.tar.xz
