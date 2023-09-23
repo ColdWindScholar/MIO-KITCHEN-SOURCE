@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    needs: [build-win,build-linux]
+    needs: [build-win,build-linux,build-linux-aarch64]
     runs-on: windows-latest
     strategy:
       matrix:
