@@ -20,7 +20,7 @@ from Crypto.Util.Padding import pad
 # ----VALUES
 from os import getcwd
 
-import imgextractor
+from lpunpack import SparseImage
 
 elocal = getcwd()
 dn = None
@@ -273,12 +273,18 @@ def cz(func, *args):
 
 
 def simg2img(path):
-    imgextractor.Extractor().converSimgToImg(path)
-    name = path.replace(".img", ".raw.img")
+    with open(path, 'rb') as fd:
+        if SparseImage(fd).check():
+            print('Sparse image detected.')
+            print('Process conversion to non sparse image...')
+            unsparse_file = SparseImage(fd).unsparse()
+            print('Result:[ok]')
+        else:
+            print(f"{path} not Sparse.Skip!")
     try:
-        if os.path.exists(name):
+        if os.path.exists(unsparse_file):
             os.remove(path)
-            os.rename(name, path)
+            os.rename(unsparse_file, path)
     except Exception as e:
         print(e)
 
