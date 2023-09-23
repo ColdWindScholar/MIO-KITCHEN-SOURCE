@@ -31,6 +31,7 @@ jobs:
         run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
       - name: Rename Tool
         # Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux-aarch64.zip
+        # move MIO-KITCHEN-linux-aarch64.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux-aarch64.zip
         run: |
           cd MIO-KITCHEN-win
           Remove-Item .git -Recurse
@@ -46,7 +47,6 @@ jobs:
           cd ..
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
-          move MIO-KITCHEN-linux-aarch64.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux-aarch64.zip
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
