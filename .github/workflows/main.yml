@@ -153,7 +153,17 @@ jobs:
             run: |
               uname -a
               apt update
-              apt install python3
+              apt install wget 
+              apt install libffi-dev gcc make
+              apt-get install zlib*
+              wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tar.xz
+              tar -xvf Python-3.11.5.tar.xz
+              cd Python-3.11.5
+              ./configure --prefix=/usr/local/python3.11.5/ --enable-optimizations
+              make && make install
+              ln -s /usr/local/python3.11.5/bin/python3.11.5 /usr/bin/python3
+              ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip3
+              ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip
               python3 -m pip install -U --force-reinstall pip
               pip3 install -r requirements.txt
               apt update -y 
