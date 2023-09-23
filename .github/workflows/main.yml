@@ -160,7 +160,7 @@ jobs:
               tar -xvf Python-3.11.5.tar.xz
               cd Python-3.11.5
               ./configure --prefix=/usr/local/python3.11.5/ --enable-optimizations
-              make && make install
+              make -j 24&& make install
               ln -s /usr/local/python3.11.5/bin/python3.11.5 /usr/bin/python3
               ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip3
               ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip

@@ -49,6 +49,7 @@ import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
 import yaml
+
 # from bootimg import parse_cpio, write_cpio, cpio_list
 # 欢迎各位大佬提PR
 config = ConfigParser()
@@ -1848,17 +1849,18 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
                         print(lang.text71 % file)
                         utils.vbpatch(file).disavb()
         if os.access(work + "config" + os.sep + "%s_fs_config" % dname, os.F_OK):
-            try:
-                if folder := findfolder(work, "com.google.android.apps.nbu."):
-                    call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
-                                                                  "com.google.android.apps.nbu")))
-                    rmdir(findfolder(work, "com.google.android.apps.nbu"))
-                fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
-                utils.qc(work + "config" + os.sep + dname + "_fs_config")
-                contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
-                utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-            except Exception as e:
-                print(e)
+            if os.name == 'nt':
+                try:
+                    if folder := findfolder(work, "com.google.android.apps.nbu."):
+                        call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
+                                                                      "com.google.android.apps.nbu")))
+                        rmdir(findfolder(work, "com.google.android.apps.nbu"))
+                    fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
+                    utils.qc(work + "config" + os.sep + dname + "_fs_config")
+                    contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
+                    utils.qc(work + "config" + os.sep + dname + "_file_contexts")
+                except Exception as e:
+                    print(e)
             if parts_dict[dname] == 'erofs':
                 mkerofs(dname, "%s" % (edbgs.get()), work)
                 if dely == 1:
@@ -2285,8 +2287,7 @@ def datbr(work, name, brl: any):
 def mkerofs(name, level, work):
     print(lang.text90 % (name, level, "1.6"))
     call(
-        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}",
-        out=1)
+        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}")
 
 
 def make_ext4fs(name, work, sparse):
