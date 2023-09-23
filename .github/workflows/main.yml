@@ -163,6 +163,7 @@ jobs:
               # deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
               # # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
               deb http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
+              apt update
               python3 -m pip install -U --force-reinstall pip
               pip3 install -r requirements.txt
               apt update -y 
