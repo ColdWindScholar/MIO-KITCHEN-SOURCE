@@ -151,7 +151,7 @@ jobs:
             distro: ubuntu20.04
             githubToken: ${{ github.token }}
             run: |
-              sudo bash ./.github/aarch64/build.sh build
+              ./.github/aarch64/build.sh build
       - name: Upload Linux Build
         if: success()
         uses: actions/upload-artifact@v3
