@@ -2464,8 +2464,7 @@ def packzip():
     else:
         load_car(0)
         print(lang.text91 % dn.get())
-        if os.name == "nt":
-            if ask_win(lang.t25) == 1:
+        if ask_win(lang.t25) == 1:
                 dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get())
         car.set(1)
