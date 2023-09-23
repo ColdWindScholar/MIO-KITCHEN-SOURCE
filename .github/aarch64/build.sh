@@ -11,4 +11,4 @@ fi
 sudo apt-get update
 sudo apt-get install docker.io
 sudo docker pull arm64v8/ubuntu
-sudo docker run arm64v8/ubuntu ./.github/aarch64/build.sh build --platform linux/amd64
+sudo docker run --platform linux/amd64/v4 arm64v8/ubuntu ./.github/aarch64/build.sh build
