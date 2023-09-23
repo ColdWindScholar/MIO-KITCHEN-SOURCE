@@ -153,17 +153,16 @@ jobs:
             run: |
               uname -a
               apt update
-              apt install wget 
-              apt install libffi-dev gcc make openssl openssl-devel gcc-c++ compat-gcc-34 compat-gcc-34-c++ libffi-devel
-              apt-get install zlib*
-              wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tar.xz
-              tar -xvf Python-3.11.5.tar.xz
-              cd Python-3.11.5
-              ./configure --prefix=/usr/local/python3.11.5/ --enable-optimizations
-              make -j 24&& make install
-              ln -s /usr/local/python3.11.5/bin/python3.11.5 /usr/bin/python3
-              ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip3
-              ln -s /usr/local/python3.11.5/bin/pip3.11.5 /usr/bin/pip
+              echo '
+              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
+              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
+              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
+              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
+              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+              # deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
+              # # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
+              deb http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
               python3 -m pip install -U --force-reinstall pip
               pip3 install -r requirements.txt
               apt update -y 
