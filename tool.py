@@ -49,7 +49,7 @@ import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
 import yaml
-
+# from bootimg import parse_cpio, write_cpio, cpio_list
 # 欢迎各位大佬提PR
 config = ConfigParser()
 
