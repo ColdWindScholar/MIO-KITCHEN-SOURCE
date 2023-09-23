@@ -143,20 +143,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Pack Tool
-        run: |
-          sudo bash ./.github/aarch64/build.sh
-          rm -rf .git
-          rm -rf .github
-          rm -rf bin/nt_*
-          rm -rf bin/posix_x86_64
-          rm -rf *.*
-          rm -rf build
-          rm -rf dist
-          rm -rf splash.png
-          find . | xargs chmod a+x 
-          chmod a+x ./*
-          ls
+      - uses: uraimo/run-on-arch-action@v2
+        name: Pack Tool
+        id: runcmd
+        with:
+            arch: aarch64
+            distro: ubuntu20.04
+            githubToken: ${{ github.token }}
+            run: |
+              sudo bash ./.github/aarch64/build.sh build
       - name: Upload Linux Build
         if: success()
         uses: actions/upload-artifact@v3
