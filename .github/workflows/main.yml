@@ -30,6 +30,7 @@ jobs:
         id: commit_message
         run: echo "::set-output name=message::$(git log -1 --pretty=%B ${{ steps.get_sha.outputs.sha }})"
       - name: Rename Tool
+        # Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux-aarch64.zip
         run: |
           cd MIO-KITCHEN-win
           Remove-Item .git -Recurse
@@ -42,7 +43,6 @@ jobs:
           cd ..
           cd MIO-KITCHEN-linux-aarch64
           ls
-          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux-aarch64.zip
           cd ..
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
