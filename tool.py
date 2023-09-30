@@ -1970,6 +1970,21 @@ def unpackrom(ifile) -> None:
                 "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"]),
                 local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
             )
+            if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config" + os.sep + "parts_info"):
+                with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
+                    parts = json.loads(pf.read())
+            else:
+                parts = {}
+            for v in os.listdir(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep):
+                if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                    0] + os.sep + "config" + os.sep + v + "_fs_config"):
+                    if not v in parts.keys():
+                        parts[v] = 'ext'
+            with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
+                json.dump(parts, pf, indent=4)
         car.set(1)
         return
     if gettype(zip_src) == 'zip':
@@ -2465,7 +2480,7 @@ def packzip():
         load_car(0)
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
-                dbkxyt()
+            dbkxyt()
         zip_file(dn.get() + ".zip", local + os.sep + dn.get())
         car.set(1)
 
