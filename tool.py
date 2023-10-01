@@ -1508,7 +1508,7 @@ class packss:
         work = rwork()
         for file_name in os.listdir(work):
             if file_name.endswith(".img"):
-                if gettype(work + file_name) in ["ext", 'erofs']:
+                if gettype(work + file_name) in ["ext", "erofs"]:
                     tl.insert(END, file_name[:-4])
         tl.pack(padx=10, pady=10, fill=BOTH)
 
