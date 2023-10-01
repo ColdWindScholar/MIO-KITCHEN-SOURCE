@@ -26,16 +26,19 @@ pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
 ```
 ***
 # Contact Us
+***
 ### Developer's Email: 3590361911@qq.com
 ### QQ Group: 879232506
 ***
-## Contributors
-### Technical Guidance:
-* [@Shaaim](https://github.com/786-shaaim) For Logo
-* [@Affggh](https://github.com/affggh) For Some Codes and Deps
-* [@sk](https://github.com/sekaiacg) FOr Deps
+# Contributors:
+***
+### [sk](https://github.com/sekaiacg)
+### [Affggh](https://github.com/affggh)
+### [Shaaim](https://github.com/786-shaaim)
+### Thanks for your help!!
 ***
 # About
+***
 ### MIO-KITCHEN
 ```
 Forever free, User first
