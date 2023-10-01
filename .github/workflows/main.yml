@@ -82,20 +82,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Pack tool
         run: |
-             pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --splash splash.png
-             move dist/tool.exe ./
-             del *.py
-             Remove-Item bin/posix_x86_64 -Recurse
-             Remove-Item bin/posix_aarch64 -Recurse
-             Remove-Item build -Recurse
-             Remove-Item dist -Recurse
-             Remove-Item .github -Recurse
-             del *.spec
-             del *.ico
-             del *.bat
-             del *.txt
-             del *.md
-             del *.png
+             python build.py
              ls
       - name: Upload Win Build
         if: success()
@@ -120,18 +107,7 @@ jobs:
             sudo apt update -y && sudo apt install python3-tk -y
       - name: Pack Tool
         run: |
-             pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png
-             mv dist/* ./
-             rm -rf .git
-             rm -rf .github
-             rm -rf bin/nt_*
-             rm -rf bin/posix_aarch64
-             rm -rf *.*
-             rm -rf build
-             rm -rf dist
-             rm -rf splash.png
-             find . | xargs chmod a+x 
-             chmod a+x ./*
+             python3 build.py
              ls
       - name: Upload Linux Build
         if: success()
