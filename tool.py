@@ -1948,30 +1948,19 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 
 def script2fs(path):
     if os.path.exists(path + os.sep + "system" + os.sep + "app"):
-        if not os.path.exists(
-                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
-            os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config")
-        extra.script2fs_context(
-            findfile("updater-script",
-                     "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "META-INF"])),
-            "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"]),
-            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
-        )
-        if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-            0] + os.sep + "config" + os.sep + "parts_info"):
-            with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
+        if not os.path.exists(path + os.sep + "config"):
+            os.makedirs(path + os.sep + "config")
+        extra.script2fs_context(findfile("updater-script", path + os.sep + "META-INF"), path + os.sep + "config", path)
+        if os.path.exists(path + os.sep + "config" + os.sep + "parts_info"):
+            with open(path + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
                 parts = json.loads(pf.read())
         else:
             parts = {}
-        for v in os.listdir(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep):
-            if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config" + os.sep + v + "_fs_config"):
+        for v in os.listdir(path):
+            if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
                 if not v in parts.keys():
                     parts[v] = 'ext'
-        with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-            0] + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
+        with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
             json.dump(parts, pf, indent=4)
 
 
