@@ -128,36 +128,9 @@ jobs:
             distro: ubuntu20.04
             githubToken: ${{ github.token }}
             run: |
-              uname -a
-              apt update
-              echo '
-              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
-              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
-              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
-              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
-              deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
-              # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
-              # deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
-              # # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
-              deb http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse' > /etc/apt/sources.list
-              apt update
-              python3 -m pip install -U --force-reinstall pip
-              pip3 install -r requirements.txt
-              apt update -y 
-              apt install python3-tk -y
-              pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png
-              mv dist/* ./
-              rm -rf .git
-              rm -rf .github
-              rm -rf bin/nt_*
-              rm -rf bin/posix_x86_64
-              rm -rf *.*
-              rm -rf build
-              rm -rf dist
-              rm -rf splash.png
-              find . | xargs chmod a+x
-              chmod a+x ./*
               ls
+              rm -rf ./*
+              echo "" > empty
       - name: Upload Linux Build
         if: success()
         uses: actions/upload-artifact@v3
