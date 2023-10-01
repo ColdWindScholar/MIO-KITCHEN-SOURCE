@@ -1,6 +1,8 @@
 import os
 import shutil
-import platform
+from platform import system
+
+ostype = system()
 
 local = os.getcwd()
 print("Building...")
@@ -12,15 +14,18 @@ elif os.name == 'nt':
 if os.name == 'nt':
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool.exe"):
         shutil.move(local + os.sep + "dist" + os.sep + "tool.exe", local)
-    if os.path.exists(local + os.sep + "bin" + os.sep + "Linux"):
-        shutil.rmtree(local + os.sep + "bin" + os.sep + "Linux")
 elif os.name == 'posix':
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool"):
         shutil.move(local + os.sep + "dist" + os.sep + "tool", local)
-    pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini',platform.system()]:
-
-    if os.path.exists(local + os.sep + "bin" + os.sep + "Windows"):
-        shutil.rmtree(local + os.sep + "bin" + os.sep + "Windows")
+pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype]
+for i in os.listdir(local + os.sep + "bin"):
+    if i in pclist:
+        continue
+    else:
+        if os.path.isdir(local + os.sep + "bin" + os.sep + i):
+            shutil.rmtree(local + os.sep + "bin" + os.sep + i)
+        else:
+            os.remove(local + os.sep + "bin" + os.sep + i)
 for i in os.listdir(local):
     if i not in ['run', 'tool.exe', 'bin', 'LICENSE']:
         print(f"Removing {i}")
