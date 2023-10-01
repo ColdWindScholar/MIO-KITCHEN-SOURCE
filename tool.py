@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import platform
+
 try:
     import load_window
 except ModuleNotFoundError:
@@ -425,7 +427,7 @@ class Process(Toplevel):
         dn.set(os.path.basename(self.dir.name))
         self.gavs = {
             'bin': self.dir.name,
-            'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
+            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                 '\\',
                 '/')}
         self.value = ['tool_bin', 'bin']
@@ -798,7 +800,7 @@ def mpkman() -> None:
 
     class msh_parse(object):
         envs = {'version': VERSION,
-                'tool_bin': ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace('\\',
+                'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\',
                                                                                                                 '/'),
                 'project': (local + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
@@ -972,7 +974,7 @@ def mpkman() -> None:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(VERSION))
                     f.write('export tool_bin={}\n'.format(
-                        ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace('\\', '/')))
+                        (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace('\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
@@ -1122,7 +1124,7 @@ def mpkman() -> None:
                             file.set(temp + os.sep + v_code())
                         with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                             f.write('export tool_bin={}\n'.format(
-                                ("".join([elocal, os.sep, 'bin', os.sep, os.name, '_', machine(), os.sep])).replace(
+                                (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
                                     '\\',
                                     '/')))
                             f.write('export version={}\n'.format(VERSION))
@@ -1643,7 +1645,7 @@ class StdoutRedirector(object):
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
     if kz == "Y":
-        cmd = f'{elocal}{os.sep}bin{os.sep}{os.name}_{machine()}{os.sep}{exe}'
+        cmd = f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}{exe}'
     else:
         cmd = exe
     if os.name != 'posix':
