@@ -800,8 +800,9 @@ def mpkman() -> None:
 
     class msh_parse(object):
         envs = {'version': VERSION,
-                'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\',
-                                                                                                                '/'),
+                'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
+                    '\\',
+                    '/'),
                 'project': (local + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
 
@@ -974,7 +975,8 @@ def mpkman() -> None:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(VERSION))
                     f.write('export tool_bin={}\n'.format(
-                        (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace('\\', '/')))
+                        (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+                            '\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
@@ -1124,7 +1126,8 @@ def mpkman() -> None:
                             file.set(temp + os.sep + v_code())
                         with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                             f.write('export tool_bin={}\n'.format(
-                                (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+                                (
+                                    f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
                                     '\\',
                                     '/')))
                             f.write('export version={}\n'.format(VERSION))
@@ -1943,6 +1946,35 @@ def input_(title: str = lang.text76, text: str = "") -> str:
     return inputvar.get()
 
 
+def script2fs(path):
+    if os.path.exists(path + os.sep + "system" + os.sep + "app"):
+        if not os.path.exists(
+                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
+            os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config")
+        extra.script2fs_context(
+            findfile("updater-script",
+                     "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "META-INF"])),
+            "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"]),
+            local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+        )
+        if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+            0] + os.sep + "config" + os.sep + "parts_info"):
+            with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
+                parts = json.loads(pf.read())
+        else:
+            parts = {}
+        for v in os.listdir(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep):
+            if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+                0] + os.sep + "config" + os.sep + v + "_fs_config"):
+                if not v in parts.keys():
+                    parts[v] = 'ext'
+        with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
+            0] + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
+            json.dump(parts, pf, indent=4)
+
+
 def unpackrom(ifile) -> None:
     print(lang.text77 + (zip_src := ifile))
     load_car(0)
@@ -1959,34 +1991,7 @@ def unpackrom(ifile) -> None:
             ofp_mtk_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         else:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-        if os.path.exists(
-                "".join(
-                    [local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
-            if not os.path.exists(
-                    "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
-                os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "config")
-            extra.script2fs_context(
-                findfile("updater-script",
-                         "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "META-INF"])),
-                "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"]),
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
-            )
-            if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config" + os.sep + "parts_info"):
-                with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
-                    parts = json.loads(pf.read())
-            else:
-                parts = {}
-            for v in os.listdir(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep):
-                if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "config" + os.sep + v + "_fs_config"):
-                    if not v in parts.keys():
-                        parts[v] = 'ext'
-            with open(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                0] + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
-                json.dump(parts, pf, indent=4)
+            script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
         return
     if gettype(zip_src) == 'zip':
@@ -2013,19 +2018,7 @@ def unpackrom(ifile) -> None:
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
             listdir()
-        if os.path.exists(
-                "".join(
-                    [local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "system", os.sep, "app"])):
-            if not os.path.exists(
-                    "".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0], os.sep, "config"])):
-                os.makedirs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[
-                    0] + os.sep + "config")
-            extra.script2fs_context(
-                findfile("updater-script",
-                         local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "META-INF"),
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0] + os.sep + "config",
-                local + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
-            )
+        script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
         return
     else:
