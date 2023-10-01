@@ -17,7 +17,7 @@ The Rom Tool Use python language
 * Use mkc file chose api On Linux,make use easily
 ***
 # Start To Use
-``` python
+``` shell
 pip install -r requirements.txt
 python tool.py
 # if you want to package it into exe
