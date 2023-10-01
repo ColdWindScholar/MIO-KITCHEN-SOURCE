@@ -14,7 +14,7 @@ elif os.name == 'nt':
 if os.name == 'nt':
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool.exe"):
         shutil.move(local + os.sep + "dist" + os.sep + "tool.exe", local)
-elif os.name == 'posix':
+else:
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool"):
         shutil.move(local + os.sep + "dist" + os.sep + "tool", local)
 pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype]
@@ -27,7 +27,7 @@ for i in os.listdir(local + os.sep + "bin"):
         else:
             os.remove(local + os.sep + "bin" + os.sep + i)
 for i in os.listdir(local):
-    if i not in ['run', 'tool.exe', 'bin', 'LICENSE']:
+    if i not in ['tool', 'tool.exe', 'bin', 'LICENSE']:
         print(f"Removing {i}")
         if os.path.isdir(local + os.sep + i):
             try:
