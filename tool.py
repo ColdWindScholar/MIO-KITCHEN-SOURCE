@@ -1756,13 +1756,8 @@ def jboot(bn: str = 'boot'):
         if not os.path.exists(work + f"{bn}" + os.sep + "ramdisk"):
             os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
         os.chdir(work + f"{bn}" + os.sep)
-        if not os.name == 'nt':
-            cpio = findfile("cpio", elocal + os.sep + "bin" + os.sep + os.name + "_" + machine())
-        else:
-            cpio = findfile("cpio.exe", elocal + os.sep + "bin" + os.sep + os.name + "_" + machine())
         print("Unpacking Ramdisk...")
-        call("%s -d --no-absolute-filenames -F %s -i -D %s" % (
-            cpio, "ramdisk.cpio", "ramdisk"), kz='N')
+        call("cpio -d --no-absolute-filenames -F %s -i -D %s" % ("ramdisk.cpio", "ramdisk"))
         os.chdir(elocal)
 
     else:
@@ -1785,9 +1780,9 @@ def dboot(nm: str = 'boot'):
         car.set(1)
         return
     if os.name != 'posix':
-        cpio = findfile("cpio.exe", elocal + os.sep + "bin" + os.sep).replace('\\', "/")
+        cpio = findfile("cpio.exe",f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace('\\', "/")
     else:
-        cpio = findfile("cpio", elocal + os.sep + "bin" + os.sep + os.name + "_" + machine())
+        cpio = findfile("cpio", f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}')
     call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
     os.chdir(work + f"{nm}" + os.sep)
     with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
