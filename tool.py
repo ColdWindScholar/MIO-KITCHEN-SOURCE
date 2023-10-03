@@ -1759,7 +1759,6 @@ def jboot(bn: str = 'boot'):
         print("Unpacking Ramdisk...")
         call("cpio -d --no-absolute-filenames -F %s -i -D %s" % ("ramdisk.cpio", "ramdisk"))
         os.chdir(elocal)
-
     else:
         print("Unpack Done!")
     os.chdir(elocal)
@@ -1805,8 +1804,6 @@ def dboot(nm: str = 'boot'):
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         if comp == "cpio":
             flag = "-n"
-    else:
-        comp = ''
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
         car.set(1)
