@@ -1804,13 +1804,17 @@ def dboot(nm: str = 'boot'):
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         if comp == "cpio":
             flag = "-n"
+        no_ramdisk = False
+    else:
+        no_ramdisk = True
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
         car.set(1)
         return
     else:
-        os.remove(work + f"{nm}.img")
-        os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + f"{nm}.img")
+        if no_ramdisk:
+            os.remove(work + f"{nm}.img")
+            os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + f"{nm}.img")
         os.chdir(elocal)
         try:
             rmdir((work + f"{nm}"), up=1)
