@@ -1780,7 +1780,9 @@ def dboot(nm: str = 'boot'):
         car.set(1)
         return
     if os.name != 'posix':
-        cpio = findfile("cpio.exe",f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace('\\', "/")
+        cpio = findfile("cpio.exe",
+                        f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+            '\\', "/")
     else:
         cpio = findfile("cpio", f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}')
     call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
@@ -1953,7 +1955,7 @@ def script2fs(path):
             parts = {}
         for v in os.listdir(path):
             if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
-                if not v in parts.keys():
+                if v not in parts.keys():
                     parts[v] = 'ext'
         with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
             json.dump(parts, pf, indent=4)
