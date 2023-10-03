@@ -1800,7 +1800,7 @@ def dboot(nm: str = 'boot'):
                 os.remove("ramdisk.cpio")
             except:
                 pass
-            os.rename("ramdisk-new.cpio.%s" % comp, "ramdisk.cpio")
+            os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
     else:
         print("Pack Ramdisk Successful..")
         os.remove("ramdisk.cpio")
