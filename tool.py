@@ -1773,42 +1773,40 @@ def dboot(nm: str = 'boot'):
         print(f"Cannot Find {nm}...")
         car.set(1)
         return
-    try:
-        os.chdir(work + f"{nm}" + os.sep + "ramdisk")
-    except Exception as e:
-        print("Ramdisk Not Found.. %s" % e)
-        car.set(1)
-        return
     if os.name != 'posix':
         cpio = findfile("cpio.exe",
                         f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
             '\\', "/")
     else:
         cpio = findfile("cpio", f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}')
-    call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
-    os.chdir(work + f"{nm}" + os.sep)
-    with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
-        comp = compf.read()
-    print("Compressing:%s" % comp)
-    if comp != "unknow":
-        if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
-            print("Pack Ramdisk Fail...")
-            os.remove("ramdisk-new.cpio")
-            car.set(1)
-            return
+    if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
+        os.chdir(work + f"{nm}" + os.sep + "ramdisk")
+        call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
+        os.chdir(work + f"{nm}" + os.sep)
+        with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
+            comp = compf.read()
+        print("Compressing:%s" % comp)
+        if comp != "unknow":
+            if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
+                print("Pack Ramdisk Fail...")
+                os.remove("ramdisk-new.cpio")
+                car.set(1)
+                return
+            else:
+                print("Pack Ramdisk Successful..")
+                try:
+                    os.remove("ramdisk.cpio")
+                except:
+                    pass
+                os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
         else:
             print("Pack Ramdisk Successful..")
-            try:
-                os.remove("ramdisk.cpio")
-            except:
-                pass
-            os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
+            os.remove("ramdisk.cpio")
+            os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+        if comp == "cpio":
+            flag = "-n"
     else:
-        print("Pack Ramdisk Successful..")
-        os.remove("ramdisk.cpio")
-        os.rename("ramdisk-new.cpio", "ramdisk.cpio")
-    if comp == "cpio":
-        flag = "-n"
+        comp = ''
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
         car.set(1)
