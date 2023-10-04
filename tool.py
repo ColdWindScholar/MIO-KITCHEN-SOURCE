@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import mmap
 import platform
+from threading import Thread
 
 try:
     import load_window
@@ -2059,8 +2061,14 @@ def unpack(chose, form: any = None):
         return 1
     if form == 'payload':
         print(lang.text79 + "payload")
+        tasks = []
         with open(work + "payload.bin", 'rb') as pay:
-            payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', chose)
+            for part in chose:
+                tasks.append(Thread(target=payload_dumper.ota_payload_dumper, args=(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'store_true', 'old', [part]), daemon=True))
+        for task in tasks:
+            task.start()
+        for task in tasks:
+            task.join()
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import mmap
 import struct
 import hashlib
 import bz2
@@ -77,7 +78,7 @@ def data_for_op(op, out_file, old_file):
             out_file.seek(ext.start_block * block_size)
             out_file.write(b'\x00' * ext.num_blocks * block_size)
     else:
-        print("Unsupported type = %d" % op.type)
+        print("Unsupported type = %d\n" % op.type)
         sys.exit(-1)
 
     return data
@@ -86,9 +87,9 @@ def data_for_op(op, out_file, old_file):
 def dump_part(part):
     start = timeit.default_timer()
     if os.access(args.out + part.partition_name + ".img", os.F_OK):
-        print(part.partition_name + "已存在")
+        print(part.partition_name + "已存在\n")
     else:
-        print("%s:[EXTRACTING]" % part.partition_name)
+        print("%s:[EXTRACTING]\n" % part.partition_name)
         out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb')
         h = hashlib.sha256()
         if args.diff:
@@ -97,7 +98,7 @@ def dump_part(part):
             old_file = None
         for op in part.operations:
             data = data_for_op(op, out_file, old_file)
-        print("%s:[%s]" % (part.partition_name, timeit.default_timer() - start))
+        print("%s:[%s]\n" % (part.partition_name, timeit.default_timer() - start))
 
 
 def ota_payload_dumper(payloadfile_, out='output', diff='store_true', old='old', images='', command: int = 1):
@@ -135,3 +136,4 @@ def ota_payload_dumper(payloadfile_, out='output', diff='store_true', old='old',
         partition = [part for part in dam.partitions if part.partition_name == image]
         assert partition, "Partition %s not found in payload!\n" % image
         dump_part(partition[0])
+    payloadfile_.close()
