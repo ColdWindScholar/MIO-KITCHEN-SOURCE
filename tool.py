@@ -2320,6 +2320,11 @@ def mke2fs(name, work, sparse):
         except:
             pass
     else:
+        if os.path.isfile(work + name + ".img"):
+            try:
+                os.remove(work + name + ".img")
+            except:
+                pass
         os.rename(work + name + "_new.img", work + name + ".img")
 
 
