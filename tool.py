@@ -2063,12 +2063,20 @@ def unpack(chose, form: any = None):
         print(lang.text79 + "payload")
         tasks = []
         with open(work + "payload.bin", 'rb') as pay:
-            for part in chose:
-                tasks.append(Thread(target=payload_dumper.ota_payload_dumper, args=(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'store_true', 'old', [part]), daemon=True))
-        for task in tasks:
-            task.start()
-        for task in tasks:
-            task.join()
+            try:
+                mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ)
+            except ValueError as e:
+                print(e, "Use Old Method")
+                payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', chose)
+            else:
+                for part in chose:
+                    tasks.append(Thread(target=payload_dumper.ota_payload_dumper, args=(
+                        mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'store_true', 'old', [part]),
+                                        daemon=True))
+                for task in tasks:
+                    task.start()
+                for task in tasks:
+                    task.join()
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
