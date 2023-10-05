@@ -2699,7 +2699,7 @@ link = ttk.Label(tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
 
 
 def open_github(o):
-    openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
+    openurl("https://github.com/MKC-Software/MIO-KITCHEN-SOURCE")
 
 
 link.bind("<Button-1>", open_github)
