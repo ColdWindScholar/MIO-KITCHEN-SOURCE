@@ -180,8 +180,6 @@ def gettype(file) -> str:
             return 'super'
     except IndexError:
         pass
-    if LOGODUMPER(file, str(None)).chkimg(file):
-        return 'logo'
     for f_ in formats:
         if len(f_) == 2:
             if compare(f_[0]):
@@ -189,6 +187,8 @@ def gettype(file) -> str:
         elif len(f_) == 3:
             if compare(f_[0], f_[2]):
                 return f_[1]
+    if LOGODUMPER(file, str(None)).chkimg(file):
+        return 'logo'
     return "unknow"
 
 
