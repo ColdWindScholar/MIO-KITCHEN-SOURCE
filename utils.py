@@ -192,6 +192,8 @@ def gettype(file) -> str:
             return 'logo'
     except AssertionError:
         pass
+    except struct.error:
+        pass
     return "unknow"
 
 
