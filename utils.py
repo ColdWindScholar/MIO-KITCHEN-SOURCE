@@ -187,8 +187,11 @@ def gettype(file) -> str:
         elif len(f_) == 3:
             if compare(f_[0], f_[2]):
                 return f_[1]
-    if LOGODUMPER(file, str(None)).chkimg(file):
-        return 'logo'
+    try:
+        if LOGODUMPER(file, str(None)).chkimg(file):
+            return 'logo'
+    except AssertionError:
+        pass
     return "unknow"
 
 
@@ -447,7 +450,6 @@ class LOGODUMPER(object):
                     self.cfg.imgnum += 1
                 else:
                     break
-        # print(self.magic)
         assert self.magic == b"LOGO!!!!", "File does not match xiaomi logo magic!"
         return True
 
