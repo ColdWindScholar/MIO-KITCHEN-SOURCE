@@ -1983,7 +1983,9 @@ def unpackrom(ifile) -> None:
         car.set(1)
         return
     elif os.path.splitext(ifile)[1] == '.ops':
-        args = {'decrypt': True, "<filename>": ifile, 'outdir': local + os.sep}
+        args = {'decrypt': True,
+                "<filename>": ifile,
+                'outdir': os.path.join(local, os.path.basename(ifile).split('.')[0])}
         opscrypto.main(args)
         car.set(1)
         return
