@@ -536,7 +536,9 @@ def main(args):
     if args["decrypt"]:
         filename = args["<filename>"].replace("\\", "/")
         print(f"Extracting {filename}")
-        if "/" in filename:
+        if args['outdir']:
+            path = args['outdir']
+        elif "/" in filename:
             path = filename[:filename.rfind("/")]
         else:
             path = ""

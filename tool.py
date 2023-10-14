@@ -53,6 +53,7 @@ import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
 import yaml
+import opscrypto
 
 # from bootimg import parse_cpio, write_cpio, cpio_list
 # 欢迎各位大佬提PR
@@ -1981,6 +1982,11 @@ def unpackrom(ifile) -> None:
             script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
         return
+    elif os.path.splitext(ifile)[1] == '.ops':
+        args = {'decrypt': True, "<filename>": ifile, 'outdir': local + os.sep}
+        opscrypto.main(args)
+        car.set(1)
+        return
     if gettype(zip_src) == 'zip':
         fz = zipfile.ZipFile(zip_src, 'r')
         for fi in fz.namelist():
@@ -2008,21 +2014,20 @@ def unpackrom(ifile) -> None:
         script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
         return
-    else:
-        if ftype != 'unknow':
-            if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
-                folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code()
-            else:
-                folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0]
-            try:
-                os.mkdir(folder)
-            except Exception as e:
-                messpop(e)
-            copy(ifile, folder)
-            listdir()
-            dn.set(os.path.basename(folder))
+    elif ftype != 'unknow':
+        if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
+            folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code()
         else:
-            print(lang.text82 % ftype)
+            folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0]
+        try:
+            os.mkdir(folder)
+        except Exception as e:
+            messpop(e)
+        copy(ifile, folder)
+        listdir()
+        dn.set(os.path.basename(folder))
+    else:
+        print(lang.text82 % ftype)
     car.set(1)
 
 
