@@ -1455,7 +1455,7 @@ class dbkxyt:
                 if t.endswith('.img') and not os.path.isdir(dir_ + t):
                     print("Add Flash method {} to update-binary".format(t))
                     if os.path.getsize(os.path.join(dir_ + 'images', t)) > 209715200:
-                        self.zstd_compress(dir_ + "images" + t)
+                        self.zstd_compress(os.path.join(dir_ + 'images', t))
                         lines.insert(70,
                                      'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
                     else:
