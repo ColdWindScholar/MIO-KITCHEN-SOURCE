@@ -1110,8 +1110,7 @@ def mpkman() -> None:
                                 sh = "bash"
                             load_car(0)
                             call("busybox {} {} {}".format(sh, file.get(),
-                                                           (
-                                                                   moduledir + os.sep + value + os.sep + "main.sh").replace(
+                                                           (moduledir + os.sep + value + os.sep + "main.sh").replace(
                                                                '\\',
                                                                '/')))
                             car.set(1)
@@ -1129,8 +1128,7 @@ def mpkman() -> None:
                             file.set(temp + os.sep + v_code())
                         with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                             f.write('export tool_bin={}\n'.format(
-                                (
-                                    f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+                                f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                                     '\\',
                                     '/')))
                             f.write('export version={}\n'.format(VERSION))
