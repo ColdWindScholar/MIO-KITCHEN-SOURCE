@@ -134,6 +134,8 @@ class Extractor(object):
                         cap = ' capabilities={cap}'.format(cap=cap)
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
+                    if dir_target.endswith('.') and os.name == 'nt':
+                        dir_target = dir_target[:-1]
                     if not os.path.isdir(dir_target):
                         os.makedirs(dir_target)
                     if os.name == 'posix' and os.geteuid() == 0:
