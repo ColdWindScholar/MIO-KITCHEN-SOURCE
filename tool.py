@@ -2566,7 +2566,6 @@ ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(si
                                                                               pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 xmcd = ttk.LabelFrame(tab2, text=lang.text12)
-frame1 = ttk.LabelFrame(tab2, text=lang.unpack)
 frame3 = ttk.LabelFrame(tab2, text=lang.text112)
 LB1 = ttk.Combobox(xmcd, textvariable=dn, state='readonly')
 LB1.pack(side="top", padx=10, pady=10, fill=X)
@@ -2577,27 +2576,30 @@ ttk.Button(xmcd, text=lang.text116, command=lambda: cz(delwork)).pack(side="left
 ttk.Button(xmcd, text=lang.text117, command=lambda: cz(cmm)).pack(side="left", padx=10, pady=10)
 
 
-class unpackg(object):
+class unpack_gui(ttk.LabelFrame):
     def __init__(self):
-        ck = frame1
+        super().__init__(master=tab2, text=lang.unpack)
+
+    def gui(self):
+        self.pack(padx=5, pady=5)
         self.ch = IntVar()
         self.ch.set(1)
-        self.fm = ttk.Combobox(ck, state="readonly", values=("new.dat", 'new.dat.br', 'img', 'payload'))
-        self.lsg = Listbox(ck, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
+        self.fm = ttk.Combobox(self, state="readonly", values=("new.dat", 'new.dat.br', 'img', 'payload'))
+        self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
 
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
-        ttk.Separator(ck, orient=HORIZONTAL).pack(padx=50, fill=X)
-        ff1 = ttk.Frame(ck)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
+        ff1 = ttk.Frame(self)
         ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
                         value=1).pack(padx=5, pady=5, side='left')
         ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
                         value=0).pack(padx=5, pady=5, side='left')
         ff1.pack(padx=5, pady=5, fill=X)
-        ttk.Separator(ck, orient=HORIZONTAL).pack(padx=50, fill=X)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(ck, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
+        ttk.Button(self, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
         self.ch.trace("w", self.hd)
 
@@ -2648,17 +2650,19 @@ class unpackg(object):
         self.hd()
         if self.ch.get() == 1:
             unpack(lbs, self.fm.get())
+            self.refs()
         else:
             packxx(lbs)
+            self.refs()
 
 
-unpackg()
+unpackg = unpack_gui()
 ttk.Button(frame3, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 xmcd.pack(padx=5, pady=5)
-frame1.pack(padx=5, pady=5)
+unpackg.gui()
 frame3.pack(padx=5, pady=5)
 listdir()
 # 设置的控件
