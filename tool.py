@@ -978,7 +978,7 @@ def mpkman() -> None:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(VERSION))
                     f.write('export tool_bin={}\n'.format(
-                        (f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+                        f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                             '\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
@@ -1073,7 +1073,7 @@ def mpkman() -> None:
                             elif con['type'] == 'checkbutton':
                                 b_var_name = con['set']
                                 self.gavs[b_var_name] = IntVar()
-                                if not 'text' in con:
+                                if 'text' not in con:
                                     text = 'M.K.C'
                                 else:
                                     text = con['text']
