@@ -1839,7 +1839,6 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
     else:
         parts_dict = {}
     for i in parts:
-        print(i)
         dname = os.path.basename(i)
         if not dname in parts_dict.keys():
             parts_dict[dname] = 'unknow'
@@ -2205,7 +2204,6 @@ def unpack(chose, form: any = None):
     with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
         ff.write(json.dumps(parts))
     parts.clear()
-
     car.set(1)
     print(lang.text8)
 
