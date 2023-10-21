@@ -188,5 +188,6 @@
   "t26": "Please Enter Your Device Code",
   "t27": "Generate LIST",
   "t28": "Working",
-  "t29": "Warn:The Project Name Cannot has [space]"
- }
+  "t29": "Warn:The Project Name Cannot has [space]",
+  "t30": "EROFS Level:{}"
+}

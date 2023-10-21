@@ -1401,8 +1401,8 @@ class packxx(object):
         edbgss.pack(side='left', padx=5, pady=5)
         edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
         # --
-        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label, variable=self.scale_erofs)
-        self.label = tk.Label(lf2, text=lang.text47.format(int(scales_erofs.get())))
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label_erofs, variable=self.scale_erofs)
+        self.label = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
         self.label.pack(side='left', padx=5, pady=5)
         scales_erofs.pack(fill="x", padx=5, pady=5)
         # --
@@ -1429,6 +1429,9 @@ class packxx(object):
 
     def update_label(self, value):
         self.label.config(text=lang.text47.format(int(float(value))))
+
+    def update_label_erofs(self, value):
+        self.label.config(text=lang.t30.format(int(float(value))))
 
     def start_(self):
         lg = self.lg
