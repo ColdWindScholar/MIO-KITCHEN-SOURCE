@@ -1825,6 +1825,7 @@ def dboot(nm: str = 'boot'):
 
 
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
+    dely = others[0]
     if not dn.get():
         messpop(lang.warn1)
         return False
