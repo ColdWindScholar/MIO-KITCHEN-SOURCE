@@ -1,9 +1,7 @@
 import os
 import os.path as op
 import re
-import subprocess
 from os import walk, symlink, readlink, name as osname
-from platform import machine
 from typing import Optional
 
 if osname == 'nt':
