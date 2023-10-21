@@ -2353,6 +2353,8 @@ class handle_log:
 
 def selectp(self):
     print(lang.text96 + dn.get())
+    if ' ' in dn.get():
+        print(lang.t29 + dn.get())
 
 
 def listdir():
