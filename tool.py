@@ -2108,58 +2108,57 @@ def unpack(chose, form: any = None):
         return 1
 
     for i in chose:
-        dname = i
-        if os.access(work + dname + ".new.dat.br", os.F_OK):
-            print(lang.text79 + dname + ".new.dat.br")
-            call("brotli -dj " + work + dname + ".new.dat.br")
-        if os.access(work + dname + ".new.dat", os.F_OK):
-            print(lang.text79 + work + dname + ".new.dat")
-            if os.path.getsize(work + dname + ".new.dat") != 0:
-                transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
+        if os.access(work + i + ".new.dat.br", os.F_OK):
+            print(lang.text79 + i + ".new.dat.br")
+            call("brotli -dj " + work + i + ".new.dat.br")
+        if os.access(work + i + ".new.dat", os.F_OK):
+            print(lang.text79 + work + i + ".new.dat")
+            if os.path.getsize(work + i + ".new.dat") != 0:
+                transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
                 if os.access(transferpath, os.F_OK):
-                    sdat2img(transferpath, work + dname + ".new.dat", work + dname + ".img")
-                    if os.access(work + dname + ".img", os.F_OK):
-                        os.remove(work + dname + ".new.dat")
+                    sdat2img(transferpath, work + i + ".new.dat", work + i + ".img")
+                    if os.access(work + i + ".img", os.F_OK):
+                        os.remove(work + i + ".new.dat")
                         os.remove(transferpath)
                         try:
-                            os.remove(work + dname + '.patch.dat')
+                            os.remove(work + i + '.patch.dat')
                         except:
                             pass
                     else:
                         print("transferpath" + lang.text84)
-        if os.access(work + dname + ".img", os.F_OK):
+        if os.access(work + i + ".img", os.F_OK):
             try:
-                parts.pop(dname)
+                parts.pop(i)
             except KeyError:
                 pass
-            if gettype(work + dname + ".img") != 'sparse':
-                parts[dname] = gettype(work + dname + ".img")
-            if gettype(work + dname + ".img") == 'dtbo':
-                un_dtbo(dname)
-            if gettype(work + dname + ".img") in ['boot', 'vendor_boot']:
-                jboot(dname)
-            if dname == 'logo':
-                logodump(dname)
-            if gettype(work + dname + ".img") == 'vbmeta':
-                print(f"{lang.text85}AVB:{dname}")
-                utils.vbpatch(work + dname + ".img").disavb()
-            ftype = gettype(work + dname + ".img")
+            if gettype(work + i + ".img") != 'sparse':
+                parts[i] = gettype(work + i + ".img")
+            if gettype(work + i + ".img") == 'dtbo':
+                un_dtbo(i)
+            if gettype(work + i + ".img") in ['boot', 'vendor_boot']:
+                jboot(i)
+            if i == 'logo':
+                logodump(i)
+            if gettype(work + i + ".img") == 'vbmeta':
+                print(f"{lang.text85}AVB:{i}")
+                utils.vbpatch(work + i + ".img").disavb()
+            ftype = gettype(work + i + ".img")
             if ftype == "sparse":
-                print(lang.text79 + dname + ".img [%s]" % ftype)
+                print(lang.text79 + i + ".img [%s]" % ftype)
                 try:
-                    utils.simg2img(work + dname + ".img")
+                    utils.simg2img(work + i + ".img")
                 except:
-                    messpop(lang.warn11.format(dname + ".img"))
-            if dname not in parts.keys():
-                parts[dname] = gettype(work + dname + ".img")
-            if gettype(work + dname + ".img") == 'super':
-                print(lang.text79 + dname + ".img")
-                if gettype(work + dname + ".img") == "sparse":
+                    messpop(lang.warn11.format(i + ".img"))
+            if i not in parts.keys():
+                parts[i] = gettype(work + i + ".img")
+            if gettype(work + i + ".img") == 'super':
+                print(lang.text79 + i + ".img")
+                if gettype(work + i + ".img") == "sparse":
                     try:
-                        utils.simg2img(work + dname + ".img")
+                        utils.simg2img(work + i + ".img")
                     except:
-                        messpop(lang.warn11.format(dname))
-                lpunpack.unpack(work + dname + ".img", work)
+                        messpop(lang.warn11.format(i))
+                lpunpack.unpack(work + i + ".img", work)
                 #
                 if os.access(work + "system_a.img", os.F_OK):
                     # start
@@ -2174,33 +2173,33 @@ def unpack(chose, form: any = None):
                 else:
                     # supersz :1
                     pass
-            if (ftype := gettype(work + dname + ".img")) == "ext":
-                print(lang.text79 + dname + ".img [%s]" % ftype)
+            if (ftype := gettype(work + i + ".img")) == "ext":
+                print(lang.text79 + i + ".img [%s]" % ftype)
                 try:
-                    imgextractor.Extractor().main(work + dname + ".img", work + dname, work)
+                    imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 except Exception as e:
                     print(f"Unpack Fail..{e}")
                     continue
-                if os.path.exists(work + dname):
+                if os.path.exists(work + i):
                     try:
-                        os.remove(work + dname + ".img")
+                        os.remove(work + i + ".img")
                     except Exception as e:
-                        messpop(lang.warn11.format(dname + ".img:" + e))
+                        messpop(lang.warn11.format(i + ".img:" + e))
             if ftype == "erofs":
-                print(lang.text79 + dname + ".img [%s]" % ftype)
-                if call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + dname + ".img -o " + work + " -x",
+                print(lang.text79 + i + ".img [%s]" % ftype)
+                if call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + i + ".img -o " + work + " -x",
                         out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
-                if os.access(work + "config" + os.sep + dname + "_fs_config", os.F_OK):
-                    with open(work + "config" + os.sep + dname + "_fs_config", 'a', encoding='utf-8',
+                if os.access(work + "config" + os.sep + i + "_fs_config", os.F_OK):
+                    with open(work + "config" + os.sep + i + "_fs_config", 'a', encoding='utf-8',
                               newline='\n') as fs:
                         fs.write("/lost+found 0 0 0777\r\n")
-                if os.path.exists(work + dname):
+                if os.path.exists(work + i):
                     try:
-                        os.remove(work + dname + ".img")
+                        os.remove(work + i + ".img")
                     except:
-                        messpop(lang.warn11.format(dname + ".img"))
+                        messpop(lang.warn11.format(i + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
     with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
