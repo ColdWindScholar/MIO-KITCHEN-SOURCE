@@ -2343,18 +2343,6 @@ def mke2fs(name, work, sparse):
 
 class handle_log:
     @staticmethod
-    def uploadlog():
-        da = {'JXK_Myname': 'MKC',
-              'JXK_Content': "%s" % (show.get(1.0, 'end-1c').encode('UTF-8'))
-              }
-        print(lang.text92 + str(
-            (ret := requests.post('http://xzz.web3v.vip/bugreport/book/List.asp?Action=save', data=da)).status_code))
-        if ret.status_code != 200:
-            messpop(lang.text93)
-        else:
-            print(lang.text94)
-
-    @staticmethod
     def putlog():
         with open(local + os.sep + (log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
                   'w', encoding='utf-8', newline='\n') as f:
@@ -2551,8 +2539,6 @@ show.pack(side=LEFT, fill=BOTH, expand=True)
 ttk.Button(rzf, text=lang.text105, command=lambda: show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
                                                                                expand=True)
 ttk.Button(rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5, expand=True)
-ttk.Button(rzf, text=lang.text107, command=lambda: cz(handle_log().uploadlog)).pack(side='bottom', padx=10, pady=5,
-                                                                                    expand=True)
 rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
 # 项目列表的控件
 sys.stdout = StdoutRedirector(show)
