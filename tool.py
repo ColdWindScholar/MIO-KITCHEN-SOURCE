@@ -1979,12 +1979,20 @@ def unpackrom(ifile) -> None:
             ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
+        try:
+            unpackg.refs()
+        except:
+            pass
         return
     elif os.path.splitext(ifile)[1] == '.ops':
         args = {'decrypt': True,
                 "<filename>": ifile,
                 'outdir': os.path.join(local, os.path.basename(ifile).split('.')[0])}
         opscrypto.main(args)
+        try:
+            unpackg.refs()
+        except:
+            pass
         car.set(1)
         return
     if gettype(zip_src) == 'zip':
@@ -2012,6 +2020,10 @@ def unpackrom(ifile) -> None:
         else:
             listdir()
         script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+        try:
+            unpackg.refs()
+        except:
+            pass
         car.set(1)
         return
     elif ftype != 'unknow':
@@ -2029,6 +2041,10 @@ def unpackrom(ifile) -> None:
     else:
         print(lang.text82 % ftype)
     car.set(1)
+    try:
+        unpackg.refs()
+    except:
+        pass
 
 
 def rwork() -> str:
