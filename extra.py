@@ -213,19 +213,3 @@ class proputil:
     def __exit__(self, exc_type, exc_val, exc_tb):  # with proputil('build.prop') as p:
         self.save()
         self.propfd.close()
-
-
-def returnoutput(cmd, elocal, kz=1):
-    if kz == 1:
-        comd = "".join([elocal, os.sep, "bin", os.sep, os.name, '_', machine(), os.sep, cmd])
-    else:
-        comd = cmd
-    if os.name == 'posix':
-        comd = comd.split()
-    else:
-        comd = cmd
-    try:
-        ret = subprocess.check_output(comd, shell=False, stderr=subprocess.STDOUT)
-        return ret.decode()
-    except subprocess.CalledProcessError as e:
-        return e
