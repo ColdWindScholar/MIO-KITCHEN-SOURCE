@@ -2327,8 +2327,11 @@ def datbr(work, name, brl: any):
 
 def mkerofs(name, format_, work, level):
     print(lang.text90 % (name, format_+f',{level}', "1.x"))
-    call(
-        f"mkfs.erofs -z{format_},{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}")
+    if format_ != 'lz4':
+        cmd = f"mkfs.erofs -z{format_},{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
+    else:
+        cmd = f"mkfs.erofs -z{format_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
+    call(cmd)
 
 
 def make_ext4fs(name, work, sparse):
