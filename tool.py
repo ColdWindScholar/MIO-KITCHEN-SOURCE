@@ -1436,7 +1436,7 @@ class packxx(object):
     def start_(self):
         lg = self.lg
         subp(com=0, master=self.ck)
-        packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get())
+        packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(), int(self.scale_erofs.get()))
 
 
 class dbkxyt:
