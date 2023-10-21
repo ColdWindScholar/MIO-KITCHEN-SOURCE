@@ -1836,7 +1836,7 @@ def dboot(nm: str = 'boot'):
 
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     dely = others[0]
-    erofs_level = others[2]
+    erofs_level = others[1]
     if not dn.get():
         messpop(lang.warn1)
         return False
