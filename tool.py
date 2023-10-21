@@ -2325,10 +2325,10 @@ def datbr(work, name, brl: any):
         print(lang.text89 % name)
 
 
-def mkerofs(name, level, work):
-    print(lang.text90 % (name, level, "1.6"))
+def mkerofs(name, format_, work, level):
+    print(lang.text90 % (name, format_+f'{level}', "1.6"))
     call(
-        f"mkfs.erofs -z{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}")
+        f"mkfs.erofs -z{format_},{level} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}")
 
 
 def make_ext4fs(name, work, sparse):
