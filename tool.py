@@ -1875,7 +1875,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                 except Exception as e:
                     print(e)
             if parts_dict[dname] == 'erofs':
-                mkerofs(dname, "%s" % (edbgs.get()), work)
+                mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level)
                 if dely == 1:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
