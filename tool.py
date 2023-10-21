@@ -1373,6 +1373,7 @@ class packxx(object):
         self.dbgs = StringVar()
         self.edbgs = StringVar()
         self.scale = IntVar()
+        self.scale_erofs = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
         self.lg = list_
@@ -1399,6 +1400,12 @@ class packxx(object):
         edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs)
         edbgss.pack(side='left', padx=5, pady=5)
         edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
+        # --
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label, variable=self.scale_erofs)
+        self.label = tk.Label(lf2, text=lang.text47.format(int(scales_erofs.get())))
+        self.label.pack(side='left', padx=5, pady=5)
+        scales_erofs.pack(fill="x", padx=5, pady=5)
+        # --
         scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal", command=self.update_label, variable=self.scale)
         self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
         self.label.pack(side='left', padx=5, pady=5)
