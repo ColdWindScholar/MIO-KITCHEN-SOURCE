@@ -2667,7 +2667,6 @@ class unpack_gui(ttk.LabelFrame):
             self.refs()
         else:
             packxx(lbs)
-            self.refs()
 
 
 unpackg = unpack_gui()
