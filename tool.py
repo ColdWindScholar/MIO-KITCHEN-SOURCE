@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import mmap
 import platform
+import subprocess
 from threading import Thread
 
 try:
