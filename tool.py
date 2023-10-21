@@ -1824,7 +1824,7 @@ def dboot(nm: str = 'boot'):
         print("Pack Successful...")
 
 
-def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, dely=0) -> any:
+def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     if not dn.get():
         messpop(lang.warn1)
         return False
