@@ -3,7 +3,7 @@ import os
 
 
 def win2wslpath(path):
-    if not ":" in path:
+    if ":" not in path:
         path = os.path.abspath(path)
     try:
         f, e = path.split(":")
@@ -18,7 +18,7 @@ def wsl2winpath(path):
             path = path[1:].replace("/", "\\")
         return "\\wsl.localhost\\Ubuntu\\" + path
     else:
-        if not "/" in path[5:]:
+        if "/" not in path[5:]:
             f, e = path[5:], ""
         else:
             f, e = path[5:].split("/", 1)
