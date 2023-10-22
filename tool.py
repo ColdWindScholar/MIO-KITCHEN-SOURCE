@@ -431,9 +431,9 @@ class Process(Toplevel):
         dn.set(os.path.basename(self.dir.name))
         self.gavs = {
             'bin': self.dir.name,
-            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
-                '\\',
-                '/')}
+            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\','/'),
+            'mkc_env': os.path.join(self.dir.name, v_code(10))
+        }
         self.value = ['tool_bin', 'bin']
         self.control = []
         self.able = True
