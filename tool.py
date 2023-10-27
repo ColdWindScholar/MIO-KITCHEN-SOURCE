@@ -422,7 +422,7 @@ class Process(Toplevel):
     def __init__(self, mps):
         super().__init__()
         self.prc = None
-        self.dir = os.path.join(elocal+os.sep+'temp', v_code(10))
+        self.dir = os.path.join(elocal+os.sep+'bin'+os.sep+'temp', v_code(10))
         self.project = os.path.join(self.dir, v_code())
         self.mps = mps
         self.in_process = False
@@ -634,7 +634,7 @@ class Process(Toplevel):
         self.notice.configure(text="错误！", fg='red')
         self.start.configure(text="退出", state='normal')
 
-    def exit(self):
+    def __exit(self):
         if self.in_process:
             return
         loadset()
@@ -642,6 +642,7 @@ class Process(Toplevel):
         sys.stderr = StdoutRedirector(show)
         listdir()
         os.chdir(elocal)
+        rmdir(self.dir)
         self.destroy()
         win.deiconify()
 
