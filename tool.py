@@ -1865,12 +1865,12 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
                                                                       "com.google.android.apps.nbu")))
                         rmdir(findfolder(work, "com.google.android.apps.nbu"))
-                    fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
-                    utils.qc(work + "config" + os.sep + dname + "_fs_config")
-                    contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
-                    utils.qc(work + "config" + os.sep + dname + "_file_contexts")
                 except Exception as e:
                     print(e)
+            fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
+            utils.qc(work + "config" + os.sep + dname + "_fs_config")
+            contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
+            utils.qc(work + "config" + os.sep + dname + "_file_contexts")
             if parts_dict[dname] == 'erofs':
                 mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level)
                 if dely == 1:
