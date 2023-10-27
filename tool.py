@@ -422,17 +422,15 @@ class Process(Toplevel):
     def __init__(self, mps):
         super().__init__()
         self.prc = None
-        self.dir = tempfile.TemporaryDirectory()
+        self.dir = v_code(10)
         self.mps = mps
         self.in_process = False
         self.error = 1
-        global local
-        local = os.path.dirname(self.dir.name)
-        dn.set(os.path.basename(self.dir.name))
+        dn.set(os.path.basename(self.dir))
         self.gavs = {
-            'bin': self.dir.name,
+            'bin': self.dir,
             'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\','/'),
-            'mkc_env': os.path.join(self.dir.name, v_code(10))
+            'mkc_env': os.path.join(self.dir, v_code(10))
         }
         self.value = ['tool_bin', 'bin', 'mkc_env']
         self.control = []
@@ -452,10 +450,10 @@ class Process(Toplevel):
         self.prepare()
 
     def prepare(self):
-        zipfile.ZipFile(self.mps).extractall(self.dir.name)
+        zipfile.ZipFile(self.mps).extractall(self.dir)
         jzxs(self)
-        os.chdir(self.dir.name)
-        with open(self.dir.name + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
+        os.chdir(self.dir)
+        with open(self.dir + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
         if "system" in self.prc['support']:
@@ -531,7 +529,7 @@ class Process(Toplevel):
         sys.stdout = StdoutRedirector(process)
         sys.stderr = StdoutRedirector(process)
         self.start.configure(text="正在运行", state='disabled')
-        with open(engine := self.dir.name + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
+        with open(engine := self.dir + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
                 try:
                     var = self.gavs[u].get()
@@ -543,7 +541,7 @@ class Process(Toplevel):
         for step in self.prc['steps']:
             self.notice.configure(text=step['name'])
             if 'run' in step:
-                with open(sh_tmp_file := self.dir.name + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
+                with open(sh_tmp_file := self.dir + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
                     sh_tmp.writelines(step['run'])
                 if os.name == 'posix':
                     sh = "ash"
@@ -572,7 +570,7 @@ class Process(Toplevel):
                 response = requests.Session().head(url)
                 file_size = int(response.headers.get("Content-Length", 0))
                 response = requests.Session().get(url, stream=True, verify=False)
-                with open(self.dir.name + os.sep + os.path.basename(url), "wb") as f:
+                with open(self.dir + os.sep + os.path.basename(url), "wb") as f:
                     chunk_size = 2048576
                     bytes_downloaded = 0
                     for data in response.iter_content(chunk_size=chunk_size):
@@ -640,11 +638,8 @@ class Process(Toplevel):
         loadset()
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
-        global local
-        local = slocal.get()
         listdir()
         os.chdir(elocal)
-        self.dir.cleanup()
         self.destroy()
         win.deiconify()
 
