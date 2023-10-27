@@ -423,16 +423,18 @@ class Process(Toplevel):
         super().__init__()
         self.prc = None
         self.dir = os.path.join(elocal+os.sep+'temp', v_code(10))
+        self.project = os.path.join(self.dir, v_code())
         self.mps = mps
         self.in_process = False
         self.error = 1
-        dn.set(os.path.basename(self.dir))
+        dn.set(os.path.basename(self.project))
         self.gavs = {
             'bin': self.dir,
             'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\','/'),
-            'mkc_env': os.path.join(self.dir, v_code(10))
+            'mkc_env': os.path.join(self.dir, v_code(10)),
+            'project': self.project.replace('\\', '/')
         }
-        self.value = ['tool_bin', 'bin', 'mkc_env']
+        self.value = ['tool_bin', 'bin', 'mkc_env', 'project']
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
