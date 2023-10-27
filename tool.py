@@ -640,7 +640,6 @@ class Process(Toplevel):
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
         listdir()
-        os.chdir(elocal)
         rmdir(self.dir)
         self.destroy()
         win.deiconify()
