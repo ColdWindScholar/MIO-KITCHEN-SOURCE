@@ -24,8 +24,9 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 if os.name == 'nt':
     import windnd
+    import win_extra as sys_extra
 elif os.name == "posix":
-    pass
+    import posix_extra as sys_extra
 import zipfile
 from io import BytesIO, StringIO
 from platform import machine
