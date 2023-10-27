@@ -297,7 +297,7 @@ def simg2img(path):
 
 
 def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
-    print('img2sdat binary - version: %s\n' % 1.7)
+    print('img2sdat binary - version: 1.7\n')
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
         '''            
@@ -309,7 +309,6 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
 
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
-    print('Done! Output files: %s' % os.path.dirname(prefix))
 
 
 def findfile(file, dir_) -> str:
