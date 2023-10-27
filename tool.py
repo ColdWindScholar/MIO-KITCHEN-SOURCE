@@ -634,7 +634,7 @@ class Process(Toplevel):
         self.notice.configure(text="错误！", fg='red')
         self.start.configure(text="退出", state='normal')
 
-    def __exit(self):
+    def exit(self):
         if self.in_process:
             return
         loadset()
