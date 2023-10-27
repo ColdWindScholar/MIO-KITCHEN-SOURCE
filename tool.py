@@ -422,7 +422,7 @@ class Process(Toplevel):
     def __init__(self, mps):
         super().__init__()
         self.prc = None
-        self.dir = v_code(10)
+        self.dir = os.path.join(elocal+os.sep+'temp', v_code(10))
         self.mps = mps
         self.in_process = False
         self.error = 1
