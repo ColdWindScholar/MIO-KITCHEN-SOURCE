@@ -57,9 +57,7 @@ class aesencrypt:
 
 
 def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
-    __version__ = '1.2'
-
-    print('sdat2img binary - version: {}\n'.format(__version__))
+    print('sdat2img binary - version: 1.2\n')
 
     def rangeset(src):
         src_set = src.split(',')
