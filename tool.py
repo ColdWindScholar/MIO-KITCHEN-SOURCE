@@ -454,7 +454,6 @@ class Process(Toplevel):
     def prepare(self):
         zipfile.ZipFile(self.mps).extractall(self.dir)
         jzxs(self)
-        os.chdir(self.dir)
         with open(self.dir + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
             self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
         self.title(self.prc['name'])
