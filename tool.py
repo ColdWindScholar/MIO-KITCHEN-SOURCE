@@ -434,7 +434,7 @@ class Process(Toplevel):
             'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\','/'),
             'mkc_env': os.path.join(self.dir.name, v_code(10))
         }
-        self.value = ['tool_bin', 'bin']
+        self.value = ['tool_bin', 'bin', 'mkc_env']
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
