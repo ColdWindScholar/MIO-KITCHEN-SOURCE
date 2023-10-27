@@ -70,7 +70,7 @@ def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
 
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
 
-    def parse_transfer_list_file(path):
+    def parse_transfer_list_file():
         with open(TRANSFER_LIST_FILE, 'r') as trans_list:
             # First line in transfer list is the version number
             # Second line in transfer list is the total number of blocks we expect to write
@@ -94,7 +94,7 @@ def sdat2img(TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
                         return
         return version, new_blocks, commands
 
-    version, new_blocks, commands = parse_transfer_list_file(TRANSFER_LIST_FILE)
+    version, new_blocks, commands = parse_transfer_list_file()
 
     show = "Android {} detected!\n"
     if version == 1:
