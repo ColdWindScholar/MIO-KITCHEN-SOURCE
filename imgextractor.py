@@ -213,10 +213,7 @@ class Extractor(object):
                                     tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                                 self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_file:
-                    wdone = None
                     if os.name == 'nt':
-                        if entry_name.endswith('/'):
-                            entry_name = entry_name[:-1]
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace('/', os.sep).replace(' ',
                                                                                                        '_').replace('"',
                                                                                                                     '')
