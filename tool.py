@@ -2381,8 +2381,6 @@ def selectp(self):
         print(lang.t29 + dn.get())
 
 
-
-
 def rmdir(path, up=0):
     if up == 0:
         load_car(0)
@@ -2403,9 +2401,6 @@ def rmdir(path, up=0):
             print(lang.text98 + path)
     if up == 0:
         car.set(1)
-
-
-
 
 
 def get_all_file_paths(directory) -> Ellipsis:
@@ -2593,7 +2588,16 @@ class xmcd(ttk.LabelFrame):
         self.listdir()
 
 
-frame3 = ttk.LabelFrame(tab2, text=lang.text112)
+class frame3(ttk.LabelFrame):
+    def __init__(self):
+        super().__init__(master=tab2, text=lang.text112)
+        self.pack(padx=5, pady=5)
+
+    def gui(self):
+        ttk.Button(self, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 
 
 class unpack_gui(ttk.LabelFrame):
@@ -2676,15 +2680,11 @@ class unpack_gui(ttk.LabelFrame):
 
 
 unpackg = unpack_gui()
-ttk.Button(frame3, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
-ttk.Button(frame3, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 xmcd_ = xmcd()
 xmcd_.gui()
 unpackg.gui()
+frame3().gui()
 xmcd_.listdir()
-frame3.pack(padx=5, pady=5)
 # 设置的控件
 slocal = StringVar()
 slocal.set(local)
