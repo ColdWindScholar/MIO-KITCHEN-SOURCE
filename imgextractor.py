@@ -221,6 +221,8 @@ class Extractor(object):
                                                                                                                     '')
                     elif os.name == "posix":
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
+                    else:
+                        file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     try:
                         with open(file_target, 'wb') as out:
                             out.write(entry_inode.open_read().read())
