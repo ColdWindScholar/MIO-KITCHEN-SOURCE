@@ -503,18 +503,16 @@ class Extractor(object):
             dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
             setattr(self, 'DIR', dirr)
             scan_dir(root)
-            for c in self.fsconfig:
-                if dirr == 'vendor':
+            if dirr == 'vendor':
                     self.fsconfig.insert(0, '/ 0 2000 0755')
                     self.fsconfig.insert(1, dirr + ' 0 2000 0755')
-                elif dirr == 'system':
+            elif dirr == 'system':
                     self.fsconfig.insert(0, '/' + ' 0 0 0755')
                     self.fsconfig.insert(1, '/' + 'lost+found' + ' 0 0 0700')
                     self.fsconfig.insert(2, dirr + ' 0 0 0755')
-                else:
+            else:
                     self.fsconfig.insert(0, '/' + ' 0 0 0755')
                     self.fsconfig.insert(1, dirr + ' 0 0 0755')
-                break
 
             self.__appendf('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
@@ -612,7 +610,7 @@ class Extractor(object):
                 # data = f.seek(offset)
                 data = f.read(15360)
                 if data:
-                    devnull = o.write(data)
+                    o.write(data)
         try:
             os.remove(input_file)
             os.rename(output_file, input_file)
