@@ -89,6 +89,7 @@ class Tool(Tk):
         self.frame_bg = ttk.Frame(self.canvas1)
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
+        self.tab4_n()
 
     def upjdt(self):
         self.frame_bg.update_idletasks()
@@ -101,6 +102,28 @@ class Tool(Tk):
         ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
         self.upjdt()
         return frame
+    def tab4_n(self):
+        def open_github(o):
+            openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
+        Label(self.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
+        Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
+        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+        Label(self.tab4,
+              text=lang.text128.format(VERSION, sys.version[:6], os.name, machine()),
+              font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
+        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+        Label(self.tab4,
+              text=lang.text127,
+              font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
+        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+        tab4_1 = ttk.LabelFrame(self.tab4, text=lang.text9)
+        Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
+        # ttk.Button(tab4_1, text="检查更新", command=lambda: CallZ(upgrade())).pack(padx=10, pady=10)
+        tab4_1.pack(padx=10, pady=10)
+        link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
+                         style="Link.TLabel")
+        link.bind("<Button-1>", open_github)
+        link.pack()
 
 
 win = Tool()
@@ -2723,31 +2746,10 @@ sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
 
 # 关于我们
-Label(win.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
-Label(win.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
-ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-Label(win.tab4,
-      text=lang.text128.format(VERSION, sys.version[:6], os.name, machine()),
-      font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
-ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-Label(win.tab4,
-      text=lang.text127,
-      font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
-ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-tab4_1 = ttk.LabelFrame(win.tab4, text=lang.text9)
-Label(win.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
-# ttk.Button(tab4_1, text="检查更新", command=lambda: CallZ(upgrade())).pack(padx=10, pady=10)
-tab4_1.pack(padx=10, pady=10)
-link = ttk.Label(win.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
-                 style="Link.TLabel")
 
 
-def open_github(o):
-    openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
 
 
-link.bind("<Button-1>", open_github)
-link.pack()
 # tab4_2.pack(padx=10, pady=10)
 # 捐赠
 Label(win.tab6,
