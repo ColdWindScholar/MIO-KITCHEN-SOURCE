@@ -582,7 +582,6 @@ class Process(Toplevel):
                         print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
             except:
                 self.error = 0
-                pass
             else:
                 self.error = 1
 
