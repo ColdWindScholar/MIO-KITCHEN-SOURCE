@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 import struct
+
 if os.name == 'nt':
     from ctypes.wintypes import LPCSTR
     from ctypes.wintypes import DWORD
@@ -504,15 +505,15 @@ class Extractor(object):
             setattr(self, 'DIR', dirr)
             scan_dir(root)
             if dirr == 'vendor':
-                    self.fsconfig.insert(0, '/ 0 2000 0755')
-                    self.fsconfig.insert(1, dirr + ' 0 2000 0755')
+                self.fsconfig.insert(0, '/ 0 2000 0755')
+                self.fsconfig.insert(1, dirr + ' 0 2000 0755')
             elif dirr == 'system':
-                    self.fsconfig.insert(0, '/' + ' 0 0 0755')
-                    self.fsconfig.insert(1, '/' + 'lost+found' + ' 0 0 0700')
-                    self.fsconfig.insert(2, dirr + ' 0 0 0755')
+                self.fsconfig.insert(0, '/' + ' 0 0 0755')
+                self.fsconfig.insert(1, '/' + 'lost+found' + ' 0 0 0700')
+                self.fsconfig.insert(2, dirr + ' 0 0 0755')
             else:
-                    self.fsconfig.insert(0, '/' + ' 0 0 0755')
-                    self.fsconfig.insert(1, dirr + ' 0 0 0755')
+                self.fsconfig.insert(0, '/' + ' 0 0 0755')
+                self.fsconfig.insert(1, dirr + ' 0 0 0755')
 
             self.__appendf('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
