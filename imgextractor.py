@@ -504,9 +504,6 @@ class Extractor(object):
             dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
             setattr(self, 'DIR', dirr)
             scan_dir(root)
-            for c in self.fsconfig:
-                if not c:
-                    pass
             if dirr == 'vendor':
                 self.fsconfig.insert(0, '/ 0 2000 0755')
                 self.fsconfig.insert(1, dirr + ' 0 2000 0755')
