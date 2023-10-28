@@ -64,6 +64,43 @@ class Tool(Tk):
     def __init__(self):
         super().__init__()
         self.title('OPEN-MIO-KITCHEN')
+    def gui(self):
+        self.subwin2 = ttk.LabelFrame(win, text=lang.text9)
+        self.subwin3 = ttk.LabelFrame(win, text=lang.text10)
+        self.subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
+        self.subwin2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
+        self.notepad = ttk.Notebook(self.subwin2)
+        self.tab = ttk.Frame(self.notepad)
+        self.tab2 = ttk.Frame(self.notepad)
+        self.tab3 = ttk.Frame(self.notepad)
+        self.tab4 = ttk.Frame(self.notepad)
+        self.tab5 = ttk.Frame(self.notepad)
+        self.tab6 = ttk.Frame(self.notepad)
+        self.notepad.add(self.tab, text=lang.text11)
+        self.notepad.add(self.tab2, text=lang.text12)
+        self.notepad.add(self.tab3, text=lang.text13)
+        self.notepad.add(self.tab4, text=lang.text14)
+        self.notepad.add(self.tab5, text=lang.text15)
+        self.notepad.add(self.tab6, text=lang.text16)
+        self.scrollbar = ttk.Scrollbar(self.tab5, orient=tk.VERTICAL)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.canvas1 = Canvas(self.tab5, yscrollcommand=self.scrollbar.set)
+        self.canvas1.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.frame_bg = ttk.Frame(self.canvas1)
+        self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
+        self.canvas1.config(highlightthickness=0)
+
+    def upjdt(self):
+        self.frame_bg.update_idletasks()
+        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
+        self.scrollbar.config(command=self.canvas1.yview)
+
+    def getframe(self, title):
+        frame = ttk.LabelFrame(self.frame_bg, text=title)
+        frame.pack(padx=10, pady=10)
+        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
+        self.upjdt()
+        return frame
 
 
 win = Tool()
@@ -367,44 +404,12 @@ def logopack() -> int:
 
 
 # 绘制界面
-subwin2 = ttk.LabelFrame(win, text=lang.text9)
-subwin3 = ttk.LabelFrame(win, text=lang.text10)
-subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
-subwin2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
-notepad = ttk.Notebook(subwin2)
-tab = ttk.Frame(notepad)
-tab2 = ttk.Frame(notepad)
-tab3 = ttk.Frame(notepad)
-tab4 = ttk.Frame(notepad)
-tab5 = ttk.Frame(notepad)
-tab6 = ttk.Frame(notepad)
-notepad.add(tab, text=lang.text11)
-notepad.add(tab2, text=lang.text12)
-notepad.add(tab3, text=lang.text13)
-notepad.add(tab4, text=lang.text14)
-notepad.add(tab5, text=lang.text15)
-notepad.add(tab6, text=lang.text16)
-scrollbar = ttk.Scrollbar(tab5, orient=tk.VERTICAL)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-canvas1 = Canvas(tab5, yscrollcommand=scrollbar.set)
-canvas1.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-frame_bg = ttk.Frame(canvas1)
-canvas1.create_window((0, 0), window=frame_bg, anchor='nw')
-canvas1.config(highlightthickness=0)
+win.gui()
 
 
-def upjdt():
-    frame_bg.update_idletasks()
-    canvas1.config(scrollregion=canvas1.bbox('all'))
-    scrollbar.config(command=canvas1.yview)
 
 
-def getframe(title):
-    frame = ttk.LabelFrame(frame_bg, text=title)
-    frame.pack(padx=10, pady=10)
-    ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
-    upjdt()
-    return frame
+
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
@@ -1678,7 +1683,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 
 
 def download_file():
-    down = getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
+    down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
@@ -2504,12 +2509,12 @@ def sdxz(other):
     dndfile(filedialog.askopenfilename().split())
 
 
-notepad.pack(fill=BOTH)
-rzf = ttk.Frame(subwin3)
-tsk = Label(subwin3, text="MIO-KITCHEN", font=('楷书', 15))
+win.notepad.pack(fill=BOTH)
+rzf = ttk.Frame(win.subwin3)
+tsk = Label(win.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
 tsk.bind('<Button-1>')
 tsk.pack(padx=10, pady=10, side='top')
-tr = ttk.LabelFrame(subwin3, text=lang.text131)
+tr = ttk.LabelFrame(win.subwin3, text=lang.text131)
 Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
 tr.bind('<Button-1>', sdxz)
 tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
@@ -2524,9 +2529,9 @@ rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
 # 项目列表的控件
 sys.stdout = StdoutRedirector(show)
 sys.stderr = StdoutRedirector(show)
-zyf1 = ttk.LabelFrame(tab, text=lang.text9)
+zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
 zyf1.pack(padx=10, pady=10)
-ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(side='left',
+ttk.Button(zyf1, text=lang.text16, command=lambda: win.notepad.select(win.tab6)).pack(side='left',
                                                                               padx=10,
                                                                               pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
@@ -2534,7 +2539,7 @@ ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side
 
 class xmcd(ttk.LabelFrame):
     def __init__(self):
-        super().__init__(master=tab2, text=lang.text12)
+        super().__init__(master=win.tab2, text=lang.text12)
         self.pack(padx=5, pady=5)
 
     def gui(self):
@@ -2590,7 +2595,7 @@ class xmcd(ttk.LabelFrame):
 
 class frame3(ttk.LabelFrame):
     def __init__(self):
-        super().__init__(master=tab2, text=lang.text112)
+        super().__init__(master=win.tab2, text=lang.text112)
         self.pack(padx=5, pady=5)
 
     def gui(self):
@@ -2602,7 +2607,7 @@ class frame3(ttk.LabelFrame):
 
 class unpack_gui(ttk.LabelFrame):
     def __init__(self):
-        super().__init__(master=tab2, text=lang.unpack)
+        super().__init__(master=win.tab2, text=lang.unpack)
 
     def gui(self):
         self.pack(padx=5, pady=5)
@@ -2688,9 +2693,9 @@ xmcd_.listdir()
 # 设置的控件
 slocal = StringVar()
 slocal.set(local)
-sf1 = ttk.Frame(tab3)
-sf2 = ttk.Frame(tab3)
-sf3 = ttk.Frame(tab3)
+sf1 = ttk.Frame(win.tab3)
+sf2 = ttk.Frame(win.tab3)
+sf3 = ttk.Frame(win.tab3)
 ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
 LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
 LB2.pack(padx=10, pady=10, side='left')
@@ -2718,22 +2723,22 @@ sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
 
 # 关于我们
-Label(tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
-Label(tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
-ttk.Separator(tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-Label(tab4,
+Label(win.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
+Label(win.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
+ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+Label(win.tab4,
       text=lang.text128.format(VERSION, sys.version[:6], os.name, machine()),
       font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
-ttk.Separator(tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-Label(tab4,
+ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+Label(win.tab4,
       text=lang.text127,
       font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
-ttk.Separator(tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-tab4_1 = ttk.LabelFrame(tab4, text=lang.text9)
-Label(tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
+ttk.Separator(win.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
+tab4_1 = ttk.LabelFrame(win.tab4, text=lang.text9)
+Label(win.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
 # ttk.Button(tab4_1, text="检查更新", command=lambda: CallZ(upgrade())).pack(padx=10, pady=10)
 tab4_1.pack(padx=10, pady=10)
-link = ttk.Label(tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
+link = ttk.Label(win.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                  style="Link.TLabel")
 
 
@@ -2745,12 +2750,12 @@ link.bind("<Button-1>", open_github)
 link.pack()
 # tab4_2.pack(padx=10, pady=10)
 # 捐赠
-Label(tab6,
+Label(win.tab6,
       text=f"Wechat Pay/微信支付",
       font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
 photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
-Label(tab6, image=photo).pack(padx=5, pady=5)
-Label(tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+Label(win.tab6, image=photo).pack(padx=5, pady=5)
+Label(win.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
 
 
 class format_conversion(Toplevel):
