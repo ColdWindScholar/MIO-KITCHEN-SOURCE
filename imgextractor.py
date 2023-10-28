@@ -385,8 +385,13 @@ class Extractor(object):
                                 for index in list(link_target):
                                     tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                 out.write(tmp + struct.pack('xx'))
-                                subprocess.Popen('attrib +s "%s"' % target.replace('/', os.sep), shell=True,
-                                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                if os.name == 'nt':
+                                    from ctypes.wintypes import LPCSTR
+                                    from ctypes.wintypes import DWORD
+                                    from stat import FILE_ATTRIBUTE_SYSTEM
+                                    from ctypes import windll
+                                    attrib = windll.kernel32.SetFileAttributesA
+                                    attrib(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
                         if not all(c in string.printable for c in link_target):
                             pass
                         if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
