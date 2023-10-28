@@ -64,6 +64,7 @@ class Tool(Tk):
     def __init__(self):
         super().__init__()
         self.title('OPEN-MIO-KITCHEN')
+
     def gui(self):
         self.subwin2 = ttk.LabelFrame(win, text=lang.text9)
         self.subwin3 = ttk.LabelFrame(win, text=lang.text10)
@@ -102,9 +103,11 @@ class Tool(Tk):
         ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
         self.upjdt()
         return frame
+
     def tab4_n(self):
         def open_github(o):
             openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
+
         Label(self.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
         Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
@@ -428,11 +431,6 @@ def logopack() -> int:
 
 # 绘制界面
 win.gui()
-
-
-
-
-
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
@@ -2555,8 +2553,8 @@ sys.stderr = StdoutRedirector(show)
 zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
 zyf1.pack(padx=10, pady=10)
 ttk.Button(zyf1, text=lang.text16, command=lambda: win.notepad.select(win.tab6)).pack(side='left',
-                                                                              padx=10,
-                                                                              pady=10)
+                                                                                      padx=10,
+                                                                                      pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 
 
@@ -2746,8 +2744,6 @@ sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
 
 # 关于我们
-
-
 
 
 # tab4_2.pack(padx=10, pady=10)
