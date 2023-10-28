@@ -3,7 +3,11 @@ import os
 import re
 import shutil
 import struct
-import subprocess
+if os.name == 'nt':
+    from ctypes.wintypes import LPCSTR
+    from ctypes.wintypes import DWORD
+    from stat import FILE_ATTRIBUTE_SYSTEM
+    from ctypes import windll
 import traceback
 from timeit import default_timer as dti
 
@@ -386,12 +390,11 @@ class Extractor(object):
                                     tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                 out.write(tmp + struct.pack('xx'))
                                 if os.name == 'nt':
-                                    from ctypes.wintypes import LPCSTR
-                                    from ctypes.wintypes import DWORD
-                                    from stat import FILE_ATTRIBUTE_SYSTEM
-                                    from ctypes import windll
                                     attrib = windll.kernel32.SetFileAttributesA
-                                    attrib(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                    try:
+                                        attrib(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                    except Exception:
+                                        pass
                         if not all(c in string.printable for c in link_target):
                             pass
                         if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
