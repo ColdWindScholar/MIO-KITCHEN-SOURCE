@@ -421,7 +421,7 @@ class Process(Toplevel):
     def __init__(self, mps):
         super().__init__()
         self.prc = None
-        self.dir = os.path.join(elocal+os.sep+'bin'+os.sep+'temp', v_code(10))
+        self.dir = os.path.join(elocal + os.sep + 'bin' + os.sep + 'temp', v_code(10))
         self.project = os.path.join(self.dir, v_code())
         self.mps = mps
         self.in_process = False
@@ -429,7 +429,8 @@ class Process(Toplevel):
         dn.set(os.path.basename(self.project))
         self.gavs = {
             'bin': self.dir,
-            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace('\\','/'),
+            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
+                '\\', '/'),
             'mkc_env': os.path.join(self.dir, v_code(10)),
             'project': self.project.replace('\\', '/')
         }
@@ -505,7 +506,7 @@ class Process(Toplevel):
             elif con['type'] == 'checkbutton':
                 b_var_name = key
                 self.gavs[b_var_name] = IntVar()
-                if not 'text' in con:
+                if 'text' not in con:
                     text = 'M.K.C'
                 else:
                     text = con['text']
@@ -1112,9 +1113,6 @@ def mpkman() -> None:
                             os.remove(file.get())
                     elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
                         msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
-
-
-                # 生成TMP
                 else:
                     if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
                         if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
@@ -1396,7 +1394,8 @@ class packxx(object):
         edbgss.pack(side='left', padx=5, pady=5)
         edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
         # --
-        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label_erofs, variable=self.scale_erofs)
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label_erofs,
+                                 variable=self.scale_erofs)
         self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
         self.label_e.pack(side='left', padx=5, pady=5)
         scales_erofs.pack(fill="x", padx=5, pady=5)
@@ -1431,7 +1430,8 @@ class packxx(object):
     def start_(self):
         lg = self.lg
         subp(com=0, master=self.ck)
-        packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(), int(self.scale_erofs.get()))
+        packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
+                int(self.scale_erofs.get()))
 
 
 class dbkxyt:
@@ -2321,7 +2321,7 @@ def datbr(work, name, brl: any):
 
 
 def mkerofs(name, format_, work, level):
-    print(lang.text90 % (name, format_+f',{level}', "1.x"))
+    print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     if format_ != 'lz4':
         extra_ = f'{format_},{level}'
     else:
