@@ -627,18 +627,6 @@ class Extractor(object):
         offset = mm.find(struct.pack('<L', EXT4_HEADER_MAGIC))
         return offset
 
-    def __getTypeTarget(self, target):
-        filename, file_extension = os.path.splitext(target)
-        if file_extension == '.img':
-            with open(target, "rb") as img_file:
-                setattr(self, 'sign_offset', self.checkSignOffset(img_file))
-                if self.sign_offset > 0:
-                    img_file.seek(self.sign_offset, 0)
-                header = ext4_file_header(img_file.read(28))
-                if header.magic != EXT4_HEADER_MAGIC:
-                    return 'img'
-                else:
-                    return 'simg'
 
     def main(self, target, output_dir, work):
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
