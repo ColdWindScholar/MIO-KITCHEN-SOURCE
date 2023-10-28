@@ -2514,7 +2514,6 @@ def dndfile(files):
             fi = fi.decode('gbk')
         except:
             fi = fi
-
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
                 installmpk(fi)
@@ -2527,7 +2526,7 @@ def dndfile(files):
 
 
 def sdxz(other):
-    dndfile(filedialog.askopenfilename().split())
+    dndfile([filedialog.askopenfilename()])
 
 
 win.notepad.pack(fill=BOTH)
