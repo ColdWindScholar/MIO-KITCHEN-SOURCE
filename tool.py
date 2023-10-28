@@ -638,7 +638,7 @@ class Process(Toplevel):
         loadset()
         sys.stdout = StdoutRedirector(show)
         sys.stderr = StdoutRedirector(show)
-        listdir()
+        xmcd_.listdir()
         rmdir(self.dir)
         self.destroy()
         win.deiconify()
@@ -2021,10 +2021,10 @@ def unpackrom(ifile) -> None:
                 pass
         print(lang.text81)
         if os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0]])):
-            listdir()
+            xmcd_.listdir()
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
-            listdir()
+            xmcd_.listdir()
         script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         try:
             unpackg.refs()
@@ -2042,7 +2042,7 @@ def unpackrom(ifile) -> None:
         except Exception as e:
             messpop(e)
         copy(ifile, folder)
-        listdir()
+        xmcd_.listdir()
         dn.set(os.path.basename(folder))
     else:
         print(lang.text82 % ftype)
@@ -2381,26 +2381,6 @@ def selectp(self):
         print(lang.t29 + dn.get())
 
 
-def listdir():
-    array = []
-    for f in os.listdir(local + os.sep + "."):
-        if os.path.isdir(local + os.sep + f) and f != 'bin' and not f.startswith('.'):
-            array.append(f)
-    if not array:
-        dn.set("")
-        LB1["value"] = array
-        LB1.current()
-    else:
-        LB1["value"] = array
-        LB1.current(0)
-
-
-def delwork():
-    if not dn.get():
-        messpop(lang.warn1)
-    else:
-        rmdir(local + os.sep + dn.get())
-    listdir()
 
 
 def rmdir(path, up=0):
@@ -2425,13 +2405,7 @@ def rmdir(path, up=0):
         car.set(1)
 
 
-def newp():
-    if not (inputvar := input_()):
-        messpop(lang.warn12)
-    else:
-        print(lang.text99 % inputvar)
-        os.mkdir(local + os.sep + "%s" % inputvar)
-    listdir()
+
 
 
 def get_all_file_paths(directory) -> Ellipsis:
@@ -2513,20 +2487,6 @@ def modpath():
     loadset()
 
 
-def cmm():
-    if not dn.get():
-        print(lang.warn1)
-        return
-    if os.path.exists(local + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
-        print(lang.text103)
-        return False
-    if inputvar != dn.get():
-        os.rename(local + os.sep + dn.get(), local + os.sep + inputvar)
-        listdir()
-    else:
-        print(lang.text104)
-
-
 def dndfile(files):
     for fi in files:
         try:
@@ -2575,15 +2535,65 @@ ttk.Button(zyf1, text=lang.text16, command=lambda: notepad.select(tab6)).pack(si
                                                                               padx=10,
                                                                               pady=10)
 ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
-xmcd = ttk.LabelFrame(tab2, text=lang.text12)
+
+
+class xmcd(ttk.LabelFrame):
+    def __init__(self):
+        super().__init__(master=tab2, text=lang.text12)
+        self.pack(padx=5, pady=5)
+
+    def gui(self):
+        self.LB1 = ttk.Combobox(self, textvariable=dn, state='readonly')
+        self.LB1.pack(side="top", padx=10, pady=10, fill=X)
+        self.LB1.bind('<<ComboboxSelected>>', selectp)
+        ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text115, command=self.newp).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text116, command=lambda: cz(self.delwork)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text117, command=lambda: cz(self.cmm)).pack(side="left", padx=10, pady=10)
+
+    def listdir(self):
+        array = []
+        for f in os.listdir(local + os.sep + "."):
+            if os.path.isdir(local + os.sep + f) and f != 'bin' and not f.startswith('.'):
+                array.append(f)
+        if not array:
+            dn.set("")
+            self.LB1["value"] = array
+            self.LB1.current()
+        else:
+            self.LB1["value"] = array
+            self.LB1.current(0)
+
+    def cmm(self):
+        if not dn.get():
+            print(lang.warn1)
+            return
+        if os.path.exists(local + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
+            print(lang.text103)
+            return False
+        if inputvar != dn.get():
+            os.rename(local + os.sep + dn.get(), local + os.sep + inputvar)
+            self.listdir()
+        else:
+            print(lang.text104)
+
+    def delwork(self):
+        if not dn.get():
+            messpop(lang.warn1)
+        else:
+            rmdir(local + os.sep + dn.get())
+        self.listdir()
+
+    def newp(self):
+        if not (inputvar := input_()):
+            messpop(lang.warn12)
+        else:
+            print(lang.text99 % inputvar)
+            os.mkdir(local + os.sep + "%s" % inputvar)
+        self.listdir()
+
+
 frame3 = ttk.LabelFrame(tab2, text=lang.text112)
-LB1 = ttk.Combobox(xmcd, textvariable=dn, state='readonly')
-LB1.pack(side="top", padx=10, pady=10, fill=X)
-LB1.bind('<<ComboboxSelected>>', selectp)
-ttk.Button(xmcd, text=lang.text23, command=listdir).pack(side="left", padx=10, pady=10)
-ttk.Button(xmcd, text=lang.text115, command=newp).pack(side="left", padx=10, pady=10)
-ttk.Button(xmcd, text=lang.text116, command=lambda: cz(delwork)).pack(side="left", padx=10, pady=10)
-ttk.Button(xmcd, text=lang.text117, command=lambda: cz(cmm)).pack(side="left", padx=10, pady=10)
 
 
 class unpack_gui(ttk.LabelFrame):
@@ -2670,10 +2680,11 @@ ttk.Button(frame3, text=lang.text122, command=lambda: cz(packzip)).pack(side="le
 ttk.Button(frame3, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
 ttk.Button(frame3, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
-xmcd.pack(padx=5, pady=5)
+xmcd_ = xmcd()
+xmcd_.gui()
 unpackg.gui()
+xmcd_.listdir()
 frame3.pack(padx=5, pady=5)
-listdir()
 # 设置的控件
 slocal = StringVar()
 slocal.set(local)
