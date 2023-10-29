@@ -800,7 +800,7 @@ def mpkman() -> None:
         try:
             title.config(text=pls.get(pls.curselection()))
         except Exception as e:
-            title.config(text="Null")
+            title.config(text=lang.text19)
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
