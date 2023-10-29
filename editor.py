@@ -4,6 +4,8 @@ import tkinter as tk
 from os.path import basename
 from tkinter import ttk
 
+from utils import cz
+
 kwlist = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del',
           'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda',
           'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield', "msh", 'echo', 'sed',
@@ -23,7 +25,7 @@ class PythonEditor(tk.Frame):
         self.text.bind("<KeyRelease>", self.highlight)
         self.highlight()
         f1 = ttk.Frame(self.parent)
-        self.save_b = ttk.Button(f1, text="保存 | Save", command=self.save)
+        self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save))
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                               expand=1)
@@ -39,7 +41,7 @@ class PythonEditor(tk.Frame):
             self.parent.title(f"{basename(self.file_)} - Editor")
 
     def save(self):
-        self.save_b.configure(text='已保存', state='disabled')
+        self.save_b.configure(text='已保存 | Saved', state='disabled')
         with open(self.file_, 'w+', encoding='utf-8', newline='\n') as txt:
             txt.write(self.text.get(1.0, tk.END))
         time.sleep(1)
