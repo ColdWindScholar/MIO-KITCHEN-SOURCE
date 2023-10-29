@@ -77,8 +77,10 @@ class Tool(Tk):
         self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
         self.tab6 = ttk.Frame(self.notepad)
+        self.tab7 = ttk.Frame(self.notepad)
         self.notepad.add(self.tab, text=lang.text11)
         self.notepad.add(self.tab2, text=lang.text12)
+        self.notepad.add(self.tab7, text=lang.text19)
         self.notepad.add(self.tab3, text=lang.text13)
         self.notepad.add(self.tab4, text=lang.text14)
         self.notepad.add(self.tab5, text=lang.text15)
@@ -1255,13 +1257,8 @@ def mpkman() -> None:
             else:
                 messpop(lang.warn2)
 
-    manager = Toplevel()
-    try:
-        manager.attributes('-topmost', 'true')
-    except:
-        pass
-    manager.title(lang.text19)
-    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+    manager = win.tab7
+    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
     pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
@@ -1284,7 +1281,6 @@ def mpkman() -> None:
     except:
         pass
     lf1.pack(padx=10, pady=10)
-    jzxs(manager)
 
 
 class installmpk(Toplevel):
@@ -2621,7 +2617,7 @@ class frame3(ttk.LabelFrame):
     def gui(self):
         ttk.Button(self, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text19, command=lambda: cz(mpkman)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 
 
@@ -2964,6 +2960,7 @@ if os.name == "posix":
 else:
     win.iconphoto(True, tk.PhotoImage(file="".join([elocal, os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
 cz(get_time)
+mpkman()
 if int(oobe) < 4:
     welcome()
 print(lang.text134 % (dti() - start))
