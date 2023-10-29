@@ -1,7 +1,8 @@
 import logging
+import time
 import tkinter as tk
-from tkinter import ttk, messagebox
 from os.path import basename
+from tkinter import ttk
 
 kwlist = ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del',
           'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda',
@@ -22,8 +23,10 @@ class PythonEditor(tk.Frame):
         self.text.bind("<KeyRelease>", self.highlight)
         self.highlight()
         f1 = ttk.Frame(self.parent)
-        ttk.Button(f1, text="保存 | Save", command=self.save).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
-        ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
+        self.save_b = ttk.Button(f1, text="保存 | Save", command=self.save)
+        self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
+        ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
+                                                                              expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         if self.file_:
             try:
@@ -36,9 +39,11 @@ class PythonEditor(tk.Frame):
             self.parent.title(f"{basename(self.file_)} - Editor")
 
     def save(self):
+        self.save_b.configure(text='已保存', state='disabled')
         with open(self.file_, 'w+', encoding='utf-8', newline='\n') as txt:
             txt.write(self.text.get(1.0, tk.END))
-        messagebox.showinfo("已保存", f"{basename(self.file_)} 已保存")
+        time.sleep(1)
+        self.save_b.configure(text='保存 | Save', state='normal')
 
     def highlight(self, event=None):
         if event:
