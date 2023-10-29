@@ -1258,7 +1258,7 @@ def mpkman() -> None:
                 messpop(lang.warn2)
 
     manager = win.tab7
-    ttk.Label(manager, text=lang.text19, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH)
+    ttk.Label(manager, text=lang.text19, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
     pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
