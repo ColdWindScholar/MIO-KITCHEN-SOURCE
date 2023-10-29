@@ -798,9 +798,9 @@ def mpkman() -> None:
 
     def relf2(self):
         try:
-            lf2.config(text=pls.get(pls.curselection()))
+            title.config(text=pls.get(pls.curselection()))
         except Exception as e:
-            lf2.config(text="Null")
+            title.config(text="Null")
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
@@ -1258,11 +1258,12 @@ def mpkman() -> None:
                 messpop(lang.warn2)
 
     manager = win.tab7
-    ttk.Label(manager, text=lang.text19, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH)
+    title = ttk.Label(manager, text=lang.text19, font=("宋体", 20))
+    title.pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
     pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
-    lf2 = ttk.LabelFrame(manager)
+    lf2 = ttk.LabelFrame(manager, text=lang.text9)
     ttk.Button(lf2, text=lang.text20, command=lambda: cz(unmpk)).pack(padx=5, pady=5, fill=BOTH)
     ttk.Button(lf2, text=lang.text22, command=lambda: cz(run)).pack(padx=5, pady=5, fill=BOTH)
     ttk.Button(lf2, text=lang.t14, command=lambda: cz(export)).pack(padx=5, pady=5, fill=BOTH)
