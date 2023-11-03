@@ -677,6 +677,7 @@ class IconGrid(tk.Frame):
         super().__init__(master, **kwargs)
         self.master = master
         self.icons = []
+        self.chose_icon = None
         self.canvas = tk.Canvas(self)
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas)
