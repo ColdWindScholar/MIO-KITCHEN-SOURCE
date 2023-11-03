@@ -700,6 +700,10 @@ class IconGrid(tk.Frame):
         col = (len(self.icons) - 1) % 4
         icon.grid(row=row, column=col, padx=10, pady=10)
 
+    def clean(self):
+        for i in self.icons:
+            i.destroy()
+
     def on_frame_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
@@ -830,7 +834,6 @@ def mpkman() -> None:
             print(lang.t15 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
         else:
             print(lang.t16 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
-
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
