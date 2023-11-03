@@ -670,6 +670,8 @@ class Process(Toplevel):
         rmdir(self.dir)
         self.destroy()
         win.deiconify()
+
+
 class IconGrid(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -701,7 +703,7 @@ class IconGrid(tk.Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
 def mpkman() -> None:
@@ -1307,7 +1309,6 @@ def mpkman() -> None:
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
-    pls.bind("<Button-3>", popup)
     try:
         listpls()
     except:
@@ -2649,7 +2650,8 @@ class frame3(ttk.LabelFrame):
     def gui(self):
         ttk.Button(self, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10,
+                                                                                              pady=10)
         ttk.Button(self, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
 
 
