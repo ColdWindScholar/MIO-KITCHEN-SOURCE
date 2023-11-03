@@ -677,7 +677,6 @@ class IconGrid(tk.Frame):
         super().__init__(master, **kwargs)
         self.master = master
         self.icons = []
-        self.chose_icon = None
         self.canvas = tk.Canvas(self)
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas)
@@ -712,18 +711,15 @@ class IconGrid(tk.Frame):
 
 
 def mpkman() -> None:
+    chosed = tk.StringVar()
+    chosed.set('')
     if not dn.get():
         messpop(lang.warn1)
         return
 
-    def impk() -> Exception:
+    def impk():
         installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
-        win.tab7.lift()
-        try:
-            listpls()
-        except Exception as e:
-            listpls()
-            return e
+        list_pls()
 
     class new_(Toplevel):
         def __init__(self):
@@ -771,15 +767,15 @@ def mpkman() -> None:
                 os.makedirs(moduledir + os.sep + iden)
             with open(moduledir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8', newline='\n') as js:
                 js.write(json.dumps(data))
-            listpls()
+            list_pls()
             editor_(iden)
 
     def editor_(id_=None):
-        if not pls.curselection():
+        if not chosed.get():
             messpop(lang.warn2)
             return 1
         if id_ is None:
-            id_ = globals()[pls.get(pls.curselection())]
+            id_ = globals()[chosed.get()]
         path = "".join([moduledir, os.sep, id_, os.sep])
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             if ask_win(lang.t18, 'SH', 'MSH') == 1:
@@ -795,11 +791,19 @@ def mpkman() -> None:
             elif os.path.exists(path + 'main.sh'):
                 editor.main(path + 'main.sh')
 
+    class mpkrun:
+        def __init__(self, name):
+            self.name = name
+
+        def popup(self, event):
+            chosed.set(self.name)
+            rmenu2.post(event.x_root, event.y_root)
+
     def export():
-        if not pls.curselection():
+        if not chosed.get():
             messpop(lang.warn2)
             return 1
-        with open("".join([moduledir, os.sep, (value := globals()[pls.get(pls.curselection())]), os.sep, "info.json"]),
+        with open("".join([moduledir, os.sep, (value := globals()[chosed.get()]), os.sep, "info.json"]),
                   'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
@@ -826,14 +830,14 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile("".join([local, os.sep, pls.get(pls.curselection()), ".mpk"]), 'w',
+        with zipfile.ZipFile("".join([local, os.sep, chosed.get(), ".mpk"]), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
-        if os.path.exists(local + os.sep + pls.get(pls.curselection()) + ".mpk"):
-            print(lang.t15 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
+        if os.path.exists(local + os.sep + chosed.get() + ".mpk"):
+            print(lang.t15 % (local + os.sep + chosed.get() + ".mpk"))
         else:
-            print(lang.t16 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
+            print(lang.t16 % (local + os.sep + chosed.get() + ".mpk"))
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
@@ -841,21 +845,19 @@ def mpkman() -> None:
     moduledir = "".join([elocal, os.sep, "bin", os.sep, "module"])
     file = StringVar()
 
-    def listpls():
-        pls.delete(0, "end")
+    def list_pls():
         try:
+            pls.clean()
             for i in os.listdir(moduledir):
                 if os.path.isdir(moduledir + os.sep + i):
                     with open("".join([moduledir, os.sep, i, os.sep, "info.json"]), 'r', encoding='UTF-8') as f:
                         data = json.load(f)
-                        pls.insert('end', data['name'])
+                        icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#00BFFF")
+                        icon.bind('<Button-3>', mpkrun(data['name']).popup)
+                        pls.add_icon(icon)
                         globals()[data['name']] = data['identifier']
         except:
-            pass
-        try:
-            pls.selection_set(0)
-        except:
-            pass
+            return 1
 
     class msh_parse(object):
         envs = {'version': VERSION,
@@ -1148,8 +1150,8 @@ def mpkman() -> None:
             self.wait_window()
 
     def run():
-        if pls.curselection():
-            value = globals()[pls.get(pls.curselection())]
+        if chosed.get():
+            value = globals()[chosed.get()]
         else:
             value = ""
         if value:
@@ -1207,7 +1209,7 @@ def mpkman() -> None:
             else:
                 if not os.path.exists(moduledir + os.sep + value):
                     messpop(lang.warn7.format(value))
-                    listpls()
+                    list_pls()
                     win.tab7.lift()
                 else:
                     print(lang.warn8)
@@ -1219,9 +1221,9 @@ def mpkman() -> None:
         def __init__(self):
             self.arr = []
             self.arr2 = []
-            if pls.curselection():
-                self.value = globals()[pls.get(pls.curselection())]
-                self.value2 = pls.get(pls.curselection())
+            if chosed.get():
+                self.value = globals()[chosed.get()]
+                self.value2 = chosed.get()
                 self.lfdep()
                 self.ask()
             else:
@@ -1283,7 +1285,7 @@ def mpkman() -> None:
                 else:
                     print(lang.text30)
                     try:
-                        listpls()
+                        list_pls()
                     except:
                         pass
             else:
@@ -1296,9 +1298,11 @@ def mpkman() -> None:
     pls = IconGrid(win.tab7)
     lf1 = Frame(win.tab7)
     pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
+    pls.canvas.bind('<Button-3>', popup)
+    pls.bind('<Button-3>', popup)
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
-    rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
+    rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
     rmenu2.add_command(label=lang.text20, command=lambda: cz(unmpk))
@@ -1306,7 +1310,7 @@ def mpkman() -> None:
     rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
     try:
-        listpls()
+        list_pls()
     except:
         pass
     lf1.pack(padx=10, pady=10)
