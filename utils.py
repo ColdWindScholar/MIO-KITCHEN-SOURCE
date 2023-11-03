@@ -1,9 +1,13 @@
 from __future__ import print_function
 
+import errno
+import os
 import struct
+import tempfile
 from os.path import exists
-import os, errno, tempfile
+
 import blockimgdiff
+
 DataImage = blockimgdiff.DataImage
 import sparse_img
 from threading import Thread
