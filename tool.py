@@ -1294,7 +1294,7 @@ def mpkman() -> None:
     title.pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
-    pls = Listbox(manager, activestyle='dotbox', highlightthickness=0)
+    pls = IconGrid(manager)
     lf2 = ttk.LabelFrame(manager, text=lang.text9)
     ttk.Button(lf2, text=lang.text20, command=lambda: cz(unmpk)).pack(padx=5, pady=5, fill=BOTH)
     ttk.Button(lf2, text=lang.text22, command=lambda: cz(run)).pack(padx=5, pady=5, fill=BOTH)
@@ -1307,7 +1307,6 @@ def mpkman() -> None:
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
-    pls.bind("<<ListboxSelect>>", relf2)
     pls.bind("<Button-3>", popup)
     try:
         listpls()
