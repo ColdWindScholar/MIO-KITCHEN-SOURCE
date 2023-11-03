@@ -830,11 +830,6 @@ def mpkman() -> None:
         else:
             print(lang.t16 % (local + os.sep + pls.get(pls.curselection()) + ".mpk"))
 
-    def relf2(self):
-        try:
-            title.config(text=pls.get(pls.curselection()))
-        except Exception as e:
-            title.config(text=lang.text19)
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
@@ -855,7 +850,6 @@ def mpkman() -> None:
             pass
         try:
             pls.selection_set(0)
-            relf2(None)
         except:
             pass
 
@@ -1297,18 +1291,16 @@ def mpkman() -> None:
     ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(manager, text=lang.text24).pack(padx=5, pady=5)
     pls = IconGrid(manager)
-    lf2 = ttk.LabelFrame(manager, text=lang.text9)
-    ttk.Button(lf2, text=lang.text20, command=lambda: cz(unmpk)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.text22, command=lambda: cz(run)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t14, command=lambda: cz(export)).pack(padx=5, pady=5, fill=BOTH)
-    ttk.Button(lf2, text=lang.t17, command=lambda: cz(editor_)).pack(padx=5, pady=5, fill=BOTH)
     lf1 = Frame(manager)
     pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-    lf2.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
+    rmenu.add_command(label=lang.text20, command=lambda: cz(unmpk))
+    rmenu.add_command(label=lang.text22, command=lambda: cz(run))
+    rmenu.add_command(label=lang.t14, command=lambda: cz(export))
+    rmenu.add_command(label=lang.t17, command=lambda: cz(editor_))
     try:
         listpls()
     except:
