@@ -3,8 +3,8 @@ from __future__ import print_function
 import struct
 from os.path import exists
 import os, errno, tempfile
-import common
 import blockimgdiff
+DataImage = blockimgdiff.DataImage
 import sparse_img
 from threading import Thread
 from random import randint, choice
