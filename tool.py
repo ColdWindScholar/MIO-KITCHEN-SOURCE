@@ -713,7 +713,7 @@ def mpkman() -> None:
 
     def impk() -> Exception:
         installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
-        manager.lift()
+        win.tab7.lift()
         try:
             listpls()
         except Exception as e:
@@ -1204,7 +1204,7 @@ def mpkman() -> None:
                 if not os.path.exists(moduledir + os.sep + value):
                     messpop(lang.warn7.format(value))
                     listpls()
-                    manager.lift()
+                    win.tab7.lift()
                 else:
                     print(lang.warn8)
         else:
@@ -1285,22 +1285,22 @@ def mpkman() -> None:
             else:
                 messpop(lang.warn2)
 
-    manager = win.tab7
-    title = ttk.Label(manager, text=lang.text19, font=("宋体", 20))
+    title = ttk.Label(win.tab7, text=lang.text19, font=("宋体", 20))
     title.pack(padx=10, pady=10, fill=BOTH)
-    ttk.Separator(manager, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-    Label(manager, text=lang.text24).pack(padx=5, pady=5)
-    pls = IconGrid(manager)
-    lf1 = Frame(manager)
+    ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+    Label(win.tab7, text=lang.text24).pack(padx=5, pady=5)
+    pls = IconGrid(win.tab7)
+    lf1 = Frame(win.tab7)
     pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(listpls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
-    rmenu.add_command(label=lang.text20, command=lambda: cz(unmpk))
-    rmenu.add_command(label=lang.text22, command=lambda: cz(run))
-    rmenu.add_command(label=lang.t14, command=lambda: cz(export))
-    rmenu.add_command(label=lang.t17, command=lambda: cz(editor_))
+    rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
+    rmenu2.add_command(label=lang.text20, command=lambda: cz(unmpk))
+    rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
+    rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
+    rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
     try:
         listpls()
     except:
