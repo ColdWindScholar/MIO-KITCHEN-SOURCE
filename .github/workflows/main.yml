@@ -78,8 +78,7 @@ jobs:
       - name: Build
         run: |
             set MSYSTEM=MINGW32
-            pacman -S mingw-w64-i686-python mingw-w64-i686-tk mingw-w64-i686-python-pip -y --noconfirm
-            pip3 install --upgrade setuptools
+            pacman -S mingw-w64-i686-python mingw-w64-i686-tk mingw-w64-i686-python-pip mingw-w64-i686-python-pycryptodome -y --noconfirm
             pip3 install -r requirements.txt
             python3 build.py
             ls
