@@ -1,4 +1,3 @@
-bsdiff4
 Pillow
 protobuf==3.20.1
 pycryptodome
