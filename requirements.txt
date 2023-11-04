@@ -1,5 +1,5 @@
 bsdiff4
-Pillow==9.5.0
+Pillow
 protobuf==3.20.1
 pycryptodome
 Requests==2.31.0
