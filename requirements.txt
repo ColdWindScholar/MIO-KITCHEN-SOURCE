@@ -1,7 +1,7 @@
 bsdiff4==1.2.3
 Pillow==9.5.0
 protobuf==3.20.1
-pycryptodome==3.18.0
+pycryptodome
 Requests==2.31.0
 sv_ttk
 windnd
