@@ -78,9 +78,9 @@ jobs:
       - name: Build
         run: |
             set MSYSTEM=MINGW32
-            pacman -S python3 -y --noconfirm
-            python3 -m pip install -U --force-reinstall pip
-            pyhton3 -m pip install -r requirements.txt
+            pacman -S mingw-w64-i686-python mingw-w64-i686-tk -y --noconfirm
+            pip3 install -U --force-reinstall pip
+            pip3 install -r requirements.txt
             python3 build.py
             ls
       - name: Upload Win Build
