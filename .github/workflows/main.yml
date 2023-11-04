@@ -67,23 +67,19 @@ jobs:
   build-win:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.8.10
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
         with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.8.10'
-          # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x86'
+          msystem: mingw32
       # You can test your matrix by printing the current Python version
-      - name: Update pip
-        run:  python -m pip install -U --force-reinstall pip
-      - name: Install Packages
-        run: pip install -r requirements.txt
-      - name: Pack tool
+      - name: Build
         run: |
-             python build.py
-             ls
+            set MSYSTEM=MINGW32
+            pacman -S python3 -y --noconfirm
+            python3 -m pip install -U --force-reinstall pip
+            pyhton3 -m pip install -r requirements.txt
+            python3 build.py
+            ls
       - name: Upload Win Build
         if: success()
         uses: actions/upload-artifact@v3
@@ -93,7 +89,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
