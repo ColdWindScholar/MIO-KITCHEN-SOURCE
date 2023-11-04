@@ -2466,14 +2466,11 @@ def rmdir(path, up=0):
 
 def get_all_file_paths(directory) -> Ellipsis:
     # 初始化文件路径列表
-    file_paths = []
     for root, directories, files in os.walk(directory):
         for filename in files:
-            # 连接字符串形成完整的路径
-            file_paths.append(os.path.join(root, filename))
+            yield os.path.join(root, filename)
 
-    # 返回所有文件路径
-    return file_paths
+
 
 
 def setf(n, w):
