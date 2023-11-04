@@ -713,9 +713,6 @@ class IconGrid(tk.Frame):
 def mpkman() -> None:
     chosed = tk.StringVar()
     chosed.set('')
-    if not dn.get():
-        messpop(lang.warn1)
-        return
 
     def impk():
         installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
