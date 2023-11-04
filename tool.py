@@ -2471,8 +2471,6 @@ def get_all_file_paths(directory) -> Ellipsis:
             yield os.path.join(root, filename)
 
 
-
-
 def setf(n, w):
     config.read(setfile)
     config.set("setting", "%s" % n, "%s" % w)
