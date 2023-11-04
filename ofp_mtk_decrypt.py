@@ -2,12 +2,12 @@
 # Oppo OFP MTK Decrypter (c) B. Kerler 2022
 # Licensed under MIT License
 
-import os
-import sys
 import hashlib
-from Crypto.Cipher import AES
-from struct import unpack
+import os
 from binascii import unhexlify, hexlify
+from struct import unpack
+
+from Crypto.Cipher import AES
 
 
 def swap(ch):
