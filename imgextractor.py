@@ -630,7 +630,6 @@ class Extractor(object):
         offset = mm.find(struct.pack('<L', EXT4_HEADER_MAGIC))
         return offset
 
-
     def main(self, target, output_dir, work):
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
         self.BASE_MYDIR = output_dir + os.sep
