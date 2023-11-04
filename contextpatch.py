@@ -34,6 +34,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     r_new_fs = {}
     add_new = 0
     permission_d = None
+    print("ContextPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
     try:
         permission_d = fs_file.get(list(fs_file)[5])
     except IndexError:
@@ -67,9 +68,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
 
 
 def main(dir_path, fs_config) -> None:
-    origin = scan_context(os.path.abspath(fs_config))
-    new_fs, add_new = context_patch(origin, dir_path)
+    new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
-    print("Load origin %d" % (len(origin.keys())) + " entries")
-    print('Add %d' % add_new + " entries")
+    print('ContextPatcher: Add %d' % add_new + " entries")
