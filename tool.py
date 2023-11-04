@@ -2828,12 +2828,10 @@ class format_conversion(Toplevel):
 
     @staticmethod
     def refile(f):
-        a = []
         for i in os.listdir(work := rwork()):
             if i.endswith(f):
                 if os.path.isfile(work + i):
-                    a.append(i)
-        return a
+                    yield i
 
     def conversion(self):
         work = rwork()
