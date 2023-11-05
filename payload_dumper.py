@@ -20,7 +20,11 @@ def u64(x):
 
 
 def data_for_op(op, out_file):
-    payloadfile.seek(data_offset + op.data_offset)
+    try:
+        payloadfile.seek(data_offset + op.data_offset)
+    except ValueError as e:
+        print(e, f"Too Many Reader，Clean Extract {path.basename(out_file.name)}")
+        return 1
     data = payloadfile.read(op.data_length)
     if op.type == op.REPLACE_XZ:
         data = LZMADecompressor().decompress(data)
@@ -65,7 +69,10 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command
     if not path.exists(args.out):
         makedirs(args.out)
     magic = payloadfile.read(4)
-    assert magic == b'CrAU'
+    if magic != b'CrAU':
+        print("Magic Check Fail")
+        payloadfile_.close()
+        return
     file_format_version = u64(payloadfile.read(8))
     assert file_format_version == 2
     manifest_size = u64(payloadfile.read(8))
