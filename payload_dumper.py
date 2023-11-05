@@ -22,8 +22,7 @@ def u64(x):
 def data_for_op(op, out_file):
     try:
         payloadfile.seek(data_offset + op.data_offset)
-    except ValueError as e:
-        print(e, f"Too Many Reader，Clean Extract {path.basename(out_file.name)}")
+    except ValueError:
         return 1
     data = payloadfile.read(op.data_length)
     if op.type == op.REPLACE_XZ:
@@ -55,7 +54,9 @@ def dump_part(part):
     else:
         with open('%s/%s.img' % (args.out, part.partition_name), 'wb') as out_file:
             for op in part.operations:
-                data_for_op(op, out_file)
+                if data_for_op(op, out_file):
+                    print(f'Clean Extract [{part.partition_name}]')
+                    return
         print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
 
 
