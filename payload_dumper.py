@@ -61,9 +61,7 @@ def dump_part(part):
         print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
 
 
-def ota_payload_dumper(payloadfile_, out='output', old='old', images=None, command: int = 1):
-    if images is None:
-        images = []
+def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command: int = 1):
     global args
     args = Namespace(out=out, old=old, images=images)
     global payloadfile
@@ -94,6 +92,7 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images=None, comma
         return dam.partitions
     for image in args.images:
         partition = [part for part in dam.partitions if part.partition_name == image]
+        print(f'[EXTRACTING]: {images}')
         assert partition, "Partition %s not found in payload!\n" % image
         dump_part(partition[0])
     payloadfile_.close()
