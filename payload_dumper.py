@@ -73,7 +73,7 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command
     if file_format_version > 1:
         metadata_signature_size = u32(payloadfile.read(4))
     manifest = payloadfile.read(manifest_size)
-    metadata_signature = payloadfile.read(metadata_signature_size)
+    print(payloadfile.read(metadata_signature_size))
     global data_offset
     data_offset = payloadfile.tell()
     dam = um.DeltaArchiveManifest()
