@@ -19,7 +19,7 @@ def u64(x):
     return struct.unpack('>Q', x)[0]
 
 
-def data_for_op(op, out_file, old_file):
+def data_for_op(op, out_file):
     payloadfile.seek(data_offset + op.data_offset)
     data = payloadfile.read(op.data_length)
     if op.type == op.REPLACE_XZ:
@@ -33,15 +33,6 @@ def data_for_op(op, out_file, old_file):
     elif op.type == op.REPLACE:
         out_file.seek(op.dst_extents[0].start_block * block_size)
         out_file.write(data)
-    elif op.type == op.SOURCE_COPY:
-        if not args.diff:
-            print("SOURCE_COPY supported only for differential OTA")
-            exit(1)
-        out_file.seek(op.dst_extents[0].start_block * block_size)
-        for ext in op.src_extents:
-            old_file.seek(ext.start_block * block_size)
-            data = old_file.read(ext.num_blocks * block_size)
-            out_file.write(data)
     elif op.type == op.ZERO:
         for ext in op.dst_extents:
             out_file.seek(ext.start_block * block_size)
@@ -60,18 +51,14 @@ def dump_part(part):
     else:
         print("%s:[EXTRACTING]\n" % part.partition_name)
         out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb')
-        if args.diff:
-            old_file = open('%s/%s.img' % (args.old, part.partition_name), 'rb')
-        else:
-            old_file = None
         for op in part.operations:
-            data_for_op(op, out_file, old_file)
+            data_for_op(op, out_file)
         print("%s:[%s]\n" % (part.partition_name, timeit.default_timer() - start))
 
 
-def ota_payload_dumper(payloadfile_, out='output', diff='store_true', old='old', images='', command: int = 1):
+def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command: int = 1):
     global args
-    args = argparse.Namespace(out=out, diff=diff, old=old, images=images)
+    args = argparse.Namespace(out=out, old=old, images=images)
     global payloadfile
     payloadfile = payloadfile_
     args.payload = payloadfile

@@ -2152,11 +2152,11 @@ def unpack(chose, form: any = None):
                 mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ)
             except ValueError as e:
                 print(e, "Use Old Method")
-                payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', chose)
+                payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
             else:
                 for part in chose:
                     tasks.append(Thread(target=payload_dumper.ota_payload_dumper, args=(
-                        mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'store_true', 'old', [part]),
+                        mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old', [part]),
                                         daemon=True))
                 for task in tasks:
                     task.start()
