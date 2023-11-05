@@ -2701,7 +2701,7 @@ class unpack_gui(ttk.LabelFrame):
             if self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
                     with open(work + "payload.bin", 'rb') as pay:
-                        for i in payload_dumper.ota_payload_dumper(pay, work, 'store_true', 'old', '',
+                        for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
                                                                    0):
                             self.lsg.insert(END, i.partition_name)
 
