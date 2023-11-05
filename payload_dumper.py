@@ -50,9 +50,9 @@ def dump_part(part):
         print(part.partition_name + "已存在\n")
     else:
         print("%s:[EXTRACTING]\n" % part.partition_name)
-        out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb')
-        for op in part.operations:
-            data_for_op(op, out_file)
+        with open('%s/%s.img' % (args.out, part.partition_name), 'wb') as out_file:
+            for op in part.operations:
+                data_for_op(op, out_file)
         print("%s:[%s]\n" % (part.partition_name, timeit.default_timer() - start))
 
 
