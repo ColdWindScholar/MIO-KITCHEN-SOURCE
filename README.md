@@ -16,6 +16,12 @@
 * Support installation of ROMs below Android 8 and packaging as IMG
 * Use mkc file chose api On Linux,make use easily
 ***
+## * Macos Notice
+``` shell
+# if you want to use [brotli],you need:
+brew install gettext
+brew install 
+```
 ## Start To Use
 ``` shell
 pip install -r requirements.txt
