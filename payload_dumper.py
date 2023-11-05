@@ -92,7 +92,7 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command
         return dam.partitions
     for image in args.images:
         partition = [part for part in dam.partitions if part.partition_name == image]
-        print(f'[EXTRACTING]: {images}')
+        print(f'[EXTRACTING]: {image}')
         assert partition, "Partition %s not found in payload!\n" % image
         dump_part(partition[0])
     payloadfile_.close()
