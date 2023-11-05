@@ -2153,9 +2153,7 @@ def unpack(chose, form: any = None):
                 print(e, "Use Old Method")
                 payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
             else:
-                Thread(target=payload_dumper.ota_payload_dumper, args=(
-                    mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old', chose),
-                       daemon=True)
+                payload_dumper.ota_payload_dumper(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old', chose)
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
