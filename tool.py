@@ -2149,7 +2149,7 @@ def unpack(chose, form: any = None):
         tasks = []
         with open(work + "payload.bin", 'rb') as pay:
             try:
-                mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ)
+                mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ).close()
             except ValueError as e:
                 print(e, "Use Old Method")
                 payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
