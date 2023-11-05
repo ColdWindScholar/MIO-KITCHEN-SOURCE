@@ -2155,6 +2155,7 @@ def unpack(chose, form: any = None):
                 payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
             else:
                 for part in chose:
+                    print(f'[EXTRACTING]: {part}')
                     tasks.append(Thread(target=payload_dumper.ota_payload_dumper, args=(
                         mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old', [part]),
                                         daemon=True))

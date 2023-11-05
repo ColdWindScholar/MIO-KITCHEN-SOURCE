@@ -53,7 +53,6 @@ def dump_part(part):
     if access(args.out + part.partition_name + ".img", F_OK):
         print(part.partition_name + "已存在\n")
     else:
-        print("%s:[EXTRACTING]\n" % part.partition_name)
         with open('%s/%s.img' % (args.out, part.partition_name), 'wb') as out_file:
             for op in part.operations:
                 data_for_op(op, out_file)
