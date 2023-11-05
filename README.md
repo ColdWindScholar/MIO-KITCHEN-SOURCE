@@ -20,7 +20,6 @@
 ``` shell
 # if you want to use [brotli],you need:
 brew install gettext
-brew install 
 ```
 ## Start To Use
 ``` shell
