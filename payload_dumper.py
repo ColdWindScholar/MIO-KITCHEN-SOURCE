@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import argparse
+from argparse import Namespace
 from bz2 import BZ2Decompressor
 from lzma import LZMADecompressor
-import os
+from os import F_OK, access, makedirs, path
 from struct import unpack
 from timeit import default_timer
 
@@ -46,7 +46,7 @@ def data_for_op(op, out_file):
 
 def dump_part(part):
     start = default_timer()
-    if os.access(args.out + part.partition_name + ".img", os.F_OK):
+    if access(args.out + part.partition_name + ".img", F_OK):
         print(part.partition_name + "已存在\n")
     else:
         print("%s:[EXTRACTING]\n" % part.partition_name)
@@ -58,12 +58,12 @@ def dump_part(part):
 
 def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command: int = 1):
     global args
-    args = argparse.Namespace(out=out, old=old, images=images)
+    args = Namespace(out=out, old=old, images=images)
     global payloadfile
     payloadfile = payloadfile_
     args.payload = payloadfile
-    if not os.path.exists(args.out):
-        os.makedirs(args.out)
+    if not path.exists(args.out):
+        makedirs(args.out)
     magic = payloadfile.read(4)
     assert magic == b'CrAU'
     file_format_version = u64(payloadfile.read(8))
