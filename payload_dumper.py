@@ -55,7 +55,7 @@ def dump_part(part):
         with open('%s/%s.img' % (args.out, part.partition_name), 'wb') as out_file:
             for op in part.operations:
                 if data_for_op(op, out_file):
-                    print(f'Clean Extract [{part.partition_name}]')
+                    print(f'Clean Extract [{part.partition_name}]\n')
                     return
         print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
 
@@ -72,7 +72,7 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images=None, comma
         makedirs(args.out)
     magic = payloadfile.read(4)
     if magic != b'CrAU':
-        print("Magic Check Fail")
+        print(f"Magic Check Fail{magic}\n")
         payloadfile_.close()
         return
     file_format_version = u64(payloadfile.read(8))
