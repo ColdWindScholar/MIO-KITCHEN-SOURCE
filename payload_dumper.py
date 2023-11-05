@@ -60,7 +60,9 @@ def dump_part(part):
         print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
 
 
-def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command: int = 1):
+def ota_payload_dumper(payloadfile_, out='output', old='old', images=None, command: int = 1):
+    if images is None:
+        images = []
     global args
     args = Namespace(out=out, old=old, images=images)
     global payloadfile
