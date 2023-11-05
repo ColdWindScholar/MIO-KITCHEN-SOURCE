@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import argparse
-import bz2
-import lzma
+from bz2 import BZ2Decompressor
+from lzma import LZMADecompressor
 import os
-import struct
-import timeit
+from struct import unpack
+from timeit import default_timer
 
 import update_metadata_pb2 as um
 
@@ -12,22 +12,22 @@ flatten = lambda l: [item for sublist in l for item in sublist]
 
 
 def u32(x):
-    return struct.unpack('>I', x)[0]
+    return unpack('>I', x)[0]
 
 
 def u64(x):
-    return struct.unpack('>Q', x)[0]
+    return unpack('>Q', x)[0]
 
 
 def data_for_op(op, out_file):
     payloadfile.seek(data_offset + op.data_offset)
     data = payloadfile.read(op.data_length)
     if op.type == op.REPLACE_XZ:
-        data = lzma.LZMADecompressor().decompress(data)
+        data = LZMADecompressor().decompress(data)
         out_file.seek(op.dst_extents[0].start_block * block_size)
         out_file.write(data)
     elif op.type == op.REPLACE_BZ:
-        data = bz2.BZ2Decompressor().decompress(data)
+        data = BZ2Decompressor().decompress(data)
         out_file.seek(op.dst_extents[0].start_block * block_size)
         out_file.write(data)
     elif op.type == op.REPLACE:
@@ -45,7 +45,7 @@ def data_for_op(op, out_file):
 
 
 def dump_part(part):
-    start = timeit.default_timer()
+    start = default_timer()
     if os.access(args.out + part.partition_name + ".img", os.F_OK):
         print(part.partition_name + "已存在\n")
     else:
@@ -53,7 +53,7 @@ def dump_part(part):
         with open('%s/%s.img' % (args.out, part.partition_name), 'wb') as out_file:
             for op in part.operations:
                 data_for_op(op, out_file)
-        print("%s:[%s]\n" % (part.partition_name, timeit.default_timer() - start))
+        print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
 
 
 def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command: int = 1):
