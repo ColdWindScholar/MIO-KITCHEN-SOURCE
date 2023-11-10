@@ -328,13 +328,9 @@ def loadset():
         oobe = config.get('setting', 'oobe')
         language.set(config.get('setting', 'language'))
         load(language.get())
-
-
-if os.path.exists(setfile):
-    loadset()
-else:
-    sv_ttk.set_theme("dark")
-    error(1, '缺失配置文件，请重新安装此软件')
+    else:
+        sv_ttk.set_theme("dark")
+        error(1, '缺失配置文件，请重新安装此软件')
 
 
 def messpop(message, color='orange') -> None:
