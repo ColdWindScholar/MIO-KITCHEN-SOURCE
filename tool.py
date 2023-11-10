@@ -91,6 +91,33 @@ class Tool(Tk):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
+        self.notepad.pack(fill=BOTH)
+        rzf = ttk.Frame(self.subwin3)
+        self.tsk = Label(self.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
+        self.tsk.bind('<Button-1>')
+        self.tsk.pack(padx=10, pady=10, side='top')
+        tr = ttk.LabelFrame(self.subwin3, text=lang.text131)
+        Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
+        tr.bind('<Button-1>', sdxz)
+        tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
+        if os.name == 'nt':
+            windnd.hook_dropfiles(tr, func=dndfile)
+        self.show = Text(rzf)
+        self.show.pack(side=LEFT, fill=BOTH, expand=True)
+        ttk.Button(rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
+                                                                                       expand=True)
+        ttk.Button(rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5,
+                                                                             expand=True)
+        rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
+        # 项目列表的控件
+        sys.stdout = StdoutRedirector(self.show)
+        sys.stderr = StdoutRedirector(self.show)
+        zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
+        zyf1.pack(padx=10, pady=10)
+        ttk.Button(zyf1, text=lang.text16, command=lambda: self.notepad.select(win.tab6)).pack(side='left',
+                                                                                              padx=10,
+                                                                                              pady=10)
+        ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 
     def upjdt(self):
         self.frame_bg.update_idletasks()
@@ -334,12 +361,12 @@ def loadset():
 
 
 def messpop(message, color='orange') -> None:
-    tsk.config(text=message, bg=color)
+    win.tsk.config(text=message, bg=color)
 
 
 def get_time() -> None:
-    tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
-    tsk.after(1000, get_time)
+    win.tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
+    win.after(1000, get_time)
 
 
 def re_folder(path) -> None:
@@ -657,8 +684,8 @@ class Process(Toplevel):
         if self.in_process:
             return
         loadset()
-        sys.stdout = StdoutRedirector(show)
-        sys.stderr = StdoutRedirector(show)
+        sys.stdout = StdoutRedirector(win.show)
+        sys.stderr = StdoutRedirector(win.show)
         xmcd_.listdir()
         rmdir(self.dir)
         self.destroy()
@@ -2417,8 +2444,8 @@ class handle_log:
     def putlog():
         with open(local + os.sep + (log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
                   'w', encoding='utf-8', newline='\n') as f:
-            f.write(show.get(1.0, END))
-        show.delete(1.0, END)
+            f.write(win.show.get(1.0, END))
+        win.show.delete(1.0, END)
         print(lang.text95 + local + os.sep + log + v_code() + ".txt")
 
 
@@ -2545,32 +2572,6 @@ def sdxz(other):
     dndfile([filedialog.askopenfilename()])
 
 
-win.notepad.pack(fill=BOTH)
-rzf = ttk.Frame(win.subwin3)
-tsk = Label(win.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
-tsk.bind('<Button-1>')
-tsk.pack(padx=10, pady=10, side='top')
-tr = ttk.LabelFrame(win.subwin3, text=lang.text131)
-Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
-tr.bind('<Button-1>', sdxz)
-tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
-if os.name == 'nt':
-    windnd.hook_dropfiles(tr, func=dndfile)
-show = Text(rzf)
-show.pack(side=LEFT, fill=BOTH, expand=True)
-ttk.Button(rzf, text=lang.text105, command=lambda: show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
-                                                                               expand=True)
-ttk.Button(rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5, expand=True)
-rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
-# 项目列表的控件
-sys.stdout = StdoutRedirector(show)
-sys.stderr = StdoutRedirector(show)
-zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
-zyf1.pack(padx=10, pady=10)
-ttk.Button(zyf1, text=lang.text16, command=lambda: win.notepad.select(win.tab6)).pack(side='left',
-                                                                                      padx=10,
-                                                                                      pady=10)
-ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 
 
 class xmcd(ttk.LabelFrame):
@@ -2969,7 +2970,7 @@ class load_car(object):
         car.set(0)
 
 
-(gifl := Label(rzf)).pack(padx=10, pady=10)
+(gifl := Label(win.rzf)).pack(padx=10, pady=10)
 load_car(0)
 car.set(1)
 print(lang.text108)
