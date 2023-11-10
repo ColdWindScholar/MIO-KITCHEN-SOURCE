@@ -1153,6 +1153,9 @@ def mpkman() -> None:
             self.wait_window()
 
     def run():
+        if not dn.get():
+            print(lang.warn1)
+            return
         if chosed.get():
             value = globals()[chosed.get()]
         else:
@@ -2153,7 +2156,8 @@ def unpack(chose, form: any = None):
                 print(e, "Use Old Method")
                 payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
             else:
-                payload_dumper.ota_payload_dumper(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old', chose)
+                payload_dumper.ota_payload_dumper(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old',
+                                                  chose)
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
