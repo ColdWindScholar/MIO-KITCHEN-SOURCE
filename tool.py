@@ -92,7 +92,7 @@ class Tool(Tk):
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
         self.notepad.pack(fill=BOTH)
-        rzf = ttk.Frame(self.subwin3)
+        self.rzf = ttk.Frame(self.subwin3)
         self.tsk = Label(self.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
         self.tsk.bind('<Button-1>')
         self.tsk.pack(padx=10, pady=10, side='top')
@@ -102,21 +102,22 @@ class Tool(Tk):
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
-        self.show = Text(rzf)
+        self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
-        ttk.Button(rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10, pady=5,
-                                                                                       expand=True)
-        ttk.Button(rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5,
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
+                                                                                            pady=5,
+                                                                                            expand=True)
+        ttk.Button(self.rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5,
                                                                              expand=True)
-        rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
+        self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show)
         zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
         zyf1.pack(padx=10, pady=10)
         ttk.Button(zyf1, text=lang.text16, command=lambda: self.notepad.select(win.tab6)).pack(side='left',
-                                                                                              padx=10,
-                                                                                              pady=10)
+                                                                                               padx=10,
+                                                                                               pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
 
     def upjdt(self):
@@ -360,6 +361,9 @@ def loadset():
         error(1, '缺失配置文件，请重新安装此软件')
 
 
+loadset()
+
+
 def messpop(message, color='orange') -> None:
     win.tsk.config(text=message, bg=color)
 
@@ -449,10 +453,6 @@ def logopack() -> int:
     os.remove(orlogo)
     os.rename(logo, orlogo)
     rmdir(dir_, 1)
-
-
-# 绘制界面
-win.gui()
 
 
 def subp(com: int = 1, title: str = lang.text18, master: any = None):
@@ -2572,8 +2572,6 @@ def sdxz(other):
     dndfile([filedialog.askopenfilename()])
 
 
-
-
 class xmcd(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
@@ -2722,6 +2720,7 @@ class unpack_gui(ttk.LabelFrame):
             packxx(lbs)
 
 
+win.gui()
 unpackg = unpack_gui()
 xmcd_ = xmcd()
 xmcd_.gui()
