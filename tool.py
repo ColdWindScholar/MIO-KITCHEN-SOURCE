@@ -54,7 +54,6 @@ import yaml
 import opscrypto
 
 # from bootimg import parse_cpio, write_cpio, cpio_list
-# 欢迎各位大佬提PR
 config = ConfigParser()
 
 
@@ -2239,19 +2238,14 @@ def unpack(chose, form: any = None):
                     except:
                         messpop(lang.warn11.format(i))
                 lpunpack.unpack(work + i + ".img", work)
-                #
                 if os.access(work + "system_a.img", os.F_OK):
-                    # start
                     for wjm in os.listdir(work):
                         if wjm.endswith('_a.img'):
                             os.rename(work + wjm, work + wjm.replace('_a', ''))
                         if wjm.endswith('_b.img'):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
-                    # end
-                    # supersz :2
                 else:
-                    # supersz :1
                     pass
             if (ftype := gettype(work + i + ".img")) == "ext":
                 print(lang.text79 + i + ".img [%s]" % ftype)
@@ -2478,7 +2472,6 @@ def rmdir(path, up=0):
 
 
 def get_all_file_paths(directory) -> Ellipsis:
-    # 初始化文件路径列表
     for root, directories, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
@@ -2758,9 +2751,6 @@ LB3.bind('<<ComboboxSelected>>', set_language)
 sf1.pack(padx=10, pady=10, fill='both')
 sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
-
-# 关于我们
-
 
 # tab4_2.pack(padx=10, pady=10)
 # 捐赠
