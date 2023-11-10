@@ -145,7 +145,6 @@ class ModuleError(Exception):
     pass
 
 
-# 打包设置变量
 class lang:
     pass
 
