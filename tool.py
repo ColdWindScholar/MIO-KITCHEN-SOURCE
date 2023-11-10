@@ -2,7 +2,6 @@
 import mmap
 import platform
 import subprocess
-from threading import Thread
 
 try:
     import load_window
@@ -24,9 +23,8 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 if os.name == 'nt':
     import windnd
-    import win_extra as sys_extra
 elif os.name == "posix":
-    import posix_extra as sys_extra
+    pass
 import zipfile
 from io import BytesIO, StringIO
 from platform import machine
