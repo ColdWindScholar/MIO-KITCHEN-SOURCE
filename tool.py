@@ -205,7 +205,7 @@ class Tool(Tk):
         self.LB2.pack(padx=10, pady=10, side='left')
         self.LB2.bind('<<ComboboxSelected>>', set_theme)
 
-        def startwjjj(self):
+        def startwjjj(ev):
             if os.name == 'nt':
                 os.startfile(self.slocal.get())
 
