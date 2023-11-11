@@ -601,13 +601,10 @@ class Extractor(object):
         moto = re.search(b'\x4d\x4f\x54\x4f', data)
         if not moto:
             return
-        result = []
-        for i in re.finditer(b'\x53\xEF', data):
-            result.append(i.start() - 1080)
         offset = 0
-        for i in result:
-            if data[i] == 0:
-                offset = i
+        for i in re.finditer(b'\x53\xEF', data):
+            if data[i.start() - 1080] == 0:
+                offset = i.start() - 1080
                 break
         if offset > 0:
             with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
