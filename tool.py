@@ -2794,9 +2794,6 @@ frame3().gui()
 xmcd_.listdir()
 
 
-# 设置的控件
-
-
 class format_conversion(Toplevel):
     def __init__(self):
         super().__init__()
