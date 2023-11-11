@@ -1104,8 +1104,7 @@ def mpkman() -> None:
             def generate_sh():
                 sh_content = ""
                 for va in self.value:
-                    if self.gavs[va].get():
-                        gva = self.gavs[va].get()
+                    if gva := self.gavs[va].get():
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if os.sep in gva:
                                 gva = gva.replace(os.sep, '/')
@@ -1125,19 +1124,21 @@ def mpkman() -> None:
                         "export project={}\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
                 self.gavs.clear()
+                self.value.clear()
 
             def generate_msh():
                 for va in self.value:
-                    if self.gavs[va].get():
-                        if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
-                            if '\\' in self.gavs[va].get():
-                                msh_parse.envs[va] = self.gavs[va].get().replace("\\", '/')
+                    if gva := self.gavs[va].get():
+                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
+                            if '\\' in gva:
+                                msh_parse.envs[va] = gva.replace("\\", '/')
                             else:
-                                msh_parse.envs[va] = self.gavs[va].get()
+                                msh_parse.envs[va] = gva
                         else:
-                            msh_parse.envs[va] = self.gavs[va].get()
+                            msh_parse.envs[va] = gva
                 self.destroy()
                 self.gavs.clear()
+                self.value.clear()
 
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
