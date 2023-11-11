@@ -173,10 +173,8 @@ class Tool(Tk):
               text=lang.text127,
               font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
-        tab4_1 = ttk.LabelFrame(self.tab4, text=lang.text9)
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
-        # ttk.Button(tab4_1, text="检查更新", command=lambda: CallZ(upgrade())).pack(padx=10, pady=10)
-        tab4_1.pack(padx=10, pady=10)
+        ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", open_github)
@@ -372,7 +370,6 @@ class welcome(object):
         pass
 
 
-'''
 def upgrade():
     ck = Toplevel()
     ck.title("检查更新")
@@ -392,7 +389,6 @@ def upgrade():
         Label(ck, text="已是最新版本：%s" % VERSION, font=('华文行楷', 15)).pack(padx=5, pady=5)
         ttk.Button(ck, text="确定", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
         ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
-'''
 
 
 class settings(object):
