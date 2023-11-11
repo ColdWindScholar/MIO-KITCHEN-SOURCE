@@ -75,7 +75,7 @@ class dev_null(object):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
-        self.title('OPEN-MIO-KITCHEN')
+        self.title('MIO-KITCHEN')
         if os.name == "posix":
             if os.geteuid() != 0:
                 print(lang.warn13)
