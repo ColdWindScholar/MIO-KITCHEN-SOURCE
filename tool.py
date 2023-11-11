@@ -2945,6 +2945,9 @@ class format_conversion(Toplevel):
         print(lang.text8)
 
 
+global frames
+
+
 def loadgif(gif):
     global frames
     frames = []
