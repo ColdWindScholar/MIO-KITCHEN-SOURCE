@@ -71,6 +71,9 @@ class dev_null(object):
     def __exit__(self):
         pass
 
+    def close(self):
+        pass
+
 
 class Tool(Tk):
     def __init__(self):
