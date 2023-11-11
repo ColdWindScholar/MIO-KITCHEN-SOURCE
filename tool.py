@@ -174,7 +174,7 @@ class Tool(Tk):
               font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
-        ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
+        # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", open_github)
