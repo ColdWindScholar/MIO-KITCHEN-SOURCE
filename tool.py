@@ -49,8 +49,8 @@ import editor
 import yaml
 import opscrypto
 
+
 # from bootimg import parse_cpio, write_cpio, cpio_list
-config = ConfigParser()
 
 
 class dev_null(object):
@@ -224,8 +224,7 @@ win = Tool()
 start = dti()
 setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini"])
 modfile = ''.join([elocal, os.sep, "bin", os.sep, "module", os.sep, "module.json"])
-utils.dn = StringVar()
-dn = utils.dn
+dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
 car = IntVar()
@@ -2506,7 +2505,7 @@ class handle_log:
     @staticmethod
     def putlog():
         with open(settings.path + os.sep + (
-        log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
+                log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
                   'w', encoding='utf-8', newline='\n') as f:
             f.write(win.show.get(1.0, END))
         win.show.delete(1.0, END)
