@@ -1099,20 +1099,17 @@ def mpkman() -> None:
                 elif cmd.split()[0] == "exec":
                     exec(cmd[cmd.index(' ') + 1:])
                 else:
-                    print(lang.text27)
+                    print(lang.text27, cmd)
 
             def generate_sh():
                 sh_content = ""
                 for va in self.value:
                     if self.gavs[va].get():
-                        if os.path.isabs(self.gavs[va].get()) and os.name == 'nt':
-                            if "\\" in self.gavs[va].get():
-                                gva = self.gavs[va].get().replace('\\', '/')
-                            else:
-                                gva = self.gavs[va].get()
-                        else:
-                            gva = self.gavs[va].get()
-                        sh_content += f"export {va}={gva}\n"
+                        gva = self.gavs[va].get()
+                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
+                            if os.sep in gva:
+                                gva = gva.replace(os.sep, '/')
+                        sh_content += f"export {va}='{gva}'\n"
                 temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
                 if not os.path.exists(temp):
                     re_folder(temp)
