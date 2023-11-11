@@ -388,10 +388,10 @@ def upgrade():
 
 
 class set_utils(object):
-    def __init__(self, setfile):
+    def __init__(self, set_ini):
         self.path = None
         self.barlevel = '0.9'
-        self.set_file = setfile
+        self.set_file = set_ini
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
             self.load()
@@ -1771,8 +1771,8 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
                     if os.path.exists(work + img + ".img"):
                         try:
                             os.remove(work + img + ".img")
-                        except:
-                            pass
+                        except Exception as e:
+                            print(e)
         else:
             messpop(lang.warn10)
     else:
@@ -1789,8 +1789,10 @@ class StdoutRedirector(object):
         self.text_space.insert(END, string)
         self.text_space.yview('end')
 
-    @staticmethod
-    def flush():
+    def flush(self):
+        pass
+
+    def close(self):
         pass
 
     def __exit__(self):
@@ -1993,7 +1995,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         parts_dict = {}
     for i in parts:
         dname = os.path.basename(i)
-        if not dname in parts_dict.keys():
+        if dname not in parts_dict.keys():
             parts_dict[dname] = 'unknow'
         if spatch == 1:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
