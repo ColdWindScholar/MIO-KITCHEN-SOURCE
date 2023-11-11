@@ -23,18 +23,14 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 if os.name == 'nt':
     import windnd
+    from tkinter import filedialog
 elif os.name == "posix":
-    pass
+    import mkc_filedialog as filedialog
 import zipfile
 from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 from tkinter import ttk, messagebox
-
-if os.name == "nt":
-    from tkinter import filedialog
-else:
-    import mkc_filedialog as filedialog
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
