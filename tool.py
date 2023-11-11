@@ -57,10 +57,33 @@ import opscrypto
 config = ConfigParser()
 
 
+class dev_null(object):
+    def __init__(self):
+        pass
+
+    def write(self, string):
+        pass
+
+    @staticmethod
+    def flush():
+        pass
+
+    def __exit__(self):
+        pass
+
+
 class Tool(Tk):
     def __init__(self):
         super().__init__()
         self.title('OPEN-MIO-KITCHEN')
+        if os.name == "posix":
+            if os.geteuid() != 0:
+                print(lang.warn13)
+        else:
+            self.iconphoto(True,
+                           tk.PhotoImage(
+                               file="".join([os.getcwd(), os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
+        sys.stdout = dev_null()
 
     def gui(self):
         self.subwin2 = ttk.LabelFrame(win, text=lang.text9)
@@ -104,10 +127,10 @@ class Tool(Tk):
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
-                                                                                            pady=5,
-                                                                                            expand=True)
+                                                                                                 pady=5,
+                                                                                                 expand=True)
         ttk.Button(self.rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5,
-                                                                             expand=True)
+                                                                                  expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
@@ -230,6 +253,9 @@ class welcome(object):
             ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             ttk.Label(self.ck, text=lang.text137, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self.ck, text=lang.text136, command=self.main).pack(fill=BOTH)
+        win.withdraw()
+        self.ck.wait_window()
+        win.deiconify()
 
     def reframe(self):
         if self.frame:
@@ -2713,6 +2739,8 @@ class unpack_gui(ttk.LabelFrame):
             packxx(lbs)
 
 
+if int(oobe) < 4:
+    welcome()
 win.gui()
 unpackg = unpack_gui()
 xmcd_ = xmcd()
@@ -2752,8 +2780,6 @@ sf1.pack(padx=10, pady=10, fill='both')
 sf2.pack(padx=10, pady=10, fill='both')
 sf3.pack(padx=10, pady=10, fill='both')
 
-# tab4_2.pack(padx=10, pady=10)
-# 捐赠
 Label(win.tab6,
       text=f"Wechat Pay/微信支付",
       font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
@@ -2963,15 +2989,8 @@ class load_car(object):
 load_car(0)
 car.set(1)
 print(lang.text108)
-if os.name == "posix":
-    if os.geteuid() != 0:
-        print(lang.warn13)
-else:
-    win.iconphoto(True, tk.PhotoImage(file="".join([elocal, os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
 cz(get_time)
 mpkman()
-if int(oobe) < 4:
-    welcome()
 print(lang.text134 % (dti() - start))
 win.update()
 jzxs(win)
