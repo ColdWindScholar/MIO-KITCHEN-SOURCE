@@ -2662,7 +2662,7 @@ class frame3(ttk.LabelFrame):
 
 class unpack_gui(ttk.LabelFrame):
     def __init__(self):
-        super().__init__(master=win.tab2, text=lang.unpack)
+        super().__init__(master=win.tab2, text=lang.text9)
 
     def gui(self):
         self.pack(padx=5, pady=5)
