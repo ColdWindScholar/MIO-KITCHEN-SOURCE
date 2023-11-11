@@ -113,6 +113,8 @@ class Tool(Tk):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
+        self.tab6_n()
+        self.setting_tab()
         self.notepad.pack(fill=BOTH)
         self.rzf = ttk.Frame(self.subwin3)
         self.tsk = Label(self.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
@@ -177,6 +179,44 @@ class Tool(Tk):
                          style="Link.TLabel")
         link.bind("<Button-1>", open_github)
         link.pack()
+
+    def tab6_n(self):
+        Label(self.tab6,
+              text=f"Wechat Pay/微信支付",
+              font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
+        self.photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
+        Label(self.tab6, image=self.photo).pack(padx=5, pady=5)
+        Label(self.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+    def setting_tab(self):
+        self.slocal = StringVar()
+        self.slocal.set(local)
+        sf1 = ttk.Frame(self.tab3)
+        sf2 = ttk.Frame(self.tab3)
+        sf3 = ttk.Frame(self.tab3)
+        ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
+        self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
+        self.LB2.pack(padx=10, pady=10, side='left')
+        self.LB2.bind('<<ComboboxSelected>>', set_theme)
+
+        def startwjjj(self):
+            if os.name == 'nt':
+                os.startfile(self.slocal.get())
+
+        ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
+        slo = ttk.Label(sf3, textvariable=self.slocal)
+        slo.bind('<Button-1>', startwjjj)
+        slo.pack(padx=10, pady=10, side='left')
+        ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
+
+        ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
+        LB3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
+                           value=[i.rsplit('.', 1)[0] for i in
+                                  os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+        LB3.pack(padx=10, pady=10, side='left')
+        LB3.bind('<<ComboboxSelected>>', set_language)
+        sf1.pack(padx=10, pady=10, fill='both')
+        sf2.pack(padx=10, pady=10, fill='both')
+        sf3.pack(padx=10, pady=10, fill='both')
 
 
 win = Tool()
@@ -2515,7 +2555,7 @@ def set_theme(self):
     try:
         setf("theme", theme.get())
         sv_ttk.set_theme(theme.get())
-        gif = Image.open("bin/images/loading_{}.gif".format(LB2.get()))
+        gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
         loadgif(gif)
         gifl.configure(image=frames[1])
     except Exception as e:
@@ -2566,7 +2606,7 @@ def modpath():
     if not (folder := filedialog.askdirectory()):
         return False
     setf("path", folder)
-    slocal.set(folder)
+    win.slocal.set(folder)
     loadset()
 
 
@@ -2668,7 +2708,7 @@ class unpack_gui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch = IntVar()
         self.ch.set(1)
-        self.fm = ttk.Combobox(self, state="readonly", values=("new.dat", 'new.dat.br', 'img', 'payload'))
+        self.fm = ttk.Combobox(self, state="readonly", values=('new.dat.br', "new.dat", 'img', 'payload'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2749,43 +2789,6 @@ unpackg.gui()
 frame3().gui()
 xmcd_.listdir()
 # 设置的控件
-slocal = StringVar()
-slocal.set(local)
-sf1 = ttk.Frame(win.tab3)
-sf2 = ttk.Frame(win.tab3)
-sf3 = ttk.Frame(win.tab3)
-ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
-LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
-LB2.pack(padx=10, pady=10, side='left')
-LB2.bind('<<ComboboxSelected>>', set_theme)
-
-
-def startwjjj(self):
-    if os.name == 'nt':
-        os.startfile(slocal.get())
-
-
-ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
-slo = ttk.Label(sf3, textvariable=slocal)
-slo.bind('<Button-1>', startwjjj)
-slo.pack(padx=10, pady=10, side='left')
-ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
-
-ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
-LB3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
-                   value=[i.rsplit('.', 1)[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
-LB3.pack(padx=10, pady=10, side='left')
-LB3.bind('<<ComboboxSelected>>', set_language)
-sf1.pack(padx=10, pady=10, fill='both')
-sf2.pack(padx=10, pady=10, fill='both')
-sf3.pack(padx=10, pady=10, fill='both')
-
-Label(win.tab6,
-      text=f"Wechat Pay/微信支付",
-      font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
-photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
-Label(win.tab6, image=photo).pack(padx=5, pady=5)
-Label(win.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
 
 
 class format_conversion(Toplevel):
@@ -2958,7 +2961,7 @@ def loadgif(gif):
         pass
 
 
-loadgif(Image.open("bin/images/loading_%s.gif" % (LB2.get())))
+loadgif(Image.open("bin/images/loading_%s.gif" % (win.LB2.get())))
 
 hide_gifl = False
 
