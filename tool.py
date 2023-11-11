@@ -50,9 +50,6 @@ import yaml
 import opscrypto
 
 
-# from bootimg import parse_cpio, write_cpio, cpio_list
-
-
 class dev_null(object):
     def __init__(self):
         pass
