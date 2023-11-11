@@ -166,7 +166,7 @@ class Tool(Tk):
         Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4,
-              text=lang.text128.format(VERSION, sys.version[:6], os.name, machine()),
+              text=lang.text128.format(settings.version, sys.version[:6], os.name, machine()),
               font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4,
@@ -190,7 +190,7 @@ class Tool(Tk):
 
     def setting_tab(self):
         self.slocal = StringVar()
-        self.slocal.set(local)
+        self.slocal.set(settings.path)
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -281,6 +281,7 @@ class welcome(object):
         self.ck.resizable(False, False)
         self.ck.protocol("WM_DELETE_WINDOW", self.clos)
         self.frame = None
+        oobe = int(settings.oobe)
         if oobe == "1":
             self.main()
         elif oobe == '2':
@@ -305,7 +306,7 @@ class welcome(object):
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
-        setf("oobe", "1")
+        settings.setf("oobe", "1")
         for i in self.ck.winfo_children():
             i.destroy()
         self.reframe()
@@ -319,7 +320,7 @@ class welcome(object):
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
-        setf("oobe", "2")
+        settings.setf("oobe", "2")
         lce = StringVar()
 
         def loadlice(self):
@@ -344,7 +345,7 @@ class welcome(object):
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
     def private(self):
-        setf("oobe", "3")
+        settings.setf("oobe", "3")
         self.reframe()
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
@@ -357,7 +358,7 @@ class welcome(object):
         ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
 
     def done(self):
-        setf("oobe", "4")
+        settings.setf("oobe", "4")
         self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
@@ -373,11 +374,11 @@ class welcome(object):
 def upgrade():
     ck = Toplevel()
     ck.title("检查更新")
-    data = requests.get(update_url + "update.json").content.decode()
+    data = requests.get(settings.update_url + "update.json").content.decode()
     up = json.loads(data)
     Label(ck, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=5, pady=5)
     ttk.Separator(ck, orient=HORIZONTAL).pack(padx=30, fill=X)
-    if up['version'] != VERSION:
+    if up['version'] != settings.version:
         Label(ck, text="发现新版本：%s" % (up['version']), font=('楷书', 15), fg='green').pack(padx=5, pady=5)
         lf = ttk.LabelFrame(ck, text="更新日志")
         lf.pack(padx=10, pady=10)
@@ -386,46 +387,48 @@ def upgrade():
         text.pack(fill=BOTH, padx=5, pady=5)
         ttk.Button(ck, text="更新").pack(padx=5, pady=5, fill=X)
     else:
-        Label(ck, text="已是最新版本：%s" % VERSION, font=('华文行楷', 15)).pack(padx=5, pady=5)
+        Label(ck, text="已是最新版本：%s" % settings.version, font=('华文行楷', 15)).pack(padx=5, pady=5)
         ttk.Button(ck, text="确定", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
         ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
 
 
-class settings(object):
-    pass
-
-
-def loadset():
-    if os.access(setfile, os.F_OK):
-        config.read(setfile)
-        sv_ttk.set_theme(config.get('setting', 'theme'))
-        theme.set(config.get('setting', 'theme'))
-        global local
-        local = config.get('setting', 'path')
-        if os.path.exists(local):
-            if not local:
-                local = os.getcwd()
+class set_utils(object):
+    def __init__(self, setfile):
+        self.path = None
+        self.barlevel = '0.9'
+        self.set_file = setfile
+        self.config = ConfigParser()
+        if os.access(self.set_file, os.F_OK):
+            self.load()
         else:
-            local = os.getcwd()
-        global update_url
-        update_url = config.get('setting', 'update_url')
-        global VERSION
-        VERSION = config.get('setting', 'version')
-        global barlv
-        barlv = config.get('setting', 'barlevel')
-        if not barlv:
-            barlv = '0.9'
-        win.attributes("-alpha", barlv)
-        global oobe
-        oobe = config.get('setting', 'oobe')
-        language.set(config.get('setting', 'language'))
+            sv_ttk.set_theme("dark")
+            error(1, '缺失配置文件，请重新安装此软件')
+
+    def load(self):
+        self.config.read(self.set_file)
+        for i in self.config.items('setting'):
+            setattr(self, i[0], i[1])
+        if os.path.exists(self.path):
+            if not self.path:
+                self.path = os.getcwd()
+        else:
+            self.path = os.getcwd()
+        language.set(self.language)
         load(language.get())
-    else:
-        sv_ttk.set_theme("dark")
-        error(1, '缺失配置文件，请重新安装此软件')
+        theme.set(self.theme)
+        sv_ttk.set_theme(self.theme)
+        win.attributes("-alpha", self.barlevel)
+
+    def setf(self, name, value):
+        self.config.read(setfile)
+        self.config.set("setting", "%s" % name, "%s" % value)
+        with open(self.set_file, 'w') as fil:
+            self.config.write(fil)
+        self.load()
 
 
-loadset()
+settings = set_utils(setfile)
+settings.load()
 
 
 def messpop(message, color='orange') -> None:
@@ -574,7 +577,7 @@ class Process(Toplevel):
                 self.notice.configure(text="未满足系统要求", fg='red')
                 self.able = False
         if "version" in self.prc['support']:
-            if VERSION not in self.prc['support']['version']:
+            if settings.version not in self.prc['support']['version']:
                 self.notice.configure(text="未满足版本要求", fg='red')
                 self.able = False
         self.start.configure(state='normal')
@@ -747,7 +750,7 @@ class Process(Toplevel):
     def exit(self):
         if self.in_process:
             return
-        loadset()
+        settings.load()
         sys.stdout = StdoutRedirector(win.show)
         sys.stderr = StdoutRedirector(win.show)
         xmcd_.listdir()
@@ -915,14 +918,14 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile("".join([local, os.sep, chosed.get(), ".mpk"]), 'w',
+        with zipfile.ZipFile("".join([settings.path, os.sep, chosed.get(), ".mpk"]), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
-        if os.path.exists(local + os.sep + chosed.get() + ".mpk"):
-            print(lang.t15 % (local + os.sep + chosed.get() + ".mpk"))
+        if os.path.exists(settings.path + os.sep + chosed.get() + ".mpk"):
+            print(lang.t15 % (settings.path + os.sep + chosed.get() + ".mpk"))
         else:
-            print(lang.t16 % (local + os.sep + chosed.get() + ".mpk"))
+            print(lang.t16 % (settings.path + os.sep + chosed.get() + ".mpk"))
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
@@ -947,11 +950,11 @@ def mpkman() -> None:
             return 1
 
     class msh_parse(object):
-        envs = {'version': VERSION,
+        envs = {'version': settings.version,
                 'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                     '\\',
                     '/'),
-                'project': (local + os.sep + dn.get()).replace('\\', '/'),
+                'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
 
         def __init__(self, sh):
@@ -1121,12 +1124,13 @@ def mpkman() -> None:
                 file.set(temp + v_code())
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                     f.write(sh_content)
-                    f.write('export version={}\n'.format(VERSION))
+                    f.write('export version={}\n'.format(settings.version))
                     f.write('export tool_bin={}\n'.format(
                         f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                             '\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
-                    f.write("export project={}\nsource $1".format((local + os.sep + dn.get()).replace('\\', '/')))
+                    f.write(
+                        "export project={}\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
                 self.gavs.clear()
 
@@ -1276,11 +1280,11 @@ def mpkman() -> None:
                                 f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
                                     '\\',
                                     '/')))
-                            f.write('export version={}\n'.format(VERSION))
+                            f.write('export version={}\n'.format(settings.version))
                             f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                             f.write(
                                 "export project={}\nsource $1".format(
-                                    (local + os.sep + dn.get()).replace('\\', '/')))
+                                    (settings.path + os.sep + dn.get()).replace('\\', '/')))
                         if os.path.exists(file.get()):
                             if os.name == 'posix':
                                 sh = "ash"
@@ -1836,7 +1840,7 @@ def download_file():
         response = requests.Session().head(url)
         file_size = int(response.headers.get("Content-Length", 0))
         response = requests.Session().get(url, stream=True, verify=False)
-        with open(local + os.sep + os.path.basename(url), "wb") as f:
+        with open(settings.path + os.sep + os.path.basename(url), "wb") as f:
             chunk_size = 2048576
             bytes_downloaded = 0
             for data in response.iter_content(chunk_size=chunk_size):
@@ -1851,8 +1855,8 @@ def download_file():
         print(lang.text65.format(os.path.basename(url), str(elapsed)))
         down.destroy()
         if var1.get() == 1:
-            unpackrom(local + os.sep + os.path.basename(url))
-            os.remove(local + os.sep + os.path.basename(url))
+            unpackrom(settings.path + os.sep + os.path.basename(url))
+            os.remove(settings.path + os.sep + os.path.basename(url))
     except Exception as e:
         print(lang.text66, str(e))
         try:
@@ -1981,7 +1985,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         messpop(lang.warn1)
         return False
     else:
-        if not os.path.exists(local + os.sep + dn.get()):
+        if not os.path.exists(settings.path + os.sep + dn.get()):
             messpop(lang.warn1, "red")
             return False
     load_car(0)
@@ -2125,10 +2129,10 @@ def unpackrom(ifile) -> None:
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif os.path.splitext(ifile)[1] == '.ofp':
         if ask_win(lang.t12) == 1:
-            ofp_mtk_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+            ofp_mtk_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         else:
-            ofp_qc_decrypt.main(ifile, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-            script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+            ofp_qc_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+            script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         car.set(1)
         try:
             unpackg.refs()
@@ -2138,7 +2142,7 @@ def unpackrom(ifile) -> None:
     elif os.path.splitext(ifile)[1] == '.ops':
         args = {'decrypt': True,
                 "<filename>": ifile,
-                'outdir': os.path.join(local, os.path.basename(ifile).split('.')[0])}
+                'outdir': os.path.join(settings.path, os.path.basename(ifile).split('.')[0])}
         opscrypto.main(args)
         try:
             unpackg.refs()
@@ -2158,19 +2162,19 @@ def unpackrom(ifile) -> None:
                     pass
             print(lang.text79 + file)
             try:
-                fz.extract(file, local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+                fz.extract(file, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             except Exception as e:
                 print(lang.text80 % (file, e))
                 messpop(lang.warn4.format(file))
             finally:
                 pass
         print(lang.text81)
-        if os.path.exists("".join([local, os.sep, os.path.splitext(os.path.basename(zip_src))[0]])):
+        if os.path.exists("".join([settings.path, os.sep, os.path.splitext(os.path.basename(zip_src))[0]])):
             xmcd_.listdir()
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
             xmcd_.listdir()
-        script2fs(local + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+        script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         try:
             unpackg.refs()
         except:
@@ -2178,10 +2182,10 @@ def unpackrom(ifile) -> None:
         car.set(1)
         return
     elif ftype != 'unknow':
-        if os.path.exists(local + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
-            folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code()
+        if os.path.exists(settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
+            folder = settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code()
         else:
-            folder = local + os.sep + os.path.splitext(os.path.basename(ifile))[0]
+            folder = settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]
         try:
             os.mkdir(folder)
         except Exception as e:
@@ -2199,7 +2203,7 @@ def unpackrom(ifile) -> None:
 
 
 def rwork() -> str:
-    return local + os.sep + dn.get() + os.sep
+    return settings.path + os.sep + dn.get() + os.sep
 
 
 def unpack(chose, form: any = None):
@@ -2207,7 +2211,7 @@ def unpack(chose, form: any = None):
         messpop(lang.warn1)
         return False
     else:
-        if not os.path.exists(local + os.sep + dn.get()):
+        if not os.path.exists(settings.path + os.sep + dn.get()):
             messpop(lang.warn1, "red")
             return False
     load_car(0)
@@ -2326,7 +2330,7 @@ def unpack(chose, form: any = None):
                         messpop(lang.warn11.format(i + ".img:" + e))
             if ftype == "erofs":
                 print(lang.text79 + i + ".img [%s]" % ftype)
-                if call(exe="extract.erofs -i " + local + os.sep + dn.get() + os.sep + i + ".img -o " + work + " -x",
+                if call(exe="extract.erofs -i " + settings.path + os.sep + dn.get() + os.sep + i + ".img -o " + work + " -x",
                         out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
@@ -2501,11 +2505,12 @@ def mke2fs(name, work, sparse):
 class handle_log:
     @staticmethod
     def putlog():
-        with open(local + os.sep + (log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
+        with open(settings.path + os.sep + (
+        log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
                   'w', encoding='utf-8', newline='\n') as f:
             f.write(win.show.get(1.0, END))
         win.show.delete(1.0, END)
-        print(lang.text95 + local + os.sep + log + v_code() + ".txt")
+        print(lang.text95 + settings.path + os.sep + log + v_code() + ".txt")
 
 
 def selectp(self):
@@ -2542,17 +2547,10 @@ def get_all_file_paths(directory) -> Ellipsis:
             yield os.path.join(root, filename)
 
 
-def setf(n, w):
-    config.read(setfile)
-    config.set("setting", "%s" % n, "%s" % w)
-    with open(setfile, 'w') as fil:
-        config.write(fil)
-
-
 def set_theme(self):
     print(lang.text100 + theme.get())
     try:
-        setf("theme", theme.get())
+        settings.setf("theme", theme.get())
         sv_ttk.set_theme(theme.get())
         gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
         loadgif(gif)
@@ -2564,7 +2562,7 @@ def set_theme(self):
 def set_language(self):
     print(lang.text129 + language.get())
     try:
-        setf("language", language.get())
+        settings.setf("language", language.get())
         load(language.get())
     except Exception as e:
         print(lang.t130, e)
@@ -2573,7 +2571,7 @@ def set_language(self):
 class zip_file(object):
     def __init__(self, file, dst_dir, path=None):
         if not path:
-            path = local + os.sep
+            path = settings.path + os.sep
         os.chdir(dst_dir)
         with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED,
                              allowZip64=True) as zip_:
@@ -2597,16 +2595,16 @@ def packzip():
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
             dbkxyt()
-        zip_file(dn.get() + ".zip", local + os.sep + dn.get())
+        zip_file(dn.get() + ".zip", settings.path + os.sep + dn.get())
         car.set(1)
 
 
 def modpath():
     if not (folder := filedialog.askdirectory()):
         return False
-    setf("path", folder)
+    settings.setf("path", folder)
     win.slocal.set(folder)
-    loadset()
+    settings.load()
 
 
 def dndfile(files):
@@ -2646,8 +2644,8 @@ class xmcd(ttk.LabelFrame):
 
     def listdir(self):
         array = []
-        for f in os.listdir(local + os.sep + "."):
-            if os.path.isdir(local + os.sep + f) and f != 'bin' and not f.startswith('.'):
+        for f in os.listdir(settings.path + os.sep + "."):
+            if os.path.isdir(settings.path + os.sep + f) and f != 'bin' and not f.startswith('.'):
                 array.append(f)
         if not array:
             dn.set("")
@@ -2661,11 +2659,11 @@ class xmcd(ttk.LabelFrame):
         if not dn.get():
             print(lang.warn1)
             return
-        if os.path.exists(local + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
+        if os.path.exists(settings.path + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
             print(lang.text103)
             return False
         if inputvar != dn.get():
-            os.rename(local + os.sep + dn.get(), local + os.sep + inputvar)
+            os.rename(settings.path + os.sep + dn.get(), settings.path + os.sep + inputvar)
             self.listdir()
         else:
             print(lang.text104)
@@ -2674,7 +2672,7 @@ class xmcd(ttk.LabelFrame):
         if not dn.get():
             messpop(lang.warn1)
         else:
-            rmdir(local + os.sep + dn.get())
+            rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
     def newp(self):
@@ -2682,7 +2680,7 @@ class xmcd(ttk.LabelFrame):
             messpop(lang.warn12)
         else:
             print(lang.text99 % inputvar)
-            os.mkdir(local + os.sep + "%s" % inputvar)
+            os.mkdir(settings.path + os.sep + "%s" % inputvar)
         self.listdir()
 
 
@@ -2778,7 +2776,7 @@ class unpack_gui(ttk.LabelFrame):
             packxx(lbs)
 
 
-if int(oobe) < 4:
+if int(settings.oobe) < 4:
     welcome()
 win.gui()
 unpackg = unpack_gui()
