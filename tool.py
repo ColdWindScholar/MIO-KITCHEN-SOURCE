@@ -86,8 +86,8 @@ class Tool(Tk):
         sys.stdout = dev_null()
 
     def gui(self):
-        self.subwin2 = ttk.LabelFrame(win, text=lang.text9)
-        self.subwin3 = ttk.LabelFrame(win, text=lang.text10)
+        self.subwin2 = ttk.LabelFrame(self, text=lang.text9)
+        self.subwin3 = ttk.LabelFrame(self, text=lang.text10)
         self.subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
         self.subwin2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
         self.notepad = ttk.Notebook(self.subwin2)
@@ -143,6 +143,9 @@ class Tool(Tk):
                                                                                                padx=10,
                                                                                                pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
+        mpkman()
+        self.gifl = Label(self.rzf)
+        self.gifl.pack(padx=10, pady=10)
 
     def upjdt(self):
         self.frame_bg.update_idletasks()
@@ -187,6 +190,7 @@ class Tool(Tk):
         self.photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
         Label(self.tab6, image=self.photo).pack(padx=5, pady=5)
         Label(self.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+
     def setting_tab(self):
         self.slocal = StringVar()
         self.slocal.set(local)
@@ -2557,7 +2561,7 @@ def set_theme(self):
         sv_ttk.set_theme(theme.get())
         gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
         loadgif(gif)
-        gifl.configure(image=frames[1])
+        win.gifl.configure(image=frames[1])
     except Exception as e:
         messpop(lang.text101 % (theme.get(), e))
 
@@ -2788,6 +2792,8 @@ xmcd_.gui()
 unpackg.gui()
 frame3().gui()
 xmcd_.listdir()
+
+
 # 设置的控件
 
 
@@ -2970,31 +2976,29 @@ class load_car(object):
     def __init__(self, ind: int = 0):
         global hide_gifl
         if hide_gifl:
-            gifl.pack(padx=10, pady=10)
+            win.gifl.pack(padx=10, pady=10)
         frame = frames[ind]
         ind += 1
         if ind == len(frames):
             ind = 0
-        gifl.configure(image=frame)
-        self.gifs = gifl.after(30, load_car, ind)
+        win.gifl.configure(image=frame)
+        self.gifs = win.gifl.after(30, load_car, ind)
         if car.get() == 1:
             self.endupdate()
 
     def endupdate(self):
         global hide_gifl
-        gifl.after_cancel(self.gifs)
-        gifl.pack_forget()
+        win.gifl.after_cancel(self.gifs)
+        win.gifl.pack_forget()
         hide_gifl = True
         car.set(0)
 
 
-(gifl := Label(win.rzf)).pack(padx=10, pady=10)
 load_car(0)
 car.set(1)
 print(lang.text108)
 cz(get_time)
-mpkman()
-print(lang.text134 % (dti() - start))
 win.update()
 jzxs(win)
+print(lang.text134 % (dti() - start))
 win.mainloop()
