@@ -1366,7 +1366,10 @@ def mpkman() -> None:
             if name:
                 print(lang.text29.format(name))
                 if os.path.exists(moduledir + os.sep + name):
-                    rmtree(moduledir + os.sep + name)
+                    try:
+                        rmtree(moduledir + os.sep + name)
+                    except PermissionError as e:
+                        print(e)
                 if os.path.exists(moduledir + os.sep + name):
                     messpop(lang.warn9, 'red')
                 else:
