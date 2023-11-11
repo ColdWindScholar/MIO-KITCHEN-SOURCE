@@ -228,7 +228,6 @@ utils.dn = StringVar()
 dn = utils.dn
 theme = StringVar()
 language = StringVar()
-var1 = IntVar()
 car = IntVar()
 
 
@@ -1827,6 +1826,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 
 
 def download_file():
+    var1 = IntVar()
     down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
