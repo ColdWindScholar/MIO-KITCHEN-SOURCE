@@ -132,9 +132,11 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
       - name: Install Packages
         run: |
+          brew install python3 --with-tcl-tk
+          brew update
           python3 -m pip install -U --force-reinstall pip
           pip3 install -r requirements.txt
-          sudo apt update -y && sudo apt install python3-tk -y
+          pip3 install tk
       - name: Pack Tool
         run: |
           python3 build.py
