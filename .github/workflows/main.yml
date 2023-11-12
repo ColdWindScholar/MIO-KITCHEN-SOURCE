@@ -42,8 +42,6 @@ jobs:
           ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux.zip
           cd ..
-          ls
-          cd ..
           cd MIO-KITCHEN-macos
           ls
           Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-macos.zip
@@ -65,6 +63,7 @@ jobs:
             Version: ${{ steps.tool_version.outputs.version }}
             Note:If u cannot run it in linux,you may need do "chmod a+x ./*"
             Author: MIO-KITCHEN-TEAM
+            * MacOS Notice:if you want use brotli,u need "brew install gettext",A few Functions are not support Macos now
             Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit),Macos Latest(X86_64)
           artifacts: "*.zip"
 
