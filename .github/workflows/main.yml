@@ -125,7 +125,8 @@ jobs:
       - name: Install Packages
         run: |
           brew update
-          brew install python-tk zlib tcl-tk python3
+          brew uninstall pipx php
+          brew install python-tk python3  tcl-tk
           python3 -m pip install -U --force-reinstall pip
           pip3 install -r requirements.txt
       - name: Pack Tool
