@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    needs: [build-win,build-linux]
+    needs: [build-win,build-linux,build-macos]
     runs-on: windows-latest
     strategy:
       matrix:
@@ -45,8 +45,13 @@ jobs:
           cd MIO-KITCHEN-linux-aarch64
           ls
           cd ..
+          cd MIO-KITCHEN-macos
+          ls
+          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-macos.zip
+          cd ..
           move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
+          move MIO-KITCHEN-macos.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-macos.zip
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
@@ -61,7 +66,7 @@ jobs:
             Version: ${{ steps.tool_version.outputs.version }}
             Note:If u cannot run it in linux,you may need do "chmod a+x ./*"
             Author: MIO-KITCHEN-TEAM
-            Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit)
+            Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit),Macos Latest
           artifacts: "*.zip"
 
   build-win:
@@ -114,6 +119,31 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-linux
+          path: './*'
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.10'
+          # Optional - x64 or x86 architecture, defaults to x64
+      - name: Install Packages
+        run: |
+          python3 -m pip install -U --force-reinstall pip
+          pip3 install -r requirements.txt
+          sudo apt update -y && sudo apt install python3-tk -y
+      - name: Pack Tool
+        run: |
+          python3 build.py
+          ls
+      - name: Upload Macos Build
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: MIO-KITCHEN-macos
           path: './*'
   build-linux-aarch64:
     runs-on: ubuntu-20.04
