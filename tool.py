@@ -1549,6 +1549,8 @@ class installmpk(Toplevel):
 
 class packxx(object):
     def __init__(self, list_):
+        if not list_:
+            return
         self.dbfs = StringVar()
         self.dbgs = StringVar()
         self.edbgs = StringVar()
