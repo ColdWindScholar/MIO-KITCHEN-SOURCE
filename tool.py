@@ -2,6 +2,7 @@
 import mmap
 import platform
 import subprocess
+from functools import wraps
 
 try:
     import load_window
@@ -48,6 +49,53 @@ import ofp_mtk_decrypt
 import editor
 import yaml
 import opscrypto
+
+
+class load_car(object):
+
+    def __init__(self, *args):
+        pass
+
+    def run(self, ind: int = 0):
+        self.hide_gifl = False
+        if not self.hide_gifl:
+            win.gifl.pack(padx=10, pady=10)
+        self.frame = self.frames[ind]
+        ind += 1
+        if ind == len(self.frames):
+            ind = 0
+        win.gifl.configure(image=self.frame)
+        self.gifs = win.gifl.after(30, self.run, ind)
+
+    def endupdate(self):
+        win.gifl.after_cancel(self.gifs)
+        win.gifl.pack_forget()
+        self.hide_gifl = True
+
+    def init(self):
+        self.run()
+        self.endupdate()
+
+    def loadgif(self, gif):
+        self.frames = []
+        try:
+            while True:
+                self.frames.append(ImageTk.PhotoImage(gif.copy()))
+                gif.seek(len(self.frames))
+        except EOFError:
+            pass
+
+    def __call__(self, func):
+        @wraps(func)
+        def call_func(*args, **kwargs):
+            cz(self.run())
+            func(*args, **kwargs)
+            self.endupdate()
+
+        return call_func
+
+
+cartoon = load_car()
 
 
 class dev_null(object):
@@ -224,7 +272,6 @@ modfile = ''.join([elocal, os.sep, "bin", os.sep, "module", os.sep, "module.json
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
-car = IntVar()
 
 
 class ModuleError(Exception):
@@ -442,7 +489,7 @@ def re_folder(path) -> None:
     else:
         os.mkdir(path)
 
-
+@cartoon
 def un_dtbo(bn: str = 'dtbo') -> any:
     if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
         print(lang.warn3.format(bn))
@@ -454,7 +501,6 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         mkdtboimg.dump_dtbo(dtboimg, work + f"{bn}" + os.sep + "dtbo" + os.sep + "dtbo")
     except Exception as e:
         print(lang.warn4.format(e))
-        car.set(1)
         return False
     for dtbo in os.listdir(work + f"{bn}" + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
@@ -469,12 +515,11 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         pass
     rmdir(work + "dtbo" + os.sep + "dtbo", 1)
 
-
+@cartoon
 def padtbo() -> any:
     work = rwork()
     if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
-        car.set(1)
         return False
     re_folder(work + "dtbo" + os.sep + "dtbo")
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
@@ -493,7 +538,7 @@ def padtbo() -> any:
     rmdir(work + "dtbo", 1)
     print(lang.text8)
 
-
+@cartoon
 def logodump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
         messpop(lang.warn3.format(bn))
@@ -501,7 +546,7 @@ def logodump(bn: str = 'logo'):
     re_folder(work + f"{bn}")
     utils.LOGODUMPER(logo, work + f"{bn}").unpack()
 
-
+@cartoon
 def logopack() -> int:
     orlogo = findfile('logo.img', work := rwork())
     logo = work + "logo-new.img"
@@ -882,6 +927,7 @@ def mpkman() -> None:
             chosed.set(self.name)
             run()
 
+    @cartoon
     def export():
         if not chosed.get():
             messpop(lang.warn2)
@@ -1044,7 +1090,6 @@ def mpkman() -> None:
                     sh = "ash"
                 else:
                     sh = "bash"
-                load_car(0)
                 call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
                 try:
                     os.remove(file_)
@@ -1233,6 +1278,7 @@ def mpkman() -> None:
             jzxs(self)
             self.wait_window()
 
+    @cartoon
     def run():
         if not dn.get():
             print(lang.warn1)
@@ -1253,12 +1299,10 @@ def mpkman() -> None:
                                 sh = "ash"
                             else:
                                 sh = "bash"
-                            load_car(0)
                             call("busybox {} {} {}".format(sh, file.get(),
                                                            (moduledir + os.sep + value + os.sep + "main.sh").replace(
                                                                '\\',
                                                                '/')))
-                            car.set(1)
                             os.remove(file.get())
                     elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
                         msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
@@ -1283,13 +1327,11 @@ def mpkman() -> None:
                                 sh = "ash"
                             else:
                                 sh = "bash"
-                            load_car(0)
                             call("busybox {} {} {}".format(sh, file.get(),
                                                            (
                                                                    moduledir + os.sep + value + os.sep + "main.sh").replace(
                                                                '\\',
                                                                '/')))
-                            car.set(1)
                             os.remove(file.get())
                     elif os.path.exists(msh_tmp := moduledir + os.sep + value + os.sep + "main.msh"):
                         msh_parse(msh_tmp)
@@ -1734,13 +1776,11 @@ class packss:
                                                                                       expand=True)
         read_list()
 
-
+@cartoon
 def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     if not dn.get():
         messpop(lang.warn1)
         return False
-    if return_cmd == 0:
-        load_car(0)
     work = rwork()
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
@@ -1777,8 +1817,6 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
             messpop(lang.warn10)
     else:
         messpop(lang.warn10)
-    if return_cmd == 0:
-        car.set(1)
 
 
 class StdoutRedirector(object):
@@ -1870,20 +1908,17 @@ def download_file():
                     messpop("%s" % e)
                 messpop(lang.text68, "red")
 
-
+@cartoon
 def jboot(bn: str = 'boot'):
     if not (boot := findfile(f"{bn}.img", (work := rwork()))):
         print(lang.warn3.format(bn))
-        car.set(1)
         return
     if not os.path.exists(boot):
         messpop(lang.warn3.format(bn))
-        car.set(1)
         return
     if os.path.exists(work + f"{bn}"):
         if rmdir((work + f"{bn}")) != 0:
             print(lang.text69)
-            car.set(1)
             return
     re_folder(work + f"{bn}")
     os.chdir(work + f"{bn}")
@@ -1891,7 +1926,6 @@ def jboot(bn: str = 'boot'):
         print("Unpack %s Fail..." % boot)
         os.chdir(elocal)
         rmtree((work + f"{bn}"))
-        car.set(1)
         return
     if os.access(work + f"{bn}" + os.sep + "ramdisk.cpio", os.F_OK):
         comp = gettype(work + f"{bn}" + os.sep + "ramdisk.cpio")
@@ -1905,7 +1939,6 @@ def jboot(bn: str = 'boot'):
                     work + f"{bn}" + os.sep + "ramdisk.cpio.comp",
                     work + f"{bn}" + os.sep + "ramdisk.cpio")) != 0:
                 print("Decompress Ramdisk Fail...")
-                car.set(1)
                 return
         if not os.path.exists(work + f"{bn}" + os.sep + "ramdisk"):
             os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
@@ -1917,14 +1950,13 @@ def jboot(bn: str = 'boot'):
         print("Unpack Done!")
     os.chdir(elocal)
 
-
+@cartoon
 def dboot(nm: str = 'boot'):
     work = rwork()
     flag = ''
     boot = findfile(f"{nm}.img", work)
     if not os.path.exists(work + f"{nm}"):
         print(f"Cannot Find {nm}...")
-        car.set(1)
         return
     if os.name != 'posix':
         cpio = findfile("cpio.exe",
@@ -1943,7 +1975,6 @@ def dboot(nm: str = 'boot'):
             if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
                 print("Pack Ramdisk Fail...")
                 os.remove("ramdisk-new.cpio")
-                car.set(1)
                 return
             else:
                 print("Pack Ramdisk Successful..")
@@ -1963,7 +1994,6 @@ def dboot(nm: str = 'boot'):
         ramdisk = False
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Pack boot Fail...")
-        car.set(1)
         return
     else:
         if ramdisk:
@@ -1976,7 +2006,7 @@ def dboot(nm: str = 'boot'):
             print(lang.warn11.format(nm))
         print("Pack Successful...")
 
-
+@cartoon
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     dely = others[0]
     erofs_level = others[1]
@@ -1987,7 +2017,6 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         if not os.path.exists(settings.path + os.sep + dn.get()):
             messpop(lang.warn1, "red")
             return False
-    load_car(0)
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
             parts_dict = json.loads(fff.read())
@@ -2062,9 +2091,8 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             logopack()
         else:
             print(f"Unsupport {i}:{parts_dict[i]}")
-    car.set(1)
 
-
+@cartoon
 def rdi(work, dname) -> any:
     if not os.listdir(work + "config"):
         rmtree(work + "config")
@@ -2114,10 +2142,9 @@ def script2fs(path):
         with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
             json.dump(parts, pf, indent=4)
 
-
+@cartoon
 def unpackrom(ifile) -> None:
     print(lang.text77 + (zip_src := ifile))
-    load_car(0)
     if (ftype := gettype(ifile)) == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
@@ -2132,7 +2159,6 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-        car.set(1)
         try:
             unpackg.refs()
         except:
@@ -2147,7 +2173,6 @@ def unpackrom(ifile) -> None:
             unpackg.refs()
         except:
             pass
-        car.set(1)
         return
     if gettype(zip_src) == 'zip':
         fz = zipfile.ZipFile(zip_src, 'r')
@@ -2178,7 +2203,6 @@ def unpackrom(ifile) -> None:
             unpackg.refs()
         except:
             pass
-        car.set(1)
         return
     elif ftype != 'unknow':
         if os.path.exists(settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]):
@@ -2194,7 +2218,6 @@ def unpackrom(ifile) -> None:
         dn.set(os.path.basename(folder))
     else:
         print(lang.text82 % ftype)
-    car.set(1)
     try:
         unpackg.refs()
     except:
@@ -2204,7 +2227,7 @@ def unpackrom(ifile) -> None:
 def rwork() -> str:
     return settings.path + os.sep + dn.get() + os.sep
 
-
+@cartoon
 def unpack(chose, form: any = None):
     if not dn.get():
         messpop(lang.warn1)
@@ -2213,7 +2236,6 @@ def unpack(chose, form: any = None):
         if not os.path.exists(settings.path + os.sep + dn.get()):
             messpop(lang.warn1, "red")
             return False
-    load_car(0)
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
             parts = json.loads(pf.read())
@@ -2232,7 +2254,6 @@ def unpack(chose, form: any = None):
         print(lang.text79 + "UPDATE.APP")
         splituapp.extract(work + "UPDATE.APP", "")
     if not chose:
-        car.set(1)
         return 1
     if form == 'payload':
         print(lang.text79 + "payload")
@@ -2251,7 +2272,6 @@ def unpack(chose, form: any = None):
             except Exception as e:
                 print(lang.text72 + " payload.bin:%s" % e)
                 os.remove(work + "payload.bin")
-        car.set(1)
         return 1
 
     for i in chose:
@@ -2347,7 +2367,6 @@ def unpack(chose, form: any = None):
     with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
         ff.write(json.dumps(parts))
     parts.clear()
-    car.set(1)
     print(lang.text8)
 
 
@@ -2433,7 +2452,7 @@ class dirsize(object):
                                  "# Grow partition {}_a from 0 to {}".format(dname, size), content)
                 ff.write(content)
 
-
+@cartoon
 def datbr(work, name, brl: any):
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, 4, name)
@@ -2455,7 +2474,7 @@ def datbr(work, name, brl: any):
                 print(e)
         print(lang.text89 % name)
 
-
+@cartoon
 def mkerofs(name, format_, work, level):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     if format_ != 'lz4':
@@ -2465,14 +2484,14 @@ def mkerofs(name, format_, work, level):
     cmd = f"mkfs.erofs -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd)
 
-
+@cartoon
 def make_ext4fs(name, work, sparse):
     print(lang.text91 % name)
     size = dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     call(
         f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
-
+@cartoon
 def mke2fs(name, work, sparse):
     print(lang.text91 % name)
     size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v
@@ -2517,10 +2536,8 @@ def selectp(self):
     if ' ' in dn.get():
         print(lang.t29 + dn.get())
 
-
+@cartoon
 def rmdir(path, up=0):
-    if up == 0:
-        load_car(0)
     if not path:
         messpop(lang.warn1)
     else:
@@ -2536,8 +2553,6 @@ def rmdir(path, up=0):
             messpop(lang.warn11.format(path))
         else:
             print(lang.text98 + path)
-    if up == 0:
-        car.set(1)
 
 
 def get_all_file_paths(directory) -> Ellipsis:
@@ -2552,8 +2567,7 @@ def set_theme(self):
         settings.setf("theme", theme.get())
         sv_ttk.set_theme(theme.get())
         gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
-        loadgif(gif)
-        win.gifl.configure(image=frames[1])
+        cartoon.loadgif(gif)
     except Exception as e:
         messpop(lang.text101 % (theme.get(), e))
 
@@ -2586,16 +2600,15 @@ class zip_file(object):
         os.chdir(elocal)
 
 
+@cartoon
 def packzip():
     if not dn.get():
         messpop(lang.warn1)
     else:
-        load_car(0)
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
             dbkxyt()
         zip_file(dn.get() + ".zip", settings.path + os.sep + dn.get())
-        car.set(1)
 
 
 def modpath():
@@ -2833,13 +2846,13 @@ class format_conversion(Toplevel):
                 if os.path.isfile(work + i):
                     yield i
 
+    @cartoon
     def conversion(self):
         work = rwork()
         fget = self.f.get()
         hget = self.h.get()
         selection = [self.list_b.get(index) for index in self.list_b.curselection()]
         self.destroy()
-        load_car(0)
         if fget == hget:
             pass
         elif fget == 'sparse':
@@ -2941,53 +2954,11 @@ class format_conversion(Toplevel):
                             os.remove(work + i)
                         except Exception as e:
                             print(e)
-        car.set(1)
         print(lang.text8)
 
 
-global frames
-
-
-def loadgif(gif):
-    global frames
-    frames = []
-    try:
-        while True:
-            frames.append(ImageTk.PhotoImage(gif.copy()))
-            gif.seek(len(frames))
-    except EOFError:
-        pass
-
-
-loadgif(Image.open("bin/images/loading_%s.gif" % (win.LB2.get())))
-
-hide_gifl = False
-
-
-class load_car(object):
-    def __init__(self, ind: int = 0):
-        global hide_gifl
-        if hide_gifl:
-            win.gifl.pack(padx=10, pady=10)
-        frame = frames[ind]
-        ind += 1
-        if ind == len(frames):
-            ind = 0
-        win.gifl.configure(image=frame)
-        self.gifs = win.gifl.after(30, load_car, ind)
-        if car.get() == 1:
-            self.endupdate()
-
-    def endupdate(self):
-        global hide_gifl
-        win.gifl.after_cancel(self.gifs)
-        win.gifl.pack_forget()
-        hide_gifl = True
-        car.set(0)
-
-
-load_car(0)
-car.set(1)
+cartoon.loadgif(Image.open("bin/images/loading_%s.gif" % (win.LB2.get())))
+cartoon.init()
 print(lang.text108)
 cz(get_time)
 win.update()
