@@ -3,11 +3,11 @@ import mmap
 import platform
 import subprocess
 from functools import wraps
-
-try:
-    import load_window
-except ModuleNotFoundError:
-    pass
+if not platform.system() == 'Darwin':
+    try:
+        import load_window
+    except ModuleNotFoundError:
+        pass
 import json
 import os.path
 import shlex
