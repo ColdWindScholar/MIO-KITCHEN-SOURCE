@@ -136,7 +136,6 @@ jobs:
           brew update
           python3 -m pip install -U --force-reinstall pip
           pip3 install -r requirements.txt
-          pip3 install tk
       - name: Pack Tool
         run: |
           python3 build.py

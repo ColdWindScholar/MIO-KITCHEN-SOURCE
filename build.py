@@ -6,7 +6,9 @@ ostype = system()
 
 local = os.getcwd()
 print("Building...")
-if os.name == 'posix':
+if ostype == 'Darwin':
+    os.system("pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder")
+elif os.name == 'posix':
     os.system(
         "pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png")
 elif os.name == 'nt':
