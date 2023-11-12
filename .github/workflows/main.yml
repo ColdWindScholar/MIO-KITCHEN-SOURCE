@@ -125,7 +125,7 @@ jobs:
       - name: Install Packages
         run: |
           brew update
-          brew uninstall pipx php
+          brew uninstall --ignore-dependencies pipx php
           brew install python-tk python3  tcl-tk
           python3 -m pip install -U --force-reinstall pip
           pip3 install -r requirements.txt
