@@ -130,8 +130,8 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
       - name: Install Packages
         run: |
-          brew install python-tk
           brew update
+          brew install python-tk zlib tcl-tk
           python3 -m pip install -U --force-reinstall pip
           pip3 install -r requirements.txt
       - name: Pack Tool
