@@ -3,6 +3,7 @@ import mmap
 import platform
 import subprocess
 from functools import wraps
+
 if not platform.system() == 'Darwin':
     try:
         import load_window
@@ -267,7 +268,6 @@ class Tool(Tk):
 win = Tool()
 start = dti()
 setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini"])
-modfile = ''.join([elocal, os.sep, "bin", os.sep, "module", os.sep, "module.json"])
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -294,10 +294,8 @@ def load(name):
 
 
 def error(code, desc="未知错误"):
-    if not win:
-        er = Tk()
-    else:
-        er = win
+    win.withdraw()
+    er = Toplevel()
     er.protocol("WM_DELETE_WINDOW", sys.exit)
     er.title("错误")
     er.lift()
@@ -309,10 +307,8 @@ def error(code, desc="未知错误"):
     te.insert('insert', desc)
 
     ttk.Button(er, text="确定", command=lambda: sys.exit(1)).pack(padx=10, pady=10)
-    if not win:
-        er.wait_window()
-    else:
-        er.mainloop()
+    er.wait_window()
+    win.deiconify()
 
 
 class welcome(object):
@@ -488,6 +484,7 @@ def re_folder(path) -> None:
     else:
         os.mkdir(path)
 
+
 @cartoon
 def un_dtbo(bn: str = 'dtbo') -> any:
     if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
@@ -514,6 +511,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         pass
     rmdir(work + "dtbo" + os.sep + "dtbo", 1)
 
+
 @cartoon
 def padtbo() -> any:
     work = rwork()
@@ -537,6 +535,7 @@ def padtbo() -> any:
     rmdir(work + "dtbo", 1)
     print(lang.text8)
 
+
 @cartoon
 def logodump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
@@ -544,6 +543,7 @@ def logodump(bn: str = 'logo'):
         return False
     re_folder(work + f"{bn}")
     utils.LOGODUMPER(logo, work + f"{bn}").unpack()
+
 
 @cartoon
 def logopack() -> int:
@@ -1777,6 +1777,7 @@ class packss:
                                                                                       expand=True)
         read_list()
 
+
 @cartoon
 def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     if not dn.get():
@@ -1909,6 +1910,7 @@ def download_file():
                     messpop("%s" % e)
                 messpop(lang.text68, "red")
 
+
 @cartoon
 def jboot(bn: str = 'boot'):
     if not (boot := findfile(f"{bn}.img", (work := rwork()))):
@@ -1950,6 +1952,7 @@ def jboot(bn: str = 'boot'):
     else:
         print("Unpack Done!")
     os.chdir(elocal)
+
 
 @cartoon
 def dboot(nm: str = 'boot'):
@@ -2006,6 +2009,7 @@ def dboot(nm: str = 'boot'):
         except:
             print(lang.warn11.format(nm))
         print("Pack Successful...")
+
 
 @cartoon
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
@@ -2093,6 +2097,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         else:
             print(f"Unsupport {i}:{parts_dict[i]}")
 
+
 @cartoon
 def rdi(work, dname) -> any:
     if not os.listdir(work + "config"):
@@ -2142,6 +2147,7 @@ def script2fs(path):
                     parts[v] = 'ext'
         with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
             json.dump(parts, pf, indent=4)
+
 
 @cartoon
 def unpackrom(ifile) -> None:
@@ -2227,6 +2233,7 @@ def unpackrom(ifile) -> None:
 
 def rwork() -> str:
     return settings.path + os.sep + dn.get() + os.sep
+
 
 @cartoon
 def unpack(chose, form: any = None):
@@ -2453,6 +2460,7 @@ class dirsize(object):
                                  "# Grow partition {}_a from 0 to {}".format(dname, size), content)
                 ff.write(content)
 
+
 @cartoon
 def datbr(work, name, brl: any):
     print(lang.text86 % (name, name))
@@ -2475,6 +2483,7 @@ def datbr(work, name, brl: any):
                 print(e)
         print(lang.text89 % name)
 
+
 @cartoon
 def mkerofs(name, format_, work, level):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
@@ -2485,12 +2494,14 @@ def mkerofs(name, format_, work, level):
     cmd = f"mkfs.erofs -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd)
 
+
 @cartoon
 def make_ext4fs(name, work, sparse):
     print(lang.text91 % name)
     size = dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     call(
         f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
+
 
 @cartoon
 def mke2fs(name, work, sparse):
@@ -2536,6 +2547,7 @@ def selectp(self):
     print(lang.text96 + dn.get())
     if ' ' in dn.get():
         print(lang.t29 + dn.get())
+
 
 @cartoon
 def rmdir(path, up=0):
