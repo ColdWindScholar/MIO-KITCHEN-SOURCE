@@ -311,6 +311,10 @@ def error(code, desc="未知错误"):
     win.deiconify()
 
 
+if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
+    error(1, '暂不支持您的设备\nSorry,Not support your device yet.')
+
+
 class welcome(object):
     def __init__(self):
         self.ck = Toplevel()
