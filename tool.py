@@ -1295,14 +1295,13 @@ def mpkman() -> None:
             sh = "bash"
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
-                parse(script_path + "main.json",
-                      (os.path.exists(script_path + "main.msh")))
+                parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
                 if os.path.exists(script_path + "main.sh"):
-                        call("busybox {} {} {}".format(sh, file.get(),
-                                                       (script_path + "main.sh").replace(
-                                                           '\\',
-                                                           '/')))
-                        os.remove(file.get())
+                    call("busybox {} {} {}".format(sh, file.get(),
+                                                   (script_path + "main.sh").replace(
+                                                       '\\',
+                                                       '/')))
+                    os.remove(file.get())
                 elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
                     msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
             else:
@@ -1322,11 +1321,7 @@ def mpkman() -> None:
                             "export project={}\nsource $1".format(
                                 (settings.path + os.sep + dn.get()).replace('\\', '/')))
                     if os.path.exists(file.get()):
-                        call("busybox {} {} {}".format(sh, file.get(),
-                                                       (
-                                                               script_path + "main.sh").replace(
-                                                           '\\',
-                                                           '/')))
+                        call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
                         os.remove(file.get())
                 elif os.path.exists(msh_tmp := script_path + "main.msh"):
                     msh_parse(msh_tmp)
