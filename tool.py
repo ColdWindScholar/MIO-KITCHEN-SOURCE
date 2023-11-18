@@ -1177,13 +1177,10 @@ def mpkman() -> None:
             def generate_msh():
                 for va in self.value:
                     if gva := self.gavs[va].get():
+                        msh_parse.envs[va] = gva
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if '\\' in gva:
                                 msh_parse.envs[va] = gva.replace("\\", '/')
-                            else:
-                                msh_parse.envs[va] = gva
-                        else:
-                            msh_parse.envs[va] = gva
                 self.destroy()
                 self.gavs.clear()
                 self.value.clear()
