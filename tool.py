@@ -53,12 +53,12 @@ import opscrypto
 
 
 class load_car(object):
+    gifs = []
 
     def __init__(self, *args):
         pass
 
-    def run(self, ind: int = 0, pid: any = 0):
-        self.tasks = {}
+    def run(self, ind: int = 0):
         self.hide_gifl = False
         if not self.hide_gifl:
             win.gifl.pack(padx=10, pady=10)
@@ -67,19 +67,20 @@ class load_car(object):
         if ind == len(self.frames):
             ind = 0
         win.gifl.configure(image=self.frame)
-        self.tasks[pid] = win.gifl.after(30, self.run, ind)
+        self.gifs.append(win.gifl.after(30, self.run, ind))
 
-    def endupdate(self, pid: any):
-        win.gifl.after_cancel(self.tasks[pid])
-        del self.tasks[pid]
-        if self.tasks.keys().__len__() == 0:
-            win.gifl.pack_forget()
-            self.hide_gifl = True
+    def endupdate(self):
+        for i in self.gifs:
+            try:
+                win.gifl.after_cancel(i)
+            except:
+                pass
+        win.gifl.pack_forget()
+        self.hide_gifl = True
 
     def init(self):
-        pid = v_code()
-        self.run(pid=pid)
-        self.endupdate(pid)
+        self.run()
+        self.endupdate()
 
     def loadgif(self, gif):
         self.frames = []
@@ -93,10 +94,9 @@ class load_car(object):
     def __call__(self, func):
         @wraps(func)
         def call_func(*args, **kwargs):
-            pid = v_code()
-            cz(self.run(pid=pid))
+            cz(self.run())
             func(*args, **kwargs)
-            self.endupdate(pid)
+            self.endupdate()
 
         return call_func
 
@@ -2501,6 +2501,7 @@ def mkerofs(name, format_, work, level):
     call(cmd)
 
 
+@cartoon
 def make_ext4fs(name, work, sparse, size=0):
     print(lang.text91 % name)
     if not size:
