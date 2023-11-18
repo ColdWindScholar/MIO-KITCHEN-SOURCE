@@ -57,7 +57,8 @@ class load_car(object):
     def __init__(self, *args):
         pass
 
-    def run(self, ind: int = 0):
+    def run(self, ind: int = 0, pid: any = 0):
+        self.tasks = {}
         self.hide_gifl = False
         if not self.hide_gifl:
             win.gifl.pack(padx=10, pady=10)
@@ -66,16 +67,19 @@ class load_car(object):
         if ind == len(self.frames):
             ind = 0
         win.gifl.configure(image=self.frame)
-        self.gifs = win.gifl.after(30, self.run, ind)
+        self.tasks[pid] = win.gifl.after(30, self.run, ind)
 
-    def endupdate(self):
-        win.gifl.after_cancel(self.gifs)
-        win.gifl.pack_forget()
-        self.hide_gifl = True
+    def endupdate(self, pid: any):
+        win.gifl.after_cancel(self.tasks[pid])
+        del self.tasks[pid]
+        if self.tasks.keys().__len__() == 0:
+            win.gifl.pack_forget()
+            self.hide_gifl = True
 
     def init(self):
-        self.run()
-        self.endupdate()
+        pid = v_code()
+        self.run(pid=pid)
+        self.endupdate(pid)
 
     def loadgif(self, gif):
         self.frames = []
@@ -89,9 +93,10 @@ class load_car(object):
     def __call__(self, func):
         @wraps(func)
         def call_func(*args, **kwargs):
-            cz(self.run())
+            pid = v_code()
+            cz(self.run(pid=pid))
             func(*args, **kwargs)
-            self.endupdate()
+            self.endupdate(pid)
 
         return call_func
 
@@ -2069,8 +2074,8 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             else:
                 ext4_size_value = 0
                 if ext4_size == lang.t33:
-                    if os.path.exists(work+"config"+os.sep+dname+"_size.txt"):
-                        with open(work+"config"+os.sep+dname+"_size.txt",encoding='utf-8') as f:
+                    if os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
+                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
                             ext4_size_value = int(f.read().strip())
                 if dbgs.get() in ["dat", "br", "sparse"]:
                     if dbfs.get() == "make_ext4fs":
@@ -2102,7 +2107,6 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             print(f"Unsupport {i}:{parts_dict[i]}")
 
 
-@cartoon
 def rdi(work, dname) -> any:
     if not os.listdir(work + "config"):
         rmtree(work + "config")
@@ -2465,7 +2469,6 @@ class dirsize(object):
                 ff.write(content)
 
 
-@cartoon
 def datbr(work, name, brl: any):
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, 4, name)
@@ -2488,7 +2491,6 @@ def datbr(work, name, brl: any):
         print(lang.text89 % name)
 
 
-@cartoon
 def mkerofs(name, format_, work, level):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     if format_ != 'lz4':
@@ -2499,7 +2501,6 @@ def mkerofs(name, format_, work, level):
     call(cmd)
 
 
-@cartoon
 def make_ext4fs(name, work, sparse, size=0):
     print(lang.text91 % name)
     if not size:
@@ -2508,7 +2509,6 @@ def make_ext4fs(name, work, sparse, size=0):
         f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
 
-@cartoon
 def mke2fs(name, work, sparse, size=0):
     print(lang.text91 % name)
     if not size:
