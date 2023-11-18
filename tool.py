@@ -1549,6 +1549,7 @@ class packxx(object):
         self.scale_erofs = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
+        self.ext4_method = StringVar()
         self.lg = list_
         self.ck = subp(com=1, title=lang.text42)
         lf1 = ttk.LabelFrame(self.ck, text=lang.text43)
@@ -1567,7 +1568,9 @@ class packxx(object):
         dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
         dbfss.pack(side='left', padx=5, pady=5)
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
-
+        (t := ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method)).pack(
+            side='left', padx=5, pady=5)
+        t.current(0)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
         dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
@@ -1614,7 +1617,7 @@ class packxx(object):
         lg = self.lg
         subp(com=0, master=self.ck)
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                int(self.scale_erofs.get()))
+                int(self.scale_erofs.get()), self.ext4_method.get())
 
 
 class dbkxyt:
@@ -2010,6 +2013,7 @@ def dboot(nm: str = 'boot'):
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     dely = others[0]
     erofs_level = others[1]
+    ext4_size = others[2]
     if not dn.get():
         messpop(lang.warn1)
         return False
@@ -2063,11 +2067,16 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     else:
                         print(lang.text3.format(dname))
             else:
+                ext4_size_value = 0
+                if ext4_size == lang.t33:
+                    if os.path.exists(work+"config"+os.sep+dname+"_size.txt"):
+                        with open(work+"config"+os.sep+dname+"_size.txt",encoding='utf-8') as f:
+                            ext4_size_value = int(f.read().strip())
                 if dbgs.get() in ["dat", "br", "sparse"]:
                     if dbfs.get() == "make_ext4fs":
-                        make_ext4fs(dname, work, "-s")
+                        make_ext4fs(dname, work, "-s", ext4_size_value)
                     else:
-                        mke2fs(dname, work, "y")
+                        mke2fs(dname, work, "y", ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
                     if dbgs.get() == "dat":
@@ -2078,9 +2087,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         print(lang.text3.format(dname))
                 else:
                     if dbfs.get() == "make_ext4fs":
-                        make_ext4fs(dname, work, "")
+                        make_ext4fs(dname, work, "", ext4_size_value)
                     else:
-                        mke2fs(dname, work, "n")
+                        mke2fs(dname, work, "n", ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
         elif parts_dict[i] in ['boot', 'vendor_boot']:
@@ -2491,17 +2500,21 @@ def mkerofs(name, format_, work, level):
 
 
 @cartoon
-def make_ext4fs(name, work, sparse):
+def make_ext4fs(name, work, sparse, size=0):
     print(lang.text91 % name)
-    size = dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
+    if not size:
+        size = dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     call(
         f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
 
 @cartoon
-def mke2fs(name, work, sparse):
+def mke2fs(name, work, sparse, size=0):
     print(lang.text91 % name)
-    size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v
+    if not size:
+        size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v
+    else:
+        size = size / 4096
     if call(
             f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {size}") != 0:
         rmdir(f'{work + name}_new.img', 1)
