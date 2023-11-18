@@ -2060,7 +2060,12 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             utils.qc(work + "config" + os.sep + dname + "_fs_config")
             contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
             utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-            if parts_dict[dname] == 'erofs' and erofsext4 == 0:
+            if erofsext4:
+                if parts_dict[dname] == 'erofs':
+                    parts_dict[dname] = 'ext'
+                elif parts_dict[dname] == 'ext':
+                    parts_dict[dname] = 'erofs'
+            if parts_dict[dname] == 'erofs':
                 mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level)
                 if dely == 1:
                     rdi(work, dname)
