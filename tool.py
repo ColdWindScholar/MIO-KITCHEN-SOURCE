@@ -1305,7 +1305,7 @@ def mpkman() -> None:
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
                 parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
-                if os.path.exists(script_path + "main.sh"):
+                if os.path.exists(script_path + "main.sh") and file.get():
                     call("busybox {} {} {}".format(sh, file.get(),
                                                    (script_path + "main.sh").replace(
                                                        '\\',
