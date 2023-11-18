@@ -302,12 +302,15 @@ def error(code, desc="未知错误"):
     er.lift()
     er.resizable(False, False)
     jzxs(er)
-    Label(er, text="Exit Code：%s" % code).pack(padx=10, pady=10)
+    Label(er, text="Error:0x%d" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
     te = Text(er)
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
-
-    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(padx=10, pady=10)
+    ttk.Button(er, text="Report",
+               command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues")).pack(side=LEFT,
+                                                                                                             padx=10,
+                                                                                                             pady=10)
+    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
     er.wait_window()
     sys.exit()
 
