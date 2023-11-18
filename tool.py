@@ -271,6 +271,7 @@ setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
+tool_bin = f"{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}"
 
 
 class ModuleError(Exception):
@@ -591,8 +592,7 @@ class Process(Toplevel):
         dn.set(os.path.basename(self.project))
         self.gavs = {
             'bin': self.dir,
-            'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
-                '\\', '/'),
+            'tool_bin': tool_bin.replace('\\', '/'),
             'mkc_env': os.path.join(self.dir, v_code(10)),
             'project': self.project.replace('\\', '/')
         }
@@ -999,9 +999,7 @@ def mpkman() -> None:
 
     class msh_parse(object):
         envs = {'version': settings.version,
-                'tool_bin': f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
-                    '\\',
-                    '/'),
+                'tool_bin': tool_bin.replace('\\','/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
 
@@ -1168,9 +1166,7 @@ def mpkman() -> None:
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(settings.version))
-                    f.write('export tool_bin={}\n'.format(
-                        f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
-                            '\\', '/')))
+                    f.write('export tool_bin={}\n'.format(tool_bin.replace('\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
                     f.write(
                         "export project={}\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
@@ -1316,7 +1312,7 @@ def mpkman() -> None:
                         file.set(temp + os.sep + v_code())
                     with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                         f.write('export tool_bin={}\n'.format(
-                            f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
+                            tool_bin.replace(
                                 '\\',
                                 '/')))
                         f.write('export version={}\n'.format(settings.version))
@@ -1833,7 +1829,7 @@ class StdoutRedirector(object):
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
     if kz == "Y":
-        cmd = f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}{exe}'
+        cmd = f'{tool_bin}{exe}'
     else:
         cmd = exe
     if os.name != 'posix':
