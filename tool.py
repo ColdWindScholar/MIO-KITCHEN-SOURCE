@@ -296,7 +296,7 @@ def load(name):
 def error(code, desc="未知错误"):
     win.withdraw()
     er = Toplevel()
-    er.protocol("WM_DELETE_WINDOW", sys.exit)
+    er.protocol("WM_DELETE_WINDOW", win.destroy)
     er.title("错误")
     er.lift()
     er.resizable(False, False)
@@ -306,9 +306,9 @@ def error(code, desc="未知错误"):
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
 
-    ttk.Button(er, text="确定", command=lambda: sys.exit(1)).pack(padx=10, pady=10)
+    ttk.Button(er, text="确定", command=lambda: win.destroy()).pack(padx=10, pady=10)
     er.wait_window()
-    win.deiconify()
+    sys.exit()
 
 
 if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
