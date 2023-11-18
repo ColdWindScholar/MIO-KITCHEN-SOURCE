@@ -173,7 +173,7 @@ class Tool(Tk):
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
-        self.scroll.pack(side=LEFT,fill=BOTH)
+        self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
@@ -1003,7 +1003,7 @@ def mpkman() -> None:
 
     class msh_parse(object):
         envs = {'version': settings.version,
-                'tool_bin': tool_bin.replace('\\','/'),
+                'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
 
@@ -1562,10 +1562,13 @@ class packxx(object):
         lf4.pack(fill=BOTH, pady=5, padx=5)
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         self.scale.set(0)
+        # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        dbfss = ttk.Combobox(lf1, state="readonly", textvariable=self.dbfs)
+        dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
         dbfss.pack(side='left', padx=5, pady=5)
-        dbfss['value'] = ("make_ext4fs", "mke2fs+e2fsdroid")
+        Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
+
+        #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
         dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
         dbgss.pack(padx=5, pady=5, side='left')

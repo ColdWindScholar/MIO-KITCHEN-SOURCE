@@ -189,5 +189,6 @@
   "t27": "Generate LIST",
   "t28": "Working",
   "t29": "Warn:The Project Name Cannot has [space]",
-  "t30": "EROFS Level:{}"
+  "t30": "EROFS Level:{}",
+  "t31": "Size Handle:"
 }
