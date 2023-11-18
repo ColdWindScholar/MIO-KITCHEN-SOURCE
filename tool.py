@@ -295,18 +295,19 @@ def load(name):
 
 def error(code, desc="未知错误"):
     win.withdraw()
+    sv_ttk.use_dark_theme()
     er = Toplevel()
     er.protocol("WM_DELETE_WINDOW", win.destroy)
-    er.title("错误")
+    er.title("Error")
     er.lift()
     er.resizable(False, False)
     jzxs(er)
-    Label(er, text="错误代码：%s" % code).pack(padx=10, pady=10)
+    Label(er, text="Exit Code：%s" % code).pack(padx=10, pady=10)
     te = Text(er)
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
 
-    ttk.Button(er, text="确定", command=lambda: win.destroy()).pack(padx=10, pady=10)
+    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(padx=10, pady=10)
     er.wait_window()
     sys.exit()
 
