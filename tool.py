@@ -1167,7 +1167,9 @@ def mpkman() -> None:
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if os.sep in gva:
                                 gva = gva.replace(os.sep, '/')
-                        sh_content += f"export {va}='{gva}'\n"
+                            sh_content += f"export {va}='{gva}'\n"
+                    else:
+                        continue
                 temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
                 if not os.path.exists(temp):
                     re_folder(temp)
