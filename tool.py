@@ -1411,8 +1411,7 @@ def mpkman() -> None:
             else:
                 messpop(lang.warn2)
 
-    title = ttk.Label(win.tab7, text=lang.text19, font=("宋体", 20))
-    title.pack(padx=10, pady=10, fill=BOTH)
+    ttk.Label(win.tab7, text=lang.text19, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(win.tab7, text=lang.text24).pack(padx=5, pady=5)
     pls = IconGrid(win.tab7)
