@@ -1556,6 +1556,7 @@ class packxx(object):
         self.delywj = IntVar()
         self.ext4_method = StringVar()
         self.lg = list_
+        self.erofsext4 = IntVar()
         self.ck = subp(com=1, title=lang.text42)
         lf1 = ttk.LabelFrame(self.ck, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
@@ -1601,6 +1602,9 @@ class packxx(object):
         ttk.Checkbutton(lf3, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
+        ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
         dbfss.current(0)
         dbgss.current(0)
         edbgss.current(0)
@@ -1622,7 +1626,7 @@ class packxx(object):
         lg = self.lg
         subp(com=0, master=self.ck)
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                int(self.scale_erofs.get()), self.ext4_method.get())
+                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get())
 
 
 class dbkxyt:
@@ -2019,6 +2023,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     dely = others[0]
     erofs_level = others[1]
     ext4_size = others[2]
+    erofsext4 = others[3]
     if not dn.get():
         messpop(lang.warn1)
         return False
@@ -2055,7 +2060,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             utils.qc(work + "config" + os.sep + dname + "_fs_config")
             contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
             utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-            if parts_dict[dname] == 'erofs':
+            if parts_dict[dname] == 'erofs' and erofsext4 == 0:
                 mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level)
                 if dely == 1:
                     rdi(work, dname)

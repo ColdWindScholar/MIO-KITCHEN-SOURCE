@@ -192,5 +192,6 @@
   "t30": "EROFS Level:{}",
   "t31": "Size Handle:",
   "t32": "Auto",
-  "t33": "Origin"
+  "t33": "Origin",
+  "t34": "EXT4<=>EROFS"
 }
