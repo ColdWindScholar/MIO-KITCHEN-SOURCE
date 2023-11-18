@@ -170,8 +170,12 @@ class Tool(Tk):
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
+        self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
+        self.scroll.pack(side=LEFT,fill=BOTH)
+        self.scroll.config(command=self.show.yview)
+        self.show.config(yscrollcommand=self.scroll.set)
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
                                                                                                  pady=5,
                                                                                                  expand=True)
