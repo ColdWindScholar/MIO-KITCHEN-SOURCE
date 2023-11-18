@@ -1286,64 +1286,62 @@ def mpkman() -> None:
         if chosed.get():
             value = globals()[chosed.get()]
         else:
-            value = ""
-        if value:
-            if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh") or os.path.exists(
-                    moduledir + os.sep + value + os.sep + "main.msh"):
-                if os.path.exists(moduledir + os.sep + value + os.sep + "main.json"):
-                    parse(moduledir + os.sep + value + os.sep + "main.json",
-                          (os.path.exists(moduledir + os.sep + value + os.sep + "main.msh")))
-                    if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
-                        if os.path.exists(file.get()):
-                            if os.name == 'posix':
-                                sh = "ash"
-                            else:
-                                sh = "bash"
-                            call("busybox {} {} {}".format(sh, file.get(),
-                                                           (moduledir + os.sep + value + os.sep + "main.sh").replace(
-                                                               '\\',
-                                                               '/')))
-                            os.remove(file.get())
-                    elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
-                        msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
-                else:
-                    if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
-                        if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
-                            re_folder(temp)
-                        if not file.get():
-                            file.set(temp + os.sep + v_code())
-                        with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                            f.write('export tool_bin={}\n'.format(
-                                f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
-                                    '\\',
-                                    '/')))
-                            f.write('export version={}\n'.format(settings.version))
-                            f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
-                            f.write(
-                                "export project={}\nsource $1".format(
-                                    (settings.path + os.sep + dn.get()).replace('\\', '/')))
-                        if os.path.exists(file.get()):
-                            if os.name == 'posix':
-                                sh = "ash"
-                            else:
-                                sh = "bash"
-                            call("busybox {} {} {}".format(sh, file.get(),
-                                                           (
-                                                                   moduledir + os.sep + value + os.sep + "main.sh").replace(
-                                                               '\\',
-                                                               '/')))
-                            os.remove(file.get())
-                    elif os.path.exists(msh_tmp := moduledir + os.sep + value + os.sep + "main.msh"):
-                        msh_parse(msh_tmp)
-            else:
-                if not os.path.exists(moduledir + os.sep + value):
-                    messpop(lang.warn7.format(value))
-                    list_pls()
-                    win.tab7.lift()
-                else:
-                    print(lang.warn8)
-        else:
             print(lang.warn2)
+            return
+        if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh") or os.path.exists(
+                moduledir + os.sep + value + os.sep + "main.msh"):
+            if os.path.exists(moduledir + os.sep + value + os.sep + "main.json"):
+                parse(moduledir + os.sep + value + os.sep + "main.json",
+                      (os.path.exists(moduledir + os.sep + value + os.sep + "main.msh")))
+                if os.path.exists(moduledir + os.sep + value + os.sep + "main.sh"):
+                    if os.path.exists(file.get()):
+                        if os.name == 'posix':
+                            sh = "ash"
+                        else:
+                            sh = "bash"
+                        call("busybox {} {} {}".format(sh, file.get(),
+                                                       (moduledir + os.sep + value + os.sep + "main.sh").replace(
+                                                           '\\',
+                                                           '/')))
+                        os.remove(file.get())
+                elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
+                    msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
+            else:
+                if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
+                    if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
+                        re_folder(temp)
+                    if not file.get():
+                        file.set(temp + os.sep + v_code())
+                    with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                        f.write('export tool_bin={}\n'.format(
+                            f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}'.replace(
+                                '\\',
+                                '/')))
+                        f.write('export version={}\n'.format(settings.version))
+                        f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
+                        f.write(
+                            "export project={}\nsource $1".format(
+                                (settings.path + os.sep + dn.get()).replace('\\', '/')))
+                    if os.path.exists(file.get()):
+                        if os.name == 'posix':
+                            sh = "ash"
+                        else:
+                            sh = "bash"
+                        call("busybox {} {} {}".format(sh, file.get(),
+                                                       (
+                                                               moduledir + os.sep + value + os.sep + "main.sh").replace(
+                                                           '\\',
+                                                           '/')))
+                        os.remove(file.get())
+                elif os.path.exists(msh_tmp := moduledir + os.sep + value + os.sep + "main.msh"):
+                    msh_parse(msh_tmp)
+        else:
+            if not os.path.exists(moduledir + os.sep + value):
+                messpop(lang.warn7.format(value))
+                list_pls()
+                win.tab7.lift()
+            else:
+                print(lang.warn8)
 
     class unmpk:
 
