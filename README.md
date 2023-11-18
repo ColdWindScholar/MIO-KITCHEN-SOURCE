@@ -28,7 +28,7 @@ pip install -r requirements.txt
 python tool.py
 # if you want to package it into exe
 # you can
-pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk
+python build.py
 ```
 ***
 # Contact Us
