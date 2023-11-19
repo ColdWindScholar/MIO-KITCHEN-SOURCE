@@ -3,7 +3,7 @@ import shutil
 import zipfile
 from platform import system
 from pip._internal.cli.main import main as _main
-
+import PyInstaller.__main__
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
         print(f"Installing {i}")
@@ -45,13 +45,54 @@ def zip_folder(folder_path):
 local = os.getcwd()
 print("Building...")
 if ostype == 'Darwin':
-    os.system(
-        "pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder")
+    PyInstaller.__main__.run([
+        '-Fw',
+        '--exclude-module',
+        'numpy'
+        '-i',
+        'icon.ico',
+        '--collect-data',
+        'sv_ttk',
+        '--hidden-import',
+        'tkinter',
+        '--hidden-import',
+        'PIL',
+        '--hidden-import',
+        'PIL._tkinter_finder',
+        'tool.py'
+    ])
 elif os.name == 'posix':
-    os.system(
-        "pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --hidden-import=tkinter --hidden-import=PIL --hidden-import=PIL._tkinter_finder --splash splash.png")
+    PyInstaller.__main__.run([
+        '-Fw',
+        '--exclude-module',
+        'numpy'
+        '-i',
+        'icon.ico',
+        '--collect-data',
+        'sv_ttk',
+        '--hidden-import',
+        'tkinter',
+        '--hidden-import',
+        'PIL',
+        '--hidden-import',
+        'PIL._tkinter_finder',
+        '--splash',
+        'splash.png',
+        'tool.py'
+    ])
 elif os.name == 'nt':
-    os.system("pyinstaller -Fw tool.py --exclude-module=numpy -i icon.ico --collect-data sv_ttk --splash splash.png")
+    PyInstaller.__main__.run([
+        '-Fw',
+        '--exclude-module',
+        'numpy'
+        '-i',
+        'icon.ico',
+        '--collect-data',
+        'sv_ttk',
+        '--splash',
+        'splash.png',
+        'tool.py'
+    ])
 if os.name == 'nt':
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool.exe"):
         shutil.move(local + os.sep + "dist" + os.sep + "tool.exe", local)
