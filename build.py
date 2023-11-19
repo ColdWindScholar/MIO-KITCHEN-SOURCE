@@ -49,7 +49,7 @@ if ostype == 'Darwin':
         'tool.py',
         '-Fw',
         '--exclude-module',
-        'numpy'
+        'numpy',
         '-i',
         'icon.ico',
         '--collect-data',
@@ -66,7 +66,7 @@ elif os.name == 'posix':
         'tool.py',
         '-Fw',
         '--exclude-module',
-        'numpy'
+        'numpy',
         '-i',
         'icon.ico',
         '--collect-data',
@@ -85,7 +85,7 @@ elif os.name == 'nt':
         'tool.py',
         '-Fw',
         '--exclude-module',
-        'numpy'
+        'numpy',
         '-i',
         'icon.ico',
         '--collect-data',
