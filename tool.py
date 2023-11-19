@@ -264,11 +264,11 @@ class Tool(Tk):
         ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
 
         ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
-        LB3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
+        lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            value=[i.rsplit('.', 1)[0] for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
-        LB3.pack(padx=10, pady=10, side='left')
-        LB3.bind('<<ComboboxSelected>>', set_language)
+        lb3.pack(padx=10, pady=10, side='left')
+        lb3.bind('<<ComboboxSelected>>', set_language)
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
@@ -367,11 +367,11 @@ class welcome(object):
         self.reframe()
         ttk.Label(self.frame, text=lang.text129, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        LB3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
+        lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             value=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
-        LB3_.pack(padx=10, pady=10, side='top')
-        LB3_.bind('<<ComboboxSelected>>', set_language)
+        lb3_.pack(padx=10, pady=10, side='top')
+        lb3_.bind('<<ComboboxSelected>>', set_language)
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
