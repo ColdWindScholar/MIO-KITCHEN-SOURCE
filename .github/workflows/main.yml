@@ -81,8 +81,6 @@ jobs:
       # You can test your matrix by printing the current Python version
       - name: Update pip
         run:  python -m pip install -U --force-reinstall pip
-      - name: Install Packages
-        run: pip install -r requirements.txt
       - name: Pack tool
         run: |
              python build.py
@@ -106,7 +104,6 @@ jobs:
       - name: Install Packages
         run: |
             python3 -m pip install -U --force-reinstall pip
-            pip3 install -r requirements.txt
             sudo apt update -y && sudo apt install python3-tk -y
       - name: Pack Tool
         run: |
@@ -126,7 +123,6 @@ jobs:
         run: |
           brew install python-tk python3  tcl-tk
           python3 -m pip install -U --force-reinstall pip
-          pip3 install -r requirements.txt
       - name: Pack Tool
         run: |
           python3 build.py

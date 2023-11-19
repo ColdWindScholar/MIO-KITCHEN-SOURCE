@@ -1,7 +1,12 @@
 import os
 import shutil
 from platform import system
+from pip._internal.cli.main import main as _main
 
+with open('requirements.txt', 'r', encoding='utf-8') as l:
+    for i in l.read().split("\n"):
+        print(f"Installing {i}")
+        _main(['install', i])
 ostype = system()
 
 local = os.getcwd()
