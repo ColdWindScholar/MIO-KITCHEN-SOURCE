@@ -24,10 +24,19 @@ brew install gettext
 ```
 ## Start To Use
 ``` shell
+# Necessary Work
+# For Macos
+brew install python-tk python3  tcl-tk
+python3 -m pip install -U --force-reinstall pip
+# For Linux
+python3 -m pip install -U --force-reinstall pip
+sudo apt update -y && sudo apt install python3-tk -y
+# For Windows
+python -m pip install -U --force-reinstall pip
+# Direct use
 pip install -r requirements.txt
 python tool.py
-# if you want to package it into exe
-# you can
+# if you want to package it into binary,you can
 python build.py
 ```
 ***
