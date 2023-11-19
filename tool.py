@@ -385,14 +385,14 @@ class welcome(object):
                 te.insert('insert', f.read())
 
         self.reframe()
-        LB = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
+        lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
-        LB.bind('<<ComboboxSelected>>', loadlice)
-        LB.current(0)
+        lb.bind('<<ComboboxSelected>>', loadlice)
+        lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                          expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        LB.pack(padx=10, pady=10, side='top', fill=X)
+        lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
         te.pack(fill=BOTH, side='top')
         loadlice(self)
