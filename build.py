@@ -46,6 +46,7 @@ print("Building...")
 import PyInstaller.__main__
 if ostype == 'Darwin':
     PyInstaller.__main__.run([
+        'tool.py',
         '-Fw',
         '--exclude-module',
         'numpy'
@@ -58,11 +59,11 @@ if ostype == 'Darwin':
         '--hidden-import',
         'PIL',
         '--hidden-import',
-        'PIL._tkinter_finder',
-        'tool.py'
+        'PIL._tkinter_finder'
     ])
 elif os.name == 'posix':
     PyInstaller.__main__.run([
+        'tool.py',
         '-Fw',
         '--exclude-module',
         'numpy'
@@ -77,11 +78,11 @@ elif os.name == 'posix':
         '--hidden-import',
         'PIL._tkinter_finder',
         '--splash',
-        'splash.png',
-        'tool.py'
+        'splash.png'
     ])
 elif os.name == 'nt':
     PyInstaller.__main__.run([
+        'tool.py',
         '-Fw',
         '--exclude-module',
         'numpy'
@@ -90,8 +91,7 @@ elif os.name == 'nt':
         '--collect-data',
         'sv_ttk',
         '--splash',
-        'splash.png',
-        'tool.py'
+        'splash.png'
     ])
 if os.name == 'nt':
     if os.path.exists(local + os.sep + "dist" + os.sep + "tool.exe"):
