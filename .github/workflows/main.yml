@@ -40,7 +40,7 @@ jobs:
           move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip .../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-macos.zip
+          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-macos.zip
           cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
