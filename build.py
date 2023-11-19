@@ -3,7 +3,6 @@ import shutil
 import zipfile
 from platform import system
 from pip._internal.cli.main import main as _main
-import PyInstaller.__main__
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
         print(f"Installing {i}")
@@ -44,6 +43,7 @@ def zip_folder(folder_path):
 
 local = os.getcwd()
 print("Building...")
+import PyInstaller.__main__
 if ostype == 'Darwin':
     PyInstaller.__main__.run([
         '-Fw',
