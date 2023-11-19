@@ -34,21 +34,14 @@ jobs:
         # move MIO-KITCHEN-linux-aarch64.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux-aarch64.zip
         run: |
           cd MIO-KITCHEN-win
-          Remove-Item .git -Recurse
-          ls
-          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-win.zip
+          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
           cd ..
           cd MIO-KITCHEN-linux
-          ls
-          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux.zip
+          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          ls
-          Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-macos.zip
+          move ./MIO-KITCHEN-macos.zip .../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-macos.zip
           cd ..
-          move MIO-KITCHEN-win.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
-          move MIO-KITCHEN-linux.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux.zip
-          move MIO-KITCHEN-macos.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-macos.zip
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
@@ -63,7 +56,7 @@ jobs:
             Version: ${{ steps.tool_version.outputs.version }}
             Note:If u cannot run it in linux,you may need do "chmod a+x ./*"
             Author: MIO-KITCHEN-TEAM
-            * MacOS Notice:if you want use brotli,u need "brew install gettext",A few Functions are not support Macos now
+            * MacOS Notice:if you want use brotli,u need "brew install gettext",A few Functions are not support Macos now *
             Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit),Macos Latest(X86_64)
           artifacts: "*.zip"
 
@@ -90,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-win
-          path: './*'
+          path: './MIO-KITCHEN-win.zip'
   build-linux:
     runs-on: ubuntu-20.04
     steps:
@@ -114,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-linux
-          path: './*'
+          path: './MIO-KITCHEN-linux.zip'
   build-macos:
     runs-on: macos-latest
     steps:
@@ -132,4 +125,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: MIO-KITCHEN-macos
-          path: './*'
+          path: './MIO-KITCHEN-macos.zip'
