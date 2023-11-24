@@ -218,8 +218,6 @@ def dynamic_list_reader(path):
                 data[tmp[1]]['parts'] = []
             elif tmp[0] == 'add':
                 data[tmp[2]]['parts'].append(tmp[1])
-            else:
-                print(f"Skip {tmp}")
     return data
 
 
