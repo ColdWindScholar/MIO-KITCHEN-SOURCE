@@ -287,8 +287,7 @@ tool_bin = f"{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.mac
 
 
 class ModuleError(Exception):
-    def __init__(self):
-        super().__init__()
+    pass
 
 
 class lang:
@@ -333,12 +332,12 @@ if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{p
     error(1, '暂不支持您的设备\nSorry,Not support your device yet.')
 
 
-class welcome(object):
+class welcome(Toplevel):
     def __init__(self):
-        self.ck = Toplevel()
-        self.ck.title(lang.text135)
-        self.ck.resizable(False, False)
-        self.ck.protocol("WM_DELETE_WINDOW", self.clos)
+        super().__init__()
+        self.title(lang.text135)
+        self.resizable(False, False)
+        self.protocol("WM_DELETE_WINDOW", self.clos)
         self.frame = None
         oobe = int(settings.oobe)
         if oobe == "1":
@@ -350,23 +349,23 @@ class welcome(object):
         elif oobe == '4':
             self.done()
         else:
-            ttk.Label(self.ck, text=lang.text135, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-            ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Label(self.ck, text=lang.text137, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-            ttk.Button(self.ck, text=lang.text136, command=self.main).pack(fill=BOTH)
+            ttk.Label(self, text=lang.text135, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+            ttk.Label(self, text=lang.text137, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+            ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
         win.withdraw()
-        self.ck.wait_window()
+        self.wait_window()
         win.deiconify()
 
     def reframe(self):
         if self.frame:
             self.frame.destroy()
-        self.frame = ttk.Frame(self.ck)
+        self.frame = ttk.Frame(self)
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
         settings.setf("oobe", "1")
-        for i in self.ck.winfo_children():
+        for i in self.winfo_children():
             i.destroy()
         self.reframe()
         ttk.Label(self.frame, text=lang.text129, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
@@ -424,7 +423,7 @@ class welcome(object):
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         ttk.Label(self.frame, text=lang.t5, font=("宋体", 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10)
-        ttk.Button(self.ck, text=lang.text34, command=self.ck.destroy).pack(fill=BOTH, side='bottom')
+        ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
     def clos(self):
         pass
