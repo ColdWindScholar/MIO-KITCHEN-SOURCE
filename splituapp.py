@@ -27,7 +27,7 @@ class extract(object):
             pass
 
         py2 = None
-        if int(''.join(str(i) for i in sys.version_info[0:2])) < 30:
+        if sys.version_info.major < 3:
             py2 = 1
 
         with open(source, 'rb') as f:
@@ -98,4 +98,3 @@ class extract(object):
                     f.seek(xbytes, 1)
 
         print('\nExtraction complete')
-        return
