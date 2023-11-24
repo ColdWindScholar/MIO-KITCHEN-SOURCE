@@ -768,31 +768,12 @@ class Process(Toplevel):
                     print(lang.text38.format(file_))
                     zip_.extract(file, folder)
 
-        def pack_super(type, dbfz, size, lb, sparse):
-            if type == 'A':
-                set_ = 1
-            elif type == 'VAB':
-                set_ = 2
-            elif type == 'AB':
-                set_ = 3
-            if sparse == "True":
-                sparse = True
-            else:
-                sparse = False
-            (supers := IntVar()).set(int(size))
-            (ssparse := IntVar()).set(int(sparse))
-            (supersz := IntVar()).set(int(set_))
-            (sdbfz := StringVar()).set(dbfz)
-            c = packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb, return_cmd=1)
-            call(c)
 
         actions = {
             'download': lambda url: download(url['url']),
             'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst'])),
             'unpack': lambda cmd: print(cmd),
-            'pack': lambda cmd: print(cmd),
-            'pack_super': lambda cmd: pack_super(cmd['type'], cmd['cluster_name'], cmd['size'],
-                                                 cmd['partition'].split(), cmd['sparse'])
+            'pack': lambda cmd: print(cmd)
         }
         actions[step['use']](step)
 
@@ -1080,17 +1061,6 @@ def mpkman() -> None:
         def run(cmd):
             call(exe=str(cmd), kz='N', shstate=True)
 
-        @staticmethod
-        def packsuper(cmd):
-            try:
-                sparse, dbfz, size, set_, lb = shlex.split(cmd)
-            except:
-                raise ModuleError("打包SUPER参数异常")
-            (supers := IntVar()).set(int(size))
-            (ssparse := IntVar()).set(int(sparse))
-            (supersz := IntVar()).set(int(set_))
-            (sdbfz := StringVar()).set(dbfz)
-            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lb)
 
         def sh(self, cmd):
             with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w",
