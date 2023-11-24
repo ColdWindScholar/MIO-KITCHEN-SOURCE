@@ -2375,6 +2375,7 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
         ask.destroy()
 
     jzxs(ask)
+    ask.lift()
     ask.wait_window()
     return value.get()
 
