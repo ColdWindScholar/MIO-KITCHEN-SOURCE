@@ -1660,16 +1660,18 @@ class dbkxyt:
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
 
-class packss:
+class packss(Toplevel):
     def __init__(self):
+        super().__init__()
+        self.title(lang.text53)
         supers = IntVar()
         ssparse = IntVar()
         supersz = IntVar()
         sdbfz = StringVar()
         scywj = IntVar()
-        (lf1 := ttk.LabelFrame((ck := subp(com=1, title=lang.text53)), text=lang.text54)).pack(fill=BOTH)
-        (lf2 := ttk.LabelFrame(ck, text=lang.settings)).pack(fill=BOTH)
-        (lf3 := ttk.LabelFrame(ck, text=lang.text55)).pack(fill=BOTH)
+        (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
+        (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
+        (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH)
         supersz.set(1)
         # 自动设置
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
@@ -1691,16 +1693,17 @@ class packss:
                     tl.insert(END, file_name[:-4])
         tl.pack(padx=10, pady=10, fill=BOTH)
 
-        ttk.Checkbutton(ck, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
+        ttk.Checkbutton(self, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
-        t_Frame = Frame(ck)
+        t_Frame = Frame(self)
         ttk.Checkbutton(t_Frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
         g_b = ttk.Button(t_Frame, text=lang.t27, command=lambda: cz(generate))
         g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_Frame.pack(fill=X)
+        jzxs(self)
 
         def read_list():
             if os.path.exists(work + "dynamic_partitions_op_list"):
@@ -1748,13 +1751,13 @@ class packss:
                 return False
             lbs = [tl.get(index) for index in tl.curselection()]
             sc = scywj.get()
-            subp(com=0, master=ck)
+            subp(com=0, master=self)
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
-        ttk.Button(ck, text=lang.pack, command=lambda: cz(start_)).pack(side='left',
+        ttk.Button(self, text=lang.pack, command=lambda: cz(start_)).pack(side='left',
                                                                         padx=5,
                                                                         pady=5, fill=X, expand=True)
-        ttk.Button(ck, text=lang.cancel, command=lambda: subp(com=0, master=ck)).pack(side='left', padx=10, pady=10,
+        ttk.Button(self, text=lang.cancel, command=lambda: subp(com=0, master=self)).pack(side='left', padx=10, pady=10,
                                                                                       fill=X,
                                                                                       expand=True)
         read_list()
