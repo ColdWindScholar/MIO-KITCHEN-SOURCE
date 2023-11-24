@@ -582,16 +582,6 @@ def logopack() -> int:
     rmdir(dir_, 1)
 
 
-def subp(com: int = 1, title: str = lang.text18, master: any = None):
-    if com == 1:
-        subpage = Toplevel()
-        subpage.title(title)
-        jzxs(subpage)
-        return subpage
-    else:
-        master.destroy()
-
-
 class Process(Toplevel):
     def __init__(self, mps):
         super().__init__()
@@ -1583,12 +1573,12 @@ class packxx(Toplevel):
         dbgss.current(0)
         edbgss.current(0)
         ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_)).pack(side='left', padx=2, pady=2,
-                                                                                  fill=X,
-                                                                                  expand=True)
+                                                                               fill=X,
+                                                                               expand=True)
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
-                                                                                                pady=2,
-                                                                                                fill=X,
-                                                                                                expand=True)
+                                                                                pady=2,
+                                                                                fill=X,
+                                                                                expand=True)
         jzxs(self)
 
     def update_label(self, value):
@@ -1751,15 +1741,15 @@ class packss(Toplevel):
                 return False
             lbs = [tl.get(index) for index in tl.curselection()]
             sc = scywj.get()
-            subp(com=0, master=self)
+            self.destroy()
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
         ttk.Button(self, text=lang.pack, command=lambda: cz(start_)).pack(side='left',
-                                                                        padx=5,
-                                                                        pady=5, fill=X, expand=True)
-        ttk.Button(self, text=lang.cancel, command=lambda: subp(com=0, master=self)).pack(side='left', padx=10, pady=10,
-                                                                                      fill=X,
-                                                                                      expand=True)
+                                                                          padx=5,
+                                                                          pady=5, fill=X, expand=True)
+        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=10, pady=10,
+                                                                                fill=X,
+                                                                                expand=True)
         read_list()
 
 
