@@ -287,7 +287,8 @@ tool_bin = f"{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.mac
 
 
 class ModuleError(Exception):
-    pass
+    def __init__(self):
+        super().__init__()
 
 
 class lang:
