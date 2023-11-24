@@ -39,11 +39,9 @@ class extract(object):
                 elif i != b'\x55\xAA\x5A\xA5':
                     continue
 
-                headersize = f.read(bytenum)
-                headersize = list(unpack('<L', headersize))[0]
+                headersize = list(unpack('<L', f.read(bytenum)))[0]
                 f.seek(16, 1)
-                filesize = f.read(bytenum)
-                filesize = list(unpack('<L', filesize))[0]
+                filesize = list(unpack('<L', f.read(bytenum)))[0]
                 f.seek(32, 1)
                 filename = f.read(16)
 
