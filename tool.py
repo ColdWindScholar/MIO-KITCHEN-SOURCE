@@ -246,6 +246,8 @@ class Tool(Tk):
         Label(self.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
 
     def setting_tab(self):
+        self.slocal = StringVar()
+        self.slocal.set(settings.path)
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -256,10 +258,10 @@ class Tool(Tk):
 
         def startwjjj(ev):
             if os.name == 'nt':
-                os.startfile(settings.path)
+                os.startfile(self.slocal.get())
 
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
-        slo = ttk.Label(sf3, textvariable=settings.path)
+        slo = ttk.Label(sf3, textvariable=self.slocal)
         slo.bind('<Button-1>', startwjjj)
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
