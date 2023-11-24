@@ -1516,10 +1516,12 @@ class installmpk(Toplevel):
         self.installb.config(state='normal')
 
 
-class packxx(object):
+class packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
+        super().__init__()
+        self.title(lang.text42)
         self.dbfs = StringVar()
         self.dbgs = StringVar()
         self.edbgs = StringVar()
@@ -1530,15 +1532,14 @@ class packxx(object):
         self.ext4_method = StringVar()
         self.lg = list_
         self.erofsext4 = IntVar()
-        self.ck = subp(com=1, title=lang.text42)
-        lf1 = ttk.LabelFrame(self.ck, text=lang.text43)
+        lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
-        lf2 = ttk.LabelFrame(self.ck, text=lang.text44)
+        lf2 = ttk.LabelFrame(self, text=lang.text44)
 
         lf2.pack(fill=BOTH, padx=5, pady=5)
-        lf3 = ttk.LabelFrame(self.ck, text=lang.text45)
+        lf3 = ttk.LabelFrame(self, text=lang.text45)
         lf3.pack(fill=BOTH, padx=5, pady=5)
-        lf4 = ttk.LabelFrame(self.ck, text=lang.text46)
+        lf4 = ttk.LabelFrame(self, text=lang.text46)
         lf4.pack(fill=BOTH, pady=5, padx=5)
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         self.scale.set(0)
@@ -1581,13 +1582,14 @@ class packxx(object):
         dbfss.current(0)
         dbgss.current(0)
         edbgss.current(0)
-        ttk.Button(self.ck, text=lang.pack, command=lambda: cz(self.start_)).pack(side='left', padx=2, pady=2,
+        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_)).pack(side='left', padx=2, pady=2,
                                                                                   fill=X,
                                                                                   expand=True)
-        ttk.Button(self.ck, text=lang.cancel, command=lambda: subp(com=0, master=self.ck)).pack(side='left', padx=2,
+        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
                                                                                                 pady=2,
                                                                                                 fill=X,
                                                                                                 expand=True)
+        jzxs(self)
 
     def update_label(self, value):
         self.label.config(text=lang.text47.format(int(float(value))))
@@ -1597,7 +1599,7 @@ class packxx(object):
 
     def start_(self):
         lg = self.lg
-        subp(com=0, master=self.ck)
+        self.destroy()
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
                 int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get())
 
