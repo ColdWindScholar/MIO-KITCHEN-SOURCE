@@ -95,7 +95,10 @@ class load_car(object):
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
-            func(*args, **kwargs)
+            try:
+                func(*args, **kwargs)
+            except Exception as e:
+                error(2, e.__str__())
             self.endupdate()
 
         return call_func
@@ -768,7 +771,6 @@ class Process(Toplevel):
                     print(lang.text38.format(file_))
                     zip_.extract(file, folder)
 
-
         actions = {
             'download': lambda url: download(url['url']),
             'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst'])),
@@ -1060,7 +1062,6 @@ def mpkman() -> None:
         @staticmethod
         def run(cmd):
             call(exe=str(cmd), kz='N', shstate=True)
-
 
         def sh(self, cmd):
             with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w",
