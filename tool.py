@@ -2351,10 +2351,6 @@ def unpack(chose, form: any = None):
                         out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
-                if os.access(work + "config" + os.sep + i + "_fs_config", os.F_OK):
-                    with open(work + "config" + os.sep + i + "_fs_config", 'a', encoding='utf-8',
-                              newline='\n') as fs:
-                        fs.write("/lost+found 0 0 0777\r\n")
                 if os.path.exists(work + i):
                     try:
                         os.remove(work + i + ".img")
