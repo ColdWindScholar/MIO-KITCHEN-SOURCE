@@ -71,6 +71,8 @@ def fs_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                     gid = '0'
                 mode = '0755'  # dir path always 755
                 config = [uid, gid, mode]
+            elif not os.path.exists(filepath):
+                config = ['0', '0', '0755']
             elif islink(filepath):
                 uid = '0'
                 if ("system/bin" in i) or ("system/xbin" in i) or ("vendor/bin" in i):
