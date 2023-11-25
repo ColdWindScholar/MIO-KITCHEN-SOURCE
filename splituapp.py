@@ -43,10 +43,9 @@ class extract(object):
                 f.seek(16, 1)
                 filesize = list(unpack('<L', f.read(bytenum)))[0]
                 f.seek(32, 1)
-                filename = f.read(16)
 
                 try:
-                    filename = str(filename.decode())
+                    filename = str(f.read(16).decode())
                     filename = ''.join(f for f in filename if f in printable).lower()
                 except:
                     filename = ''
