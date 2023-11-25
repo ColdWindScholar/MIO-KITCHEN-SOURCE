@@ -2108,6 +2108,7 @@ def rdi(work, dname) -> any:
 def input_(title: str = lang.text76, text: str = "") -> str:
     (inputvar := StringVar()).set(text)
     input__ = Toplevel()
+    input__.attributes('-topmost', 'true')
     input__.geometry("300x180")
     input__.resizable(False, False)
     input__.title(title)
@@ -2365,6 +2366,7 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     value = IntVar()
     ask = Toplevel()
     ask.resizable(False, False)
+    ask.attributes('-topmost', 'true')
     ttk.Label(ask, text=text, font=(None, 20)).pack()
     ttk.Button(ask, text=ok, command=lambda: close_ask(1)).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                 expand=True)
