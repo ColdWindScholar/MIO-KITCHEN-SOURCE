@@ -26,7 +26,10 @@ DataImage = blockimgdiff.DataImage
 # ----VALUES
 
 # Prevent system errors
-sys.set_int_max_str_digits(0)
+try:
+    sys.set_int_max_str_digits(0)
+except AttributeError:
+    pass
 
 elocal = getcwd()
 dn = None
