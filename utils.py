@@ -1,30 +1,26 @@
-from __future__ import print_function
-
 import errno
 import os
 import struct
 import tempfile
 from os.path import exists
-
+from os import getcwd
+from lpunpack import SparseImage
 import blockimgdiff
-
-DataImage = blockimgdiff.DataImage
 import sparse_img
 from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+DataImage = blockimgdiff.DataImage
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
-#       AUTHORS: xpirt - luxi78 - howellzhu
+#       AUTHORS: xpirt - luxi78 - howellzhu - ColdWindScholar
 #          DATE: 2018-10-27 10:33:21 CEST | 2018-05-25 12:19:12 CEST
 # ====================================================
 # -----
 # ----VALUES
-from os import getcwd
 
-from lpunpack import SparseImage
 
 elocal = getcwd()
 dn = None
