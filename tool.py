@@ -832,7 +832,7 @@ def mpkman() -> None:
     chosed.set('')
 
     def impk():
-        installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
+        Installmpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
         list_pls()
 
     class new_(Toplevel):
@@ -1408,7 +1408,7 @@ def mpkman() -> None:
     lf1.pack(padx=10, pady=10)
 
 
-class installmpk(Toplevel):
+class Installmpk(Toplevel):
     def __init__(self, mpk):
         super().__init__()
         self.mconf = ConfigParser()
@@ -2627,7 +2627,7 @@ def dndfile(files):
             fi = fi
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
-                installmpk(fi)
+                Installmpk(fi)
             elif os.path.basename(fi).endswith(".mps"):
                 Process(fi)
             else:
