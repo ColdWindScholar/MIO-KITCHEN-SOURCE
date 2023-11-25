@@ -508,7 +508,7 @@ def get_time() -> None:
 
 def re_folder(path) -> None:
     if os.path.exists(path):
-        rmdir(path, 1)
+        rmdir(path)
         os.mkdir(path)
     else:
         os.mkdir(path)
@@ -538,7 +538,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         os.remove(dtboimg)
     except:
         pass
-    rmdir(work + "dtbo" + os.sep + "dtbo", 1)
+    rmdir(work + "dtbo" + os.sep + "dtbo")
 
 
 @cartoon
@@ -561,7 +561,7 @@ def padtbo() -> any:
             list_.append(work + "dtbo" + os.sep + "dtbo" + os.sep + f)
     list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
-    rmdir(work + "dtbo", 1)
+    rmdir(work + "dtbo")
     print(lang.text8)
 
 
@@ -587,7 +587,7 @@ def logopack() -> int:
     utils.LOGODUMPER(orlogo, logo, dir_).repack()
     os.remove(orlogo)
     os.rename(logo, orlogo)
-    rmdir(dir_, 1)
+    rmdir(dir_)
 
 
 class Process(Toplevel):
@@ -1055,7 +1055,7 @@ def mpkman() -> None:
 
         @staticmethod
         def rmdir(path):
-            rmdir(path.strip(), up=1)
+            rmdir(path.strip())
 
         @staticmethod
         def run(cmd):
@@ -2000,7 +2000,7 @@ def dboot(nm: str = 'boot'):
             os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + f"{nm}.img")
         os.chdir(elocal)
         try:
-            rmdir((work + f"{nm}"), up=1)
+            rmdir(work + f"{nm}")
         except:
             print(lang.warn11.format(nm))
         print("Pack Successful...")
@@ -2112,7 +2112,7 @@ def rdi(work, dname) -> any:
     if os.access(work + dname + ".img", os.F_OK):
         print(lang.text72 % dname)
         try:
-            rmdir(work + dname, 1)
+            rmdir(work + dname)
             if os.access(work + "config" + os.sep + "%s_size.txt" % dname, os.F_OK):
                 os.remove(work + "config" + os.sep + "%s_size.txt" % dname)
             os.remove(work + "config" + os.sep + "%s_file_contexts" % dname)
@@ -2515,12 +2515,12 @@ def mke2fs(name, work, sparse, size=0):
         size = size / 4096
     if call(
             f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {size}") != 0:
-        rmdir(f'{work + name}_new.img', 1)
+        rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return False
     if call(
             f"e2fsdroid -e -T {int(time.time())} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img") != 0:
-        rmdir(f'{work + name}_new.img', 1)
+        rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return False
     if sparse == "y":
@@ -2545,7 +2545,7 @@ def selectp(self):
 
 
 @cartoon
-def rmdir(path, up=0):
+def rmdir(path):
     if not path:
         messpop(lang.warn1)
     else:
