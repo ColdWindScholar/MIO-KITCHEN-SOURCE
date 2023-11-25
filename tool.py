@@ -187,7 +187,7 @@ class Tool(Tk):
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
                                                                                                  pady=5,
                                                                                                  expand=True)
-        ttk.Button(self.rzf, text=lang.text106, command=handle_log().putlog).pack(side='bottom', padx=10, pady=5,
+        ttk.Button(self.rzf, text=lang.text106, command=putlog()).pack(side='bottom', padx=10, pady=5,
                                                                                   expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         # 项目列表的控件
@@ -2519,15 +2519,12 @@ def mke2fs(name, work, sparse, size=0):
         os.rename(work + name + "_new.img", work + name + ".img")
 
 
-class handle_log:
-    @staticmethod
-    def putlog():
-        with open(settings.path + os.sep + (
-                log := time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt',
-                  'w', encoding='utf-8', newline='\n') as f:
-            f.write(win.show.get(1.0, END))
-        win.show.delete(1.0, END)
-        print(lang.text95 + settings.path + os.sep + log + v_code() + ".txt")
+def putlog():
+    log_ = settings.path + os.sep + (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt'
+    with open(log_, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(win.show.get(1.0, END))
+    win.show.delete(1.0, END)
+    print(lang.text95 + log_)
 
 
 def selectp(self):
