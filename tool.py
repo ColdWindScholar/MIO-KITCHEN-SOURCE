@@ -195,7 +195,7 @@ class Tool(Tk):
                                                                                                  pady=5,
                                                                                                  expand=True)
         ttk.Button(self.rzf, text=lang.text106, command=lambda: self.putlog()).pack(side='bottom', padx=10, pady=5,
-                                                                            expand=True)
+                                                                                    expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
@@ -1722,11 +1722,21 @@ class packss(Toplevel):
                     supersz.set(1)
 
         def versize():
-            size = 0
-            for i in [tl.get(index) for index in tl.curselection()]:
-                size += os.path.getsize(work + i + ".img")
+            size = sum(
+                [os.path.getsize(work + i + ".img") for i in [tl.get(index) for index in tl.curselection()]]) + 409600
+            diff_size = size
             if size > supers.get() + 409600:
-                supers.set(size + 4096000)
+                for i in range(20):
+                    if not i:
+                        continue
+                    i = i - 0.5
+                    t = 1024 * 1024 * 1024 * i - size
+                    if t < diff_size:
+                        diff_size = t
+                    else:
+                        size = i * 1024 * 1024 * 1024
+                        break
+                supers.set(int(size))
                 return False
             else:
                 return True
