@@ -2432,7 +2432,7 @@ class dirsize(object):
     def rsizelist(dname, size, file):
         if os.access(file, os.F_OK):
             print(lang.text74 % (dname, size))
-            with open(file, 'r') as f:
+            with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
                 content = re.sub("resize {} \\d+".format(dname),
