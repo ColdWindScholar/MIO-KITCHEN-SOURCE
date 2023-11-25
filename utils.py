@@ -1,5 +1,6 @@
 import errno
 import os
+import sys
 import struct
 import tempfile
 from os.path import exists
@@ -11,7 +12,10 @@ from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+
 DataImage = blockimgdiff.DataImage
+
+
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
@@ -21,6 +25,8 @@ DataImage = blockimgdiff.DataImage
 # -----
 # ----VALUES
 
+# Prevent system errors
+sys.set_int_max_str_digits(0)
 
 elocal = getcwd()
 dn = None
