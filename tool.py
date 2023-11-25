@@ -1731,6 +1731,8 @@ class packss(Toplevel):
                         continue
                     i = i - 0.5
                     t = 1024 * 1024 * 1024 * i - size
+                    if t < 0:
+                        continue
                     if t < diff_size:
                         diff_size = t
                     else:
