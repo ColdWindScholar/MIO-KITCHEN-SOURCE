@@ -1915,7 +1915,7 @@ def jboot(bn: str = 'boot'):
         messpop(lang.warn3.format(bn))
         return
     if os.path.exists(work + f"{bn}"):
-        if rmdir((work + f"{bn}")) != 0:
+        if rmdir(work + f"{bn}") != 0:
             print(lang.text69)
             return
     re_folder(work + f"{bn}")
