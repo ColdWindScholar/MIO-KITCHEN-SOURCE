@@ -599,7 +599,7 @@ class Process(Toplevel):
             'mkc_env': os.path.join(self.dir, v_code(10)),
             'project': self.project.replace('\\', '/')
         }
-        self.value = ['tool_bin', 'bin', 'mkc_env', 'project']
+        self.value = [self.gavs.keys()]
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
