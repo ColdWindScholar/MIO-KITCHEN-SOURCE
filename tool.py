@@ -295,13 +295,14 @@ class lang:
 
 
 def load(name):
-    if not name and not os.path.exists(elocal + os.sep + f'bin/languages/English.json'):
+    lang_file = f'bin/languages/{name}.json'
+    if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
         error(1)
-    elif not os.path.exists(elocal + os.sep + f'bin/languages/{name}.json'):
-        with open("".join([elocal, os.sep, 'bin/languages/English.json']), 'r', encoding='utf-8') as f:
+    elif not os.path.exists(elocal + os.sep + lang_file):
+        with open(elocal + os.sep + 'bin/languages/English.json', 'r', encoding='utf-8') as f:
             _lang = json.load(f)
     else:
-        with open(f'{elocal}{os.sep}bin/languages/{name}.json', 'r', encoding='utf-8') as f:
+        with open(f'{elocal}{os.sep}{lang_file}', 'r', encoding='utf-8') as f:
             _lang = json.load(f)
     [setattr(lang, i, _lang[i]) for i in _lang]
 
