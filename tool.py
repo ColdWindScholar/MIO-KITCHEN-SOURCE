@@ -135,6 +135,13 @@ class Tool(Tk):
                                file="".join([os.getcwd(), os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
         sys.stdout = dev_null()
 
+    def putlog(self):
+        log_ = settings.path + os.sep + v_code() + '.txt'
+        with open(log_, 'w', encoding='utf-8', newline='\n') as f:
+            f.write(self.show.get(1.0, END))
+            self.show.delete(1.0, END)
+        print(lang.text95 + log_)
+
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -187,8 +194,8 @@ class Tool(Tk):
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
                                                                                                  pady=5,
                                                                                                  expand=True)
-        ttk.Button(self.rzf, text=lang.text106, command=putlog()).pack(side='bottom', padx=10, pady=5,
-                                                                                  expand=True)
+        ttk.Button(self.rzf, text=lang.text106, command=lambda: self.putlog()).pack(side='bottom', padx=10, pady=5,
+                                                                            expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
@@ -2517,14 +2524,6 @@ def mke2fs(name, work, sparse, size=0):
             except:
                 pass
         os.rename(work + name + "_new.img", work + name + ".img")
-
-
-def putlog():
-    log_ = settings.path + os.sep + (time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())) + v_code() + '.txt'
-    with open(log_, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(win.show.get(1.0, END))
-    win.show.delete(1.0, END)
-    print(lang.text95 + log_)
 
 
 def selectp(self):
