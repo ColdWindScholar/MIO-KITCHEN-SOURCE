@@ -391,11 +391,10 @@ class Extractor(object):
                                     tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                 out.write(tmp + struct.pack('xx'))
                                 if os.name == 'nt':
-                                    attrib = windll.kernel32.SetFileAttributesA
                                     try:
-                                        attrib(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
-                                    except Exception:
-                                        pass
+                                        windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                    except Exception as e:
+                                        print(e.__str__())
                         if not all(c in string.printable for c in link_target):
                             pass
                         if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
