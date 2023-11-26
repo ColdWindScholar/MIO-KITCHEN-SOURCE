@@ -2008,10 +2008,7 @@ def dboot(nm: str = 'boot'):
 
 @cartoon
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
-    dely = others[0]
-    erofs_level = others[1]
-    ext4_size = others[2]
-    erofsext4 = others[3]
+    dely, erofs_level, ext4_size, erofsext4 = others
     if not dn.get():
         messpop(lang.warn1)
         return False
