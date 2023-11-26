@@ -21,7 +21,7 @@ def scan_dir(folder) -> list:
     elif os.name == 'posix':
         yield os.path.basename(folder).replace('/', '')
     else:
-        return ''
+        yield os.path.basename(folder)
     for root, dirs, files in os.walk(folder, topdown=True):
         for dir_ in dirs:
             yield os.path.join(root, dir_).replace(folder, os.path.basename(folder)).replace('\\', '/')
