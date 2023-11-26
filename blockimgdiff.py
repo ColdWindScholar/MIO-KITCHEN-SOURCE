@@ -14,16 +14,16 @@
 
 from __future__ import print_function
 
-import array
-import functools
-import heapq
-import itertools
-import multiprocessing
+from array import array
+from functools import total_ordering
+from heapq import heappop, heappush, heapify
+from itertools import chain
+from multiprocessing import cpu_count
 import os
-import re
-import subprocess
+from re import sub
+from subprocess import call, STDOUT
 from tempfile import mkstemp
-import threading
+from threading import Lock,Thread
 from collections import deque, OrderedDict
 from hashlib import sha1
 from rangelib import RangeSet
@@ -56,11 +56,11 @@ def compute_patch(src, tgt, imgdiff=False):
         except OSError:
             pass
         if imgdiff:
-            p = subprocess.call(["imgdiff", "-z", srcfile, tgtfile, patchfile],
+            p = call(["imgdiff", "-z", srcfile, tgtfile, patchfile],
                                 stdout=open("/dev/null", "a"),
-                                stderr=subprocess.STDOUT)
+                                stderr=STDOUT)
         else:
-            p = subprocess.call(["bsdiff", srcfile, tgtfile, patchfile])
+            p = call(["bsdiff", srcfile, tgtfile, patchfile])
 
         if p:
             raise ValueError("diff failed: " + str(p))
@@ -211,7 +211,7 @@ class Transfer(object):
                 " to " + str(self.tgt_ranges) + ">")
 
 
-@functools.total_ordering
+@total_ordering
 class HeapItem(object):
     def __init__(self, item):
         self.item = item
@@ -272,7 +272,7 @@ class BlockImageDiff(object):
     def __init__(self, tgt, src=None, version=4, threads=None,
                  disable_imgdiff=False):
         if threads is None:
-            threads = multiprocessing.cpu_count() // 2
+            threads = cpu_count() // 2
             if threads == 0:
                 threads = 1
         self.threads = threads
@@ -385,7 +385,7 @@ class BlockImageDiff(object):
             for s, sr in xf.stash_before:
                 assert s not in stashes
                 if free_stash_ids:
-                    sid = heapq.heappop(free_stash_ids)
+                    sid = heappop(free_stash_ids)
                 else:
                     sid = next_stash_id
                     next_stash_id += 1
@@ -447,7 +447,7 @@ class BlockImageDiff(object):
                             free_size += sr.size()
                             free_string.append("free %s\n" % sh)
                             stashes.pop(sh)
-                    heapq.heappush(free_stash_ids, sid)
+                    heappush(free_stash_ids, sid)
 
                 if unstashed_src_ranges.size() > 0:
                     src_str.insert(1, unstashed_src_ranges.to_string_raw())
@@ -769,7 +769,7 @@ class BlockImageDiff(object):
             patches = [None] * patch_num
 
             # TODO: Rewrite with multiprocessing.ThreadPool?
-            lock = threading.Lock()
+            lock = Lock()
 
             def diff_worker():
                 while True:
@@ -786,7 +786,7 @@ class BlockImageDiff(object):
                             xf.tgt_name if xf.tgt_name == xf.src_name else (
                                     xf.tgt_name + " (from " + xf.src_name + ")")))
 
-            threads = [threading.Thread(target=diff_worker)
+            threads = [Thread(target=diff_worker)
                        for _ in range(self.threads)]
             for th in threads:
                 th.start()
@@ -809,7 +809,7 @@ class BlockImageDiff(object):
         # - we write every block we care about exactly once.
 
         # Start with no blocks having been touched yet.
-        touched = array.array("B", (0,) * self.tgt.total_blocks)
+        touched = array("B", (0,) * self.tgt.total_blocks)
 
         # Imagine processing the transfers in order.
         for xf in self.transfers:
@@ -864,15 +864,15 @@ class BlockImageDiff(object):
         # executed.
         S = [(u.NetStashChange(), u.order, u) for u in self.transfers
              if not u.incoming]
-        heapq.heapify(S)
+        heapify(S)
 
         while S:
-            _, _, xf = heapq.heappop(S)
+            _, _, xf = heappop(S)
             L.append(xf)
             for u in xf.outgoing:
                 del u.incoming[xf]
                 if not u.incoming:
-                    heapq.heappush(S, (u.NetStashChange(), u.order, u))
+                    heappush(S, (u.NetStashChange(), u.order, u))
 
         # if this fails then our graph had a cycle.
         assert len(L) == len(self.transfers)
@@ -990,7 +990,7 @@ class BlockImageDiff(object):
         for xf in self.transfers:
             xf.heap_item = HeapItem(xf)
             heap.append(xf.heap_item)
-        heapq.heapify(heap)
+        heapify(heap)
 
         sinks = set(u for u in G if not u.outgoing)
         sources = set(u for u in G if not u.incoming)
@@ -999,7 +999,7 @@ class BlockImageDiff(object):
             iu.score += delta
             iu.heap_item.clear()
             iu.heap_item = HeapItem(iu)
-            heapq.heappush(heap, iu.heap_item)
+            heappush(heap, iu.heap_item)
 
         while G:
             # Put all sinks at the end of the sequence.
@@ -1033,7 +1033,7 @@ class BlockImageDiff(object):
             # pretending it's a source rather than a sink.
 
             while True:
-                u = heapq.heappop(heap)
+                u = heappop(heap)
                 if u and u.item in G:
                     u = u.item
                     break
@@ -1052,7 +1052,7 @@ class BlockImageDiff(object):
         # and by rearranging self.transfers to be in the chosen sequence.
 
         new_transfers = []
-        for x in itertools.chain(s1, s2):
+        for x in chain(s1, s2):
             x.order = len(new_transfers)
             new_transfers.append(x)
             del x.incoming
@@ -1198,7 +1198,7 @@ class BlockImageDiff(object):
                             "diff", self.transfers, self.version >= 3)
                 continue
 
-            b = re.sub("[0-9]+", "#", b)
+            b = sub("[0-9]+", "#", b)
             if b in self.src_numpatterns:
                 # Look for a 'number pattern' match (a basename match after
                 # all runs of digits are replaced by "#").  (This is useful
@@ -1215,7 +1215,7 @@ class BlockImageDiff(object):
         for k in self.src.file_map.keys():
             b = os.path.basename(k)
             self.src_basenames[b] = k
-            b = re.sub("[0-9]+", "#", b)
+            b = sub("[0-9]+", "#", b)
             self.src_numpatterns[b] = k
 
     @staticmethod
