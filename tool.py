@@ -2471,10 +2471,7 @@ def datbr(work, name, brl: any):
 
 def mkerofs(name, format_, work, level):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
-    if format_ != 'lz4':
-        extra_ = f'{format_},{level}'
-    else:
-        extra_ = f'{format_}'
+    extra_ = f'{format_},{level}' if format_ != 'lz4' else f'{format_}'
     cmd = f"mkfs.erofs -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd)
 
