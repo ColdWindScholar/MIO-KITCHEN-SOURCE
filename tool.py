@@ -2664,10 +2664,7 @@ class xmcd(ttk.LabelFrame):
             print(lang.text104)
 
     def delwork(self):
-        if not dn.get():
-            messpop(lang.warn1)
-        else:
-            rmdir(settings.path + os.sep + dn.get())
+        messpop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
     def newp(self):
