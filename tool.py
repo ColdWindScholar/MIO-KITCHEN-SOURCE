@@ -1830,7 +1830,11 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
     except subprocess.CalledProcessError as e:
         for i in iter(e.stdout.readline, b""):
             if out == 0:
-                print(e.decode("utf-8", "ignore").strip())
+                try:
+                    out_put = e.decode("utf-8").strip()
+                except:
+                    out_put = e.decode("gbk").strip()
+                print(out_put)
     ret.wait()
     return ret.returncode
 
