@@ -1826,7 +1826,11 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
                                stderr=subprocess.STDOUT, creationflags=conf)
         for i in iter(ret.stdout.readline, b""):
             if out == 0:
-                print(i.decode("utf-8", "ignore").strip())
+                try:
+                    out_put = i.decode("utf-8").strip()
+                except:
+                    out_put = i.decode("gbk").strip()
+                print(out_put)
     except subprocess.CalledProcessError as e:
         for i in iter(e.stdout.readline, b""):
             if out == 0:
