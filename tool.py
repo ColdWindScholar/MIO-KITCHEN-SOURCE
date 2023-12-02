@@ -1625,7 +1625,8 @@ class dbkxyt:
             script.truncate()
             script.writelines(lines)
 
-    def zstd_compress(self, path):
+    @staticmethod
+    def zstd_compress(path):
         if os.path.exists(path):
             if gettype(path) == "sparse":
                 print(f"[INFO] {os.path.basename(path)} is (sparse), converting to (raw)")
