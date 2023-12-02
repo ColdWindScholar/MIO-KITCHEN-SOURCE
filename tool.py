@@ -1251,10 +1251,7 @@ def mpkman() -> None:
             print(lang.warn2)
             return
         script_path = moduledir + os.sep + value + os.sep
-        if os.name == 'posix':
-            sh = "ash"
-        else:
-            sh = "bash"
+        sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
                 parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
