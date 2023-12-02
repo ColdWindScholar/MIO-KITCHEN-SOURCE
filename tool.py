@@ -1814,7 +1814,7 @@ class StdoutRedirector(object):
 
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
-    cmd = f'{tool_bin}{exe}' if kz == "Y" else cmd
+    cmd = f'{tool_bin}{exe}' if kz == "Y" else exe
     if os.name != 'posix':
         conf = subprocess.CREATE_NO_WINDOW
     else:
