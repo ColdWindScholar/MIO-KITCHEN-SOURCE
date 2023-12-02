@@ -653,10 +653,7 @@ class Process(Toplevel):
                 radio_var_name = key
                 self.gavs[radio_var_name] = StringVar()
                 options = con['opins'].split()
-                if 'text' in con:
-                    pft1 = ttk.LabelFrame(self, text=con['text'])
-                else:
-                    pft1 = ttk.Frame(self)
+                pft1 = ttk.LabelFrame(self, text=con['text']) if 'text' in con else ttk.Frame(self)
                 self.control.append(pft1)
                 pft1.pack(padx=10, pady=10)
                 for option in options:
