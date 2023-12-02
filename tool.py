@@ -1673,13 +1673,13 @@ class packss(Toplevel):
         ttk.Checkbutton(self, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
-        t_Frame = Frame(self)
-        ttk.Checkbutton(t_Frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
+        t_frame = Frame(self)
+        ttk.Checkbutton(t_frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
-        g_b = ttk.Button(t_Frame, text=lang.t27, command=lambda: cz(generate))
+        g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(generate))
         g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
-        t_Frame.pack(fill=X)
+        t_frame.pack(fill=X)
         jzxs(self)
 
         def read_list():
