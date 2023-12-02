@@ -320,7 +320,10 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
 def findfile(file, dir_) -> str:
     for root, dirs, files in os.walk(dir_, topdown=True):
         if file in files:
-            return (root + os.sep + file).replace("\\", '/') if os.name == 'nt' else return root + os.sep + file
+            if os.name == 'nt':
+                return (root + os.sep + file).replace("\\", '/')
+            else:
+                return root + os.sep + file
         else:
             pass
 
