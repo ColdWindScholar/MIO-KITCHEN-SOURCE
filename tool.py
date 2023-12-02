@@ -710,10 +710,7 @@ class Process(Toplevel):
             if 'run' in step:
                 with open(sh_tmp_file := self.dir + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
                     sh_tmp.writelines(step['run'])
-                if os.name == 'posix':
-                    sh = "ash"
-                else:
-                    sh = "bash"
+                sh = "ash" if os.name == 'posix' else 'bash'
                 self.error = call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
             elif "use" in step:
                 try:
