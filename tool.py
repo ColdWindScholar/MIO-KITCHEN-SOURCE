@@ -1171,10 +1171,7 @@ def mpkman() -> None:
                     self.attributes('-topmost', 'true')
                 except:
                     pass
-                if resizable == '1':
-                    self.resizable(True, True)
-                else:
-                    self.resizable(False, False)
+                self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
                 for group_name, group_data in data['main'].items():
                     if group_name != "info":
                         group_frame = ttk.LabelFrame(self, text=group_data['title'])
