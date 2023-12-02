@@ -675,7 +675,7 @@ class Process(Toplevel):
             elif con['type'] == 'checkbutton':
                 b_var_name = key
                 self.gavs[b_var_name] = IntVar()
-                text = 'M.K.C' if 'text' not in con else text = con['text']
+                text = 'M.K.C' if 'text' not in con else con['text']
                 self.control.append(cb := ttk.Checkbutton(self, text=text, variable=self.gavs[b_var_name], onvalue=1,
                                                           offvalue=0,
                                                           style="Switch.TCheckbutton"))
@@ -1225,10 +1225,7 @@ def mpkman() -> None:
                             elif con['type'] == 'checkbutton':
                                 b_var_name = con['set']
                                 self.gavs[b_var_name] = IntVar()
-                                if 'text' not in con:
-                                    text = 'M.K.C'
-                                else:
-                                    text = con['text']
+                                text = 'M.K.C' if 'text' not in con else con['text']
                                 ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
                                                 offvalue=0,
                                                 style="Switch.TCheckbutton").pack(
