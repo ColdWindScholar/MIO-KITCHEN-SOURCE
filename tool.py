@@ -1060,10 +1060,7 @@ def mpkman() -> None:
                     f.write(f'export {i}={self.envs[i]}\n')
                 f.write("source $1")
             if os.path.exists(file_):
-                if os.name == 'posix':
-                    sh = "ash"
-                else:
-                    sh = "bash"
+                sh = "ash" if os.name == 'posix' else "bash"
                 call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
                 try:
                     os.remove(file_)
