@@ -2487,12 +2487,9 @@ def make_ext4fs(name, work, sparse, size=0):
 
 def mke2fs(name, work, sparse, size=0):
     print(lang.text91 % name)
-    if not size:
-        size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v
-    else:
-        size = size / 4096
+    size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     if call(
-            f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {size}") != 0:
+            f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return False
