@@ -2386,14 +2386,14 @@ class dirsize(object):
     # 1 - retun True value of dir size
     # 2 - return Rsize value of dir size
     # 3 - return Rsize value of dir size and modify dynampic_partition_list
-    def __init__(self, dir: str, num: int = 1, get: int = 2, list_f: str = None):
+    def __init__(self, dir_: str, num: int = 1, get: int = 2, list_f: str = None):
         self.rsize_v: int
         self.num = num
         self.get = get
         self.list_f = list_f
-        self.dname = os.path.basename(dir)
+        self.dname = os.path.basename(dir_)
         self.size = 0
-        for root, dirs, files in os.walk(dir):
+        for root, dirs, files in os.walk(dir_):
             self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
                               not os.path.islink(os.path.join(root, name))])
         if self.get == 1:
