@@ -959,10 +959,7 @@ def mpkman() -> None:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
             del buffer2, buffer
-        if os.path.exists(settings.path + os.sep + chosed.get() + ".mpk"):
-            print(lang.t15 % (settings.path + os.sep + chosed.get() + ".mpk"))
-        else:
-            print(lang.t16 % (settings.path + os.sep + chosed.get() + ".mpk"))
+        print(lang.t15 % (settings.path + os.sep + chosed.get() + ".mpk")) if os.path.exists(settings.path + os.sep + chosed.get() + ".mpk") else print(lang.t16 % (settings.path + os.sep + chosed.get() + ".mpk"))
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
