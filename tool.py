@@ -261,7 +261,7 @@ class Tool(Tk):
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
-        self.LB2.bind('<<ComboboxSelected>>', set_theme)
+        self.LB2.bind('<<ComboboxSelected>>', settings.set_theme)
 
         def startwjjj(ev):
             if os.name == 'nt':
@@ -491,6 +491,16 @@ class set_utils(object):
         with open(self.set_file, 'w') as fil:
             self.config.write(fil)
         self.load()
+
+    def set_theme(self, f):
+        print(lang.text100 + theme.get())
+        try:
+            self.setf("theme", theme.get())
+            sv_ttk.set_theme(theme.get())
+            gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
+            cartoon.loadgif(gif)
+        except Exception as e:
+            messpop(lang.text101 % (theme.get(), e))
 
 
 settings = set_utils(setfile)
@@ -2537,17 +2547,6 @@ def get_all_file_paths(directory) -> Ellipsis:
     for root, directories, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
-
-
-def set_theme(self):
-    print(lang.text100 + theme.get())
-    try:
-        settings.setf("theme", theme.get())
-        sv_ttk.set_theme(theme.get())
-        gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
-        cartoon.loadgif(gif)
-    except Exception as e:
-        messpop(lang.text101 % (theme.get(), e))
 
 
 def set_language(self):
