@@ -142,6 +142,9 @@ class Tool(Tk):
             self.show.delete(1.0, END)
         print(lang.text95 + log_)
 
+    def messpop(self, message, color='orange') -> None:
+        self.tsk.config(text=message, bg=color)
+
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -500,15 +503,11 @@ class set_utils(object):
             gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
             cartoon.loadgif(gif)
         except Exception as e:
-            messpop(lang.text101 % (theme.get(), e))
+            win.messpop(lang.text101 % (theme.get(), e))
 
 
 settings = set_utils(setfile)
 settings.load()
-
-
-def messpop(message, color='orange') -> None:
-    win.tsk.config(text=message, bg=color)
 
 
 def get_time() -> None:
@@ -578,7 +577,7 @@ def padtbo() -> any:
 @cartoon
 def logodump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
-        messpop(lang.warn3.format(bn))
+        win.messpop(lang.warn3.format(bn))
         return False
     re_folder(work + f"{bn}")
     utils.LOGODUMPER(logo, work + f"{bn}").unpack()
@@ -894,7 +893,7 @@ def mpkman() -> None:
 
     def editor_(id_=None):
         if not chosed.get():
-            messpop(lang.warn2)
+            win.messpop(lang.warn2)
             return 1
         if id_ is None:
             id_ = globals()[chosed.get()]
@@ -928,7 +927,7 @@ def mpkman() -> None:
     @cartoon
     def export():
         if not chosed.get():
-            messpop(lang.warn2)
+            win.messpop(lang.warn2)
             return 1
         with open("".join([moduledir, os.sep, (value := globals()[chosed.get()]), os.sep, "info.json"]),
                   'r',
@@ -1167,7 +1166,7 @@ def mpkman() -> None:
                 try:
                     data = json.load(f)
                 except Exception as e:
-                    messpop(lang.text133 + str(e))
+                    win.messpop(lang.text133 + str(e))
                     print(lang.text133 + str(e))
                     self.destroy()
                 self.title(data['main']['info']['title'])
@@ -1296,7 +1295,7 @@ def mpkman() -> None:
                     msh_parse(msh_tmp)
         else:
             if not os.path.exists(moduledir + os.sep + value):
-                messpop(lang.warn7.format(value))
+                win.messpop(lang.warn7.format(value))
                 list_pls()
                 win.tab7.lift()
             else:
@@ -1313,7 +1312,7 @@ def mpkman() -> None:
                 self.lfdep()
                 self.ask()
             else:
-                messpop(lang.warn2)
+                win.messpop(lang.warn2)
 
         def ask(self):
             self.ck = Toplevel()
@@ -1370,7 +1369,7 @@ def mpkman() -> None:
                     except PermissionError as e:
                         print(e)
                 if os.path.exists(moduledir + os.sep + name):
-                    messpop(lang.warn9, 'red')
+                    win.messpop(lang.warn9, 'red')
                 else:
                     print(lang.text30)
                     try:
@@ -1378,7 +1377,7 @@ def mpkman() -> None:
                     except:
                         pass
             else:
-                messpop(lang.warn2)
+                win.messpop(lang.warn2)
 
     ttk.Label(win.tab7, text=lang.text19, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
@@ -1409,7 +1408,7 @@ class Installmpk(Toplevel):
         super().__init__()
         self.mconf = ConfigParser()
         if not mpk:
-            messpop(lang.warn2)
+            win.messpop(lang.warn2)
             self.destroy()
             return
         self.title(lang.text31)
@@ -1594,7 +1593,7 @@ class packxx(Toplevel):
 class dbkxyt:
     def __init__(self):
         if not dn.get():
-            messpop(lang.warn1)
+            win.messpop(lang.warn1)
             return
         if os.path.exists((dir_ := rwork()) + "firmware-update"):
             os.rename(dir_ + "firmware-update", dir_ + "images")
@@ -1766,7 +1765,7 @@ class packss(Toplevel):
 @cartoon
 def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     if not dn.get():
-        messpop(lang.warn1)
+        win.messpop(lang.warn1)
         return False
     work = rwork()
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
@@ -1801,9 +1800,9 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
                         except Exception as e:
                             print(e)
         else:
-            messpop(lang.warn10)
+            win.messpop(lang.warn10)
     else:
-        messpop(lang.warn10)
+        win.messpop(lang.warn10)
 
 
 class StdoutRedirector(object):
@@ -1857,7 +1856,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 def download_file():
     var1 = IntVar()
     down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
-    messpop(lang.text62, "green")
+    win.messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
     var1.set(0)
@@ -1897,8 +1896,8 @@ def download_file():
                 try:
                     down.destroy()
                 except Exception as e:
-                    messpop("%s" % e)
-                messpop(lang.text68, "red")
+                    win.messpop("%s" % e)
+                win.messpop(lang.text68, "red")
 
 
 @cartoon
@@ -1907,7 +1906,7 @@ def jboot(bn: str = 'boot'):
         print(lang.warn3.format(bn))
         return
     if not os.path.exists(boot):
-        messpop(lang.warn3.format(bn))
+        win.messpop(lang.warn3.format(bn))
         return
     if os.path.exists(work + f"{bn}"):
         if rmdir(work + f"{bn}") != 0:
@@ -2003,11 +2002,11 @@ def dboot(nm: str = 'boot'):
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     dely, erofs_level, ext4_size, erofsext4 = others
     if not dn.get():
-        messpop(lang.warn1)
+        win.messpop(lang.warn1)
         return False
     else:
         if not os.path.exists(settings.path + os.sep + dn.get()):
-            messpop(lang.warn1, "red")
+            win.messpop(lang.warn1, "red")
             return False
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
@@ -2110,7 +2109,7 @@ def rdi(work, dname) -> any:
             print(lang.text73 % (dname, e))
         print(lang.text3.format(dname))
     else:
-        messpop(lang.text75 % dname, "red")
+        win.messpop(lang.text75 % dname, "red")
 
 
 def input_(title: str = lang.text76, text: str = "") -> str:
@@ -2154,7 +2153,7 @@ def unpackrom(ifile) -> None:
         try:
             os.remove(ifile)
         except Exception as e:
-            messpop(lang.warn11.format(e))
+            win.messpop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif os.path.splitext(ifile)[1] == '.ofp':
         if ask_win(lang.t12) == 1:
@@ -2192,7 +2191,7 @@ def unpackrom(ifile) -> None:
                 fz.extract(file, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             except Exception as e:
                 print(lang.text80 % (file, e))
-                messpop(lang.warn4.format(file))
+                win.messpop(lang.warn4.format(file))
             finally:
                 pass
         print(lang.text81)
@@ -2215,7 +2214,7 @@ def unpackrom(ifile) -> None:
         try:
             os.mkdir(folder)
         except Exception as e:
-            messpop(e)
+            win.messpop(e)
         copy(ifile, folder)
         xmcd_.listdir()
         dn.set(os.path.basename(folder))
@@ -2234,11 +2233,11 @@ def rwork() -> str:
 @cartoon
 def unpack(chose, form: any = None):
     if not dn.get():
-        messpop(lang.warn1)
+        win.messpop(lang.warn1)
         return False
     else:
         if not os.path.exists(settings.path + os.sep + dn.get()):
-            messpop(lang.warn1, "red")
+            win.messpop(lang.warn1, "red")
             return False
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
         with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
@@ -2319,7 +2318,7 @@ def unpack(chose, form: any = None):
                 try:
                     utils.simg2img(work + i + ".img")
                 except:
-                    messpop(lang.warn11.format(i + ".img"))
+                    win.messpop(lang.warn11.format(i + ".img"))
             if i not in parts.keys():
                 parts[i] = gettype(work + i + ".img")
             if gettype(work + i + ".img") == 'super':
@@ -2328,7 +2327,7 @@ def unpack(chose, form: any = None):
                     try:
                         utils.simg2img(work + i + ".img")
                     except:
-                        messpop(lang.warn11.format(i))
+                        win.messpop(lang.warn11.format(i))
                 lpunpack.unpack(work + i + ".img", work)
                 if os.access(work + "system_a.img", os.F_OK):
                     for wjm in os.listdir(work):
@@ -2350,7 +2349,7 @@ def unpack(chose, form: any = None):
                     try:
                         os.remove(work + i + ".img")
                     except Exception as e:
-                        messpop(lang.warn11.format(i + ".img:" + e))
+                        win.messpop(lang.warn11.format(i + ".img:" + e))
             if ftype == "erofs":
                 print(lang.text79 + i + ".img [%s]" % ftype)
                 if call(exe="extract.erofs -i " + settings.path + os.sep + dn.get() + os.sep + i + ".img -o " + work + " -x",
@@ -2361,7 +2360,7 @@ def unpack(chose, form: any = None):
                     try:
                         os.remove(work + i + ".img")
                     except:
-                        messpop(lang.warn11.format(i + ".img"))
+                        win.messpop(lang.warn11.format(i + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
     with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
@@ -2530,7 +2529,7 @@ def selectp(self):
 @cartoon
 def rmdir(path):
     if not path:
-        messpop(lang.warn1)
+        win.messpop(lang.warn1)
     else:
         print(lang.text97 + f'{os.path.basename(path)}')
         try:
@@ -2540,7 +2539,7 @@ def rmdir(path):
                 call(f'busybox rm -rf {path}')
         except:
             print(lang.warn11.format(path))
-        messpop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
+        win.messpop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
 
 
 def get_all_file_paths(directory) -> Ellipsis:
@@ -2580,7 +2579,7 @@ class zip_file(object):
 @cartoon
 def packzip():
     if not dn.get():
-        messpop(lang.warn1)
+        win.messpop(lang.warn1)
     else:
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
@@ -2658,12 +2657,12 @@ class xmcd(ttk.LabelFrame):
             print(lang.text104)
 
     def delwork(self):
-        messpop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
+        win.messpop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
     def newp(self):
         if not (inputvar := input_()):
-            messpop(lang.warn12)
+            win.messpop(lang.warn12)
         else:
             print(lang.text99 % inputvar)
             os.mkdir(settings.path + os.sep + "%s" % inputvar)
@@ -2721,7 +2720,7 @@ class unpack_gui(ttk.LabelFrame):
     def refs(self, N=None):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
-            messpop(lang.warn1)
+            win.messpop(lang.warn1)
             return False
         if not self.fm.get() in ['payload', 'super']:
             for file_name in os.listdir(work):
@@ -2745,7 +2744,7 @@ class unpack_gui(ttk.LabelFrame):
     def refs2(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
-            messpop(lang.warn1)
+            win.messpop(lang.warn1)
             return False
         parts_dict = self.rt_info()
         for folder in os.listdir(work):
