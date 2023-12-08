@@ -929,7 +929,7 @@ def mpkman() -> None:
         if not chosed.get():
             win.messpop(lang.warn2)
             return 1
-        with open("".join([moduledir, os.sep, (value := globals()[chosed.get()]), os.sep, "info.json"]),
+        with open(os.path.join(moduledir,  (value := globals()[chosed.get()]),  "info.json"),
                   'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
