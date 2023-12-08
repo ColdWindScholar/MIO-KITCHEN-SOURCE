@@ -350,7 +350,7 @@ class welcome(Toplevel):
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self.clos)
         self.frame = None
-        oobe = int(settings.oobe)
+        oobe = settings.oobe
         if oobe == "1":
             self.main()
         elif oobe == '2':
