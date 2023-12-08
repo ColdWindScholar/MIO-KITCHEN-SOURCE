@@ -394,7 +394,7 @@ class welcome(Toplevel):
 
         def loadlice(self):
             te.delete(1.0, END)
-            with open(''.join([elocal, os.sep, "bin", os.sep, "licenses", os.sep, lce.get(), ".txt"]), 'r',
+            with open(os.path.join(elocal,  "bin",  "licenses",  lce.get()+ ".txt"), 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
 
@@ -419,7 +419,7 @@ class welcome(Toplevel):
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        with open(''.join([elocal, os.sep, "bin", os.sep, "licenses", os.sep, "private.txt"]), 'r',
+        with open(os.path.join(elocal,  "bin",  "licenses",  "private.txt"), 'r',
                   encoding='UTF-8') as f:
             (te := Text(self.frame)).insert('insert', f.read())
         te.pack(fill=BOTH)
