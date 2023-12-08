@@ -1943,8 +1943,8 @@ def dboot(nm: str = 'boot'):
         print(f"Cannot Find {nm}...")
         return
     cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                        f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
-            '\\', "/")
+                    f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+        '\\', "/")
 
     if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
         os.chdir(work + f"{nm}" + os.sep + "ramdisk")
@@ -2056,7 +2056,10 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
                             ext4_size_value = int(f.read().strip())
                 if dbgs.get() in ["dat", "br", "sparse"]:
-                    make_ext4fs(dname, work, "-s", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname, work, "y", ext4_size_value)
+                    make_ext4fs(dname, work, "-s", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                                                                                               work,
+                                                                                                               "y",
+                                                                                                               ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
                     if dbgs.get() == "dat":
@@ -2066,7 +2069,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     else:
                         print(lang.text3.format(dname))
                 else:
-                    make_ext4fs(dname, work, "", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname, work, "n", ext4_size_value)
+                    make_ext4fs(dname, work, "", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                                                                                             work, "n",
+                                                                                                             ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
         elif parts_dict[i] in ['boot', 'vendor_boot']:
@@ -2193,7 +2198,10 @@ def unpackrom(ifile) -> None:
             pass
         return
     elif ftype != 'unknow':
-        folder = settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code() if os.path.exists(settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]) else settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]
+        folder = settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code() if os.path.exists(
+            settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]) else settings.path + os.sep + \
+                                                                                        os.path.splitext(
+                                                                                            os.path.basename(ifile))[0]
         try:
             os.mkdir(folder)
         except Exception as e:
@@ -2523,7 +2531,6 @@ def rmdir(path):
         except:
             print(lang.warn11.format(path))
         messpop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
-
 
 
 def get_all_file_paths(directory) -> Ellipsis:
