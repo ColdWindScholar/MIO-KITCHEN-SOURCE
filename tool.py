@@ -1118,10 +1118,10 @@ def mpkman() -> None:
                         sh_content += f"export {va}='{gva}'\n"
                     else:
                         continue
-                temp = elocal + os.sep + "bin" + os.sep + "temp" + os.sep
+                temp = os.path.join(elocal , "bin" , "temp" ) + os.sep
                 if not os.path.exists(temp):
                     re_folder(temp)
-                file.set(temp + v_code())
+                file.set(str(temp) + v_code())
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                     f.write(sh_content)
                     f.write('export version={}\n'.format(settings.version))
