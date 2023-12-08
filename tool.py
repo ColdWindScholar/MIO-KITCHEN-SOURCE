@@ -1836,9 +1836,9 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
         for i in iter(e.stdout.readline, b""):
             if out == 0:
                 try:
-                    out_put = e.decode("utf-8").strip()
+                    out_put = i.decode("utf-8").strip()
                 except:
-                    out_put = e.decode("gbk").strip()
+                    out_put = i.decode("gbk").strip()
                 print(out_put)
     ret.wait()
     return ret.returncode
