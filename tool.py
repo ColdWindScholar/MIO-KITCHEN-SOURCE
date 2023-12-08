@@ -289,7 +289,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-setfile = ''.join([(elocal := utils.elocal), os.sep, "bin", os.sep, "setting.ini"])
+setfile = os.path.join((elocal := utils.elocal), "bin",  "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
