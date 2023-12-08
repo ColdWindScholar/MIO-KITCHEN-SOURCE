@@ -1942,12 +1942,10 @@ def dboot(nm: str = 'boot'):
     if not os.path.exists(work + f"{nm}"):
         print(f"Cannot Find {nm}...")
         return
-    if os.name != 'posix':
-        cpio = findfile("cpio.exe",
+    cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                         f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
             '\\', "/")
-    else:
-        cpio = findfile("cpio", f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}')
+
     if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
         os.chdir(work + f"{nm}" + os.sep + "ramdisk")
         call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
