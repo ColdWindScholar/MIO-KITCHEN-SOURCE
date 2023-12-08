@@ -1031,10 +1031,7 @@ def mpkman() -> None:
             gettype(file_)
 
         def sfor(self, vn, vs, do):
-            if ',' in vs:
-                fgf = ','
-            else:
-                fgf = None
+            fgf = ',' if ',' in vs else None
             for v in vs.split(fgf):
                 getattr(self, (do_ := do.replace(f'@{vn}@', v)).split()[0])(do_[do_.index(' ') + 1:])
 
