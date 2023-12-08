@@ -289,7 +289,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-setfile = os.path.join((elocal := utils.elocal), "bin",  "setting.ini")
+setfile = os.path.join((elocal := utils.elocal), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -394,7 +394,7 @@ class welcome(Toplevel):
 
         def loadlice(self):
             te.delete(1.0, END)
-            with open(os.path.join(elocal,  "bin",  "licenses",  lce.get()+ ".txt"), 'r',
+            with open(os.path.join(elocal, "bin", "licenses", lce.get() + ".txt"), 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
 
@@ -419,7 +419,7 @@ class welcome(Toplevel):
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        with open(os.path.join(elocal,  "bin",  "licenses",  "private.txt"), 'r',
+        with open(os.path.join(elocal, "bin", "licenses", "private.txt"), 'r',
                   encoding='UTF-8') as f:
             (te := Text(self.frame)).insert('insert', f.read())
         te.pack(fill=BOTH)
@@ -958,6 +958,7 @@ def mpkman() -> None:
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
+            del buffer2, buffer
         if os.path.exists(settings.path + os.sep + chosed.get() + ".mpk"):
             print(lang.t15 % (settings.path + os.sep + chosed.get() + ".mpk"))
         else:
