@@ -132,7 +132,7 @@ class Tool(Tk):
         if os.name != "posix":
             self.iconphoto(True,
                            tk.PhotoImage(
-                               file="".join([os.getcwd(), os.sep, "bin", os.sep, "images", os.sep, "icon.png"])))
+                               file=os.path.join(os.getcwd(),  "bin",  "images",  "icon.png")))
         sys.stdout = dev_null()
 
     def putlog(self):
@@ -540,8 +540,8 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(exe="dtc -@ -I dtb -O dts %s -o %s" % (work + f"{bn}" + os.sep + "dtbo" + os.sep + dtbo,
-                                                        "".join([work, f"{bn}", os.sep, "dts", os.sep, "dts." +
-                                                                 os.path.basename(dtbo).rsplit('.', 1)[1]])), out=1)
+                                                        os.path.join(work, f"{bn}",  "dts",  "dts." +
+                                                                 os.path.basename(dtbo).rsplit('.', 1)[1])), out=1)
     print(lang.text5)
     try:
         os.remove(dtboimg)
@@ -897,7 +897,7 @@ def mpkman() -> None:
             return 1
         if id_ is None:
             id_ = globals()[chosed.get()]
-        path = "".join([moduledir, os.sep, id_, os.sep])
+        path = os.path.join(moduledir, id_)+os.sep
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             if ask_win(lang.t18, 'SH', 'MSH') == 1:
                 s = "main.sh"
@@ -954,7 +954,7 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile("".join([settings.path, os.sep, chosed.get(), ".mpk"]), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, chosed.get(), ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
@@ -1044,7 +1044,7 @@ def mpkman() -> None:
             call(exe=str(cmd), kz='N', shstate=True)
 
         def sh(self, cmd):
-            with open(file_ := ("".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])) + v_code(), "w",
+            with open(file_ := (os.path.join(elocal,  "bin", "temp", v_code())), "w",
                       encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
@@ -1252,14 +1252,14 @@ def mpkman() -> None:
                                                        '\\',
                                                        '/')))
                     os.remove(file.get())
-                elif os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.msh"])):
-                    msh_parse("".join([moduledir, os.sep, value, os.sep, "main.msh"]))
+                elif os.path.exists(os.path.join(moduledir,  value,  "main.msh")):
+                    msh_parse(os.path.join(moduledir,  value,  "main.msh"))
             else:
-                if os.path.exists("".join([moduledir, os.sep, value, os.sep, "main.sh"])):
-                    if not os.path.exists(temp := "".join([elocal, os.sep, "bin", os.sep, "temp", os.sep])):
+                if os.path.exists(os.path.join(moduledir, value,  "main.sh")):
+                    if not os.path.exists(temp := os.path.join(elocal, "bin", "temp")+os.sep):
                         re_folder(temp)
                     if not file.get():
-                        file.set(temp + os.sep + v_code())
+                        file.set(temp + v_code())
                     with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                         f.write('export tool_bin={}\n'.format(
                             tool_bin.replace(
@@ -1324,7 +1324,7 @@ def mpkman() -> None:
             if not name:
                 name = self.value
             for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
-                with open("".join([moduledir, os.sep, i, os.sep, "info.json"]), 'r', encoding='UTF-8') as f:
+                with open(os.path.join(moduledir,  i,  "info.json"), 'r', encoding='UTF-8') as f:
                     data = json.load(f)
                     for n in data['depend'].split():
                         if name == n:
@@ -1406,7 +1406,7 @@ class Installmpk(Toplevel):
                         print(e)
                         pyt = ImageTk.PhotoImage(Image.open(elocal + os.sep + "images" + os.sep + "none"))
             except:
-                pyt = ImageTk.PhotoImage(Image.open("".join([elocal, os.sep, "bin", os.sep, "images", os.sep, "none"])))
+                pyt = ImageTk.PhotoImage(Image.open(os.path.join(elocal,  "bin",  "images",  "none")))
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
@@ -1441,15 +1441,13 @@ class Installmpk(Toplevel):
             self.state['text'] = lang.warn15.format(sys.platform)
             return False
         for dep in self.mconf.get('module', 'depend').split():
-            if not os.path.isdir("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, dep])):
+            if not os.path.isdir(os.path.join(elocal,  "bin",  "module",  dep)):
                 self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
                 self.installb['text'] = lang.text37
                 self.installb.config(state='normal')
                 return False
-        if os.path.exists(
-                "".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')])
-        ):
-            rmtree("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
+        if os.path.exists(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'))):
+            rmtree(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier')))
         fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
         uncompress_size = sum((file.file_size for file in fz.infolist()))
         extracted_size = 0
@@ -1461,9 +1459,7 @@ class Installmpk(Toplevel):
             info = fz.getinfo(file)
             extracted_size += info.file_size
             self.state['text'] = lang.text38.format(file)
-            fz.extract(file,
-                       "".join(
-                           [elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier')]))
+            fz.extract(file,os.path.join(elocal,  "bin", "module",  self.mconf.get('module', 'identifier')))
             self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
@@ -1475,8 +1471,7 @@ class Installmpk(Toplevel):
                  "identifier": "%s" % (self.mconf.get('module', 'identifier')),
                  "describe": "%s" % (self.mconf.get('module', 'describe')),
                  "depend": "%s" % depends}
-        with open("".join([elocal, os.sep, "bin", os.sep, "module", os.sep, self.mconf.get('module', 'identifier'),
-                           os.sep, "info.json"]),
+        with open(os.path.join(elocal, "bin",  "module", self.mconf.get('module', 'identifier'),"info.json"),
                   'w') as f:
             json.dump(minfo, f, indent=2)
         self.state['text'] = lang.text39
@@ -2177,7 +2172,7 @@ def unpackrom(ifile) -> None:
             finally:
                 pass
         print(lang.text81)
-        if os.path.exists("".join([settings.path, os.sep, os.path.splitext(os.path.basename(zip_src))[0]])):
+        if os.path.exists(os.path.join(settings.path,  os.path.splitext(os.path.basename(zip_src))[0])):
             xmcd_.listdir()
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
