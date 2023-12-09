@@ -75,7 +75,7 @@ class json_edit:
         self.write(data)
 
 
-class load_car(object):
+class load_car:
     gifs = []
 
     def __init__(self, *args):
