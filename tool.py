@@ -2204,15 +2204,17 @@ def unpackrom(ifile) -> None:
             pass
         return
     elif ftype != 'unknow':
-        folder = settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0] + v_code() if os.path.exists(
-            settings.path + os.sep + os.path.splitext(os.path.basename(ifile))[0]) else settings.path + os.sep + \
-                                                                                        os.path.splitext(
-                                                                                            os.path.basename(ifile))[0]
+        folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
+            os.path.join(
+                settings.path, os.path.splitext(os.path.basename(ifile))[0])) else os.path.join(settings.path,
+                                                                                                os.path.splitext(
+                                                                                                    os.path.basename(
+                                                                                                        ifile))[0])
         try:
             os.mkdir(folder)
         except Exception as e:
             win.messpop(e)
-        copy(ifile, folder)
+        copy(ifile, str(folder))
         xmcd_.listdir()
         dn.set(os.path.basename(folder))
     else:
@@ -2224,7 +2226,7 @@ def unpackrom(ifile) -> None:
 
 
 def rwork() -> str:
-    return settings.path + os.sep + dn.get() + os.sep
+    return os.path.join(settings.path, dn.get()) + os.sep
 
 
 @cartoon
@@ -2515,9 +2517,6 @@ def mke2fs(name, work, sparse, size=0):
             except:
                 pass
         os.rename(work + name + "_new.img", work + name + ".img")
-
-
-
 
 
 @cartoon
