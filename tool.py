@@ -221,13 +221,6 @@ class Tool(Tk):
         self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
         self.scrollbar.config(command=self.canvas1.yview)
 
-    def getframe(self, title):
-        frame = ttk.LabelFrame(self.frame_bg, text=title)
-        frame.pack(padx=10, pady=10)
-        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
-        self.upjdt()
-        return frame
-
     def tab4_n(self):
         def open_github(o):
             openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
@@ -1840,7 +1833,8 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 
 def download_file():
     var1 = IntVar()
-    down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
+    down = Toplevel()
+    down.title(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     win.messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
