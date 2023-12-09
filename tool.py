@@ -205,12 +205,13 @@ class Tool(Tk):
         # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show)
-        zyf1 = ttk.LabelFrame(win.tab, text=lang.text9)
+        zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
         zyf1.pack(padx=10, pady=10)
-        ttk.Button(zyf1, text=lang.text16, command=lambda: self.notepad.select(win.tab6)).pack(side='left',
+        ttk.Button(zyf1, text=lang.text16, command=lambda: self.notepad.select(self.tab6)).pack(side='left',
                                                                                                padx=10,
                                                                                                pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
+        Label(self.tab, text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!').pack(padx=5,pady=5)
         mpkman()
         self.gifl = Label(self.rzf)
         self.gifl.pack(padx=10, pady=10)
