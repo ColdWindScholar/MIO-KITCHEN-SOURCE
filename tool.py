@@ -486,7 +486,7 @@ class set_utils(object):
 
     def setf(self, name, value):
         self.config.read(setfile)
-        self.config.set("setting", "%s" % name, "%s" % value)
+        self.config.set("setting", name, value)
         with open(self.set_file, 'w') as fil:
             self.config.write(fil)
         self.load()
@@ -1419,13 +1419,13 @@ class Installmpk(Toplevel):
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
         Label(self, image=pyt).pack(padx=10, pady=10)
-        Label(self, text="%s" % (self.mconf.get('module', 'name')), font=('黑体', 14)).pack(padx=10, pady=10)
+        Label(self, text= self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
         Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10,
                                                                                                            pady=10)
         text = Text(self)
-        text.insert("insert", "%s" % (self.mconf.get('module', 'describe')))
+        text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
         self.prog = ttk.Progressbar(self, length=200, mode='determinate', orient=HORIZONTAL, maximum=100, value=0)
         self.prog.pack()
