@@ -2158,18 +2158,18 @@ def unpackrom(ifile) -> None:
         fz = zipfile.ZipFile(zip_src, 'r')
         for fi in fz.namelist():
             try:
-                file = fi.encode('cp437').decode('gbk')
+                file_ = fi.encode('cp437').decode('gbk')
             except:
                 try:
-                    file = fi.encode('cp437').decode('utf-8')
+                    file_ = fi.encode('cp437').decode('utf-8')
                 except:
                     pass
-            print(lang.text79 + file)
+            print(lang.text79 + file_)
             try:
-                fz.extract(file, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+                fz.extract(file_, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             except Exception as e:
-                print(lang.text80 % (file, e))
-                win.messpop(lang.warn4.format(file))
+                print(lang.text80 % (file_, e))
+                win.messpop(lang.warn4.format(file_))
             finally:
                 pass
         print(lang.text81)
