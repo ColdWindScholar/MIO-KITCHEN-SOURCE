@@ -281,7 +281,7 @@ class Tool(Tk):
                            value=[i.rsplit('.', 1)[0] for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3.pack(padx=10, pady=10, side='left')
-        lb3.bind('<<ComboboxSelected>>', set_language)
+        lb3.bind('<<ComboboxSelected>>', settings.set_language)
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
@@ -385,7 +385,7 @@ class welcome(Toplevel):
                             value=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3_.pack(padx=10, pady=10, side='top')
-        lb3_.bind('<<ComboboxSelected>>', set_language)
+        lb3_.bind('<<ComboboxSelected>>', settings.set_language)
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
@@ -504,6 +504,14 @@ class set_utils(object):
             cartoon.loadgif(gif)
         except Exception as e:
             win.messpop(lang.text101 % (theme.get(), e))
+
+    def set_language(self, f):
+        print(lang.text129 + language.get())
+        try:
+            self.setf("language", language.get())
+            load(language.get())
+        except Exception as e:
+            print(lang.t130, e)
 
 
 settings = set_utils(setfile)
@@ -2524,15 +2532,6 @@ def get_all_file_paths(directory) -> Ellipsis:
     for root, directories, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
-
-
-def set_language(self):
-    print(lang.text129 + language.get())
-    try:
-        settings.setf("language", language.get())
-        load(language.get())
-    except Exception as e:
-        print(lang.t130, e)
 
 
 class zip_file(object):
