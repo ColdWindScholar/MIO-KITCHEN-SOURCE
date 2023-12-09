@@ -2110,11 +2110,8 @@ def script2fs(path):
         if not os.path.exists(path + os.sep + "config"):
             os.makedirs(path + os.sep + "config")
         extra.script2fs_context(findfile("updater-script", path + os.sep + "META-INF"), path + os.sep + "config", path)
-        if os.path.exists(path + os.sep + "config" + os.sep + "parts_info"):
-            with open(path + os.sep + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
-                parts = json.loads(pf.read())
-        else:
-            parts = {}
+        json_ = json_edit(os.path.join(path, "config", "parts_info"))
+        parts = json_.read()
         for v in os.listdir(path):
             if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
                 if v not in parts.keys():
@@ -2128,12 +2125,18 @@ class json_edit:
         self.file = j_f
 
     def read(self):
+        if not os.path.exists(self.file):
+            return {}
         with open(self.file, 'r+', encoding='utf-8') as pf:
-            return json.loads(pf.read())
+            try:
+                return json.loads(pf.read())
+            except:
+                return {}
 
     def write(self, data):
         with open(self.file, 'w+', encoding='utf-8') as pf:
             json.dump(data, pf, indent=4)
+
     def edit(self, name, value):
         data = self.read()
         data[name] = value
