@@ -308,8 +308,7 @@ def load(name):
     if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
         error(1)
     elif not os.path.exists(elocal + os.sep + lang_file):
-        with open(elocal + os.sep + 'bin/languages/English.json', 'r', encoding='utf-8') as f:
-            _lang = json.load(f)
+        _lang = json_edit(elocal + os.sep + 'bin/languages/English.json').read()
     else:
         with open(f'{elocal}{os.sep}{lang_file}', 'r', encoding='utf-8') as f:
             _lang = json.load(f)
