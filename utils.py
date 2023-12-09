@@ -15,7 +15,6 @@ from Crypto.Util.Padding import pad
 
 DataImage = blockimgdiff.DataImage
 
-
 # -----
 # ====================================================
 #          FUNCTION: sdat2img img2sdat
@@ -304,16 +303,15 @@ def simg2img(path):
 
 
 def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
-    print('img2sdat binary - version: 1.7\n')
+    print('img2sdat binary - version: 1.8\n')
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
-        '''            
-        1. Android Lollipop 5.0
-        2. Android Lollipop 5.1
-        3. Android Marshmallow 6.0
-        4. Android Nougat 7.0/7.1/8.0/8.1
-        '''
-
+    versions = {
+            1: "Android Lollipop 5.0",
+            2: "Android Lollipop 5.1",
+            3: "Android Marshmallow 6.0",
+            4: "Android Nougat 7.0/7.1/8.0/8.1"}
+    print("Chose Version:"+versions[version])
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
 
