@@ -303,7 +303,6 @@ def simg2img(path):
 
 
 def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
-    print('img2sdat binary - version: 1.8\n')
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     versions = {
@@ -311,7 +310,7 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
             2: "Android Lollipop 5.1",
             3: "Android Marshmallow 6.0",
             4: "Android Nougat 7.0/7.1/8.0/8.1"}
-    print("Chose Version:"+versions[version])
+    print("Img2sdat(1.7):"+versions[version])
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
 
