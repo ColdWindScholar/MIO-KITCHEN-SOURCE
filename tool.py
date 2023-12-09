@@ -119,7 +119,6 @@ class dev_null(object):
         pass
 
 
-
 class Tool(Tk):
     def __init__(self):
         super().__init__()
