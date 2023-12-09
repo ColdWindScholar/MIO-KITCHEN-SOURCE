@@ -118,11 +118,6 @@ class dev_null(object):
     def flush():
         pass
 
-    def __exit__(self):
-        pass
-
-    def close(self):
-        pass
 
 
 class Tool(Tk):
@@ -1811,12 +1806,6 @@ class StdoutRedirector(object):
         self.text_space.yview('end')
 
     def flush(self):
-        pass
-
-    def close(self):
-        pass
-
-    def __exit__(self):
         pass
 
 
