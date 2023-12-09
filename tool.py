@@ -142,6 +142,10 @@ class Tool(Tk):
             self.show.delete(1.0, END)
         print(lang.text95 + log_)
 
+    def get_time(self):
+        self.tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
+        self.after(1000, self.get_time)
+
     def messpop(self, message, color='orange') -> None:
         self.tsk.config(text=message, bg=color)
 
@@ -212,6 +216,7 @@ class Tool(Tk):
         mpkman()
         self.gifl = Label(self.rzf)
         self.gifl.pack(padx=10, pady=10)
+        self.get_time()
 
     def upjdt(self):
         self.frame_bg.update_idletasks()
@@ -525,9 +530,7 @@ settings = set_utils(setfile)
 settings.load()
 
 
-def get_time() -> None:
-    win.tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
-    win.after(1000, get_time)
+
 
 
 def re_folder(path) -> None:
@@ -2909,7 +2912,6 @@ class format_conversion(Toplevel):
 cartoon.loadgif(Image.open("bin/images/loading_%s.gif" % (win.LB2.get())))
 cartoon.init()
 print(lang.text108)
-cz(get_time)
 win.update()
 jzxs(win)
 print(lang.text134 % (dti() - start))
