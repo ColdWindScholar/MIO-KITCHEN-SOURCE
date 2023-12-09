@@ -1987,7 +1987,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             win.messpop(lang.warn1, "red")
             return False
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
-        with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
+        with open(os.path.join(work + "config", "parts_info"), 'r+', encoding='utf-8') as fff:
             parts_dict = json.loads(fff.read())
     else:
         parts_dict = {}
@@ -2002,7 +2002,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     if gettype(file) == 'vbmeta':
                         print(lang.text71 % file)
                         utils.vbpatch(file).disavb()
-        if os.access(work + "config" + os.sep + "%s_fs_config" % dname, os.F_OK):
+        if os.access(os.path.join(work + "config", "%s_fs_config" % dname), os.F_OK):
             if os.name == 'nt':
                 try:
                     if folder := findfolder(work, "com.google.android.apps.nbu."):
@@ -2011,7 +2011,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         rmdir(findfolder(work, "com.google.android.apps.nbu"))
                 except Exception as e:
                     print(e)
-            fspatch.main(work + dname, work + "config" + os.sep + dname + "_fs_config")
+            fspatch.main(work + dname, os.path.join(work + "config" , dname + "_fs_config"))
             utils.qc(work + "config" + os.sep + dname + "_fs_config")
             contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
             utils.qc(work + "config" + os.sep + dname + "_file_contexts")
