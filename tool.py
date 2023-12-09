@@ -147,7 +147,7 @@ class Tool(Tk):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
 
-        def sdxz(other):
+        def sdxz(o):
             dndfile([filedialog.askopenfilename()])
 
         self.subwin2 = ttk.LabelFrame(self, text=lang.text9)
