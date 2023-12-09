@@ -293,7 +293,7 @@ setfile = os.path.join((elocal := utils.elocal), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
-tool_bin = f"{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}"
+tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + os.sep
 
 
 class ModuleError(Exception):
@@ -2569,9 +2569,6 @@ def packzip():
         if ask_win(lang.t25) == 1:
             dbkxyt()
         zip_file(dn.get() + ".zip", settings.path + os.sep + dn.get())
-
-
-
 
 
 def dndfile(files):
