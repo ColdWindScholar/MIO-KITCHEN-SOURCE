@@ -52,6 +52,29 @@ import yaml
 import opscrypto
 
 
+class json_edit:
+    def __init__(self, j_f):
+        self.file = j_f
+
+    def read(self):
+        if not os.path.exists(self.file):
+            return {}
+        with open(self.file, 'r+', encoding='utf-8') as pf:
+            try:
+                return json.loads(pf.read())
+            except:
+                return {}
+
+    def write(self, data):
+        with open(self.file, 'w+', encoding='utf-8') as pf:
+            json.dump(data, pf, indent=4)
+
+    def edit(self, name, value):
+        data = self.read()
+        data[name] = value
+        self.write(data)
+
+
 class load_car(object):
     gifs = []
 
@@ -212,7 +235,8 @@ class Tool(Tk):
                                                                                                 pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
-              text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!', font=(None, 10)).pack(
+              text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!',
+              font=(None, 10)).pack(
             padx=5, pady=5)
         mpkman()
         self.gifl = Label(self.rzf)
@@ -310,8 +334,7 @@ def load(name):
     elif not os.path.exists(elocal + os.sep + lang_file):
         _lang = json_edit(elocal + os.sep + 'bin/languages/English.json').read()
     else:
-        with open(f'{elocal}{os.sep}{lang_file}', 'r', encoding='utf-8') as f:
-            _lang = json.load(f)
+        _lang = json_edit(f'{elocal}{os.sep}{lang_file}').read()
     [setattr(lang, i, _lang[i]) for i in _lang]
 
 
@@ -2115,29 +2138,6 @@ def script2fs(path):
                 if v not in parts.keys():
                     parts[v] = 'ext'
         json_.write(parts)
-
-
-class json_edit:
-    def __init__(self, j_f):
-        self.file = j_f
-
-    def read(self):
-        if not os.path.exists(self.file):
-            return {}
-        with open(self.file, 'r+', encoding='utf-8') as pf:
-            try:
-                return json.loads(pf.read())
-            except:
-                return {}
-
-    def write(self, data):
-        with open(self.file, 'w+', encoding='utf-8') as pf:
-            json.dump(data, pf, indent=4)
-
-    def edit(self, name, value):
-        data = self.read()
-        data[name] = value
-        self.write(data)
 
 
 @cartoon
