@@ -152,6 +152,8 @@ class Tool(Tk):
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
+        def sdxz(other):
+            dndfile([filedialog.askopenfilename()])
         self.subwin2 = ttk.LabelFrame(self, text=lang.text9)
         self.subwin3 = ttk.LabelFrame(self, text=lang.text10)
         self.subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
@@ -2591,8 +2593,7 @@ def dndfile(files):
             print(fi + lang.text84)
 
 
-def sdxz(other):
-    dndfile([filedialog.askopenfilename()])
+
 
 
 class xmcd(ttk.LabelFrame):
