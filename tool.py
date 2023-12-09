@@ -2239,9 +2239,8 @@ def unpack(chose, form: any = None):
         if not os.path.exists(settings.path + os.sep + dn.get()):
             win.messpop(lang.warn1, "red")
             return False
-    if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
-        json_ = json_edit(work + "config" + os.sep + "parts_info")
-        parts = json_.read()
+    json_ = json_edit((work := rwork()) + "config" + os.sep + "parts_info")
+    parts = json_.read()
     for fd in [f for f in os.listdir(work) if re.search(r'\.new\.dat\.\d+', f)]:
         with open(work + os.path.basename(fd).rsplit('.', 1)[0], 'ab') as ofd:
             for fd1 in sorted(
