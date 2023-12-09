@@ -1987,11 +1987,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         if not os.path.exists(settings.path + os.sep + dn.get()):
             win.messpop(lang.warn1, "red")
             return False
-    if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
-        with open(os.path.join(work + "config", "parts_info"), 'r+', encoding='utf-8') as fff:
-            parts_dict = json.loads(fff.read())
-    else:
-        parts_dict = {}
+    parts_dict = json_edit((work := rwork()) + "config" + os.sep + "parts_info").read()
     for i in parts:
         dname = os.path.basename(i)
         if dname not in parts_dict.keys():
@@ -2032,9 +2028,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         os.remove(work + dname + ".img")
                         os.rename(work + dname + ".simg", work + dname + ".img")
                     if dbgs.get() == 'dat':
-                        datbr(work, dname, "dat")
+                        datbr(work, dname, "dat", int(parts_dict['dat_ver']))
                     elif dbgs.get() == 'br':
-                        datbr(work, dname, scale.get())
+                        datbr(work, dname, scale.get(), int(parts_dict['dat_ver']))
                     else:
                         print(lang.text3.format(dname))
             else:
@@ -2051,9 +2047,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     if dely == 1:
                         rdi(work, dname)
                     if dbgs.get() == "dat":
-                        datbr(work, dname, "dat")
+                        datbr(work, dname, "dat", int(parts_dict['dat_ver']))
                     elif dbgs.get() == "br":
-                        datbr(work, dname, scale.get())
+                        datbr(work, dname, scale.get(), int(parts_dict['dat_ver']))
                     else:
                         print(lang.text3.format(dname))
                 else:
@@ -2450,9 +2446,9 @@ class dirsize(object):
                 ff.write(content)
 
 
-def datbr(work, name, brl: any):
+def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
-    utils.img2sdat(work + name + ".img", work, 4, name)
+    utils.img2sdat(work + name + ".img", work, dat_ver, name)
     if os.access(work + name + ".new.dat", os.F_OK):
         try:
             os.remove(work + name + ".img")
