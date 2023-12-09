@@ -2708,19 +2708,12 @@ class unpack_gui(ttk.LabelFrame):
                                                                    0):
                             self.lsg.insert(END, i.partition_name)
 
-    def rt_info(self):
-        if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
-            with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as fff:
-                return json.loads(fff.read())
-        else:
-            return {}
-
     def refs2(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
             win.messpop(lang.warn1)
             return False
-        parts_dict = self.rt_info()
+        parts_dict = json_edit((work := rwork()) + "config" + os.sep + "parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(END, folder)
