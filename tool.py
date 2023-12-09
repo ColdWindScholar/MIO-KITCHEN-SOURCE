@@ -2283,7 +2283,7 @@ def unpack(chose, form: any = None):
             if os.path.getsize(work + i + ".new.dat") != 0:
                 transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
                 if os.access(transferpath, os.F_OK):
-                    sdat2img(transferpath, work + i + ".new.dat", work + i + ".img")
+                    parts['dat_ver'] = sdat2img(transferpath, work + i + ".new.dat", work + i + ".img").version
                     if os.access(work + i + ".img", os.F_OK):
                         os.remove(work + i + ".new.dat")
                         os.remove(transferpath)

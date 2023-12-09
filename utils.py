@@ -74,6 +74,7 @@ class sdat2img:
         self.list_file = self.parse_transfer_list_file()
         block_size = 4096
         version = next(self.list_file)
+        self.version = version
         next(self.list_file)
         show = "Android {} detected!\n"
         if version == 1:
