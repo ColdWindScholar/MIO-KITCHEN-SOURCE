@@ -2624,7 +2624,7 @@ class xmcd(ttk.LabelFrame):
             win.messpop(lang.warn12)
         else:
             print(lang.text99 % inputvar)
-            os.mkdir(settings.path + os.sep + "%s" % inputvar)
+            os.mkdir(settings.path + os.sep + inputvar)
         self.listdir()
 
 
