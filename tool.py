@@ -1419,7 +1419,7 @@ class Installmpk(Toplevel):
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
         Label(self, image=pyt).pack(padx=10, pady=10)
-        Label(self, text= self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
+        Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
         Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10,
@@ -2121,6 +2121,23 @@ def script2fs(path):
                     parts[v] = 'ext'
         with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
             json.dump(parts, pf, indent=4)
+
+
+class json_edit:
+    def __init__(self, j_f):
+        self.file = j_f
+
+    def read(self):
+        with open(self.file, 'r+', encoding='utf-8') as pf:
+            return json.loads(pf.read())
+
+    def write(self, data):
+        with open(self.file, 'w+', encoding='utf-8') as pf:
+            json.dump(data, pf, indent=4)
+    def edit(self, name, value):
+        data = self.read()
+        data[name] = value
+        self.write(data)
 
 
 @cartoon
