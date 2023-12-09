@@ -2116,8 +2116,7 @@ def script2fs(path):
             if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
                 if v not in parts.keys():
                     parts[v] = 'ext'
-        with open(path + os.sep + "config" + os.sep + "parts_info", 'w+', encoding='utf-8') as pf:
-            json.dump(parts, pf, indent=4)
+        json_.write(parts)
 
 
 class json_edit:
