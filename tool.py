@@ -274,7 +274,7 @@ class Tool(Tk):
         slo = ttk.Label(sf3, textvariable=self.slocal)
         slo.bind('<Button-1>', startwjjj)
         slo.pack(padx=10, pady=10, side='left')
-        ttk.Button(sf3, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
+        ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
         ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
@@ -512,6 +512,13 @@ class set_utils(object):
             load(language.get())
         except Exception as e:
             print(lang.t130, e)
+
+    def modpath(self):
+        if not (folder := filedialog.askdirectory()):
+            return False
+        self.setf("path", folder)
+        win.slocal.set(folder)
+        self.load()
 
 
 settings = set_utils(setfile)
@@ -2564,12 +2571,7 @@ def packzip():
         zip_file(dn.get() + ".zip", settings.path + os.sep + dn.get())
 
 
-def modpath():
-    if not (folder := filedialog.askdirectory()):
-        return False
-    settings.setf("path", folder)
-    win.slocal.set(folder)
-    settings.load()
+
 
 
 def dndfile(files):
