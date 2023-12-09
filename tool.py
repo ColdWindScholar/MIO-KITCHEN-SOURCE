@@ -2240,10 +2240,8 @@ def unpack(chose, form: any = None):
             win.messpop(lang.warn1, "red")
             return False
     if os.path.exists((work := rwork()) + "config" + os.sep + "parts_info"):
-        with open(work + "config" + os.sep + "parts_info", 'r+', encoding='utf-8') as pf:
-            parts = json.loads(pf.read())
-    else:
-        parts = {}
+        json_ = json_edit(work + "config" + os.sep + "parts_info")
+        parts = json_.read()
     for fd in [f for f in os.listdir(work) if re.search(r'\.new\.dat\.\d+', f)]:
         with open(work + os.path.basename(fd).rsplit('.', 1)[0], 'ab') as ofd:
             for fd1 in sorted(
@@ -2363,8 +2361,7 @@ def unpack(chose, form: any = None):
                         win.messpop(lang.warn11.format(i + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
-    with open(work + "config" + os.sep + "parts_info", 'w+', encoding='utf-8', newline='\n') as ff:
-        ff.write(json.dumps(parts))
+    json_.write(parts)
     parts.clear()
     print(lang.text8)
 
