@@ -2011,7 +2011,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                         rmdir(findfolder(work, "com.google.android.apps.nbu"))
                 except Exception as e:
                     print(e)
-            fspatch.main(work + dname, os.path.join(work + "config" , dname + "_fs_config"))
+            fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
             utils.qc(work + "config" + os.sep + dname + "_fs_config")
             contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
             utils.qc(work + "config" + os.sep + dname + "_file_contexts")
@@ -2105,7 +2105,7 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 
 
 def script2fs(path):
-    if os.path.exists(path + os.sep + "system" + os.sep + "app"):
+    if os.path.exists(os.path.join(path, "system", "app")):
         if not os.path.exists(path + os.sep + "config"):
             os.makedirs(path + os.sep + "config")
         extra.script2fs_context(findfile("updater-script", path + os.sep + "META-INF"), path + os.sep + "config", path)
