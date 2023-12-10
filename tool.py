@@ -1001,20 +1001,16 @@ def mpkman() -> None:
     file = StringVar()
 
     def list_pls():
-        try:
-            pls.clean()
-            for i in os.listdir(moduledir):
-                if os.path.isdir(moduledir + os.sep + i):
-                    with open(os.path.join(moduledir, i, "info.json"), 'r', encoding='UTF-8') as f:
-                        data = json.load(f)
-                        icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#4682B4",
-                                        wraplength=70, justify='center')
-                        icon.bind('<Double-Button-1>', mpkrun(data['name']).run)
-                        icon.bind('<Button-3>', mpkrun(data['name']).popup)
-                        pls.add_icon(icon)
-                        globals()[data['name']] = data['identifier']
-        except:
-            return 1
+        pls.clean()
+        for i in os.listdir(moduledir):
+            if os.path.isdir(moduledir + os.sep + i):
+                data = json_edit(os.path.join(moduledir, i, "info.json")).read()
+                icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#4682B4",
+                                wraplength=70, justify='center')
+                icon.bind('<Double-Button-1>', mpkrun(data['name']).run)
+                icon.bind('<Button-3>', mpkrun(data['name']).popup)
+                pls.add_icon(icon)
+                globals()[data['name']] = data['identifier']
 
     class msh_parse(object):
         envs = {'version': settings.version,
@@ -1502,10 +1498,10 @@ class Installmpk(Toplevel):
         for i in self.mconf.items('module'):
             minfo[i[0]] = i[1]
         minfo['depend'] = depends
-        minfo.clear()
         with open(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'), "info.json"),
                   'w') as f:
             json.dump(minfo, f, indent=2)
+        minfo.clear()
         self.state['text'] = lang.text39
         self.installb['text'] = lang.text34
         self.installb.config(state='normal')
