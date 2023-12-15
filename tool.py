@@ -1065,8 +1065,7 @@ def mpkman() -> None:
                         self.envs['result'] = "None"
 
         def sfor(self, vn, vs, do):
-            fgf = ',' if ',' in vs else None
-            for v in vs.split(fgf):
+            for v in vs.split(',' if ',' in vs else None):
                 self.runline(do.replace(f'@{vn}@', v))
 
         def sh(self, cmd):
