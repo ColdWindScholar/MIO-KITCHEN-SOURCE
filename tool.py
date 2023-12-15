@@ -228,9 +228,6 @@ class Tool(Tk):
         sys.stderr = StdoutRedirector(self.show)
         zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
         zyf1.pack(padx=10, pady=10)
-        ttk.Button(zyf1, text=lang.text16, command=lambda: self.notepad.select(self.tab6)).pack(side='left',
-                                                                                                padx=10,
-                                                                                                pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
               text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!',
@@ -329,6 +326,7 @@ class lang:
 
 
 def load(name):
+    global _lang
     lang_file = f'bin/languages/{name}.json'
     if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
         error(1)
