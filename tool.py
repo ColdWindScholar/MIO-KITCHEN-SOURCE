@@ -131,7 +131,7 @@ class load_car:
 cartoon = load_car()
 
 
-class dev_null(object):
+class dev_null:
     def __init__(self):
         pass
 
@@ -483,7 +483,7 @@ def upgrade():
         ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
 
 
-class set_utils(object):
+class set_utils:
     def __init__(self, set_ini):
         self.path = None
         self.barlevel = '0.9'
@@ -1013,7 +1013,7 @@ def mpkman() -> None:
                 pls.add_icon(icon)
                 globals()[data['name']] = data['identifier']
 
-    class msh_parse(object):
+    class msh_parse:
         envs = {'version': settings.version,
                 'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
@@ -1811,7 +1811,7 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
         win.messpop(lang.warn10)
 
 
-class StdoutRedirector(object):
+class StdoutRedirector:
     def __init__(self, text_widget):
         self.text_space = text_widget
 
@@ -2383,7 +2383,7 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     return value.get()
 
 
-class dirsize(object):
+class dirsize:
     # get-command
     # 1 - retun True value of dir size
     # 2 - return Rsize value of dir size
@@ -2535,7 +2535,7 @@ def get_all_file_paths(directory) -> Ellipsis:
             yield os.path.join(root, filename)
 
 
-class zip_file(object):
+class zip_file:
     def __init__(self, file, dst_dir, path=None):
         if not path:
             path = settings.path + os.sep
