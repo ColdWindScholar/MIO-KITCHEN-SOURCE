@@ -183,7 +183,6 @@ class Tool(Tk):
         self.tab3 = ttk.Frame(self.notepad)
         self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
-        self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
         self.notepad.add(self.tab, text=lang.text11)
         self.notepad.add(self.tab2, text=lang.text12)
@@ -191,7 +190,6 @@ class Tool(Tk):
         self.notepad.add(self.tab3, text=lang.text13)
         self.notepad.add(self.tab4, text=lang.text14)
         self.notepad.add(self.tab5, text=lang.text15)
-        self.notepad.add(self.tab6, text=lang.text16)
         self.scrollbar = ttk.Scrollbar(self.tab5, orient=tk.VERTICAL)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas1 = Canvas(self.tab5, yscrollcommand=self.scrollbar.set)
@@ -200,7 +198,6 @@ class Tool(Tk):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
-        self.tab6_n()
         self.setting_tab()
         self.notepad.pack(fill=BOTH)
         self.rzf = ttk.Frame(self.subwin3)
@@ -238,6 +235,7 @@ class Tool(Tk):
               text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!',
               font=(None, 10)).pack(
             padx=5, pady=5)
+        self.tab6_n()
         mpkman()
         self.gifl = Label(self.rzf)
         self.gifl.pack(padx=10, pady=10)
@@ -271,12 +269,14 @@ class Tool(Tk):
         link.pack()
 
     def tab6_n(self):
-        Label(self.tab6,
+        tab = ttk.LabelFrame(self.tab, text=lang.text16)
+        Label(tab,
               text=f"Wechat Pay/微信支付",
               font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
         self.photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
-        Label(self.tab6, image=self.photo).pack(padx=5, pady=5)
-        Label(self.tab6, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+        Label(tab, image=self.photo).pack(padx=5, pady=5)
+        Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+        tab.pack()
 
     def setting_tab(self):
         self.slocal = StringVar()
