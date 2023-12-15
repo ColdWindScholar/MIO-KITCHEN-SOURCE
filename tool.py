@@ -2177,7 +2177,8 @@ def unpackrom(ifile) -> None:
             print(lang.text79 + file_)
             try:
                 fz.extract(fi, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-                os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi), os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
+                if fi != file_:
+                    os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi), os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
             except Exception as e:
                 print(lang.text80 % (file_, e))
                 win.messpop(lang.warn4.format(file_))
