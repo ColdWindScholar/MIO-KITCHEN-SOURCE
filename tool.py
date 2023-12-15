@@ -1103,7 +1103,7 @@ def mpkman() -> None:
             modes = {
                 'exist': lambda var: os.path.exists(var),
                 'equ': lambda var: var.split('--')[0] == var.split('--')[1],
-                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1],
+                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
             }
             if mode[:1] == "!":
                 if not modes[mode](var_):
