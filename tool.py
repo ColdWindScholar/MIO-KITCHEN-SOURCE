@@ -1110,7 +1110,7 @@ def mpkman() -> None:
                 'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
             }
             if mode[:1] == "!":
-                if not modes[mode[:1]](var_):
+                if not modes[mode[1:]](var_):
                     self.runline(other)
             elif modes[mode](var_):
                 self.runline(other)
