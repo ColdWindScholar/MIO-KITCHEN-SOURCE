@@ -1102,14 +1102,13 @@ def mpkman() -> None:
         def sif(self, mode, var_, other):
             modes = {
                 'exist': lambda var: os.path.exists(var),
-                '!exist': lambda var: not os.path.exists(var),
                 'equ': lambda var: var.split('--')[0] == var.split('--')[1],
-                '!equ': lambda var: var.split('--')[0] != var.split('--')[1],
                 'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1],
-                '!gettype': lambda var: gettype(var.split('--')[0]) != var.split('--')[1]
             }
-
-            if modes[mode](var_):
+            if mode[:1] == "!":
+                if not modes[mode](var_):
+                    getattr(self, other.split()[0])(other[other.index(' ') + 1:])
+            elif modes[mode](var_):
                 getattr(self, other.split()[0])(other[other.index(' ') + 1:])
 
     class parse(Toplevel):
