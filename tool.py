@@ -1027,21 +1027,8 @@ def mpkman() -> None:
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
                 for i in shell.readlines():
-                    for key, value in self.envs.items():
-                        i = i.replace('@{}@'.format(key), value).strip()
                     try:
-                        if i[:1] != "#" and i not in ["", '\n']:
-                            if i.split()[0] == "if":
-                                self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
-                            elif i.split()[0] == "for":
-                                self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
-                            else:
-                                if i.split()[0] in self.grammar_words.keys():
-                                    self.envs["result"] = self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
-                                else:
-                                    self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
-                                if not self.envs['result']:
-                                    self.envs['result'] = "None"
+                        self.runline(i)
                     except AttributeError as e:
                         print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
                     except ModuleError as e:
@@ -1061,10 +1048,26 @@ def mpkman() -> None:
                 return 1
             self.envs[vn] = va
 
+        def runline(self, i):
+            for key, value in self.envs.items():
+                i = i.replace('@{}@'.format(key), value).strip()
+            if i[:1] != "#" and i not in ["", '\n']:
+                if i.split()[0] == "if":
+                    self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
+                elif i.split()[0] == "for":
+                    self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
+                else:
+                    if i.split()[0] in self.grammar_words.keys():
+                        self.envs["result"] = self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
+                    else:
+                        self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                    if not self.envs['result']:
+                        self.envs['result'] = "None"
+
         def sfor(self, vn, vs, do):
             fgf = ',' if ',' in vs else None
             for v in vs.split(fgf):
-                getattr(self, (do_ := do.replace(f'@{vn}@', v)).split()[0])(do_[do_.index(' ') + 1:])
+                self.runline(do.replace(f'@{vn}@', v))
 
         def sh(self, cmd):
             with open(file_ := (os.path.join(elocal, "bin", "temp", v_code())), "w",
@@ -1109,9 +1112,9 @@ def mpkman() -> None:
             }
             if mode[:1] == "!":
                 if not modes[mode[:1]](var_):
-                    getattr(self, other.split()[0])(other[other.index(' ') + 1:])
+                    self.runline(other)
             elif modes[mode](var_):
-                getattr(self, other.split()[0])(other[other.index(' ') + 1:])
+                self.runline(other)
 
     class parse(Toplevel):
         gavs = {}
