@@ -52,6 +52,7 @@ import yaml
 import opscrypto
 import images
 
+
 class json_edit:
     def __init__(self, j_f):
         self.file = j_f
@@ -1841,6 +1842,8 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
     except subprocess.CalledProcessError as e:
+        ret = lambda: print(f"Error!{exe}")
+        ret.returncode = 114514
         for i in iter(e.stdout.readline, b""):
             if out == 0:
                 try:
