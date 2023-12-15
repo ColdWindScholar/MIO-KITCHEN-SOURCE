@@ -2174,7 +2174,7 @@ def unpackrom(ifile) -> None:
                 try:
                     file_ = fi.encode('cp437').decode('utf-8')
                 except:
-                    pass
+                    file_ = fi
             print(lang.text79 + file_)
             try:
                 fz.extract(file_, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
