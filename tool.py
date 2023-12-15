@@ -1018,7 +1018,9 @@ def mpkman() -> None:
                 'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
-        grammar_words = {"echo": lambda strings: print(strings)}
+        grammar_words = {"echo": lambda strings: print(strings),
+                         "rmdir": lambda path: rmdir(path.strip()),
+                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True)}
 
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
@@ -1057,10 +1059,6 @@ def mpkman() -> None:
             self.envs[vn] = va
 
         @staticmethod
-        def echo(cmd):
-            print(cmd)
-
-        @staticmethod
         def gettype(file_):
             gettype(file_)
 
@@ -1068,14 +1066,6 @@ def mpkman() -> None:
             fgf = ',' if ',' in vs else None
             for v in vs.split(fgf):
                 getattr(self, (do_ := do.replace(f'@{vn}@', v)).split()[0])(do_[do_.index(' ') + 1:])
-
-        @staticmethod
-        def rmdir(path):
-            rmdir(path.strip())
-
-        @staticmethod
-        def run(cmd):
-            call(exe=str(cmd), kz='N', shstate=True)
 
         def sh(self, cmd):
             with open(file_ := (os.path.join(elocal, "bin", "temp", v_code())), "w",
