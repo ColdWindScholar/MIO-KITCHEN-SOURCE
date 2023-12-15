@@ -1017,8 +1017,8 @@ def mpkman() -> None:
         envs = {'version': settings.version,
                 'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
-                'moddir': moduledir.replace('\\', '/')}
-        state = {"echo_stus": True}
+                'moddir': moduledir.replace('\\', '/'),
+                "echo_stus": "1"}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
                          "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
@@ -1053,7 +1053,7 @@ def mpkman() -> None:
             for key, value in self.envs.items():
                 i = i.replace(f'@{key}@', value).strip()
             if i[:1] not in ["#"] and i not in ["", '\n', "\r\n"]:
-                if self.state['echo_stus'] and i[:1] != "@":
+                if self.envs['echo_stus'] == '1' and i[:1] != "@":
                     print(i.strip())
                 if i[:1] == "@":
                     i = i[1:]
