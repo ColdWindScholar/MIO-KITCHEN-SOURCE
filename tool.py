@@ -521,7 +521,7 @@ class set_utils(object):
         try:
             self.setf("theme", theme.get())
             sv_ttk.set_theme(theme.get())
-            gif = Image.open("bin/images/loading_{}.gif".format(win.LB2.get()))
+            gif = Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get()))))
             cartoon.loadgif(gif)
         except Exception as e:
             win.messpop(lang.text101 % (theme.get(), e))
@@ -2891,7 +2891,7 @@ class format_conversion(Toplevel):
         print(lang.text8)
 
 
-cartoon.loadgif(Image.open("bin/images/loading_%s.gif" % (win.LB2.get())))
+cartoon.loadgif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
 cartoon.init()
 print(lang.text108)
 win.update()
