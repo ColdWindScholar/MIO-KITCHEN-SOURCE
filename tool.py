@@ -1018,6 +1018,7 @@ def mpkman() -> None:
                 'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                 'moddir': moduledir.replace('\\', '/')}
+        grammar_words = {"echo": lambda strings: print(strings)}
 
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
@@ -1032,7 +1033,10 @@ def mpkman() -> None:
                             elif i.split()[0] == "for":
                                 self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
                             else:
-                                getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                                if i.split()[0] in self.grammar_words.keys():
+                                    self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
+                                else:
+                                    getattr(self, i.split()[0])(i[i.index(" ") + 1:])
                     except AttributeError as e:
                         print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
                     except ModuleError as e:
