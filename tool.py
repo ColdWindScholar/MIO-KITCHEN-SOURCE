@@ -1041,7 +1041,7 @@ def mpkman() -> None:
                                 else:
                                     self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
                                 if not self.envs['result']:
-                                    self.envs['result'] = ""
+                                    self.envs['result'] = "None"
                     except AttributeError as e:
                         print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
                     except ModuleError as e:
@@ -1108,7 +1108,7 @@ def mpkman() -> None:
                 'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
             }
             if mode[:1] == "!":
-                if not modes[mode](var_):
+                if not modes[mode[:1]](var_):
                     getattr(self, other.split()[0])(other[other.index(' ') + 1:])
             elif modes[mode](var_):
                 getattr(self, other.split()[0])(other[other.index(' ') + 1:])
