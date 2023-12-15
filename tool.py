@@ -1050,8 +1050,8 @@ def mpkman() -> None:
 
         def runline(self, i):
             for key, value in self.envs.items():
-                i = i.replace('@{}@'.format(key), value).strip()
-            if i[:1] != "#" and i not in ["", '\n']:
+                i = i.replace(f'@{key}@', value).strip()
+            if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
                 if i.split()[0] == "if":
                     self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
                 elif i.split()[0] == "for":
