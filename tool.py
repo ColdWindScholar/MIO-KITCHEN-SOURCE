@@ -1040,6 +1040,8 @@ def mpkman() -> None:
                                     self.envs["result"] = self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
                                 else:
                                     self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                                if not self.envs['result']:
+                                    self.envs['result'] = ""
                     except AttributeError as e:
                         print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
                     except ModuleError as e:
