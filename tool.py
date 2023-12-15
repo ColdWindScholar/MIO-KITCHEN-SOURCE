@@ -1020,7 +1020,8 @@ def mpkman() -> None:
                 'moddir': moduledir.replace('\\', '/')}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
-                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True)}
+                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
+                         'gettype': lambda file_: gettype(file_)}
 
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
@@ -1036,9 +1037,9 @@ def mpkman() -> None:
                                 self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
                             else:
                                 if i.split()[0] in self.grammar_words.keys():
-                                    self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
+                                    self.envs["result"] = self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
                                 else:
-                                    getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                                    self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
                     except AttributeError as e:
                         print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
                     except ModuleError as e:
@@ -1057,10 +1058,6 @@ def mpkman() -> None:
                 print("赋值异常：%s\n语句：%s" % (e, cmd))
                 return 1
             self.envs[vn] = va
-
-        @staticmethod
-        def gettype(file_):
-            gettype(file_)
 
         def sfor(self, vn, vs, do):
             fgf = ',' if ',' in vs else None
