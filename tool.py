@@ -2194,6 +2194,7 @@ def unpackrom(ifile) -> None:
             unpackg.refs()
         except:
             pass
+        fz.close()
         return
     elif ftype != 'unknow':
         folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
