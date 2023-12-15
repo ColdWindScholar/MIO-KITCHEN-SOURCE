@@ -223,7 +223,6 @@ class Tool(Tk):
         ttk.Button(self.rzf, text=lang.text106, command=lambda: self.putlog()).pack(side='bottom', padx=10, pady=5,
                                                                                     expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
-        # 项目列表的控件
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show)
         zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
@@ -2177,7 +2176,8 @@ def unpackrom(ifile) -> None:
                     file_ = fi
             print(lang.text79 + file_)
             try:
-                fz.extract(file_, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+                fz.extract(fi, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+                os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi), os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
             except Exception as e:
                 print(lang.text80 % (file_, e))
                 win.messpop(lang.warn4.format(file_))
