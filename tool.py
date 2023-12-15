@@ -1828,7 +1828,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
         conf = subprocess.CREATE_NO_WINDOW
     else:
         if sp == 0:
-            cmd = cmd.split()
+            cmd = shlex.split(cmd)
         conf = 0
     try:
         ret = subprocess.Popen(cmd, shell=shstate, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
