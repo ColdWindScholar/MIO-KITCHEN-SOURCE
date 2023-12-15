@@ -1137,21 +1137,19 @@ def mpkman() -> None:
                     print(lang.text27, cmd)
 
             def generate_sh():
-                sh_content = ""
-                for va in self.value:
-                    if gva := self.gavs[va].get():
-                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
-                            if os.sep in gva:
-                                gva = gva.replace(os.sep, '/')
-                        sh_content += f"export {va}='{gva}'\n"
-                    else:
-                        continue
                 temp = os.path.join(elocal, "bin", "temp") + os.sep
                 if not os.path.exists(temp):
                     re_folder(temp)
                 file.set(str(temp) + v_code())
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                    f.write(sh_content)
+                    for va in self.value:
+                        if gva := self.gavs[va].get():
+                            if gva is str and os.path.isabs(gva) and os.name == 'nt':
+                                if os.sep in gva:
+                                    gva = gva.replace(os.sep, '/')
+                            f.write(f"export {va}='{gva}'\n")
+                        else:
+                            continue
                     f.write('export version={}\n'.format(settings.version))
                     f.write('export tool_bin={}\n'.format(tool_bin.replace('\\', '/')))
                     f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
