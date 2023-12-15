@@ -50,7 +50,7 @@ import ofp_mtk_decrypt
 import editor
 import yaml
 import opscrypto
-
+import images
 
 class json_edit:
     def __init__(self, j_f):
@@ -148,8 +148,8 @@ class Tool(Tk):
         self.title('MIO-KITCHEN')
         if os.name != "posix":
             self.iconphoto(True,
-                           tk.PhotoImage(
-                               file=os.path.join(os.getcwd(), "bin", "images", "icon.png")))
+                           PhotoImage(
+                               data=images.icon_byte))
         sys.stdout = dev_null()
 
     def putlog(self):
@@ -273,7 +273,7 @@ class Tool(Tk):
         Label(tab,
               text=f"Wechat Pay/微信支付",
               font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
-        self.photo = ImageTk.PhotoImage(Image.open('bin/images/wechat.gif'))
+        self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
         Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
         tab.pack()
@@ -1433,9 +1433,9 @@ class Installmpk(Toplevel):
                         pyt = ImageTk.PhotoImage(Image.open(BytesIO(myfi.read())))
                     except Exception as e:
                         print(e)
-                        pyt = ImageTk.PhotoImage(Image.open(elocal + os.sep + "images" + os.sep + "none"))
+                        pyt = ImageTk.PhotoImage(data=images.none_byte)
             except:
-                pyt = ImageTk.PhotoImage(Image.open(os.path.join(elocal, "bin", "images", "none")))
+                pyt = ImageTk.PhotoImage(data=images.none_byte)
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
                 self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
