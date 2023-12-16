@@ -14,84 +14,78 @@ import sys
 from os import makedirs, name, sep, path
 
 
-class extract(object):
-    def __init__(self, source, flist):
+def extract(source, flist):
+    bytenum = 4
+    outdir = 'output'
+    img_files = []
 
-        bytenum = 4
-        outdir = 'output'
-        img_files = []
+    try:
+        makedirs(outdir)
+    except:
+        pass
 
-        try:
-            makedirs(outdir)
-        except:
-            pass
+    with open(source, 'rb') as f:
+        while True:
+            i = f.read(bytenum)
 
-        py2 = None
-        if sys.version_info.major < 3:
-            py2 = 1
+            if not i:
+                break
+            elif i != b'\x55\xAA\x5A\xA5':
+                continue
 
-        with open(source, 'rb') as f:
-            while True:
-                i = f.read(bytenum)
+            headersize = list(unpack('<L', f.read(bytenum)))[0]
+            f.seek(16, 1)
+            filesize = list(unpack('<L', f.read(bytenum)))[0]
+            f.seek(32, 1)
 
-                if not i:
-                    break
-                elif i != b'\x55\xAA\x5A\xA5':
-                    continue
+            try:
+                filename = str(f.read(16).decode())
+                filename = ''.join(f for f in filename if f in printable).lower()
+            except:
+                filename = ''
 
-                headersize = list(unpack('<L', f.read(bytenum)))[0]
-                f.seek(16, 1)
-                filesize = list(unpack('<L', f.read(bytenum)))[0]
-                f.seek(32, 1)
+            f.seek(22, 1)
+            crcdata = f.read(headersize - 98)
+
+            if not flist or filename in flist:
+                if filename in img_files:
+                    filename = filename + '_2'
+
+                print(f'Extracting {filename}.img ...')
+
+                chunk = 10240
 
                 try:
-                    filename = str(f.read(16).decode())
-                    filename = ''.join(f for f in filename if f in printable).lower()
-                except:
-                    filename = ''
+                    with open(outdir + sep + filename + '.img', 'wb') as o:
+                        while filesize > 0:
+                            if chunk > filesize:
+                                chunk = filesize
 
-                f.seek(22, 1)
-                crcdata = f.read(headersize - 98)
+                            o.write(f.read(chunk))
+                            filesize -= chunk
+                except Exception as e:
+                    print('ERROR: Failed to create ' + filename + '.img:%s\n' % e)
+                    return
 
-                if not flist or filename in flist:
-                    if filename in img_files:
-                        filename = filename + '_2'
+                img_files.append(filename)
 
-                    print(f'Extracting {filename}.img ...')
+                if name != 'nt':
+                    if path.isfile('crc'):
+                        print('Calculating crc value for ' + filename + '.img ...\n')
 
-                    chunk = 10240
+                        crc_val = []
+                        if sys.version_info.major < 3:
+                            for i in crcdata:
+                                crc_val.append('%02X' % int(i))
+                        else:
+                            for i in crcdata:
+                                crc_val.append('%02X' % i)
 
-                    try:
-                        with open(outdir + sep + filename + '.img', 'wb') as o:
-                            while filesize > 0:
-                                if chunk > filesize:
-                                    chunk = filesize
+            else:
+                f.seek(filesize, 1)
 
-                                o.write(f.read(chunk))
-                                filesize -= chunk
-                    except Exception as e:
-                        print('ERROR: Failed to create ' + filename + '.img:%s\n' % e)
-                        return
+            xbytes = bytenum - f.tell() % bytenum
+            if xbytes < bytenum:
+                f.seek(xbytes, 1)
 
-                    img_files.append(filename)
-
-                    if name != 'nt':
-                        if path.isfile('crc'):
-                            print('Calculating crc value for ' + filename + '.img ...\n')
-
-                            crc_val = []
-                            if py2:
-                                for i in crcdata:
-                                    crc_val.append('%02X' % int(i))
-                            else:
-                                for i in crcdata:
-                                    crc_val.append('%02X' % i)
-
-                else:
-                    f.seek(filesize, 1)
-
-                xbytes = bytenum - f.tell() % bytenum
-                if xbytes < bytenum:
-                    f.seek(xbytes, 1)
-
-        print('\nExtraction complete')
+    print('\nExtraction complete')
