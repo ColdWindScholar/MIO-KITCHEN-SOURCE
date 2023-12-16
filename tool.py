@@ -1932,7 +1932,7 @@ def jboot(bn: str = 'boot'):
             os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
         os.chdir(work + f"{bn}" + os.sep)
         print("Unpacking Ramdisk...")
-        call("cpio -d --no-absolute-filenames -F %s -i -D %s" % ("ramdisk.cpio", "ramdisk"))
+        call("cpio -i -d -F %s -D %s" % ("ramdisk.cpio", "ramdisk"))
         os.chdir(elocal)
     else:
         print("Unpack Done!")
@@ -1953,7 +1953,7 @@ def dboot(nm: str = 'boot'):
 
     if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
         os.chdir(work + f"{nm}" + os.sep + "ramdisk")
-        call(exe="busybox ash -c \"find . | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
+        call(exe="busybox ash -c \"find | sed 1d | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
         os.chdir(work + f"{nm}" + os.sep)
         with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
