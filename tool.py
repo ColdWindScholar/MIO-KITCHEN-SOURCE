@@ -774,21 +774,9 @@ class Process(Toplevel):
 
     def use(self, step):
         def download(url):
-            start_time = time.time()
             try:
-                response = requests.Session().head(url)
-                file_size = int(response.headers.get("Content-Length", 0))
-                response = requests.Session().get(url, stream=True, verify=False)
-                with open(self.dir + os.sep + os.path.basename(url), "wb") as f:
-                    chunk_size = 2048576
-                    bytes_downloaded = 0
-                    for data in response.iter_content(chunk_size=chunk_size):
-                        f.write(data)
-                        bytes_downloaded += len(data)
-                        elapsed = time.time() - start_time
-                        speed = bytes_downloaded / (1024 * elapsed)
-                        percentage = int(bytes_downloaded * 100 / file_size)
-                        print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
+                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
+                    print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
             except:
                 self.error = 0
             else:
