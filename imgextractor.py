@@ -247,57 +247,27 @@ class Extractor(object):
                         else:
                             self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                     else:
-                        if cap == '':
-                            tmppath = self.DIR + entry_inode_path
-                            if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                if not os.path.isfile(spaces_file):
-                                    f = open(spaces_file, 'tw', encoding='utf-8')
-                                    self.__appendf(tmppath, spaces_file)
-                                    f.close()
-                                else:
-                                    self.__appendf(tmppath, spaces_file)
-                                tmppath = tmppath.replace(' ', '_')
-                                self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                        tmppath = self.DIR + entry_inode_path
+                        if tmppath.find(' ', 1, len(tmppath)) > 0:
+                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
+                            if not os.path.isfile(spaces_file):
+                                f = open(spaces_file, 'tw', encoding='utf-8')
+                                self.__appendf(tmppath, spaces_file)
+                                f.close()
                             else:
-                                self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                                self.__appendf(tmppath, spaces_file)
+                            tmppath = tmppath.replace(' ', '_')
+                            self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                        else:
+                            self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                        if cap == '':
                             for fuk_symb in fuking_symbols:
                                 tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                             self.context.append('/%s %s' % (tmppath, con))
-                        else:
-                            if con == '':
-                                tmppath = self.DIR + entry_inode_path
-                                if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                    spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                    if not os.path.isfile(spaces_file):
-                                        f = open(spaces_file, 'tw', encoding='utf-8')
-                                        self.__appendf(tmppath, spaces_file)
-                                        f.close()
-                                    else:
-                                        self.__appendf(tmppath, spaces_file)
-                                    tmppath = tmppath.replace(' ', '_')
-                                    self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode + cap))
-                                else:
-                                    self.fsconfig.append(
-                                        '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
-                            else:
-                                tmppath = self.DIR + entry_inode_path
-                                if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                    spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                    if not os.path.isfile(spaces_file):
-                                        f = open(spaces_file, 'tw', encoding='utf-8')
-                                        self.__appendf(tmppath, spaces_file)
-                                        f.close()
-                                    else:
-                                        self.__appendf(tmppath, spaces_file)
-                                    tmppath = tmppath.replace(' ', '_')
-                                    self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode + cap))
-                                else:
-                                    self.fsconfig.append(
-                                        '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
-                                for fuk_symb in fuking_symbols:
-                                    tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                                self.context.append('/%s %s' % (tmppath, con))
+                        elif con:
+                            for fuk_symb in fuking_symbols:
+                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                            self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
@@ -339,9 +309,9 @@ class Extractor(object):
                                     tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                                 self.context.append('/%s %s' % (tmppath, con))
                             elif con:
-                                    for fuk_symb in fuking_symbols:
-                                        tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                                    self.context.append('/%s %s' % (tmppath, con))
+                                for fuk_symb in fuking_symbols:
+                                    tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                                self.context.append('/%s %s' % (tmppath, con))
                         if os.path.islink(target):
                             try:
                                 os.remove(target)
@@ -362,7 +332,8 @@ class Extractor(object):
                                 out.write(tmp + struct.pack('xx'))
                                 if os.name == 'nt':
                                     try:
-                                        windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                        windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
+                                                                           DWORD(FILE_ATTRIBUTE_SYSTEM))
                                     except Exception as e:
                                         print(e.__str__())
                         if not all(c in string.printable for c in link_target):
@@ -414,7 +385,7 @@ class Extractor(object):
                                             tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                                         self.context.append('/%s %s' % (tmppath, con))
                                     else:
-                                        #Good Codes
+                                        # Good Codes
                                         tmppath = self.DIR + entry_inode_path
                                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                                         if tmppath.find(' ', 1, len(tmppath)) > 0:
