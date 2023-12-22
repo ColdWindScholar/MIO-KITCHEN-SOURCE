@@ -1068,7 +1068,7 @@ def mpkman() -> None:
                       encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
-                    f.write(f'export {i}={self.envs[i]}\n')
+                    f.write(f'export {i}="{self.envs[i]}"\n')
                 f.write("source $1")
             if os.path.exists(file_):
                 sh = "ash" if os.name == 'posix' else "bash"
