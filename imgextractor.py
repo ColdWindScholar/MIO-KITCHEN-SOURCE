@@ -148,72 +148,25 @@ class Extractor(object):
                         os.chmod(dir_target, int(mode, 8))
                         os.chown(dir_target, uid, gid)
                     scan_dir(entry_inode, entry_inode_path)
-                    if cap == '' and con == '':
-                        tmppath = self.DIR + entry_inode_path
-                        if tmppath.find(' ', 1, len(tmppath)) > 0:
-                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                            if not os.path.isfile(spaces_file):
-                                f = open(spaces_file, 'tw', encoding='utf-8')
-                                self.__appendf(tmppath, spaces_file)
-                                f.close()
-                            else:
-                                self.__appendf(tmppath, spaces_file)
-                            tmppath = tmppath.replace(' ', '_')
-                            self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                    tmppath = self.DIR + entry_inode_path
+                    if tmppath.find(' ', 1, len(tmppath)) > 0:
+                        spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
+                        if not os.path.isfile(spaces_file):
+                            f = open(spaces_file, 'tw', encoding='utf-8')
+                            self.__appendf(tmppath, spaces_file)
+                            f.close()
                         else:
-                            self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                            self.__appendf(tmppath, spaces_file)
+                        tmppath = tmppath.replace(' ', '_')
+                        self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                     else:
-                        if cap == '':
-                            tmppath = self.DIR + entry_inode_path
-                            if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                if not os.path.isfile(spaces_file):
-                                    f = open(spaces_file, 'tw', encoding='utf-8')
-                                    self.__appendf(tmppath, spaces_file)
-                                    f.close()
-                                else:
-                                    self.__appendf(tmppath, spaces_file)
-                                tmppath = tmppath.replace(' ', '_')
-                                self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
-                            else:
-                                self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
-                            for fuk_symb in fuking_symbols:
-                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                            self.context.append('/%s %s' % (tmppath, con))
-                        else:
-                            if con == '':
-                                tmppath = self.DIR + entry_inode_path
-                                if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                    spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                    if not os.path.isfile(spaces_file):
-                                        f = open(spaces_file, 'tw', encoding='utf-8')
-                                        self.__appendf(tmppath, spaces_file)
-                                        f.close()
-                                    else:
-                                        self.__appendf(tmppath, spaces_file)
-                                    tmppath = tmppath.replace(' ', '_')
-                                    self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode + cap))
-                                else:
-                                    self.fsconfig.append(
-                                        '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
-                            else:
-                                tmppath = self.DIR + entry_inode_path
-                                if tmppath.find(' ', 1, len(tmppath)) > 0:
-                                    spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                                    if not os.path.isfile(spaces_file):
-                                        f = open(spaces_file, 'tw', encoding='utf-8')
-                                        self.__appendf(tmppath, spaces_file)
-                                        f.close()
-                                    else:
-                                        self.__appendf(tmppath, spaces_file)
-                                    tmppath = tmppath.replace(' ', '_')
-                                    self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode + cap))
-                                else:
-                                    self.fsconfig.append(
-                                        '%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode + cap))
-                                for fuk_symb in fuking_symbols:
-                                    tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                                self.context.append('/%s %s' % (tmppath, con))
+                        self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                    if cap == '' and con == '':
+                        pass
+                    else:
+                        for fuk_symb in fuking_symbols:
+                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                        self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_file:
                     if os.name == 'nt':
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace('/', os.sep).replace(' ',
