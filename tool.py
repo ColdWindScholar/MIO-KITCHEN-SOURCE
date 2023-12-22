@@ -1009,8 +1009,7 @@ def mpkman() -> None:
         envs = {'version': settings.version,
                 'tool_bin': tool_bin.replace('\\', '/'),
                 'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
-                'moddir': moduledir.replace('\\', '/'),
-                "echo_stus": "Y"}
+                'moddir': moduledir.replace('\\', '/')}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
                          "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
