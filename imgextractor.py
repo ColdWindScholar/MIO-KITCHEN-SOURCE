@@ -163,7 +163,7 @@ class Extractor(object):
                         self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                     if cap == '' and con == '':
                         pass
-                    else:
+                    elif cap == '' or con:
                         for fuk_symb in fuking_symbols:
                             tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                         self.context.append('/%s %s' % (tmppath, con))
@@ -200,7 +200,7 @@ class Extractor(object):
                         self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                     if cap == '' and con == '':
                         pass
-                    else:
+                    elif cap == '' or con:
                         for fuk_symb in fuking_symbols:
                             tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                         self.context.append('/%s %s' % (tmppath, con))
@@ -224,11 +224,10 @@ class Extractor(object):
                                 '%s %s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode, link_target))
                         if cap == '' and con == '':
                             pass
-                        else:
-                            if cap == '' or con:
-                                for fuk_symb in fuking_symbols:
-                                    tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                                self.context.append('/%s %s' % (tmppath, con))
+                        elif cap == '' or con:
+                            for fuk_symb in fuking_symbols:
+                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                            self.context.append('/%s %s' % (tmppath, con))
                         if os.path.islink(target):
                             try:
                                 os.remove(target)
