@@ -232,34 +232,22 @@ class Extractor(object):
                         if os.geteuid() == 0:
                             os.chmod(file_target, int(mode, 8))
                             os.chown(file_target, uid, gid)
-                    if cap == '' and con == '':
-                        tmppath = self.DIR + entry_inode_path
-                        if tmppath.find(' ', 1, len(tmppath)) > 0:
-                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                            if not os.path.isfile(spaces_file):
-                                f = open(spaces_file, 'tw', encoding='utf-8')
-                                self.__appendf(tmppath, spaces_file)
-                                f.close()
-                            else:
-                                self.__appendf(tmppath, spaces_file)
-                            tmppath = tmppath.replace(' ', '_')
-                            self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                    tmppath = self.DIR + entry_inode_path
+                    if tmppath.find(' ', 1, len(tmppath)) > 0:
+                        spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
+                        if not os.path.isfile(spaces_file):
+                            f = open(spaces_file, 'tw', encoding='utf-8')
+                            self.__appendf(tmppath, spaces_file)
+                            f.close()
                         else:
-                            self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                            self.__appendf(tmppath, spaces_file)
+                        tmppath = tmppath.replace(' ', '_')
+                        self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                     else:
-                        tmppath = self.DIR + entry_inode_path
-                        if tmppath.find(' ', 1, len(tmppath)) > 0:
-                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
-                            if not os.path.isfile(spaces_file):
-                                f = open(spaces_file, 'tw', encoding='utf-8')
-                                self.__appendf(tmppath, spaces_file)
-                                f.close()
-                            else:
-                                self.__appendf(tmppath, spaces_file)
-                            tmppath = tmppath.replace(' ', '_')
-                            self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
-                        else:
-                            self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                        self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                    if cap == '' and con == '':
+                        pass
+                    else:
                         if cap == '':
                             for fuk_symb in fuking_symbols:
                                 tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
