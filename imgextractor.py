@@ -248,14 +248,9 @@ class Extractor(object):
                     if cap == '' and con == '':
                         pass
                     else:
-                        if cap == '':
-                            for fuk_symb in fuking_symbols:
-                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                            self.context.append('/%s %s' % (tmppath, con))
-                        elif con:
-                            for fuk_symb in fuking_symbols:
-                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                            self.context.append('/%s %s' % (tmppath, con))
+                        for fuk_symb in fuking_symbols:
+                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                        self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
