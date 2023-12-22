@@ -841,10 +841,10 @@ class IconGrid(tk.Frame):
         # Bind mouse wheel event to scrollbar
         self.master.bind_all("<MouseWheel>", self.on_mousewheel)
 
-    def add_icon(self, icon):
+    def add_icon(self, icon, num=4):
         self.icons.append(icon)
-        row = (len(self.icons) - 1) // 4
-        col = (len(self.icons) - 1) % 4
+        row = (len(self.icons) - 1) // num
+        col = (len(self.icons) - 1) % num
         icon.grid(row=row, column=col, padx=10, pady=10)
 
     def clean(self):
@@ -873,23 +873,26 @@ def mpkman() -> None:
             self.title(lang.text115)
             self.gui()
 
+        def labelEntry(self, master, text, side):
+            frame = Frame(master)
+            ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
+            entry = ttk.Entry(frame)
+            entry.pack(padx=5, pady=5, side=LEFT)
+            frame.pack(padx=5, pady=5, fill=X, side=side)
+            return entry
+
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            f1 = ttk.Frame(self)
-            ttk.Label(f1, text=lang.t20).pack(side=LEFT, padx=5, pady=5)
-            self.name = ttk.Entry(f1)
-            self.name.pack(padx=5, pady=5, side=LEFT)
-            f1.pack(padx=5, pady=5, fill=X)
-            ttk.Label(f1, text=lang.t21).pack(side=LEFT, padx=5, pady=5)
-            self.aou = ttk.Entry(f1)
-            self.aou.pack(padx=5, pady=5, side=LEFT)
-            ttk.Label(f1, text=lang.t22).pack(side=LEFT, padx=5, pady=5)
-            self.ver = ttk.Entry(f1)
-            self.ver.pack(padx=5, pady=5, side=LEFT)
-            ttk.Label(f1, text=lang.t23).pack(side=LEFT, padx=5, pady=5)
-            self.dep = ttk.Entry(f1)
-            self.dep.pack(padx=5, pady=5, side=LEFT)
+            #
+            self.name = self.labelEntry(self, lang.t20, TOP)
+            #
+            self.aou = self.labelEntry(self, lang.t21, TOP)
+            #
+            self.ver = self.labelEntry(self, lang.t22, TOP)
+            #
+            self.dep =  self.labelEntry(self, lang.t23, TOP)
+            #
             ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
             self.intro = Text(self)
             self.intro.pack(fill=BOTH, padx=5, pady=5, expand=1)
