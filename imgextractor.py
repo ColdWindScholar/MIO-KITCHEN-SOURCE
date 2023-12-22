@@ -197,7 +197,7 @@ class Extractor(object):
                         self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                     else:
                         self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
-                    if cap == '' and con == '':
+                    if not cap and not con:
                         pass
                     elif cap == '' or con:
                         for fuk_symb in fuking_symbols:
