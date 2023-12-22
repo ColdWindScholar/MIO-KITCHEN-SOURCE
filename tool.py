@@ -167,6 +167,13 @@ class Tool(Tk):
     def messpop(self, message, color='orange') -> None:
         self.tsk.config(text=message, bg=color)
 
+    def getframe(self, title):
+        frame = ttk.LabelFrame(self.frame_bg, text=title)
+        frame.pack(padx=10, pady=10)
+        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
+        self.upjdt()
+        return frame
+
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -1850,8 +1857,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
 
 def download_file():
     var1 = IntVar()
-    down = Toplevel()
-    down.title(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
+    down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     win.messpop(lang.text62, "green")
     progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
@@ -1953,7 +1959,8 @@ def dboot(nm: str = 'boot'):
 
     if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
         os.chdir(work + f"{nm}" + os.sep + "ramdisk")
-        call(exe="busybox ash -c \"find | sed 1d | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1, shstate=True)
+        call(exe="busybox ash -c \"find | sed 1d | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1,
+             shstate=True)
         os.chdir(work + f"{nm}" + os.sep)
         with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
@@ -2178,7 +2185,8 @@ def unpackrom(ifile) -> None:
             try:
                 fz.extract(fi, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
                 if fi != file_:
-                    os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi), os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
+                    os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi),
+                              os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
             except Exception as e:
                 print(lang.text80 % (file_, e))
                 win.messpop(lang.warn4.format(file_))
