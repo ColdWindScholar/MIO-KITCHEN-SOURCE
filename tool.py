@@ -1855,6 +1855,23 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
     return ret.returncode
 
 
+def download_api(url, path=None):
+    start_time = time.time()
+    response = requests.Session().head(url)
+    file_size = int(response.headers.get("Content-Length", 0))
+    response = requests.Session().get(url, stream=True, verify=False)
+    with open((settings.path if path is None else path) + os.sep + os.path.basename(url), "wb") as f:
+        chunk_size = 2048576
+        bytes_downloaded = 0
+        for data in response.iter_content(chunk_size=chunk_size):
+            f.write(data)
+            bytes_downloaded += len(data)
+            elapsed = time.time() - start_time
+            speed = bytes_downloaded / (1024 * elapsed)
+            percentage = int(bytes_downloaded * 100 / file_size)
+            yield percentage, speed, bytes_downloaded, file_size, elapsed
+
+
 def download_file():
     var1 = IntVar()
     down = win.getframe(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
@@ -1867,21 +1884,10 @@ def download_file():
     c1.pack(padx=10, pady=10)
     start_time = time.time()
     try:
-        response = requests.Session().head(url)
-        file_size = int(response.headers.get("Content-Length", 0))
-        response = requests.Session().get(url, stream=True, verify=False)
-        with open(settings.path + os.sep + os.path.basename(url), "wb") as f:
-            chunk_size = 2048576
-            bytes_downloaded = 0
-            for data in response.iter_content(chunk_size=chunk_size):
-                f.write(data)
-                bytes_downloaded += len(data)
-                elapsed = time.time() - start_time
-                speed = bytes_downloaded / (1024 * elapsed)
-                percentage = int(bytes_downloaded * 100 / file_size)
-                progressbar["value"] = percentage
-                jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
-                progressbar.update()
+        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
+            progressbar["value"] = percentage
+            jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
+            progressbar.update()
         print(lang.text65.format(os.path.basename(url), str(elapsed)))
         down.destroy()
         if var1.get() == 1:
