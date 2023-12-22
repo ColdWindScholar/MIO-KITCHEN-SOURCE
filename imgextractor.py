@@ -128,6 +128,7 @@ class Extractor(object):
                 gid = entry_inode.inode.i_gid
                 con = ''
                 cap = ''
+                tmppath = self.DIR + entry_inode_path
                 for i in list(entry_inode.xattrs()):
                     if i[0] == 'security.selinux':
                         con = i[1].decode('utf8')[:-1]
@@ -148,7 +149,6 @@ class Extractor(object):
                         os.chmod(dir_target, int(mode, 8))
                         os.chown(dir_target, uid, gid)
                     scan_dir(entry_inode, entry_inode_path)
-                    tmppath = self.DIR + entry_inode_path
                     if tmppath.find(' ', 1, len(tmppath)) > 0:
                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                         if not os.path.isfile(spaces_file):
@@ -185,7 +185,6 @@ class Extractor(object):
                         if os.geteuid() == 0:
                             os.chmod(file_target, int(mode, 8))
                             os.chown(file_target, uid, gid)
-                    tmppath = self.DIR + entry_inode_path
                     if tmppath.find(' ', 1, len(tmppath)) > 0:
                         spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                         if not os.path.isfile(spaces_file):
@@ -208,7 +207,6 @@ class Extractor(object):
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
-                        tmppath = self.DIR + entry_inode_path
                         if tmppath.find(' ', 1, len(tmppath)) > 0:
                             spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                             if not os.path.isfile(spaces_file):
