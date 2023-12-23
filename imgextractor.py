@@ -240,11 +240,10 @@ class Extractor(object):
             self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             root = ext4.Volume(file).root
-            dirlist = []
             for file_name, inode_idx, file_type in root.open_dir():
-                dirlist.append(file_name)
+                ...
             dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
-            setattr(self, 'DIR', dir_r)
+            self.DIR = dir_r
             scan_dir(root)
             if dir_r == 'vendor':
                 self.fs_config.insert(0, '/ 0 2000 0755')
