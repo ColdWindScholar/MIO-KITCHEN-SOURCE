@@ -1,7 +1,6 @@
 import mmap
 import os
 import re
-import shutil
 import struct
 
 if os.name == 'nt':
@@ -9,7 +8,6 @@ if os.name == 'nt':
     from ctypes.wintypes import DWORD
     from stat import FILE_ATTRIBUTE_SYSTEM
     from ctypes import windll
-import traceback
 from timeit import default_timer as dti
 from collections import deque
 
