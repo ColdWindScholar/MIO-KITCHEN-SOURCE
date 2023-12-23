@@ -150,6 +150,11 @@ class Extractor(object):
                     self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                 else:
                     self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                if not cap:
+                    if con:
+                        for fuk_symb in fuking_symbols:
+                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                        self.context.append('/%s %s' % (tmppath, con))
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if dir_target.endswith('.') and os.name == 'nt':
@@ -160,11 +165,6 @@ class Extractor(object):
                         os.chmod(dir_target, int(mode, 8))
                         os.chown(dir_target, uid, gid)
                     scan_dir(entry_inode, entry_inode_path)
-                    if not cap:
-                        if con:
-                            for fuk_symb in fuking_symbols:
-                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                            self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_file:
                     if os.name == 'nt':
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace('/', os.sep).replace(' ',
@@ -183,22 +183,10 @@ class Extractor(object):
                         if os.geteuid() == 0:
                             os.chmod(file_target, int(mode, 8))
                             os.chown(file_target, uid, gid)
-                    if not cap and not con:
-                        ...
-                    elif cap == '' or con:
-                        for fuk_symb in fuking_symbols:
-                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                        self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
-                        if cap == '' and con == '':
-                            ...
-                        elif cap == '' or con:
-                            for fuk_symb in fuking_symbols:
-                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                            self.context.append('/%s %s' % (tmppath, con))
                         if os.path.islink(target):
                             try:
                                 os.remove(target)
@@ -236,12 +224,6 @@ class Extractor(object):
                                                                  entry_inode.inode.i_size).decode("utf8")
                             target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                             if link_target and all(c in string.printable for c in link_target):
-                                if cap == '' and con == '':
-                                    ...
-                                elif cap == '' or con:
-                                    for fuk_symb in fuking_symbols:
-                                        tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                                    self.context.append('/%s %s' % (tmppath, con))
                                 if os.name == 'posix':
                                     os.symlink(link_target, target)
                                 if os.name == 'nt':
