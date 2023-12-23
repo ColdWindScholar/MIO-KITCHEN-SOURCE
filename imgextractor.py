@@ -42,6 +42,10 @@ class ext4_chunk_header(object):
 
 class Extractor(object):
     def __init__(self):
+        self.CONFING_DIR = None
+        self.MYFileName = None
+        self.OUTPUT_MYIMAGE_FILE = None
+        self.BASE_DIR_ = None
         self.sign_offset = None
         self.DIR = None
         self.FileName = ""
@@ -138,7 +142,7 @@ class Extractor(object):
                 con = ''
                 cap = ''
                 tmppath = self.DIR + entry_inode_path
-                spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
+                spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for i in list(entry_inode.xattrs()):
                     if i[0] == 'security.selinux':
                         con = i[1].decode('utf8')[:-1]
@@ -373,7 +377,7 @@ class Extractor(object):
 
     def main(self, target, output_dir, work):
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
-        self.BASE_MYDIR = output_dir + os.sep
+        self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))  # output_dir
         self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
