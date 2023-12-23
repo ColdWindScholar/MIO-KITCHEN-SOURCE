@@ -39,6 +39,7 @@ class ext4_chunk_header(object):
 
 class Extractor(object):
     def __init__(self):
+        self.sign_offset = None
         self.symlinks = deque()
         self.DIR = None
         self.FileName = ""
@@ -83,21 +84,39 @@ class Extractor(object):
             arg = arg[1:]
         oor, ow, ox, gr, gw, gx, wr, ww, wx = list(arg)
         o, g, w, s = 0, 0, 0, 0
-        if oor == 'r': o += 4
-        if ow == 'w': o += 2
-        if ox == 'x': o += 1
-        if ox == 'S': s += 4
-        if ox == 's': s += 4; o += 1
-        if gr == 'r': g += 4
-        if gw == 'w': g += 2
-        if gx == 'x': g += 1
-        if gx == 'S': s += 2
-        if gx == 's': s += 2; g += 1
-        if wr == 'r': w += 4
-        if ww == 'w': w += 2
-        if wx == 'x': w += 1
-        if wx == 'T': s += 1
-        if wx == 't': s += 1; w += 1
+        if oor == 'r':
+            o += 4
+        if ow == 'w':
+            o += 2
+        if ox == 'x':
+            o += 1
+        if ox == 'S':
+            s += 4
+        if ox == 's':
+            s += 4
+            o += 1
+        if gr == 'r':
+            g += 4
+        if gw == 'w':
+            g += 2
+        if gx == 'x':
+            g += 1
+        if gx == 'S':
+            s += 2
+        if gx == 's':
+            s += 2
+            g += 1
+        if wr == 'r':
+            w += 4
+        if ww == 'w':
+            w += 2
+        if wx == 'x':
+            w += 1
+        if wx == 'T':
+            s += 1
+        if wx == 't':
+            s += 1
+            w += 1
         return str(s) + str(o) + str(g) + str(w)
 
     def __ext4extractor(self):
