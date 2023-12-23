@@ -14,6 +14,7 @@ if os.name == 'nt':
 from timeit import default_timer as dti
 from collections import deque
 from utils import simg2img
+
 EXT4_HEADER_MAGIC = 0xED26FF3A
 EXT4_SPARSE_HEADER_LEN = 28
 EXT4_CHUNK_HEADER_SIZE = 12
@@ -180,11 +181,9 @@ class Extractor(object):
                     scan_dir(entry_inode, entry_inode_path)
                 elif entry_inode.is_file:
                     if os.name == 'nt':
-                        file_target = self.EXTRACT_DIR + entry_inode_path.replace('/', os.sep).replace(' ',
-                                                                                                       '_').replace('"',
-                                                                                                                    '')
-                    elif os.name == "posix":
-                        file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
+                        file_target = self.EXTRACT_DIR + entry_inode_path.replace('\\', '/').replace(' ',
+                                                                                                     '_').replace('"',
+                                                                                                                  '')
                     else:
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     try:
