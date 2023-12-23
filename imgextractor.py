@@ -11,7 +11,7 @@ if os.name == 'nt':
     from ctypes import windll
 import traceback
 from timeit import default_timer as dti
-
+from collections import deque
 EXT4_HEADER_MAGIC = 0xED26FF3A
 EXT4_SPARSE_HEADER_LEN = 28
 EXT4_CHUNK_HEADER_SIZE = 12
@@ -47,8 +47,8 @@ class Extractor(object):
         self.EXTRACT_DIR = ""
         self.BLOCK_SIZE = 4096
         self.TYPE_IMG = 'system'
-        self.context = []
-        self.fsconfig = []
+        self.context = deque()
+        self.fsconfig = deque()
 
     def __remove(self, path):
         if os.path.isfile(path):
@@ -315,7 +315,9 @@ class Extractor(object):
 
             self.__appendf('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
-                self.context.sort()  # 11.05.18
+                tmp = sorted(self.context)
+                self.context.clear()
+                self.context.extend(tmp)  # 11.05.18
                 for c in self.context:
                     if re.search('lost..found', c):
                         self.context.insert(0, '/' + ' ' + c.split(" ")[1])
