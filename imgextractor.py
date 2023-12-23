@@ -245,7 +245,7 @@ class Extractor(object):
                                     except Exception as e:
                                         print(e.__str__())
                         if not all(c in string.printable for c in link_target):
-                            pass
+                            ...
                         if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
                             self.symlinks.append('%s %s' % (link_target, entry_inode_path[1:]))
                         else:
