@@ -12,6 +12,7 @@ if os.name == 'nt':
 import traceback
 from timeit import default_timer as dti
 from collections import deque
+
 EXT4_HEADER_MAGIC = 0xED26FF3A
 EXT4_SPARSE_HEADER_LEN = 28
 EXT4_CHUNK_HEADER_SIZE = 12
@@ -50,22 +51,8 @@ class Extractor(object):
         self.context = deque()
         self.fsconfig = deque()
 
-    def __remove(self, path):
-        if os.path.isfile(path):
-            os.remove(path)  # remove the file
-        elif os.path.isdir(path):
-            shutil.rmtree(path)  # remove dir and all contains
-        else:
-            raise ValueError("file {} is not a file or dir.".format(path))
-
-    def __logtb(self, ex, ex_traceback=None):
-        if ex_traceback is None:
-            ex_traceback = ex.__traceback__
-        tb_lines = [line.rstrip('\n') for line in
-                    traceback.format_exception(ex.__class__, ex, ex_traceback)]
-        return '\n'.join(tb_lines)
-
-    def __file_name(self, file_path):
+    @staticmethod
+    def __file_name(file_path):
         name = os.path.basename(file_path).rsplit('.', 1)[0]
         name = name.split('-')[0]
         name = name.split(' ')[0]
@@ -74,7 +61,8 @@ class Extractor(object):
         name = name.split('(')[0]
         return name
 
-    def __out_name(self, file_path):
+    @staticmethod
+    def __out_name(file_path):
         name = file_path
         name = name.split('-')[0]
         name = name.split(' ')[0]
