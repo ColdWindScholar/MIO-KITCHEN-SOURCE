@@ -22,7 +22,7 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
-from collections import deque
+
 if os.name == 'nt':
     import windnd
     from tkinter import filedialog
