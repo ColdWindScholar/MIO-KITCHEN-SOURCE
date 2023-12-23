@@ -9,7 +9,7 @@ from utils import cz
 kwlist = ['False', 'gettype', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue',
           'def', 'del',
           'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda',
-          'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield', "msh", 'echo', 'sed',
+          'nonlocal', 'not', 'or', '...', 'raise', 'return', 'try', 'while', 'with', 'yield', "msh", 'echo', 'sed',
           'find', 'cd', 'done', 'rm', 'mkdir', "mv", "cat"]
 
 
@@ -50,7 +50,7 @@ class PythonEditor(tk.Frame):
 
     def highlight(self, event=None):
         if event:
-            pass
+            ...
         self.text.tag_remove("keyword", "1.0", "end")
         self.text.tag_remove("builtin", "1.0", "end")
         self.text.tag_remove("string", "1.0", "end")

@@ -38,9 +38,9 @@ class DtEntry(object):
     """Provides individual DT image file arguments to be added to a DTBO.
 
     Attributes:
-        REQUIRED_KEYS_V0: 'keys' needed to be present in the dictionary passed to instantiate
+        REQUIRED_KEYS_V0: 'keys' needed to be present in the dictionary ...ed to instantiate
             an object of this class when a DTBO header of version 0 is used.
-        REQUIRED_KEYS_V1: 'keys' needed to be present in the dictionary passed to instantiate
+        REQUIRED_KEYS_V1: 'keys' needed to be present in the dictionary ...ed to instantiate
             an object of this class when a DTBO header of version 1 is used.
         COMPRESSION_FORMAT_MASK: Mask to retrieve compression info for DT entry from flags field
             when a DTBO header of version 1 is used.
@@ -64,10 +64,10 @@ class DtEntry(object):
         """
 
         if not arg or arg[0] == '+' or arg[0] == '-':
-            raise ValueError('Invalid argument passed to DTImage')
+            raise ValueError('Invalid argument ...ed to DTImage')
         if arg[0] == '/':
             # TODO(b/XXX): Use pylibfdt to get property value from DT
-            raise ValueError('Invalid argument passed to DTImage')
+            raise ValueError('Invalid argument ...ed to DTImage')
         else:
             base = 10
             if arg.startswith('0x') or arg.startswith('0X'):

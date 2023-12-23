@@ -28,7 +28,7 @@ DataImage = blockimgdiff.DataImage
 try:
     sys.set_int_max_str_digits(0)
 except AttributeError:
-    pass
+    ...
 
 elocal = getcwd()
 dn = None
@@ -190,7 +190,7 @@ def gettype(file) -> str:
         if is_super(file):
             return 'super'
     except IndexError:
-        pass
+        ...
     for f_ in formats:
         if len(f_) == 2:
             if compare(f_[0]):
@@ -202,9 +202,9 @@ def gettype(file) -> str:
         if LOGODUMPER(file, str(None)).chkimg(file):
             return 'logo'
     except AssertionError:
-        pass
+        ...
     except struct.error:
-        pass
+        ...
     return "unknow"
 
 
@@ -323,7 +323,7 @@ def findfile(file, dir_) -> str:
             else:
                 return root + os.sep + file
         else:
-            pass
+            ...
 
 
 def findfolder(dir__, folder_name):

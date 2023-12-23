@@ -527,7 +527,7 @@ class Metadata:
                 "partition_layout": self._get_partition_layout()
             }
         except Exception:
-            pass
+            ...
         finally:
             return result
 

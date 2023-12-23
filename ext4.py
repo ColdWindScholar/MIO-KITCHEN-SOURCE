@@ -16,19 +16,19 @@ def wcscmp(str_a, str_b):
 
 
 class Ext4Error(Exception):
-    pass
+    ...
 
 
 class BlockMapError(Ext4Error):
-    pass
+    ...
 
 
 class EndOfStreamError(Ext4Error):
-    pass
+    ...
 
 
 class MagicError(Ext4Error):
-    pass
+    ...
 
 
 # ----------------------------- LOW LEVEL ------------------------------
@@ -152,7 +152,7 @@ class ext4_group_descriptor(ext4_struct):
 
 class ext4_inode(ext4_struct):
     EXT2_GOOD_OLD_INODE_SIZE = 128
-    # Every field passing 128 bytes is "additional data", whose size is specified by i_extra_isize.
+    # Every field ...ing 128 bytes is "additional data", whose size is specified by i_extra_isize.
 
     # i_mode
     S_IXOTH = 0x1  # Others can execute
@@ -768,7 +768,7 @@ class Inode:
 
         # # Hash trees are compatible with linear arrays
         if (self.inode.i_flags & ext4_inode.EXT4_INDEX_FL) != 0:
-            pass
+            ...
 
         # Read raw directory content
         raw_data = self.open_read().read()
@@ -850,7 +850,7 @@ class Inode:
                                                                   prefix_override=prefix_override):
                     yield xattr_name, xattr_value
             except:
-                pass
+                ...
         # xattr block(s)
         if check_block and self.inode.i_file_acl != 0:
             xattrs_block_start = self.inode.i_file_acl * self.volume.block_size
@@ -866,7 +866,7 @@ class Inode:
                             xattrs_header=xattrs_header.h_magic
                         ))
                 except:
-                    pass
+                    ...
 
             if xattrs_header.h_blocks != 1:
                 raise Ext4Error(

@@ -22,7 +22,7 @@ def extract(source, flist):
     try:
         makedirs(outdir)
     except:
-        pass
+        ...
 
     with open(source, 'rb') as f:
         while True:

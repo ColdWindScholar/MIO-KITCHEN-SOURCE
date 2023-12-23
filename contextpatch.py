@@ -38,7 +38,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     try:
         permission_d = fs_file.get(list(fs_file)[5])
     except IndexError:
-        pass
+        ...
     if not permission_d:
         permission_d = ['u:object_r:system_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
