@@ -43,7 +43,6 @@ class ext4_chunk_header(object):
 class Extractor(object):
     def __init__(self):
         self.sign_offset = None
-        self.symlinks = deque()
         self.DIR = None
         self.FileName = ""
         self.BASE_DIR = ""
@@ -221,10 +220,6 @@ class Extractor(object):
                                                                            DWORD(FILE_ATTRIBUTE_SYSTEM))
                                     except Exception as e:
                                         print(e.__str__())
-                        if entry_inode_path[1:] == entry_name or link_target[1:] == entry_name:
-                            self.symlinks.append('%s %s' % (link_target, entry_inode_path[1:]))
-                        else:
-                            self.symlinks.append('%s %s' % (link_target, self.DIR + entry_inode_path))
                     except:
                         try:
                             link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")

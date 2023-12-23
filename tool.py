@@ -2675,7 +2675,7 @@ class unpack_gui(ttk.LabelFrame):
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
         ttk.Button(self, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
-        self.ch.trace("w", lambda x: self.hd())
+        self.ch.trace("w", lambda *x: self.hd())
 
     def hd(self):
         if self.ch.get() == 1:
