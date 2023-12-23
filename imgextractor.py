@@ -396,8 +396,7 @@ class Extractor(object):
             self.converSimgToImg(target)
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
-            moto = re.search(b'\x4d\x4f\x54\x4f', data)
-            if moto:
+            if re.search(b'\x4d\x4f\x54\x4f', data):
                 print(".....Finding MOTO structure! Fixing.....")
                 self.fixmoto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
@@ -407,8 +406,7 @@ class Extractor(object):
         if target_type == 'img':
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
-            moto = re.search(b'\x4d\x4f\x54\x4f', data)
-            if moto:
+            if re.search(b'\x4d\x4f\x54\x4f', data):
                 print(".....Finding MOTO structure! Fixing.....")
                 self.fixmoto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
