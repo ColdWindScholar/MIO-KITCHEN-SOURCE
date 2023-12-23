@@ -70,7 +70,7 @@ class Extractor(object):
         return name
 
     @staticmethod
-    def __appendf(msg, log):
+    def __append(msg, log):
         with open(log, 'a', newline='\n') as file:
             print(msg, file=file)
 
@@ -130,9 +130,9 @@ class Extractor(object):
                 if tmppath.find(' ', 1, len(tmppath)) > 0:
                     if not os.path.isfile(spaces_file):
                         with open(spaces_file, 'tw', encoding='utf-8'):
-                            self.__appendf(tmppath, spaces_file)
+                            self.__append(tmppath, spaces_file)
                     else:
-                        self.__appendf(tmppath, spaces_file)
+                        self.__append(tmppath, spaces_file)
                     tmppath = tmppath.replace(' ', '_')
                     self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                 else:
@@ -228,7 +228,7 @@ class Extractor(object):
         if not os.path.isdir(dir_my):
             os.makedirs(dir_my)
         with open(dir_my + self.FileName + '_size.txt', 'tw', encoding='utf-8'):
-            self.__appendf(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
+            self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             root = ext4.Volume(file).root
             dirlist = []
@@ -248,7 +248,7 @@ class Extractor(object):
                 self.fsconfig.insert(0, '/' + ' 0 0 0755')
                 self.fsconfig.insert(1, dirr + ' 0 0 0755')
 
-            self.__appendf('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
+            self.__append('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
                 for c in self.context:
                     if re.search('lost..found', c):
@@ -263,7 +263,7 @@ class Extractor(object):
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
                         self.context.insert(4, '/' + dirr + '/' + dirr + '(/.*)? ' + c.split(" ")[1])
                         break
-                self.__appendf('\n'.join(sorted(self.context)), contexts)  # 11.05.18
+                self.__append('\n'.join(sorted(self.context)), contexts)  # 11.05.18
 
     def converSimgToImg(self, target):
         with open(target, "rb") as img_file:
