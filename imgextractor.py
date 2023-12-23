@@ -129,6 +129,7 @@ class Extractor(object):
                 con = ''
                 cap = ''
                 tmppath = self.DIR + entry_inode_path
+                spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                 for i in list(entry_inode.xattrs()):
                     if i[0] == 'security.selinux':
                         con = i[1].decode('utf8')[:-1]
@@ -150,7 +151,6 @@ class Extractor(object):
                         os.chown(dir_target, uid, gid)
                     scan_dir(entry_inode, entry_inode_path)
                     if tmppath.find(' ', 1, len(tmppath)) > 0:
-                        spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                         if not os.path.isfile(spaces_file):
                             f = open(spaces_file, 'tw', encoding='utf-8')
                             self.__appendf(tmppath, spaces_file)
@@ -186,7 +186,6 @@ class Extractor(object):
                             os.chmod(file_target, int(mode, 8))
                             os.chown(file_target, uid, gid)
                     if tmppath.find(' ', 1, len(tmppath)) > 0:
-                        spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                         if not os.path.isfile(spaces_file):
                             f = open(spaces_file, 'tw', encoding='utf-8')
                             self.__appendf(tmppath, spaces_file)
@@ -208,7 +207,6 @@ class Extractor(object):
                         link_target = entry_inode.open_read().read().decode("utf8")
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                         if tmppath.find(' ', 1, len(tmppath)) > 0:
-                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                             if not os.path.isfile(spaces_file):
                                 f = open(spaces_file, 'tw', encoding='utf-8')
                                 self.__appendf(tmppath, spaces_file)
@@ -262,8 +260,6 @@ class Extractor(object):
                             link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                                  entry_inode.inode.i_size).decode("utf8")
                             target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
-                            tmppath = self.DIR + entry_inode_path
-                            spaces_file = self.BASE_MYDIR + 'config' + os.sep + self.FileName + '_space.txt'
                             if link_target and all(c in string.printable for c in link_target):
                                 if tmppath.find(' ', 1, len(tmppath)) > 0:
                                     if not os.path.isfile(spaces_file):
