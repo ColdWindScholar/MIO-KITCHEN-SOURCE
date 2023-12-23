@@ -83,7 +83,7 @@ class Extractor(object):
             print(msg, file=file)
 
     @staticmethod
-    def __getperm(arg):
+    def __get_perm(arg):
         if len(arg) < 9 or len(arg) > 10:
             return
         if len(arg) > 8:
@@ -127,7 +127,7 @@ class Extractor(object):
 
     def __ext4extractor(self):
         fs_config_file = self.FileName + '_fs_config'
-        fuking_symbols = '\\^$.|?*+(){}[]'
+        fuk_symbols = '\\^$.|?*+(){}[]'
         contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"  # 08.05.18
 
         def scan_dir(root_inode, root_path=""):
@@ -136,7 +136,7 @@ class Extractor(object):
                     continue
                 entry_inode = root_inode.volume.get_inode(entry_inode_idx, entry_type)
                 entry_inode_path = root_path + '/' + entry_name
-                mode = self.__getperm(entry_inode.mode_str)
+                mode = self.__get_perm(entry_inode.mode_str)
                 uid = entry_inode.inode.i_uid
                 gid = entry_inode.inode.i_gid
                 con = ''
@@ -165,7 +165,7 @@ class Extractor(object):
                     self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                 if not cap:
                     if con:
-                        for fuk_symb in fuking_symbols:
+                        for fuk_symb in fuk_symbols:
                             tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
                         self.context.append('/%s %s' % (tmppath, con))
                 if entry_inode.is_dir:
