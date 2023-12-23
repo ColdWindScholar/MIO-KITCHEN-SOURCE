@@ -302,7 +302,7 @@ class Tool(Tk):
 
         ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
-                           value=[i.rsplit('.', 1)[0] for i in
+                           value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda x: settings.set_language())
@@ -833,7 +833,7 @@ class IconGrid(tk.Frame):
 
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
+        self.scrollable_frame.bind("<Configure>", lambda x: self.on_frame_configure())
 
         # Bind mouse wheel event to scrollbar
         self.master.bind_all("<MouseWheel>", self.on_mousewheel)
@@ -848,7 +848,7 @@ class IconGrid(tk.Frame):
         for i in self.icons:
             i.destroy()
 
-    def on_frame_configure(self, event):
+    def on_frame_configure(self):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def on_mousewheel(self, event):
