@@ -997,7 +997,7 @@ def mpkman() -> None:
                 data = json_edit(os.path.join(moduledir, i, "info.json")).read()
                 icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#4682B4",
                                 wraplength=70, justify='center')
-                icon.bind('<Double-Button-1>', lambda x:mpkrun(data['name']).run())
+                icon.bind('<Double-Button-1>', lambda x: mpkrun(data['name']).run())
                 icon.bind('<Button-3>', mpkrun(data['name']).popup)
                 pls.add_icon(icon)
                 globals()[data['name']] = data['identifier']
