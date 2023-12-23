@@ -20,6 +20,7 @@
 ## * Macos Notice
 ``` shell
 # if you want to use [brotli],you need:
+# You System May Had It Already, So Check First
 brew install gettext
 ```
 ## Start To Use
