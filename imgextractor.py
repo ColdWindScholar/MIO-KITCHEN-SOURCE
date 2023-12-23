@@ -1,10 +1,9 @@
-import mmap
 import os
 import re
-
-import ext4
 import string
 import struct
+
+import ext4
 
 if os.name == 'nt':
     from ctypes.wintypes import LPCSTR
@@ -47,7 +46,6 @@ class Extractor(object):
         self.MYFileName = None
         self.OUTPUT_MYIMAGE_FILE = None
         self.BASE_DIR_ = None
-        self.sign_offset = None
         self.DIR = None
         self.FileName = ""
         self.BASE_DIR = ""
@@ -305,16 +303,6 @@ class Extractor(object):
             os.rename(output_file, input_file)
         finally:
             ...
-
-    @staticmethod
-    def check_sign_offset(file):
-        size = os.stat(file.name).st_size
-        if size <= 52428800:
-            mm = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
-        else:
-            mm = mmap.mmap(file.fileno(), 52428800, access=mmap.ACCESS_READ)  # 52428800=50Mb
-        offset = mm.find(struct.pack('<L', EXT4_HEADER_MAGIC))
-        return offset
 
     def main(self, target, output_dir, work):
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
