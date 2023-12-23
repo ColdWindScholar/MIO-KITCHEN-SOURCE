@@ -214,7 +214,7 @@ class Extractor(object):
                             os.symlink(link_target, target)
                         if os.name == 'nt':
                             with open(target.replace('/', os.sep), 'wb') as out:
-                                tmp = bytes.fromhex('213C73796D6C696E6B3EFFFE')
+                                tmp = b'!<symlink>\xff\xfe'
                                 for index in list(link_target):
                                     tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                 out.write(tmp + struct.pack('xx'))
@@ -235,7 +235,7 @@ class Extractor(object):
                                     os.symlink(link_target, target)
                                 if os.name == 'nt':
                                     with open(target.replace('/', os.sep), 'wb') as out:
-                                        tmp = bytes.fromhex('213C73796D6C696E6B3EFFFE')
+                                        tmp = b'!<symlink>\xff\xfe'
                                         for index in list(link_target):
                                             tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                         out.write(tmp + struct.pack('xx'))
