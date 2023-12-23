@@ -415,7 +415,7 @@ class welcome(Toplevel):
         settings.setf("oobe", "2")
         lce = StringVar()
 
-        def loadlice(self):
+        def loadlice():
             te.delete(1.0, END)
             with open(os.path.join(elocal, "bin", "licenses", lce.get() + ".txt"), 'r',
                       encoding='UTF-8') as f:
@@ -424,7 +424,7 @@ class welcome(Toplevel):
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
-        lb.bind('<<ComboboxSelected>>', loadlice)
+        lb.bind('<<ComboboxSelected>>', lambda x: loadlice())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                          expand=True)
@@ -432,7 +432,7 @@ class welcome(Toplevel):
         lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
         te.pack(fill=BOTH, side='top')
-        loadlice(self)
+        loadlice()
         ttk.Label(self.frame, text=lang.t1).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
