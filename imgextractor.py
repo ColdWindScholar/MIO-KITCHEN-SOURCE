@@ -131,6 +131,7 @@ class Extractor(object):
                 gid = entry_inode.inode.i_gid
                 con = ''
                 cap = ''
+                link_target = ''
                 tmp_path = self.DIR + entry_inode_path
                 spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for i in list(entry_inode.xattrs()):
@@ -150,8 +151,6 @@ class Extractor(object):
                         link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
-                else:
-                    link_target = ''
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
                     if not os.path.isfile(spaces_file):
                         with open(spaces_file, 'tw', encoding='utf-8'):
