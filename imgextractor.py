@@ -164,10 +164,10 @@ class Extractor(object):
                         self.__append(tmp_path, spaces_file)
                     tmp_path = tmp_path.replace(' ', '_')
                     self.fs_config.append(
-                        f'{tmp_path} {uid} {gid} {mode + cap if cap else mode} {link_target}')
+                        f'{tmp_path} {uid} {gid} {mode + cap} {link_target}')
                 else:
                     self.fs_config.append(
-                        f'{self.DIR + entry_inode_path} {uid} {gid} {mode + cap if cap else mode} {link_target}')
+                        f'{self.DIR + entry_inode_path} {uid} {gid} {mode + cap} {link_target}')
                 if not cap:
                     if con:
                         for fuk_ in fuk_symbols:
