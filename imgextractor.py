@@ -291,9 +291,8 @@ class Extractor(object):
         dir_my = self.CONFING_DIR + os.sep
         if not os.path.isdir(dir_my):
             os.makedirs(dir_my)
-        f = open(dir_my + self.FileName + '_size.txt', 'tw', encoding='utf-8')
-        self.__appendf(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
-        f.close()
+        with open(dir_my + self.FileName + '_size.txt', 'tw', encoding='utf-8'):
+            self.__appendf(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             root = ext4.Volume(file).root
             dirlist = []
@@ -315,9 +314,6 @@ class Extractor(object):
 
             self.__appendf('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
-                tmp = sorted(self.context)
-                self.context.clear()
-                self.context.extend(tmp)  # 11.05.18
                 for c in self.context:
                     if re.search('lost..found', c):
                         self.context.insert(0, '/' + ' ' + c.split(" ")[1])
@@ -331,7 +327,7 @@ class Extractor(object):
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
                         self.context.insert(4, '/' + dirr + '/' + dirr + '(/.*)? ' + c.split(" ")[1])
                         break
-                self.__appendf('\n'.join(self.context), contexts)  # 11.05.18
+                self.__appendf('\n'.join(sorted(self.context)), contexts)  # 11.05.18
 
     def converSimgToImg(self, target):
         with open(target, "rb") as img_file:
