@@ -194,7 +194,7 @@ class Extractor(object):
                     else:
                         self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                     if not cap and not con:
-                        pass
+                        ...
                     elif cap == '' or con:
                         for fuk_symb in fuking_symbols:
                             tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
@@ -215,7 +215,7 @@ class Extractor(object):
                             self.fsconfig.append(
                                 '%s %s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode, link_target))
                         if cap == '' and con == '':
-                            pass
+                            ...
                         elif cap == '' or con:
                             for fuk_symb in fuking_symbols:
                                 tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
@@ -224,12 +224,12 @@ class Extractor(object):
                             try:
                                 os.remove(target)
                             except:
-                                pass
+                                ...
                         if os.path.isfile(target):
                             try:
                                 os.remove(target)
                             except:
-                                pass
+                                ...
                         if os.name == 'posix':
                             os.symlink(link_target, target)
                         if os.name == 'nt':
@@ -269,7 +269,7 @@ class Extractor(object):
                                     self.fsconfig.append('%s %s %s %s %s' % (
                                         self.DIR + entry_inode_path, uid, gid, mode, link_target))
                                 if cap == '' and con == '':
-                                    pass
+                                    ...
                                 elif cap == '' or con:
                                     for fuk_symb in fuking_symbols:
                                         tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
@@ -283,9 +283,9 @@ class Extractor(object):
                                             tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                         out.write(tmp + struct.pack('xx'))
                             else:
-                                pass
+                                ...
                         except:
-                            pass
+                            ...
 
         dir_my = self.CONFING_DIR + os.sep
         if not os.path.isdir(dir_my):
@@ -387,7 +387,7 @@ class Extractor(object):
             try:
                 os.remove(output_file)
             except:
-                pass
+                ...
         with open(input_file, 'rb') as f:
             data = f.read(500000)
         moto = re.search(b'\x4d\x4f\x54\x4f', data)
@@ -408,7 +408,7 @@ class Extractor(object):
             os.remove(input_file)
             os.rename(output_file, input_file)
         except:
-            pass
+            ...
 
     def checkSignOffset(self, file):
         size = os.stat(file.name).st_size
