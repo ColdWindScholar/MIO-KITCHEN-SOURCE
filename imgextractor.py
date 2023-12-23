@@ -168,11 +168,10 @@ class Extractor(object):
                 else:
                     self.fs_config.append(
                         f'{self.DIR + entry_inode_path} {uid} {gid} {mode + cap} {link_target}')
-                if not cap:
-                    if con:
-                        for fuk_ in fuk_symbols:
-                            tmp_path = tmp_path.replace(fuk_, '\\' + fuk_)
-                        self.context.append('/%s %s' % (tmp_path, con))
+                if con:
+                    for fuk_ in fuk_symbols:
+                        tmp_path = tmp_path.replace(fuk_, '\\' + fuk_)
+                    self.context.append('/%s %s' % (tmp_path, con))
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if dir_target.endswith('.') and os.name == 'nt':
