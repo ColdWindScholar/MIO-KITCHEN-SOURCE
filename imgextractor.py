@@ -190,7 +190,6 @@ class Extractor(object):
                         os.chown(file_target, uid, gid)
                 elif entry_inode.is_symlink:
                     try:
-                        link_target = entry_inode.open_read().read().decode("utf8")
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                         if os.path.islink(target) or os.path.isfile(target):
                             try:
@@ -212,9 +211,6 @@ class Extractor(object):
                                     print(e.__str__())
                     except BaseException and Exception:
                         try:
-                            link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")
-                            link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
-                                                                 entry_inode.inode.i_size).decode("utf8")
                             target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                             if link_target and all(c_ in string.printable for c_ in link_target):
                                 if os.name == 'posix':
