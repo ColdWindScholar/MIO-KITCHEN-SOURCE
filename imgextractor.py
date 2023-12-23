@@ -152,6 +152,10 @@ class Extractor(object):
                         else:
                             cap = '' + str(hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16)))
                         cap = ' capabilities={cap}'.format(cap=cap)
+                if entry_inode.is_symlink:
+                    link_target = entry_inode.open_read().read().decode("utf8")
+                else:
+                    link_target = ''
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
                     if not os.path.isfile(spaces_file):
                         with open(spaces_file, 'tw', encoding='utf-8'):
@@ -159,9 +163,10 @@ class Extractor(object):
                     else:
                         self.__append(tmp_path, spaces_file)
                     tmp_path = tmp_path.replace(' ', '_')
-                    self.fs_config.append('%s %s %s %s' % (tmp_path, uid, gid, mode))
+                    self.fs_config.append(" ".join([tmp_path, uid, gid, mode + cap if cap else mode, link_target]))
                 else:
-                    self.fs_config.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                    self.fs_config.append(
+                        ' '.join([self.DIR + entry_inode_path, uid, gid, mode + cap if cap else mode, link_target]))
                 if not cap:
                     if con:
                         for fuk_ in fuk_symbols:
