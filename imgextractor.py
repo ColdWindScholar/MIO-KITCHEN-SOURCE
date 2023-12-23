@@ -200,12 +200,7 @@ class Extractor(object):
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
                         target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
-                        if os.path.islink(target):
-                            try:
-                                os.remove(target)
-                            finally:
-                                ...
-                        if os.path.isfile(target):
+                        if os.path.islink(target) or os.path.isfile(target):
                             try:
                                 os.remove(target)
                             finally:
