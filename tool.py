@@ -2674,9 +2674,9 @@ class unpack_gui(ttk.LabelFrame):
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
         ttk.Button(self, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
-        self.ch.trace("w", self.hd)
+        self.ch.trace("w", lambda x: self.hd())
 
-    def hd(self, *args):
+    def hd(self):
         if self.ch.get() == 1:
             self.fm.configure(state='readonly')
             self.refs(None)
@@ -2741,7 +2741,7 @@ class format_conversion(Toplevel):
         self.f.pack(pady=5, padx=5, fill=X)
         self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
         self.h.current(0)
-        self.h.bind("<<ComboboxSelected>>", lambda x:self.relist())
+        self.h.bind("<<ComboboxSelected>>", lambda x: self.relist())
         self.h.pack(side='left', padx=5)
         Label(self.f, text='>>>>>>').pack(side='left', padx=5)
         self.f = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
