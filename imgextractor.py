@@ -250,6 +250,7 @@ class Extractor(object):
 
             self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
+                self.context.sort()
                 for c in self.context:
                     if re.search('lost..found', c):
                         self.context.insert(0, '/' + ' ' + c.split(" ")[1])
@@ -263,7 +264,7 @@ class Extractor(object):
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
                         self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
                         break
-                self.__append('\n'.join(sorted(self.context)), contexts)  # 11.05.18
+                self.__append('\n'.join(self.context), contexts)  # 11.05.18
 
     @staticmethod
     def fix_moto(input_file):
