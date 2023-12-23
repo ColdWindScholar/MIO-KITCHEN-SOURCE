@@ -160,12 +160,11 @@ class Extractor(object):
                         self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                     else:
                         self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
-                    if cap == '' and con == '':
-                        pass
-                    elif cap == '' or con:
-                        for fuk_symb in fuking_symbols:
-                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                        self.context.append('/%s %s' % (tmppath, con))
+                    if not cap:
+                        if con:
+                            for fuk_symb in fuking_symbols:
+                                tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
+                            self.context.append('/%s %s' % (tmppath, con))
                 elif entry_inode.is_file:
                     if os.name == 'nt':
                         file_target = self.EXTRACT_DIR + entry_inode_path.replace('/', os.sep).replace(' ',
