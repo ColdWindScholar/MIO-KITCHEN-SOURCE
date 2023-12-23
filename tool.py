@@ -2582,7 +2582,8 @@ class xmcd(ttk.LabelFrame):
         super().__init__(master=win.tab2, text=lang.text12)
         self.pack(padx=5, pady=5)
 
-    def selectp(self, f):
+    @staticmethod
+    def selectp():
         print(lang.text96 + dn.get())
         if ' ' in dn.get():
             print(lang.t29 + dn.get())
@@ -2590,7 +2591,7 @@ class xmcd(ttk.LabelFrame):
     def gui(self):
         self.LB1 = ttk.Combobox(self, textvariable=dn, state='readonly')
         self.LB1.pack(side="top", padx=10, pady=10, fill=X)
-        self.LB1.bind('<<ComboboxSelected>>', self.selectp)
+        self.LB1.bind('<<ComboboxSelected>>', lambda x: self.selectp())
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text115, command=self.newp).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.delwork)).pack(side="left", padx=10, pady=10)
@@ -2705,7 +2706,7 @@ class unpack_gui(ttk.LabelFrame):
         if not os.path.exists(work := rwork()):
             win.messpop(lang.warn1)
             return False
-        parts_dict = json_edit((work := rwork()) + "config" + os.sep + "parts_info").read()
+        parts_dict = json_edit(work + "config" + os.sep + "parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(END, folder)
