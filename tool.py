@@ -266,7 +266,7 @@ class Tool(Tk):
         # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
-        link.bind("<Button-1>", lambda x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
+        link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
 
     def tab6_n(self):
@@ -288,7 +288,7 @@ class Tool(Tk):
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
-        self.LB2.bind('<<ComboboxSelected>>', lambda x: settings.set_theme())
+        self.LB2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
 
         def startwjjj():
             if os.name == 'nt':
@@ -296,7 +296,7 @@ class Tool(Tk):
 
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.slocal)
-        slo.bind('<Button-1>', lambda x: startwjjj())
+        slo.bind('<Button-1>', lambda *x: startwjjj())
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
@@ -305,7 +305,7 @@ class Tool(Tk):
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3.pack(padx=10, pady=10, side='left')
-        lb3.bind('<<ComboboxSelected>>', lambda x: settings.set_language())
+        lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
@@ -408,7 +408,7 @@ class welcome(Toplevel):
                             value=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3_.pack(padx=10, pady=10, side='top')
-        lb3_.bind('<<ComboboxSelected>>', lambda x: settings.set_language())
+        lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
@@ -424,7 +424,7 @@ class welcome(Toplevel):
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
-        lb.bind('<<ComboboxSelected>>', lambda x: loadlice())
+        lb.bind('<<ComboboxSelected>>', lambda *x: loadlice())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                          expand=True)
@@ -601,7 +601,7 @@ def padtbo() -> any:
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
         if f.startswith("dtbo."):
             list_.append(work + "dtbo" + os.sep + "dtbo" + os.sep + f)
-    list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
+    list_ = sorted(list_, key=lambda *x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
     print(lang.text8)
@@ -833,7 +833,7 @@ class IconGrid(tk.Frame):
 
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        self.scrollable_frame.bind("<Configure>", lambda x: self.on_frame_configure())
+        self.scrollable_frame.bind("<Configure>", lambda *x: self.on_frame_configure())
 
         # Bind mouse wheel event to scrollbar
         self.master.bind_all("<MouseWheel>", self.on_mousewheel)
@@ -997,7 +997,7 @@ def mpkman() -> None:
                 data = json_edit(os.path.join(moduledir, i, "info.json")).read()
                 icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#4682B4",
                                 wraplength=70, justify='center')
-                icon.bind('<Double-Button-1>', lambda x: mpkrun(data['name']).run())
+                icon.bind('<Double-Button-1>', lambda *x: mpkrun(data['name']).run())
                 icon.bind('<Button-3>', mpkrun(data['name']).popup)
                 pls.add_icon(icon)
                 globals()[data['name']] = data['identifier']
@@ -2238,7 +2238,7 @@ def unpack(chose, form: any = None):
         with open(work + os.path.basename(fd).rsplit('.', 1)[0], 'ab') as ofd:
             for fd1 in sorted(
                     [f for f in os.listdir(work) if f.startswith(os.path.basename(fd).rsplit('.', 1)[0] + ".")],
-                    key=lambda x: int(x.rsplit('.')[3])):
+                    key=lambda *x: int(x.rsplit('.')[3])):
                 print(lang.text83 % (fd1, os.path.basename(fd).rsplit('.', 1)[0]))
                 with open(work + fd1, 'rb') as nfd:
                     ofd.write(nfd.read())
@@ -2592,7 +2592,7 @@ class xmcd(ttk.LabelFrame):
     def gui(self):
         self.LB1 = ttk.Combobox(self, textvariable=dn, state='readonly')
         self.LB1.pack(side="top", padx=10, pady=10, fill=X)
-        self.LB1.bind('<<ComboboxSelected>>', lambda x: self.selectp())
+        self.LB1.bind('<<ComboboxSelected>>', lambda *x: self.selectp())
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text115, command=self.newp).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.delwork)).pack(side="left", padx=10, pady=10)
@@ -2742,7 +2742,7 @@ class format_conversion(Toplevel):
         self.f.pack(pady=5, padx=5, fill=X)
         self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
         self.h.current(0)
-        self.h.bind("<<ComboboxSelected>>", lambda x: self.relist())
+        self.h.bind("<<ComboboxSelected>>", lambda *x: self.relist())
         self.h.pack(side='left', padx=5)
         Label(self.f, text='>>>>>>').pack(side='left', padx=5)
         self.f = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
