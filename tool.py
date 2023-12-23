@@ -290,13 +290,13 @@ class Tool(Tk):
         self.LB2.pack(padx=10, pady=10, side='left')
         self.LB2.bind('<<ComboboxSelected>>', lambda x: settings.set_theme())
 
-        def startwjjj(ev):
+        def startwjjj():
             if os.name == 'nt':
                 os.startfile(self.slocal.get())
 
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.slocal)
-        slo.bind('<Button-1>', startwjjj)
+        slo.bind('<Button-1>', lambda x: startwjjj())
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
