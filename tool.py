@@ -1300,6 +1300,7 @@ def mpkman() -> None:
     class unmpk:
 
         def __init__(self):
+            self.ck = None
             self.arr = []
             self.arr2 = []
             if chosed.get():
