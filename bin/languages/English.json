@@ -18,7 +18,7 @@
   "warn10": "Sorry, packaging failed!" , 
   "warn11": "Failed to delete {}!" , 
   "warn12": "Please enter", 
-  "warn13": "Warning: You are using a normal user to run the tool, this may cause packet deciphering (hitting) abnormalities",
+  "warn13": "Warning: You are using a normal user to run the tool, this may cause packet deciphering (hitting) abnormalities, (You Should Use ROOT)",
   "warn14": "Unsupported control：{}",
   "warn15": "Unsupport System {}",
   "text1": "Writing:", 
