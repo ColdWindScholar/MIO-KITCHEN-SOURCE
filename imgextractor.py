@@ -55,7 +55,7 @@ class Extractor(object):
         self.BLOCK_SIZE = 4096
         self.TYPE_IMG = 'system'
         self.context = deque()
-        self.fsconfig = deque()
+        self.fs_config = deque()
 
     @staticmethod
     def __file_name(file_path):
@@ -160,9 +160,9 @@ class Extractor(object):
                     else:
                         self.__append(tmppath, spaces_file)
                     tmppath = tmppath.replace(' ', '_')
-                    self.fsconfig.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                    self.fs_config.append('%s %s %s %s' % (tmppath, uid, gid, mode))
                 else:
-                    self.fsconfig.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
+                    self.fs_config.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                 if not cap:
                     if con:
                         for fuk_symb in fuk_symbols:
@@ -258,17 +258,17 @@ class Extractor(object):
             setattr(self, 'DIR', dirr)
             scan_dir(root)
             if dirr == 'vendor':
-                self.fsconfig.insert(0, '/ 0 2000 0755')
-                self.fsconfig.insert(1, dirr + ' 0 2000 0755')
+                self.fs_config.insert(0, '/ 0 2000 0755')
+                self.fs_config.insert(1, dirr + ' 0 2000 0755')
             elif dirr == 'system':
-                self.fsconfig.insert(0, '/' + ' 0 0 0755')
-                self.fsconfig.insert(1, '/' + 'lost+found' + ' 0 0 0700')
-                self.fsconfig.insert(2, dirr + ' 0 0 0755')
+                self.fs_config.insert(0, '/' + ' 0 0 0755')
+                self.fs_config.insert(1, '/' + 'lost+found' + ' 0 0 0700')
+                self.fs_config.insert(2, dirr + ' 0 0 0755')
             else:
-                self.fsconfig.insert(0, '/' + ' 0 0 0755')
-                self.fsconfig.insert(1, dirr + ' 0 0 0755')
+                self.fs_config.insert(0, '/' + ' 0 0 0755')
+                self.fs_config.insert(1, dirr + ' 0 0 0755')
 
-            self.__append('\n'.join(self.fsconfig), self.CONFING_DIR + os.sep + fs_config_file)
+            self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
                 for c in self.context:
                     if re.search('lost..found', c):
