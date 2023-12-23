@@ -254,34 +254,34 @@ class Extractor(object):
             dirlist = []
             for file_name, inode_idx, file_type in root.open_dir():
                 dirlist.append(file_name)
-            dirr = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
-            setattr(self, 'DIR', dirr)
+            dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
+            setattr(self, 'DIR', dir_r)
             scan_dir(root)
-            if dirr == 'vendor':
+            if dir_r == 'vendor':
                 self.fs_config.insert(0, '/ 0 2000 0755')
-                self.fs_config.insert(1, dirr + ' 0 2000 0755')
-            elif dirr == 'system':
+                self.fs_config.insert(1, dir_r + ' 0 2000 0755')
+            elif dir_r == 'system':
                 self.fs_config.insert(0, '/' + ' 0 0 0755')
                 self.fs_config.insert(1, '/' + 'lost+found' + ' 0 0 0700')
-                self.fs_config.insert(2, dirr + ' 0 0 0755')
+                self.fs_config.insert(2, dir_r + ' 0 0 0755')
             else:
                 self.fs_config.insert(0, '/' + ' 0 0 0755')
-                self.fs_config.insert(1, dirr + ' 0 0 0755')
+                self.fs_config.insert(1, dir_r + ' 0 0 0755')
 
             self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
             if self.context:  # 11.05.18
                 for c in self.context:
                     if re.search('lost..found', c):
                         self.context.insert(0, '/' + ' ' + c.split(" ")[1])
-                        self.context.insert(1, '/' + dirr + '(/.*)? ' + c.split(" ")[1])
-                        self.context.insert(2, '/' + dirr + ' ' + c.split(" ")[1])
-                        self.context.insert(3, '/' + dirr + '/lost+\\found' + ' ' + c.split(" ")[1])
+                        self.context.insert(1, '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
+                        self.context.insert(2, '/' + dir_r + ' ' + c.split(" ")[1])
+                        self.context.insert(3, '/' + dir_r + '/lost+\\found' + ' ' + c.split(" ")[1])
                         break
 
                 for c in self.context:
                     if re.search('/system/system/build..prop ', c):
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
-                        self.context.insert(4, '/' + dirr + '/' + dirr + '(/.*)? ' + c.split(" ")[1])
+                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
                         break
                 self.__append('\n'.join(sorted(self.context)), contexts)  # 11.05.18
 
