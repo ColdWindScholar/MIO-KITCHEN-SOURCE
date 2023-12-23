@@ -336,7 +336,7 @@ class Extractor(object):
         if os.path.exists(output_file):
             try:
                 os.remove(output_file)
-            except:
+            finally:
                 ...
         with open(input_file, 'rb') as f:
             data = f.read(500000)
@@ -355,7 +355,7 @@ class Extractor(object):
         try:
             os.remove(input_file)
             os.rename(output_file, input_file)
-        except:
+        finally:
             ...
 
     def checkSignOffset(self, file):
