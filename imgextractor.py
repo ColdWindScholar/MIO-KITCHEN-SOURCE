@@ -182,10 +182,9 @@ class Extractor(object):
                             out.write(entry_inode.open_read().read())
                     except Exception and BaseException as e:
                         print(f'ERROR:Cannot Write {file_target}, Because of {e}')
-                    if os.name == 'posix':
-                        if os.geteuid() == 0:
-                            os.chmod(file_target, int(mode, 8))
-                            os.chown(file_target, uid, gid)
+                    if os.name == 'posix' and os.geteuid() == 0:
+                        os.chmod(file_target, int(mode, 8))
+                        os.chown(file_target, uid, gid)
                 elif entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
