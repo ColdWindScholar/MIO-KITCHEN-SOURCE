@@ -180,12 +180,9 @@ class Extractor(object):
                         os.chown(dir_target, uid, gid)
                     scan_dir(entry_inode, entry_inode_path)
                 elif entry_inode.is_file:
+                    file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if os.name == 'nt':
-                        file_target = self.EXTRACT_DIR + entry_inode_path.replace('\\', '/').replace(' ',
-                                                                                                     '_').replace('"',
-                                                                                                                  '')
-                    else:
-                        file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
+                        file_target = file_target.replace('\\', '/')
                     try:
                         with open(file_target, 'wb') as out:
                             out.write(entry_inode.open_read().read())
