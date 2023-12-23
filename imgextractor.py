@@ -6,8 +6,7 @@ import struct
 import ext4
 
 if os.name == 'nt':
-    from ctypes.wintypes import LPCSTR
-    from ctypes.wintypes import DWORD
+    from ctypes.wintypes import LPCSTR, DWORD
     from stat import FILE_ATTRIBUTE_SYSTEM
     from ctypes import windll
 from timeit import default_timer as dti
