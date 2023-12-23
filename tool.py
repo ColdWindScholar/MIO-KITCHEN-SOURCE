@@ -251,9 +251,6 @@ class Tool(Tk):
         self.scrollbar.config(command=self.canvas1.yview)
 
     def tab4_n(self):
-        def open_github(o):
-            openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
-
         Label(self.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
         Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
         ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
@@ -269,7 +266,7 @@ class Tool(Tk):
         # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
-        link.bind("<Button-1>", open_github)
+        link.bind("<Button-1>", lambda x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
 
     def tab6_n(self):
@@ -291,7 +288,7 @@ class Tool(Tk):
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
-        self.LB2.bind('<<ComboboxSelected>>', settings.set_theme)
+        self.LB2.bind('<<ComboboxSelected>>', lambda x: settings.set_theme())
 
         def startwjjj(ev):
             if os.name == 'nt':
@@ -308,7 +305,7 @@ class Tool(Tk):
                            value=[i.rsplit('.', 1)[0] for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3.pack(padx=10, pady=10, side='left')
-        lb3.bind('<<ComboboxSelected>>', settings.set_language)
+        lb3.bind('<<ComboboxSelected>>', lambda x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
@@ -411,7 +408,7 @@ class welcome(Toplevel):
                             value=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3_.pack(padx=10, pady=10, side='top')
-        lb3_.bind('<<ComboboxSelected>>', settings.set_language)
+        lb3_.bind('<<ComboboxSelected>>', lambda x: settings.set_language())
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
@@ -521,7 +518,7 @@ class set_utils:
             self.config.write(fil)
         self.load()
 
-    def set_theme(self, f):
+    def set_theme(self):
         print(lang.text100 + theme.get())
         try:
             self.setf("theme", theme.get())
@@ -531,7 +528,7 @@ class set_utils:
         except Exception as e:
             win.messpop(lang.text101 % (theme.get(), e))
 
-    def set_language(self, f):
+    def set_language(self):
         print(lang.text129 + language.get())
         try:
             self.setf("language", language.get())
@@ -891,7 +888,7 @@ def mpkman() -> None:
             #
             self.ver = self.labelEntry(self, lang.t22, TOP)
             #
-            self.dep =  self.labelEntry(self, lang.t23, TOP)
+            self.dep = self.labelEntry(self, lang.t23, TOP)
             #
             ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
             self.intro = Text(self)
