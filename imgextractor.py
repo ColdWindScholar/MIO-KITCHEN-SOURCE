@@ -141,7 +141,7 @@ class Extractor(object):
                 gid = entry_inode.inode.i_gid
                 con = ''
                 cap = ''
-                tmppath = self.DIR + entry_inode_path
+                tmp_path = self.DIR + entry_inode_path
                 spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for i in list(entry_inode.xattrs()):
                     if i[0] == 'security.selinux':
@@ -153,21 +153,21 @@ class Extractor(object):
                         else:
                             cap = '' + str(hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16)))
                         cap = ' capabilities={cap}'.format(cap=cap)
-                if tmppath.find(' ', 1, len(tmppath)) > 0:
+                if tmp_path.find(' ', 1, len(tmp_path)) > 0:
                     if not os.path.isfile(spaces_file):
                         with open(spaces_file, 'tw', encoding='utf-8'):
-                            self.__append(tmppath, spaces_file)
+                            self.__append(tmp_path, spaces_file)
                     else:
-                        self.__append(tmppath, spaces_file)
-                    tmppath = tmppath.replace(' ', '_')
-                    self.fs_config.append('%s %s %s %s' % (tmppath, uid, gid, mode))
+                        self.__append(tmp_path, spaces_file)
+                    tmp_path = tmp_path.replace(' ', '_')
+                    self.fs_config.append('%s %s %s %s' % (tmp_path, uid, gid, mode))
                 else:
                     self.fs_config.append('%s %s %s %s' % (self.DIR + entry_inode_path, uid, gid, mode))
                 if not cap:
                     if con:
                         for fuk_symb in fuk_symbols:
-                            tmppath = tmppath.replace(fuk_symb, '\\' + fuk_symb)
-                        self.context.append('/%s %s' % (tmppath, con))
+                            tmp_path = tmp_path.replace(fuk_symb, '\\' + fuk_symb)
+                        self.context.append('/%s %s' % (tmp_path, con))
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if dir_target.endswith('.') and os.name == 'nt':
