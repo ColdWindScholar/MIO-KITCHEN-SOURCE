@@ -340,8 +340,7 @@ class Extractor(object):
                 ...
         with open(input_file, 'rb') as f:
             data = f.read(500000)
-        moto = re.search(b'\x4d\x4f\x54\x4f', data)
-        if not moto:
+        if not re.search(b'\x4d\x4f\x54\x4f', data):
             return
         offset = 0
         for i in re.finditer(b'\x53\xEF', data):
