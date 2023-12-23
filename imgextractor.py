@@ -285,56 +285,6 @@ class Extractor(object):
                         break
                 self.__append('\n'.join(sorted(self.context)), contexts)  # 11.05.18
 
-    def s_img_to_img(self, target):
-        with open(target, "rb") as img_file:
-            setattr(self, 'sign_offset', self.check_sign_offset(img_file))
-            if self.sign_offset > 0:
-                img_file.seek(self.sign_offset, 0)
-            header = ext4_file_header(img_file.read(28))
-            total_chunks = header.total_chunks
-            if header.file_header_size > EXT4_SPARSE_HEADER_LEN:
-                img_file.seek(header.file_header_size - EXT4_SPARSE_HEADER_LEN, 1)
-            with open(target.replace(".img", ".raw.img"), "wb") as raw_img_file:
-                sector_base = 82528
-                output_len = 0
-                while total_chunks > 0:
-                    chunk_header = ext4_chunk_header(img_file.read(EXT4_CHUNK_HEADER_SIZE))
-                    sector_size = (chunk_header.chunk_size * header.block_size) >> 9
-                    chunk_data_size = chunk_header.total_size - header.chunk_header_size
-                    if chunk_header.type == 0xCAC1:  # CHUNK_TYPE_RAW
-                        if header.chunk_header_size > EXT4_CHUNK_HEADER_SIZE:
-                            img_file.seek(header.chunk_header_size - EXT4_CHUNK_HEADER_SIZE, 1)
-                        data = img_file.read(chunk_data_size)
-                        len_data = len(data)
-                        if len_data == (sector_size << 9):
-                            raw_img_file.write(data)
-                            output_len += len_data
-                            sector_base += sector_size
-                    else:
-                        if chunk_header.type == 0xCAC2:  # CHUNK_TYPE_FILL
-                            if header.chunk_header_size > EXT4_CHUNK_HEADER_SIZE:
-                                img_file.seek(header.chunk_header_size - EXT4_CHUNK_HEADER_SIZE, 1)
-                            data = img_file.read(chunk_data_size)
-                            len_data = sector_size << 9
-                            raw_img_file.write(struct.pack("B", 0) * len_data)
-                            output_len += len(data)
-                            sector_base += sector_size
-                        else:
-                            if chunk_header.type == 0xCAC3:  # CHUNK_TYPE_DONT_CARE
-                                if header.chunk_header_size > EXT4_CHUNK_HEADER_SIZE:
-                                    img_file.seek(header.chunk_header_size - EXT4_CHUNK_HEADER_SIZE, 1)
-                                data = img_file.read(chunk_data_size)
-                                len_data = sector_size << 9
-                                raw_img_file.write(struct.pack("B", 0) * len_data)
-                                output_len += len(data)
-                                sector_base += sector_size
-                            else:
-                                len_data = sector_size << 9
-                                raw_img_file.write(struct.pack("B", 0) * len_data)
-                                sector_base += sector_size
-                    total_chunks -= 1
-        self.OUTPUT_IMAGE_FILE = target.replace(".img", ".raw.img")
-
     @staticmethod
     def fix_moto(input_file):
         if not os.path.exists(input_file):
