@@ -336,7 +336,7 @@ class Extractor(object):
         self.OUTPUT_IMAGE_FILE = target.replace(".img", ".raw.img")
 
     @staticmethod
-    def fixmoto(input_file):
+    def fix_moto(input_file):
         if not os.path.exists(input_file):
             return
         output_file = input_file + "_"
@@ -395,7 +395,7 @@ class Extractor(object):
                 data = f.read(500000)
             if re.search(b'\x4d\x4f\x54\x4f', data):
                 print(".....Finding MOTO structure! Fixing.....")
-                self.fixmoto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
+                self.fix_moto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
             start = dti()
             self.__ext4extractor()
@@ -405,7 +405,7 @@ class Extractor(object):
                 data = f.read(500000)
             if re.search(b'\x4d\x4f\x54\x4f', data):
                 print(".....Finding MOTO structure! Fixing.....")
-                self.fixmoto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
+                self.fix_moto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
             start = dti()
             self.__ext4extractor()
