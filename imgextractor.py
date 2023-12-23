@@ -1,6 +1,9 @@
 import mmap
 import os
 import re
+
+import ext4
+import string
 import struct
 
 if os.name == 'nt':
@@ -120,7 +123,6 @@ class Extractor(object):
         return str(s) + str(o) + str(g) + str(w)
 
     def __ext4extractor(self):
-        import ext4, string, struct
         fs_config_file = self.FileName + '_fs_config'
         fuking_symbols = '\\^$.|?*+(){}[]'
         contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"  # 08.05.18
