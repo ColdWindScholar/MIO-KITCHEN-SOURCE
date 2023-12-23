@@ -247,11 +247,11 @@ class Extractor(object):
                 self.fs_config.insert(0, '/ 0 2000 0755')
                 self.fs_config.insert(1, dir_r + ' 0 2000 0755')
             elif dir_r == 'system':
-                self.fs_config.insert(0, '/' + ' 0 0 0755')
-                self.fs_config.insert(1, '/' + 'lost+found' + ' 0 0 0700')
+                self.fs_config.insert(0, '/ 0 0 0755')
+                self.fs_config.insert(1, '/lost+found 0 0 0700')
                 self.fs_config.insert(2, dir_r + ' 0 0 0755')
             else:
-                self.fs_config.insert(0, '/' + ' 0 0 0755')
+                self.fs_config.insert(0, '/ 0 0 0755')
                 self.fs_config.insert(1, dir_r + ' 0 0 0755')
 
             self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
