@@ -190,12 +190,12 @@ class Extractor(object):
                         if os.path.islink(target):
                             try:
                                 os.remove(target)
-                            except:
+                            finally:
                                 ...
                         if os.path.isfile(target):
                             try:
                                 os.remove(target)
-                            except:
+                            finally:
                                 ...
                         if os.name == 'posix':
                             os.symlink(link_target, target)
