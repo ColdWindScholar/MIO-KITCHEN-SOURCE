@@ -203,12 +203,11 @@ class Extractor(object):
                                 for index in list(link_target):
                                     tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                 out.write(tmp + struct.pack('xx'))
-                                if os.name == 'nt':
-                                    try:
-                                        windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
-                                                                           DWORD(FILE_ATTRIBUTE_SYSTEM))
-                                    except Exception as e:
-                                        print(e.__str__())
+                                try:
+                                    windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
+                                                                       DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                except Exception as e:
+                                    print(e.__str__())
                     except BaseException and Exception:
                         try:
                             link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")
