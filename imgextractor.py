@@ -220,7 +220,7 @@ class Extractor(object):
                                                                            DWORD(FILE_ATTRIBUTE_SYSTEM))
                                     except Exception as e:
                                         print(e.__str__())
-                    except:
+                    except BaseException:
                         try:
                             link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")
                             link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
