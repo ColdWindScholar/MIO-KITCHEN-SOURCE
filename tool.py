@@ -8,7 +8,7 @@ if not platform.system() == 'Darwin':
     try:
         import load_window
     except ModuleNotFoundError:
-        pass
+        ...
 import json
 import os.path
 import shlex
@@ -80,7 +80,7 @@ class load_car:
     gifs = []
 
     def __init__(self, *args):
-        pass
+        ...
 
     def run(self, ind: int = 0):
         self.hide_gifl = False
@@ -98,7 +98,7 @@ class load_car:
             try:
                 win.gifl.after_cancel(i)
             except:
-                pass
+                ...
         win.gifl.pack_forget()
         self.hide_gifl = True
 
@@ -113,7 +113,7 @@ class load_car:
                 self.frames.append(ImageTk.PhotoImage(gif.copy()))
                 gif.seek(len(self.frames))
         except EOFError:
-            pass
+            ...
 
     def __call__(self, func):
         @wraps(func)
@@ -133,14 +133,14 @@ cartoon = load_car()
 
 class dev_null:
     def __init__(self):
-        pass
+        ...
 
     def write(self, string):
-        pass
+        ...
 
     @staticmethod
     def flush():
-        pass
+        ...
 
 
 class Tool(Tk):
@@ -321,11 +321,11 @@ tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + 
 
 
 class ModuleError(Exception):
-    pass
+    ...
 
 
 class lang:
-    pass
+    ...
 
 
 def load(name):
@@ -460,7 +460,7 @@ class welcome(Toplevel):
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
     def clos(self):
-        pass
+        ...
 
 
 def upgrade():
@@ -579,7 +579,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
     try:
         os.remove(dtboimg)
     except:
-        pass
+        ...
     rmdir(work + "dtbo" + os.sep + "dtbo")
 
 
@@ -655,7 +655,7 @@ class Process(Toplevel):
         try:
             win.withdraw()
         finally:
-            pass
+            ...
         self.notice = Label(self, text='Preparing...', font=(None, 15))
         self.notice.pack(padx=10, pady=10)
         self.title("Preparing...")
@@ -1073,7 +1073,7 @@ def mpkman() -> None:
                 try:
                     os.remove(file_)
                 except:
-                    pass
+                    ...
 
         def msh(self, cmd):
             try:
@@ -1175,7 +1175,7 @@ def mpkman() -> None:
                 try:
                     self.attributes('-topmost', 'true')
                 except:
-                    pass
+                    ...
                 self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
                 for group_name, group_data in data['main'].items():
                     if group_name != "info":
@@ -1316,7 +1316,7 @@ def mpkman() -> None:
             try:
                 self.ck.attributes('-topmost', 'true')
             except:
-                pass
+                ...
             self.ck.title(lang.t6)
             jzxs(self.ck)
             ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
@@ -1372,7 +1372,7 @@ def mpkman() -> None:
                     try:
                         list_pls()
                     except:
-                        pass
+                        ...
             else:
                 win.messpop(lang.warn2)
 
@@ -1396,7 +1396,7 @@ def mpkman() -> None:
     try:
         list_pls()
     except:
-        pass
+        ...
     lf1.pack(padx=10, pady=10)
 
 
@@ -1805,7 +1805,7 @@ class StdoutRedirector:
         self.text_space.yview('end')
 
     def flush(self):
-        pass
+        ...
 
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
@@ -1967,7 +1967,7 @@ def dboot(nm: str = 'boot'):
                 try:
                     os.remove("ramdisk.cpio")
                 except:
-                    pass
+                    ...
                 os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
         else:
             print("Pack Ramdisk Successful..")
@@ -2151,7 +2151,7 @@ def unpackrom(ifile) -> None:
         try:
             unpackg.refs()
         except:
-            pass
+            ...
         return
     elif os.path.splitext(ifile)[1] == '.ops':
         args = {'decrypt': True,
@@ -2161,7 +2161,7 @@ def unpackrom(ifile) -> None:
         try:
             unpackg.refs()
         except:
-            pass
+            ...
         return
     if gettype(zip_src) == 'zip':
         fz = zipfile.ZipFile(zip_src, 'r')
@@ -2183,7 +2183,7 @@ def unpackrom(ifile) -> None:
                 print(lang.text80 % (file_, e))
                 win.messpop(lang.warn4.format(file_))
             finally:
-                pass
+                ...
         print(lang.text81)
         if os.path.exists(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
             xmcd_.listdir()
@@ -2194,7 +2194,7 @@ def unpackrom(ifile) -> None:
         try:
             unpackg.refs()
         except:
-            pass
+            ...
         fz.close()
         return
     elif ftype != 'unknow':
@@ -2216,7 +2216,7 @@ def unpackrom(ifile) -> None:
     try:
         unpackg.refs()
     except:
-        pass
+        ...
 
 
 def rwork() -> str:
@@ -2283,14 +2283,14 @@ def unpack(chose, form: any = None):
                         try:
                             os.remove(work + i + '.patch.dat')
                         except:
-                            pass
+                            ...
                     else:
                         print("transferpath" + lang.text84)
         if os.access(work + i + ".img", os.F_OK):
             try:
                 parts.pop(i)
             except KeyError:
-                pass
+                ...
             if gettype(work + i + ".img") != 'sparse':
                 parts[i] = gettype(work + i + ".img")
             if gettype(work + i + ".img") == 'dtbo':
@@ -2327,7 +2327,7 @@ def unpack(chose, form: any = None):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
                 else:
-                    pass
+                    ...
             if (ftype := gettype(work + i + ".img")) == "ext":
                 print(lang.text79 + i + ".img [%s]" % ftype)
                 try:
@@ -2499,13 +2499,13 @@ def mke2fs(name, work, sparse, size=0):
         try:
             os.remove(work + name + "_new.img")
         except:
-            pass
+            ...
     else:
         if os.path.isfile(work + name + ".img"):
             try:
                 os.remove(work + name + ".img")
             except:
-                pass
+                ...
         os.rename(work + name + "_new.img", work + name + ".img")
 
 
@@ -2788,7 +2788,7 @@ class format_conversion(Toplevel):
         selection = [self.list_b.get(index) for index in self.list_b.curselection()]
         self.destroy()
         if fget == hget:
-            pass
+            ...
         elif fget == 'sparse':
             for i in selection:
                 print(f'[{hget}->{fget}]{i}')
@@ -2810,7 +2810,7 @@ class format_conversion(Toplevel):
                                     try:
                                         os.remove(work + dname + '.patch.dat')
                                     except:
-                                        pass
+                                        ...
                             else:
                                 print("transferpath" + lang.text84)
                     if os.path.exists(work + dname + '.img'):
@@ -2844,7 +2844,7 @@ class format_conversion(Toplevel):
                                         os.remove(transferpath)
                                         os.remove(work + dname + '.patch.dat')
                                     except:
-                                        pass
+                                        ...
                             else:
                                 print("transferpath" + lang.text84)
                 if hget == 'sparse':
