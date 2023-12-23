@@ -2741,7 +2741,7 @@ class format_conversion(Toplevel):
         self.f.pack(pady=5, padx=5, fill=X)
         self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
         self.h.current(0)
-        self.h.bind("<<ComboboxSelected>>", self.relist)
+        self.h.bind("<<ComboboxSelected>>", lambda x:self.relist())
         self.h.pack(side='left', padx=5)
         Label(self.f, text='>>>>>>').pack(side='left', padx=5)
         self.f = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
@@ -2753,7 +2753,7 @@ class format_conversion(Toplevel):
         ttk.Button(self, text=lang.ok, command=lambda: cz(self.conversion)).pack(side=BOTTOM, fill=BOTH)
         jzxs(self)
 
-    def relist(self, *other):
+    def relist(self):
         work = rwork()
         self.list_b.delete(0, "end")
         if self.h.get() == "br":
