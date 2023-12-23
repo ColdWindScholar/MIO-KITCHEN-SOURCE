@@ -144,7 +144,12 @@ class Extractor(object):
                             cap = f"{hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16))}"
                         cap = f' capabilities={cap}'
                 if entry_inode.is_symlink:
-                    link_target = entry_inode.open_read().read().decode("utf8")
+                    try:
+                        link_target = entry_inode.open_read().read().decode("utf8")
+                    except Exception and BaseException:
+                        link_target_block = int.from_bytes(entry_inode.open_read().read(), "little")
+                        link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
+                                                             entry_inode.inode.i_size).decode("utf8")
                 else:
                     link_target = ''
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
