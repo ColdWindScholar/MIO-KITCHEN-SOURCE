@@ -336,20 +336,11 @@ class Extractor(object):
         self.FileName = self.__file_name(os.path.basename(target))
         target_type = 'img'
         self.CONFING_DIR = work + os.sep + 'config'
-
         if target_type == 's_img':
             print(".....Convert %s to %s" % (
                 os.path.basename(target), os.path.basename(target).replace(".img", ".raw.img")))
             simg2img(target)
-            with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
-                data = f.read(500000)
-            if re.search(b'\x4d\x4f\x54\x4f', data):
-                print(".....Finding MOTO structure! Fixing.....")
-                self.fix_moto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
-            print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
-            start = dti()
-            self.__ext4extractor()
-            print("Done! [%s]" % (dti() - start))
+            target_type = 'img'
         if target_type == 'img':
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
