@@ -233,8 +233,6 @@ class Extractor(object):
                                         for index in list(link_target):
                                             tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
                                         out.write(tmp + struct.pack('xx'))
-                            else:
-                                ...
                         finally:
                             ...
 
