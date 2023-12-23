@@ -52,23 +52,15 @@ class Extractor(object):
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
         self.BLOCK_SIZE = 4096
-        self.TYPE_IMG = 'system'
         self.context = deque()
         self.fs_config = deque()
 
     @staticmethod
-    def __file_name(file_path):
-        name = os.path.basename(file_path).rsplit('.', 1)[0]
-        name = name.split('-')[0]
-        name = name.split(' ')[0]
-        name = name.split('+')[0]
-        name = name.split('{')[0]
-        name = name.split('(')[0]
-        return name
-
-    @staticmethod
-    def __out_name(file_path):
-        name = file_path
+    def __out_name(file_path, out=1):
+        if out == 1:
+            name = file_path
+        else:
+            name = os.path.basename(file_path).rsplit('.', 1)[0]
         name = name.split('-')[0]
         name = name.split(' ')[0]
         name = name.split('+')[0]
@@ -312,7 +304,7 @@ class Extractor(object):
         self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
         self.OUTPUT_MYIMAGE_FILE = os.path.basename(target)
         self.MYFileName = os.path.basename(self.OUTPUT_IMAGE_FILE).replace(".img", "")
-        self.FileName = self.__file_name(os.path.basename(target))
+        self.FileName = self.__out_name(os.path.basename(target), out=0)
         target_type = 'img'
         self.CONFING_DIR = work + os.sep + 'config'
         if target_type == 's_img':
