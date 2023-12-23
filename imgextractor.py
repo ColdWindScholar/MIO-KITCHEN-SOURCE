@@ -148,10 +148,10 @@ class Extractor(object):
                     elif i[0] == 'security.capability':
                         raw_cap = struct.unpack("<5I", i[1])
                         if raw_cap[1] > 65535:
-                            cap = '' + str(hex(int('%04x%04x' % (raw_cap[3], raw_cap[1]), 16)))
+                            cap = f'{hex(int('%04x%04x' % (raw_cap[3], raw_cap[1]), 16))}'
                         else:
-                            cap = '' + str(hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16)))
-                        cap = ' capabilities={cap}'.format(cap=cap)
+                            cap = f'{hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16))}'
+                        cap = f' capabilities={cap}'
                 if entry_inode.is_symlink:
                     link_target = entry_inode.open_read().read().decode("utf8")
                 else:
