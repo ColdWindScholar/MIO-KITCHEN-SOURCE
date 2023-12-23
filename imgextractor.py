@@ -226,7 +226,7 @@ class Extractor(object):
                             link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                                  entry_inode.inode.i_size).decode("utf8")
                             target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
-                            if link_target and all(c in string.printable for c in link_target):
+                            if link_target and all(c_ in string.printable for c_ in link_target):
                                 if os.name == 'posix':
                                     os.symlink(link_target, target)
                                 if os.name == 'nt':
@@ -281,9 +281,9 @@ class Extractor(object):
                         break
                 self.__append('\n'.join(sorted(self.context)), contexts)  # 11.05.18
 
-    def converSimgToImg(self, target):
+    def conver_simg_to_img(self, target):
         with open(target, "rb") as img_file:
-            setattr(self, 'sign_offset', self.checkSignOffset(img_file))
+            setattr(self, 'sign_offset', self.check_sign_offset(img_file))
             if self.sign_offset > 0:
                 img_file.seek(self.sign_offset, 0)
             header = ext4_file_header(img_file.read(28))
@@ -362,7 +362,7 @@ class Extractor(object):
             ...
 
     @staticmethod
-    def checkSignOffset(file):
+    def check_sign_offset(file):
         size = os.stat(file.name).st_size
         if size <= 52428800:
             mm = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
@@ -386,7 +386,7 @@ class Extractor(object):
         if target_type == 'simg':
             print(".....Convert %s to %s" % (
                 os.path.basename(target), os.path.basename(target).replace(".img", ".raw.img")))
-            self.converSimgToImg(target)
+            self.conver_simg_to_img(target)
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
             if re.search(b'\x4d\x4f\x54\x4f', data):
