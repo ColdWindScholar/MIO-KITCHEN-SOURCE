@@ -69,8 +69,9 @@ class Extractor(object):
         name = name.split('(')[0]
         return name
 
-    def __appendf(self, msg, log_file):
-        with open(log_file, 'a', newline='\n') as file:
+    @staticmethod
+    def __appendf(msg, log):
+        with open(log, 'a', newline='\n') as file:
             print(msg, file=file)
 
     def __getperm(self, arg):
