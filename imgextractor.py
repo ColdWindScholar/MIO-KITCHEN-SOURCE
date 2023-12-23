@@ -368,7 +368,8 @@ class Extractor(object):
         finally:
             ...
 
-    def checkSignOffset(self, file):
+    @staticmethod
+    def checkSignOffset(file):
         size = os.stat(file.name).st_size
         if size <= 52428800:
             mm = mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ)
