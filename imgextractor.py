@@ -39,6 +39,7 @@ class ext4_chunk_header(object):
 
 class Extractor(object):
     def __init__(self):
+        self.symlinks = deque()
         self.DIR = None
         self.FileName = ""
         self.BASE_DIR = ""
@@ -74,7 +75,8 @@ class Extractor(object):
         with open(log, 'a', newline='\n') as file:
             print(msg, file=file)
 
-    def __getperm(self, arg):
+    @staticmethod
+    def __getperm(arg):
         if len(arg) < 9 or len(arg) > 10:
             return
         if len(arg) > 8:
