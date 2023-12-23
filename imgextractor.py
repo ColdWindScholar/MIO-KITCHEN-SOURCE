@@ -400,7 +400,6 @@ class Extractor(object):
                 break
         if offset > 0:
             with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
-                # data = f.seek(offset)
                 data = f.read(15360)
                 if data:
                     o.write(data)
