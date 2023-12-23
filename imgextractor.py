@@ -122,7 +122,7 @@ class Extractor(object):
         if wx == 't':
             s += 1
             w += 1
-        return str(s) + str(o) + str(g) + str(w)
+        return f'{s}{o}{g}{w}'
 
     def __ext4extractor(self):
         fs_config_file = self.FileName + '_fs_config'
@@ -164,10 +164,10 @@ class Extractor(object):
                         self.__append(tmp_path, spaces_file)
                     tmp_path = tmp_path.replace(' ', '_')
                     self.fs_config.append(
-                        " ".join([tmp_path, str(uid), str(gid), str(mode) + cap if cap else str(mode), link_target]))
+                        f'{tmp_path} {uid} {gid} {mode + cap if cap else mode} {link_target}')
                 else:
                     self.fs_config.append(
-                        ' '.join([self.DIR + entry_inode_path, str(uid), str(gid), str(mode) + cap if cap else str(mode), link_target]))
+                        f'{self.DIR + entry_inode_path} {uid} {gid} {mode + cap if cap else mode} {link_target}')
                 if not cap:
                     if con:
                         for fuk_ in fuk_symbols:
