@@ -17,7 +17,7 @@ EXT4_SPARSE_HEADER_LEN = 28
 EXT4_CHUNK_HEADER_SIZE = 12
 
 
-class ext4_file_header(object):
+class ext4_file_header:
     def __init__(self, buf):
         (self.magic,
          self.major,
@@ -30,7 +30,7 @@ class ext4_file_header(object):
          self.crc32) = struct.unpack('<I4H4I', buf)
 
 
-class ext4_chunk_header(object):
+class ext4_chunk_header:
     def __init__(self, buf):
         (self.type,
          self.reserved,
@@ -38,7 +38,7 @@ class ext4_chunk_header(object):
          self.total_size) = struct.unpack('<2H2I', buf)
 
 
-class Extractor(object):
+class Extractor:
     def __init__(self):
         self.CONFING_DIR = None
         self.MYFileName = None
