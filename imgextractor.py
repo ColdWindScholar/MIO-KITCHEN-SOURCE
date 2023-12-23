@@ -13,7 +13,7 @@ if os.name == 'nt':
     from ctypes import windll
 from timeit import default_timer as dti
 from collections import deque
-
+from utils import simg2img
 EXT4_HEADER_MAGIC = 0xED26FF3A
 EXT4_SPARSE_HEADER_LEN = 28
 EXT4_CHUNK_HEADER_SIZE = 12
@@ -340,7 +340,7 @@ class Extractor(object):
         if target_type == 's_img':
             print(".....Convert %s to %s" % (
                 os.path.basename(target), os.path.basename(target).replace(".img", ".raw.img")))
-            self.s_img_to_img(target)
+            simg2img(target)
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
             if re.search(b'\x4d\x4f\x54\x4f', data):
