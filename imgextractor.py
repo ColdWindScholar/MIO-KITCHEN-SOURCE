@@ -234,7 +234,7 @@ class Extractor(object):
                                         out.write(tmp + struct.pack('xx'))
                             else:
                                 ...
-                        except:
+                        finally:
                             ...
 
         dir_my = self.CONFING_DIR + os.sep
