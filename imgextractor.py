@@ -11,7 +11,6 @@ if os.name == 'nt':
     from stat import FILE_ATTRIBUTE_SYSTEM
     from ctypes import windll
 from timeit import default_timer as dti
-from collections import deque
 from utils import simg2img
 
 EXT4_HEADER_MAGIC = 0xED26FF3A
@@ -52,8 +51,8 @@ class Extractor(object):
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
         self.BLOCK_SIZE = 4096
-        self.context = deque()
-        self.fs_config = deque()
+        self.context = []
+        self.fs_config = []
 
     @staticmethod
     def __out_name(file_path, out=1):
