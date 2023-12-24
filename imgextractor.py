@@ -114,7 +114,10 @@ class Extractor:
                         con = e.decode('utf8')[:-1]
                     elif f == 'security.capability':
                         r = struct.unpack('<5I', e)
-                        cap = hex(int(f'{r[3]:04x}{r[1]:04x}', 16)) if r[1] > 65535 else hex(int(f'{r[3]:04x}{r[2]:04x}{r[1]:04x}', 16))
+                        if r[1] > 65535:
+                            cap = hex(int(f'{r[3]:04x}{r[1]:04x}', 16))
+                        else:
+                            cap = hex(int(f'{r[3]:04x}{r[2]:04x}{r[1]:04x}', 16))
                         cap = f" capabilities={cap}"
                 if entry_inode.is_symlink:
                     try:
