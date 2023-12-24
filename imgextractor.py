@@ -68,6 +68,9 @@ class Extractor:
 
     @staticmethod
     def __append(msg, log):
+        if not os.path.isfile(log) and not os.path.exists(log):
+            with open(log, 'tw', encoding='utf-8'):
+                ...
         with open(log, 'a', newline='\n') as file:
             print(msg, file=file)
 
@@ -151,11 +154,7 @@ class Extractor:
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
-                    if not os.path.isfile(spaces_file):
-                        with open(spaces_file, 'tw', encoding='utf-8'):
-                            self.__append(tmp_path, spaces_file)
-                    else:
-                        self.__append(tmp_path, spaces_file)
+                    self.__append(tmp_path, spaces_file)
                     tmp_path = tmp_path.replace(' ', '_')
                     self.fs_config.append(
                         f'{tmp_path} {uid} {gid} {mode}{cap} {link_target}')
@@ -226,8 +225,7 @@ class Extractor:
         dir_my = self.CONFING_DIR + os.sep
         if not os.path.isdir(dir_my):
             os.makedirs(dir_my)
-        with open(dir_my + self.FileName + '_size.txt', 'tw', encoding='utf-8'):
-            self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
+        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             root = ext4.Volume(file).root
             dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
