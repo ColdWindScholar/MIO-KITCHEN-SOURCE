@@ -109,8 +109,7 @@ class Extractor:
                 link_target = ''
                 tmp_path = self.DIR + entry_inode_path
                 spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
-                for i in entry_inode.xattrs():
-                    f, *e = i
+                for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
                         con = e.decode('utf8')[:-1]
                     elif f == 'security.capability':
