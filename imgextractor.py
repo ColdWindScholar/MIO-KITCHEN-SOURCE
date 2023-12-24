@@ -127,9 +127,8 @@ class Extractor:
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
                     self.__append(tmp_path, spaces_file)
-                    tmp_path = tmp_path.replace(' ', '_')
                     self.fs_config.append(
-                        f'{tmp_path} {uid} {gid} {mode}{cap} {link_target}')
+                        f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
                     self.fs_config.append(
                         f'{self.DIR + entry_inode_path} {uid} {gid} {mode}{cap} {link_target}')
