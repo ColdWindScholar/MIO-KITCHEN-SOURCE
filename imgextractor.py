@@ -161,8 +161,8 @@ class Extractor:
                         os.chmod(file_target, int(mode, 8))
                         os.chown(file_target, uid, gid)
                 elif entry_inode.is_symlink:
+                    target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                     try:
-                        target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                         if os.path.islink(target) or os.path.isfile(target):
                             try:
                                 os.remove(target)
@@ -180,7 +180,6 @@ class Extractor:
                                     print(e.__str__())
                     except BaseException and Exception:
                         try:
-                            target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_')
                             if link_target and all(c_ in string.printable for c_ in link_target):
                                 if os.name == 'posix':
                                     os.symlink(link_target, target)
