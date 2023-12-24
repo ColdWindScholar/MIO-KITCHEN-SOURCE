@@ -248,13 +248,12 @@ class Extractor:
         finally:
             ...
 
-    def main(self, target, output_dir, work):
+    def main(self, target, output_dir, work, target_type: str = 'img'):
         self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
-        target_type = 'img'
         self.CONFING_DIR = work + os.sep + 'config'
         if target_type == 's_img':
             print(".....Convert %s to %s" % (
