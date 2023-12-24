@@ -36,8 +36,7 @@ class SparseImage(object):
                  mode="rb", build_map=True):
         self.simg_f = f = open(simg_fn, mode)
 
-        header_bin = f.read(28)
-        header = struct.unpack("<I4H4I", header_bin)
+        header = struct.unpack("<I4H4I", f.read(28))
 
         magic = header[0]
         major_version = header[1]
@@ -131,7 +130,7 @@ class SparseImage(object):
         else:
             self.file_map = {"__DATA": self.care_map}
 
-    def AppendFillChunk(self, data, blocks):
+    def append_fill_chunk(self, data, blocks):
         f = self.simg_f
 
         # Append a fill chunk
@@ -163,7 +162,7 @@ class SparseImage(object):
 
     def _GetRangeData(self, ranges):
         """Generator that produces all the image data in 'ranges'.  The
-    number of individual pieces returned is arbitrary (and in
+    number of individual pieces returned is arbitrary and in
     particular is not necessarily equal to the number of ranges in
     'ranges'.
 
