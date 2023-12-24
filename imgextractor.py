@@ -256,8 +256,6 @@ class Extractor:
         self.FileName = self.__out_name(os.path.basename(target), out=0)
         self.CONFING_DIR = work + os.sep + 'config'
         if target_type == 's_img':
-            print(".....Convert %s to %s" % (
-                os.path.basename(target), os.path.basename(target).replace(".img", ".raw.img")))
             simg2img(target)
             target_type = 'img'
         if target_type == 'img':
