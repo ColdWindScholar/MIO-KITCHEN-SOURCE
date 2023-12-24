@@ -41,8 +41,6 @@ class ext4_chunk_header:
 class Extractor:
     def __init__(self):
         self.CONFING_DIR = None
-        self.MYFileName = None
-        self.OUTPUT_MYIMAGE_FILE = None
         self.BASE_DIR_ = None
         self.DIR = None
         self.FileName = ""
@@ -296,8 +294,6 @@ class Extractor:
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))  # output_dir
         self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
-        self.OUTPUT_MYIMAGE_FILE = os.path.basename(target)
-        self.MYFileName = os.path.basename(self.OUTPUT_IMAGE_FILE).replace(".img", "")
         self.FileName = self.__out_name(os.path.basename(target), out=0)
         target_type = 'img'
         self.CONFING_DIR = work + os.sep + 'config'
