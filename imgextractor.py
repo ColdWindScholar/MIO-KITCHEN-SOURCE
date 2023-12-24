@@ -200,10 +200,7 @@ class Extractor:
                             os.symlink(link_target, target)
                         if os.name == 'nt':
                             with open(target.replace('/', os.sep), 'wb') as out:
-                                tmp = b'!<symlink>\xff\xfe'
-                                for index in list(link_target):
-                                    tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
-                                out.write(tmp + struct.pack('xx'))
+                                out.write(b'!<symlink>' + link_target.encode('utf-16') + struct.pack('xx'))
                                 try:
                                     windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
                                                                        DWORD(FILE_ATTRIBUTE_SYSTEM))
@@ -217,10 +214,12 @@ class Extractor:
                                     os.symlink(link_target, target)
                                 if os.name == 'nt':
                                     with open(target.replace('/', os.sep), 'wb') as out:
-                                        tmp = b'!<symlink>\xff\xfe'
-                                        for index in list(link_target):
-                                            tmp = tmp + struct.pack('>sx', index.encode('utf-8'))
-                                        out.write(tmp + struct.pack('xx'))
+                                        out.write(b'!<symlink>' + link_target.encode('utf-16') + struct.pack('xx'))
+                                    try:
+                                        windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
+                                                                           DWORD(FILE_ATTRIBUTE_SYSTEM))
+                                    except Exception as e:
+                                        print(e.__str__())
                         finally:
                             ...
 
