@@ -113,7 +113,8 @@ class Extractor:
                     if f == 'security.selinux':
                         con = e.decode('utf8')[:-1]
                     elif f == 'security.capability':
-                        cap = f" capabilities={hex(int('%04x%04x' % (r_cap[3], r_cap[1]), 16)) if (r_cap := struct.unpack('<5I', e))[1] > 65535 else hex(int('%04x%04x%04x' % (r_cap[3], r_cap[2], r_cap[1]), 16))}"
+                        cap = hex(int(f'{r_cap[3]:04x}{r_cap[1]:04x}', 16)) if (r_cap := struct.unpack('<5I', e))[1] > 65535 else hex(int(f'{r_cap[3]:04x}{r_cap[2]:04x}{r_cap[1]:04x}', 16))
+                        cap = f" capabilities={cap}"
                 if entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
