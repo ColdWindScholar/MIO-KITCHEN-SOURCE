@@ -15,11 +15,10 @@ from utils import simg2img
 
 class Extractor:
     def __init__(self):
-        self.CONFING_DIR = None
         self.BASE_DIR_ = None
+        self.CONFING_DIR = None
         self.DIR = None
         self.FileName = ""
-        self.BASE_DIR = ""
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
         self.BLOCK_SIZE = 4096
@@ -254,11 +253,10 @@ class Extractor:
             ...
 
     def main(self, target, output_dir, work):
-        self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
         self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
-        self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
+        self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
         target_type = 'img'
         self.CONFING_DIR = work + os.sep + 'config'
