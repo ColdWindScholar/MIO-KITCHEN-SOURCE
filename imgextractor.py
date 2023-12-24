@@ -97,7 +97,7 @@ class Extractor:
     def __ext4extractor(self):
         fs_config_file = self.FileName + '_fs_config'
         fuk_symbols = '\\^$.|?*+(){}[]'
-        contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"  # 08.05.18
+        contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"
 
         def scan_dir(root_inode, root_path=""):
             for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
@@ -271,7 +271,7 @@ class Extractor:
         self.BASE_DIR = (os.path.realpath(os.path.dirname(target)) + os.sep)
         self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
-            os.path.basename(output_dir))  # output_dir
+            os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = self.BASE_DIR + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
         target_type = 'img'
