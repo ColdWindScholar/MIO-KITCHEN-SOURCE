@@ -151,7 +151,7 @@ class Extractor:
                         with open(file_target, 'wb') as out:
                             out.write(entry_inode.open_read().read())
                     except Exception and BaseException as e:
-                        print(f'ERROR:Cannot Write {file_target}, Because of {e}')
+                        print(f'[E] Cannot Write {file_target}, Because of {e}')
                     if os.name == 'posix' and os.geteuid() == 0:
                         os.chmod(file_target, int(mode, 8))
                         os.chown(file_target, uid, gid)
