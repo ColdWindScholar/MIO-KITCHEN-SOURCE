@@ -12,10 +12,6 @@ if os.name == 'nt':
 from timeit import default_timer as dti
 from utils import simg2img
 
-EXT4_HEADER_MAGIC = 0xED26FF3A
-EXT4_SPARSE_HEADER_LEN = 28
-EXT4_CHUNK_HEADER_SIZE = 12
-
 
 class Extractor:
     def __init__(self):
