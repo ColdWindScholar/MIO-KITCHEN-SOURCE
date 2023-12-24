@@ -205,7 +205,7 @@ class Extractor:
         self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             root = ext4.Volume(file).root
-            dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])  # 11.05.18
+            dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])
             self.DIR = dir_r
             scan_dir(root)
             if dir_r == 'vendor':
@@ -220,7 +220,7 @@ class Extractor:
                 self.fs_config.insert(1, f'{dir_r} 0 0 0755')
 
             self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
-            if self.context:  # 11.05.18
+            if self.context:
                 self.context.sort()
                 for c in self.context:
                     if re.search('lost..found', c):
@@ -235,7 +235,7 @@ class Extractor:
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
                         self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
                         break
-                self.__append('\n'.join(self.context), contexts)  # 11.05.18
+                self.__append('\n'.join(self.context), contexts)
 
     @staticmethod
     def fix_moto(input_file):
