@@ -208,16 +208,16 @@ class Extractor:
                 self.context.sort()
                 for c in self.context:
                     if re.search('lost..found', c):
-                        self.context.insert(0, '/' + ' ' + c.split(" ")[1])
-                        self.context.insert(1, '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
-                        self.context.insert(2, '/' + dir_r + ' ' + c.split(" ")[1])
-                        self.context.insert(3, '/' + dir_r + '/lost+\\found' + ' ' + c.split(" ")[1])
+                        self.context.insert(0, '/' + ' ' + c.split()[1])
+                        self.context.insert(1, '/' + dir_r + '(/.*)? ' + c.split()[1])
+                        self.context.insert(2, f'/{dir_r} {c.split()[1]}')
+                        self.context.insert(3, '/' + dir_r + '/lost+\\found ' + c.split()[1])
                         break
 
                 for c in self.context:
                     if re.search('/system/system/build..prop ', c):
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
-                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split(" ")[1])
+                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split()[1])
                         break
                 self.__append('\n'.join(self.context), contexts)
 
