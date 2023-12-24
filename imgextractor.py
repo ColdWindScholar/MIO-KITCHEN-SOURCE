@@ -110,10 +110,11 @@ class Extractor:
                 tmp_path = self.DIR + entry_inode_path
                 spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for i in entry_inode.xattrs():
-                    if i[0] == 'security.selinux':
-                        con = i[1].decode('utf8')[:-1]
-                    elif i[0] == 'security.capability':
-                        cap = f" capabilities={hex(int('%04x%04x' % (raw_cap[3], raw_cap[1]), 16)) if (raw_cap := struct.unpack('<5I', i[1]))[1] > 65535 else hex(int('%04x%04x%04x' % (raw_cap[3], raw_cap[2], raw_cap[1]), 16))}"
+                    f, *e = i
+                    if f == 'security.selinux':
+                        con = e.decode('utf8')[:-1]
+                    elif f == 'security.capability':
+                        cap = f" capabilities={hex(int('%04x%04x' % (r_cap[3], r_cap[1]), 16)) if (r_cap := struct.unpack('<5I', e))[1] > 65535 else hex(int('%04x%04x%04x' % (r_cap[3], r_cap[2], r_cap[1]), 16))}"
                 if entry_inode.is_symlink:
                     try:
                         link_target = entry_inode.open_read().read().decode("utf8")
