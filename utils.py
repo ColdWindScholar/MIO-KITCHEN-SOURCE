@@ -263,8 +263,8 @@ def v_code(num=6) -> str:
         num = randint(0, 9)
         # num = chr(random.randint(48,57))#ASCII表示数字
         letter = chr(randint(97, 122))  # 取小写字母
-        Letter = chr(randint(65, 90))  # 取大写字母
-        s = str(choice([num, letter, Letter]))
+        letter_ = chr(randint(65, 90))  # 取大写字母
+        s = str(choice([num, letter, letter_]))
         ret += s
     return ret
 
