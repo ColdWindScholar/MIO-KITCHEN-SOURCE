@@ -246,7 +246,7 @@ class Extractor:
         finally:
             ...
 
-    def main(self, target, output_dir, work, target_type: str = 'img'):
+    def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
         self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
