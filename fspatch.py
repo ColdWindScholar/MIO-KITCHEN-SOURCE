@@ -7,10 +7,13 @@ def scanfs(file) -> dict:
     filesystem_config = {}
     with open(file, "r") as file_:
         for i in file_.readlines():
-            filepath, *other = i.strip().split()
+            try:
+                filepath, *other = i.strip().split()
+            except TypeError:
+                print(f'[W] Skip {i}')
             filesystem_config[filepath] = other
             if (long := len(other)) > 4:
-                print(f"[Warn] {i[0]} has too much data-{long}.")
+                print(f"[W] {i[0]} has too much data-{long}.")
     return filesystem_config
 
 
