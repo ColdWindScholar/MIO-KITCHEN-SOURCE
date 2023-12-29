@@ -253,15 +253,12 @@ class Tool(Tk):
     def tab4_n(self):
         Label(self.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
         Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
-        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4,
-              text=lang.text128.format(settings.version, sys.version[:6], os.name, machine()),
+              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
               font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
-        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4,
               text=lang.text127,
               font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
-        ttk.Separator(self.tab4, orient=HORIZONTAL).pack(padx=100, fill=X)
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
         # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
