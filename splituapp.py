@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-# splituapp for Python2/3 by SuperR. @XDA
+# split_app for Python2/3 by SuperR. @XDA
 #
 # For extracting img files from UPDATE.APP
 
-# Based on the app_structure file in split_updata.pl by McSpoon
+# Based on the app_structure file in split_up_data.pl by McSpoon
 
 from __future__ import print_function
 
@@ -15,27 +15,27 @@ from os import makedirs, name, sep, path
 
 
 def extract(source, flist):
-    bytenum = 4
-    outdir = 'output'
+    byte_num = 4
+    out_dir = 'output'
     img_files = []
 
     try:
-        makedirs(outdir)
+        makedirs(out_dir)
     finally:
         ...
 
     with open(source, 'rb') as f:
         while True:
-            i = f.read(bytenum)
+            i = f.read(byte_num)
 
             if not i:
                 break
             elif i != b'\x55\xAA\x5A\xA5':
                 continue
 
-            headersize = list(unpack('<L', f.read(bytenum)))[0]
+            header_size = list(unpack('<L', f.read(byte_num)))[0]
             f.seek(16, 1)
-            filesize = list(unpack('<L', f.read(bytenum)))[0]
+            file_size = list(unpack('<L', f.read(byte_num)))[0]
             f.seek(32, 1)
 
             try:
@@ -45,7 +45,7 @@ def extract(source, flist):
                 filename = ''
 
             f.seek(22, 1)
-            crcdata = f.read(headersize - 98)
+            crc_data = f.read(header_size - 98)
 
             if not flist or filename in flist:
                 if filename in img_files:
@@ -56,13 +56,13 @@ def extract(source, flist):
                 chunk = 10240
 
                 try:
-                    with open(outdir + sep + filename + '.img', 'wb') as o:
-                        while filesize > 0:
-                            if chunk > filesize:
-                                chunk = filesize
+                    with open(out_dir + sep + filename + '.img', 'wb') as o:
+                        while file_size > 0:
+                            if chunk > file_size:
+                                chunk = file_size
 
                             o.write(f.read(chunk))
-                            filesize -= chunk
+                            file_size -= chunk
                 except Exception as e:
                     print('ERROR: Failed to create ' + filename + '.img:%s\n' % e)
                     return
@@ -75,17 +75,17 @@ def extract(source, flist):
 
                         crc_val = []
                         if sys.version_info.major < 3:
-                            for i in crcdata:
+                            for i in crc_data:
                                 crc_val.append('%02X' % int(i))
                         else:
-                            for i in crcdata:
+                            for i in crc_data:
                                 crc_val.append('%02X' % i)
 
             else:
-                f.seek(filesize, 1)
+                f.seek(file_size, 1)
 
-            xbytes = bytenum - f.tell() % bytenum
-            if xbytes < bytenum:
-                f.seek(xbytes, 1)
+            x_bytes = byte_num - f.tell() % byte_num
+            if x_bytes < byte_num:
+                f.seek(x_bytes, 1)
 
     print('\nExtraction complete')
