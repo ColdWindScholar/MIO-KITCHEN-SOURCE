@@ -195,20 +195,21 @@ class Extractor:
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
             self.fs_config.insert(2 if dir_r == 'system' else 1, f'{dir_r} 0 0 0755')
             self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
+            p1 = p2 = 0
             if self.context:
                 self.context.sort()
                 for c in self.context:
-                    if re.search('lost..found', c):
+                    if re.search('/system/system/build..prop ', c) and p1 == 0:
+                        self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
+                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split()[1])
+                        p1 = 1
+                    if re.search('lost..found', c) and p2 == 0:
                         self.context.insert(0, '/ ' + c.split()[1])
                         self.context.insert(1, '/' + dir_r + '(/.*)? ' + c.split()[1])
                         self.context.insert(2, f'/{dir_r} {c.split()[1]}')
                         self.context.insert(3, '/' + dir_r + '/lost+\\found ' + c.split()[1])
-                        break
-
-                for c in self.context:
-                    if re.search('/system/system/build..prop ', c):
-                        self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
-                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split()[1])
+                        p2 = 1
+                    if p1 == p2 == 1:
                         break
                 self.__append('\n'.join(self.context), contexts)
 
