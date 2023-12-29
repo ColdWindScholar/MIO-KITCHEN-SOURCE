@@ -21,7 +21,7 @@ def extract(source, flist):
 
     try:
         makedirs(outdir)
-    except:
+    finally:
         ...
 
     with open(source, 'rb') as f:
@@ -41,7 +41,7 @@ def extract(source, flist):
             try:
                 filename = str(f.read(16).decode())
                 filename = ''.join(f for f in filename if f in printable).lower()
-            except:
+            except Exception or BaseException:
                 filename = ''
 
             f.seek(22, 1)
