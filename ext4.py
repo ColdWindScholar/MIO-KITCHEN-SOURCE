@@ -442,12 +442,7 @@ class MappingEntry:
         yield self.block_count
 
     def __repr__(self):
-        return "{type:s}({file_block_idx!r:s}, {disk_block_idx!r:s}, {blocK_count!r:s})".format(
-            blocK_count=self.block_count,
-            disk_block_idx=self.disk_block_idx,
-            file_block_idx=self.file_block_idx,
-            type=type(self).__name__
-        )
+        return f"{type(self).__name__:s}({self.file_block_idx!r:s}, {self.disk_block_idx!r:s}, {self.block_count!r:s})"
 
     def copy(self):
         return MappingEntry(self.file_block_idx, self.disk_block_idx, self.block_count)
