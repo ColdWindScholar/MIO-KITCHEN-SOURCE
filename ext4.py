@@ -870,14 +870,11 @@ class Inode:
 
             if xattrs_header.h_blocks != 1:
                 raise Ext4Error(
-                    "Invalid number of xattr blocks at offset 0x{xattrs_block_start:X} of inode {inode:d}: {xattrs_header:d} (expected 1)".format(
-                        inode=self.inode_idx,
-                        xattrs_header=xattrs_header.h_blocks,
-                        xattrs_block_start=xattrs_block_start
-                    ))
+                    f"Invalid number of xattr blocks at offset 0x{xattrs_block_start:X} of inode {self.inode_idx:d}: {xattrs_header.h_blocks:d} (expected 1)")
 
             offset = 4 * ((ctypes.sizeof(
-                ext4_xattr_header) + 3) // 4)  # The ext4_xattr_entry following the header is aligned on a 4-byte boundary
+                ext4_xattr_header) + 3) // 4)
+            # The ext4_xattr_entry following the header is aligned on a 4-byte boundary
             for xattr_name, xattr_value in self._parse_xattrs(xattrs_block[offset:], -offset,
                                                               prefix_override=prefix_override):
                 yield xattr_name, xattr_value
