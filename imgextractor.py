@@ -260,7 +260,7 @@ class Extractor:
             with open(os.path.abspath(self.OUTPUT_IMAGE_FILE), 'rb') as f:
                 data = f.read(500000)
             if re.search(b'\x4d\x4f\x54\x4f', data):
-                print(".....Finding MOTO structure! Fixing.....")
+                print(".....MOTO structure! Fixing.....")
                 self.fix_moto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
             start = dti()
