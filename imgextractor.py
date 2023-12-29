@@ -126,7 +126,7 @@ class Extractor:
                         f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
                     self.fs_config.append(
-                        f'{self.DIR + entry_inode_path} {uid} {gid} {mode}{cap} {link_target}')
+                        f'{tmp_path} {uid} {gid} {mode}{cap} {link_target}')
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if dir_target.endswith('.') and os.name == 'nt':
