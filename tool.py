@@ -774,7 +774,7 @@ class Process(Toplevel):
             try:
                 for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
                     print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
-            except:
+            except BaseException:
                 self.error = 0
             else:
                 self.error = 1
