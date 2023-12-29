@@ -805,7 +805,8 @@ class Inode:
                 if header.eh_depth != 0:
                     indices = self.volume.read_struct(ext4_extent_idx * header.eh_entries,
                                                       header_offset + ctypes.sizeof(ext4_extent_header))
-                    for idx in indices: nodes.put_nowait(idx.ei_leaf * self.volume.block_size)
+                    for idx in indices:
+                        nodes.put_nowait(idx.ei_leaf * self.volume.block_size)
                 else:
                     extents = self.volume.read_struct(ext4_extent * header.eh_entries,
                                                       header_offset + ctypes.sizeof(ext4_extent_header))
