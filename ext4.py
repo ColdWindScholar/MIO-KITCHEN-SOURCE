@@ -796,11 +796,8 @@ class Inode:
 
                 if not self.volume.ignore_magic and header.eh_magic != 0xF30A:
                     raise MagicError(
-                        "Invalid magic value in extent header at offset 0x{header_offset:X} of inode {inode:d}: 0x{header_magic:04X} (expected 0xF30A)".format(
-                            header_magic=header.eh_magic,
-                            header_offset=self.inode_idx,
-                            inode=self.inode_idx
-                        ))
+                        f"Invalid magic value in extent header at offset 0x{self.inode_idx:X} of"
+                        f" inode {self.inode_idx:d}: 0x{header.eh_magic:04X} (expected 0xF30A)")
 
                 if header.eh_depth != 0:
                     indices = self.volume.read_struct(ext4_extent_idx * header.eh_entries,
