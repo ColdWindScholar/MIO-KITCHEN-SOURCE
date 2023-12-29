@@ -100,14 +100,16 @@ class Extractor:
                 mode = self.__get_perm(entry_inode.mode_str)
                 uid = entry_inode.inode.i_uid
                 gid = entry_inode.inode.i_gid
-                con = ''
                 cap = ''
                 link_target = ''
                 tmp_path = self.DIR + entry_inode_path
                 spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
-                        con = e.decode('utf8')[:-1]
+                        t_p_mkc = tmp_path
+                        for fuk_ in fuk_symbols:
+                            t_p_mkc = t_p_mkc.replace(fuk_, '\\' + fuk_)
+                        self.context.append(f"/{t_p_mkc} {e.decode('utf8')[:-1]}")
                     elif f == 'security.capability':
                         r = struct.unpack('<5I', e)
                         if r[1] > 65535:
@@ -129,10 +131,6 @@ class Extractor:
                 else:
                     self.fs_config.append(
                         f'{self.DIR + entry_inode_path} {uid} {gid} {mode}{cap} {link_target}')
-                if con:
-                    for fuk_ in fuk_symbols:
-                        tmp_path = tmp_path.replace(fuk_, '\\' + fuk_)
-                    self.context.append(f'/{tmp_path} {con}')
                 if entry_inode.is_dir:
                     dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                     if dir_target.endswith('.') and os.name == 'nt':
