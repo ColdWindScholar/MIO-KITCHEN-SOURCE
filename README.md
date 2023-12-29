@@ -65,7 +65,7 @@ python build.py
 # Contact Us
 ***
 ### Developer's Email: 3590361911@qq.com
-### QQ Group: 879232506
+### QQ Group: 836898509
 ***
 # Contributors:
 ***
