@@ -870,7 +870,8 @@ class Inode:
 
             if xattrs_header.h_blocks != 1:
                 raise Ext4Error(
-                    f"Invalid number of xattr blocks at offset 0x{xattrs_block_start:X} of inode {self.inode_idx:d}: {xattrs_header.h_blocks:d} (expected 1)")
+                    f"Invalid number of xattr blocks at offset 0x{xattrs_block_start:X} "
+                    f"of inode {self.inode_idx:d}: {xattrs_header.h_blocks:d} (expected 1)")
 
             offset = 4 * ((ctypes.sizeof(
                 ext4_xattr_header) + 3) // 4)
