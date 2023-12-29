@@ -9,7 +9,7 @@ def scanfs(file) -> dict:
         for i in file_.readlines():
             try:
                 filepath, *other = i.strip().split()
-            except TypeError:
+            except Exception or BaseException:
                 print(f'[W] Skip {i}')
                 continue
             filesystem_config[filepath] = other
