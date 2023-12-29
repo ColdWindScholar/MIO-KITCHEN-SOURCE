@@ -11,6 +11,7 @@ def scanfs(file) -> dict:
                 filepath, *other = i.strip().split()
             except TypeError:
                 print(f'[W] Skip {i}')
+                continue
             filesystem_config[filepath] = other
             if (long := len(other)) > 4:
                 print(f"[W] {i[0]} has too much data-{long}.")
