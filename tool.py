@@ -122,7 +122,7 @@ class load_car:
             try:
                 func(*args, **kwargs)
             except Exception as e:
-                error(2, e.__str__())
+                error(2, e.__str__() + str(e.__traceback__.tb_lineno))
             self.endupdate()
 
         return call_func
