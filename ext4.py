@@ -656,10 +656,8 @@ class Inode:
         for i, part in enumerate(relative_path):
             if not self.volume.ignore_flags and not current_inode.is_dir:
                 current_path = "/".join(relative_path[:i])
-                raise Ext4Error("{current_path!r:s} (Inode {inode:d}) is not a directory.".format(
-                    current_path=current_path,
-                    inode=inode_idx
-                ))
+                raise Ext4Error(f"{current_path!r:s} (Inode {inode_idx:d}) is not a directory."
+                                )
 
             file_name, inode_idx, file_type = next(
                 filter(lambda entry: entry[0] == part, current_inode.open_dir(decode_name)), (None, None, None))
