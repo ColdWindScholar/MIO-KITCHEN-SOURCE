@@ -888,7 +888,6 @@ class BlockImageDiff(object):
         lost_source = 0
 
         for xf in self.transfers:
-            lost = 0
             size = xf.src_ranges.size()
             for u in xf.goes_before:
                 # xf should go before u
