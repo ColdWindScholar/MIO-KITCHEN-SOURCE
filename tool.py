@@ -601,7 +601,7 @@ def padtbo() -> any:
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
         if f.startswith("dtbo."):
             list_.append(work + "dtbo" + os.sep + "dtbo" + os.sep + f)
-    list_ = sorted(list_, key=lambda *x: int(x.rsplit('.')[1]))
+    list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
     print(lang.text8)
