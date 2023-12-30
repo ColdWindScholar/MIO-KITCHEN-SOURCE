@@ -8,7 +8,7 @@ import shutil
 
 import os
 from struct import pack, unpack
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as et
 import hashlib
 from pathlib import Path
 from queue import Queue
@@ -232,7 +232,6 @@ class QCSparse:
                 return -1
             else:
                 fill_bin = self.rf.read(4)
-                fill = unpack("<I", fill_bin)
                 # self.debug(format("Fill with 0x%08X" % fill))
                 data = fill_bin * (chunk_sz * self.blk_sz // 4)
                 self.offset += chunk_sz
@@ -246,8 +245,6 @@ class QCSparse:
                 self.error("CRC32 chunk should have 4 bytes of CRC, but this has %u" % data_sz)
                 return -1
             else:
-                crc_bin = self.rf.read(4)
-                crc = unpack("<I", crc_bin)
                 # self.debug(format("Unverified CRC32 0x%08X" % crc))
                 return b""
         else:
@@ -565,7 +562,7 @@ def main(args):
                 else:
                     print("Unsupported key !")
                     exit(0)
-        root = ET.fromstring(xml)
+        root = et.fromstring(xml)
         for child in root:
             if child.tag == "SAHARA":
                 for item in child:
@@ -630,7 +627,7 @@ def main(args):
         directory = args["<directory>"].replace("\\", "/")
         settings = os.path.join(directory, "settings.xml")
         # root = ET.fromstring(settings)
-        tree = ET.parse(settings)
+        tree = et.parse(settings)
         root = tree.getroot()
         outfilename = os.path.join(Path(directory).parent, args["--savename"])
         projid = None
@@ -719,5 +716,3 @@ def main(args):
     else:
         print("Usage:./opsdecrypt.py decrypt [filename.ops]")
         exit(0)
-
-
