@@ -3,7 +3,7 @@
 import hashlib
 import os
 import shutil
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as et
 import zipfile
 from struct import unpack
 
@@ -96,8 +96,6 @@ def generatekey2(filename):
     ]
 
     for dkey in keys:
-        key = bytearray()
-        iv = bytearray()
         # "Read metadata failed"
         mc = bytearray.fromhex(dkey[1])
         userkey = bytearray.fromhex(dkey[2])
@@ -206,7 +204,7 @@ def decryptfile(key, iv, filename, path, wfilename, start, length, rlength, chec
                 copysub(rf, wf, start + size, rlength - size)
 
             if rlength % 0x1000 != 0:
-                fill = bytearray([0x00 for i in range(0x1000 - (rlength % 0x1000))])
+                ...
                 # wf.write(fill)
 
     checkhashfile(os.path.join(path, wfilename), checksums, False)
@@ -325,7 +323,7 @@ def main(filename, outdir):
     with open(path + os.sep + "ProFile.xml", mode="w") as file_handle:
         file_handle.write(xml)
 
-    for child in ET.fromstring(xml):
+    for child in et.fromstring(xml):
         for item in child:
             if "Path" not in item.attrib and "filename" not in item.attrib:
                 for subitem in item:

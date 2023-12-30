@@ -166,6 +166,3 @@ def main(filename, outdir):
                     wb.write(data)
 
     print(f"Files successfully decrypted to subdirectory {outdir}")
-
-
-    #main(filename, outdir)
