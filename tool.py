@@ -2536,8 +2536,7 @@ class zip_file:
         if not path:
             path = settings.path + os.sep
         os.chdir(dst_dir)
-        with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED,
-                             allowZip64=True) as zip_:
+        with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED) as zip_:
             # 遍历写入文件
             for file in get_all_file_paths('.'):
                 print(f"{lang.text1}:%s" % file)
