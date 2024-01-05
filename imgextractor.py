@@ -21,7 +21,6 @@ class Extractor:
         self.FileName = ""
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
-        self.BLOCK_SIZE = 4096
         self.context = []
         self.fs_config = []
 
