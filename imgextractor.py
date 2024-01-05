@@ -96,7 +96,6 @@ class Extractor:
                 cap = ''
                 link_target = ''
                 tmp_path = self.DIR + entry_inode_path
-                spaces_file = self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt'
                 for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
                         t_p_mkc = tmp_path
@@ -118,7 +117,7 @@ class Extractor:
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
-                    self.__append(tmp_path, spaces_file)
+                    self.__append(tmp_path, self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt')
                     self.fs_config.append(
                         f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
