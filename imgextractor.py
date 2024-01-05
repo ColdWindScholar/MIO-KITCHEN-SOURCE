@@ -1,6 +1,5 @@
 import os
 import re
-from string import printable
 import struct
 
 import ext4
@@ -153,7 +152,7 @@ class Extractor:
                                     print(e.__str__())
                     except BaseException and Exception:
                         try:
-                            if link_target and all(c_ in printable for c_ in link_target):
+                            if link_target and link_target.isprintable():
                                 if os.name == 'posix':
                                     os.symlink(link_target, target)
                                 if os.name == 'nt':
