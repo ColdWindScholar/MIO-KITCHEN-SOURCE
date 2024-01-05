@@ -180,10 +180,10 @@ class Extractor:
                         finally:
                             ...
 
-        dir_my = self.CONFING_DIR + os.sep
+        dir_my = self.CONFING_DIR
         if not os.path.isdir(dir_my):
             os.makedirs(dir_my)
-        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + self.FileName + '_size.txt')
+        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), dir_my + os.sep + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])
             self.DIR = dir_r
