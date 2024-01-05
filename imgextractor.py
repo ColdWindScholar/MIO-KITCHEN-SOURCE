@@ -46,15 +46,13 @@ class Extractor:
         w = 4 if wr == 'r' else 0
         s = 4 if ox == 'S' else 0
         g = 4 if gr == 'r' else 0
-        if ow == 'w':
-            o += 2
+        o += 2 if ow == 'w' else 0
         if ox == 'x':
             o += 1
         if ox == 's':
             s += 4
             o += 1
-        if gw == 'w':
-            g += 2
+        g += 2 if gw == 'w' else 0
         if gx == 'x':
             g += 1
         if gx == 'S':
@@ -62,8 +60,7 @@ class Extractor:
         if gx == 's':
             s += 2
             g += 1
-        if ww == 'w':
-            w += 2
+        w += 2 if ww == 'w' else 0
         if wx == 'x':
             w += 1
         if wx == 'T':
