@@ -42,10 +42,10 @@ class Extractor:
             return
         if len(arg) > 8:
             arg = arg[1:]
-        o = g = w = s = 0
+        w = s = 0
         oor, ow, ox, gr, gw, gx, wr, ww, wx = arg
-        if oor == 'r':
-            o += 4
+        o = 4 if oor == 'r' else 0
+
         if ow == 'w':
             o += 2
         if ox == 'x':
@@ -55,8 +55,7 @@ class Extractor:
         if ox == 's':
             s += 4
             o += 1
-        if gr == 'r':
-            g += 4
+        g = 4 if gr == 'r' else 0
         if gw == 'w':
             g += 2
         if gx == 'x':
