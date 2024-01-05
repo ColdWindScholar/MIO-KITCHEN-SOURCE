@@ -239,6 +239,10 @@ class Tool(Tk):
               text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!',
               font=(None, 10)).pack(
             padx=5, pady=5)
+        Label(self.tab,
+              text='反对肆意违反开源协议！\nOppose wanton violation of open source agreements!',
+              font=(None, 10)).pack(
+            padx=5, pady=5)
         self.tab6_n()
         mpkman()
         self.gifl = Label(self.rzf)
