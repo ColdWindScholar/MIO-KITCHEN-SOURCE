@@ -217,7 +217,7 @@ class Tool(Tk):
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.subwin3, text=lang.text131)
         Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
-        tr.bind('<Button-1>', lambda *x:dndfile([filedialog.askopenfilename()]))
+        tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
