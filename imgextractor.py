@@ -32,8 +32,7 @@ class Extractor:
     @staticmethod
     def __append(msg, log):
         if not os.path.isfile(log) and not os.path.exists(log):
-            with open(log, 'tw', encoding='utf-8'):
-                ...
+            open(log, 'tw', encoding='utf-8').close()
         with open(log, 'a', newline='\n') as file:
             print(msg, file=file)
 
