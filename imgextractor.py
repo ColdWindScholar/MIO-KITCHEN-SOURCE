@@ -83,7 +83,6 @@ class Extractor:
         return f'{s}{o}{g}{w}'
 
     def __ext4extractor(self):
-        fuk_symbols = '\\^$.|?*+(){}[]'
 
         def scan_dir(root_inode, root_path=""):
             for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
@@ -101,7 +100,7 @@ class Extractor:
                 for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
                         t_p_mkc = tmp_path
-                        for fuk_ in fuk_symbols:
+                        for fuk_ in '\\^$.|?*+(){}[]':
                             t_p_mkc = t_p_mkc.replace(fuk_, '\\' + fuk_)
                         self.context.append(f"/{t_p_mkc} {e.decode('utf8')[:-1]}")
                     elif f == 'security.capability':
