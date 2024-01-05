@@ -26,8 +26,7 @@ class Extractor:
     @staticmethod
     def __out_name(file_path, out=1):
         name = file_path if out == 1 else os.path.basename(file_path).rsplit('.', 1)[0]
-        name = name.split('-')[0].split(' ')[0].split('+')[0].split('{')[0].split('(')[0]
-        return name
+        return name.split('-')[0].split(' ')[0].split('+')[0].split('{')[0].split('(')[0]
 
     @staticmethod
     def __append(msg, log):
