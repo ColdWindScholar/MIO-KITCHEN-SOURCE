@@ -83,7 +83,6 @@ class Extractor:
         return f'{s}{o}{g}{w}'
 
     def __ext4extractor(self):
-        fs_config_file = self.FileName + '_fs_config'
         fuk_symbols = '\\^$.|?*+(){}[]'
 
         def scan_dir(root_inode, root_path=""):
@@ -193,7 +192,7 @@ class Extractor:
             self.fs_config.insert(0, '/ 0 2000 0755' if dir_r == 'vendor' else '/ 0 0 0755')
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
             self.fs_config.insert(2 if dir_r == 'system' else 1, f'{dir_r} 0 0 0755')
-            self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + fs_config_file)
+            self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + self.FileName + '_fs_config')
             p1 = p2 = 0
             if self.context:
                 self.context.sort()
