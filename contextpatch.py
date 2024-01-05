@@ -42,6 +42,8 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     if not permission_d:
         permission_d = ['u:object_r:system_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
+        if not i.isprintable():
+            continue
         if fs_file.get(i):
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
         else:
