@@ -15,7 +15,6 @@ from utils import simg2img
 
 class Extractor:
     def __init__(self):
-        self.BASE_DIR_ = None
         self.CONFING_DIR = None
         self.DIR = None
         self.FileName = ""
@@ -116,7 +115,7 @@ class Extractor:
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
-                    self.__append(tmp_path, self.BASE_DIR_ + 'config' + os.sep + self.FileName + '_space.txt')
+                    self.__append(tmp_path, os.path.join(self.CONFING_DIR, 'config', self.FileName + '_space.txt'))
                     self.fs_config.append(
                         f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
@@ -238,7 +237,6 @@ class Extractor:
             ...
 
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
-        self.BASE_DIR_ = output_dir + os.sep
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
