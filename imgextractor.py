@@ -85,7 +85,6 @@ class Extractor:
     def __ext4extractor(self):
         fs_config_file = self.FileName + '_fs_config'
         fuk_symbols = '\\^$.|?*+(){}[]'
-        contexts = self.CONFING_DIR + os.sep + self.FileName + "_file_contexts"
 
         def scan_dir(root_inode, root_path=""):
             for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
@@ -211,7 +210,7 @@ class Extractor:
                         p2 = 1
                     if p1 == p2 == 1:
                         break
-                self.__append('\n'.join(self.context), contexts)
+                self.__append('\n'.join(self.context), self.CONFING_DIR + os.sep + self.FileName + "_file_contexts")
 
     @staticmethod
     def fix_moto(input_file):
