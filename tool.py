@@ -63,7 +63,7 @@ class json_edit:
         with open(self.file, 'r+', encoding='utf-8') as pf:
             try:
                 return json.loads(pf.read())
-            except:
+            except BaseException or Exception:
                 return {}
 
     def write(self, data):
@@ -146,6 +146,13 @@ class dev_null:
 class Tool(Tk):
     def __init__(self):
         super().__init__()
+        self.rzf = None
+        self.tsk = None
+        self.gifl = None
+        self.photo = None
+        self.slocal = None
+        self.LB2 = None
+        self.notepad = None
         self.title('MIO-KITCHEN')
         if os.name != "posix":
             self.iconphoto(True,
@@ -177,10 +184,6 @@ class Tool(Tk):
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
-
-        def sdxz(o):
-            dndfile([filedialog.askopenfilename()])
-
         self.subwin2 = ttk.LabelFrame(self, text=lang.text9)
         self.subwin3 = ttk.LabelFrame(self, text=lang.text10)
         self.subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
@@ -214,7 +217,7 @@ class Tool(Tk):
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.subwin3, text=lang.text131)
         Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
-        tr.bind('<Button-1>', sdxz)
+        tr.bind('<Button-1>', lambda *x:dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
