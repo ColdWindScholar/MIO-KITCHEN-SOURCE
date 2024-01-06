@@ -68,6 +68,7 @@ class ext4_dir_entry_2(ext4_struct):
         # Variable length field "name" missing at 0x8
     ]
 
+    @staticmethod
     def _from_buffer_copy(raw, offset=0, platform64=True):
         struct = ext4_dir_entry_2.from_buffer_copy(raw, offset)
         struct.name = raw[offset + 0x8: offset + 0x8 + struct.name_len]
@@ -390,6 +391,7 @@ class ext4_xattr_entry(ext4_struct):
         # Variable length field "e_name" missing at 0x10
     ]
 
+    @staticmethod
     def _from_buffer_copy(raw, offset=0, platform64=True):
         struct = ext4_xattr_entry.from_buffer_copy(raw, offset)
         struct.e_name = raw[offset + 0x10: offset + 0x10 + struct.e_name_len]
@@ -458,6 +460,7 @@ class MappingEntry:
 
         return result
 
+    @staticmethod
     def optimize(entries):
         entries.sort(key=lambda entry: entry.file_block_idx)
 
@@ -593,7 +596,8 @@ class Inode:
         while i < len(raw_data):
             xattr_entry = ext4_xattr_entry._from_buffer_copy(raw_data, i, platform64=self.volume.platform64)
 
-            if not (xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
+            if not (
+                    xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
                 # End of ext4_xattr_entry list
                 break
 
