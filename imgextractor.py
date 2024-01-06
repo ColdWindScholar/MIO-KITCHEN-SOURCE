@@ -41,38 +41,43 @@ class Extractor:
         if len(arg) > 8:
             arg = arg[1:]
         o = s = w = g = 0
+        perms = {
+            'r': 4,
+            'w': 2,
+            'x': 1
+        }
         for n, sym in enumerate(arg):
-            if n == 0 and sym == 'r':
-                o = 4
-            elif n == 1 and sym == 'w':
-                o += 2
+            if n == 0 and perms.get(sym):
+                o = perms.get(sym)
+            elif n == 1 and perms.get(sym):
+                o += perms.get(sym)
             elif n == 2:
                 if sym == 'S':
                     s = 4
-                elif sym == 'x':
-                    o += 1
+                elif perms.get(sym):
+                    o += perms.get(sym)
                 elif sym == 's':
                     s += 4
                     o += 1
-            elif n == 3 and sym == 'r':
-                g = 4
-            elif n == 4 and sym == 'w':
-                g += 2
+            elif n == 3 and perms.get(sym):
+                g = perms.get(sym)
+            elif n == 4 and perms.get(sym):
+                g += perms.get(sym)
             if n == 5:
-                if sym == 'x':
-                    g += 1
+                if perms.get(sym):
+                    g += perms.get(sym)
                 elif sym == 'S':
                     s += 2
                 elif sym == 's':
                     s += 2
                     g += 1
-            elif n == 6 and sym == 'r':
-                w = 4
-            elif n == 7 and sym == 'w':
-                w += 2
+            elif n == 6 and perms.get(sym):
+                w = perms.get(sym)
+            elif n == 7 and perms.get(sym):
+                w += perms.get(sym)
             elif n == 8:
-                if sym == 'x':
-                    w += 1
+                if perms.get(sym):
+                    w += perms.get(sym)
                 elif sym == 'T':
                     s += 1
                 elif sym == 't':
