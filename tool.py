@@ -1589,6 +1589,7 @@ class packxx(Toplevel):
                 int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get())
 
 
+@cartoon
 class dbkxyt:
     def __init__(self):
         if not dn.get():
@@ -1618,7 +1619,8 @@ class dbkxyt:
                         lines.insert(add_line,
                                      'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
                     else:
-                        lines.insert(add_line, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                        lines.insert(add_line,
+                                     'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
             for t in os.listdir(dir_):
                 if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
                     print("Add Flash method {} to update-binary".format(t))
@@ -1628,7 +1630,8 @@ class dbkxyt:
                         lines.insert(add_line,
                                      'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
                     else:
-                        lines.insert(add_line, 'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                        lines.insert(add_line,
+                                     'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
                         move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
             script.seek(0)
             script.truncate()
@@ -2546,6 +2549,7 @@ def get_all_file_paths(directory) -> Ellipsis:
             yield os.path.join(root, filename)
 
 
+@cartoon
 class zip_file:
     def __init__(self, file, dst_dir, path=None):
         if not path:
