@@ -379,7 +379,7 @@ class welcome(Toplevel):
         super().__init__()
         self.title(lang.text135)
         self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", self.clos)
+        self.protocol("WM_DELETE_WINDOW", lambda: print())
         self.frame = None
         oobe = settings.oobe
         if oobe == "1":
@@ -466,9 +466,6 @@ class welcome(Toplevel):
         ttk.Label(self.frame, text=lang.t5, font=("宋体", 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10)
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
-
-    def clos(self):
-        ...
 
 
 def upgrade():
