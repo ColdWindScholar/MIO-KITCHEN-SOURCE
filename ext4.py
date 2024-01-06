@@ -586,8 +586,7 @@ class Inode:
         while i < len(raw_data):
             xattr_entry = ext4_xattr_entry._from_buffer_copy(raw_data, i, platform64=self.volume.platform64)
 
-            if not (
-                    xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
+            if not (xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
                 # End of ext4_xattr_entry list
                 break
 
@@ -645,11 +644,7 @@ class Inode:
 
             if inode_idx is None:
                 current_path = "/".join(relative_path[:i])
-                raise FileNotFoundError("{part!r:s} not found in {current_path!r:s} (Inode {inode:d}).".format(
-                    current_path=current_path,
-                    inode=current_inode.inode_idx,
-                    part=part
-                ))
+                raise FileNotFoundError(f"{part!r:s} not found in {current_path!r:s} (Inode {current_inode.inode_idx:d}).")
 
             current_inode = current_inode.volume.get_inode(inode_idx, file_type)
 
