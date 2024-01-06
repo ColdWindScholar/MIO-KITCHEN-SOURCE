@@ -804,7 +804,7 @@ class Inode:
                 unit=units[unit_idx - 1]
             )
 
-    def xattrs(self, check_inline=True, check_block=True, force_inline=False, prefix_override: dict = None):
+    def xattrs(self, check_inline=True, check_block=True, force_inline=False):
         # Inline xattrs
         inline_data_offset = self.offset + ext4_inode.EXT2_GOOD_OLD_INODE_SIZE + self.inode.i_extra_isize
         inline_data_length = self.offset + self.volume.superblock.s_inode_size - inline_data_offset
