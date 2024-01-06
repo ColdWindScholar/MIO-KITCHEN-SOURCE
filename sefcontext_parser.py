@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# sefcontext_parser.py
+# setcontext_parser.py
 # Copyright 2017 Jake Valletta (@jake_valletta)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +22,9 @@ import operator
 import os.path
 import struct
 
-SELINUX_MAGIC_COMPILED_FCONTEXT = 0xf97cff8a
+SELINUX_MAGIC_COMPILED_CONTEXT = 0xf97cff8a
 
-F_MODE = {0x1000: '-p',  # S_IFFIFO
+F_MODE = {0x1000: '-p',  # S_FIFO
           0x2000: '-c',  # S_IFCHR
           0x4000: '-d',  # S_IFDIR
           0x6000: '-b',  # S_IFBLK
@@ -116,7 +116,7 @@ class SefContextParser(object):
         return struct.unpack("%is" % length,
                              self.file_contexts_file.read(length))[0]
 
-    def __read_nstring(self, length):
+    def __read_n_string(self, length):
 
         """Read a null terminated string"""
 
@@ -131,7 +131,7 @@ class SefContextParser(object):
         magic = self.__read_u32()
         self.debug("Magic: 0x%x" % magic)
 
-        if magic != SELINUX_MAGIC_COMPILED_FCONTEXT:
+        if magic != SELINUX_MAGIC_COMPILED_CONTEXT:
             raise TypeError("Invalid Magic")
 
         version = self.__read_u32()
@@ -153,7 +153,7 @@ class SefContextParser(object):
         cur_stem = 0
         while cur_stem < num_of_stems:
             length_of_stem = self.__read_u32()
-            stem_name = self.__read_nstring(length_of_stem)
+            self.__read_n_string(length_of_stem)
 
             cur_stem += 1
 
@@ -177,22 +177,22 @@ class SefContextParser(object):
             mode_bits = self.__read_u32()
 
             # The rest really doesn't matter.
-            stem_id = self.__read_s32()
-            has_meta_characters = self.__read_u32()
-            prefix_len = self.__read_u32()
+            self.__read_s32()
+            self.__read_u32()
+            self.__read_u32()
 
             # Version <=4 is slightly different
             if version <= 4:
                 data_len = self.__read_u32()
-                raw_pcre = self.__read_string(data_len)
+                self.__read_string(data_len)
 
                 study_data_len = self.__read_u32()
-                study_data = self.__read_string(study_data_len)
+                self.__read_string(study_data_len)
 
             # Version 5+
             else:
                 pattern_len = self.__read_u32()
-                pattern = self.__read_string(pattern_len)
+                self.__read_string(pattern_len)
 
             entry = Entry(org_regex_string, raw_context, mode_bits)
             entries.append(entry)
