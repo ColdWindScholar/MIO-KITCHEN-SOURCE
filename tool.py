@@ -80,6 +80,7 @@ class load_car:
     gifs = []
 
     def __init__(self, *args):
+        self.frame = None
         ...
 
     def run(self, ind: int = 0):
