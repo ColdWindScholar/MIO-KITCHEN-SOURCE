@@ -885,12 +885,7 @@ class BlockReader:
         self.block_map = block_map
 
     def __repr__(self):
-        return "{type_name:s}(byte_size = {size!r:s}, block_map = {block_map!r:s}, volume_uuid = {uuid!r:s})".format(
-            block_map=self.block_map,
-            size=self.byte_size,
-            type_name=type(self).__name__,
-            uuid=self.volume.uuid
-        )
+        return f"{type(self).__name__:s}(byte_size = {self.byte_size!r:s}, block_map = {self.block_map!r:s}, volume_uuid = {self.volume.uuid!r:s})"
 
     def get_block_mapping(self, file_block_idx):
         disk_block_idx = None
