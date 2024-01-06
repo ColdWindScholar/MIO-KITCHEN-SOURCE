@@ -637,7 +637,7 @@ class Inode:
 
     def get_inode(self, *relative_path, decode_name=None):
         if not self.is_dir:
-            raise Ext4Error("Inode {inode:d} is not a directory.".format(inode=self.inode_idx))
+            raise Ext4Error(f"Inode {self.inode_idx:d} is not a directory.")
 
         current_inode = self
 
