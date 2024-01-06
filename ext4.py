@@ -568,7 +568,7 @@ class Inode:
         else:
             return f"{type(self).__name__:s}(offset = 0x{self.offset:X}, volume_uuid = {self.volume.uuid!r:s})"
 
-    def _parse_xattrs(self, raw_data, offset, prefix_override: dict = None):
+    def _parse_xattrs(self, raw_data, offset):
         prefixes = {
             0: "",
             1: "user.",
@@ -820,8 +820,7 @@ class Inode:
                     ext4_xattr_ibody_header) + 3) // 4)
                 # The ext4_xattr_entry following the header is aligned on a 4-byte boundary
             try:
-                for xattr_name, xattr_value in self._parse_xattrs(inline_data[offset:], 0,
-                                                                  prefix_override=prefix_override):
+                for xattr_name, xattr_value in self._parse_xattrs(inline_data[offset:], 0):
                     yield xattr_name, xattr_value
             except BaseException and Exception:
                 ...
@@ -848,8 +847,7 @@ class Inode:
             offset = 4 * ((ctypes.sizeof(
                 ext4_xattr_header) + 3) // 4)
             # The ext4_xattr_entry following the header is aligned on a 4-byte boundary
-            for xattr_name, xattr_value in self._parse_xattrs(xattrs_block[offset:], -offset,
-                                                              prefix_override=prefix_override):
+            for xattr_name, xattr_value in self._parse_xattrs(xattrs_block[offset:], -offset):
                 yield xattr_name, xattr_value
 
 
