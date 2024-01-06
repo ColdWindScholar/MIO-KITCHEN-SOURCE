@@ -598,11 +598,8 @@ class Inode:
                 # End of ext4_xattr_entry list
                 break
 
-            if not xattr_entry.e_name_index in prefixes:
-                raise Ext4Error("Unknown attribute prefix {prefix:d} in inode {inode:d}".format(
-                    inode=self.inode_idx,
-                    prefix=xattr_entry.e_name_index
-                ))
+            if xattr_entry.e_name_index not in prefixes:
+                raise Ext4Error(f"Unknown attribute prefix {xattr_entry.e_name_index:d} in inode {self.inode_idx:d}")
 
             xattr_name = prefixes[xattr_entry.e_name_index] + xattr_entry.e_name.decode("iso-8859-2")
 
@@ -612,11 +609,7 @@ class Inode:
 
                 if not self.volume.ignore_flags and (xattr_inode.inode.i_flags & ext4_inode.EXT4_EA_INODE_FL) != 0:
                     raise Ext4Error(
-                        "Inode {value_indoe:d} associated with the extended attribute {xattr_name!r:s} of inode {inode:d} is not marked as large extended attribute value.".format(
-                            inode=self.inode_idx,
-                            value_inode=xattr_inode.inode_idx,
-                            xattr_name=xattr_name
-                        ))
+                        f"Inode {xattr_inode.inode_idx:d} associated with the extended attribute {xattr_name!r:s} of inode {self.inode_idx:d} is not marked as large extended attribute value.")
 
                 # TODO Use xattr_entry.e_value_size or xattr_inode.inode.i_size?
                 xattr_value = xattr_inode.open_read().read()
@@ -757,7 +750,7 @@ class Inode:
             decode_name = lambda raw: raw.decode("utf8")
 
         if not self.volume.ignore_flags and not self.is_dir:
-            raise Ext4Error("Inode ({inode:d}) is not a directory.".format(inode=self.inode_idx))
+            raise Ext4Error(f"Inode ({self.inode_idx:d}) is not a directory.")
 
         # # Hash trees are compatible with linear arrays
         if (self.inode.i_flags & ext4_inode.EXT4_INDEX_FL) != 0:
