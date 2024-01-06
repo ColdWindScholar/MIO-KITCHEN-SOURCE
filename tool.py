@@ -123,7 +123,7 @@ class load_car:
             try:
                 func(*args, **kwargs)
             except Exception as e:
-                error(2, e.__str__() + str(e.__traceback__.tb_lineno))
+                error(e.args[0], e.__repr__())
             self.endupdate()
 
         return call_func
@@ -949,7 +949,7 @@ def mpkman() -> None:
             }
             info_.write((buffer2 := StringIO()))
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-            os.chdir(moduledir + os.sep + value + os.sep)
+            os.chdir(moduledir + os.sep + value)
             for i in get_all_file_paths("."):
                 print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
                 try:
@@ -957,7 +957,7 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, chosed.get(), ".mpk"), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, str(chosed.get())+".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
