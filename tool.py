@@ -974,6 +974,8 @@ def mpkman() -> None:
         rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
 
     moduledir = os.path.join(elocal, "bin", "module")
+    if not os.path.exists(moduledir):
+        os.makedirs(moduledir)
     file = StringVar()
 
     def list_pls():
