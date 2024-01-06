@@ -102,7 +102,7 @@
   "text79": "Unpacking:", 
   "text80": "%s unpack failed, reason: %s", 
   "text81": "Decompression completed",
-  "text82": "This file is not ZIP, %s", 
+  "text82": "This file is not supported format, %s",
   "text83": "Merge %s to %s", 
   "text84": "does not exist",
   "text85": "Processing:", 
