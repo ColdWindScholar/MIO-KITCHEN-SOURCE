@@ -57,7 +57,10 @@ def fs_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     print("FsPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
     for i in scan_dir(os.path.abspath(dir_path)):
         if not i.isprintable():
-            continue
+            tmp = ''
+            for c in i:
+                tmp += c if c.isprintable() else '*'
+            i = tmp
         if fs_file.get(i):
             new_fs[i] = fs_file[i]
         else:
