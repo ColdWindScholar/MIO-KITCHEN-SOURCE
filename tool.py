@@ -1004,7 +1004,8 @@ def mpkman() -> None:
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
                          "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
-                         'gettype': lambda file_: gettype(file_)}
+                         'gettype': lambda file_: gettype(file_),
+                         'exist': lambda x: '1' if os.path.exists(x) else '0'}
 
         def __init__(self, sh):
             self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
@@ -1048,7 +1049,7 @@ def mpkman() -> None:
                     else:
                         self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
                     if not self.envs['result']:
-                        self.envs['result'] = "None"
+                        self.envs['result'] = ""
 
         def sfor(self, vn, vs, do):
             for v in vs.split(',' if ',' in vs else None):
