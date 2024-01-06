@@ -468,8 +468,6 @@ class welcome(Toplevel):
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
 
-
-
 class set_utils:
     def __init__(self, set_ini):
         self.path = None
@@ -977,14 +975,21 @@ def mpkman() -> None:
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
     file = StringVar()
+    images_ = {}
 
     def list_pls():
         pls.clean()
         for i in os.listdir(moduledir):
             if os.path.isdir(moduledir + os.sep + i):
+                images_[i] = ImageTk.PhotoImage(data=images.none_byte)
                 data = json_edit(os.path.join(moduledir, i, "info.json")).read()
-                icon = tk.Label(pls.scrollable_frame, text=data['name'], width=10, height=5, bg="#4682B4",
-                                wraplength=70, justify='center')
+                icon = tk.Label(pls.scrollable_frame,
+                                image=images_[i],
+                                compound="center",
+                                text=data['name']
+                                , bg="#4682B4",
+                                wraplength=70,
+                                justify='center')
                 icon.bind('<Double-Button-1>', lambda *x: mpkrun(data['name']).run())
                 icon.bind('<Button-3>', mpkrun(data['name']).popup)
                 pls.add_icon(icon)
