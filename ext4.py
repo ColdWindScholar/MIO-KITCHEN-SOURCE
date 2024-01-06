@@ -490,8 +490,7 @@ class Volume:
         self.platform64 = (self.superblock.s_feature_incompat & ext4_superblock.INCOMPAT_64BIT) != 0
 
         if not ignore_magic and self.superblock.s_magic != 0xEF53:
-            raise MagicError("Invalid magic value in superblock: 0x{magic:04X} (expected 0xEF53)".format(
-                magic=self.superblock.s_magic))
+            raise MagicError(f"Invalid magic value in superblock: 0x{self.superblock.s_magic:04X} (expected 0xEF53)")
 
         # Group descriptors
         self.group_descriptors = [None] * (self.superblock.s_inodes_count // self.superblock.s_inodes_per_group)
@@ -502,12 +501,7 @@ class Volume:
             self.group_descriptors[group_desc_idx] = self.read_struct(ext4_group_descriptor, group_desc_offset)
 
     def __repr__(self):
-        return "{type_name:s}(volume_name = {volume_name!r:s}, uuid = {uuid!r:s}, last_mounted = {last_mounted!r:s})".format(
-            last_mounted=self.superblock.s_last_mounted,
-            type_name=type(self).__name__,
-            uuid=self.uuid,
-            volume_name=self.superblock.s_volume_name
-        )
+        return f"{type(self).__name__:s}(volume_name = {self.superblock.s_volume_name!r:s}, uuid = {self.uuid!r:s}, last_mounted = {self.superblock.s_last_mounted!r:s})"
 
     @property
     def block_size(self):
