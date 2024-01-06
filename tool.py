@@ -905,10 +905,7 @@ def mpkman() -> None:
             id_ = globals()[chosed.get()]
         path = os.path.join(moduledir, id_) + os.sep
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
-            if ask_win(lang.t18, 'SH', 'MSH') == 1:
-                s = "main.sh"
-            else:
-                s = "main.msh"
+            s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
             with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
                 sh.write("echo MIO-KITCHEN")
             editor.main(path + s)
