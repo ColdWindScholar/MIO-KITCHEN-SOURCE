@@ -410,7 +410,7 @@ class welcome(Toplevel):
         for i in self.winfo_children():
             i.destroy()
         self.reframe()
-        ttk.Label(self.frame, text=lang.text129, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+        ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             value=[i.rsplit('.', 1)[0] for i in
