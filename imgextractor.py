@@ -86,7 +86,6 @@ class Extractor:
         return f'{s}{o}{g}{w}'
 
     def __ext4extractor(self):
-
         def scan_dir(root_inode, root_path=""):
             for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
                 if entry_name in ['.', '..'] or entry_name.endswith(' (2)'):
