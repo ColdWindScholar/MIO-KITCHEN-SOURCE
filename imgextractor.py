@@ -183,13 +183,13 @@ class Extractor:
                 for c in self.context:
                     if re.search('/system/system/build..prop ', c) and p1 == 0:
                         self.context.insert(3, '/lost+\\found' + ' u:object_r:rootfs:s0')
-                        self.context.insert(4, '/' + dir_r + '/' + dir_r + '(/.*)? ' + c.split()[1])
+                        self.context.insert(4, f'/{dir_r}/{dir_r}/(/.*)? ' + c.split()[1])
                         p1 = 1
                     if re.search('lost..found', c) and p2 == 0:
                         self.context.insert(0, '/ ' + c.split()[1])
-                        self.context.insert(1, '/' + dir_r + '(/.*)? ' + c.split()[1])
+                        self.context.insert(1, f'/{dir_r}(/.*)? ' + c.split()[1])
                         self.context.insert(2, f'/{dir_r} {c.split()[1]}')
-                        self.context.insert(3, '/' + dir_r + '/lost+\\found ' + c.split()[1])
+                        self.context.insert(3, f'/{dir_r}/lost+\\found ' + c.split()[1])
                         p2 = 1
                     if p1 == p2 == 1:
                         break
