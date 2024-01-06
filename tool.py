@@ -1092,7 +1092,7 @@ def mpkman() -> None:
 
         def sif(self, mode, var_, other):
             modes = {
-                'exist': self.grammar_words['exist'],
+                'exist': lambda var: os.path.exists(str(var)),
                 'equ': lambda var: var.split('--')[0] == var.split('--')[1],
                 'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
             }
