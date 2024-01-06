@@ -981,7 +981,10 @@ def mpkman() -> None:
         pls.clean()
         for i in os.listdir(moduledir):
             if os.path.isdir(moduledir + os.sep + i):
-                images_[i] = ImageTk.PhotoImage(data=images.none_byte)
+                if os.path.exists(os.path.join(moduledir, i, 'icon')):
+                    images_[i] = ImageTk.PhotoImage(Image.open(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
+                else:
+                    images_[i] = ImageTk.PhotoImage(data=images.none_byte)
                 data = json_edit(os.path.join(moduledir, i, "info.json")).read()
                 icon = tk.Label(pls.scrollable_frame,
                                 image=images_[i],
