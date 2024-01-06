@@ -831,6 +831,7 @@ class IconGrid(tk.Frame):
     def clean(self):
         for i in self.icons:
             i.destroy()
+        self.icons.clear()
 
     def on_frame_configure(self):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
