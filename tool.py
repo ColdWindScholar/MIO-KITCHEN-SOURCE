@@ -2245,15 +2245,6 @@ def unpack(chose, form: any = None):
             return False
     json_ = json_edit((work := rwork()) + "config" + os.sep + "parts_info")
     parts = json_.read()
-    for fd in [f for f in os.listdir(work) if re.search(r'\.new\.dat\.\d+', f)]:
-        with open(work + os.path.basename(fd).rsplit('.', 1)[0], 'ab') as ofd:
-            for fd1 in sorted(
-                    [f for f in os.listdir(work) if f.startswith(os.path.basename(fd).rsplit('.', 1)[0] + ".")],
-                    key=lambda *x: int(x.rsplit('.')[3])):
-                print(lang.text83 % (fd1, os.path.basename(fd).rsplit('.', 1)[0]))
-                with open(work + fd1, 'rb') as nfd:
-                    ofd.write(nfd.read())
-                os.remove(work + fd1)
     if os.access(work + "UPDATE.APP", os.F_OK):
         print(lang.text79 + "UPDATE.APP")
         splituapp.extract(work + "UPDATE.APP", "")
@@ -2282,6 +2273,14 @@ def unpack(chose, form: any = None):
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
             call("brotli -dj " + work + i + ".new.dat.br")
+        if os.access(work + i + ".new.dat.1", os.F_OK):
+            with open(work + i + ".new.dat", 'ab') as ofd:
+                for n in range(100):
+                    if os.access(work + i + f".new.dat.{n}", os.F_OK):
+                        print(lang.text83 % (i + f".new.dat.{n}", i + f".new.dat"))
+                        with open(work + i + f".new.dat.{n}",'rb') as fd:
+                            ofd.write(fd.read())
+                        os.remove(work + i + f".new.dat.{n}")
         if os.access(work + i + ".new.dat", os.F_OK):
             print(lang.text79 + work + i + ".new.dat")
             if os.path.getsize(work + i + ".new.dat") != 0:
