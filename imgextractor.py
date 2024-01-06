@@ -40,38 +40,44 @@ class Extractor:
             return
         if len(arg) > 8:
             arg = arg[1:]
-
-        actions = {
-            0: lambda x: 4 if x == 'r' else 0,
-            1: lambda x: 2 if x == 'w' else 0
-        }
-        oor, ow, ox, gr, gw, gx, wr, ww, wx = arg
-        o = 4 if oor == 'r' else 0
-        o += 2 if ow == 'w' else 0
-        s = 4 if ox == 'S' else 0
-        if ox == 'x':
-            o += 1
-        if ox == 's':
-            s += 4
-            o += 1
-        g = 4 if gr == 'r' else 0
-        g += 2 if gw == 'w' else 0
-        if gx == 'x':
-            g += 1
-        if gx == 'S':
-            s += 2
-        if gx == 's':
-            s += 2
-            g += 1
-        w = 4 if wr == 'r' else 0
-        w += 2 if ww == 'w' else 0
-        if wx == 'x':
-            w += 1
-        if wx == 'T':
-            s += 1
-        if wx == 't':
-            s += 1
-            w += 1
+        o = s = w = g = 0
+        for n, sym in enumerate(arg):
+            if n == 0 and sym == 'r':
+                o = 4
+            elif n == 1 and sym == 'w':
+                o += 2
+            elif n == 2:
+                if sym == 'S':
+                    s = 4
+                elif sym == 'x':
+                    o += 1
+                elif sym == 's':
+                    s += 4
+                    o += 1
+            elif n == 3 and sym == 'r':
+                g = 4
+            elif n == 4 and sym == 'w':
+                g += 2
+            if n == 5:
+                if sym == 'x':
+                    g += 1
+                elif sym == 'S':
+                    s += 2
+                elif sym == 's':
+                    s += 2
+                    g += 1
+            elif n == 6 and sym == 'r':
+                w = 4
+            elif n == 7 and sym == 'w':
+                w += 2
+            elif n == 8:
+                if sym == 'x':
+                    w += 1
+                elif sym == 'T':
+                    s += 1
+                elif sym == 't':
+                    s += 1
+                    w += 1
         return f'{s}{o}{g}{w}'
 
     def __ext4extractor(self):
