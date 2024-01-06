@@ -40,19 +40,22 @@ class Extractor:
             return
         if len(arg) > 8:
             arg = arg[1:]
+
+        actions = {
+            0: lambda x: 4 if x == 'r' else 0,
+            1: lambda x: 2 if x == 'w' else 0
+        }
         oor, ow, ox, gr, gw, gx, wr, ww, wx = arg
         o = 4 if oor == 'r' else 0
-        w = 4 if wr == 'r' else 0
-        s = 4 if ox == 'S' else 0
-        g = 4 if gr == 'r' else 0
         o += 2 if ow == 'w' else 0
-        g += 2 if gw == 'w' else 0
-        w += 2 if ww == 'w' else 0
+        s = 4 if ox == 'S' else 0
         if ox == 'x':
             o += 1
         if ox == 's':
             s += 4
             o += 1
+        g = 4 if gr == 'r' else 0
+        g += 2 if gw == 'w' else 0
         if gx == 'x':
             g += 1
         if gx == 'S':
@@ -60,6 +63,8 @@ class Extractor:
         if gx == 's':
             s += 2
             g += 1
+        w = 4 if wr == 'r' else 0
+        w += 2 if ww == 'w' else 0
         if wx == 'x':
             w += 1
         if wx == 'T':
