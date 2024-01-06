@@ -1402,14 +1402,16 @@ class Installmpk(Toplevel):
             self.destroy()
             return
         self.title(lang.text31)
+        self.icon = None
         self.resizable(False, False)
         with zipfile.ZipFile(mpk, 'r') as myfile:
             with myfile.open('info') as info_file:
                 self.mconf.read_string(info_file.read().decode('utf-8'))
             try:
                 with myfile.open('icon') as myfi:
+                    self.icon = myfi.read()
                     try:
-                        pyt = ImageTk.PhotoImage(Image.open(BytesIO(myfi.read())))
+                        pyt = ImageTk.PhotoImage(Image.open(BytesIO(self.icon)))
                     except Exception as e:
                         print(e)
                         pyt = ImageTk.PhotoImage(data=images.none_byte)
@@ -1480,7 +1482,11 @@ class Installmpk(Toplevel):
         with open(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'), "info.json"),
                   'w') as f:
             json.dump(minfo, f, indent=2)
-        minfo.clear()
+        if self.icon:
+            with open(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'), "icon"),
+                      'wb') as f:
+                f.write(self.icon)
+
         self.state['text'] = lang.text39
         self.installb['text'] = lang.text34
         self.installb.config(state='normal')
