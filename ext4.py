@@ -566,11 +566,7 @@ class Inode:
                 uuid=self.volume.uuid
             )
         else:
-            return "{type_name:s}(offset = 0x{offset:X}, volume_uuid = {uuid!r:s})".format(
-                offset=self.offset,
-                type_name=type(self).__name__,
-                uuid=self.volume.uuid
-            )
+            return f"{type(self).__name__:s}(offset = 0x{self.offset:X}, volume_uuid = {self.volume.uuid!r:s})"
 
     def _parse_xattrs(self, raw_data, offset, prefix_override: dict = None):
         prefixes = {
