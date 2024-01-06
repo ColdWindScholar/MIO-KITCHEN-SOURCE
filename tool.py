@@ -468,25 +468,6 @@ class welcome(Toplevel):
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
 
-def upgrade():
-    ck = Toplevel()
-    ck.title("检查更新")
-    data = requests.get(settings.update_url + "update.json").content.decode()
-    up = json.loads(data)
-    Label(ck, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=5, pady=5)
-    ttk.Separator(ck, orient=HORIZONTAL).pack(padx=30, fill=X)
-    if up['version'] != settings.version:
-        Label(ck, text="发现新版本：%s" % (up['version']), font=('楷书', 15), fg='green').pack(padx=5, pady=5)
-        lf = ttk.LabelFrame(ck, text="更新日志")
-        lf.pack(padx=10, pady=10)
-        text = Text(lf)
-        text.insert("insert", up['uplog'])
-        text.pack(fill=BOTH, padx=5, pady=5)
-        ttk.Button(ck, text="更新").pack(padx=5, pady=5, fill=X)
-    else:
-        Label(ck, text="已是最新版本：%s" % settings.version, font=('华文行楷', 15)).pack(padx=5, pady=5)
-        ttk.Button(ck, text="确定", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
-        ttk.Button(ck, text="刷新", command=ck.destroy).pack(padx=5, pady=5, fill=X, side=LEFT, expand=True)
 
 
 class set_utils:
