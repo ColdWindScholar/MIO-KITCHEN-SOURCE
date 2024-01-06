@@ -181,7 +181,7 @@ def gettype(file) -> str:
                 buf = bytearray(file_.read(1))
             try:
                 file_.seek(-1, 1)
-            except:
+            except BaseException or Exception:
                 return False
             buf += bytearray(file_.read(4))
         return buf[1:] == b'\x67\x44\x6c\x61'
@@ -433,6 +433,7 @@ class XIAOMI_BLKSTRUCT(object):
 
 class LOGODUMPER(object):
     def __init__(self, img: str, out: str, dir__: str = "pic"):
+        self.magic = None
         self.out = out
         self.img = img
         self.dir = dir__
