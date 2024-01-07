@@ -35,19 +35,19 @@ def scan_dir(folder) -> list:
             yield rv
 
 
-def islink(file) -> str and None:
+def islink(file) -> str:
     if os.name == 'nt':
         if not os.path.isdir(file):
             with open(file, 'rb') as f:
                 if f.read(10) == b'!<symlink>':
                     return f.read().decode("utf-16")[:-1]
                 else:
-                    return
+                    return ''
     elif os.name == 'posix':
         if os.path.islink(file):
             return os.readlink(file)
         else:
-            return
+            return ''
 
 
 def fs_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
