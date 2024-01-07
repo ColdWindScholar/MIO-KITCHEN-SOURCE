@@ -36,7 +36,8 @@ from tkinter import ttk, messagebox
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
-if sys.version_info.major == 3 and sys.version_info.minor>12:
+
+if sys.version_info.major == 3 and sys.version_info.minor > 12:
     print(f"Not Support [{sys.version}] yet\nSorry for any inconvenience caused")
     sys.exit(1)
 from PIL import Image, ImageTk
@@ -959,7 +960,7 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, str(chosed.get())+".mpk"), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, str(chosed.get()) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
@@ -2279,7 +2280,7 @@ def unpack(chose, form: any = None):
                 for n in range(100):
                     if os.access(work + i + f".new.dat.{n}", os.F_OK):
                         print(lang.text83 % (i + f".new.dat.{n}", i + f".new.dat"))
-                        with open(work + i + f".new.dat.{n}",'rb') as fd:
+                        with open(work + i + f".new.dat.{n}", 'rb') as fd:
                             ofd.write(fd.read())
                         os.remove(work + i + f".new.dat.{n}")
         if os.access(work + i + ".new.dat", os.F_OK):
