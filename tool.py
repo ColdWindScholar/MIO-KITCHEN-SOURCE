@@ -36,6 +36,9 @@ from tkinter import ttk, messagebox
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
+if sys.version_info > (3, 12):
+    print(f"Not Support [{sys.version}] yet\nSorry for any inconvenience caused")
+    sys.exit(1)
 from PIL import Image, ImageTk
 import fspatch
 import imgextractor
