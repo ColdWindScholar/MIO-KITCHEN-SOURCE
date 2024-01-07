@@ -632,7 +632,8 @@ class Process(Toplevel):
             'mkc_env': os.path.join(self.dir, v_code(10)),
             'project': self.project.replace('\\', '/')
         }
-        self.value = [self.gavs.keys()]
+        self.value = self.gavs.keys()
+        self.value = list(self.value)
         self.control = []
         self.able = True
         self.protocol("WM_DELETE_WINDOW", self.exit)
@@ -724,9 +725,9 @@ class Process(Toplevel):
         self.start.configure(text="正在运行", state='disabled')
         with open(engine := self.dir + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
-                try:
+                if 'get' in dir(self.gavs[u]):
                     var = self.gavs[u].get()
-                except:
+                else:
                     var = self.gavs[u]
                 en.write(f"export {u}={var}\n")
             en.write("source $1")
@@ -756,7 +757,7 @@ class Process(Toplevel):
     def use(self, step):
         def download(url):
             try:
-                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
+                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url, self.project):
                     print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
             except BaseException or Exception:
                 self.error = 0
@@ -776,9 +777,7 @@ class Process(Toplevel):
 
         actions = {
             'download': lambda url: download(url['url']),
-            'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst'])),
-            'unpack': lambda cmd: print(cmd),
-            'pack': lambda cmd: print(cmd)
+            'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst']))
         }
         actions[step['use']](step)
 
@@ -2336,8 +2335,6 @@ def unpack(chose, form: any = None):
                         if wjm.endswith('_b.img'):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
-                else:
-                    ...
             if (ftype := gettype(work + i + ".img")) == "ext":
                 print(lang.text79 + i + ".img [%s]" % ftype)
                 try:
