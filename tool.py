@@ -1132,11 +1132,11 @@ def mpkman() -> None:
                             f.write(f"export {va}='{gva}'\n")
                         else:
                             continue
-                    f.write('export version={}\n'.format(settings.version))
-                    f.write('export tool_bin={}\n'.format(tool_bin.replace('\\', '/')))
-                    f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
+                    f.write('export version="{}"\n'.format(settings.version))
+                    f.write('export tool_bin="{}"\n'.format(tool_bin.replace('\\', '/')))
+                    f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
                     f.write(
-                        "export project={}\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
+                        "export project='{}'\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
                 self.gavs.clear()
                 self.value.clear()
