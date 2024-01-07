@@ -1119,10 +1119,10 @@ def mpkman() -> None:
                     print(lang.text27, cmd)
 
             def generate_sh():
-                temp = os.path.join(elocal, "bin", "temp") + os.sep
+                temp = os.path.join(elocal, "bin", "temp")
                 if not os.path.exists(temp):
                     re_folder(temp)
-                file.set(str(temp) + v_code())
+                file.set(os.path.join(temp, v_code()))
                 with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                     for va in self.value:
                         if gva := self.gavs[va].get():
