@@ -157,7 +157,7 @@ class Extractor:
                                 ...
                         if os.name == 'posix':
                             os.symlink(link_target, target)
-                        if os.name == 'nt':
+                        elif os.name == 'nt':
                             with open(target.replace('/', os.sep), 'wb') as out:
                                 out.write(b'!<symlink>' + link_target.encode('utf-16') + b'\x00\x00')
                                 try:
@@ -170,7 +170,7 @@ class Extractor:
                             if link_target and link_target.isprintable():
                                 if os.name == 'posix':
                                     os.symlink(link_target, target)
-                                if os.name == 'nt':
+                                elif os.name == 'nt':
                                     with open(target.replace('/', os.sep), 'wb') as out:
                                         out.write(b'!<symlink>' + link_target.encode('utf-16') + b'\x00\x00')
                                     try:
