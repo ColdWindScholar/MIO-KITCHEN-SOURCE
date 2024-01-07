@@ -1442,7 +1442,7 @@ class Installmpk(Toplevel):
     def install(self):
         if self.installb.cget('text') == lang.text34:
             self.destroy()
-            return True
+            return 1
         self.installb.config(state=DISABLED)
         try:
             supports = self.mconf.get('module', 'supports').split()
@@ -1450,13 +1450,13 @@ class Installmpk(Toplevel):
             supports = [sys.platform]
         if sys.platform not in supports:
             self.state['text'] = lang.warn15.format(sys.platform)
-            return False
+            return 0
         for dep in self.mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(elocal, "bin", "module", dep)):
                 self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
                 self.installb['text'] = lang.text37
                 self.installb.config(state='normal')
-                return False
+                return 0
         if os.path.exists(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'))):
             rmtree(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier')))
         fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
@@ -1512,7 +1512,6 @@ class packxx(Toplevel):
         lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
         lf2 = ttk.LabelFrame(self, text=lang.text44)
-
         lf2.pack(fill=BOTH, padx=5, pady=5)
         lf3 = ttk.LabelFrame(self, text=lang.text45)
         lf3.pack(fill=BOTH, padx=5, pady=5)
