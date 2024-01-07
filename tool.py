@@ -1714,7 +1714,7 @@ class packss(Toplevel):
             size = sum(
                 [os.path.getsize(work + i + ".img") for i in [tl.get(index) for index in tl.curselection()]]) + 409600
             diff_size = size
-            if size > supers.get() + 409600:
+            if size > supers.get():
                 for i in range(20):
                     if not i:
                         continue
