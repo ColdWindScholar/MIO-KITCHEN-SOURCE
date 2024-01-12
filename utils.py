@@ -12,7 +12,6 @@ from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
-
 DataImage = blockimgdiff.DataImage
 
 # -----
@@ -43,7 +42,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\x03\x21\x4c\x18', 'lz4'], [b'\x04\x22\x4d\x18', 'lz4'],
            [b'\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03', "zopfli"], [b'\xfd7zXZ', 'xz'],
            [b']\x00\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff', 'lzma'], [b'\x02!L\x18', 'lz4_lg'],
-           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000])
+           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'])
 
 
 # ----DEFS
