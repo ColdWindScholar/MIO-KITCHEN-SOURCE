@@ -85,7 +85,6 @@ class load_car:
 
     def __init__(self, *args):
         self.frame = None
-        ...
 
     def run(self, ind: int = 0):
         self.hide_gifl = False
@@ -858,7 +857,8 @@ def mpkman() -> None:
             self.title(lang.text115)
             self.gui()
 
-        def labelEntry(self, master, text, side):
+        @staticmethod
+        def labelEntry(master, text, side):
             frame = Frame(master)
             ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
             entry = ttk.Entry(frame)
@@ -1127,19 +1127,19 @@ def mpkman() -> None:
                 if not os.path.exists(temp):
                     re_folder(temp)
                 file.set(os.path.join(temp, v_code()))
-                with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                with open(file.get(), "w", encoding='UTF-8', newline="\n") as _f_:
                     for va in self.value:
                         if gva := self.gavs[va].get():
                             if gva is str and os.path.isabs(gva) and os.name == 'nt':
                                 if os.sep in gva:
                                     gva = gva.replace(os.sep, '/')
-                            f.write(f"export {va}='{gva}'\n")
+                            _f_.write(f"export {va}='{gva}'\n")
                         else:
                             continue
-                    f.write('export version="{}"\n'.format(settings.version))
-                    f.write('export tool_bin="{}"\n'.format(tool_bin.replace('\\', '/')))
-                    f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
-                    f.write(
+                    _f_.write('export version="{}"\n'.format(settings.version))
+                    _f_.write('export tool_bin="{}"\n'.format(tool_bin.replace('\\', '/')))
+                    _f_.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
+                    _f_.write(
                         "export project='{}'\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
                 self.gavs.clear()
