@@ -218,27 +218,32 @@ class Extractor:
         if os.path.exists(output_file):
             try:
                 os.remove(output_file)
-            finally:
-                ...
+            except:
+                pass
         with open(input_file, 'rb') as f:
             data = f.read(500000)
-        if not re.search(b'\x4d\x4f\x54\x4f', data):
+        moto = re.search(b'\x4d\x4f\x54\x4f', data)
+        if not moto:
             return
-        offset = 0
+        result = []
         for i in re.finditer(b'\x53\xEF', data):
-            if data[i.start() - 1080] == 0:
-                offset = i.start() - 1080
+            result.append(i.start() - 1080)
+        offset = 0
+        for i in result:
+            if data[i] == 0:
+                offset = i
                 break
         if offset > 0:
             with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
+                f.seek(offset)
                 data = f.read(15360)
                 if data:
                     o.write(data)
         try:
             os.remove(input_file)
             os.rename(output_file, input_file)
-        finally:
-            ...
+        except:
+            pass
 
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
