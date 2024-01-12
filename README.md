@@ -4,6 +4,10 @@
 ***
 ## This tool uses many open source projects. Pay tribute to the developers!
 ***
+# Global
+## Japanese: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
+## Chinese: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
+***
 ## Functions
 * Unpack boot dtbo ext4 erofs payload logo and so on 
 * Pack boot dtbo ext4 erofs payload logo and so on
