@@ -39,6 +39,7 @@ import sv_ttk
 
 if sys.version_info.major == 3 and sys.version_info.minor > 12:
     print(f"Not Support [{sys.version}] yet\nSorry for any inconvenience caused")
+    input()
     sys.exit(1)
 from PIL import Image, ImageTk
 import fspatch
