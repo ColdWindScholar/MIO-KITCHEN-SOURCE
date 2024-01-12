@@ -2455,7 +2455,7 @@ class dirsize:
                                  "# Grow partition {}_a from 0 to {}".format(dname, size), content)
                 ff.write(content)
 
-
+@cartoon
 def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, dat_ver, name)
