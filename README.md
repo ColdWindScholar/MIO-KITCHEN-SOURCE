@@ -1,14 +1,14 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
-#### The Rom Tool Use python language
+#### The Rom Tool Written in python
 ***
 ## This tool uses many open source projects. Pay tribute to the developers!
 ***
-## Global
+## localization
 ### Japanese: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
 ### Chinese: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
 ***
-## Functions
+## Features
 * Unpack boot dtbo ext4 erofs payload logo and so on 
 * Pack boot dtbo ext4 erofs payload logo and so on
 ***
