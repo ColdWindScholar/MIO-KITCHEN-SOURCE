@@ -218,7 +218,7 @@ class Extractor:
         if os.path.exists(output_file):
             try:
                 os.remove(output_file)
-            except:
+            finally:
                 pass
         with open(input_file, 'rb') as f:
             data = f.read(500000)
@@ -242,7 +242,7 @@ class Extractor:
         try:
             os.remove(input_file)
             os.rename(output_file, input_file)
-        except:
+        finally:
             pass
 
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
