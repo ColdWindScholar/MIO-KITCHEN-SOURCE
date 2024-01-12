@@ -2075,9 +2075,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     if dely == 1:
                         rdi(work, dname)
                     if dbgs.get() == "dat":
-                        datbr(work, dname, "dat", int(parts_dict['dat_ver']))
+                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver')))
                     elif dbgs.get() == "br":
-                        datbr(work, dname, scale.get(), int(parts_dict['dat_ver']))
+                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver')))
                     else:
                         print(lang.text3.format(dname))
                 else:
@@ -2455,8 +2455,11 @@ class dirsize:
                                  "# Grow partition {}_a from 0 to {}".format(dname, size), content)
                 ff.write(content)
 
+
 @cartoon
-def datbr(work, name, brl: any, dat_ver=4):
+def datbr(work, name, brl: any, dat_ver=None):
+    if not dat_ver:
+        dat_ver = 4
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, dat_ver, name)
     if os.access(work + name + ".new.dat", os.F_OK):
