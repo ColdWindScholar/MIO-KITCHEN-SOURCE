@@ -2272,6 +2272,10 @@ def unpack(chose, form: any = None):
         return 1
 
     for i in chose:
+        if os.access(work + i + ".zstd", os.F_OK):
+            print(lang.text79 + i + ".zstd")
+            call('zstd --rm -d '+work+i+'.zstd')
+            return
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
             call("brotli -dj " + work + i + ".new.dat.br")
@@ -2668,7 +2672,7 @@ class unpack_gui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch = IntVar()
         self.ch.set(1)
-        self.fm = ttk.Combobox(self, state="readonly", values=('new.dat.br', "new.dat", 'img', 'payload'))
+        self.fm = ttk.Combobox(self, state="readonly", values=('new.dat.br', "new.dat", 'payload', 'img', 'zstd'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2704,8 +2708,7 @@ class unpack_gui(ttk.LabelFrame):
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
                     self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
-        else:
-            if self.fm.get() == 'payload':
+        elif self.fm.get() == 'payload':
                 if os.path.exists(work + "payload.bin"):
                     with open(work + "payload.bin", 'rb') as pay:
                         for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
