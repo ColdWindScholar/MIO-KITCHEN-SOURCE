@@ -2074,6 +2074,8 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                                                                                                                ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
+                    if not parts_dict.get('dat_ver'):
+                        parts_dict['dat_ver'] = '4'
                     if dbgs.get() == "dat":
                         datbr(work, dname, "dat", int(parts_dict.get('dat_ver')))
                     elif dbgs.get() == "br":
@@ -2240,8 +2242,7 @@ def unpack(chose, form: any = None):
     if not dn.get():
         win.messpop(lang.warn1)
         return False
-    else:
-        if not os.path.exists(settings.path + os.sep + dn.get()):
+    elif not os.path.exists(settings.path + os.sep + dn.get()):
             win.messpop(lang.warn1, "red")
             return False
     json_ = json_edit((work := rwork()) + "config" + os.sep + "parts_info")
