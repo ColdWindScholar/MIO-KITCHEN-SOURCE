@@ -4,9 +4,9 @@
 ***
 ## 此工具使用了许多开源项目， 向开发者们致敬!
 ***
-# 国际化
-## 日本语: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
-## 英语: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
+## 国际化
+### 日本语: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
+### 英语: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
 ***
 ## 功能
 * 解包 boot dtbo ext4 erofs payload logo 之类
