@@ -2,7 +2,7 @@
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
 #### 一款Python编写的Rom工具
 ***
-## This tool uses many open source projects. Pay tribute to the developers!
+## 此工具使用了许多开源项目， 向开发者们致敬!
 ***
 # 国际化
 ## 日本语: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
