@@ -69,8 +69,9 @@ class askopenfilenames(Toplevel):
         except:
             file = ""
         var = os.path.join(self.path.get(), file)
-        self.file = var
-        self.destroy()
+        if os.path.isfile(var):
+            self.file = var
+            self.destroy()
 
     def cancel(self):
         self.destroy()
