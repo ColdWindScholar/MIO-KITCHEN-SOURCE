@@ -2013,10 +2013,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     if not dn.get():
         win.messpop(lang.warn1)
         return False
-    else:
-        if not os.path.exists(settings.path + os.sep + dn.get()):
-            win.messpop(lang.warn1, "red")
-            return False
+    elif not os.path.exists(settings.path + os.sep + dn.get()):
+        win.messpop(lang.warn1, "red")
+        return False
     parts_dict = json_edit((work := rwork()) + "config" + os.sep + "parts_info").read()
     for i in parts:
         dname = os.path.basename(i)
@@ -2035,7 +2034,6 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     if folder := findfolder(work, "com.google.android.apps.nbu."):
                         call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
                                                                       "com.google.android.apps.nbu")))
-                        rmdir(findfolder(work, "com.google.android.apps.nbu"))
                 except Exception as e:
                     print(e)
             fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
@@ -2275,7 +2273,7 @@ def unpack(chose, form: any = None):
     for i in chose:
         if os.access(work + i + ".zstd", os.F_OK):
             print(lang.text79 + i + ".zstd")
-            call('zstd --rm -d '+work+i+'.zstd')
+            call('zstd --rm -d ' + work + i + '.zstd')
             return
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
@@ -2710,11 +2708,11 @@ class unpack_gui(ttk.LabelFrame):
                 if file_name.endswith(self.fm.get()):
                     self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
         elif self.fm.get() == 'payload':
-                if os.path.exists(work + "payload.bin"):
-                    with open(work + "payload.bin", 'rb') as pay:
-                        for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
-                                                                   0):
-                            self.lsg.insert(END, i.partition_name)
+            if os.path.exists(work + "payload.bin"):
+                with open(work + "payload.bin", 'rb') as pay:
+                    for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
+                                                               0):
+                        self.lsg.insert(END, i.partition_name)
 
     def refs2(self):
         self.lsg.delete(0, END)
