@@ -71,9 +71,11 @@ python build.py
 ***
 # Contributors:
 ***
-### [sk](https://github.com/sekaiacg)
-### [Affggh](https://github.com/affggh)
-### [Shaaim](https://github.com/786-shaaim)
+### MACOS partial binary compiler:[sk](https://github.com/sekaiacg)
+### Some Code provider:[Affggh](https://github.com/affggh)
+### Partial logo designer:[Shaaim](https://github.com/786-shaaim)
+### Japanese translator:[reindex-ot](https://github.com/reindex-ot)
+### And MORE...
 ### Thanks for your help!!
 ***
 # About
