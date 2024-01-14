@@ -245,6 +245,15 @@ class Extractor:
         finally:
             pass
 
+    def fix_size(self):
+        orig_size = os.path.getsize(self.OUTPUT_IMAGE_FILE)
+        with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
+            t = ext4.Volume(file)
+            real_size = t.get_block_count * t.block_size
+            if orig_size != real_size:
+                print(f"......Wrong Size!Fixing.......\nShould:{real_size}\nYours:{orig_size}")
+                file.truncate(real_size)
+
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
@@ -260,6 +269,7 @@ class Extractor:
             if re.search(b'\x4d\x4f\x54\x4f', data):
                 print(".....MOTO structure! Fixing.....")
                 self.fix_moto(os.path.abspath(self.OUTPUT_IMAGE_FILE))
+            self.fix_size()
             print("Extracting %s --> %s" % (os.path.basename(target), os.path.basename(self.EXTRACT_DIR)))
             start = dti()
             self.__ext4extractor()

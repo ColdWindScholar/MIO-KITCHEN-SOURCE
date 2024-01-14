@@ -507,6 +507,10 @@ class Volume:
     def block_size(self):
         return 1 << (10 + self.superblock.s_log_block_size)
 
+    @property
+    def get_block_count(self):
+        return self.superblock.s_blocks_count
+
     def get_inode(self, inode_idx, file_type=InodeType.UNKNOWN):
         group_idx, inode_table_entry_idx = self.get_inode_group(inode_idx)
 
@@ -586,7 +590,8 @@ class Inode:
         while i < len(raw_data):
             xattr_entry = ext4_xattr_entry._from_buffer_copy(raw_data, i, platform64=self.volume.platform64)
 
-            if not (xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
+            if not (
+                    xattr_entry.e_name_len | xattr_entry.e_name_index | xattr_entry.e_value_offs | xattr_entry.e_value_inum):
                 # End of ext4_xattr_entry list
                 break
 
@@ -644,7 +649,8 @@ class Inode:
 
             if inode_idx is None:
                 current_path = "/".join(relative_path[:i])
-                raise FileNotFoundError(f"{part!r:s} not found in {current_path!r:s} (Inode {current_inode.inode_idx:d}).")
+                raise FileNotFoundError(
+                    f"{part!r:s} not found in {current_path!r:s} (Inode {current_inode.inode_idx:d}).")
 
             current_inode = current_inode.volume.get_inode(inode_idx, file_type)
 
