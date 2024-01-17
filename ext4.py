@@ -5,7 +5,7 @@ import math
 import queue
 
 
-def wcscmp(str_a, str_b):
+def wcs_cmp(str_a, str_b):
     for a, b in zip(str_a, str_b):
         tmp = ord(a) - ord(b)
         if tmp != 0:
@@ -620,8 +620,8 @@ class Inode:
         file_name_b, _, file_type_b = dir_b
 
         if file_type_a == InodeType.DIRECTORY == file_type_b or file_type_a != InodeType.DIRECTORY != file_type_b:
-            tmp = wcscmp(file_name_a.lower(), file_name_b.lower())
-            return tmp if tmp != 0 else wcscmp(file_name_a, file_name_b)
+            tmp = wcs_cmp(file_name_a.lower(), file_name_b.lower())
+            return tmp if tmp != 0 else wcs_cmp(file_name_a, file_name_b)
         else:
             return -1 if file_type_a == InodeType.DIRECTORY else 1
 
