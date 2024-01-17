@@ -563,12 +563,7 @@ class Inode:
 
     def __repr__(self):
         if self.inode_idx is not None:
-            return "{type_name:s}(inode_idx = {inode!r:s}, offset = 0x{offset:X}, volume_uuid = {uuid!r:s})".format(
-                inode=self.inode_idx,
-                offset=self.offset,
-                type_name=type(self).__name__,
-                uuid=self.volume.uuid
-            )
+            return f"{type(self).__name__:s}(inode_idx = {self.inode_idx!r:s}, offset = 0x{self.offset:X}, volume_uuid = {self.volume.uuid!r:s})"
         else:
             return f"{type(self).__name__:s}(offset = 0x{self.offset:X}, volume_uuid = {self.volume.uuid!r:s})"
 
@@ -805,10 +800,7 @@ class Inode:
             units = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
             unit_idx = min(int(math.log(self.inode.i_size, 1024)), len(units))
 
-            return "{size:.2f} {unit:s}".format(
-                size=self.inode.i_size / (1024 ** unit_idx),
-                unit=units[unit_idx - 1]
-            )
+            return f"{self.inode.i_size / (1024 ** unit_idx):.2f} {units[unit_idx - 1]:s}"
 
     def xattrs(self, check_inline=True, check_block=True, force_inline=False):
         # Inline xattrs
