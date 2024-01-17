@@ -249,7 +249,7 @@ class Extractor:
         with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
             t = ext4.Volume(file)
             real_size = t.get_block_count * t.block_size
-            if orig_size != real_size:
+            if orig_size < real_size:
                 print(f"......Wrong Size!Fixing.......\nShould:{real_size}\nYours:{orig_size}")
                 file.truncate(real_size)
 
