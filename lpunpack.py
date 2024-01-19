@@ -924,11 +924,7 @@ def create_parser():
 
 
 def unpack(file: str, out: str):
-    _parser = argparse.ArgumentParser()
-    _parser.add_argument('--SUPER_IMAGE', default=file)
-    _parser.add_argument('--OUTPUT_DIR', default=out)
-    _parser.add_argument('--SHOW_INFO', default=False)
-    namespace = _parser.parse_args()
+    namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False)
     if not os.path.exists(namespace.SUPER_IMAGE):
         raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
     else:
