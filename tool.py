@@ -2243,8 +2243,8 @@ def unpack(chose, form: any = None):
         win.messpop(lang.warn1)
         return False
     elif not os.path.exists(settings.path + os.sep + dn.get()):
-            win.messpop(lang.warn1, "red")
-            return False
+        win.messpop(lang.warn1, "red")
+        return False
     json_ = json_edit((work := rwork()) + "config" + os.sep + "parts_info")
     parts = json_.read()
     if os.access(work + "UPDATE.APP", os.F_OK):
@@ -2270,7 +2270,18 @@ def unpack(chose, form: any = None):
                 print(lang.text72 + " payload.bin:%s" % e)
                 os.remove(work + "payload.bin")
         return 1
-
+    elif form == 'super':
+        print(lang.text79 + f"Super[{chose}]")
+        ftype = gettype(work + "super.img")
+        if ftype == "sparse":
+            print(lang.text79 + "super.img [%s]" % ftype)
+            try:
+                utils.simg2img(work + "super.img")
+            except:
+                win.messpop(lang.warn11.format("super.img"))
+        if gettype(work + "super.img") == 'super':
+            lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
+        return 1
     for i in chose:
         if os.access(work + i + ".zstd", os.F_OK):
             print(lang.text79 + i + ".zstd")
@@ -2675,7 +2686,8 @@ class unpack_gui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch = IntVar()
         self.ch.set(1)
-        self.fm = ttk.Combobox(self, state="readonly", values=('new.dat.br', "new.dat", 'payload', 'img', 'zstd'))
+        self.fm = ttk.Combobox(self, state="readonly",
+                               values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2717,6 +2729,12 @@ class unpack_gui(ttk.LabelFrame):
                     for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
                                                                0):
                         self.lsg.insert(END, i.partition_name)
+        elif self.fm.get() == 'super':
+            if os.path.exists(work + "super.img"):
+                data = lpunpack.get_parts(work + "super.img")
+                if len(data):
+                    for i in data:
+                        self.lsg.insert(END, i)
 
     def refs2(self):
         self.lsg.delete(0, END)

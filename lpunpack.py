@@ -531,6 +531,13 @@ class Metadata:
         finally:
             return result
 
+    @property
+    def get_info2(self):
+        parts = {}
+        for item in self.partitions:
+            parts[self.groups[item.group_index].name] = parts[self.groups[item.group_index].name] + item.name
+        return parts
+
     def to_json(self) -> str:
         data = self._get_info()
         if not data:
@@ -815,6 +822,35 @@ class LpUnpack(object):
 
             size -= block_size
 
+    def get_info(self):
+        try:
+            if SparseImage(self._fd).check():
+                print('Sparse image detected.')
+                print('Process conversion to non sparse image...')
+                unsparse_file = SparseImage(self._fd).unsparse()
+                self._fd.close()
+                self._fd = open(str(unsparse_file), 'rb')
+                print('Result:[ok]')
+
+            self._fd.seek(0)
+            metadata = self._read_metadata()
+
+            filter_partition = []
+            for index, partition in enumerate(metadata.partitions):
+                filter_partition.append(partition.name)
+
+            if not filter_partition:
+                raise LpUnpackError(f'Could not find partition: {self._partition_name}')
+
+            return filter_partition
+
+        except LpUnpackError as e:
+            print(e.message)
+            sys.exit(1)
+
+        finally:
+            self._fd.close()
+
     def unpack(self):
         try:
             if SparseImage(self._fd).check():
@@ -923,12 +959,20 @@ def create_parser():
     return _parser
 
 
-def unpack(file: str, out: str):
-    namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False)
+def unpack(file: str, out: str, parts: list = None):
+    namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
     if not os.path.exists(namespace.SUPER_IMAGE):
         raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
     else:
         LpUnpack(**vars(namespace)).unpack()
+
+
+def get_parts(file_):
+    namespace = argparse.Namespace(SUPER_IMAGE=file_, SHOW_INFO=False)
+    if not os.path.exists(namespace.SUPER_IMAGE):
+        raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
+    else:
+        return LpUnpack(**vars(namespace)).get_info()
 
 
 def main():
