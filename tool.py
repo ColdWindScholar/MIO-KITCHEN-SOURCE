@@ -2271,7 +2271,7 @@ def unpack(chose, form: any = None):
                 os.remove(work + "payload.bin")
         return 1
     elif form == 'super':
-        print(lang.text79 + f"Super[{chose}]")
+        print(lang.text79 + f"Super")
         ftype = gettype(work + "super.img")
         if ftype == "sparse":
             print(lang.text79 + "super.img [%s]" % ftype)
