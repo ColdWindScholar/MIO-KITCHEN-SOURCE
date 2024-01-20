@@ -86,6 +86,7 @@ class load_car:
     gifs = []
 
     def __init__(self, *args):
+        self.hide_gifl = False
         self.frame = None
 
     def run(self, ind: int = 0):
@@ -339,8 +340,8 @@ class lang:
 
 
 def load(name):
-    global _lang
     lang_file = f'bin/languages/{name}.json'
+    _lang: dict = {}
     if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
         error(1)
     elif not os.path.exists(elocal + os.sep + lang_file):
@@ -353,7 +354,7 @@ def load(name):
 def error(code, desc="未知错误"):
     win.withdraw()
     sv_ttk.use_dark_theme()
-    er = Toplevel()
+    er: Toplevel = Toplevel()
     img = Image.open(BytesIO(images.error_logo_byte)).resize((100, 100))
     pyt = ImageTk.PhotoImage(img)
     Label(er, image=pyt).pack(padx=10, pady=10)
@@ -411,7 +412,7 @@ class welcome(Toplevel):
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
-        settings.setf("oobe", "1")
+        settings.set_value("oobe", "1")
         for i in self.winfo_children():
             i.destroy()
         self.reframe()
@@ -425,7 +426,7 @@ class welcome(Toplevel):
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
-        settings.setf("oobe", "2")
+        settings.set_value("oobe", "2")
         lce = StringVar()
 
         def loadlice():
@@ -450,7 +451,7 @@ class welcome(Toplevel):
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
     def private(self):
-        settings.setf("oobe", "3")
+        settings.set_value("oobe", "3")
         self.reframe()
         ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
@@ -463,7 +464,7 @@ class welcome(Toplevel):
         ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
 
     def done(self):
-        settings.setf("oobe", "4")
+        settings.set_value("oobe", "4")
         self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
@@ -483,7 +484,7 @@ class set_utils:
             self.load()
         else:
             sv_ttk.set_theme("dark")
-            error(1, '缺失配置文件，请重新安装此软件')
+            error(1, '缺失配置文件，请重新安装此软件\nSome Necessary Files Are LOST!')
 
     def load(self):
         self.config.read(self.set_file)
@@ -500,7 +501,7 @@ class set_utils:
         sv_ttk.set_theme(self.theme)
         win.attributes("-alpha", self.barlevel)
 
-    def setf(self, name, value):
+    def set_value(self, name, value):
         self.config.read(setfile)
         self.config.set("setting", name, value)
         with open(self.set_file, 'w') as fil:
@@ -510,7 +511,7 @@ class set_utils:
     def set_theme(self):
         print(lang.text100 + theme.get())
         try:
-            self.setf("theme", theme.get())
+            self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
             gif = Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get()))))
             cartoon.loadgif(gif)
@@ -520,7 +521,7 @@ class set_utils:
     def set_language(self):
         print(lang.text129 + language.get())
         try:
-            self.setf("language", language.get())
+            self.set_value("language", language.get())
             load(language.get())
         except Exception as e:
             print(lang.t130, e)
@@ -528,7 +529,7 @@ class set_utils:
     def modpath(self):
         if not (folder := filedialog.askdirectory()):
             return False
-        self.setf("path", folder)
+        self.set_value("path", folder)
         win.slocal.set(folder)
         self.load()
 
@@ -540,9 +541,7 @@ settings.load()
 def re_folder(path) -> None:
     if os.path.exists(path):
         rmdir(path)
-        os.mkdir(path)
-    else:
-        os.mkdir(path)
+    os.mkdir(path)
 
 
 @cartoon
@@ -589,7 +588,7 @@ def padtbo() -> any:
     list_ = []
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
         if f.startswith("dtbo."):
-            list_.append(work + "dtbo" + os.sep + "dtbo" + os.sep + f)
+            list_.append(os.path.join(work, "dtbo", "dtbo", f))
     list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
@@ -609,10 +608,7 @@ def logodump(bn: str = 'logo'):
 def logopack() -> int:
     orlogo = findfile('logo.img', work := rwork())
     logo = work + "logo-new.img"
-    if not os.path.exists(dir_ := work + "logo"):
-        print(lang.warn6)
-        return 1
-    if not os.path.exists(orlogo):
+    if not os.path.exists(dir_ := work + "logo") or not os.path.exists(orlogo):
         print(lang.warn6)
         return 1
     utils.LOGODUMPER(orlogo, logo, dir_).repack()
@@ -972,7 +968,7 @@ def mpkman() -> None:
             lang.t16 % (settings.path + os.sep + chosed.get() + ".mpk"))
 
     def popup(event):
-        rmenu.post(event.x_root, event.y_root)  # post在指定的位置显示弹出菜单
+        rmenu.post(event.x_root, event.y_root)
 
     moduledir = os.path.join(elocal, "bin", "module")
     if not os.path.exists(moduledir):
@@ -2107,10 +2103,10 @@ def rdi(work, dname) -> any:
         print(lang.text72 % dname)
         try:
             rmdir(work + dname)
-            if os.access(work + "config" + os.sep + "%s_size.txt" % dname, os.F_OK):
-                os.remove(work + "config" + os.sep + "%s_size.txt" % dname)
-            os.remove(work + "config" + os.sep + "%s_file_contexts" % dname)
-            os.remove(work + "config" + os.sep + "%s_fs_config" % dname)
+            for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config']:
+                path_ = os.path.join(work, "config", i_ % dname)
+                if os.access(path_, os.F_OK):
+                    os.remove(path_)
         except Exception as e:
             print(lang.text73 % (dname, e))
         print(lang.text3.format(dname))
@@ -2615,7 +2611,7 @@ class xmcd(ttk.LabelFrame):
     @staticmethod
     def selectp():
         print(lang.text96 + dn.get())
-        if ' ' in dn.get():
+        if ' ' in dn.get() or not dn.get().isprintable():
             print(lang.t29 + dn.get())
 
     def gui(self):
@@ -2632,12 +2628,11 @@ class xmcd(ttk.LabelFrame):
         for f in os.listdir(settings.path + os.sep + "."):
             if os.path.isdir(settings.path + os.sep + f) and f != 'bin' and not f.startswith('.'):
                 array.append(f)
+        self.LB1["value"] = array
         if not array:
             dn.set("")
-            self.LB1["value"] = array
             self.LB1.current()
         else:
-            self.LB1["value"] = array
             self.LB1.current(0)
 
     def cmm(self):
@@ -2682,10 +2677,10 @@ class frame3(ttk.LabelFrame):
 class unpack_gui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text9)
+        self.ch = IntVar()
 
     def gui(self):
         self.pack(padx=5, pady=5)
-        self.ch = IntVar()
         self.ch.set(1)
         self.fm = ttk.Combobox(self, state="readonly",
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
@@ -2774,6 +2769,7 @@ class unpack_gui(ttk.LabelFrame):
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
                     self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
+
     def refs2(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
