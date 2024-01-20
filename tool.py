@@ -2715,6 +2715,7 @@ class unpack_gui(ttk.LabelFrame):
         ck_.title(lang.attribute)
         if not self.lsg.curselection():
             ck_.destroy()
+            return
         f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
