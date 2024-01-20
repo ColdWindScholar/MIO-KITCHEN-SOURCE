@@ -2691,7 +2691,7 @@ class unpack_gui(ttk.LabelFrame):
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
-        self.menu.add_command(label="属性", command=self.info)
+        self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2717,7 +2717,7 @@ class unpack_gui(ttk.LabelFrame):
     def info(self):
         ck_ = Toplevel()
         jzxs(ck_)
-        ck_.title("属性")
+        ck_.title(lang.attribute)
         if not self.lsg.curselection():
             ck_.destroy()
         f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0] + ".img")

@@ -3,6 +3,8 @@
   "cancel": "Cancel", 
   "pack": "Pack", 
   "unpack": "Unpack",
+  "not_active": "You have not activated it, please activate and use it!",
+  "attribute":"attribute",
   "run": "Run",
   "lang": "Language:", 
   "settings": "Settings", 
