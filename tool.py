@@ -2717,22 +2717,22 @@ class unpack_gui(ttk.LabelFrame):
         ck_ = Toplevel()
         jzxs(ck_)
         ck_.title("属性")
+        if not self.lsg.curselection():
+            ck_.destroy()
         f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0]+".img")
         if not os.path.exists(f_path):
             print("文件不存在")
             ck_.destroy()
         f_type = gettype(f_path)
+        info = [["File Path", f_path], ['File Type', f_type]]
         if f_type == 'ext':
-            info = [["路径" , f_path], ['类型', f_type,]]
             with open(f_path, 'rb') as e:
                 t = ext4.Volume(e)
                 data = t.get_info_list
             for i in data:
                 info.append(i)
-        else:
-            info = [["路径" , f_path], ['类型', f_type,]]
         scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
-        columns = ['信息', '参数']
+        columns = ['信息/Info', '参数/Value']
         table = ttk.Treeview(master=ck_,height=10,columns=columns,show='headings',yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
@@ -2742,7 +2742,7 @@ class unpack_gui(ttk.LabelFrame):
         table.pack(fill=BOTH, expand=True)
         for index, data in enumerate(info):
             table.insert('', END, values=data)
-        ttk.Button(ck_, text="确定",command=ck_.destroy).pack(padx=5, pady=5)
+        ttk.Button(ck_, text=lang.ok,command=ck_.destroy).pack(padx=5, pady=5)
 
     def hd(self):
         if self.ch.get() == 1:
