@@ -266,7 +266,7 @@ class SparseImage(object):
                     if len(nonzero_blocks) >= MAX_BLOCKS_PER_GROUP:
                         nonzero_groups.append(nonzero_blocks)
                         # Clear the list.
-                        nonzero_blocks = []
+                        nonzero_blocks.clear()
 
         if nonzero_blocks:
             nonzero_groups.append(nonzero_blocks)
