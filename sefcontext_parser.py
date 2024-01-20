@@ -210,20 +210,11 @@ def main(input_f, outfile, debug=False):
     if not os.path.isfile(input_f):
         print("Error: input file '%s' doesn't exist!"
               % input_f)
-        return 1
+        return
 
-    sef_parser = SefContextParser(input_f,
-                                  debugging=debug)
-
-    out_file = open(outfile, "w")
-
-    entries = sef_parser.process_file()
-
-    print("Writing %d entries to '%s'..." % (len(entries), out_file.name))
-
-    for entry in entries:
-        out_file.write("%s\n" % str(entry))
-
-    out_file.close()
-
-    return 0
+    with open(outfile, "w") as out_file:
+        entries = SefContextParser(input_f,
+                                   debugging=debug).process_file()
+        print("Writing %d entries to '%s'..." % (len(entries), out_file.name))
+        for entry in entries:
+            out_file.write("%s\n" % str(entry))
