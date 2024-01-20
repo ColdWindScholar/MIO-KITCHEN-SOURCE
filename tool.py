@@ -1009,7 +1009,7 @@ def mpkman() -> None:
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
 
         def __init__(self, sh):
-            self.envs['bin'] = os.path.dirname(sh.replace('\\', '/'))
+            self.envs['bin'] = os.path.dirname(sh).replace('\\', '/')
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
                 for i in shell.readlines():
                     try:
