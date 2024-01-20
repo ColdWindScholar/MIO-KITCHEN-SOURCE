@@ -4,6 +4,7 @@ import platform
 import subprocess
 from functools import wraps
 import ext4
+
 if not platform.system() == 'Darwin':
     try:
         import load_window
@@ -2690,7 +2691,7 @@ class unpack_gui(ttk.LabelFrame):
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
-        self.menu.add_command(label="属性" , command=self.info)
+        self.menu.add_command(label="属性", command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
@@ -2719,7 +2720,7 @@ class unpack_gui(ttk.LabelFrame):
         ck_.title("属性")
         if not self.lsg.curselection():
             ck_.destroy()
-        f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0]+".img")
+        f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0] + ".img")
         if not os.path.exists(f_path):
             print("文件不存在")
             ck_.destroy()
@@ -2733,7 +2734,7 @@ class unpack_gui(ttk.LabelFrame):
                 info.append(i)
         scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
         columns = ['信息/Info', '参数/Value']
-        table = ttk.Treeview(master=ck_,height=10,columns=columns,show='headings',yscrollcommand=scroll.set)
+        table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
             table.column(column=column, anchor=CENTER, )
@@ -2742,7 +2743,7 @@ class unpack_gui(ttk.LabelFrame):
         table.pack(fill=BOTH, expand=True)
         for index, data in enumerate(info):
             table.insert('', END, values=data)
-        ttk.Button(ck_, text=lang.ok,command=ck_.destroy).pack(padx=5, pady=5)
+        ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5)
 
     def hd(self):
         if self.ch.get() == 1:
