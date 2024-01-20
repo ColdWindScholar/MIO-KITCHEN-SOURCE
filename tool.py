@@ -908,7 +908,7 @@ def mpkman() -> None:
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
             with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
-                sh.write("echo MIO-KITCHEN")
+                sh.write("echo Hello")
             editor.main(path + s)
         else:
             if os.path.exists(path + "main.msh"):
