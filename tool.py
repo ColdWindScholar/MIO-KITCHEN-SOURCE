@@ -2717,8 +2717,9 @@ class unpack_gui(ttk.LabelFrame):
             ck_.destroy()
         f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0] + ".img")
         if not os.path.exists(f_path):
-            print("文件不存在")
+            print(f_path + lang.text84)
             ck_.destroy()
+            return
         f_type = gettype(f_path)
         info = [["File Path", f_path], ['File Type', f_type]]
         if f_type == 'ext':
