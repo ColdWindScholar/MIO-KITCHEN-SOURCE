@@ -782,17 +782,9 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
     """
 
     assert list, 'List of dt_images to add to DTBO not provided'
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--id', type=str, default=id, action='store')
-    parser.add_argument('--rev', type=str, default=rev, action='store')
-    parser.add_argument('--flags', type=str, default=flags, action='store')
-    parser.add_argument('--custom0', type=str, default=custom0, action='store')
-    parser.add_argument('--custom1', type=str, default=custom1, action='store')
-    parser.add_argument('--custom2', type=str, default=custom2, action='store')
-    parser.add_argument('--custom3', type=str, default=custom3, action='store')
-    parser.add_argument('--version', type=int, default=version, action='store')
-    global_args = parser.parse_args()
-    dt_entries = parse_dt_entries(global_args, list)
+    data = argparse.Namespace(id=id, rev=rev, flags=flags, custom0=custom0, custom1=custom1, custom2=custom2,
+                              custom3=custom3, version=version)
+    dt_entries = parse_dt_entries(data, list)
     dtbo = Dtbo(fout, dt_type, page_size, version)
     dt_entry_buf = dtbo.add_dt_entries(dt_entries)
     dtbo.commit(dt_entry_buf)
