@@ -3,7 +3,7 @@ import mmap
 import platform
 import subprocess
 from functools import wraps
-
+import ext4
 if not platform.system() == 'Darwin':
     try:
         import load_window
@@ -2689,6 +2689,9 @@ class unpack_gui(ttk.LabelFrame):
         self.fm = ttk.Combobox(self, state="readonly",
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
+        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
+        self.menu.add_command(label="属性" , command=self.info)
+        self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", self.refs)
 
@@ -2705,6 +2708,41 @@ class unpack_gui(ttk.LabelFrame):
         ttk.Button(self, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
         self.ch.trace("w", lambda *x: self.hd())
+
+    def show_menu(self, event):
+        if self.lsg.curselection().__len__() == 1 and self.fm.get() == 'img':
+            self.menu.post(event.x_root, event.y_root)
+
+    def info(self):
+        ck_ = Toplevel()
+        jzxs(ck_)
+        ck_.title("属性")
+        f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0]+".img")
+        if not os.path.exists(f_path):
+            print("文件不存在")
+            ck_.destroy()
+        f_type = gettype(f_path)
+        if f_type == 'ext':
+            info = [["路径" , f_path], ['类型', f_type,]]
+            with open(f_path, 'rb') as e:
+                t = ext4.Volume(e)
+                data = t.get_info_list
+            for i in data:
+                info.append(i)
+        else:
+            info = [["路径" , f_path], ['类型', f_type,]]
+        scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
+        columns = ['信息', '参数']
+        table = ttk.Treeview(master=ck_,height=10,columns=columns,show='headings',yscrollcommand=scroll.set)
+        for column in columns:
+            table.heading(column=column, text=column, anchor=CENTER)
+            table.column(column=column, anchor=CENTER, )
+        scroll.config(command=table.yview)
+        scroll.pack(side=RIGHT, fill=Y)
+        table.pack(fill=BOTH, expand=True)
+        for index, data in enumerate(info):
+            table.insert('', END, values=data)
+        ttk.Button(ck_, text="确定",command=ck_.destroy).pack(padx=5, pady=5)
 
     def hd(self):
         if self.ch.get() == 1:
