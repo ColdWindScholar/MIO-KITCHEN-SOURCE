@@ -126,7 +126,7 @@ class SefContextParser(object):
 
         """Validate and process our file"""
 
-        entries = list()
+        entries = []
 
         magic = self.__read_u32()
         self.debug("Magic: 0x%x" % magic)
