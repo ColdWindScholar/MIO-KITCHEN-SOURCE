@@ -2758,11 +2758,7 @@ class unpack_gui(ttk.LabelFrame):
         if not os.path.exists(work := rwork()):
             win.messpop(lang.warn1)
             return False
-        if not self.fm.get() in ['payload', 'super']:
-            for file_name in os.listdir(work):
-                if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
-        elif self.fm.get() == 'payload':
+        if self.fm.get() == 'payload':
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
                     for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
@@ -2774,7 +2770,10 @@ class unpack_gui(ttk.LabelFrame):
                 if len(data):
                     for i in data:
                         self.lsg.insert(END, i)
-
+        else:
+            for file_name in os.listdir(work):
+                if file_name.endswith(self.fm.get()):
+                    self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
     def refs2(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
