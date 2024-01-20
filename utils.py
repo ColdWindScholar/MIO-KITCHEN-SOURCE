@@ -12,6 +12,7 @@ from threading import Thread
 from random import randint, choice
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
+
 DataImage = blockimgdiff.DataImage
 
 # -----
@@ -305,11 +306,11 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     versions = {
-            1: "Android Lollipop 5.0",
-            2: "Android Lollipop 5.1",
-            3: "Android Marshmallow 6.0",
-            4: "Android Nougat 7.0/7.1/8.0/8.1"}
-    print("Img2sdat(1.7):"+versions[version])
+        1: "Android Lollipop 5.0",
+        2: "Android Lollipop 5.1",
+        3: "Android Marshmallow 6.0",
+        4: "Android Nougat 7.0/7.1/8.0/8.1"}
+    print("Img2sdat(1.7):" + versions[version])
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
 
@@ -345,15 +346,16 @@ class jzxs(object):
 
 
 class vbpatch:
+    magic = b'AVB0'
+
     def __init__(self, file_):
         self.file = file_
 
     def checkmagic(self):
         if os.access(self.file, os.F_OK):
-            magic = b'AVB0'
             with open(self.file, "rb") as f:
                 buf = f.read(4)
-                return magic == buf
+                return self.magic == buf
         else:
             print("File dose not exist!")
 
