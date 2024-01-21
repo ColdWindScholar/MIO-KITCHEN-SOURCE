@@ -137,8 +137,6 @@ class Extractor:
                     scan_dir(entry_inode, entry_inode_path)
                 elif entry_inode.is_file:
                     file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
-                    if os.name == 'nt':
-                        file_target = file_target.replace('\\', '/')
                     try:
                         with open(file_target, 'wb') as out:
                             out.write(entry_inode.open_read().read())
@@ -212,37 +210,38 @@ class Extractor:
 
     @staticmethod
     def fix_moto(input_file):
-        if not os.path.exists(input_file):
-            return
-        output_file = input_file + "_"
-        if os.path.exists(output_file):
-            try:
-                os.remove(output_file)
-            finally:
-                pass
-        with open(input_file, 'rb') as f:
-            data = f.read(500000)
-        if not re.search(b'\x4d\x4f\x54\x4f', data):
-            return
-        result = []
-        for i in re.finditer(b'\x53\xEF', data):
-            result.append(i.start() - 1080)
-        offset = 0
-        for i in result:
-            if data[i] == 0:
-                offset = i
-                break
-        if offset > 0:
-            with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
-                f.seek(offset)
-                data = f.read(15360)
-                if data:
-                    o.write(data)
-        try:
-            os.remove(input_file)
-            os.rename(output_file, input_file)
-        finally:
-            pass
+            if not os.path.exists(input_file):
+                return
+            output_file = input_file + "_"
+            if os.path.exists(output_file):
+                try:
+                    os.remove(output_file)
+                finally:
+                    pass
+            with open(input_file, 'rb') as f:
+                data = f.read(500000)
+            if not re.search(b'\x4d\x4f\x54\x4f', data):
+                return
+            result = []
+            for i in re.finditer(b'\x53\xEF', data):
+                result.append(i.start() - 1080)
+            offset = 0
+            for i in result:
+                if data[i] == 0:
+                    offset = i
+                    break
+            if offset > 0:
+                with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
+                    f.seek(offset)
+                    data = f.read(15360)
+                    if data:
+                        o.write(data)
+            if os.path.exists(output_file):
+                try:
+                    os.remove(input_file)
+                    os.rename(output_file, input_file)
+                finally:
+                    pass
 
     def fix_size(self):
         orig_size = os.path.getsize(self.OUTPUT_IMAGE_FILE)

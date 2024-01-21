@@ -129,7 +129,10 @@ class load_car:
             try:
                 func(*args, **kwargs)
             except Exception as e:
-                error(e.args[0], e.__repr__())
+                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n' for i in e.__traceback__.tb_frame.f_globals.keys()]
+                data.append(f"Error Line:{e.__traceback__.tb_lineno}\n")
+                data.append(f"Reason: {e.__repr__()}")
+                error(e.args[0], "".join(e.__traceback__.tb_frame.f_globals))
             self.endupdate()
 
         return call_func
