@@ -210,38 +210,38 @@ class Extractor:
 
     @staticmethod
     def fix_moto(input_file):
-            if not os.path.exists(input_file):
-                return
-            output_file = input_file + "_"
-            if os.path.exists(output_file):
-                try:
-                    os.remove(output_file)
-                finally:
-                    pass
-            with open(input_file, 'rb') as f:
-                data = f.read(500000)
-            if not re.search(b'\x4d\x4f\x54\x4f', data):
-                return
-            result = []
-            for i in re.finditer(b'\x53\xEF', data):
-                result.append(i.start() - 1080)
-            offset = 0
-            for i in result:
-                if data[i] == 0:
-                    offset = i
-                    break
-            if offset > 0:
-                with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
-                    f.seek(offset)
-                    data = f.read(15360)
-                    if data:
-                        o.write(data)
-            if os.path.exists(output_file):
-                try:
-                    os.remove(input_file)
-                    os.rename(output_file, input_file)
-                finally:
-                    pass
+        if not os.path.exists(input_file):
+            return
+        output_file = input_file + "_"
+        if os.path.exists(output_file):
+            try:
+                os.remove(output_file)
+            finally:
+                pass
+        with open(input_file, 'rb') as f:
+            data = f.read(500000)
+        if not re.search(b'\x4d\x4f\x54\x4f', data):
+            return
+        result = []
+        for i in re.finditer(b'\x53\xEF', data):
+            result.append(i.start() - 1080)
+        offset = 0
+        for i in result:
+            if data[i] == 0:
+                offset = i
+                break
+        if offset > 0:
+            with open(output_file, 'wb') as o, open(input_file, 'rb') as f:
+                f.seek(offset)
+                data = f.read(15360)
+                if data:
+                    o.write(data)
+        if os.path.exists(output_file):
+            try:
+                os.remove(input_file)
+                os.rename(output_file, input_file)
+            finally:
+                pass
 
     def fix_size(self):
         orig_size = os.path.getsize(self.OUTPUT_IMAGE_FILE)
