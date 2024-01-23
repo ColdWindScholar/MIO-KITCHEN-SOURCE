@@ -129,10 +129,10 @@ class load_car:
             try:
                 func(*args, **kwargs)
             except Exception as e:
-                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n' for i in e.__traceback__.tb_frame.f_globals.keys()]
-                data.append(f"Error Line:{e.__traceback__.tb_lineno}\n")
-                data.append(f"Reason: {e.__repr__()}")
-                error(e.args[0], "".join(e.__traceback__.tb_frame.f_globals))
+                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n\n' for i in e.__traceback__.tb_frame.f_globals.keys()]
+                data.append(f"\nError Line:{e.__traceback__.tb_lineno}\n")
+                data.append(f"\nReason: {e.__repr__()}")
+                error(e.args[0], "".join(data))
             self.endupdate()
 
         return call_func
@@ -366,10 +366,14 @@ def error(code, desc="未知错误"):
     er.lift()
     er.resizable(False, False)
     jzxs(er)
-    Label(er, text="Error:0x%d" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
+    Label(er, text="Error:0x%s" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
+    scroll = ttk.Scrollbar(er)
+    scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er)
+    scroll.config(command=te.yview)
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
+    te.config(yscrollcommand=scroll.set)
     ttk.Button(er, text="Report",
                command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues")).pack(side=LEFT,
                                                                                                              padx=10,
