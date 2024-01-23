@@ -130,6 +130,9 @@ class load_car:
                 func(*args, **kwargs)
             except Exception as e:
                 data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n\n' for i in e.__traceback__.tb_frame.f_globals.keys()]
+                data.append(f"\nError File: {e.__traceback__.tb_frame.f_globals.get('__file__')}\n")
+                data.append(f"\nError Function: {func.__name__}\n")
+                data.append(f"\nFunction Args: {args, kwargs}\n")
                 data.append(f"\nError Line:{e.__traceback__.tb_lineno}\n")
                 data.append(f"\nReason: {e.__repr__()}")
                 error(e.args[0], "".join(data))
