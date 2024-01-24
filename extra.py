@@ -157,15 +157,15 @@ def script2fs_context(input_f, outdir, project):
 
 
 class proputil:
-    def __init__(self, propfile: str):
-        if os.path.exists(os.path.abspath(propfile)):
-            self.propfd = open(propfile, 'r+')
+    def __init__(self, prop_file: str):
+        if os.path.exists(os.path.abspath(prop_file)):
+            self.propfd = open(prop_file, 'r+')
         else:
-            raise FileExistsError(f"File {propfile} does not exist!")
-        self.prop = self.__loadprop
+            raise FileExistsError(f"File {prop_file} does not exist!")
+        self.prop = self.load
 
     @property
-    def __loadprop(self) -> list:
+    def load(self) -> list:
         return self.propfd.readlines()
 
     def getprop(self, key: str) -> Optional[str]:
@@ -179,7 +179,7 @@ class proputil:
                 return i.rstrip().split('=')[1]
         return None
 
-    def setprop(self, key, value) -> None:
+    def set_prop(self, key, value) -> None:
         flag: bool = False  # maybe there is not only one item
         for index, current in enumerate(self.prop):
             if key in current:
