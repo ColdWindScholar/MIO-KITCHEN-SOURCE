@@ -131,7 +131,7 @@ def script2fs_context(input_f, outdir, project):
             unix_path = os.path.join(
                 os.path.join("/system", os.path.relpath(os.path.join(root, file), project + os.sep + "system")).replace("\\", "/")
             ).replace("[", "\\[")
-            if not unix_path in fs_files:
+            if unix_path not in fs_files:
                 link = __readlink(os.path.join(root, file))
                 if link:
                     fs_label.append(
