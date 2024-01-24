@@ -69,16 +69,8 @@ def script2fs_context(input_f, outdir, project):
         else:
             symlink(src_l, dest)
 
-    fs_label = []
-    fc_label = []
-    fs_label.append(
-        ["/", '0', '0', '0755'])
-    fs_label.append(
-        ["/lost\\+found", '0', '0', '0700'])
-    fc_label.append(
-        ['/', 'u:object_r:system_file:s0'])
-    fc_label.append(
-        ['/system(/.*)?', 'u:object_r:system_file:s0'])
+    fs_label = [["/", '0', '0', '0755'], ["/lost\\+found", '0', '0', '0700']]
+    fc_label = [['/', 'u:object_r:system_file:s0'], ['/system(/.*)?', 'u:object_r:system_file:s0']]
     print("分析刷机脚本...")
     with open(input_f, 'r', encoding='utf-8') as updater:
         contents = updaterutil(updater).content
@@ -130,7 +122,8 @@ def script2fs_context(input_f, outdir, project):
     print("添加缺失的文件和权限")
     fs_files = [i[0] for i in fs_label]
     for root, dirs, files in walk(project + os.sep + "system"):
-        if project + os.sep + "install" in root.replace('\\', '/'): continue  # skip lineage spec
+        if project + os.sep + "install" in root.replace('\\', '/'):
+            continue  # skip lineage spec
         for dir in dirs:
             unix_path = op.join(
                 op.join("/system", op.relpath(op.join(root, dir), project + os.sep + "system")).replace("\\", "/")
