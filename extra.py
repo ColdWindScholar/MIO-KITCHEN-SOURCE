@@ -1,5 +1,4 @@
 import os
-import os.path as op
 import re
 from os import walk, symlink, readlink, name as osname
 from typing import Optional
@@ -124,18 +123,18 @@ def script2fs_context(input_f, outdir, project):
     for root, dirs, files in walk(project + os.sep + "system"):
         if project + os.sep + "install" in root.replace('\\', '/'):
             continue  # skip lineage spec
-        for dir in dirs:
-            unix_path = op.join(
-                op.join("/system", op.relpath(op.join(root, dir), project + os.sep + "system")).replace("\\", "/")
+        for d in dirs:
+            unix_path = os.path.join(
+                os.path.join("/system", os.path.relpath(os.path.join(root, d), project + os.sep + "system")).replace("\\", "/")
             ).replace("[", "\\[")
             if not unix_path in fs_files:
                 fs_label.append([unix_path.lstrip('/'), '0', '0', '0755'])
         for file in files:
-            unix_path = op.join(
-                op.join("/system", op.relpath(op.join(root, file), project + os.sep + "system")).replace("\\", "/")
+            unix_path = os.path.join(
+                os.path.join("/system", os.path.relpath(os.path.join(root, file), project + os.sep + "system")).replace("\\", "/")
             ).replace("[", "\\[")
             if not unix_path in fs_files:
-                link = __readlink(op.join(root, file))
+                link = __readlink(os.path.join(root, file))
                 if link:
                     fs_label.append(
                         [unix_path.lstrip('/'), '0', '2000', '0755', link])
