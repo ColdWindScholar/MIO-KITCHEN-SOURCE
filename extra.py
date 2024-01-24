@@ -124,10 +124,8 @@ def script2fs_context(input_f, outdir, project):
         if project + os.sep + "install" in root.replace('\\', '/'):
             continue  # skip lineage spec
         for d in dirs:
-            unix_path = os.path.join(
-                os.path.join("/system", os.path.relpath(os.path.join(root, d), project + os.sep + "system")).replace("\\", "/")
-            ).replace("[", "\\[")
-            if not unix_path in fs_files:
+            unix_path = os.path.join("/system", os.path.relpath(os.path.join(root, d), project + os.sep + "system")).replace("\\", "/").replace("[", "\\[")
+            if unix_path not in fs_files:
                 fs_label.append([unix_path.lstrip('/'), '0', '0', '0755'])
         for file in files:
             unix_path = os.path.join(
