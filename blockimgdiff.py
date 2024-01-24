@@ -14,33 +14,28 @@
 
 from __future__ import print_function
 
-from array import array
-from functools import total_ordering
-from heapq import heappop, heappush, heapify
-from itertools import chain
-from multiprocessing import cpu_count
+import array
+import functools
+import heapq
+import itertools
+import multiprocessing
 import os
-from re import sub
-from subprocess import call, STDOUT
-from tempfile import mkstemp
-from threading import Lock, Thread
+import re
+import subprocess
+import tempfile
+import threading
 from collections import deque, OrderedDict
 from hashlib import sha1
+
 from rangelib import RangeSet
 
 __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
 
 
-class Settings(object):
-    # Stash size cannot exceed cache_size * threshold.
-    cache_size = None
-    stash_threshold = 0.8
-
-
 def compute_patch(src, tgt, imgdiff=False):
-    srcfd, srcfile = mkstemp(prefix="src-")
-    tgtfd, tgtfile = mkstemp(prefix="tgt-")
-    patchfd, patchfile = mkstemp(prefix="patch-")
+    srcfd, srcfile = tempfile.mkstemp(prefix="src-")
+    tgtfd, tgtfile = tempfile.mkstemp(prefix="tgt-")
+    patchfd, patchfile = tempfile.mkstemp(prefix="patch-")
     os.close(patchfd)
 
     try:
@@ -54,13 +49,13 @@ def compute_patch(src, tgt, imgdiff=False):
         try:
             os.unlink(patchfile)
         except OSError:
-            ...
+            pass
         if imgdiff:
-            p = call(["imgdiff", "-z", srcfile, tgtfile, patchfile],
-                     stdout=open("/dev/null", "a"),
-                     stderr=STDOUT)
+            p = subprocess.call(["imgdiff", "-z", srcfile, tgtfile, patchfile],
+                                stdout=open("/dev/null", "a"),
+                                stderr=subprocess.STDOUT)
         else:
-            p = call(["bsdiff", srcfile, tgtfile, patchfile])
+            p = subprocess.call(["bsdiff", srcfile, tgtfile, patchfile])
 
         if p:
             raise ValueError("diff failed: " + str(p))
@@ -73,7 +68,7 @@ def compute_patch(src, tgt, imgdiff=False):
             os.unlink(tgtfile)
             os.unlink(patchfile)
         except OSError:
-            ...
+            pass
 
 
 class Image(object):
@@ -211,7 +206,7 @@ class Transfer(object):
                 " to " + str(self.tgt_ranges) + ">")
 
 
-@total_ordering
+@functools.total_ordering
 class HeapItem(object):
     def __init__(self, item):
         self.item = item
@@ -272,7 +267,7 @@ class BlockImageDiff(object):
     def __init__(self, tgt, src=None, version=4, threads=None,
                  disable_imgdiff=False):
         if threads is None:
-            threads = cpu_count() // 2
+            threads = multiprocessing.cpu_count() // 2
             if threads == 0:
                 threads = 1
         self.threads = threads
@@ -329,19 +324,13 @@ class BlockImageDiff(object):
         else:
             self.ReverseBackwardEdges()
             self.ImproveVertexSequence()
-
-        # Ensure the runtime stash size is under the limit.
-        if self.version >= 2 and Settings.cache_size is not None:
-            self.ReviseStashSize()
-
         # Double-check our work.
         self.AssertSequenceGood()
 
         self.ComputePatches(prefix)
         self.WriteTransfers(prefix)
 
-    @staticmethod
-    def HashBlocks(source, ranges):  # pylint: disable=no-self-use
+    def HashBlocks(self, source, ranges):  # pylint: disable=no-self-use
         data = source.ReadRangeSet(ranges)
         ctx = sha1()
 
@@ -386,7 +375,7 @@ class BlockImageDiff(object):
             for s, sr in xf.stash_before:
                 assert s not in stashes
                 if free_stash_ids:
-                    sid = heappop(free_stash_ids)
+                    sid = heapq.heappop(free_stash_ids)
                 else:
                     sid = next_stash_id
                     next_stash_id += 1
@@ -448,7 +437,7 @@ class BlockImageDiff(object):
                             free_size += sr.size()
                             free_string.append("free %s\n" % sh)
                             stashes.pop(sh)
-                    heappush(free_stash_ids, sid)
+                    heapq.heappush(free_stash_ids, sid)
 
                 if unstashed_src_ranges.size() > 0:
                     src_str.insert(1, unstashed_src_ranges.to_string_raw())
@@ -556,21 +545,6 @@ class BlockImageDiff(object):
                 out.append("".join(free_string))
                 stashed_blocks -= free_size
 
-            if self.version >= 2 and Settings.cache_size is not None:
-                # Sanity check: abort if we're going to need more stash space than
-                # the allowed size (cache_size * threshold). There are two purposes
-                # of having a threshold here. a) Part of the cache may have been
-                # occupied by some recovery logs. b) It will buy us some time to deal
-                # with the oversize issue.
-                cache_size = Settings.cache_size
-                stash_threshold = Settings.stash_threshold
-                max_allowed = cache_size * stash_threshold
-                assert max_stashed_blocks * self.tgt.blocksize < max_allowed, \
-                    'Stash size %d (%d * %d) exceeds the limit %d (%d * %.2f)' % (
-                        max_stashed_blocks * self.tgt.blocksize, max_stashed_blocks,
-                        self.tgt.blocksize, max_allowed, cache_size,
-                        stash_threshold)
-
         if self.version >= 3:
             self.touched_src_sha1 = self.HashBlocks(
                 self.src, self.touched_src_ranges)
@@ -613,15 +587,7 @@ class BlockImageDiff(object):
 
         if self.version >= 2:
             self._max_stashed_size = max_stashed_blocks * self.tgt.blocksize
-            OPTIONS = Settings
-            if OPTIONS.cache_size is not None:
-                max_allowed = OPTIONS.cache_size * OPTIONS.stash_threshold
-                print("max stashed blocks: %d  (%d bytes), "
-                      "limit: %d bytes (%.2f%%)\n" % (
-                          max_stashed_blocks, self._max_stashed_size, max_allowed,
-                          self._max_stashed_size * 100.0 / max_allowed))
-            else:
-                print("max stashed blocks: %d  (%d bytes), limit: <unknown>\n" % (
+            print("max stashed blocks: %d  (%d bytes), limit: <unknown>\n" % (
                     max_stashed_blocks, self._max_stashed_size))
 
     def ReviseStashSize(self):
@@ -641,8 +607,8 @@ class BlockImageDiff(object):
 
         # Compute the maximum blocks available for stash based on /cache size and
         # the threshold.
-        cache_size = Settings.cache_size
-        stash_threshold = Settings.stash_threshold
+        cache_size = None
+        stash_threshold = 0.8
         max_allowed = cache_size * stash_threshold / self.tgt.blocksize
 
         stashed_blocks = 0
@@ -704,7 +670,7 @@ class BlockImageDiff(object):
         with open(prefix + ".new.dat", "wb") as new_f:
             for xf in self.transfers:
                 if xf.style == "zero":
-                    ...
+                    pass
                 elif xf.style == "new":
                     for piece in self.tgt.ReadRangeSet(xf.tgt_ranges):
                         new_f.write(piece)
@@ -770,7 +736,7 @@ class BlockImageDiff(object):
             patches = [None] * patch_num
 
             # TODO: Rewrite with multiprocessing.ThreadPool?
-            lock = Lock()
+            lock = threading.Lock()
 
             def diff_worker():
                 while True:
@@ -787,7 +753,7 @@ class BlockImageDiff(object):
                             xf.tgt_name if xf.tgt_name == xf.src_name else (
                                     xf.tgt_name + " (from " + xf.src_name + ")")))
 
-            threads = [Thread(target=diff_worker)
+            threads = [threading.Thread(target=diff_worker)
                        for _ in range(self.threads)]
             for th in threads:
                 th.start()
@@ -810,7 +776,7 @@ class BlockImageDiff(object):
         # - we write every block we care about exactly once.
 
         # Start with no blocks having been touched yet.
-        touched = array("B", (0,) * self.tgt.total_blocks)
+        touched = array.array("B", (0,) * self.tgt.total_blocks)
 
         # Imagine processing the transfers in order.
         for xf in self.transfers:
@@ -865,15 +831,15 @@ class BlockImageDiff(object):
         # executed.
         S = [(u.NetStashChange(), u.order, u) for u in self.transfers
              if not u.incoming]
-        heapify(S)
+        heapq.heapify(S)
 
         while S:
-            _, _, xf = heappop(S)
+            _, _, xf = heapq.heappop(S)
             L.append(xf)
             for u in xf.outgoing:
                 del u.incoming[xf]
                 if not u.incoming:
-                    heappush(S, (u.NetStashChange(), u.order, u))
+                    heapq.heappush(S, (u.NetStashChange(), u.order, u))
 
         # if this fails then our graph had a cycle.
         assert len(L) == len(self.transfers)
@@ -990,7 +956,7 @@ class BlockImageDiff(object):
         for xf in self.transfers:
             xf.heap_item = HeapItem(xf)
             heap.append(xf.heap_item)
-        heapify(heap)
+        heapq.heapify(heap)
 
         sinks = set(u for u in G if not u.outgoing)
         sources = set(u for u in G if not u.incoming)
@@ -999,7 +965,7 @@ class BlockImageDiff(object):
             iu.score += delta
             iu.heap_item.clear()
             iu.heap_item = HeapItem(iu)
-            heappush(heap, iu.heap_item)
+            heapq.heappush(heap, iu.heap_item)
 
         while G:
             # Put all sinks at the end of the sequence.
@@ -1033,7 +999,7 @@ class BlockImageDiff(object):
             # pretending it's a source rather than a sink.
 
             while True:
-                u = heappop(heap)
+                u = heapq.heappop(heap)
                 if u and u.item in G:
                     u = u.item
                     break
@@ -1052,7 +1018,7 @@ class BlockImageDiff(object):
         # and by rearranging self.transfers to be in the chosen sequence.
 
         new_transfers = []
-        for x in chain(s1, s2):
+        for x in itertools.chain(s1, s2):
             x.order = len(new_transfers)
             new_transfers.append(x)
             del x.incoming
@@ -1077,7 +1043,7 @@ class BlockImageDiff(object):
                         source_ranges[i] = b
                     else:
                         if not isinstance(source_ranges[i], set):
-                            source_ranges[i] = {source_ranges[i]}
+                            source_ranges[i] = set([source_ranges[i]])
                         source_ranges[i].add(b)
 
         for a in self.transfers:
@@ -1093,8 +1059,7 @@ class BlockImageDiff(object):
                             intersections.add(b)
 
             for b in intersections:
-                if a is b:
-                    continue
+                if a is b: continue
 
                 # If the blocks written by A are read by B, then B needs to go before A.
                 i = a.tgt_ranges.intersect(b.src_ranges)
@@ -1133,7 +1098,7 @@ class BlockImageDiff(object):
                 return
 
             pieces = 0
-            cache_size = Settings.cache_size
+            cache_size = None
             split_threshold = 0.125
             max_blocks_per_transfer = int(cache_size * split_threshold /
                                           self.tgt.blocksize)
@@ -1198,7 +1163,7 @@ class BlockImageDiff(object):
                             "diff", self.transfers, self.version >= 3)
                 continue
 
-            b = sub("[0-9]+", "#", b)
+            b = re.sub("[0-9]+", "#", b)
             if b in self.src_numpatterns:
                 # Look for a 'number pattern' match (a basename match after
                 # all runs of digits are replaced by "#").  (This is useful
@@ -1215,7 +1180,7 @@ class BlockImageDiff(object):
         for k in self.src.file_map.keys():
             b = os.path.basename(k)
             self.src_basenames[b] = k
-            b = sub("[0-9]+", "#", b)
+            b = re.sub("[0-9]+", "#", b)
             self.src_numpatterns[b] = k
 
     @staticmethod
