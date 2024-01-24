@@ -186,9 +186,7 @@ class proputil:
                 self.prop[index] = current.split('=')[0] + '=' + value + '\n'
                 flag = True
         if not flag:
-            self.prop.append(
-                key + '=' + value + '\n'
-            )
+            self.prop.append(key + '=' + value + '\n')
 
     def save(self):
         self.propfd.seek(0, 0)
