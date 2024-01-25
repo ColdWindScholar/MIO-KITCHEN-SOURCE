@@ -331,16 +331,12 @@ def findfolder(dir__, folder_name):
                 return os.path.join(root, dirname).replace("\\", '/')
     return None
 
+    # ----CLASSES
 
-# ----CLASSES
-class jzxs(object):
-    def __init__(self, master):
-        self.master = master
-        self.set()
 
-    def set(self):
-        self.master.geometry('+{}+{}'.format(int(self.master.winfo_screenwidth() / 2 - self.master.winfo_width() / 2),
-                                             int(self.master.winfo_screenheight() / 2 - self.master.winfo_height() / 2)))
+def jzxs(master):
+    master.geometry('+{}+{}'.format(int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2),
+                                    int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)))
 
 
 class vbpatch:
