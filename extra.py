@@ -1,6 +1,6 @@
 import os
 import re
-from os import symlink, readlink, name as osname
+from os import symlink, name as osname
 from typing import Optional
 
 import contextpatch
@@ -43,19 +43,6 @@ class updaterutil:
 
 # This Function copy from affggh mtk-porttool(https://gitee.com/affggh/mtk-garbage-porttool)
 def script2fs_context(input_f, outdir, project):
-    def __readlink(dest: str):
-        if os.name == 'nt':
-            with open(dest, 'rb') as f:
-                if f.read(10) == b'!<symlink>':
-                    return f.read().decode('utf-16').rstrip('\0')
-                else:
-                    return None
-        else:
-            try:
-                readlink(dest)
-            except:
-                return None
-
     def __symlink(src_l: str, dest: str):
         def set_attrib(path: str) -> wintypes.BOOL:
             return windll.kernel32.SetFileAttributesA(path.encode('gb2312'), wintypes.DWORD(0x4))
