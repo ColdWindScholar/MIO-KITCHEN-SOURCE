@@ -76,17 +76,14 @@ class sdat2img:
         self.version = str(version)
         next(self.list_file)
         show = "Android {} detected!\n"
-        if version == 1:
-            print(show.format("Lollipop 5.0"))
-        elif version == 2:
-            print(show.format("Lollipop 5.1"))
-        elif version == 3:
-            print(show.format("Marshmallow 6.x"))
-        elif version == 4:
-            print(show.format("Nougat 7.x / Oreo 8.x / Pie 9.x"))
-        else:
-            print(show.format('Unknown Android version {version}!\n'))
+        versions = {
+            1: "Lollipop 5.0",
+            2: "Lollipop 5.1",
+            3: "Marshmallow 6.x",
+            4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
 
+        }
+        print(show.format(versions.get(version, 'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
             output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
@@ -331,13 +328,13 @@ def findfolder(dir__, folder_name):
                 return os.path.join(root, dirname).replace("\\", '/')
     return None
 
-    # ----CLASSES
-
 
 def jzxs(master):
     master.geometry('+{}+{}'.format(int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2),
                                     int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)))
 
+
+# ----CLASSES
 
 class vbpatch:
     magic = b'AVB0'
