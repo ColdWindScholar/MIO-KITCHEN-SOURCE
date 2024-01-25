@@ -47,6 +47,8 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             for c in i:
                 tmp += c if c.isprintable() else '*'
             i = tmp
+        if ' ' in i:
+            i = i.replace(' ', '*')
         if fs_file.get(i):
             new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
         else:
