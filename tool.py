@@ -3,6 +3,7 @@ import mmap
 import platform
 import subprocess
 from functools import wraps
+
 import ext4
 
 if not platform.system() == 'Darwin':
@@ -18,7 +19,6 @@ import time
 import tkinter as tk
 from configparser import ConfigParser
 from webbrowser import open as openurl
-import contextpatch
 import extra
 import utils
 from extra import *
@@ -2699,7 +2699,7 @@ class unpack_gui(ttk.LabelFrame):
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
-        self.fm.bind("<<ComboboxSelected>>", self.refs)
+        self.fm.bind("<<ComboboxSelected>>", lambda *x:self.refs)
 
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
@@ -2754,12 +2754,12 @@ class unpack_gui(ttk.LabelFrame):
     def hd(self):
         if self.ch.get() == 1:
             self.fm.configure(state='readonly')
-            self.refs(None)
+            self.refs()
         else:
             self.fm.configure(state="disabled")
             self.refs2()
 
-    def refs(self, N=None):
+    def refs(self):
         self.lsg.delete(0, END)
         if not os.path.exists(work := rwork()):
             win.messpop(lang.warn1)
