@@ -83,7 +83,7 @@ class sdat2img:
             4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
 
         }
-        print(show.format(versions.get(version, 'Unknown Android version {version}!\n')))
+        print(show.format(versions.get(version, f'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
             output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
