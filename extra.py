@@ -1,7 +1,10 @@
 import os
 import re
-from os import walk, symlink, readlink, name as osname
+from os import symlink, readlink, name as osname
 from typing import Optional
+
+import contextpatch
+import fspatch
 
 if osname == 'nt':
     from ctypes import wintypes, windll
@@ -117,33 +120,6 @@ def script2fs_context(input_f, outdir, project):
                 [fpath, selable])
             last_fpath = fpath
 
-    # Patch fs_config
-    print("添加缺失的文件和权限")
-    fs_files = [i[0] for i in fs_label]
-    for root, dirs, files in walk(project + os.sep + "system"):
-        if project + os.sep + "install" in root.replace('\\', '/'):
-            continue  # skip lineage spec
-        for d in dirs:
-            unix_path = os.path.join("/system", os.path.relpath(os.path.join(root, d), project + os.sep + "system")).replace("\\", "/").replace("[", "\\[")
-            if unix_path not in fs_files:
-                fs_label.append([unix_path.lstrip('/'), '0', '0', '0755'])
-        for file in files:
-            unix_path = os.path.join(
-                os.path.join("/system", os.path.relpath(os.path.join(root, file), project + os.sep + "system")).replace("\\", "/")
-            ).replace("[", "\\[")
-            if unix_path not in fs_files:
-                link = __readlink(os.path.join(root, file))
-                if link:
-                    fs_label.append(
-                        [unix_path.lstrip('/'), '0', '2000', '0755', link])
-                else:
-                    if "bin/" in unix_path:
-                        mode = '0755'
-                    else:
-                        mode = '0644'
-                    fs_label.append(
-                        [unix_path.lstrip('/'), '0', '2000', mode])
-
     # generate config
     print("生成fs_config 和 file_contexts")
     fs_label.sort()
@@ -154,6 +130,8 @@ def script2fs_context(input_f, outdir, project):
             fs_config.write(" ".join(fs) + '\n')
         for fc in fc_label:
             file_contexts.write(" ".join(fc) + '\n')
+    fspatch.main(os.path.join(project, 'system'), os.path.join(outdir, "system_fs_config"))
+    contextpatch.main(os.path.join(project, 'system'), os.path.join(outdir, "system_file_contexts"))
 
 
 class proputil:
