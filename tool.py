@@ -129,7 +129,8 @@ class load_car:
             try:
                 func(*args, **kwargs)
             except Exception as e:
-                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n\n' for i in e.__traceback__.tb_frame.f_globals.keys()]
+                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n\n' for i in
+                        e.__traceback__.tb_frame.f_globals.keys()]
                 data.append(f"\nError File: {e.__traceback__.tb_frame.f_globals.get('__file__')}\n")
                 data.append(f"\nError Function: {func.__name__}\n")
                 data.append(f"\nFunction Args: {args, kwargs}\n")
@@ -2699,7 +2700,7 @@ class unpack_gui(ttk.LabelFrame):
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
-        self.fm.bind("<<ComboboxSelected>>", lambda *x:self.refs)
+        self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs)
 
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
@@ -2812,6 +2813,16 @@ frame3().gui()
 xmcd_.listdir()
 
 
+def img2simg(path):
+    call('img2simg {} {}'.format(path, path + 's'))
+    if os.path.exists(path + 's'):
+        try:
+            os.remove(path)
+            os.rename(path + 's', path)
+        except Exception as e:
+            print(e)
+
+
 class format_conversion(Toplevel):
     def __init__(self):
         super().__init__()
@@ -2893,13 +2904,7 @@ class format_conversion(Toplevel):
                             else:
                                 print("transferpath" + lang.text84)
                     if os.path.exists(work + dname + '.img'):
-                        call('img2simg {} {}'.format(work + i, work + i + 's'))
-                        if os.path.exists(work + i + 's'):
-                            try:
-                                os.remove(work + i)
-                                os.rename(work + i + 's', work + i)
-                            except Exception as e:
-                                print(e)
+                        img2simg(work + dname + '.img')
         elif fget == 'raw':
             for i in selection:
                 print(f'[{hget}->{fget}]{i}')
@@ -2932,13 +2937,7 @@ class format_conversion(Toplevel):
             for i in selection:
                 print(f'[{hget}->{fget}]{i}')
                 if hget == 'raw':
-                    call('img2simg {} {}'.format(work + i, work + i + 's'))
-                    if os.path.exists(work + i + 's'):
-                        try:
-                            os.remove(work + i)
-                            os.rename(work + i + 's', work + i)
-                        except Exception as e:
-                            print(e)
+                    img2simg(work + i)
                 if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if hget == 'br':
@@ -2949,13 +2948,7 @@ class format_conversion(Toplevel):
             for i in selection:
                 print(f'[{hget}->{fget}]{i}')
                 if hget == 'raw':
-                    call('img2simg {} {}'.format(work + i, work + i + 's'))
-                    if os.path.exists(work + i + 's'):
-                        try:
-                            os.remove(work + i)
-                            os.rename(work + i + 's', work + i)
-                        except Exception as e:
-                            print(e)
+                    img2simg(work + i)
                 if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget == 'dat':
