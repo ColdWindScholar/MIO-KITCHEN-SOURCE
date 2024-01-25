@@ -322,8 +322,6 @@ def findfile(file, dir_) -> str:
                 return (root + os.sep + file).replace("\\", '/')
             else:
                 return root + os.sep + file
-        else:
-            ...
 
 
 def findfolder(dir__, folder_name):
@@ -350,6 +348,9 @@ class vbpatch:
 
     def __init__(self, file_):
         self.file = file_
+        self.restore = lambda: self.patchvb(b'\x00')
+        self.disdm = lambda: self.patchvb(b'\x01')
+        self.disavb = lambda: self.patchvb(b'\x02')
 
     def checkmagic(self):
         if os.access(self.file, os.F_OK):
@@ -387,15 +388,6 @@ class vbpatch:
             print("Done!")
         else:
             print("File not Found")
-
-    def restore(self):
-        self.patchvb(b'\x00')
-
-    def disdm(self):
-        self.patchvb(b'\x01')
-
-    def disavb(self):
-        self.patchvb(b'\x02')
 
 
 class DUMPCFG:
