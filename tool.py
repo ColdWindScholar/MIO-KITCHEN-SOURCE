@@ -999,8 +999,8 @@ def mpkman() -> None:
                 icon = tk.Label(pls.scrollable_frame,
                                 image=images_[i],
                                 compound="center",
-                                text=data['name']
-                                , bg="#4682B4",
+                                text=data['name'],
+                                bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
                 icon.bind('<Double-Button-1>', lambda *x: mpkrun(data['name']).run())
