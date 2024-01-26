@@ -451,8 +451,7 @@ class welcome(Toplevel):
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
         lb.bind('<<ComboboxSelected>>', lambda *x: loadlice())
         lb.current(0)
-        ttk.Label(self.frame, text=lang.text139, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                         expand=True)
+        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH, expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
@@ -2082,12 +2081,10 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                                                                                                                ext4_size_value)
                     if dely == 1:
                         rdi(work, dname)
-                    if not parts_dict.get('dat_ver'):
-                        parts_dict['dat_ver'] = '4'
                     if dbgs.get() == "dat":
-                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver')))
+                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
                     elif dbgs.get() == "br":
-                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver')))
+                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', '4')))
                     else:
                         print(lang.text3.format(dname))
                 else:
