@@ -2704,7 +2704,7 @@ class unpack_gui(ttk.LabelFrame):
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
-        self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs)
+        self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
 
         self.lsg.pack(padx=5, pady=5, fill=X, side='top')
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
