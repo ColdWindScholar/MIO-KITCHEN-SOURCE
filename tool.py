@@ -1728,8 +1728,7 @@ class packss(Toplevel):
                     supersz.set(1)
 
         def versize():
-            size = sum(
-                [os.path.getsize(work + i + ".img") for i in [tl.get(index) for index in tl.curselection()]]) + 409600
+            size = sum([os.path.getsize(work + i + ".img") for i in [tl.get(index) for index in tl.curselection()]])
             diff_size = size
             if size > supers.get():
                 for i in range(20):
