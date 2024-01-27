@@ -935,7 +935,7 @@ def mpkman() -> None:
             chosed.set(self.name)
             rmenu2.post(event.x_root, event.y_root)
 
-        def run(self):
+        def run(self, event):
             chosed.set(self.name)
             run()
 
@@ -1003,7 +1003,7 @@ def mpkman() -> None:
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', lambda *x: mpkrun(data['name']).run())
+                icon.bind('<Double-Button-1>', mpkrun(data['name']).run)
                 icon.bind('<Button-3>', mpkrun(data['name']).popup)
                 pls.add_icon(icon)
                 globals()[data['name']] = data['identifier']
