@@ -2505,7 +2505,7 @@ def datbr(work, name, brl: any, dat_ver=None):
 def mkerofs(name, format_, work, level, old_kernel=0):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else f'{format_}'
-    other = ''
+    other_ = ''
     if old_kernel:
         other_ = '-E legacy-compress'
     cmd = f"mkfs.erofs {other_} -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
