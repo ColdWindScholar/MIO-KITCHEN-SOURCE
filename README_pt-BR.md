@@ -41,7 +41,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details><summary>linux</summary>
+<details><summary>Linux</summary>
 
 ```` shell
 python3 -m pip install -U --force-reinstall pip
