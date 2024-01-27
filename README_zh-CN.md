@@ -21,7 +21,7 @@
 * 支持安卓8以下ROM打IMG
 * 在LINUX上使用MKC_文件选择，更易用
 ***
-## * Macos 注意！
+## * macOS 注意！
 ``` shell
 # 如果你想使用 [brotli],你需要:
 # 可能系统自带, 请先检查
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details><summary>linux</summary>
+<details><summary>Linux</summary>
 
 ```` shell
 python3 -m pip install -U --force-reinstall pip
@@ -70,15 +70,15 @@ python build.py
 ***
 ### 开发者邮箱: 3590361911@qq.com
 ### QQ 群: 836898509
-### TG 群 [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### Tg 频道 [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### TG 群: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### TG 频道: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # 贡献者:
 ***
-### 部分二进制编译者:[sk](https://github.com/sekaiacg)
-### 部分代码提供者:[Affggh](https://github.com/affggh)
-### 部分LOGO设计者:[Shaaim](https://github.com/786-shaaim)
-### 日本语翻译者:[reindex-ot](https://github.com/reindex-ot)
+### 部分二进制编译者: [sk](https://github.com/sekaiacg)
+### 部分代码提供者: [Affggh](https://github.com/affggh)
+### 部分LOGO设计者: [Shaaim](https://github.com/786-shaaim)
+### 日本语翻译者: [reindex-ot](https://github.com/reindex-ot)
 ### 和更多...
 ### 感谢你们的帮助!!
 ***

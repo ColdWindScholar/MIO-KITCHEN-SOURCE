@@ -66,15 +66,16 @@ python build.py
 ***
 ### 開発者のメール: 3590361911@qq.com
 ### QQ グループ: 836898509
-### TG グループ [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### TG チャンネル [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### TG グループ: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### TG チャンネル: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # 貢献者:
 ***
-### MACOS partial binary compiler:[sk](https://github.com/sekaiacg)
-### Some Code provider:[Affggh](https://github.com/affggh)
-### Partial logo designer:[Shaaim](https://github.com/786-shaaim)
-### Japanese translator:[reindex-ot](https://github.com/reindex-ot)
+### MACOS partial binary compiler: [sk](https://github.com/sekaiacg)
+### Some Code provider: [Affggh](https://github.com/affggh)
+### Partial logo designer: [Shaaim](https://github.com/786-shaaim)
+### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
+### Brazilian Portuguese traslator: [igor](https://github.com/igormiguell) 
 ### And MORE...
 ### ご協力ありがとうございます!!
 ***

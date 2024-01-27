@@ -1,16 +1,17 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
-#### The Rom Tool Written in python
+#### The Rom Tool Written in Python
 ***
 ## This tool uses many open source projects. Pay tribute to the developers!
 ***
-## localization
+## Localization
 ### Japanese: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
 ### Chinese: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
+### Português brasileiro: [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
 ***
 ## Features
-* Unpack boot dtbo ext4 erofs payload logo and so on 
-* Pack boot dtbo ext4 erofs payload logo and so on
+* Unpack boot, dtbo, ext4, erofs, payload, logo and so on
+* Pack boot, dtbo, ext4, erofs, payload, logo and so on
 ***
 ## Advantages
 * Automatically repair CONTEXT
@@ -19,9 +20,9 @@
 * Quick updates, secure and stable
 * Unique MSH interpreter that supports running MSH scripts
 * Support installation of ROMs below Android 8 and packaging as IMG
-* Use mkc file chose api On Linux,make use easily
+* Use mkc file chose api on Linux, make use easily
 ***
-## * Macos Notice
+## * macOS Notice
 ``` shell
 # if you want to use [brotli],you need:
 # You System May Had It Already, So Check First
@@ -40,7 +41,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details><summary>linux</summary>
+<details><summary>Linux</summary>
 
 ```` shell
 python3 -m pip install -U --force-reinstall pip
@@ -70,15 +71,16 @@ python build.py
 ***
 ### Developer's Email: 3590361911@qq.com
 ### QQ Group: 836898509
-### TG Group [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### Tg Channel [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### TG Group: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### TG Channel: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # Contributors:
 ***
-### MACOS partial binary compiler:[sk](https://github.com/sekaiacg)
-### Some Code provider:[Affggh](https://github.com/affggh)
-### Partial logo designer:[Shaaim](https://github.com/786-shaaim)
-### Japanese translator:[reindex-ot](https://github.com/reindex-ot)
+### MACOS partial binary compiler: [sk](https://github.com/sekaiacg)
+### Some Code provider: [Affggh](https://github.com/affggh)
+### Partial logo designer: [Shaaim](https://github.com/786-shaaim)
+### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
+### Brazilian Portuguese traslator: [igor](https://github.com/igormiguell) 
 ### And MORE...
 ### Thanks for your help!!
 ***
