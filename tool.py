@@ -1521,6 +1521,7 @@ class packxx(Toplevel):
         self.ext4_method = StringVar()
         self.lg = list_
         self.erofsext4 = IntVar()
+        self.erofs_old_kernel = IntVar()
         lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
         lf2 = ttk.LabelFrame(self, text=lang.text44)
@@ -1547,6 +1548,9 @@ class packxx(Toplevel):
         edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs)
         edbgss.pack(side='left', padx=5, pady=5)
         edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
+        ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
         # --
         scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label_erofs,
                                  variable=self.scale_erofs)
@@ -1589,7 +1593,7 @@ class packxx(Toplevel):
         lg = self.lg
         self.destroy()
         packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get())
+                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(), self.erofs_old_kernel.get())
 
 
 @cartoon
@@ -2016,7 +2020,7 @@ def dboot(nm: str = 'boot'):
 
 @cartoon
 def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
-    dely, erofs_level, ext4_size, erofsext4 = others
+    dely, erofs_level, ext4_size, erofsext4, erofs_old_kernel = others
     if not dn.get():
         win.messpop(lang.warn1)
         return False
@@ -2053,7 +2057,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                 elif parts_dict[dname] == 'ext':
                     parts_dict[dname] = 'erofs'
             if parts_dict[dname] == 'erofs':
-                mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level)
+                mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level, erofs_old_kernel)
                 if dely == 1:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
@@ -2498,10 +2502,13 @@ def datbr(work, name, brl: any, dat_ver=None):
         print(lang.text89 % name)
 
 
-def mkerofs(name, format_, work, level):
+def mkerofs(name, format_, work, level, old_kernel=0):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else f'{format_}'
-    cmd = f"mkfs.erofs -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
+    other = ''
+    if old_kernel:
+        other_ = '-E legacy-compress'
+    cmd = f"mkfs.erofs {other_} -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd)
 
 
