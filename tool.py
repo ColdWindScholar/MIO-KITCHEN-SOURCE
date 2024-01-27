@@ -451,7 +451,8 @@ class welcome(Toplevel):
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
         lb.bind('<<ComboboxSelected>>', lambda *x: loadlice())
         lb.current(0)
-        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH, expand=True)
+        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
+                                                                       expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
@@ -591,9 +592,9 @@ def padtbo() -> any:
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:%s" % dts)
-            call(exe="dtc -@ -I dts -O dtb %s -o %s" % (work + "dtbo" + os.sep + "dts" + os.sep + dts,
-                                                        work + "dtbo" + os.sep + "dtbo" + os.sep + "dtbo." +
-                                                        os.path.basename(dts).rsplit('.', 1)[1]), out=1)
+            call(exe="dtc -@ -I dts -O dtb %s -o %s" % (os.path.join(work, "dtbo", "dts", dts),
+                                                        os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' +
+                                                                     os.path.basename(dts).rsplit('.', 1)[1])), out=1)
     print(f"{lang.text7}:dtbo.img")
     list_ = []
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
