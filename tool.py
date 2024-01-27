@@ -331,7 +331,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-setfile = os.path.join((elocal := utils.elocal), "bin", "setting.ini")
+setfile = os.path.join((elocal := utils.e_local), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -611,7 +611,7 @@ def logodump(bn: str = 'logo'):
         win.messpop(lang.warn3.format(bn))
         return False
     re_folder(work + f"{bn}")
-    utils.LOGODUMPER(logo, work + f"{bn}").unpack()
+    utils.LOGO_DUMPER(logo, work + f"{bn}").unpack()
 
 
 @cartoon
@@ -621,7 +621,7 @@ def logopack() -> int:
     if not os.path.exists(dir_ := work + "logo") or not os.path.exists(orlogo):
         print(lang.warn6)
         return 1
-    utils.LOGODUMPER(orlogo, logo, dir_).repack()
+    utils.LOGO_DUMPER(orlogo, logo, dir_).repack()
     os.remove(orlogo)
     os.rename(logo, orlogo)
     rmdir(dir_)

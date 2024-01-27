@@ -30,7 +30,7 @@ try:
 except AttributeError:
     ...
 
-elocal = getcwd()
+e_local = getcwd()
 dn = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
@@ -196,7 +196,7 @@ def gettype(file) -> str:
             if compare(f_[0], f_[2]):
                 return f_[1]
     try:
-        if LOGODUMPER(file, str(None)).chkimg(file):
+        if LOGO_DUMPER(file, str(None)).check_img(file):
             return 'logo'
     except AssertionError:
         ...
@@ -412,33 +412,33 @@ class XIAOMI_BLKSTRUCT(object):
     def __init__(self, buf: bytes):
         self.structstr = "2I"
         (
-            self.imgoff,
+            self.img_offset,
             self.blksz,
         ) = struct.unpack(self.structstr, buf)
 
 
-class LOGODUMPER(object):
+class LOGO_DUMPER(object):
     def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.magic = None
         self.out = out
         self.img = img
         self.dir = dir__
-        self.structstr = "<8s"
+        self.struct_str = "<8s"
         self.cfg = DUMPCFG()
-        self.chkimg(img)
+        self.check_img(img)
 
-    def chkimg(self, img: str):
+    def check_img(self, img: str):
         assert os.access(img, os.F_OK), f"{img} does not found!"
         with open(img, 'rb') as f:
             f.seek(self.cfg.headoff, 0)
             self.magic = struct.unpack(
-                self.structstr, f.read(struct.calcsize(self.structstr))
+                self.struct_str, f.read(struct.calcsize(self.struct_str))
             )[0]
             while True:
                 m = XIAOMI_BLKSTRUCT(f.read(8))
-                if m.imgoff != 0:
+                if m.img_offset != 0:
                     self.cfg.imgblkszs.append(m.blksz << 0xc)
-                    self.cfg.imgblkoffs.append(m.imgoff << 0xc)
+                    self.cfg.imgblkoffs.append(m.img_offset << 0xc)
                     self.cfg.imgnum += 1
                 else:
                     break
@@ -451,11 +451,11 @@ class LOGODUMPER(object):
                   "BMP\tSize\tWidth\tHeight")
             for i in range(self.cfg.imgnum):
                 f.seek(self.cfg.imgblkoffs[i], 0)
-                bmph = BMPHEAD(f.read(26))
+                bmp_h = BMPHEAD(f.read(26))
                 f.seek(self.cfg.imgblkoffs[i], 0)
-                print("%d\t%d\t%d\t%d" % (i, bmph.fsize, bmph.width, bmph.height))
+                print("%d\t%d\t%d\t%d" % (i, bmp_h.fsize, bmp_h.width, bmp_h.height))
                 with open(os.path.join(self.out, "%d.bmp" % i), 'wb') as o:
-                    o.write(f.read(bmph.fsize))
+                    o.write(f.read(bmp_h.fsize))
             print("\tDone!")
 
     def repack(self):
@@ -464,13 +464,13 @@ class LOGODUMPER(object):
             for i in range(self.cfg.imgnum):
                 print("Write BMP [%d.bmp] at offset 0x%X" % (i, off << 0xc))
                 with open(os.path.join(self.dir, "%d.bmp" % i), 'rb') as b:
-                    bhead = BMPHEAD(b.read(26))
+                    bmp_head = BMPHEAD(b.read(26))
                     b.seek(0, 0)
-                    self.cfg.imgblkszs[i] = (bhead.fsize >> 0xc) + 1
+                    self.cfg.imgblkszs[i] = (bmp_head.fsize >> 0xc) + 1
                     self.cfg.imgblkoffs[i] = off
 
                     o.seek(off << 0xc)
-                    o.write(b.read(bhead.fsize))
+                    o.write(b.read(bmp_head.fsize))
 
                     off += self.cfg.imgblkszs[i]
             o.seek(self.cfg.headoff)
