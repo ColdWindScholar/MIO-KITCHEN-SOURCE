@@ -1308,8 +1308,7 @@ def mpkman() -> None:
 
         def __init__(self):
             self.ck = None
-            self.arr = []
-            self.arr2 = []
+            self.arr = {}
             if chosed.get():
                 self.value = globals()[chosed.get()]
                 self.value2 = chosed.get()
@@ -1328,13 +1327,13 @@ def mpkman() -> None:
             jzxs(self.ck)
             ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                                  expand=True)
-            if self.arr2:
+            if self.arr:
                 ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
                 ttk.Label(self.ck, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
                                                                        expand=True)
                 te = Listbox(self.ck, highlightthickness=0, activestyle='dotbox')
-                for i in self.arr2:
-                    te.insert("end", i)
+                for i in self.arr.keys():
+                    te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
             ttk.Button(self.ck, text=lang.ok, command=self.unloop).pack(fill=X, expand=True, side=LEFT, pady=10,
                                                                         padx=10)
@@ -1350,23 +1349,20 @@ def mpkman() -> None:
                     data = json.load(f)
                     for n in data['depend'].split():
                         if name == n:
-                            self.arr.append(i)
-                            self.arr2.append(data['name'])
+                            self.arr[i] = data['name']
                             self.lfdep(i)
                             break
-                    self.arr = sorted(set(self.arr), key=self.arr.index)
-                    self.arr2 = sorted(set(self.arr2), key=self.arr2.index)
 
         def unloop(self):
             self.ck.destroy()
-            for i in self.arr:
-                self.umpk(i)
-            self.umpk(self.value)
+            for i in self.arr.keys():
+                self.umpk(i, self.arr.get(i, 'None'))
+            self.umpk(self.value, self.value2)
 
         @staticmethod
-        def umpk(name=None) -> None:
+        def umpk(name=None, show_name='') -> None:
             if name:
-                print(lang.text29.format(name))
+                print(lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(moduledir + os.sep + name):
                     try:
                         rmtree(moduledir + os.sep + name)
