@@ -854,6 +854,7 @@ class IconGrid(tk.Frame):
 def mpkman() -> None:
     chosed = tk.StringVar()
     chosed.set('')
+    global_mpk = {}
 
     def impk():
         Install_mpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
@@ -914,7 +915,7 @@ def mpkman() -> None:
             win.message_pop(lang.warn2)
             return 1
         if id_ is None:
-            id_ = globals()[chosed.get()]
+            id_ = global_mpk[chosed.get()]
         path = os.path.join(moduledir, id_) + os.sep
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
@@ -944,7 +945,7 @@ def mpkman() -> None:
         if not chosed.get():
             win.message_pop(lang.warn2)
             return 1
-        with open(os.path.join(moduledir, (value := globals()[chosed.get()]), "info.json"), 'r', encoding='UTF-8') as f:
+        with open(os.path.join(moduledir, (value := global_mpk[chosed.get()]), "info.json"), 'r', encoding='UTF-8') as f:
             data = json.load(f)
             if "describe" in data:
                 des = data["describe"]
@@ -1006,7 +1007,7 @@ def mpkman() -> None:
                 icon.bind('<Double-Button-1>', mpkrun(data['name']).run)
                 icon.bind('<Button-3>', mpkrun(data['name']).popup)
                 pls.add_icon(icon)
-                globals()[data['name']] = data['identifier']
+                global_mpk[data['name']] = data['identifier']
 
     class msh_parse:
         envs = {'version': settings.version,
@@ -1258,7 +1259,7 @@ def mpkman() -> None:
             print(lang.warn1)
             return
         if chosed.get():
-            value = globals()[chosed.get()]
+            value = global_mpk[chosed.get()]
         else:
             print(lang.warn2)
             return
@@ -1316,7 +1317,7 @@ def mpkman() -> None:
             self.ck = None
             self.arr = {}
             if chosed.get():
-                self.value = globals()[chosed.get()]
+                self.value = global_mpk[chosed.get()]
                 self.value2 = chosed.get()
                 self.lfdep()
                 self.ask()
