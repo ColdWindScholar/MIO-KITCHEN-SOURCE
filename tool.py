@@ -1263,7 +1263,7 @@ def mpkman() -> None:
             print(lang.warn2)
             return
         script_path = moduledir + os.sep + value + os.sep
-        with open(os.path.join(script_path , "info.json"), 'r', encoding='UTF-8') as f:
+        with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
             data = json.load(f)
             for n in data['depend'].split():
                 if not os.path.exists(os.path.join(moduledir, n)):
