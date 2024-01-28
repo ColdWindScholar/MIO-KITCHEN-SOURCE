@@ -1263,6 +1263,12 @@ def mpkman() -> None:
             print(lang.warn2)
             return
         script_path = moduledir + os.sep + value + os.sep
+        with open(os.path.join(script_path , "info.json"), 'r', encoding='UTF-8') as f:
+            data = json.load(f)
+            for n in data['depend'].split():
+                if not os.path.exists(os.path.join(moduledir, n)):
+                    print(lang.text36 % (chosed.get(), n, n))
+                    return 2
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
@@ -1351,6 +1357,7 @@ def mpkman() -> None:
                         if name == n:
                             self.arr[i] = data['name']
                             self.lfdep(i)
+                            # 检测到依赖后立即停止
                             break
 
         def unloop(self):
