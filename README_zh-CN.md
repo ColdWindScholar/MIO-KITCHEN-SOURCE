@@ -79,6 +79,7 @@ python build.py
 ### 部分代码提供者: [Affggh](https://github.com/affggh)
 ### 部分LOGO设计者: [Shaaim](https://github.com/786-shaaim)
 ### 日本语翻译者: [reindex-ot](https://github.com/reindex-ot)
+### 巴西葡萄牙语翻译者: [igor](https://github.com/igormiguell)
 ### 和更多...
 ### 感谢你们的帮助!!
 ***
