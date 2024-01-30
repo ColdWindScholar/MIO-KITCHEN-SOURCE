@@ -855,7 +855,7 @@ def mpkman() -> None:
     chosed = tk.StringVar()
     chosed.set('')
     global_mpk = {}
-
+    moduledir = os.path.join(elocal, "bin", "module")
     def impk():
         Install_mpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
         list_pls()
@@ -981,8 +981,6 @@ def mpkman() -> None:
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)
-
-    moduledir = os.path.join(elocal, "bin", "module")
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
     file = StringVar()
