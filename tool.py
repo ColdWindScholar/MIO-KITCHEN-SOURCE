@@ -4,6 +4,7 @@ import platform
 import subprocess
 from functools import wraps
 
+import AI_engine
 import ext4
 
 if not platform.system() == 'Darwin':
@@ -2110,6 +2111,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             logo_pack()
         else:
             print(f"Unsupported {i}:{parts_dict[i]}")
+    AI_engine.suggest(win.show.get(1.0, END))
 
 
 def rdi(work, part_name) -> any:
