@@ -14,15 +14,6 @@ def swap(ch):
     return ((ch & 0xF) << 4) + ((ch & 0xF0) >> 4)
 
 
-def keyshuffle(key, hkey):
-    for i in range(0, 0x10, 4):
-        key[i] = swap((hkey[i] ^ key[i]))
-        key[i + 1] = swap(hkey[i + 1] ^ key[i + 1])
-        key[i + 2] = swap(hkey[i + 2] ^ key[i + 2])
-        key[i + 3] = swap(hkey[i + 3] ^ key[i + 3])
-    return key
-
-
 def mtk_shuffle(key, keylength, input, inputlength):
     for i in range(0, inputlength):
         k = key[(i % keylength)]

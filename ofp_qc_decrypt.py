@@ -30,22 +30,6 @@ def ROL(x, n, bits=32):
     return (x >> n) | (mask_bits << (bits - n))
 
 
-def generatekey1():
-    key1 = "42F2D5399137E2B2813CD8ECDF2F4D72"
-    key2 = "F6C50203515A2CE7D8C3E1F938B7E94C"
-    key3 = "67657963787565E837D226B69A495D21"
-
-    key1 = bytearray.fromhex(key1)
-    key2 = bytearray.fromhex(key2)
-    key3 = bytearray.fromhex(key3)
-
-    key2 = keyshuffle(key2, key3)
-    aeskey = bytes(hashlib.md5(key2).hexdigest()[0:16], 'utf-8')
-    key1 = keyshuffle(key1, key3)
-    iv = bytes(hashlib.md5(key1).hexdigest()[0:16], 'utf-8')
-    return aeskey, iv
-
-
 def deobfuscate(data, mask):
     ret = bytearray()
     for i in range(0, len(data)):
@@ -296,7 +280,6 @@ def main(filename, outdir):
             print("Files extracted to " + outdir)
             exit(0)
 
-    # key,iv=generatekey1()
     pagesize, key, iv, data = generatekey2(filename)
     if pagesize == 0:
         print("Unknown key. Aborting")
