@@ -929,7 +929,7 @@ def mpkman() -> None:
             elif os.path.exists(path + 'main.sh'):
                 editor.main(path + 'main.sh')
 
-    class mpkrun:
+    class mpk_run_menu:
         def __init__(self, name):
             self.name = name
 
@@ -1005,8 +1005,8 @@ def mpkman() -> None:
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', mpkrun(data['name']).run)
-                icon.bind('<Button-3>', mpkrun(data['name']).popup)
+                icon.bind('<Double-Button-1>', mpk_run_menu(data['name']).run)
+                icon.bind('<Button-3>', mpk_run_menu(data['name']).popup)
                 pls.add_icon(icon)
                 global_mpk[data['name']] = data['identifier']
 
