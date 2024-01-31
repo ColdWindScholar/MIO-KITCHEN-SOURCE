@@ -86,34 +86,34 @@ class load_car:
     gifs = []
 
     def __init__(self, *args):
-        self.hide_gifl = False
+        self.hide_gif = False
         self.frame = None
 
     def run(self, ind: int = 0):
-        self.hide_gifl = False
-        if not self.hide_gifl:
-            win.gifl.pack(padx=10, pady=10)
+        self.hide_gif = False
+        if not self.hide_gif:
+            win.gif_label.pack(padx=10, pady=10)
         self.frame = self.frames[ind]
         ind += 1
         if ind == len(self.frames):
             ind = 0
-        win.gifl.configure(image=self.frame)
-        self.gifs.append(win.gifl.after(30, self.run, ind))
+        win.gif_label.configure(image=self.frame)
+        self.gifs.append(win.gif_label.after(30, self.run, ind))
 
-    def endupdate(self):
+    def stop(self):
         for i in self.gifs:
             try:
-                win.gifl.after_cancel(i)
+                win.gif_label.after_cancel(i)
             except:
                 ...
-        win.gifl.pack_forget()
-        self.hide_gifl = True
+        win.gif_label.pack_forget()
+        self.hide_gif = True
 
     def init(self):
         self.run()
-        self.endupdate()
+        self.stop()
 
-    def loadgif(self, gif):
+    def load_gif(self, gif):
         self.frames = []
         try:
             while True:
@@ -137,7 +137,7 @@ class load_car:
                 data.append(f"\nError Line:{e.__traceback__.tb_lineno}\n")
                 data.append(f"\nReason: {e.__repr__()}")
                 error(e.args[0], "".join(data))
-            self.endupdate()
+            self.stop()
 
         return call_func
 
@@ -162,9 +162,9 @@ class Tool(Tk):
         super().__init__()
         self.rzf = None
         self.tsk = None
-        self.gifl = None
+        self.gif_label = None
         self.photo = None
-        self.slocal = None
+        self.show_local = None
         self.LB2 = None
         self.notepad = None
         self.title('MIO-KITCHEN')
@@ -198,11 +198,11 @@ class Tool(Tk):
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
-        self.subwin2 = ttk.LabelFrame(self, text=lang.text9)
-        self.subwin3 = ttk.LabelFrame(self, text=lang.text10)
-        self.subwin3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
-        self.subwin2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
-        self.notepad = ttk.Notebook(self.subwin2)
+        self.sub_win2 = ttk.LabelFrame(self, text=lang.text9)
+        self.sub_win3 = ttk.LabelFrame(self, text=lang.text10)
+        self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
+        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
+        self.notepad = ttk.Notebook(self.sub_win2)
         self.tab = ttk.Frame(self.notepad)
         self.tab2 = ttk.Frame(self.notepad)
         self.tab3 = ttk.Frame(self.notepad)
@@ -225,11 +225,11 @@ class Tool(Tk):
         self.tab4_n()
         self.setting_tab()
         self.notepad.pack(fill=BOTH)
-        self.rzf = ttk.Frame(self.subwin3)
-        self.tsk = Label(self.subwin3, text="MIO-KITCHEN", font=('楷书', 15))
+        self.rzf = ttk.Frame(self.sub_win3)
+        self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=('楷书', 15))
         self.tsk.bind('<Button-1>')
         self.tsk.pack(padx=10, pady=10, side='top')
-        tr = ttk.LabelFrame(self.subwin3, text=lang.text131)
+        tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
         Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
         tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
@@ -262,8 +262,8 @@ class Tool(Tk):
             padx=5, pady=5)
         self.tab6_n()
         mpkman()
-        self.gifl = Label(self.rzf)
-        self.gifl.pack(padx=10, pady=10)
+        self.gif_label = Label(self.rzf)
+        self.gif_label.pack(padx=10, pady=10)
         self.get_time()
 
     def up_progressbar(self):
@@ -298,8 +298,8 @@ class Tool(Tk):
         tab.pack()
 
     def setting_tab(self):
-        self.slocal = StringVar()
-        self.slocal.set(settings.path)
+        self.show_local = StringVar()
+        self.show_local.set(settings.path)
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -310,10 +310,10 @@ class Tool(Tk):
 
         def start_folder():
             if os.name == 'nt':
-                os.startfile(self.slocal.get())
+                os.startfile(self.show_local.get())
 
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
-        slo = ttk.Label(sf3, textvariable=self.slocal)
+        slo = ttk.Label(sf3, textvariable=self.show_local)
         slo.bind('<Button-1>', lambda *x: start_folder())
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
@@ -331,7 +331,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-setfile = os.path.join((elocal := utils.e_local), "bin", "setting.ini")
+settings_file = os.path.join((elocal := utils.e_local), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -440,7 +440,7 @@ class welcome(Toplevel):
         settings.set_value("oobe", "2")
         lce = StringVar()
 
-        def loadlice():
+        def load_license():
             te.delete(1.0, END)
             with open(os.path.join(elocal, "bin", "licenses", lce.get() + ".txt"), 'r',
                       encoding='UTF-8') as f:
@@ -449,7 +449,7 @@ class welcome(Toplevel):
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
-        lb.bind('<<ComboboxSelected>>', lambda *x: loadlice())
+        lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                        expand=True)
@@ -457,7 +457,7 @@ class welcome(Toplevel):
         lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
         te.pack(fill=BOTH, side='top')
-        loadlice()
+        load_license()
         ttk.Label(self.frame, text=lang.t1).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
@@ -488,7 +488,7 @@ class welcome(Toplevel):
 class set_utils:
     def __init__(self, set_ini):
         self.path = None
-        self.barlevel = '0.9'
+        self.bar_level = '0.9'
         self.set_file = set_ini
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
@@ -510,10 +510,10 @@ class set_utils:
         load(language.get())
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
-        win.attributes("-alpha", self.barlevel)
+        win.attributes("-alpha", self.bar_level)
 
     def set_value(self, name, value):
-        self.config.read(setfile)
+        self.config.read(settings_file)
         self.config.set("setting", name, value)
         with open(self.set_file, 'w') as fil:
             self.config.write(fil)
@@ -525,7 +525,7 @@ class set_utils:
             self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
             gif = Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get()))))
-            cartoon.loadgif(gif)
+            cartoon.load_gif(gif)
         except Exception as e:
             win.message_pop(lang.text101 % (theme.get(), e))
 
@@ -541,11 +541,11 @@ class set_utils:
         if not (folder := filedialog.askdirectory()):
             return False
         self.set_value("path", folder)
-        win.slocal.set(folder)
+        win.show_local.set(folder)
         self.load()
 
 
-settings = set_utils(setfile)
+settings = set_utils(settings_file)
 settings.load()
 
 
@@ -583,7 +583,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
 
 
 @cartoon
-def padtbo() -> any:
+def pack_dtbo() -> any:
     work = rwork()
     if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
@@ -607,7 +607,7 @@ def padtbo() -> any:
 
 
 @cartoon
-def logodump(bn: str = 'logo'):
+def logo_dump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
         win.message_pop(lang.warn3.format(bn))
         return False
@@ -616,15 +616,15 @@ def logodump(bn: str = 'logo'):
 
 
 @cartoon
-def logopack() -> int:
-    orlogo = findfile('logo.img', work := rwork())
+def logo_pack() -> int:
+    origin_logo = findfile('logo.img', work := rwork())
     logo = work + "logo-new.img"
-    if not os.path.exists(dir_ := work + "logo") or not os.path.exists(orlogo):
+    if not os.path.exists(dir_ := work + "logo") or not os.path.exists(origin_logo):
         print(lang.warn6)
         return 1
-    utils.LOGO_DUMPER(orlogo, logo, dir_).repack()
-    os.remove(orlogo)
-    os.rename(logo, orlogo)
+    utils.LOGO_DUMPER(origin_logo, logo, dir_).repack()
+    os.remove(origin_logo)
+    os.rename(logo, origin_logo)
     rmdir(dir_)
 
 
@@ -806,7 +806,7 @@ class Process(Toplevel):
         settings.load()
         sys.stdout = StdoutRedirector(win.show)
         sys.stderr = StdoutRedirector(win.show)
-        xmcd_.listdir()
+        project_menu.listdir()
         rmdir(self.dir)
         self.destroy()
         win.deiconify()
@@ -852,10 +852,11 @@ class IconGrid(tk.Frame):
 
 
 def mpkman() -> None:
-    chosed = tk.StringVar()
-    chosed.set('')
+    chosen = tk.StringVar()
+    chosen.set('')
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
+
     def impk():
         Install_mpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
         list_pls()
@@ -911,11 +912,11 @@ def mpkman() -> None:
             editor_(iden)
 
     def editor_(id_=None):
-        if not chosed.get():
+        if not chosen.get():
             win.message_pop(lang.warn2)
             return 1
         if id_ is None:
-            id_ = global_mpk[chosed.get()]
+            id_ = global_mpk[chosen.get()]
         path = os.path.join(moduledir, id_) + os.sep
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
@@ -933,19 +934,20 @@ def mpkman() -> None:
             self.name = name
 
         def popup(self, event):
-            chosed.set(self.name)
+            chosen.set(self.name)
             rmenu2.post(event.x_root, event.y_root)
 
         def run(self, event):
-            chosed.set(self.name)
+            chosen.set(self.name)
             cz(run())
 
     @cartoon
     def export():
-        if not chosed.get():
+        if not chosen.get():
             win.message_pop(lang.warn2)
             return 1
-        with open(os.path.join(moduledir, (value := global_mpk[chosed.get()]), "info.json"), 'r', encoding='UTF-8') as f:
+        with open(os.path.join(moduledir, (value := global_mpk[chosen.get()]), "info.json"), 'r',
+                  encoding='UTF-8') as f:
             data = json.load(f)
             if "describe" in data:
                 des = data["describe"]
@@ -970,17 +972,18 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, str(chosed.get()) + ".mpk"), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, str(chosen.get()) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
             del buffer2, buffer
-        print(lang.t15 % (settings.path + os.sep + chosed.get() + ".mpk")) if os.path.exists(
-            settings.path + os.sep + chosed.get() + ".mpk") else print(
-            lang.t16 % (settings.path + os.sep + chosed.get() + ".mpk"))
+        print(lang.t15 % (settings.path + os.sep + chosen.get() + ".mpk")) if os.path.exists(
+            settings.path + os.sep + chosen.get() + ".mpk") else print(
+            lang.t16 % (settings.path + os.sep + chosen.get() + ".mpk"))
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)
+
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
     file = StringVar()
@@ -1256,8 +1259,8 @@ def mpkman() -> None:
         if not dn.get():
             print(lang.warn1)
             return
-        if chosed.get():
-            value = global_mpk[chosed.get()]
+        if chosen.get():
+            value = global_mpk[chosen.get()]
         else:
             print(lang.warn2)
             return
@@ -1266,7 +1269,7 @@ def mpkman() -> None:
             data = json.load(f)
             for n in data['depend'].split():
                 if not os.path.exists(os.path.join(moduledir, n)):
-                    print(lang.text36 % (chosed.get(), n, n))
+                    print(lang.text36 % (chosen.get(), n, n))
                     return 2
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
@@ -1309,14 +1312,14 @@ def mpkman() -> None:
             else:
                 print(lang.warn8)
 
-    class unmpk:
+    class uninstall_mpk:
 
         def __init__(self):
             self.ck = None
             self.arr = {}
-            if chosed.get():
-                self.value = global_mpk[chosed.get()]
-                self.value2 = chosed.get()
+            if chosen.get():
+                self.value = global_mpk[chosen.get()]
+                self.value2 = chosen.get()
                 self.lfdep()
                 self.ask()
             else:
@@ -1398,7 +1401,7 @@ def mpkman() -> None:
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu2.add_command(label=lang.text20, command=lambda: cz(unmpk))
+    rmenu2.add_command(label=lang.text20, command=lambda: cz(uninstall_mpk))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
     rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
@@ -1945,7 +1948,7 @@ def jboot(bn: str = 'boot'):
         print("Ramdisk is %s" % comp)
         with open(work + f"{bn}" + os.sep + "comp", "w") as f:
             f.write(comp)
-        if comp != "unknow":
+        if comp != "unknown":
             os.rename(work + f"{bn}" + os.sep + "ramdisk.cpio",
                       work + f"{bn}" + os.sep + "ramdisk.cpio.comp")
             if call("magiskboot decompress %s %s" % (
@@ -1984,7 +1987,7 @@ def dboot(nm: str = 'boot'):
         with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print("Compressing:%s" % comp)
-        if comp != "unknow":
+        if comp != "unknown":
             if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
                 print("Pack Ramdisk Fail...")
                 os.remove("ramdisk-new.cpio")
@@ -2033,7 +2036,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     for i in parts:
         dname = os.path.basename(i)
         if dname not in parts_dict.keys():
-            parts_dict[dname] = 'unknow'
+            parts_dict[dname] = 'unknown'
         if spatch == 1:
             for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                 file = findfile(j, work)
@@ -2102,44 +2105,44 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         elif parts_dict[i] in ['boot', 'vendor_boot']:
             dboot(i)
         elif parts_dict[i] == 'dtbo':
-            padtbo()
+            pack_dtbo()
         elif parts_dict[i] == 'logo':
-            logopack()
+            logo_pack()
         else:
-            print(f"Unsupport {i}:{parts_dict[i]}")
+            print(f"Unsupported {i}:{parts_dict[i]}")
 
 
-def rdi(work, dname) -> any:
+def rdi(work, part_name) -> any:
     if not os.listdir(work + "config"):
         rmtree(work + "config")
         return False
-    if os.access(work + dname + ".img", os.F_OK):
-        print(lang.text72 % dname)
+    if os.access(work + part_name + ".img", os.F_OK):
+        print(lang.text72 % part_name)
         try:
-            rmdir(work + dname)
+            rmdir(work + part_name)
             for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config']:
-                path_ = os.path.join(work, "config", i_ % dname)
+                path_ = os.path.join(work, "config", i_ % part_name)
                 if os.access(path_, os.F_OK):
                     os.remove(path_)
         except Exception as e:
-            print(lang.text73 % (dname, e))
-        print(lang.text3.format(dname))
+            print(lang.text73 % (part_name, e))
+        print(lang.text3.format(part_name))
     else:
-        win.message_pop(lang.text75 % dname, "red")
+        win.message_pop(lang.text75 % part_name, "red")
 
 
 def input_(title: str = lang.text76, text: str = "") -> str:
-    (inputvar := StringVar()).set(text)
+    (input_var := StringVar()).set(text)
     input__ = Toplevel()
     input__.attributes('-topmost', 'true')
     input__.geometry("300x180")
     input__.resizable(False, False)
     input__.title(title)
-    ttk.Entry(input__, textvariable=inputvar).pack(pady=5, padx=5, fill=BOTH)
+    ttk.Entry(input__, textvariable=input_var).pack(pady=5, padx=5, fill=BOTH)
     ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
     jzxs(input__)
     input__.wait_window()
-    return inputvar.get()
+    return input_var.get()
 
 
 def script2fs(path):
@@ -2211,10 +2214,10 @@ def unpackrom(ifile) -> None:
                 ...
         print(lang.text81)
         if os.path.exists(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
-            xmcd_.listdir()
+            project_menu.listdir()
             dn.set(os.path.splitext(os.path.basename(zip_src))[0])
         else:
-            xmcd_.listdir()
+            project_menu.listdir()
         script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         try:
             unpackg.refs()
@@ -2222,7 +2225,7 @@ def unpackrom(ifile) -> None:
             ...
         fz.close()
         return
-    elif ftype != 'unknow':
+    elif ftype != 'unknown':
         folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
             os.path.join(
                 settings.path, os.path.splitext(os.path.basename(ifile))[0])) else os.path.join(settings.path,
@@ -2234,7 +2237,7 @@ def unpackrom(ifile) -> None:
         except Exception as e:
             win.message_pop(e)
         copy(ifile, str(folder))
-        xmcd_.listdir()
+        project_menu.listdir()
         dn.set(os.path.basename(folder))
     else:
         print(lang.text82 % ftype)
@@ -2283,9 +2286,9 @@ def unpack(chose, form: any = None):
         return 1
     elif form == 'super':
         print(lang.text79 + f"Super")
-        ftype = gettype(work + "super.img")
-        if ftype == "sparse":
-            print(lang.text79 + "super.img [%s]" % ftype)
+        file_type = gettype(work + "super.img")
+        if file_type == "sparse":
+            print(lang.text79 + "super.img [%s]" % file_type)
             try:
                 utils.simg2img(work + "super.img")
             except:
@@ -2312,18 +2315,18 @@ def unpack(chose, form: any = None):
         if os.access(work + i + ".new.dat", os.F_OK):
             print(lang.text79 + work + i + ".new.dat")
             if os.path.getsize(work + i + ".new.dat") != 0:
-                transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
-                if os.access(transferpath, os.F_OK):
-                    parts['dat_ver'] = sdat2img(transferpath, work + i + ".new.dat", work + i + ".img").version
+                transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
+                if os.access(transferfile, os.F_OK):
+                    parts['dat_ver'] = sdat2img(transferfile, work + i + ".new.dat", work + i + ".img").version
                     if os.access(work + i + ".img", os.F_OK):
                         os.remove(work + i + ".new.dat")
-                        os.remove(transferpath)
+                        os.remove(transferfile)
                         try:
                             os.remove(work + i + '.patch.dat')
                         except:
                             ...
                     else:
-                        print("transferpath" + lang.text84)
+                        print("transferfile" + lang.text84)
         if os.access(work + i + ".img", os.F_OK):
             try:
                 parts.pop(i)
@@ -2336,13 +2339,13 @@ def unpack(chose, form: any = None):
             if gettype(work + i + ".img") in ['boot', 'vendor_boot']:
                 jboot(i)
             if i == 'logo':
-                logodump(i)
+                logo_dump(i)
             if gettype(work + i + ".img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{i}")
                 utils.vbpatch(work + i + ".img").disavb()
-            ftype = gettype(work + i + ".img")
-            if ftype == "sparse":
-                print(lang.text79 + i + ".img [%s]" % ftype)
+            file_type = gettype(work + i + ".img")
+            if file_type == "sparse":
+                print(lang.text79 + i + ".img [%s]" % file_type)
                 try:
                     utils.simg2img(work + i + ".img")
                 except:
@@ -2364,8 +2367,8 @@ def unpack(chose, form: any = None):
                         if wjm.endswith('_b.img'):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
-            if (ftype := gettype(work + i + ".img")) == "ext":
-                print(lang.text79 + i + ".img [%s]" % ftype)
+            if (file_type := gettype(work + i + ".img")) == "ext":
+                print(lang.text79 + i + ".img [%s]" % file_type)
                 try:
                     imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 except Exception as e:
@@ -2376,8 +2379,8 @@ def unpack(chose, form: any = None):
                         os.remove(work + i + ".img")
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
-            if ftype == "erofs":
-                print(lang.text79 + i + ".img [%s]" % ftype)
+            if file_type == "erofs":
+                print(lang.text79 + i + ".img [%s]" % file_type)
                 if call(exe="extract.erofs -i " + settings.path + os.sep + dn.get() + os.sep + i + ".img -o " + work + " -x",
                         out=1) != 0:
                     print(f'Unpack Fail...')
@@ -2417,7 +2420,7 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
 
 class dirsize:
     # get-command
-    # 1 - retun True value of dir size
+    # 1 - return True value of dir size
     # 2 - return Rsize value of dir size
     # 3 - return Rsize value of dir size and modify dynampic_partition_list
     def __init__(self, dir_: str, num: int = 1, get: int = 2, list_f: str = None):
@@ -2461,21 +2464,21 @@ class dirsize:
         self.rsize_v = int(size_ * bs / num)
 
     @staticmethod
-    def rsizelist(dname, size, file):
+    def rsizelist(part_name, size, file):
         if os.access(file, os.F_OK):
-            print(lang.text74 % (dname, size))
+            print(lang.text74 % (part_name, size))
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
-                content = re.sub("resize {} \\d+".format(dname),
-                                 "resize {} {}".format(dname, size), content)
-                content = re.sub("resize {}_a \\d+".format(dname),
-                                 "resize {}_a {}".format(dname, size), content)
-                content = re.sub("# Grow partition {} from 0 to \\d+".format(dname),
-                                 "# Grow partition {} from 0 to {}".format(dname, size),
+                content = re.sub("resize {} \\d+".format(part_name),
+                                 "resize {} {}".format(part_name, size), content)
+                content = re.sub("resize {}_a \\d+".format(part_name),
+                                 "resize {}_a {}".format(part_name, size), content)
+                content = re.sub("# Grow partition {} from 0 to \\d+".format(part_name),
+                                 "# Grow partition {} from 0 to {}".format(part_name, size),
                                  content)
-                content = re.sub("# Grow partition {}_a from 0 to \\d+".format(dname),
-                                 "# Grow partition {}_a from 0 to {}".format(dname, size), content)
+                content = re.sub("# Grow partition {}_a from 0 to \\d+".format(part_name),
+                                 "# Grow partition {}_a from 0 to {}".format(part_name, size), content)
                 ff.write(content)
 
 
@@ -2593,7 +2596,7 @@ class zip_file:
 
 
 @cartoon
-def packzip():
+def pack_zip():
     if not dn.get():
         win.message_pop(lang.warn1)
     else:
@@ -2626,7 +2629,7 @@ class xmcd(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     @staticmethod
-    def selectp():
+    def select_print():
         print(lang.text96 + dn.get())
         if ' ' in dn.get() or not dn.get().isprintable():
             print(lang.t29 + dn.get())
@@ -2634,10 +2637,10 @@ class xmcd(ttk.LabelFrame):
     def gui(self):
         self.LB1 = ttk.Combobox(self, textvariable=dn, state='readonly')
         self.LB1.pack(side="top", padx=10, pady=10, fill=X)
-        self.LB1.bind('<<ComboboxSelected>>', lambda *x: self.selectp())
+        self.LB1.bind('<<ComboboxSelected>>', lambda *x: self.select_print())
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text115, command=self.newp).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text116, command=lambda: cz(self.delwork)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove_project)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text117, command=lambda: cz(self.cmm)).pack(side="left", padx=10, pady=10)
 
     def listdir(self):
@@ -2665,7 +2668,7 @@ class xmcd(ttk.LabelFrame):
         else:
             print(lang.text104)
 
-    def delwork(self):
+    def remove_project(self):
         win.message_pop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
@@ -2684,7 +2687,7 @@ class frame3(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
-        ttk.Button(self, text=lang.text122, command=lambda: cz(packzip)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10,
                                                                                               pady=10)
@@ -2812,11 +2815,11 @@ if int(settings.oobe) < 4:
     welcome()
 win.gui()
 unpackg = unpack_gui()
-xmcd_ = xmcd()
-xmcd_.gui()
+project_menu = xmcd()
+project_menu.gui()
 unpackg.gui()
 frame3().gui()
-xmcd_.listdir()
+project_menu.listdir()
 
 
 def img2simg(path):
@@ -2879,16 +2882,16 @@ class format_conversion(Toplevel):
     @cartoon
     def conversion(self):
         work = rwork()
-        fget = self.f.get()
+        f_get = self.f.get()
         hget = self.h.get()
         selection = [self.list_b.get(index) for index in self.list_b.curselection()]
         self.destroy()
-        if fget == hget:
+        if f_get == hget:
             ...
-        elif fget == 'sparse':
+        elif f_get == 'sparse':
             for i in selection:
-                print(f'[{hget}->{fget}]{i}')
-                dname = os.path.basename(i).split('.')[0]
+                print(f'[{hget}->{f_get}]{i}')
+                basename = os.path.basename(i).split('.')[0]
                 if hget == 'br':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
@@ -2897,24 +2900,24 @@ class format_conversion(Toplevel):
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + work + i)
                         if os.path.getsize(work + i) != 0:
-                            transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
-                            if os.access(transferpath, os.F_OK):
-                                sdat2img(transferpath, work + i, work + dname + ".img")
-                                if os.access(work + dname + ".img", os.F_OK):
+                            transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                            if os.access(transferfile, os.F_OK):
+                                sdat2img(transferfile, work + i, work + basename + ".img")
+                                if os.access(work + basename + ".img", os.F_OK):
                                     os.remove(work + i)
-                                    os.remove(transferpath)
+                                    os.remove(transferfile)
                                     try:
-                                        os.remove(work + dname + '.patch.dat')
+                                        os.remove(work + basename + '.patch.dat')
                                     except:
                                         ...
                             else:
                                 print("transferpath" + lang.text84)
-                    if os.path.exists(work + dname + '.img'):
-                        img2simg(work + dname + '.img')
-        elif fget == 'raw':
+                    if os.path.exists(work + basename + '.img'):
+                        img2simg(work + basename + '.img')
+        elif f_get == 'raw':
             for i in selection:
-                print(f'[{hget}->{fget}]{i}')
-                dname = os.path.basename(i).split('.')[0]
+                print(f'[{hget}->{f_get}]{i}')
+                basename = os.path.basename(i).split('.')[0]
                 if hget == 'br':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
@@ -2925,23 +2928,23 @@ class format_conversion(Toplevel):
                             i = i.replace('.br', '')
                         print(lang.text79 + work + i)
                         if os.path.getsize(work + i) != 0:
-                            transferpath = os.path.abspath(os.path.dirname(work)) + os.sep + dname + ".transfer.list"
-                            if os.access(transferpath, os.F_OK):
-                                sdat2img(transferpath, work + i, work + dname + ".img")
-                                if os.access(work + dname + ".img", os.F_OK):
+                            transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                            if os.access(transferfile, os.F_OK):
+                                sdat2img(transferfile, work + i, work + basename + ".img")
+                                if os.access(work + basename + ".img", os.F_OK):
                                     try:
                                         os.remove(work + i)
-                                        os.remove(transferpath)
-                                        os.remove(work + dname + '.patch.dat')
+                                        os.remove(transferfile)
+                                        os.remove(work + basename + '.patch.dat')
                                     except:
                                         ...
                             else:
-                                print("transferpath" + lang.text84)
+                                print("transferfile" + lang.text84)
                 if hget == 'sparse':
                     utils.simg2img(work + i)
-        elif fget == 'dat':
+        elif f_get == 'dat':
             for i in selection:
-                print(f'[{hget}->{fget}]{i}')
+                print(f'[{hget}->{f_get}]{i}')
                 if hget == 'raw':
                     img2simg(work + i)
                 if hget in ['raw', 'sparse']:
@@ -2950,9 +2953,9 @@ class format_conversion(Toplevel):
                     print(lang.text79 + i)
                     call("brotli -dj " + work + i)
 
-        elif fget == 'br':
+        elif f_get == 'br':
             for i in selection:
-                print(f'[{hget}->{fget}]{i}')
+                print(f'[{hget}->{f_get}]{i}')
                 if hget == 'raw':
                     img2simg(work + i)
                 if hget in ['raw', 'sparse']:
@@ -2969,7 +2972,7 @@ class format_conversion(Toplevel):
         print(lang.text8)
 
 
-cartoon.loadgif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
+cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
 cartoon.init()
 print(lang.text108)
 win.update()

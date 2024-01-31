@@ -202,7 +202,7 @@ def gettype(file) -> str:
         ...
     except struct.error:
         ...
-    return "unknow"
+    return "unknown"
 
 
 def dynamic_list_reader(path):
