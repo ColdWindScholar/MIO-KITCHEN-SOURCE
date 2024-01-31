@@ -2125,7 +2125,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
         else:
             print(f"Unsupported {i}:{parts_dict[i]}")
     if settings.ai_engine == '1':
-        AI_engine.suggest(win.show.get(1.0, END), ok=lang.ok)
+        AI_engine.suggest(win.show.get(1.0, END), language='cn' if "Chinese" in settings.language else 'en', ok=lang.ok)
 
 
 def rdi(work, part_name) -> any:
