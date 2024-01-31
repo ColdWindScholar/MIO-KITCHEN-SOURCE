@@ -19,7 +19,7 @@ def suggest(string: str = '', language='cn', ok='ok'):
     similarity = 0
     window = Toplevel()
     window.title("AI ENGINE:<Based on bug feedback>")
-    text = '未发现错误'
+    text = 'SORRY, No Suggestion For This Problem'
     if string:
         for i in library.keys():
             similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
