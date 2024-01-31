@@ -7,5 +7,9 @@ library = {
     'error: build_directory_structure: cannot lookup security context for xxx': {
         "en": "You should check if there are any folders/files with spaces in their names in this folder. If you find any, please rename or delete them and repackage them",
         "cn": "您应该检查此文件夹是否存在名称带空格的文件夹/文件，发现后请重命名或删除，然后重新打包"
-    }
+    },
+    "Partition table must have at least one entry": {
+        "en": "Please select at least one partition for Super packaging",
+        "cn": "请为Super至少选择一个分区打包"
+    },
 }
