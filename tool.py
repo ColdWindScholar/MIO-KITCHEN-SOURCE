@@ -301,14 +301,19 @@ class Tool(Tk):
     def setting_tab(self):
         self.show_local = StringVar()
         self.show_local.set(settings.path)
+        AI = StringVar()
+        AI.set(settings.ai_engine)
+        def on_value_change(args):
+            settings.set_value('ai_engine', AI.get())
+        AI.trace("w", on_value_change)
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
+        sf4 = ttk.Frame(self.tab3)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
         self.LB2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
-
         def start_folder():
             if os.name == 'nt':
                 os.startfile(self.show_local.get())
@@ -323,11 +328,15 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+        ttk.Checkbutton(sf4, text="AI引擎", variable=AI, onvalue='1',
+                        offvalue='0',
+                        style="Switch.TCheckbutton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
+        sf4.pack(padx=10, pady=10, fill='both')
 
 
 win = Tool()
