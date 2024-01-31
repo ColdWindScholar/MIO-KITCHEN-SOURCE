@@ -18,12 +18,10 @@ from __future__ import print_function
 """Tool for packing multiple DTB/DTBO files into a single image"""
 
 import argparse
-import fnmatch
 import os
 import struct
 import zlib
 from array import array
-from collections import namedtuple
 
 
 class CompressionFormat(object):
@@ -662,116 +660,6 @@ def parse_dt_entries(global_args, arg_list):
     return dt_entries
 
 
-def parse_config_option(line, is_global, dt_keys, global_key_types):
-    """Parses a single line from the configuration file.
-
-    Args:
-        line: String containing the key=value line from the file.
-        is_global: Boolean indicating if we should parse global or DT entry
-            specific option.
-        dt_keys: Tuple containing all valid DT entry and global option strings
-            in configuration file.
-        global_key_types: A dict of global options and their corresponding types. It
-            contains all exclusive valid global option strings in configuration
-            file that are not repeated in dt entry options.
-
-    Returns:
-        Returns a tuple for parsed key and value for the option. Also, checks
-        the key to make sure its valid.
-    """
-
-    if line.find('=') == -1:
-        raise ValueError('Invalid line (%s) in configuration file' % line)
-
-    key, value = (x.strip() for x in line.split('='))
-    if is_global and key in global_key_types:
-        if global_key_types[key] is int:
-            value = int(value)
-    elif key not in dt_keys:
-        raise ValueError('Invalid option (%s) in configuration file' % key)
-
-    return key, value
-
-
-def parse_config_file(fin, dt_keys, global_key_types):
-    """Parses the configuration file for creating DTBO image.
-
-    Args:
-        fin: File handle for configuration file
-        is_global: Boolean indicating if we should parse global or DT entry
-            specific option.
-        dt_keys: Tuple containing all valid DT entry and global option strings
-            in configuration file.
-        global_key_types: A dict of global options and their corresponding types. It
-            contains all exclusive valid global option strings in configuration
-            file that are not repeated in dt entry options.
-
-    Returns:
-        global_args, dt_args: Tuple of a dictionary with global arguments
-        and a list of dictionaries for all DT entry specific arguments the
-        following format.
-            global_args:
-                {'id' : <value>, 'rev' : <value> ...}
-            dt_args:
-                [{'filename' : 'dt_file_name', 'id' : <value>,
-                 'rev' : <value> ...},
-                 {'filename' : 'dt_file_name2', 'id' : <value2>,
-                  'rev' : <value2> ...}, ...
-                ]
-    """
-
-    # set all global defaults
-    global_args = dict((k, '0') for k in dt_keys)
-    global_args['dt_type'] = 'dtb'
-    global_args['page_size'] = 2048
-    global_args['version'] = 0
-
-    dt_args = []
-    found_dt_entry = False
-    count = -1
-    for line in fin:
-        line = line.rstrip()
-        if line.lstrip().startswith('#'):
-            continue
-        comment_idx = line.find('#')
-        line = line if comment_idx == -1 else line[0:comment_idx]
-        if not line or line.isspace():
-            continue
-        if line.startswith((' ', '\t')) and not found_dt_entry:
-            # This is a global argument
-            key, value = parse_config_option(line, True, dt_keys, global_key_types)
-            global_args[key] = value
-        elif line.find('=') != -1:
-            key, value = parse_config_option(line, False, dt_keys, global_key_types)
-            dt_args[-1][key] = value
-        else:
-            found_dt_entry = True
-            count += 1
-            dt_args.append({})
-            dt_args[-1]['filename'] = line.strip()
-    return global_args, dt_args
-
-
-def parse_config_create_cmd_args(arglist):
-    """Parse command line arguments for 'cfg_create subcommand.
-
-    Args:
-        arglist: A list of all command line arguments including the
-            mandatory input configuration file name.
-
-    Returns:
-        A Namespace object of parsed arguments.
-    """
-    parser = argparse.ArgumentParser(prog='cfg_create')
-    parser.add_argument('conf_file', nargs='?',
-                        type=argparse.FileType('r'),
-                        default=None)
-    cwd = os.getcwd()
-    parser.add_argument('--dtb-dir', '-d', nargs='?', type=str,
-                        dest='dtbdir', default=cwd)
-    return parser.parse_args(arglist)
-
-
 def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="0", rev="0", flags='0', custom0='0',
                       custom1='0', custom2='0', custom3='0'):
     """Create Device Tree Blob Overlay image using provided arguments.
@@ -791,7 +679,7 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
     fout.close()
 
 
-def dump_dtbo_image(fin, dtfilename, decompress=False, outfile=None):
+def dump_dtbo_image(fin, dtfilename, decompress=False):
     """Dump DTBO file.
 
     Dump Device Tree Blob Overlay metadata as output and the device
@@ -809,135 +697,6 @@ def dump_dtbo_image(fin, dtfilename, decompress=False, outfile=None):
             with open(dtfilename + '.{:d}'.format(idx), 'wb') as fout:
                 dtbo.extract_dt_file(idx, fout, decompress)
     print(str(dtbo) + '\n')
-
-
-def create_dtbo_image_from_config(fout, argv):
-    """Create DTBO file from a configuration file.
-
-    Args:
-        fout: Output file handle to write to.
-        argv: list of command line arguments.
-    """
-    args = parse_config_create_cmd_args(argv)
-    if not args.conf_file:
-        raise ValueError('Configuration file must be provided')
-
-    _DT_KEYS = ('id', 'rev', 'flags', 'custom0', 'custom1', 'custom2', 'custom3')
-    _GLOBAL_KEY_TYPES = {'dt_type': str, 'page_size': int, 'version': int}
-
-    global_args, dt_args = parse_config_file(args.conf_file,
-                                             _DT_KEYS, _GLOBAL_KEY_TYPES)
-    version = global_args['version']
-
-    params = {'version': version}
-    dt_entries = []
-    for dt_arg in dt_args:
-        filepath = dt_arg['filename']
-        if not os.path.isabs(filepath):
-            for root, dirnames, filenames in os.walk(args.dtbdir):
-                for filename in fnmatch.filter(filenames, os.path.basename(filepath)):
-                    filepath = os.path.join(root, filename)
-        params['dt_file'] = open(filepath, 'rb')
-        params['dt_offset'] = 0
-        params['dt_size'] = os.fstat(params['dt_file'].fileno()).st_size
-        for key in _DT_KEYS:
-            if key not in dt_arg:
-                params[key] = global_args[key]
-            else:
-                params[key] = dt_arg[key]
-        dt_entries.append(DtEntry(**params))
-
-    # Create and write DTBO file
-    dtbo = Dtbo(fout, global_args['dt_type'], global_args['page_size'], version)
-    dt_entry_buf = dtbo.add_dt_entries(dt_entries)
-    dtbo.commit(dt_entry_buf)
-    fout.close()
-
-
-def print_default_usage(progname):
-    """Prints program's default help string.
-
-    Args:
-        progname: This program's name.
-    """
-    sb = ['  ' + progname + ' help all', '  ' + progname + ' help <command>\n', '    commands:',
-          '      help, dump, create, cfg_create']
-    print('\n'.join(sb))
-
-
-def print_dump_usage(progname):
-    """Prints usage for 'dump' sub-command.
-
-    Args:
-        progname: This program's name.
-    """
-    sb = ['  ' + progname + ' dump <image_file> (<option>...)\n', '    options:',
-          '      -o, --output <filename>  Output file name.',
-          '                               Default is output to stdout.',
-          '      -b, --dtb <filename>     Dump dtb/dtbo files from image.',
-          '                               Will output to <filename>.0, <filename>.1, etc.']
-    print('\n'.join(sb))
-
-
-def print_cfg_create_usage(progname):
-    """Prints usage for 'cfg_create' sub-command.
-
-    Args:
-        progname: This program's name.
-    """
-    sb = ['  ' + progname + ' cfg_create <image_file> <config_file> (<option>...)\n', '    options:',
-          '      -d, --dtb-dir <dir>      The path to load dtb files.',
-          '                               Default is load from the current path.']
-    print('\n'.join(sb))
-
-
-def print_usage(cmd, _):
-    """Prints usage for this program.
-
-    Args:
-        cmd: The string sub-command for which help (usage) is requested.
-    """
-    prog_name = os.path.basename(__file__)
-    if not cmd:
-        print_default_usage(prog_name)
-        return
-
-    HelpCommand = namedtuple('HelpCommand', 'help_cmd, help_func')
-    help_commands = (HelpCommand('dump'),
-                     HelpCommand('create'),
-                     HelpCommand('cfg_create'),
-                     )
-
-    if cmd == 'all':
-        print_default_usage(prog_name)
-
-    for help_cmd, help_func in help_commands:
-        if cmd == 'all' or cmd == help_cmd:
-            help_func(prog_name)
-            if cmd != 'all':
-                return
-
-    print('Unsupported help command: %s' % cmd, end='\n\n')
-    print_default_usage(prog_name)
-    return
-
-
-def main():
-    """Main entry point for mkdtboimg."""
-
-    parser = argparse.ArgumentParser(prog='mkdtboimg.py')
-
-    subparser = parser.add_subparsers(title='subcommand',
-                                      description='Valid subcommands')
-
-    config_parser = subparser.add_parser('cfg_create', add_help=False)
-    config_parser.add_argument('argfile', nargs='?',
-                               action='store',
-                               type=argparse.FileType('wb'))
-    config_parser.set_defaults(func=create_dtbo_image_from_config)
-
-    (subcmd, subcmd_args) = parser.parse_known_args()
-    subcmd.func(subcmd.argfile, subcmd_args)
 
 
 def dump_dtbo(file, out):
