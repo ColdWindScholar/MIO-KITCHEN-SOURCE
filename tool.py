@@ -491,6 +491,7 @@ class set_utils:
         self.path = None
         self.bar_level = '0.9'
         self.set_file = set_ini
+        self.ai_engine = '0'
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
             self.load()
@@ -2111,7 +2112,8 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             logo_pack()
         else:
             print(f"Unsupported {i}:{parts_dict[i]}")
-    AI_engine.suggest(win.show.get(1.0, END), ok=lang.ok)
+    if settings.ai_engine == '1':
+        AI_engine.suggest(win.show.get(1.0, END), ok=lang.ok)
 
 
 def rdi(work, part_name) -> any:
