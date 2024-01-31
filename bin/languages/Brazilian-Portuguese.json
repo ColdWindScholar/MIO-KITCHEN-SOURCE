@@ -4,6 +4,7 @@
   "pack": "Empacotar",
   "unpack": "Desempacotar",
   "not_active": "Você não o ativou. Por favor, ative e use-o!",
+  "ai_engine": "Motor AI",
   "attribute": "Atributo",
   "run": "Rodar",
   "lang": "Idioma:",

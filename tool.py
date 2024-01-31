@@ -331,7 +331,7 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
-        ttk.Checkbutton(sf4, text="AI引擎", variable=AI, onvalue='1',
+        ttk.Checkbutton(sf4, text=lang.ai_engine, variable=AI, onvalue='1',
                         offvalue='0',
                         style="Switch.TCheckbutton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')

@@ -7,6 +7,7 @@
   "attribute": "attribute",
   "run": "Run",
   "lang": "Language:",
+  "ai_engine": "AI ENGINE",
   "settings": "Settings",
   "warn1": "Please select a project",
   "warn2": "Please select a plugin",
