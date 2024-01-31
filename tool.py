@@ -2111,7 +2111,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             logo_pack()
         else:
             print(f"Unsupported {i}:{parts_dict[i]}")
-    AI_engine.suggest(win.show.get(1.0, END))
+    AI_engine.suggest(win.show.get(1.0, END), ok=lang.ok)
 
 
 def rdi(work, part_name) -> any:

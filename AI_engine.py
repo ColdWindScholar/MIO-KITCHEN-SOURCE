@@ -4,7 +4,7 @@ from utils import jzxs
 from Document_Library import library
 
 
-def suggest(string: str = '', language='cn'):
+def suggest(string: str = '', language='cn', ok='ok'):
     catch_error = [i for i in string.split("\n") if 'error' in i][0]
     if not catch_error:
         return
@@ -25,5 +25,5 @@ def suggest(string: str = '', language='cn'):
                     text = library[i][language]
                     break
     ttk.Label(window, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
-    ttk.Button(window, text="ok", command=window.destroy).pack(padx=10, pady=10)
+    ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10)
     jzxs(window)
