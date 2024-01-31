@@ -303,9 +303,11 @@ class Tool(Tk):
         self.show_local.set(settings.path)
         AI = StringVar()
         AI.set(settings.ai_engine)
-        def on_value_change(args):
+
+        def on_value_change():
             settings.set_value('ai_engine', AI.get())
-        AI.trace("w", on_value_change)
+
+        AI.trace("w", lambda *x: on_value_change())
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -314,6 +316,7 @@ class Tool(Tk):
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
         self.LB2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
+
         def start_folder():
             if os.name == 'nt':
                 os.startfile(self.show_local.get())
