@@ -127,8 +127,9 @@ class load_car:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
+            func(*args, **kwargs)
             try:
-                func(*args, **kwargs)
+                ...
             except Exception as e:
                 data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}\n\n' for i in
                         e.__traceback__.tb_frame.f_globals.keys()]
