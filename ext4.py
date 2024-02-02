@@ -534,8 +534,10 @@ class Volume:
 
     def get_inode(self, inode_idx, file_type=InodeType.UNKNOWN):
         group_idx, inode_table_entry_idx = self.get_inode_group(inode_idx)
-
-        inode_table_offset = self.group_descriptors[group_idx].bg_inode_table * self.block_size
+        try:
+            inode_table_offset = self.group_descriptors[group_idx].bg_inode_table * self.block_size
+        except Exception:
+            inode_table_offset = 99 * self.block_size
         inode_offset = inode_table_offset + inode_table_entry_idx * self.superblock.s_inode_size
 
         return Inode(self, inode_offset, inode_idx, file_type)
