@@ -1088,7 +1088,7 @@ def mpkman() -> None:
                       encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
-                    f.write(f'export {i}="{self.envs[i]}"\n')
+                    f.write(f'export {i}="{self.envs.get(i, "")}"\n')
                 f.write("source $1")
             if os.path.exists(file_):
                 sh = "ash" if os.name == 'posix' else "bash"
@@ -1304,14 +1304,14 @@ def mpkman() -> None:
                     if not file.get():
                         file.set(temp + v_code())
                     with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                        f.write('export tool_bin={}\n'.format(
+                        f.write('export tool_bin="{}"\n'.format(
                             tool_bin.replace(
                                 '\\',
                                 '/')))
-                        f.write('export version={}\n'.format(settings.version))
-                        f.write('export moddir={}\n'.format(moduledir.replace('\\', '/')))
+                        f.write('export version="{}"\n'.format(settings.version))
+                        f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
                         f.write(
-                            "export project={}\nsource $1".format(
+                            "export project='{}'\nsource $1".format(
                                 (settings.path + os.sep + dn.get()).replace('\\', '/')))
                     if os.path.exists(file.get()):
                         call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
