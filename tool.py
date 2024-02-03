@@ -87,6 +87,7 @@ class load_car:
     gifs = []
 
     def __init__(self, *args):
+        self.frames = []
         self.hide_gif = False
         self.frame = None
 
@@ -115,7 +116,6 @@ class load_car:
         self.stop()
 
     def load_gif(self, gif):
-        self.frames = []
         try:
             while True:
                 self.frames.append(ImageTk.PhotoImage(gif.copy()))
