@@ -2397,7 +2397,7 @@ def unpack(chose, form: any = None):
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
                 print(lang.text79 + i + ".img [%s]" % file_type)
-                if call(exe="extract.erofs -i " + settings.path + os.sep + dn.get() + os.sep + i + f".img -o {work} -x",
+                if call(exe=f"extract.erofs -i {os.path.join(settings.path, dn.get(), i+'.img')} -o {work} -x",
                         out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
