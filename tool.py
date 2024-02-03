@@ -301,13 +301,13 @@ class Tool(Tk):
     def setting_tab(self):
         self.show_local = StringVar()
         self.show_local.set(settings.path)
-        AI = StringVar()
-        AI.set(settings.ai_engine)
+        ai = StringVar()
+        ai.set(settings.ai_engine)
 
         def on_value_change():
-            settings.set_value('ai_engine', AI.get())
+            settings.set_value('ai_engine', ai.get())
 
-        AI.trace("w", lambda *x: on_value_change())
+        ai.trace("w", lambda *x: on_value_change())
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -331,7 +331,7 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
-        ttk.Checkbutton(sf4, text=lang.ai_engine, variable=AI, onvalue='1',
+        ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
                         offvalue='0',
                         style="Switch.TCheckbutton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')
