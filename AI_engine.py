@@ -7,7 +7,7 @@ from Document_Library import library
 def suggest(string: str = '', language='cn', ok='ok'):
     catch_error = [i for i in string.split("\n") if 'error' in i]
     if not catch_error:
-        catch_error = [i for i in string.split("\n") if 'fail' in i]
+        catch_error = [i for i in string.split("\n") if 'failed' in i]
         if not catch_error:
             return
         else:
