@@ -2370,11 +2370,6 @@ def unpack(chose, form: any = None):
                 parts[i] = gettype(work + i + ".img")
             if gettype(work + i + ".img") == 'super':
                 print(lang.text79 + i + ".img")
-                if gettype(work + i + ".img") == "sparse":
-                    try:
-                        utils.simg2img(work + i + ".img")
-                    except:
-                        win.message_pop(lang.warn11.format(i))
                 lpunpack.unpack(work + i + ".img", work)
                 if os.access(work + "system_a.img", os.F_OK):
                     for wjm in os.listdir(work):
