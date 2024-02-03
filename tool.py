@@ -953,7 +953,7 @@ def mpkman() -> None:
 
         def run(self, event):
             chosen.set(self.name)
-            cz(run())
+            cz(run)
 
     @cartoon
     def export():
