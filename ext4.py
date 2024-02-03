@@ -515,7 +515,7 @@ class Volume:
     def get_info_list(self):
         data = [
             ['Filesystem magic number', hex(self.superblock.s_magic).upper()],
-            ["Filesystem volume name",self.superblock.s_volume_name.decode()],
+            ["Filesystem volume name", self.superblock.s_volume_name.decode()],
             ["Filesystem UUID", self.uuid],
             ['Last mounted on', self.superblock.s_last_mounted.decode()],
             ["Block size", f"{1 << (10 + self.superblock.s_log_block_size)}"],
