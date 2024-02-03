@@ -1260,11 +1260,7 @@ def mpkman() -> None:
                                     padx=5, pady=5, fill=BOTH)
                             else:
                                 print(lang.warn14.format(con['type']))
-                if msh:
-                    ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh)).pack(fill=X, side='bottom')
-                else:
-                    ttk.Button(self, text=lang.ok, command=lambda: cz(generate_sh)).pack(fill=X, side='bottom')
-
+                ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X, side='bottom')
             jzxs(self)
             self.wait_window()
 
