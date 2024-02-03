@@ -1621,7 +1621,7 @@ class dbkxyt:
         if not os.path.exists(dir_ + "images"):
             os.makedirs(dir_ + 'images')
         if os.path.exists(os.path.join(rwork(), 'payload.bin')):
-            print("Find payload.bin ,Stop!")
+            print("Found payload.bin ,Stop!")
             return
         if os.path.exists(dir_ + 'META-INF'):
             rmdir(dir_ + 'META-INF')
