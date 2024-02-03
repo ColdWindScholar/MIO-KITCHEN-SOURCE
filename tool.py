@@ -2145,6 +2145,8 @@ def rdi(work, part_name) -> any:
         print(lang.text3.format(part_name))
     else:
         win.message_pop(lang.text75 % part_name, "red")
+    # The Second Run To Remove Empty Folder
+    rdi(work, part_name)
 
 
 def input_(title: str = lang.text76, text: str = "") -> str:
@@ -2392,7 +2394,7 @@ def unpack(chose, form: any = None):
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
                 print(lang.text79 + i + ".img [%s]" % file_type)
-                if call(exe=f"extract.erofs -i {os.path.join(settings.path, dn.get(), i+'.img')} -o {work} -x",
+                if call(exe=f"extract.erofs -i {os.path.join(settings.path, dn.get(), i + '.img')} -o {work} -x",
                         out=1) != 0:
                     print(f'Unpack Fail...')
                     continue
