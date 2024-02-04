@@ -106,7 +106,7 @@ class load_car:
         for i in self.gifs:
             try:
                 win.gif_label.after_cancel(i)
-            except:
+            except (Exception, BaseException):
                 ...
         win.gif_label.pack_forget()
         self.hide_gif = True
@@ -891,6 +891,9 @@ def mpkman() -> None:
     class new_(Toplevel):
         def __init__(self):
             super().__init__()
+            self.ver = None
+            self.aou = None
+            self.name = None
             jzxs(self)
             self.title(lang.text115)
             self.gui()
