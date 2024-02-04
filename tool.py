@@ -161,6 +161,19 @@ class dev_null:
 class Tool(Tk):
     def __init__(self):
         super().__init__()
+        self.show = None
+        self.scroll = None
+        self.frame_bg = None
+        self.canvas1 = None
+        self.scrollbar = None
+        self.tab7 = None
+        self.tab5 = None
+        self.tab4 = None
+        self.tab3 = None
+        self.tab2 = None
+        self.tab = None
+        self.sub_win3 = None
+        self.sub_win2 = None
         self.rzf = None
         self.tsk = None
         self.gif_label = None
@@ -1045,7 +1058,7 @@ def mpkman() -> None:
                         return
                     except Exception as e:
                         print("运行错误:%s\n错误：%s" % (i, e))
-                    except:
+                    except (Exception, BaseException):
                         print("运行错误:%s" % i)
             self.envs.clear()
 
@@ -1092,7 +1105,7 @@ def mpkman() -> None:
                 call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
                 try:
                     os.remove(file_)
-                except:
+                except (Exception, BaseException):
                     ...
 
         def msh(self, cmd):
@@ -1194,7 +1207,7 @@ def mpkman() -> None:
                 resizable = data['main']['info']['resize']
                 try:
                     self.attributes('-topmost', 'true')
-                except:
+                except (Exception, BaseException):
                     ...
                 self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
                 for group_name, group_data in data['main'].items():
@@ -1337,7 +1350,7 @@ def mpkman() -> None:
             self.ck = Toplevel()
             try:
                 self.ck.attributes('-topmost', 'true')
-            except:
+            except (Exception, BaseException):
                 ...
             self.ck.title(lang.t6)
             jzxs(self.ck)
@@ -1391,7 +1404,7 @@ def mpkman() -> None:
                     print(lang.text30)
                     try:
                         list_pls()
-                    except:
+                    except (Exception, BaseException):
                         ...
             else:
                 win.message_pop(lang.warn2)
@@ -1439,7 +1452,7 @@ class Install_mpk(Toplevel):
                     except Exception as e:
                         print(e)
                         pyt = ImageTk.PhotoImage(data=images.none_byte)
-            except:
+            except (Exception, BaseException):
                 pyt = ImageTk.PhotoImage(data=images.none_byte)
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
