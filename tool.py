@@ -2091,25 +2091,21 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     if os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
                         with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
                             ext4_size_value = int(f.read().strip())
-                if dbgs.get() in ["dat", "br", "sparse"]:
-                    make_ext4fs(dname, work, "-s", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                                               work,
-                                                                                                               "y",
-                                                                                                               ext4_size_value)
-                    if dely == 1:
-                        rdi(work, dname)
-                    if dbgs.get() == "dat":
-                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
-                    elif dbgs.get() == "br":
-                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', '4')))
-                    else:
-                        print(lang.text3.format(dname))
+                make_ext4fs(dname, work, "-s" if dbgs.get() in ["dat", "br", "sparse"] else '',
+                            ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                                                                        work,
+                                                                                        "y" if dbgs.get() in [
+                                                                                            "dat", "br",
+                                                                                            "sparse"] else 'n',
+                                                                                        ext4_size_value)
+                if dely == 1:
+                    rdi(work, dname)
+                if dbgs.get() == "dat":
+                    datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
+                elif dbgs.get() == "br":
+                    datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', '4')))
                 else:
-                    make_ext4fs(dname, work, "", ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                                             work, "n",
-                                                                                                             ext4_size_value)
-                    if dely == 1:
-                        rdi(work, dname)
+                    print(lang.text3.format(dname))
         elif parts_dict[i] in ['boot', 'vendor_boot']:
             dboot(i)
         elif parts_dict[i] == 'dtbo':
