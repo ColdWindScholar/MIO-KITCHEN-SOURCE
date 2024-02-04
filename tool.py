@@ -2136,7 +2136,6 @@ def rdi(work, part_name) -> any:
     else:
         win.message_pop(lang.text75 % part_name, "red")
     # The Second Run To Remove Empty Folder
-    rdi(work, part_name)
 
 
 def input_(title: str = lang.text76, text: str = "") -> str:
