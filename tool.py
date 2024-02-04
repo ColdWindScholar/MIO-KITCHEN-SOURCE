@@ -2545,13 +2545,13 @@ def mke2fs(name, work, sparse, size=0):
         call(f"img2simg {work + name}_new.img {work + name}.img")
         try:
             os.remove(work + name + "_new.img")
-        except:
+        except (Exception, BaseException):
             ...
     else:
         if os.path.isfile(work + name + ".img"):
             try:
                 os.remove(work + name + ".img")
-            except:
+            except (Exception, BaseException):
                 ...
         os.rename(work + name + "_new.img", work + name + ".img")
 
@@ -2565,9 +2565,9 @@ def rmdir(path):
         try:
             try:
                 rmtree(f'{path}')
-            except:
-                call(f'busybox rm -rf {path}')
-        except:
+            except (Exception, BaseException):
+                call(f'busybox rm -rf "{path}"')
+        except (Exception, BaseException):
             print(lang.warn11.format(path))
         win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
 
@@ -2612,7 +2612,7 @@ def dndfile(files):
     for fi in files:
         try:
             fi = fi.decode('gbk')
-        except:
+        except (Exception, BaseException):
             fi = fi
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
@@ -2628,6 +2628,7 @@ def dndfile(files):
 class xmcd(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
+        self.LB1 = None
         self.pack(padx=5, pady=5)
 
     @staticmethod
@@ -2699,6 +2700,9 @@ class frame3(ttk.LabelFrame):
 class unpack_gui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text9)
+        self.fm = None
+        self.lsg = None
+        self.menu = None
         self.ch = IntVar()
 
     def gui(self):
@@ -2910,7 +2914,7 @@ class format_conversion(Toplevel):
                                     os.remove(transferfile)
                                     try:
                                         os.remove(work + basename + '.patch.dat')
-                                    except:
+                                    except (Exception, BaseException):
                                         ...
                             else:
                                 print("transferpath" + lang.text84)
@@ -2938,7 +2942,7 @@ class format_conversion(Toplevel):
                                         os.remove(work + i)
                                         os.remove(transferfile)
                                         os.remove(work + basename + '.patch.dat')
-                                    except:
+                                    except (Exception, BaseException):
                                         ...
                             else:
                                 print("transferfile" + lang.text84)
