@@ -963,10 +963,7 @@ def mpkman() -> None:
         with open(os.path.join(moduledir, (value := global_mpk[chosen.get()]), "info.json"), 'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
-            if "describe" in data:
-                des = data["describe"]
-            else:
-                des = ''
+            des = data.get("describe", '')
             (info_ := ConfigParser())['module'] = {
                 'name': f'{data["name"]}',
                 'version': f'{data["version"]}',
