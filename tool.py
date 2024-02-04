@@ -1469,7 +1469,7 @@ class Install_mpk(Toplevel):
         self.installb.config(state=DISABLED)
         try:
             supports = self.mconf.get('module', 'supports').split()
-        except:
+        except (Exception, BaseException):
             supports = [sys.platform]
         if sys.platform not in supports:
             self.state['text'] = lang.warn15.format(sys.platform)
@@ -1488,7 +1488,7 @@ class Install_mpk(Toplevel):
         for file in self.inner_filenames:
             try:
                 file = str(file).encode('cp437').decode('gbk')
-            except:
+            except (Exception, BaseException):
                 file = str(file).encode('utf-8').decode('utf-8')
             info = fz.getinfo(file)
             extracted_size += info.file_size
@@ -1497,7 +1497,7 @@ class Install_mpk(Toplevel):
             self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
-        except:
+        except (Exception, BaseException):
             depends = ''
         minfo = {}
         for i in self.mconf.items('module'):
@@ -1726,7 +1726,7 @@ class packss(Toplevel):
             if os.path.exists(work + "dynamic_partitions_op_list"):
                 try:
                     data = utils.dynamic_list_reader(work + "dynamic_partitions_op_list")
-                except:
+                except (Exception, BaseException):
                     return
                 if len(data) > 1:
                     fir, sec = data
@@ -1772,7 +1772,7 @@ class packss(Toplevel):
         def start_():
             try:
                 supers.get()
-            except:
+            except (Exception, BaseException):
                 supers.set(0)
             if not versize():
                 ask_win(lang.t10)
@@ -1861,7 +1861,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
             if out == 0:
                 try:
                     out_put = i.decode("utf-8").strip()
-                except:
+                except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
     except subprocess.CalledProcessError as e:
@@ -1871,7 +1871,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
             if out == 0:
                 try:
                     out_put = i.decode("utf-8").strip()
-                except:
+                except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
     ret.wait()
@@ -1921,7 +1921,7 @@ def download_file():
         print(lang.text66, str(e))
         try:
             os.remove(os.path.basename(url))
-        except:
+        except (Exception, BaseException):
             if os.access(os.path.basename(url), os.F_OK):
                 print(lang.text67 + os.path.basename(url))
             else:
@@ -2004,7 +2004,7 @@ def dboot(nm: str = 'boot'):
                 print("Pack Ramdisk Successful..")
                 try:
                     os.remove("ramdisk.cpio")
-                except:
+                except (Exception, BaseException):
                     ...
                 os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
         else:
@@ -2026,7 +2026,7 @@ def dboot(nm: str = 'boot'):
         os.chdir(elocal)
         try:
             rmdir(work + f"{nm}")
-        except:
+        except (Exception, BaseException):
             print(lang.warn11.format(nm))
         print("Pack Successful...")
 
@@ -2185,7 +2185,7 @@ def unpackrom(ifile) -> None:
             script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         try:
             unpackg.refs()
-        except:
+        except (Exception, BaseException):
             ...
         return
     elif os.path.splitext(ifile)[1] == '.ops':
@@ -2195,7 +2195,7 @@ def unpackrom(ifile) -> None:
         opscrypto.main(args)
         try:
             unpackg.refs()
-        except:
+        except (Exception, BaseException):
             ...
         return
     if gettype(zip_src) == 'zip':
@@ -2203,10 +2203,10 @@ def unpackrom(ifile) -> None:
         for fi in fz.namelist():
             try:
                 file_ = fi.encode('cp437').decode('gbk')
-            except:
+            except (Exception, BaseException):
                 try:
                     file_ = fi.encode('cp437').decode('utf-8')
-                except:
+                except (Exception, BaseException):
                     file_ = fi
             print(lang.text79 + file_)
             try:
@@ -2228,7 +2228,7 @@ def unpackrom(ifile) -> None:
         script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         try:
             unpackg.refs()
-        except:
+        except (Exception, BaseException):
             ...
         fz.close()
         return
@@ -2250,7 +2250,7 @@ def unpackrom(ifile) -> None:
         print(lang.text82 % ftype)
     try:
         unpackg.refs()
-    except:
+    except (Exception, BaseException):
         ...
 
 
@@ -2298,7 +2298,7 @@ def unpack(chose, form: any = None):
             print(lang.text79 + "super.img [%s]" % file_type)
             try:
                 utils.simg2img(work + "super.img")
-            except:
+            except (Exception, BaseException):
                 win.message_pop(lang.warn11.format("super.img"))
         if gettype(work + "super.img") == 'super':
             lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
@@ -2330,7 +2330,7 @@ def unpack(chose, form: any = None):
                         os.remove(transferfile)
                         try:
                             os.remove(work + i + '.patch.dat')
-                        except:
+                        except (Exception, BaseException):
                             ...
                     else:
                         print("transferfile" + lang.text84)
@@ -2355,7 +2355,7 @@ def unpack(chose, form: any = None):
                 print(lang.text79 + i + ".img [%s]" % file_type)
                 try:
                     utils.simg2img(work + i + ".img")
-                except:
+                except (Exception, BaseException):
                     win.message_pop(lang.warn11.format(i + ".img"))
             if i not in parts.keys():
                 parts[i] = gettype(work + i + ".img")
@@ -2390,7 +2390,7 @@ def unpack(chose, form: any = None):
                 if os.path.exists(work + i):
                     try:
                         os.remove(work + i + ".img")
-                    except:
+                    except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
