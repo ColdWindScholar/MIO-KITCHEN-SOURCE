@@ -891,6 +891,8 @@ def mpkman() -> None:
     class new_(Toplevel):
         def __init__(self):
             super().__init__()
+            self.dep = None
+            self.intro = None
             self.ver = None
             self.aou = None
             self.name = None
