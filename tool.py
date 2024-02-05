@@ -604,7 +604,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
     print(lang.text5)
     try:
         os.remove(dtboimg)
-    except:
+    except (Exception, BaseException):
         ...
     rmdir(work + "dtbo" + os.sep + "dtbo")
 
@@ -809,7 +809,7 @@ class Process(Toplevel):
                 for file_ in zip_.namelist():
                     try:
                         file = str(file_).encode('cp437').decode('gbk')
-                    except:
+                    except (BaseException, Exception):
                         file = str(file_).encode('utf-8').decode('utf-8')
                     print(lang.text38.format(file_))
                     zip_.extract(file, folder)
