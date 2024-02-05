@@ -771,7 +771,7 @@ class Process(Toplevel):
                 en.write(f"export {u}={var}\n")
             en.write("source $1")
         self.progbar.start()
-        for step in self.prc['steps']:
+        for step in self.prc.get('steps', []):
             self.notice.configure(text=step['name'])
             if 'run' in step:
                 with open(sh_tmp_file := self.dir + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
