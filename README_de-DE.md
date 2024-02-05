@@ -7,7 +7,8 @@
 ## Localization
 ### Japanisch: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
 ### Chinesisch: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
-### Português brasileiro: [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
+### Englisch: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
+### Portugiesisch (Brasilien): [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
 ***
 ## Eigenschaften
 * Entpacken Sie Boot, dtbo, ext4, erofs, Payload, Logo und so weiter
@@ -63,7 +64,7 @@ pip install -r requirements.txt
 ### Dann Starte
 ```` shell
 python tool.py
-# if you want to package it into binary,you can
+# if you want to package it into binary, you can
 python build.py
 ````
 ***
@@ -71,25 +72,26 @@ python build.py
 ***
 ### E-Mail-Adresse des Entwicklers: 3590361911@qq.com
 ### QQ-Gruppe: 836898509
-### TG-Gruppe: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### TG-Kanal: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### Telegram-Gruppe: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### Telegram-Kanal: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # Mitwirkende:
 ***
-### MACOS partieller binärer Compiler: [sk](https://github.com/sekaiacg)
+### macOS partieller binärer Compiler: [sk](https://github.com/sekaiacg)
 ### Irgendein Code-Anbieter: [Affggh](https://github.com/affggh)
 ### Teilweise Logo-Designer: [Shaaim](https://github.com/786-shaaim)
 ### Japanischer Übersetzer: [reindex-ot](https://github.com/reindex-ot)
-### Brasilianisches Portugiesisch: [igor](https://github.com/igormiguell) 
+### Portugiesisch (Brasilien) Übersetzer: [igor](https://github.com/igormiguell)
+### Deutscher Übersetzer: [keldrion](https://github.com/keldrion)
 ### Und MEHR...
 ### Danke für deine Hilfe!!
 ***
 # Über uns
 ***
-### MIO-Kitchen
+### MIO-KITCHEN
 ```
 Für immer kostenlos, der Benutzer zuerst
 Gute Werkzeuge, hier drin!
 Geschrieben von MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) Alle Rechte vorbehalten. ####
+#### ColdWindScholar(3590361911@qq.com) Alle Rechte Vorbehalten. ####
