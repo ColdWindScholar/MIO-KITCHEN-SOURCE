@@ -1,17 +1,16 @@
 import errno
 import os
-import sys
 import struct
+import sys
 import tempfile
-from os.path import exists
 from os import getcwd
-from lpunpack import SparseImage
+from os.path import exists
+from random import randint, choice
+from threading import Thread
+
 import blockimgdiff
 import sparse_img
-from threading import Thread
-from random import randint, choice
-from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad
+from lpunpack import SparseImage
 
 DataImage = blockimgdiff.DataImage
 
@@ -47,21 +46,6 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 
 
 # ----DEFS
-class aesencrypt:
-    @staticmethod
-    def encrypt(key, file_path, outfile):
-        cipher = AES.new(key.encode("utf-8"), AES.MODE_ECB)
-        with open(outfile, "wb") as f, open(file_path, 'rb') as fd:
-            f.write(cipher.encrypt(pad(fd.read(), AES.block_size)))
-
-    @staticmethod
-    def decrypt(key, file_path, outfile):
-        cipher = AES.new(key.encode("utf-8"), AES.MODE_ECB)
-        with open(file_path, "rb") as f:
-            data = cipher.decrypt(f.read())
-        data = data[:-data[-1]]
-        with open(outfile, "wb") as f:
-            f.write(data)
 
 
 class sdat2img:
@@ -81,7 +65,6 @@ class sdat2img:
             2: "Lollipop 5.1",
             3: "Marshmallow 6.x",
             4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
-
         }
         print(show.format(versions.get(version, f'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
