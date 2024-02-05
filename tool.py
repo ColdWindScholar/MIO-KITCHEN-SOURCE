@@ -1021,7 +1021,13 @@ def mpkman() -> None:
     def list_pls():
         pls.clean()
         for i in os.listdir(moduledir):
+            if not os.path.isdir(os.path.join(moduledir, i)):
+                continue
             if not os.path.exists(os.path.join(moduledir, i, "info.json")):
+                try:
+                    rmtree(os.path.join(moduledir, i))
+                finally:
+                    ...
                 continue
             if os.path.isdir(moduledir + os.sep + i):
                 if os.path.exists(os.path.join(moduledir, i, 'icon')):
