@@ -858,7 +858,7 @@ class Inode:
                             f"Invalid magic value in xattrs block header at offset 0x{xattrs_block_start:X} of "
                             f"inode {self.inode_idx:d}: 0x{xattrs_header.h_magic} (expected 0xEA020000)"
                         )
-                    except BaseException and Exception:
+                    except MagicError:
                         ...
 
                 if xattrs_header.h_blocks != 1:
