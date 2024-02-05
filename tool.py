@@ -1476,8 +1476,7 @@ class Install_mpk(Toplevel):
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
-        Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10,
-                                                                                                           pady=10)
+        Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10, pady=10)
         text = Text(self)
         text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
