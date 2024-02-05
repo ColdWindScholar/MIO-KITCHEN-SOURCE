@@ -1377,8 +1377,8 @@ def mpkman() -> None:
                 for i in self.arr.keys():
                     te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
-            ttk.Button(self.ck, text=lang.ok, command=self.unloop).pack(fill=X, expand=True, side=LEFT, pady=10,
-                                                                        padx=10)
+            ttk.Button(self.ck, text=lang.ok, command=self.uninstall).pack(fill=X, expand=True, side=LEFT, pady=10,
+                                                                           padx=10)
             ttk.Button(self.ck, text=lang.cancel, command=self.ck.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                                 pady=10,
                                                                                 padx=10)
@@ -1398,7 +1398,7 @@ def mpkman() -> None:
                             # 检测到依赖后立即停止
                             break
 
-        def unloop(self):
+        def uninstall(self):
             self.ck.destroy()
             for i in self.arr.keys():
                 self.umpk(i, self.arr.get(i, 'None'))
