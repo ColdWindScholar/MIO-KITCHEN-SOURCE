@@ -1387,6 +1387,8 @@ def mpkman() -> None:
             if not name:
                 name = self.value
             for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
+                if not os.path.exists(os.path.join(moduledir, i, "info.json")):
+                    continue
                 with open(os.path.join(moduledir, i, "info.json"), 'r', encoding='UTF-8') as f:
                     data = json.load(f)
                     for n in data['depend'].split():
