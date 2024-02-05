@@ -29,6 +29,8 @@ def suggest(string: str = '', language='cn', ok='ok'):
             else:
                 if similarity_ > similarity:
                     similarity = similarity_
+                    if similarity < 0.5:
+                        break
                 else:
                     text = library[i][language]
                     break
