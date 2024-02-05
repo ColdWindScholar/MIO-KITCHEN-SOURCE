@@ -1401,11 +1401,11 @@ def mpkman() -> None:
         def uninstall(self):
             self.ck.destroy()
             for i in self.arr.keys():
-                self.umpk(i, self.arr.get(i, 'None'))
-            self.umpk(self.value, self.value2)
+                self.remove(i, self.arr.get(i, 'None'))
+            self.remove(self.value, self.value2)
 
         @staticmethod
-        def umpk(name=None, show_name='') -> None:
+        def remove(name=None, show_name='') -> None:
             if name:
                 print(lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(moduledir + os.sep + name):
