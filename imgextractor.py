@@ -92,6 +92,10 @@ class Extractor:
                     continue
                 entry_inode = root_inode.volume.get_inode(entry_inode_idx, entry_type)
                 entry_inode_path = root_path + '/' + entry_name
+                print(entry_inode_path)
+                if entry_inode_path[-1:] == '/' and not entry_inode.is_dir:
+                    continue
+
                 mode = self.__get_perm(entry_inode.mode_str)
                 uid = entry_inode.inode.i_uid
                 gid = entry_inode.inode.i_gid
