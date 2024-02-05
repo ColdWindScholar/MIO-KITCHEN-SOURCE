@@ -1021,6 +1021,8 @@ def mpkman() -> None:
     def list_pls():
         pls.clean()
         for i in os.listdir(moduledir):
+            if not os.path.exists(os.path.join(moduledir, i, "info.json")):
+                continue
             if os.path.isdir(moduledir + os.sep + i):
                 if os.path.exists(os.path.join(moduledir, i, 'icon')):
                     images_[i] = ImageTk.PhotoImage(Image.open(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
