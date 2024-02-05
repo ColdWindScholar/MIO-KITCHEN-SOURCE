@@ -4,6 +4,12 @@
 ***
 ## このツールは多くのオープンソースプロジェクトを使用しています。開発者に敬意を表します!
 ***
+## Localization
+### Chinese: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
+### English: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
+### Portuguese (Brazil): [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
+### German: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
+***
 ## 機能
 * boot、dtbo、ext4、erofs、payload、logoなどをアンパック
 * boot、dtbo、ext4、erofs、payload、logoなどをパッキング
@@ -58,7 +64,7 @@ pip install -r requirements.txt
 ### それではスタート
 ```` shell
 python tool.py
-# if you want to package it into binary,you can
+# if you want to package it into binary, you can
 python build.py
 ````
 ***
@@ -66,16 +72,17 @@ python build.py
 ***
 ### 開発者のメール: 3590361911@qq.com
 ### QQ グループ: 836898509
-### TG グループ: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### TG チャンネル: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### Telegram グループ: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### Telegram チャンネル: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # 貢献者:
 ***
-### MACOS partial binary compiler: [sk](https://github.com/sekaiacg)
-### Some Code provider: [Affggh](https://github.com/affggh)
+### macOS partial binary compiler: [sk](https://github.com/sekaiacg)
+### Some code provider: [Affggh](https://github.com/affggh)
 ### Partial logo designer: [Shaaim](https://github.com/786-shaaim)
 ### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
-### Brazilian Portuguese traslator: [igor](https://github.com/igormiguell) 
+### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
+### German translator: [keldrion](https://github.com/keldrion)
 ### And MORE...
 ### ご協力ありがとうございます!!
 ***
@@ -87,4 +94,4 @@ python build.py
 素晴らしいツールが勢揃い!
 文章: MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) All rights reserved. ####
+#### ColdWindScholar(3590361911@qq.com) All Rights Reserved. ####
