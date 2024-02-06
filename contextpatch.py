@@ -31,7 +31,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
 
 
 def str_to_selinux(string: str):
-    return sub(r'([^-_/a-zA-Z0-9])', r'\\\1', string)
+    return string.replace('.', r'\.')
 
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
