@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 from difflib import SequenceMatcher
-
+from re import escape
 fix_permission = {"/vendor/bin/hw/android.hardware.wifi@1.0": "u:object_r:hal_wifi_default_exec:s0"}
 
 
@@ -30,7 +30,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
 
 
 def str_to_selinux(string: str):
-    return string.replace('.', r'\.')
+    return escape(string)
 
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
