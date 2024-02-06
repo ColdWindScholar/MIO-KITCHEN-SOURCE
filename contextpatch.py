@@ -3,6 +3,7 @@
 import os
 from re import sub
 from difflib import SequenceMatcher
+
 fix_permission = {"/vendor/bin/hw/android.hardware.wifi@1.0": "u:object_r:hal_wifi_default_exec:s0"}
 
 
@@ -10,7 +11,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
     with open(file, "r", encoding='utf-8') as file_:
         for i in file_.readlines():
-            filepath, *other = i.strip().replace('\\', '').split()
+            filepath, *other = i.strip().split()
             context[filepath] = other
             if len(other) > 1:
                 print(f"[Warn] {i[0]} has too much data.")
@@ -27,6 +28,10 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
         for rv in allfiles:
             yield rv
+
+
+def str_to_selinux(string: str):
+    return sub(r'([^-_/a-zA-Z0-9])', r'\\\1', string)
 
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
@@ -49,8 +54,9 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             i = tmp
         if ' ' in i:
             i = i.replace(' ', '*')
+        i = str_to_selinux(i)
         if fs_file.get(i):
-            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = fs_file[i]
+            new_fs[i] = fs_file[i]
         else:
             permission = permission_d
             if r_new_fs.get(i):
@@ -70,7 +76,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             print(f"ADD [{i} {permission}]")
             add_new += 1
             r_new_fs[i] = permission
-            new_fs[sub(r'([^-_/a-zA-Z0-9])', r'\\\1', i)] = permission
+            new_fs[i] = permission
     return new_fs, add_new
 
 
