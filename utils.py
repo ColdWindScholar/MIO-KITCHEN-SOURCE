@@ -375,7 +375,7 @@ class DUMPCFG:
     imgblkszs = []
 
 
-class BMPHEAD(object):
+class BMPHEAD:
     def __init__(self, buf: bytes = None):  # Read bytes buf and use this struct to parse
         assert buf is not None, f"buf Should be bytes not {type(buf)}"
         # print(buf)
@@ -391,7 +391,7 @@ class BMPHEAD(object):
         ) = struct.unpack(self.structstr, buf)
 
 
-class XIAOMI_BLKSTRUCT(object):
+class XIAOMI_BLKSTRUCT:
     def __init__(self, buf: bytes):
         self.structstr = "2I"
         (
@@ -400,7 +400,7 @@ class XIAOMI_BLKSTRUCT(object):
         ) = struct.unpack(self.structstr, buf)
 
 
-class LOGO_DUMPER(object):
+class LOGO_DUMPER:
     def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.magic = None
         self.out = out
