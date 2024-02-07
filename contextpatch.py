@@ -52,6 +52,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             i = i.replace(' ', '*')
         i = str_to_selinux(i)
         if fs_file.get(i):
+            # 如果存在直接使用默认的
             new_fs[i] = fs_file[i]
         else:
             permission = permission_d
