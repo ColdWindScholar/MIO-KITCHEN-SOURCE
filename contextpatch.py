@@ -3,7 +3,12 @@
 import os
 from difflib import SequenceMatcher
 from re import escape
-fix_permission = {"android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0"}
+
+fix_permission = {
+    "android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0",
+    "bin/fsck": "u:object_r:fsck_exec:s0",
+    "bin/e2fsck": "u:object_r:fsck_exec:s0"
+}
 
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
