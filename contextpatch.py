@@ -11,6 +11,7 @@ fix_permission = {
     "bin/e2fsck": "u:object_r:fsck_exec:s0",
     "bin/logcat": "u:object_r:logcat_exec:s0",
     "system/bin": "u:object_r:system_file:s0",
+    "/system/bin/init":	"u:object_r:init_exec:s0"
 }
 
 
