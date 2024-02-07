@@ -56,6 +56,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             permission = permission_d
             if r_new_fs.get(i):
                 continue
+            # 确认i不为空
             if i:
                 if i in fix_permission.keys():
                     permission = fix_permission[i]
