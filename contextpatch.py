@@ -60,7 +60,8 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                 continue
             # 确认i不为空
             if i:
-                if i in fix_permission.keys():
+                # 搜索已定义的权限
+                if fix_permission.get(i):
                     permission = fix_permission[i]
                 else:
                     for e in fs_file.keys():
