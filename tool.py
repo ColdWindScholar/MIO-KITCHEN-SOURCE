@@ -2104,9 +2104,9 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                 if dbgs.get() in ["dat", "br", "sparse"]:
                     img2simg(work + dname+".img")
                     if dbgs.get() == 'dat':
-                        datbr(work, dname, "dat", int(parts_dict['dat_ver']))
+                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
                     elif dbgs.get() == 'br':
-                        datbr(work, dname, scale.get(), int(parts_dict['dat_ver']))
+                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', 4)))
                     else:
                         print(lang.text3.format(dname))
             else:
