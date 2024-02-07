@@ -37,7 +37,6 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     new_fs = {}
     r_new_fs = {}
     add_new = 0
-    permission_d = None
     print("ContextPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
     permission_d = [f'u:object_r:{os.path.basename(dir_path)}_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
