@@ -35,6 +35,7 @@ def str_to_selinux(string: str):
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     new_fs = {}
+    # 定义已修补过的 避免重复修补
     r_new_fs = {}
     add_new = 0
     print("ContextPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
