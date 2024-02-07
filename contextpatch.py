@@ -6,9 +6,11 @@ from re import escape
 
 fix_permission = {
     "android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0",
+    "bin/idmap": "u:object_r:idmap_exec:s0",
     "bin/fsck": "u:object_r:fsck_exec:s0",
     "bin/e2fsck": "u:object_r:fsck_exec:s0",
-    "system/bin": "u:object_r:system_file:s0"
+    "bin/logcat": "u:object_r:logcat_exec:s0",
+    "system/bin": "u:object_r:system_file:s0",
 }
 
 
