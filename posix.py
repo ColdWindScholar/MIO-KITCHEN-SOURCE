@@ -17,3 +17,15 @@ def symlink(link_target, target):
                                                    DWORD(FILE_ATTRIBUTE_SYSTEM))
             except Exception as e:
                 print(e.__str__())
+
+
+def readlink(path):
+    if os.name == 'nt':
+        if not os.path.isdir(path):
+            with open(path, 'rb') as f:
+                if f.read(10) == b'!<symlink>':
+                    return f.read().decode("utf-16")[:-1]
+                else:
+                    return ''
+    else:
+        return os.readlink(path)
