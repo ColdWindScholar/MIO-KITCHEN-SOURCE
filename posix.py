@@ -28,4 +28,7 @@ def readlink(path):
                 else:
                     return ''
     else:
-        return os.readlink(path)
+        if os.path.islink(path):
+            return os.readlink(path)
+        else:
+            return ''
