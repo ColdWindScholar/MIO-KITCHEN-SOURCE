@@ -38,8 +38,10 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     r_new_fs = {}
     add_new = 0
     print("ContextPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
+    # 定义默认SeLinux标签
     permission_d = [f'u:object_r:{os.path.basename(dir_path)}_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
+        # 把不可打印字符替换为*
         if not i.isprintable():
             tmp = ''
             for c in i:
