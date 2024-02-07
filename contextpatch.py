@@ -3,7 +3,7 @@
 import os
 from difflib import SequenceMatcher
 from re import escape
-fix_permission = {"/vendor/bin/hw/android.hardware.wifi@1.0": "u:object_r:hal_wifi_default_exec:s0"}
+fix_permission = {"android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0"}
 
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
@@ -55,15 +55,16 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             # 如果存在直接使用默认的
             new_fs[i] = fs_file[i]
         else:
-            permission = permission_d
+            permission = None
             if r_new_fs.get(i):
                 continue
             # 确认i不为空
             if i:
                 # 搜索已定义的权限
-                if fix_permission.get(i):
-                    permission = fix_permission[i]
-                else:
+                for f in fix_permission.keys():
+                    if f in i:
+                        permission = fix_permission[f]
+                if not permission:
                     for e in fs_file.keys():
                         if SequenceMatcher(None, (path := os.path.dirname(i)), e).quick_ratio() >= 0.85:
                             if e == path:
