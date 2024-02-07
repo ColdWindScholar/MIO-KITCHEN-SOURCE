@@ -1,26 +1,9 @@
 import os
 import re
-from os import symlink, name as osname
-from typing import Optional
 
 import contextpatch
 import fspatch
-
-if osname == 'nt':
-    from ctypes import wintypes, windll
-
-
-def clink(link: str, target: str):
-    with open(link, 'wb') as f:
-        f.write(
-            b"!<symlink>" + target.encode('utf-16') + b'\0\0')
-    if osname == 'nt':
-        from ctypes.wintypes import LPCSTR
-        from ctypes.wintypes import DWORD
-        from stat import FILE_ATTRIBUTE_SYSTEM
-        from ctypes import windll
-        attrib = windll.kernel32.SetFileAttributesA
-        attrib(LPCSTR(link.encode()), DWORD(FILE_ATTRIBUTE_SYSTEM))
+from posix import symlink
 
 
 class updaterutil:
@@ -43,18 +26,6 @@ class updaterutil:
 
 # This Function copy from affggh mtk-porttool(https://gitee.com/affggh/mtk-garbage-porttool)
 def script2fs_context(input_f, outdir, project):
-    def __symlink(src_l: str, dest: str):
-        print(f"创建软链接 [{src_l}] -> [{dest}]")
-        if not os.path.exists(os.path.dirname(dest)):
-            os.makedirs(os.path.dirname(dest))
-        if osname == 'nt':
-            with open(dest, 'wb') as f:
-                f.write(
-                    b"!<symlink>" + src_l.encode('utf-16') + b'\0\0')
-            windll.kernel32.SetFileAttributesA(dest.encode('gb2312'), wintypes.DWORD(0x4))
-        else:
-            symlink(src_l, dest)
-
     fs_label = [["/", '0', '0', '0755'], ["/lost\\+found", '0', '0', '0700']]
     fc_label = [['/', 'u:object_r:system_file:s0'], ['/system(/.*)?', 'u:object_r:system_file:s0']]
     print("分析刷机脚本...")
@@ -67,10 +38,7 @@ def script2fs_context(input_f, outdir, project):
         if command == 'symlink':
             src, *targets = args
             for target in targets:
-                if osname == 'nt':
-                    __symlink(src, str(os.path.join(project, target.lstrip('/'))))
-                else:
-                    os.symlink(src, str(os.path.join(project, target.lstrip('/'))))
+                symlink(src, str(os.path.join(project, target.lstrip('/'))))
         elif command in ['set_metadata', 'set_metadata_recursive']:
             dirmode = False if command == 'set_metadata' else True
             fpath, *fargs = args
