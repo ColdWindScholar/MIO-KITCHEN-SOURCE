@@ -2508,9 +2508,7 @@ class dirsize:
 
 
 @cartoon
-def datbr(work, name, brl: any, dat_ver=None):
-    if not dat_ver:
-        dat_ver = 4
+def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
     utils.img2sdat(work + name + ".img", work, dat_ver, name)
     if os.access(work + name + ".new.dat", os.F_OK):
