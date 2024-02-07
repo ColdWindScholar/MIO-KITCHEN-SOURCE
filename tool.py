@@ -2102,10 +2102,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
                 if dbgs.get() in ["dat", "br", "sparse"]:
-                    call('img2simg {}.img {}.simg'.format(work + dname, work + dname))
-                    if os.path.exists(work + dname + ".simg"):
-                        os.remove(work + dname + ".img")
-                        os.rename(work + dname + ".simg", work + dname + ".img")
+                    img2simg(work + dname+".img")
                     if dbgs.get() == 'dat':
                         datbr(work, dname, "dat", int(parts_dict['dat_ver']))
                     elif dbgs.get() == 'br':
