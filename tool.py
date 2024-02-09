@@ -2510,7 +2510,11 @@ class dirsize:
 @cartoon
 def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
-    utils.img2sdat(work + name + ".img", work, dat_ver, name)
+    if not os.path.exists(work + name + ".img"):
+        print(work + name + ".img"+lang.text84)
+        return
+    else:
+        utils.img2sdat(work + name + ".img", work, dat_ver, name)
     if os.access(work + name + ".new.dat", os.F_OK):
         try:
             os.remove(work + name + ".img")
