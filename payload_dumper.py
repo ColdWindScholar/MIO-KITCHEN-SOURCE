@@ -11,10 +11,6 @@ import update_metadata_pb2 as um
 flatten = lambda l: [item for sublist in l for item in sublist]
 
 
-def u32(x):
-    return unpack('>I', x)[0]
-
-
 def u64(x):
     return unpack('>Q', x)[0]
 
@@ -79,7 +75,7 @@ def ota_payload_dumper(payloadfile_, out='output', old='old', images='', command
     manifest_size = u64(payloadfile.read(8))
     metadata_signature_size = 0
     if file_format_version > 1:
-        metadata_signature_size = u32(payloadfile.read(4))
+        metadata_signature_size = unpack('>I', payloadfile.read(4))[0]
     manifest = payloadfile.read(manifest_size)
     payloadfile.read(metadata_signature_size)
     global data_offset
