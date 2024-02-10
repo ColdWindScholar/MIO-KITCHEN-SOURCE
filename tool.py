@@ -2667,9 +2667,9 @@ class project_menu_utils(ttk.LabelFrame):
         self.LB1.pack(side="top", padx=10, pady=10, fill=X)
         self.LB1.bind('<<ComboboxSelected>>', lambda *x: self.select_print())
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text115, command=self.newp).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text115, command=self.new_project).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove_project)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text117, command=lambda: cz(self.cmm)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text117, command=lambda: cz(self.rename_project)).pack(side="left", padx=10, pady=10)
 
     def listdir(self):
         array = []
@@ -2683,7 +2683,7 @@ class project_menu_utils(ttk.LabelFrame):
         else:
             self.LB1.current(0)
 
-    def cmm(self):
+    def rename_project(self):
         if not dn.get():
             print(lang.warn1)
             return
@@ -2700,7 +2700,7 @@ class project_menu_utils(ttk.LabelFrame):
         win.message_pop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
-    def newp(self):
+    def new_project(self):
         if not (inputvar := input_()):
             win.message_pop(lang.warn12)
         else:
