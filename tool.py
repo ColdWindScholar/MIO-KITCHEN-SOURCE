@@ -2650,7 +2650,7 @@ def dndfile(files):
             print(fi + lang.text84)
 
 
-class xmcd(ttk.LabelFrame):
+class project_menu_utils(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
         self.LB1 = None
@@ -2846,7 +2846,7 @@ if int(settings.oobe) < 4:
     welcome()
 win.gui()
 unpackg = unpack_gui()
-project_menu = xmcd()
+project_menu = project_menu_utils()
 project_menu.gui()
 unpackg.gui()
 frame3().gui()
