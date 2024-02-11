@@ -59,14 +59,13 @@ class sdat2img:
         version = next(self.list_file)
         self.version = str(version)
         next(self.list_file)
-        show = "Android {} detected!\n"
         versions = {
             1: "Lollipop 5.0",
             2: "Lollipop 5.1",
             3: "Marshmallow 6.x",
             4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
         }
-        print(show.format(versions.get(version, f'Unknown Android version {version}!\n')))
+        print("Android {} detected!\n".format(versions.get(version, f'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
             output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
