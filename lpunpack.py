@@ -927,6 +927,7 @@ class LpUnpack(object):
         finally:
             self._fd.close()
 
+
 def unpack(file: str, out: str, parts: list = None):
     namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
     if not os.path.exists(namespace.SUPER_IMAGE):
