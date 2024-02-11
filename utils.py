@@ -132,7 +132,8 @@ class sdat2img:
             for line in trans_list:
                 line = line.split(' ')
                 cmd = line[0]
-                if cmd in ['erase', 'new', 'zero']:
+                if cmd == 'new':
+                # if cmd in ['erase', 'new', 'zero']:
                     yield [cmd, self.rangeset(line[1])]
                 else:
                     # Skip lines starting with numbers, they are not commands anyway
