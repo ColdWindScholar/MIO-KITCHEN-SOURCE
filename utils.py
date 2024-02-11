@@ -136,6 +136,8 @@ class sdat2img:
                     # if cmd in ['erase', 'new', 'zero']:
                     yield [cmd, self.rangeset(line[1])]
                 else:
+                    if cmd in ['erase', 'new', 'zero']:
+                        continue
                     # Skip lines starting with numbers, they are not commands anyway
                     if not cmd[0].isdigit():
                         print('Command "{}" is not valid.'.format(cmd))
