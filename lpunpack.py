@@ -141,7 +141,7 @@ class SparseHeader(object):
         (
             self.magic,  # 0xed26ff3a
             self.major_version,  # (0x1) - reject images with higher major versions
-            self.minor_version,  # (0x0) - allow images with higher minor versions
+            self.minor_version,  # (0x0) - allow images with higer minor versions
             self.file_hdr_sz,  # 28 bytes for first revision of the file format
             self.chunk_hdr_sz,  # 12 bytes for first revision of the file format
             self.blk_sz,  # block size in bytes, must be a multiple of 4 (4096)
@@ -531,13 +531,6 @@ class Metadata:
         finally:
             return result
 
-    @property
-    def get_info2(self):
-        parts = {}
-        for item in self.partitions:
-            parts[self.groups[item.group_index].name] = parts[self.groups[item.group_index].name] + item.name
-        return parts
-
     def to_json(self) -> str:
         data = self._get_info()
         if not data:
@@ -627,6 +620,19 @@ class SparseImage:
 
         return self._fd.read(chunk_data_size)
 
+    @staticmethod
+    def split(num):
+        block = 10000000
+        while True:
+            if num > block:
+                yield struct.pack("B", 0) * block
+                num -= block
+            else:
+                if num > 0:
+                    return struct.pack("B", 0) * num
+                else:
+                    break
+
     def unsparse(self):
         if not self.header:
             self._fd.seek(0)
@@ -654,19 +660,31 @@ class SparseImage:
                     if chunk_header.chunk_type == 0xCAC2:
                         data = self._read_data(chunk_data_size)
                         len_data = sector_size << 9
-                        out.write(struct.pack("B", 0) * len_data)
+                        try:
+                            out.write(struct.pack("B", 0) * len_data)
+                        except (BaseException, Exception):
+                            for i in self.split(len_data):
+                                out.write(i)
                         output_len += len(data)
                         sector_base += sector_size
                     else:
                         if chunk_header.chunk_type == 0xCAC3:
                             data = self._read_data(chunk_data_size)
                             len_data = sector_size << 9
-                            out.write(struct.pack("B", 0) * len_data)
+                            try:
+                                out.write(struct.pack("B", 0) * len_data)
+                            except (BaseException, Exception):
+                                for i in self.split(len_data):
+                                    out.write(i)
                             output_len += len(data)
                             sector_base += sector_size
                         else:
                             len_data = sector_size << 9
-                            out.write(struct.pack("B", 0) * len_data)
+                            try:
+                                out.write(struct.pack("B", 0) * len_data)
+                            except (BaseException, Exception):
+                                for i in self.split(len_data):
+                                    out.write(i)
                             sector_base += sector_size
                 chunks -= 1
         return unsparse_file
@@ -822,35 +840,6 @@ class LpUnpack(object):
 
             size -= block_size
 
-    def get_info(self):
-        try:
-            if SparseImage(self._fd).check():
-                print('Sparse image detected.')
-                print('Process conversion to non sparse image...')
-                unsparse_file = SparseImage(self._fd).unsparse()
-                self._fd.close()
-                self._fd = open(str(unsparse_file), 'rb')
-                print('Result:[ok]')
-
-            self._fd.seek(0)
-            metadata = self._read_metadata()
-
-            filter_partition = []
-            for index, partition in enumerate(metadata.partitions):
-                filter_partition.append(partition.name)
-
-            if not filter_partition:
-                raise LpUnpackError(f'Could not find partition: {self._partition_name}')
-
-            return filter_partition
-
-        except LpUnpackError as e:
-            print(e.message)
-            sys.exit(1)
-
-        finally:
-            self._fd.close()
-
     def unpack(self):
         try:
             if SparseImage(self._fd).check():
@@ -959,20 +948,12 @@ def create_parser():
     return _parser
 
 
-def unpack(file: str, out: str, parts: list = None):
-    namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
+def unpack(file: str, out: str):
+    namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False)
     if not os.path.exists(namespace.SUPER_IMAGE):
         raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
     else:
         LpUnpack(**vars(namespace)).unpack()
-
-
-def get_parts(file_):
-    namespace = argparse.Namespace(SUPER_IMAGE=file_, SHOW_INFO=False)
-    if not os.path.exists(namespace.SUPER_IMAGE):
-        raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
-    else:
-        return LpUnpack(**vars(namespace)).get_info()
 
 
 def main():
