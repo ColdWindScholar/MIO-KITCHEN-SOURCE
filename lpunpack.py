@@ -3,14 +3,13 @@ import copy
 import enum
 import io
 import json
-import re
+import os
 import struct
 import sys
 from dataclasses import dataclass, field
-import os
 from string import Template
-from typing import IO, Dict, List, TypeVar, cast, BinaryIO, Tuple
 from timeit import default_timer as dti
+from typing import IO, Dict, List, TypeVar, cast, BinaryIO, Tuple
 
 SPARSE_HEADER_MAGIC = 0xED26FF3A
 SPARSE_HEADER_SIZE = 28
@@ -928,66 +927,6 @@ class LpUnpack(object):
         finally:
             self._fd.close()
 
-
-def create_parser():
-    _parser = argparse.ArgumentParser(
-        description=f'{os.path.basename(sys.argv[0])} - command-line tool for extracting partition images from super'
-    )
-    _parser.add_argument(
-        '-p',
-        '--partition',
-        dest='NAME',
-        type=lambda x: re.split("\\w+", x),
-        help='Extract the named partition. This can be specified multiple times or through the delimiter [","  ":"]'
-    )
-    _parser.add_argument(
-        '-S',
-        '--slot',
-        dest='NUM',
-        type=int,
-        help=' !!! No implementation yet !!! Slot number (default is 0).'
-    )
-
-    if sys.version_info >= (3, 9):
-        _parser.add_argument(
-            '--info',
-            dest='SHOW_INFO',
-            default=False,
-            action=argparse.BooleanOptionalAction,
-            help='Displays pretty-printed partition metadata'
-        )
-    else:
-        _parser.add_argument(
-            '--info',
-            dest='SHOW_INFO',
-            action='store_true',
-            help='Displays pretty-printed partition metadata'
-        )
-        _parser.add_argument(
-            '--no-info',
-            dest='SHOW_INFO',
-            action='store_false'
-        )
-        _parser.set_defaults(SHOW_INFO=False)
-
-    _parser.add_argument(
-        '-f',
-        '--format',
-        dest='SHOW_INFO_FORMAT',
-        type=FormatType,
-        action=EnumAction,
-        default=FormatType.TEXT,
-        help='Choice the format for printing info'
-    )
-    _parser.add_argument('SUPER_IMAGE')
-    _parser.add_argument(
-        'OUTPUT_DIR',
-        type=str,
-        nargs='?',
-    )
-    return _parser
-
-
 def unpack(file: str, out: str, parts: list = None):
     namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
     if not os.path.exists(namespace.SUPER_IMAGE):
@@ -1002,14 +941,3 @@ def get_parts(file_):
         raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
     else:
         return LpUnpack(**vars(namespace)).get_info()
-
-
-def main():
-    parser = create_parser()
-    namespace = parser.parse_args()
-    if len(sys.argv) >= 2:
-        if not os.path.exists(namespace.SUPER_IMAGE):
-            return 2
-        LpUnpack(**vars(namespace)).unpack()
-    else:
-        return 1
