@@ -1093,14 +1093,14 @@ def mpkman() -> None:
                 i = i.replace(f'@{key}@', str(value)).strip()
             if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
                 if i.split()[0] == "if":
-                    self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
+                    self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
                 elif i.split()[0] == "for":
                     self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
                 else:
                     if i.split()[0] in self.grammar_words.keys():
-                        self.envs["result"] = self.grammar_words[i.split()[0]](''.join(i.split()[1:]))
+                        self.envs["result"] = self.grammar_words[i.split()[0]](' '.join(i.split()[1:]))
                     else:
-                        self.envs["result"] = getattr(self, i.split()[0])(''.join(i.split()[1:]))
+                        self.envs["result"] = getattr(self, i.split()[0])(' '.join(i.split()[1:]))
                     if not self.envs['result']:
                         self.envs['result'] = ""
 
