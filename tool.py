@@ -274,7 +274,6 @@ class Tool(Tk):
               text='反对肆意违反开源协议！\nOppose wanton violation of open source agreements!',
               font=(None, 10)).pack(
             padx=5, pady=5)
-        self.tab6_n()
         mpkman()
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
@@ -301,18 +300,16 @@ class Tool(Tk):
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
 
-    def tab6_n(self):
-        def ck():
-            tab = Toplevel()
-            tab.title(lang.text16)
-            Label(tab,
-                  text=f"Wechat Pay/微信支付",
-                  font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
-            self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
-            Label(tab, image=self.photo).pack(padx=5, pady=5)
-            Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
-            jzxs(tab)
-        ttk.Button(self.tab, text=lang.text16, command=ck).pack()
+    def support(self):
+        tab = Toplevel()
+        tab.title(lang.text16)
+        Label(tab,
+              text=f"Wechat Pay/微信支付",
+              font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
+        self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
+        Label(tab, image=self.photo).pack(padx=5, pady=5)
+        Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+        jzxs(tab)
 
     def setting_tab(self):
         self.show_local = StringVar()
@@ -356,6 +353,7 @@ class Tool(Tk):
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
         sf4.pack(padx=10, pady=10, fill='both')
+        ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
 
 
 win = Tool()
