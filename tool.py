@@ -1087,6 +1087,9 @@ def mpkman() -> None:
                 return 1
             self.envs[vn] = str(va)
 
+        def exit(self, cmd):
+            raise ModuleError(cmd)
+
         def runline(self, i):
             for key, value in self.envs.items():
                 i = i.replace(f'@{key}@', str(value)).strip()
