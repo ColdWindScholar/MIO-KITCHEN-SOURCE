@@ -1049,10 +1049,6 @@ def mpkman() -> None:
                 global_mpk[data['name']] = data['identifier']
 
     class msh_parse:
-        envs = {'version': settings.version,
-                'tool_bin': tool_bin.replace('\\', '/'),
-                'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
-                'moddir': moduledir.replace('\\', '/')}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
                          "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
@@ -1060,7 +1056,9 @@ def mpkman() -> None:
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
 
         def __init__(self, sh):
-            self.envs['bin'] = os.path.dirname(sh).replace('\\', '/')
+            self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
+                         'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
+                         'moddir': moduledir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
                 for i in shell.readlines():
                     try:
@@ -1087,6 +1085,7 @@ def mpkman() -> None:
 
         def runline(self, i):
             for key, value in self.envs.items():
+                print(key, value)
                 i = i.replace(f'@{key}@', str(value)).strip()
             if i[:1] not in ["#"] and i not in ["", '\n', "\r\n"]:
                 if i[:1] == "@":
