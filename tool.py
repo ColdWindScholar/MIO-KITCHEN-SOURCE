@@ -302,14 +302,17 @@ class Tool(Tk):
         link.pack()
 
     def tab6_n(self):
-        tab = ttk.LabelFrame(self.tab, text=lang.text16)
-        Label(tab,
-              text=f"Wechat Pay/微信支付",
-              font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
-        self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
-        Label(tab, image=self.photo).pack(padx=5, pady=5)
-        Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
-        tab.pack()
+        def ck():
+            tab = Toplevel()
+            tab.title(lang.text16)
+            Label(tab,
+                  text=f"Wechat Pay/微信支付",
+                  font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
+            self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
+            Label(tab, image=self.photo).pack(padx=5, pady=5)
+            Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+            jzxs(tab)
+        ttk.Button(self.tab, text=lang.text16, command=ck).pack()
 
     def setting_tab(self):
         self.show_local = StringVar()
@@ -1476,7 +1479,8 @@ class Install_mpk(Toplevel):
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
-        Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10, pady=10)
+        Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10,
+                                                                                                           pady=10)
         text = Text(self)
         text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
@@ -2102,7 +2106,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
                 if dbgs.get() in ["dat", "br", "sparse"]:
-                    img2simg(work + dname+".img")
+                    img2simg(work + dname + ".img")
                     if dbgs.get() == 'dat':
                         datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
                     elif dbgs.get() == 'br':
@@ -2511,7 +2515,7 @@ class dirsize:
 def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
     if not os.path.exists(work + name + ".img"):
-        print(work + name + ".img"+lang.text84)
+        print(work + name + ".img" + lang.text84)
         return
     else:
         utils.img2sdat(work + name + ".img", work, dat_ver, name)
