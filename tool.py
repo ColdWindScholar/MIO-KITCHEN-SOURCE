@@ -1087,7 +1087,7 @@ def mpkman() -> None:
 
         def runline(self, i):
             for key, value in self.envs.items():
-                i = i.replace(f'@{key}@', value).strip()
+                i = i.replace(f'@{key}@', str(value)).strip()
             if i[:1] not in ["#"] and i not in ["", '\n', "\r\n"]:
                 if i[:1] == "@":
                     i = i[1:]
