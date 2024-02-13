@@ -28,7 +28,7 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 if os.name == 'nt':
     import windnd
     from tkinter import filedialog
-elif os.name == "posix":
+else:
     import mkc_filedialog as filedialog
 import zipfile
 from io import BytesIO, StringIO
@@ -426,14 +426,14 @@ class welcome(Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: print())
         self.frame = None
         oobe = settings.oobe
-        if oobe == "1":
-            self.main()
-        elif oobe == '2':
-            self.license()
-        elif oobe == '3':
-            self.private()
-        elif oobe == '4':
-            self.done()
+        frames = {
+            "1": self.main,
+            "2": self.license,
+            "3": self.private,
+            "4": self.done
+        }
+        if frames.get(oobe):
+            frames[oobe]()
         else:
             ttk.Label(self, text=lang.text135, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
@@ -1086,7 +1086,6 @@ def mpkman() -> None:
                 print("赋值异常：%s\n语句：%s" % (e, cmd))
                 return 1
             self.envs[vn] = str(va)
-
 
         def runline(self, i):
             for key, value in self.envs.items():
