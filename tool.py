@@ -1049,6 +1049,7 @@ def mpkman() -> None:
                 global_mpk[data['name']] = data['identifier']
 
     class msh_parse:
+        extra_envs = {}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
                          "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
@@ -1059,6 +1060,8 @@ def mpkman() -> None:
             self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
                          'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
                          'moddir': moduledir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
+            for n, v in self.extra_envs.items():
+                self.envs[n] = v
             with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
                 for i in shell.readlines():
                     try:
@@ -1085,7 +1088,6 @@ def mpkman() -> None:
 
         def runline(self, i):
             for key, value in self.envs.items():
-                print(key, value)
                 i = i.replace(f'@{key}@', str(value)).strip()
             if i[:1] not in ["#"] and i not in ["", '\n', "\r\n"]:
                 if i[:1] == "@":
@@ -1196,10 +1198,10 @@ def mpkman() -> None:
             def generate_msh():
                 for va in self.value:
                     if gva := self.gavs[va].get():
-                        msh_parse.envs[va] = gva
+                        msh_parse.extra_envs[va] = gva
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if '\\' in gva:
-                                msh_parse.envs[va] = gva.replace("\\", '/')
+                                msh_parse.extra_envs[va] = gva.replace("\\", '/')
                 self.destroy()
                 self.gavs.clear()
                 self.value.clear()
