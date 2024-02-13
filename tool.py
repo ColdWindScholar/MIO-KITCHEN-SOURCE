@@ -1086,8 +1086,7 @@ def mpkman() -> None:
             except Exception as e:
                 print("赋值异常：%s\n语句：%s" % (e, cmd))
                 return 1
-            if not self.envs[vn] == str(va):
-                self.envs[vn] = str(va)
+            self.envs[vn] = str(va)
 
         def runline(self, i):
             for key, value in self.envs.items():
