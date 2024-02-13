@@ -1079,7 +1079,10 @@ def mpkman() -> None:
 
         def set(self, cmd):
             try:
-                vn, va = cmd.split()
+                if "=" in cmd:
+                    vn, va = cmd.strip().split("=")
+                else:
+                    vn, va = cmd.strip().split()
             except Exception as e:
                 print("赋值异常：%s\n语句：%s" % (e, cmd))
                 return 1
@@ -1089,18 +1092,16 @@ def mpkman() -> None:
         def runline(self, i):
             for key, value in self.envs.items():
                 i = i.replace(f'@{key}@', str(value)).strip()
-            if i[:1] not in ["#"] and i not in ["", '\n', "\r\n"]:
-                if i[:1] == "@":
-                    i = i[1:]
+            if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
                 if i.split()[0] == "if":
                     self.sif(i.split()[1], i.split()[2], shlex.split(i)[3])
                 elif i.split()[0] == "for":
                     self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
                 else:
                     if i.split()[0] in self.grammar_words.keys():
-                        self.envs["result"] = self.grammar_words[i.split()[0]](i[i.index(" ") + 1:])
+                        self.envs["result"] = self.grammar_words[i.split()[0]](''.join(i.split()[1:]))
                     else:
-                        self.envs["result"] = getattr(self, i.split()[0])(i[i.index(" ") + 1:])
+                        self.envs["result"] = getattr(self, i.split()[0])(''.join(i.split()[1:]))
                     if not self.envs['result']:
                         self.envs['result'] = ""
 
