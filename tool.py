@@ -2947,6 +2947,9 @@ class format_conversion(Toplevel):
                                 print("transferpath" + lang.text84)
                     if os.path.exists(work + basename + '.img'):
                         img2simg(work + basename + '.img')
+                if hget == 'raw':
+                    if os.path.exists(work + basename + '.img'):
+                        img2simg(work + basename + '.img')
         elif f_get == 'raw':
             for i in selection:
                 print(f'[{hget}->{f_get}]{i}')
