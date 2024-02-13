@@ -552,8 +552,7 @@ class set_utils:
         try:
             self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
-            gif = Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get()))))
-            cartoon.load_gif(gif)
+            cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get())))))
         except Exception as e:
             win.message_pop(lang.text101 % (theme.get(), e))
 
