@@ -24,7 +24,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
             context[filepath] = other
             if len(other) > 1:
                 print(f"[Warn] {i[0]} has too much data.Automatic processing.")
-                context[filepath] = other.replace(" ", '')
+                context[filepath] = ''.join(other)
     return context
 
 
