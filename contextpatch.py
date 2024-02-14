@@ -74,7 +74,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                 # 搜索已定义的权限
                 for f in fix_permission.keys():
                     if f in i:
-                        permission = fix_permission[f]
+                        permission = [fix_permission[f]]
                 if not permission:
                     for e in fs_file.keys():
                         if SequenceMatcher(None, (path := os.path.dirname(i)), e).quick_ratio() >= 0.85:
