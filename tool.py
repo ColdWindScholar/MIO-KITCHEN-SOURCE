@@ -369,8 +369,18 @@ class ModuleError(Exception):
     ...
 
 
-class lang:
-    ...
+class lang_utils:
+    def __init__(self):
+        ...
+
+    def __getattr__(self, item):
+        try:
+            return getattr(self, item)
+        except:
+            return "None"
+
+
+lang = lang_utils()
 
 
 def load(name):
