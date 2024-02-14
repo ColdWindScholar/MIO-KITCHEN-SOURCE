@@ -344,15 +344,7 @@ class vbpatch:
         if os.access(self.file, os.F_OK):
             with open(self.file, "rb") as f:
                 f.seek(123, 0)
-                flag = f.read(1)
-                if flag == b'\x00':
-                    return 0  # Verify boot and dm-verity is on
-                elif flag == b'\x01':
-                    return 1  # Verify boot but dm-verity is off
-                elif flag == b'\x02':
-                    return 2  # All verity is off
-                else:
-                    return flag
+                return int(f.read(1).hex())
         else:
             print("File does not exist!")
 
