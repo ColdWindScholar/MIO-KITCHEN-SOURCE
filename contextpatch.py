@@ -23,8 +23,8 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
             filepath, *other = i.strip().split()
             context[filepath] = other
             if len(other) > 1:
-                print(f"[Warn] {i[0]} has too much data.Automatic processing.")
-                context[filepath] = ''.join(other)
+                print(f"[Warn] {i[0]} has too much data.Skip.")
+                del context[filepath]
     return context
 
 
