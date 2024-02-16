@@ -376,7 +376,7 @@ class lang_utils:
     def __getattr__(self, item):
         try:
             return getattr(self, item)
-        except:
+        except (Exception, BaseException):
             return "None"
 
 
