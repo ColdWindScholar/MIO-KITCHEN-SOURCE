@@ -215,7 +215,7 @@ class Tool(Tk):
         self.sub_win2 = ttk.LabelFrame(self, text=lang.text9)
         self.sub_win3 = ttk.LabelFrame(self, text=lang.text10)
         self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
-        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True, pady=5)
+        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True, pady=5, padx=5)
         self.notepad = ttk.Notebook(self.sub_win2)
         self.tab = ttk.Frame(self.notepad)
         self.tab2 = ttk.Frame(self.notepad)
