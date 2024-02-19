@@ -19,10 +19,6 @@ class Ext4Error(Exception):
     ...
 
 
-class BlockMapError(Ext4Error):
-    ...
-
-
 class EndOfStreamError(Ext4Error):
     ...
 
