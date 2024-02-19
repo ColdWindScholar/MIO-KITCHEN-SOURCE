@@ -1057,6 +1057,9 @@ def mpkman() -> None:
                 pls.add_icon(icon)
                 global_mpk[data['name']] = data['identifier']
 
+    global list_pls_plugin
+    list_pls_plugin = list_pls
+
     class msh_parse:
         extra_envs = {}
         grammar_words = {"echo": lambda strings: print(strings),
@@ -1500,6 +1503,7 @@ class Install_mpk(Toplevel):
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
         self.wait_window()
+        list_pls_plugin()
 
     def install(self):
         if self.installb.cget('text') == lang.text34:
