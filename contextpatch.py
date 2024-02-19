@@ -21,6 +21,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
     with open(file, "r", encoding='utf-8') as file_:
         for i in file_.readlines():
             filepath, *other = i.strip().split()
+            filepath = filepath.replace(r'\@', '@')
             context[filepath] = other
             if len(other) > 1:
                 print(f"[Warn] {i[0]} has too much data.Skip.")
