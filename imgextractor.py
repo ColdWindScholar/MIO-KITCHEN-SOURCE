@@ -258,6 +258,9 @@ class Extractor:
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
         self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + self.__out_name(
             os.path.basename(output_dir))
+        self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
+        self.FileName = self.__out_name(os.path.basename(target), out=0)
+        self.CONFING_DIR = work + os.sep + 'config'
         with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
             mount = ext4.Volume(file).get_mount_point
             if mount[:1] == '/':
@@ -265,9 +268,7 @@ class Extractor:
             if self.__out_name(os.path.basename(output_dir)) != mount:
                 print(f"[N]:Your File Name Not Right , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
-        self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
-        self.FileName = self.__out_name(os.path.basename(target), out=0)
-        self.CONFING_DIR = work + os.sep + 'config'
+                self.FileName = mount
         if target_type == 's_img':
             simg2img(target)
             target_type = 'img'
