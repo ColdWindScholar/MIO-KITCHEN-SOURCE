@@ -586,7 +586,7 @@ settings = set_utils(settings_file)
 settings.load()
 
 
-def re_folder(path) -> None:
+def re_folder(path):
     if os.path.exists(path):
         rmdir(path)
     os.mkdir(path)
