@@ -263,6 +263,7 @@ class Extractor:
             if mount[:1] == '/':
                 mount = mount[1:]
             if self.__out_name(os.path.basename(output_dir)) != mount:
+                print(f"[N]:Your File Name Not Right , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
