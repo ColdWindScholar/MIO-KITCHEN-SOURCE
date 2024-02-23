@@ -1476,7 +1476,7 @@ class Install_mpk(Toplevel):
         with zipfile.ZipFile(mpk, 'r') as myfile:
             if 'info' not in myfile.namelist():
                 self.destroy()
-                return 1
+                return
             with myfile.open('info') as info_file:
                 self.mconf.read_string(info_file.read().decode('utf-8'))
             try:
