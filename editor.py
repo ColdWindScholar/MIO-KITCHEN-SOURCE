@@ -26,6 +26,7 @@ class PythonEditor(tk.Frame):
         self.text.bind("<KeyRelease>", self.highlight)
         self.highlight()
         f1 = ttk.Frame(self.parent)
+        parent.bind("<Control-s>", lambda *x: cz(self.save))
         self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save))
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,

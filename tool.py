@@ -485,7 +485,7 @@ class welcome(Toplevel):
 
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
-                          value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses")])
+                          value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
@@ -911,7 +911,7 @@ def mpkman() -> None:
             self.gui()
 
         @staticmethod
-        def labelEntry(master, text, side):
+        def label_entry(master, text, side):
             frame = Frame(master)
             ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
             entry = ttk.Entry(frame)
@@ -923,13 +923,13 @@ def mpkman() -> None:
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             #
-            self.name = self.labelEntry(self, lang.t20, TOP)
+            self.name = self.label_entry(self, lang.t20, TOP)
             #
-            self.aou = self.labelEntry(self, lang.t21, TOP)
+            self.aou = self.label_entry(self, lang.t21, TOP)
             #
-            self.ver = self.labelEntry(self, lang.t22, TOP)
+            self.ver = self.label_entry(self, lang.t22, TOP)
             #
-            self.dep = self.labelEntry(self, lang.t23, TOP)
+            self.dep = self.label_entry(self, lang.t23, TOP)
             #
             ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
             self.intro = Text(self)
@@ -963,7 +963,7 @@ def mpkman() -> None:
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
             with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
-                sh.write("echo Hello")
+                sh.write("echo 'MIO-KITCHEN'")
             editor.main(path + s)
         else:
             if os.path.exists(path + "main.msh"):
@@ -1015,6 +1015,8 @@ def mpkman() -> None:
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
+            if os.path.exists(os.path.join(moduledir, value, 'icon')):
+                mpk2.write(os.path.join(moduledir, value, 'icon'), 'icon')
             del buffer2, buffer
         print(lang.t15 % (settings.path + os.sep + chosen.get() + ".mpk")) if os.path.exists(
             settings.path + os.sep + chosen.get() + ".mpk") else print(
@@ -2128,9 +2130,21 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
             else:
                 ext4_size_value = 0
                 if ext4_size == lang.t33:
-                    if os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
+                    if os.path.exists(work + "dynamic_partitions_op_list"):
+                        with open(work+"dynamic_partitions_op_list") as t:
+                            for _i_ in t.readlines():
+                                _i = _i_.strip().split()
+                                if _i.__len__() < 3:
+                                    continue
+                                if _i[0] != 'resize':
+                                    continue
+                                if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
+                                    if int(_i[2]) > ext4_size_value:
+                                        ext4_size_value = int(_i[2])
+                    elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
                         with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
                             ext4_size_value = int(f.read().strip())
+
                 make_ext4fs(dname, work, "-s" if dbgs.get() in ["dat", "br", "sparse"] else '',
                             ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
                                                                                         work,
@@ -2489,13 +2503,13 @@ class dirsize:
             size_ = int(size + 10086)
             if size_ > 2684354560:
                 bs = 1.0658
-            if size_ <= 2684354560:
+            elif size_ <= 2684354560:
                 bs = 1.0758
-            if size_ <= 1073741824:
+            elif size_ <= 1073741824:
                 bs = 1.0858
-            if size_ <= 536870912:
+            elif size_ <= 536870912:
                 bs = 1.0958
-            if size_ <= 104857600:
+            elif size_ <= 104857600:
                 bs = 1.1158
             else:
                 bs = 1.1258

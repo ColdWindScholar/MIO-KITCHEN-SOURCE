@@ -5,6 +5,7 @@ from difflib import SequenceMatcher
 from re import escape
 
 fix_permission = {
+    "system/app/*/.apk": "u:object_r:system_file:s0",
     "data-app/.apk": "u:object_r:system_file:s0",
     "android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0",
     "bin/idmap": "u:object_r:idmap_exec:s0",
