@@ -2426,6 +2426,12 @@ def unpack(chose, form: any = None):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
             if (file_type := gettype(work + i + ".img")) == "ext":
+                with open(work + i + ".img", 'rb+') as e:
+                    mount = ext4.Volume(e).get_mount_point
+                    if mount[:1] == '/':
+                        mount = mount[1:]
+                    if mount != i:
+                        parts[mount] = 'ext'
                 print(lang.text79 + i + ".img [%s]" % file_type)
                 try:
                     imgextractor.Extractor().main(work + i + ".img", work + i, work)

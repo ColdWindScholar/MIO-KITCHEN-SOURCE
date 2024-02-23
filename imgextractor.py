@@ -186,7 +186,7 @@ class Extractor:
             os.makedirs(self.CONFING_DIR)
         self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFING_DIR + os.sep + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
-            dir_r = self.__out_name(os.path.basename(self.OUTPUT_IMAGE_FILE).rsplit('.', 1)[0])
+            dir_r = self.FileName
             self.DIR = dir_r
             scan_dir(ext4.Volume(file).root)
             self.fs_config.insert(0, '/ 0 2000 0755' if dir_r == 'vendor' else '/ 0 0 0755')
