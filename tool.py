@@ -1464,6 +1464,7 @@ def mpkman() -> None:
 class Install_mpk(Toplevel):
     def __init__(self, mpk):
         super().__init__()
+        self.inner_filenames = []
         self.mconf = ConfigParser()
         if not mpk:
             win.message_pop(lang.warn2)
@@ -1473,6 +1474,9 @@ class Install_mpk(Toplevel):
         self.icon = None
         self.resizable(False, False)
         with zipfile.ZipFile(mpk, 'r') as myfile:
+            if 'info' not in myfile.namelist():
+                self.destroy()
+                return 1
             with myfile.open('info') as info_file:
                 self.mconf.read_string(info_file.read().decode('utf-8'))
             try:
@@ -1487,7 +1491,6 @@ class Install_mpk(Toplevel):
                 pyt = ImageTk.PhotoImage(data=images.none_byte)
             with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
-                self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
         Label(self, image=pyt).pack(padx=10, pady=10)
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
@@ -1530,6 +1533,7 @@ class Install_mpk(Toplevel):
         fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
         uncompress_size = sum((file.file_size for file in fz.infolist()))
         extracted_size = 0
+        self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
         for file in self.inner_filenames:
             try:
                 file = str(file).encode('cp437').decode('gbk')
