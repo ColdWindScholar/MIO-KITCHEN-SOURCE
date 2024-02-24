@@ -2946,9 +2946,8 @@ class format_conversion(Toplevel):
     @staticmethod
     def refile(f):
         for i in os.listdir(work := rwork()):
-            if i.endswith(f):
-                if os.path.isfile(work + i):
-                    yield i
+            if i.endswith(f) and os.path.isfile(work + i):
+                yield i
 
     @cartoon
     def conversion(self):
