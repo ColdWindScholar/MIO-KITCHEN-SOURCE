@@ -265,7 +265,7 @@ class Extractor:
             mount = ext4.Volume(file).get_mount_point
             if mount[:1] == '/':
                 mount = mount[1:]
-            if self.__out_name(os.path.basename(output_dir)) != mount:
+            if self.__out_name(os.path.basename(output_dir)) != mount and mount:
                 print(f"[N]:Your File Name Not Right , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
                 self.FileName = mount
