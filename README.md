@@ -1,6 +1,8 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
 #### The Rom Tool Written in Python
+> [!CAUTION]
+> Unauthorized prohibition of commercial use
 ***
 ## This tool uses many open source projects. Pay tribute to the developers!
 ***
