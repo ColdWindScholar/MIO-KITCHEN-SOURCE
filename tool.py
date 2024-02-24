@@ -485,7 +485,8 @@ class welcome(Toplevel):
 
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
-                          value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if i != 'private.txt'])
+                          value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if
+                                 i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
@@ -2134,7 +2135,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                 ext4_size_value = 0
                 if ext4_size == lang.t33:
                     if os.path.exists(work + "dynamic_partitions_op_list"):
-                        with open(work+"dynamic_partitions_op_list") as t:
+                        with open(work + "dynamic_partitions_op_list") as t:
                             for _i_ in t.readlines():
                                 _i = _i_.strip().split()
                                 if _i.__len__() < 3:
@@ -2969,19 +2970,18 @@ class format_conversion(Toplevel):
                 if hget == 'dat':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + work + i)
-                        if os.path.getsize(work + i) != 0:
-                            transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
-                            if os.access(transferfile, os.F_OK):
-                                sdat2img(transferfile, work + i, work + basename + ".img")
-                                if os.access(work + basename + ".img", os.F_OK):
-                                    os.remove(work + i)
-                                    os.remove(transferfile)
-                                    try:
-                                        os.remove(work + basename + '.patch.dat')
-                                    except (Exception, BaseException):
-                                        ...
-                            else:
-                                print("transferpath" + lang.text84)
+                        transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
+                            sdat2img(transferfile, work + i, work + basename + ".img")
+                            if os.access(work + basename + ".img", os.F_OK):
+                                os.remove(work + i)
+                                os.remove(transferfile)
+                                try:
+                                    os.remove(work + basename + '.patch.dat')
+                                except (Exception, BaseException):
+                                    ...
+                        else:
+                            print("transferpath" + lang.text84)
                     if os.path.exists(work + basename + '.img'):
                         img2simg(work + basename + '.img')
                 if hget == 'raw':
@@ -3000,19 +3000,18 @@ class format_conversion(Toplevel):
                         if hget == 'br':
                             i = i.replace('.br', '')
                         print(lang.text79 + work + i)
-                        if os.path.getsize(work + i) != 0:
-                            transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
-                            if os.access(transferfile, os.F_OK):
-                                sdat2img(transferfile, work + i, work + basename + ".img")
-                                if os.access(work + basename + ".img", os.F_OK):
-                                    try:
-                                        os.remove(work + i)
-                                        os.remove(transferfile)
-                                        os.remove(work + basename + '.patch.dat')
-                                    except (Exception, BaseException):
-                                        ...
-                            else:
-                                print("transferfile" + lang.text84)
+                        transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
+                            sdat2img(transferfile, work + i, work + basename + ".img")
+                            if os.access(work + basename + ".img", os.F_OK):
+                                try:
+                                    os.remove(work + i)
+                                    os.remove(transferfile)
+                                    os.remove(work + basename + '.patch.dat')
+                                except (Exception, BaseException):
+                                    ...
+                        else:
+                            print("transferfile" + lang.text84)
                 if hget == 'sparse':
                     utils.simg2img(work + i)
         elif f_get == 'dat':
