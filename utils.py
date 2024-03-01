@@ -319,6 +319,10 @@ def findfolder(dir__, folder_name):
 def jzxs(master):
     master.geometry('+{}+{}'.format(int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2),
                                     int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)))
+    try:
+        master.update()
+    except (Exception, BaseException):
+        ...
 
 
 # ----CLASSES

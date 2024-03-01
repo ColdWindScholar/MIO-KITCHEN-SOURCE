@@ -38,6 +38,7 @@ from tkinter import ttk, messagebox
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
+
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
         input(f"Not Support [{sys.version}] yet\nSorry for any inconvenience caused")
