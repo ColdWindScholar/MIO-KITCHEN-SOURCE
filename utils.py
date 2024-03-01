@@ -28,8 +28,10 @@ try:
     sys.set_int_max_str_digits(0)
 except AttributeError:
     ...
-
-e_local = getcwd()
+if os.name == 'nt':
+    e_local = getcwd()
+else:
+    e_local = os.path.normpath(os.path.dirname(sys.argv[0]))
 dn = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
