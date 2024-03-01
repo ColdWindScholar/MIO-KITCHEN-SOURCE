@@ -329,14 +329,9 @@ class Tool(Tk):
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
         self.LB2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
-
-        def start_folder():
-            if os.name == 'nt':
-                os.startfile(self.show_local.get())
-
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.show_local)
-        slo.bind('<Button-1>', lambda *x: start_folder())
+        slo.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
