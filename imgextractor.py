@@ -15,7 +15,6 @@ from utils import simg2img
 class Extractor:
     def __init__(self):
         self.CONFING_DIR = None
-        self.DIR = None
         self.FileName = ""
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
@@ -100,7 +99,7 @@ class Extractor:
                 gid = entry_inode.inode.i_gid
                 cap = ''
                 link_target = ''
-                tmp_path = self.DIR + entry_inode_path
+                tmp_path = self.FileName + entry_inode_path
                 for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
                         t_p_mkc = tmp_path
@@ -187,7 +186,6 @@ class Extractor:
         self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFING_DIR + os.sep + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             dir_r = self.FileName
-            self.DIR = dir_r
             scan_dir(ext4.Volume(file).root)
             self.fs_config.insert(0, '/ 0 2000 0755' if dir_r == 'vendor' else '/ 0 0 0755')
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
