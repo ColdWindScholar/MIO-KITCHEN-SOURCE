@@ -2426,6 +2426,9 @@ def unpack(chose, form: any = None):
                     mount = ext4.Volume(e).get_mount_point
                     if mount[:1] == '/':
                         mount = mount[1:]
+                    if '/' in mount:
+                        mount = mount.split('/')
+                        mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
                 print(lang.text79 + i + ".img [%s]" % file_type)
