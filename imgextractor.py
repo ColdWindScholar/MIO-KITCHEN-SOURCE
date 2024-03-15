@@ -14,7 +14,7 @@ from utils import simg2img
 
 class Extractor:
     def __init__(self):
-        self.CONFING_DIR = None
+        self.CONFIG_DIR = None
         self.FileName = ""
         self.OUTPUT_IMAGE_FILE = ""
         self.EXTRACT_DIR = ""
@@ -121,7 +121,7 @@ class Extractor:
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
-                    self.__append(tmp_path, os.path.join(self.CONFING_DIR, self.FileName + '_space.txt'))
+                    self.__append(tmp_path, os.path.join(self.CONFIG_DIR, self.FileName + '_space.txt'))
                     self.fs_config.append(
                         f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
@@ -181,16 +181,16 @@ class Extractor:
                         finally:
                             ...
 
-        if not os.path.isdir(self.CONFING_DIR):
-            os.makedirs(self.CONFING_DIR)
-        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFING_DIR + os.sep + self.FileName + '_size.txt')
+        if not os.path.isdir(self.CONFIG_DIR):
+            os.makedirs(self.CONFIG_DIR)
+        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFIG_DIR + os.sep + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             dir_r = self.FileName
             scan_dir(ext4.Volume(file).root)
             self.fs_config.insert(0, '/ 0 2000 0755' if dir_r == 'vendor' else '/ 0 0 0755')
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
             self.fs_config.insert(2 if dir_r == 'system' else 1, f'{dir_r} 0 0 0755')
-            self.__append('\n'.join(self.fs_config), self.CONFING_DIR + os.sep + self.FileName + '_fs_config')
+            self.__append('\n'.join(self.fs_config), self.CONFIG_DIR + os.sep + self.FileName + '_fs_config')
             p1 = p2 = 0
             if self.context:
                 self.context.sort()
@@ -207,7 +207,7 @@ class Extractor:
                         p2 = 1
                     if p1 == p2 == 1:
                         break
-                self.__append('\n'.join(self.context), self.CONFING_DIR + os.sep + self.FileName + "_file_contexts")
+                self.__append('\n'.join(self.context), self.CONFIG_DIR + os.sep + self.FileName + "_file_contexts")
 
     @staticmethod
     def fix_moto(input_file):
@@ -258,7 +258,7 @@ class Extractor:
             os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
-        self.CONFING_DIR = work + os.sep + 'config'
+        self.CONFIG_DIR = work + os.sep + 'config'
         with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
             mount = ext4.Volume(file).get_mount_point
             if mount[:1] == '/':
