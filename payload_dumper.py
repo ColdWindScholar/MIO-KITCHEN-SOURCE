@@ -5,7 +5,6 @@ from lzma import LZMADecompressor
 from os import F_OK, access, makedirs, path
 from struct import unpack
 from timeit import default_timer
-from utils import cz
 import update_metadata_pb2 as um
 
 
