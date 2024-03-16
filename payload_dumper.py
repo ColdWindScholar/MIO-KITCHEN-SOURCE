@@ -5,10 +5,8 @@ from lzma import LZMADecompressor
 from os import F_OK, access, makedirs, path
 from struct import unpack
 from timeit import default_timer
-
+from utils import cz
 import update_metadata_pb2 as um
-
-flatten = lambda l: [item for sublist in l for item in sublist]
 
 
 def u64(x):
@@ -25,6 +23,7 @@ class ota_payload_dumper:
             print(f"Magic Check Fail\n")
             self.payloadfile.close()
             return
+        start = default_timer()
         file_format_version = u64(self.payloadfile.read(8))
         assert file_format_version == 2
         manifest_size = u64(self.payloadfile.read(8))
@@ -42,10 +41,10 @@ class ota_payload_dumper:
             print(f'[EXTRACTING]: {image}')
             assert partition, "Partition %s not found in payload!\n" % image
             self.dump_part(partition[0])
+        print("Total Time:[%s]" % (default_timer() - start))
         self.payloadfile.close()
 
     def dump_part(self, part):
-        start = default_timer()
         if access(self.args.out + part.partition_name + ".img", F_OK):
             print(part.partition_name + "已存在\n")
         else:
@@ -54,7 +53,7 @@ class ota_payload_dumper:
                     if self.data_for_op(op, out_file) == 1:
                         print(f'Clean Extract [{part.partition_name}]\n')
                         return
-            print("%s:[%s]\n" % (part.partition_name, default_timer() - start))
+            print("%s:Done!" % part.partition_name)
 
     def data_for_op(self, op, out_file):
         try:
