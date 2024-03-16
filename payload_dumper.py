@@ -21,17 +21,14 @@ class ota_payload_dumper:
         self.args = Namespace(out=out, old=old, images=images, payload=self.payloadfile)
         if not path.exists(self.args.out):
             makedirs(self.args.out)
-        magic = self.payloadfile.read(4)
-        if magic != b'CrAU':
-            print(f"Magic Check Fail{magic}\n")
-            payloadfile_.close()
+        if self.payloadfile.read(4) != b'CrAU':
+            print(f"Magic Check Fail\n")
+            self.payloadfile.close()
             return
         file_format_version = u64(self.payloadfile.read(8))
         assert file_format_version == 2
         manifest_size = u64(self.payloadfile.read(8))
-        metadata_signature_size = 0
-        if file_format_version > 1:
-            metadata_signature_size = unpack('>I', self.payloadfile.read(4))[0]
+        metadata_signature_size = unpack('>I', self.payloadfile.read(4))[0] if file_format_version > 1 else 0
         manifest = self.payloadfile.read(manifest_size)
         self.payloadfile.read(metadata_signature_size)
         self.data_offset = self.payloadfile.tell()
