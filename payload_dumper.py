@@ -36,11 +36,8 @@ class ota_payload_dumper:
         if command == 0:
             return
         self.block_size = self.dam.block_size
-        self.partitions = {}
-        for part in self.dam.partitions:
-            self.partitions[part.partition_name] = part
         for image in self.args.images:
-            partition = self.partitions[image]
+            partition = [part for part in self.dam.partitions if part.partition_name == image]
             assert partition, "Partition %s not found in payload!\n" % image
             print(f'[EXTRACTING]: {image}')
             self.dump_part(partition[0])
