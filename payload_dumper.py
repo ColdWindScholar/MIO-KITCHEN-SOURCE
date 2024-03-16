@@ -33,13 +33,16 @@ class ota_payload_dumper:
         self.data_offset = self.payloadfile.tell()
         self.dam = um.DeltaArchiveManifest()
         self.dam.ParseFromString(manifest)
-        self.block_size = self.dam.block_size
         if command == 0:
             return
+        self.block_size = self.dam.block_size
+        self.partitions = {}
+        for part in self.dam.partitions:
+            self.partitions[part.partition_name] = part
         for image in self.args.images:
-            partition = [part for part in self.dam.partitions if part.partition_name == image]
-            print(f'[EXTRACTING]: {image}')
+            partition = self.partitions[image]
             assert partition, "Partition %s not found in payload!\n" % image
+            print(f'[EXTRACTING]: {image}')
             self.dump_part(partition[0])
         print("Total Time:[%s]" % (default_timer() - start))
         self.payloadfile.close()
@@ -77,4 +80,3 @@ class ota_payload_dumper:
         else:
             print("Unsupported type = %d\n" % op.type)
             exit(-2)
-        return 0
