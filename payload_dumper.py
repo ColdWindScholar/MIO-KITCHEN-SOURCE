@@ -23,13 +23,11 @@ def data_for_op(op, out_file):
         return 1
     data = payloadfile.read(op.data_length)
     if op.type == op.REPLACE_XZ:
-        data = LZMADecompressor().decompress(data)
         out_file.seek(op.dst_extents[0].start_block * block_size)
-        out_file.write(data)
+        out_file.write(LZMADecompressor().decompress(data))
     elif op.type == op.REPLACE_BZ:
-        data = BZ2Decompressor().decompress(data)
         out_file.seek(op.dst_extents[0].start_block * block_size)
-        out_file.write(data)
+        out_file.write(BZ2Decompressor().decompress(data))
     elif op.type == op.REPLACE:
         out_file.seek(op.dst_extents[0].start_block * block_size)
         out_file.write(data)
@@ -41,7 +39,7 @@ def data_for_op(op, out_file):
         print("Unsupported type = %d\n" % op.type)
         exit(-2)
 
-    return data
+    return 0
 
 
 def dump_part(part):
