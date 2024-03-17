@@ -16,10 +16,10 @@ class PythonEditor(tk.Frame):
         self.text = CodeView(self, wrap="word", undo=True, lexer=pygments.lexers.BashLexer, color_scheme="monokai")
         self.text.pack(side="left", fill="both", expand=True)
         f1 = ttk.Frame(self.parent)
-        self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save))
-        self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                               expand=1)
+        self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save), style="Accent.TButton")
+        self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         if self.file_:
             try:

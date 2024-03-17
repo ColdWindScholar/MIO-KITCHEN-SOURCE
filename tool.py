@@ -324,7 +324,7 @@ class Tool(Tk):
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
-        sf4 = ttk.Frame(self.tab3)
+        sf4 = ttk.Frame(self.tab3, width=20)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.LB2.pack(padx=10, pady=10, side='left')
@@ -341,7 +341,7 @@ class Tool(Tk):
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
                         offvalue='0',
-                        style="Switch.TCheckbutton").pack(padx=10, pady=10, fill=X)
+                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
@@ -1388,11 +1388,13 @@ def mpkman() -> None:
                 for i in self.arr.keys():
                     te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
-            ttk.Button(self.ck, text=lang.ok, command=self.uninstall).pack(fill=X, expand=True, side=LEFT, pady=10,
-                                                                           padx=10)
+
             ttk.Button(self.ck, text=lang.cancel, command=self.ck.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                                 pady=10,
                                                                                 padx=10)
+            ttk.Button(self.ck, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
+                                                                                                   side=LEFT, pady=10,
+                                                                                                   padx=10)
 
         def lfdep(self, name=None):
             if not name:
@@ -1629,13 +1631,15 @@ class packxx(Toplevel):
         dbfss.current(0)
         dbgss.current(0)
         edbgss.current(0)
-        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_)).pack(side='left', padx=2, pady=2,
-                                                                               fill=X,
-                                                                               expand=True)
+
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
                                                                                 pady=2,
                                                                                 fill=X,
                                                                                 expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
+                                                                                                       padx=2, pady=2,
+                                                                                                       fill=X,
+                                                                                                       expand=True)
         jzxs(self)
 
     def update_label(self, value):
@@ -1825,13 +1829,13 @@ class packss(Toplevel):
             sc = scywj.get()
             self.destroy()
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
-
-        ttk.Button(self, text=lang.pack, command=lambda: cz(start_)).pack(side='left',
-                                                                          padx=5,
-                                                                          pady=5, fill=X, expand=True)
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=10, pady=10,
                                                                                 fill=X,
                                                                                 expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: cz(start_), style="Accent.TButton").pack(side='left',
+                                                                                                  padx=5,
+                                                                                                  pady=5, fill=X,
+                                                                                                  expand=True)
         read_list()
 
 
@@ -2466,10 +2470,11 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     ask.resizable(False, False)
     ask.attributes('-topmost', 'true')
     ttk.Label(ask, text=text, font=(None, 20)).pack()
-    ttk.Button(ask, text=ok, command=lambda: close_ask(1)).pack(side='left', padx=5, pady=5, fill=BOTH,
-                                                                expand=True)
     ttk.Button(ask, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                     expand=True)
+    ttk.Button(ask, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5, pady=5,
+                                                                                        fill=BOTH,
+                                                                                        expand=True)
 
     def close_ask(value_=1):
         value.set(value_)
