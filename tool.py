@@ -1748,7 +1748,8 @@ class packss(Toplevel):
         sdbfzs.current(0)
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
         supers.set(9126805504)
-        (ttk.Entry(lf2, textvariable=supers)).pack(side='left', padx=10, pady=10)
+        (super_size := ttk.Entry(lf2, textvariable=supers)).pack(side='left', padx=10, pady=10)
+        super_size.bind("<KeyRelease>", lambda *x:super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
 
         (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
         work = rwork()
