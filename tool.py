@@ -411,7 +411,7 @@ def error(code, desc="未知错误"):
     te.insert('insert', desc)
     te.config(yscrollcommand=scroll.set)
     ttk.Button(er, text="Report",
-               command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues")).pack(side=LEFT,
+               command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"), style="Accent.TButton").pack(side=LEFT,
                                                                                                              padx=10,
                                                                                                              pady=10)
     ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
@@ -1749,7 +1749,8 @@ class packss(Toplevel):
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
         supers.set(9126805504)
         (super_size := ttk.Entry(lf2, textvariable=supers)).pack(side='left', padx=10, pady=10)
-        super_size.bind("<KeyRelease>", lambda *x:super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
+        super_size.bind("<KeyRelease>",
+                        lambda *x: super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
 
         (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
         work = rwork()
@@ -1830,6 +1831,7 @@ class packss(Toplevel):
             sc = scywj.get()
             self.destroy()
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
+
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=10, pady=10,
                                                                                 fill=X,
                                                                                 expand=True)
