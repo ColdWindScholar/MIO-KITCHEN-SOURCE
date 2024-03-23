@@ -344,16 +344,6 @@ class vbpatch:
         else:
             print("File does not exist!")
 
-    def readflag(self):
-        if not self.checkmagic():
-            return False
-        if os.access(self.file, os.F_OK):
-            with open(self.file, "rb") as f:
-                f.seek(123, 0)
-                return int(f.read(1).hex())
-        else:
-            print("File does not exist!")
-
     def patchvb(self, flag):
         if not self.checkmagic():
             return False

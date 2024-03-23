@@ -2197,10 +2197,8 @@ def rdi(work, part_name) -> any:
 
 def input_(title: str = lang.text76, text: str = "") -> str:
     (input_var := StringVar()).set(text)
-
-    input__ = ttk.LabelFrame(win)
+    input__ = ttk.LabelFrame(win, text=title)
     input__.place(relx=0.5, rely=0.5, anchor="center")
-    ttk.Label(input__, text=title, font=(None, "13")).pack()
     ttk.Entry(input__, textvariable=input_var).pack(pady=5, padx=5, fill=BOTH)
     ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
     input__.wait_window()
