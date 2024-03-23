@@ -266,6 +266,8 @@ class Extractor:
             if '/' in mount:
                 mount = mount.split('/')
                 mount = mount[len(mount) - 1]
+            if [True for i in [".", "@", "#"] if i in mount]:
+                mount = ""
             if self.__out_name(os.path.basename(output_dir)) != mount and mount and self.FileName != 'mi_ext':
                 print(f"[N]:Your image file name appears to be wrong , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
