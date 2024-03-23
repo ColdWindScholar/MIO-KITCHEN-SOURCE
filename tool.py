@@ -270,7 +270,7 @@ class Tool(Tk):
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
-              text='反对肆意违反开源协议！\nWe also strongly oppose the companies those are violating open source licenses!',
+              text='反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         mpkman()
