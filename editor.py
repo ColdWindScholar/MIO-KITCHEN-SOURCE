@@ -23,9 +23,13 @@ class PythonEditor(tk.Frame):
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         if self.file_:
             try:
-                with open(self.file_, 'r+', encoding='utf-8', newline='\n') as f:
+                with open(self.file_, 'rb+') as f:
                     self.text.delete(0.0, tk.END)
-                    self.text.insert(tk.END, f.read())
+                    try:
+                        data = f.read().decode("utf-8")
+                    except:
+                        data = f.read().decode("gbk")
+                    self.text.insert(tk.END, data)
             except Exception as e:
                 logging.debug(e)
             self.parent.title(f"{basename(self.file_)} - Editor")
