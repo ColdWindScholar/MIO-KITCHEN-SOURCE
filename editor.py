@@ -13,7 +13,7 @@ class PythonEditor(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.file_ = file_
         self.parent = parent
-        self.text = CodeView(self, wrap="word", undo=True, lexer=pygments.lexers.BashLexer, color_scheme="monokai")
+        self.text = CodeView(self, wrap="word", undo=True, lexer=pygments.lexers.BashLexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
