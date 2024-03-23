@@ -26,7 +26,6 @@ def mmap_io(filename, mode, length=0):
         else:
             with open(filename, "wb") as wf:
                 wf.write(length * b'\0')
-                wf.close()
         with open(filename, mode="r+b") as file_obj:
             return mmap.mmap(file_obj.fileno(), length=length, access=mmap.ACCESS_WRITE)
         # mmap_obj.flush() on finish

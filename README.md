@@ -33,6 +33,8 @@
 brew install gettext
 ```
 ## Start To Use
+### Notice!
+#### The Source Only Support Python 3.8 and Newer!
 ### Necessary Prepare
 <details><summary>macOS</summary>
 
