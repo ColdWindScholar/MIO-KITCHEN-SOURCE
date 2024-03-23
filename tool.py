@@ -876,8 +876,7 @@ class IconGrid(tk.Frame):
 
 
 def mpkman() -> None:
-    chosen = tk.StringVar()
-    chosen.set('')
+    chosen = tk.StringVar(value='')
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
 
