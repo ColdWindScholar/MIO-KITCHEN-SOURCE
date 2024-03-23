@@ -54,7 +54,7 @@ def fs_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     new_fs = {}
     new_add = 0
     r_fs = {}
-    print("FsPatcher: Load origin %d" % (len(fs_file.keys())) + " entries")
+    print("FsPatcher: The original file has %d" % (len(fs_file.keys())) + " entries")
     for i in scan_dir(os.path.abspath(dir_path)):
         if not i.isprintable():
             tmp = ''
@@ -130,4 +130,4 @@ def main(dir_path, fs_config):
     new_fs, new_add = fs_patch(scanfs(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
-    print('FsPatcher: Add %d' % new_add + " entries")
+    print('FsPatcher: Added %d' % new_add + " entries")

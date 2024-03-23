@@ -1,21 +1,21 @@
-# File Chose Extra Module For MIO-KITCHEN
+# File Choose Extra Module For MIO-KITCHEN
 import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import Button, Entry, Frame, Combobox
 
 
-def askopenfilename(title="Chose File", filetypes=(("*", "*.*"),)):
+def askopenfilename(title="Choose File", filetypes=(("*", "*.*"),)):
     return askopenfilenames(title=title, filetypes=filetypes).file
 
 
-def askdirectory(title="Chose File"):
+def askdirectory(title="Choose File"):
     return askdirectorys(title=title).file
 
 
 class askopenfilenames(Toplevel):
     file = ""
 
-    def __init__(self, title="Chose File", filetypes=(("*", "*.*"),)):
+    def __init__(self, title="Choose File", filetypes=(("*", "*.*"),)):
         super().__init__()
         self.title(title)
         self.protocol("WM_DELETE_WINDOW", self.cancel)
@@ -35,7 +35,7 @@ class askopenfilenames(Toplevel):
         self.show.bind("<Double-Button-1>", self.p_bind)
         self.show.pack(fill=BOTH, padx=5, pady=5)
         ff = Frame(self)
-        Button(ff, text="选择|Chose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text="选择|Choose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
@@ -80,7 +80,7 @@ class askopenfilenames(Toplevel):
 class askdirectorys(Toplevel):
     file = ""
 
-    def __init__(self, title="Chose File"):
+    def __init__(self, title="Choose File"):
         super().__init__()
         self.title(title)
         self.protocol("WM_DELETE_WINDOW", self.cancel)
@@ -93,7 +93,7 @@ class askdirectorys(Toplevel):
         self.show.bind("<Double-Button-1>", self.p_bind)
         self.show.pack(fill=BOTH, padx=5, pady=5)
         ff = Frame(self)
-        Button(ff, text="选择|Chose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text="选择|Choose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)

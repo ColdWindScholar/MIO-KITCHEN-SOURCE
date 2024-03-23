@@ -40,7 +40,7 @@ import sv_ttk
 
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
-        input(f"Not Support [{sys.version}] yet\nSorry for any inconvenience caused")
+        input(f"Your Python version: [{sys.version}] is not supported yet\nThe program will now quit\nSorry for any inconvenience caused")
         sys.exit(1)
 from PIL import Image, ImageTk
 import fspatch
@@ -266,11 +266,11 @@ class Tool(Tk):
         zyf1.pack(padx=10, pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
-              text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is the user right! Oppose the ban on unlocking BL!',
+              text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
-              text='反对肆意违反开源协议！\nOppose wanton violation of open source agreements!',
+              text='反对肆意违反开源协议！\nWe also strongly oppose the companies those are violating open source licenses!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         mpkman()
@@ -529,7 +529,7 @@ class set_utils:
             self.load()
         else:
             sv_ttk.set_theme("dark")
-            error(1, '缺失配置文件，请重新安装此软件\nSome Necessary Files Are LOST!')
+            error(1, '缺失配置文件，请重新安装此软件\nSome necessary files were lost, please reinstall this software to fix the problem!')
 
     def load(self):
         self.config.read(self.set_file)
@@ -2013,7 +2013,7 @@ def jboot(bn: str = 'boot'):
             if call("magiskboot decompress %s %s" % (
                     work + f"{bn}" + os.sep + "ramdisk.cpio.comp",
                     work + f"{bn}" + os.sep + "ramdisk.cpio")) != 0:
-                print("Decompress Ramdisk Fail...")
+                print("Failed to decompress Ramdisk...")
                 return
         if not os.path.exists(work + f"{bn}" + os.sep + "ramdisk"):
             os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
@@ -2048,18 +2048,18 @@ def dboot(nm: str = 'boot'):
         print("Compressing:%s" % comp)
         if comp != "unknown":
             if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
-                print("Pack Ramdisk Fail...")
+                print("Failed to pack Ramdisk...")
                 os.remove("ramdisk-new.cpio")
                 return
             else:
-                print("Pack Ramdisk Successful..")
+                print("Successfully packed Ramdisk..")
                 try:
                     os.remove("ramdisk.cpio")
                 except (Exception, BaseException):
                     ...
                 os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
         else:
-            print("Pack Ramdisk Successful..")
+            print("Successfully packed Ramdisk..")
             os.remove("ramdisk.cpio")
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         if comp == "cpio":
@@ -2068,7 +2068,7 @@ def dboot(nm: str = 'boot'):
     else:
         ramdisk = False
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
-        print("Pack boot Fail...")
+        print("Failed to Pack boot...")
         return
     else:
         if ramdisk:
@@ -2079,7 +2079,7 @@ def dboot(nm: str = 'boot'):
             rmdir(work + f"{nm}")
         except (Exception, BaseException):
             print(lang.warn11.format(nm))
-        print("Pack Successful...")
+        print("Successfully packed Boot...")
 
 
 @cartoon
@@ -2440,7 +2440,7 @@ def unpack(chose, form: any = None):
                 try:
                     imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 except Exception as e:
-                    print(f"Unpack Fail..{e}")
+                    print(f"Unpack failed..{e}")
                     continue
                 if os.path.exists(work + i):
                     try:
@@ -2451,7 +2451,7 @@ def unpack(chose, form: any = None):
                 print(lang.text79 + i + ".img [%s]" % file_type)
                 if call(exe=f"extract.erofs -i '{os.path.join(settings.path, dn.get(), i + '.img')}' -o '{work}' -x",
                         out=1) != 0:
-                    print(f'Unpack Fail...')
+                    print(f'Unpack failed...')
                     continue
                 if os.path.exists(work + i):
                     try:
@@ -2828,7 +2828,7 @@ class unpack_gui(ttk.LabelFrame):
             for i in data:
                 info.append(i)
         scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
-        columns = ['信息/Info', '参数/Value']
+        columns = ['信息/Name', '参数/Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
