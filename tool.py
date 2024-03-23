@@ -2467,7 +2467,6 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     ask.place(relx=0.5, rely=0.5, anchor="center")
     frameInner = ttk.Frame(ask)
     frameInner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-
     ttk.Label(frameInner, text=text, font=(None, 20)).pack(side=TOP)
     frameButton = ttk.Frame(frameInner)
     frameButton.pack(side=TOP)
@@ -2581,9 +2580,7 @@ def datbr(work, name, brl: any, dat_ver=4):
 def mkerofs(name, format_, work, level, old_kernel=0):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else f'{format_}'
-    other_ = ''
-    if old_kernel:
-        other_ = '-E legacy-compress'
+    other_ = '-E legacy-compress' if old_kernel else ''
     cmd = f"mkfs.erofs {other_} -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd)
 
