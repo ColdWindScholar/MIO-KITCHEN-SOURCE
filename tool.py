@@ -5,6 +5,7 @@ import subprocess
 from functools import wraps
 import AI_engine
 import ext4
+
 if not platform.system() == 'Darwin':
     try:
         import load_window
@@ -22,6 +23,7 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+
 if os.name == 'nt':
     import windnd
     from tkinter import filedialog
@@ -408,9 +410,10 @@ def error(code, desc="未知错误"):
     te.insert('insert', desc)
     te.config(yscrollcommand=scroll.set)
     ttk.Button(er, text="Report",
-               command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"), style="Accent.TButton").pack(side=LEFT,
-                                                                                                             padx=10,
-                                                                                                             pady=10)
+               command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"),
+               style="Accent.TButton").pack(side=LEFT,
+                                            padx=10,
+                                            pady=10)
     ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
     er.wait_window()
     sys.exit()
@@ -2196,14 +2199,12 @@ def rdi(work, part_name) -> any:
 
 def input_(title: str = lang.text76, text: str = "") -> str:
     (input_var := StringVar()).set(text)
-    input__ = Toplevel()
-    input__.attributes('-topmost', 'true')
-    input__.geometry("300x180")
-    input__.resizable(False, False)
-    input__.title(title)
+
+    input__ = ttk.LabelFrame(win)
+    input__.place(relx=0.5, rely=0.5, anchor="center")
+    ttk.Label(input__, text=title, font=(None, "13")).pack()
     ttk.Entry(input__, textvariable=input_var).pack(pady=5, padx=5, fill=BOTH)
     ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
-    jzxs(input__)
     input__.wait_window()
     return input_var.get()
 
@@ -2466,22 +2467,26 @@ def unpack(chose, form: any = None):
 
 def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     value = IntVar()
-    ask = Toplevel()
-    ask.resizable(False, False)
-    ask.attributes('-topmost', 'true')
-    ttk.Label(ask, text=text, font=(None, 20)).pack()
-    ttk.Button(ask, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
-                                                                    expand=True)
-    ttk.Button(ask, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5, pady=5,
-                                                                                        fill=BOTH,
-                                                                                        expand=True)
+    ask = ttk.LabelFrame(win)
+    ask.place(relx=0.5, rely=0.5, anchor="center")
+    frameInner = ttk.Frame(ask)
+    frameInner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+
+    ttk.Label(frameInner, text=text, font=(None, 20)).pack(side=TOP)
+    frameButton = ttk.Frame(frameInner)
+    frameButton.pack(side=TOP)
+
+    ttk.Button(frameButton, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
+                                                                            expand=True)
+    ttk.Button(frameButton, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
+                                                                                                pady=5,
+                                                                                                fill=BOTH,
+                                                                                                expand=True)
 
     def close_ask(value_=1):
         value.set(value_)
         ask.destroy()
 
-    jzxs(ask)
-    ask.lift()
     ask.wait_window()
     return value.get()
 
