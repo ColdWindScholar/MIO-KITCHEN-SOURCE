@@ -273,7 +273,7 @@ def simg2img(path):
     with open(path, 'rb') as fd:
         if SparseImage(fd).check():
             print('Sparse image detected.')
-            print('Process conversion to non sparse image...')
+            print('Converting to raw image...')
             unsparse_file = SparseImage(fd).unsparse()
             print('Result:[ok]')
         else:
@@ -342,7 +342,7 @@ class vbpatch:
                 buf = f.read(4)
                 return self.magic == buf
         else:
-            print("File dose not exist!")
+            print("File does not exist!")
 
     def readflag(self):
         if not self.checkmagic():
@@ -377,7 +377,7 @@ class DUMPCFG:
 
 class BMPHEAD:
     def __init__(self, buf: bytes = None):  # Read bytes buf and use this struct to parse
-        assert buf is not None, f"buf Should be bytes not {type(buf)}"
+        assert buf is not None, f"buf Should be bytes, not {type(buf)}"
         # print(buf)
         self.structstr = "<H6I"
         (
@@ -411,7 +411,7 @@ class LOGO_DUMPER:
         self.check_img(img)
 
     def check_img(self, img: str):
-        assert os.access(img, os.F_OK), f"{img} does not found!"
+        assert os.access(img, os.F_OK), f"{img} does not exist!"
         with open(img, 'rb') as f:
             f.seek(self.cfg.headoff, 0)
             self.magic = struct.unpack(

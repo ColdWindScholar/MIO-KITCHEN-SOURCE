@@ -1,14 +1,14 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
-#### The Rom Tool Written in Python
+#### A Rom Tool Written in Python
 > [!CAUTION]
-> Unauthorized prohibition of commercial use
+> Unauthorized commercial use prohibited
 ***
-## This tool uses many open source projects. Pay tribute to the developers!
+## This tool uses many open source projects. Huge shout out to the developers!
 ***
 ## Localization
-### Japanese: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
-### Chinese: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
+### 日本語: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
+### 中文: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
 ### Portuguese (Brazil): [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
 ### German: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
 ***
@@ -17,13 +17,13 @@
 * Pack boot, dtbo, ext4, erofs, payload, logo and so on
 ***
 ## Advantages
-* Automatically repair CONTEXT
+* Automatic fs_config and fs_context patch
 * GUI graphical interface
-* Graphical parsing of plugins supports plugin editing, plugin installation, plugin export
-* Quick updates, secure and stable
+* A graphical plugin manager, plus an editor for plugin script editing. Support plugin installing and exporting
+* Quick updates, secure, stable and fast
 * Unique MSH interpreter that supports running MSH scripts
-* Support installation of ROMs below Android 8 and packaging as IMG
-* Use mkc file chose api on Linux, make use easily
+* Provide backward compatibility with Android 8 and lower and create .img for these versions
+* Use mkc file choose api on Linux, making it easier to use
 ***
 ## * macOS Notice
 ``` shell
@@ -33,9 +33,9 @@
 brew install gettext
 ```
 ## Start To Use
-### Notice!
-#### The Source Only Support Python 3.8 and Newer!
-### Necessary Prepare
+> [!NOTE]
+> Currently Only Support Python 3.8 and Newer!
+### Prerequisites
 <details><summary>macOS</summary>
 
 ```` shell
@@ -65,10 +65,10 @@ pip install -r requirements.txt
 
 </details>
 
-### Then Start
+### Get started
 ```` shell
 python tool.py
-# if you want to package it into binary, you can
+# to create a binary distribution, you could:
 python build.py
 ````
 ***
@@ -81,21 +81,21 @@ python build.py
 ***
 # Contributors:
 ***
-### macOS partial binary compiler: [sk](https://github.com/sekaiacg)
-### Some code provider: [Affggh](https://github.com/affggh)
-### Partial logo designer: [Shaaim](https://github.com/786-shaaim)
+### macOS prebuilt binary for several tools: [sk](https://github.com/sekaiacg)
+### Some part of the code: [Affggh](https://github.com/affggh)
+### Logo co-designer: [Shaaim](https://github.com/786-shaaim)
 ### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
 ### And MORE...
-### Thanks for your help!!
+### Thanks to people like you for helping out!!
 ***
 # About
 ***
 ### MIO-KITCHEN
 ```
-Forever free, user first
-Good Tools, in here!
-Written by MIO-KITCHEN-TEAM
+Always free, users first
+Quality Tools, presented here!
+Brought you by the MIO-KITCHEN-TEAM
 ```
 #### ColdWindScholar(3590361911@qq.com) All Rights Reserved. ####

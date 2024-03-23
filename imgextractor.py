@@ -143,7 +143,7 @@ class Extractor:
                         with open(file_target, 'wb') as out:
                             out.write(entry_inode.open_read().read())
                     except Exception and BaseException as e:
-                        print(f'[E] Cannot Write {file_target}, Because of {e}')
+                        print(f'[E] Cannot Write to {file_target}, Reason: {e}')
                     if os.name == 'posix' and os.geteuid() == 0:
                         os.chmod(file_target, int(mode, 8))
                         os.chown(file_target, uid, gid)
@@ -250,7 +250,7 @@ class Extractor:
             t = ext4.Volume(file)
             real_size = t.get_block_count * t.block_size
             if orig_size < real_size:
-                print(f"......Wrong Size!Fixing.......\nShould:{real_size}\nYours:{orig_size}")
+                print(f"......Your image is smaller than expected! Expanding the file.......\nExpected:{real_size}\nGot:{orig_size}")
                 file.truncate(real_size)
 
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
@@ -267,7 +267,7 @@ class Extractor:
                 mount = mount.split('/')
                 mount = mount[len(mount) - 1]
             if self.__out_name(os.path.basename(output_dir)) != mount and mount and self.FileName != 'mi_ext':
-                print(f"[N]:Your File Name Not Right , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
+                print(f"[N]:Your image file name appears to be wrong , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
                 self.FileName = mount
         if target_type == 's_img':

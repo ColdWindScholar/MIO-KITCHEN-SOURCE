@@ -64,7 +64,7 @@ pip install -r requirements.txt
 ### それではスタート
 ```` shell
 python tool.py
-# if you want to package it into binary, you can
+# to create a binary distribution, you could:
 python build.py
 ````
 ***
@@ -77,9 +77,9 @@ python build.py
 ***
 # 貢献者:
 ***
-### macOS partial binary compiler: [sk](https://github.com/sekaiacg)
-### Some code provider: [Affggh](https://github.com/affggh)
-### Partial logo designer: [Shaaim](https://github.com/786-shaaim)
+### macOS prebuilt binary for several tools: [sk](https://github.com/sekaiacg)
+### Some part of the code: [Affggh](https://github.com/affggh)
+### Logo co-designer: [Shaaim](https://github.com/786-shaaim)
 ### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
