@@ -40,7 +40,8 @@ import sv_ttk
 
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
-        input(f"Your Python version: [{sys.version}] is not supported yet\nThe program will now quit\nSorry for any inconvenience caused")
+        input(
+            f"Your Python version: [{sys.version}] is not supported yet\nThe program will now quit\nSorry for any inconvenience caused")
         sys.exit(1)
 from PIL import Image, ImageTk
 import fspatch
@@ -126,17 +127,7 @@ class load_car:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
-            try:
-                func(*args, **kwargs)
-            except Exception as e:
-                data = [f'Value:{i}={e.__traceback__.tb_frame.f_globals[i]}' for i in
-                        e.__traceback__.tb_frame.f_globals.keys()]
-                data.append(f"\nError File: {e.__traceback__.tb_frame.f_globals.get('__file__')}")
-                data.append(f"\nError Function: {func.__name__}")
-                data.append(f"\nFunction Args: {args, kwargs}")
-                data.append(f"\nError Line:{e.__traceback__.tb_lineno}")
-                data.append(f"\nReason: {e.__repr__()}")
-                error(e.args[0], "\n".join(data))
+            func(*args, **kwargs)
             self.stop()
 
         return call_func
@@ -261,7 +252,7 @@ class Tool(Tk):
                                                                                      expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         sys.stdout = StdoutRedirector(self.show)
-        sys.stderr = StdoutRedirector(self.show)
+        sys.stderr = StdoutRedirector(self.show, error_=True)
         zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
         zyf1.pack(padx=10, pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
@@ -529,7 +520,8 @@ class set_utils:
             self.load()
         else:
             sv_ttk.set_theme("dark")
-            error(1, '缺失配置文件，请重新安装此软件\nSome necessary files were lost, please reinstall this software to fix the problem!')
+            error(1,
+                  '缺失配置文件，请重新安装此软件\nSome necessary files were lost, please reinstall this software to fix the problem!')
 
     def load(self):
         self.config.read(self.set_file)
@@ -765,7 +757,7 @@ class Process(Toplevel):
         process = Text(self)
         process.pack(fill=BOTH)
         sys.stdout = StdoutRedirector(process)
-        sys.stderr = StdoutRedirector(process)
+        sys.stderr = StdoutRedirector(process, error_=True)
         self.start.configure(text="正在运行", state='disabled')
         with open(engine := self.dir + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
@@ -1886,15 +1878,21 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
 
 
 class StdoutRedirector:
-    def __init__(self, text_widget):
+    def __init__(self, text_widget, error_=False):
         self.text_space = text_widget
+        self.error = error_
+        self.error_info = ''
 
     def write(self, string):
+        if self.error:
+            self.error_info += string
+            return
         self.text_space.insert(END, string)
         self.text_space.yview('end')
 
     def flush(self):
-        ...
+        if self.error_info:
+            error(1, self.error_info)
 
 
 def call(exe, kz='Y', out=0, shstate=False, sp=0):
