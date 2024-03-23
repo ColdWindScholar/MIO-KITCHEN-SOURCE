@@ -1477,7 +1477,7 @@ class Install_mpk(Toplevel):
                         pyt = ImageTk.PhotoImage(data=images.none_byte)
             except (Exception, BaseException):
                 pyt = ImageTk.PhotoImage(data=images.none_byte)
-            with myfile.open('%s' % (self.mconf.get('module', 'resource')), 'r') as inner_file:
+            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
         Label(self, image=pyt).pack(padx=10, pady=10)
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
@@ -1976,7 +1976,7 @@ def download_file():
                 try:
                     down.destroy()
                 except Exception as e:
-                    win.message_pop("%s" % e)
+                    win.message_pop(e)
                 win.message_pop(lang.text68, "red")
 
 
