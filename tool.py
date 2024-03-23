@@ -70,7 +70,7 @@ class json_edit:
         with open(self.file, 'r+', encoding='utf-8') as pf:
             try:
                 return json.loads(pf.read())
-            except BaseException or Exception:
+            except (BaseException, Exception):
                 return {}
 
     def write(self, data):
