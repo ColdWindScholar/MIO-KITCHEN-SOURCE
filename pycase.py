@@ -3,7 +3,7 @@
 set directory case sensitive on Windows directly with ctypes
 
 **requires WSL to be enabled**
-
+BASED ON CODE FROM https://github.com/microsoft/WSL/issues/2954 !!!
 thus for Windows 10 1903 and up
 """
 
