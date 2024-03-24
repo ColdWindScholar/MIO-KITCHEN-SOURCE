@@ -32,8 +32,3 @@ def readlink(path):
             return os.readlink(path)
         else:
             return ''
-
-
-if os.name == 'nt':
-    # TODO: Add Case Sensitive
-    pass

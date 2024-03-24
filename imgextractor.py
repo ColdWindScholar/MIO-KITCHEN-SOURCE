@@ -11,6 +11,11 @@ if os.name == 'nt':
 from timeit import default_timer as dti
 from utils import simg2img
 
+try:
+    from pycase import ensure_dir_case_sensitive
+except ImportError:
+    ensure_dir_case_sensitive = lambda *x: ...
+
 
 class Extractor:
     def __init__(self):
@@ -133,6 +138,11 @@ class Extractor:
                         dir_target = dir_target[:-1]
                     if not os.path.isdir(dir_target):
                         os.makedirs(dir_target)
+                        if os.name == 'nt' and windll.shell32.IsUserAnAdmin():
+                            try:
+                                ensure_dir_case_sensitive(dir_target)
+                            except (Exception, BaseException):
+                                ...
                     if os.name == 'posix' and os.geteuid() == 0:
                         os.chmod(dir_target, int(mode, 8))
                         os.chown(dir_target, uid, gid)
@@ -250,7 +260,9 @@ class Extractor:
             t = ext4.Volume(file)
             real_size = t.get_block_count * t.block_size
             if orig_size < real_size:
-                print(f"......Your image is smaller than expected! Expanding the file.......\nExpected:{real_size}\nGot:{orig_size}")
+                print(
+                    f"......Your image is smaller than expected! Expanding the file.......\n"
+                    f"Expected:{real_size}\nGot:{orig_size}")
                 file.truncate(real_size)
 
     def main(self, target: str, output_dir: str, work: str, target_type: str = 'img'):
@@ -269,7 +281,8 @@ class Extractor:
             if [True for i in [".", "@", "#"] if i in mount]:
                 mount = ""
             if self.__out_name(os.path.basename(output_dir)) != mount and mount and self.FileName != 'mi_ext':
-                print(f"[N]:Your image file name appears to be wrong , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
+                print(
+                    f"[N]:Filename appears to be wrong , We will Extract {self.OUTPUT_IMAGE_FILE} to {mount}")
                 self.EXTRACT_DIR = os.path.realpath(os.path.dirname(output_dir)) + os.sep + mount
                 self.FileName = mount
         if target_type == 's_img':
