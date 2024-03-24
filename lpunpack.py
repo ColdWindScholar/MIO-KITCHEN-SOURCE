@@ -653,19 +653,20 @@ class SparseImage:
                     if chunk_header.chunk_type == 0xCAC2:
                         data = self._read_data(chunk_data_size)
                         len_data = sector_size << 9
-                        out.write(struct.pack("B", 0) * len_data)
+                        out.truncate(out.tell() + len_data)
                         output_len += len(data)
                         sector_base += sector_size
                     else:
                         if chunk_header.chunk_type == 0xCAC3:
                             data = self._read_data(chunk_data_size)
                             len_data = sector_size << 9
-                            out.write(struct.pack("B", 0) * len_data)
+                            out_seek = out.tell()
+                            out.truncate(out_seek + len_data)
                             output_len += len(data)
                             sector_base += sector_size
                         else:
                             len_data = sector_size << 9
-                            out.write(struct.pack("B", 0) * len_data)
+                            out.truncate(out.tell() + len_data)
                             sector_base += sector_size
                 chunks -= 1
         return unsparse_file
