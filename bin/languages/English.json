@@ -187,7 +187,7 @@
   "t22": "Version:",
   "t23": "Required Libraries:",
   "t24": "Description：",
-  "t25": "Also make the resulting ROM package friendly for flashing via a PC?",
+  "t25": "Also include the flashing tools for using on a PC?",
   "t26": "Please enter your device codename",
   "t27": "Generate LIST",
   "t28": "Working",
