@@ -2911,11 +2911,10 @@ def img2simg(path):
             print(e)
 
 
-class format_conversion(Toplevel):
+class format_conversion(ttk.LabelFrame):
     def __init__(self):
-        super().__init__()
-        self.resizable(False, False)
-        self.title(lang.t13)
+        super().__init__(text=lang.t13)
+        self.place(relx=0.5, rely=0.5, anchor="center")
         self.f = Frame(self)
         self.f.pack(pady=5, padx=5, fill=X)
         self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
@@ -2930,7 +2929,6 @@ class format_conversion(Toplevel):
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         self.relist()
         ttk.Button(self, text=lang.ok, command=lambda: cz(self.conversion)).pack(side=BOTTOM, fill=BOTH)
-        jzxs(self)
 
     def relist(self):
         work = rwork()
