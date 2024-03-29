@@ -25,6 +25,7 @@ class Extractor:
         self.EXTRACT_DIR = ""
         self.context = []
         self.fs_config = []
+        self.space = []
 
     @staticmethod
     def __out_name(file_path, out=1):
@@ -32,10 +33,10 @@ class Extractor:
         return name.split('-')[0].split(' ')[0].split('+')[0].split('{')[0].split('(')[0]
 
     @staticmethod
-    def __append(msg, log):
+    def __write(msg, log):
         if not os.path.isfile(log) and not os.path.exists(log):
             open(log, 'tw', encoding='utf-8').close()
-        with open(log, 'a', newline='\n') as file:
+        with open(log, 'w', newline='\n') as file:
             print(msg, file=file)
 
     @staticmethod
@@ -126,7 +127,7 @@ class Extractor:
                         link_target = root_inode.volume.read(link_target_block * root_inode.volume.block_size,
                                                              entry_inode.inode.i_size).decode("utf8")
                 if tmp_path.find(' ', 1, len(tmp_path)) > 0:
-                    self.__append(tmp_path, os.path.join(self.CONFIG_DIR, self.FileName + '_space.txt'))
+                    self.space.append(tmp_path)
                     self.fs_config.append(
                         f"{tmp_path.replace(' ', '_')} {uid} {gid} {mode}{cap} {link_target}")
                 else:
@@ -193,14 +194,15 @@ class Extractor:
 
         if not os.path.isdir(self.CONFIG_DIR):
             os.makedirs(self.CONFIG_DIR)
-        self.__append(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFIG_DIR + os.sep + self.FileName + '_size.txt')
+        self.__write(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFIG_DIR + os.sep + self.FileName + '_size.txt')
         with open(self.OUTPUT_IMAGE_FILE, 'rb') as file:
             dir_r = self.FileName
             scan_dir(ext4.Volume(file).root)
             self.fs_config.insert(0, '/ 0 2000 0755' if dir_r == 'vendor' else '/ 0 0 0755')
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
             self.fs_config.insert(2 if dir_r == 'system' else 1, f'{dir_r} 0 0 0755')
-            self.__append('\n'.join(self.fs_config), self.CONFIG_DIR + os.sep + self.FileName + '_fs_config')
+            self.__write('\n'.join(self.fs_config), self.CONFIG_DIR + os.sep + self.FileName + '_fs_config')
+            self.__write('\n'.join(self.space), os.path.join(self.CONFIG_DIR, self.FileName + '_space.txt'))
             p1 = p2 = 0
             if self.context:
                 self.context.sort()
@@ -217,7 +219,7 @@ class Extractor:
                         p2 = 1
                     if p1 == p2 == 1:
                         break
-                self.__append('\n'.join(self.context), self.CONFIG_DIR + os.sep + self.FileName + "_file_contexts")
+                self.__write('\n'.join(self.context), self.CONFIG_DIR + os.sep + self.FileName + "_file_contexts")
 
     @staticmethod
     def fix_moto(input_file):
