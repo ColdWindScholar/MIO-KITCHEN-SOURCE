@@ -340,7 +340,8 @@ class BlockImageDiff(object):
         self.ComputePatches(prefix)
         self.WriteTransfers(prefix)
 
-    def HashBlocks(self, source, ranges):  # pylint: disable=no-self-use
+    @staticmethod
+    def HashBlocks(source, ranges):  # pylint: disable=no-self-use
         data = source.ReadRangeSet(ranges)
         ctx = sha1()
 
@@ -1005,27 +1006,32 @@ class BlockImageDiff(object):
             while sinks:
                 new_sinks = set()
                 for u in sinks:
-                    if u not in G: continue
+                    if u not in G:
+                        continue
                     s2.appendleft(u)
                     del G[u]
                     for iu in u.incoming:
                         adjust_score(iu, -iu.outgoing.pop(u))
-                        if not iu.outgoing: new_sinks.add(iu)
+                        if not iu.outgoing:
+                            new_sinks.add(iu)
                 sinks = new_sinks
 
             # Put all the sources at the beginning of the sequence.
             while sources:
                 new_sources = set()
                 for u in sources:
-                    if u not in G: continue
+                    if u not in G:
+                        continue
                     s1.append(u)
                     del G[u]
                     for iu in u.outgoing:
                         adjust_score(iu, +iu.incoming.pop(u))
-                        if not iu.incoming: new_sources.add(iu)
+                        if not iu.incoming:
+                            new_sources.add(iu)
                 sources = new_sources
 
-            if not G: break
+            if not G:
+                break
 
             # Find the "best" vertex to put next.  "Best" is the one that
             # maximizes the net difference in source blocks saved we get by
@@ -1041,11 +1047,13 @@ class BlockImageDiff(object):
             del G[u]
             for iu in u.outgoing:
                 adjust_score(iu, +iu.incoming.pop(u))
-                if not iu.incoming: sources.add(iu)
+                if not iu.incoming:
+                    sources.add(iu)
 
             for iu in u.incoming:
                 adjust_score(iu, -iu.outgoing.pop(u))
-                if not iu.outgoing: sinks.add(iu)
+                if not iu.outgoing:
+                    sinks.add(iu)
 
         # Now record the sequence in the 'order' field of each transfer,
         # and by rearranging self.transfers to be in the chosen sequence.
@@ -1083,7 +1091,8 @@ class BlockImageDiff(object):
             intersections = set()
             for s, e in a.tgt_ranges:
                 for i in range(s, e):
-                    if i >= len(source_ranges): break
+                    if i >= len(source_ranges):
+                        break
                     b = source_ranges[i]
                     if b is not None:
                         if isinstance(b, set):
