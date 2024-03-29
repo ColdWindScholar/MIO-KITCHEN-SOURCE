@@ -2472,15 +2472,15 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     value = IntVar()
     ask = ttk.LabelFrame(win)
     ask.place(relx=0.5, rely=0.5, anchor="center")
-    frameInner = ttk.Frame(ask)
-    frameInner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frameInner, text=text, font=(None, 20)).pack(side=TOP)
-    frameButton = ttk.Frame(frameInner)
-    frameButton.pack(side=TOP)
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20)).pack(side=TOP)
+    frame_button = ttk.Frame(frame_inner)
+    frame_button.pack(side=TOP)
 
-    ttk.Button(frameButton, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
+    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                             expand=True)
-    ttk.Button(frameButton, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
+    ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
                                                                                                 pady=5,
                                                                                                 fill=BOTH,
                                                                                                 expand=True)
