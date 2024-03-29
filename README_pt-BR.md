@@ -1,27 +1,29 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
-#### A ferramenta ROM escrita em Python
+#### Uma ferramenta ROM escrita em Python
+> [!CAUTION]
+> Proibido o uso comercial não autorizado
 ***
 ## Esta ferramenta usa muitos projetos de código aberto. Preste homenagem aos desenvolvedores!
 ***
 ## Localização
-### Japonês: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
-### Chinês: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
-### Inglês: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
-### Alemão: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
+### 日本語: [ja-JP](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md)
+### 中文: [zh-CN](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md)
+### English: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
+### Deutsch: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
 ***
 ## Características
 * Desempacote o boot, dtbo, ext4, erofs, payload, logo e assim por diante
 * Empacote o boot, dtbo, ext4, erofs, payload, logo e assim por diante
 ***
 ## Vantagens
-* Reparar CONTEXTO automaticamente
-* Interface gráfica do usuário
-* Análise gráfica de plugins suporta edição de plugins, instalação de plugins e exportação de plugins
-* Atualizações rápidas, seguras e estáveis
-* Intérprete o MSH exclusivo que suporta a execução de scripts MSH
-* Suporta instalação de ROMs abaixo do Android 8 e empacotamento como IMG
-* Use um arquivo mkc para escolher a API no Linux, facilitando o uso
+* Patch automático de fs_config e fs_context.
+* Interface gráfica do usuário.
+* Um gerenciador gráfico de plugins, além de um editor para edição de scripts de plugins. Suporte para instalação e exportação de plugins.
+* Atualizações rápidas, seguras, estáveis ​​e rápidas.
+* Intérprete o MSH exclusivo que suporta a execução de scripts MSH.
+* Forneça compatibilidade com versões anteriores do Android 8 e inferior e crie .img para essas versões.
+* Use o arquivo mkc e escolha a api no Linux, facilitando o uso.
 ***
 ## * Aviso macOS
 ``` shell
@@ -31,7 +33,9 @@
 brew install gettext
 ```
 ## Comece a usar
-### Preparação necessária
+> [!NOTE]
+> Atualmente suporta apenas Python 3.8 e mais recente
+### Pré-requisitos
 <details><summary>macOS</summary>
 
 ```` shell
@@ -61,10 +65,10 @@ pip install -r requirements.txt
 
 </details>
 
-### Então comece
+### Iniciar
 ```` shell
 python tool.py
-# se você quiser empacotá-lo em binário, você pode
+# para criar uma distribuição binária, você poderia:
 python build.py
 ````
 ***
@@ -77,21 +81,21 @@ python build.py
 ***
 # Contribuidores:
 ***
-### Compilador binário parcial macOS: [sk](https://github.com/sekaiacg)
-### Algum provedor de código: [Affggh](https://github.com/affggh)
-### Designer do logotipo parcial: [Shaaim](https://github.com/786-shaaim)
+### Binário pré-construído do macOS para diversas ferramentas: [sk](https://github.com/sekaiacg)
+### Alguma parte do código: [Affggh](https://github.com/affggh)
+### Co-designer do logotipo: [Shaaim](https://github.com/786-shaaim)
 ### Tradutor japonês: [reindex-ot](https://github.com/reindex-ot)
 ### Tradutor português (Brasil): [igor](https://github.com/igormiguell)
 ### Tradutor alemão: [keldrion](https://github.com/keldrion)
 ### E MAIS...
-### Obrigado pela sua ajuda!!
+### Obrigado a pessoas como você por ajudar!
 ***
 # Sobre
 ***
 ### MIO-KITCHEN
 ```
-Sempre grátis, primeiro usuário
-Boas ferramentas, aqui!
+Sempre gratuito, primeiros usuários
+Ferramentas de qualidade, apresentadas aqui!
 Escrito por MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) Todos os Direitos Reservados. ####
+#### ColdWindScholar (3590361911@qq.com) Todos os Direitos Reservados. ####
