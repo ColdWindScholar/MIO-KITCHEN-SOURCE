@@ -2401,7 +2401,12 @@ def unpack(chose, form: any = None):
             if gettype(work + i + ".img") in ['boot', 'vendor_boot']:
                 jboot(i)
             if i == 'logo':
-                logo_dump(i)
+                try:
+                    utils.LOGO_DUMPER(work + i + ".img", work + i).check_img(work + i + ".img")
+                except AssertionError:
+                    pass
+                else:
+                    logo_dump(i)
             if gettype(work + i + ".img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{i}")
                 utils.vbpatch(work + i + ".img").disavb()
