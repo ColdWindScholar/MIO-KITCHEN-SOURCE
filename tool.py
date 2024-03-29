@@ -298,7 +298,8 @@ class Tool(Tk):
               font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
         self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
-        Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10, side='bottom')
+        Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10)
+        ttk.Button(tab, text=lang.text17, command=tab.destroy).pack(fill=X, side='bottom')
 
     def setting_tab(self):
         self.show_local = StringVar()
