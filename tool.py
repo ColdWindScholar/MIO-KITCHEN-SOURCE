@@ -2146,7 +2146,10 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                                         ext4_size_value = int(_i[2])
                     elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
                         with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
-                            ext4_size_value = int(f.read().strip())
+                            try:
+                                ext4_size_value = int(f.read().strip())
+                            except ValueError:
+                                ext4_size_value = 0
 
                 make_ext4fs(dname, work, "-s" if dbgs.get() in ["dat", "br", "sparse"] else '',
                             ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
