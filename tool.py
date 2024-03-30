@@ -1321,13 +1321,12 @@ def mpkman() -> None:
                     ...
             elif os.path.exists(script_path + "main.msh"):
                 msh_parse(script_path + "main.msh")
-        else:
-            if not os.path.exists(moduledir + os.sep + value):
+        elif not os.path.exists(moduledir + os.sep + value):
                 win.message_pop(lang.warn7.format(value))
                 list_pls()
                 win.tab7.lift()
-            else:
-                print(lang.warn8)
+        else:
+            print(lang.warn8)
 
     class uninstall_mpk:
 
