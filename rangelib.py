@@ -300,9 +300,3 @@ class RangeSet(object):
                 out += (s, e)
                 n -= e - s
         return RangeSet(data=out)
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
