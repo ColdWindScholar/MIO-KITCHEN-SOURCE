@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import bisect
+from bisect import bisect_right
 import os
 import sys
 import struct
@@ -21,7 +21,7 @@ from hashlib import sha1
 import rangelib
 
 
-class SparseImage(object):
+class SparseImage:
     """Wraps a sparse image file into an image object.
 
   Wraps a sparse image file (and optional file map and clobbered_blocks) into
@@ -174,7 +174,7 @@ class SparseImage(object):
         f = self.simg_f
         for s, e in ranges:
             to_read = e - s
-            idx = bisect.bisect_right(self.offset_index, s) - 1
+            idx = bisect_right(self.offset_index, s) - 1
             chunk_start, chunk_len, filepos, fill_data = self.offset_map[idx]
 
             # for the first chunk we may be starting partway through it.
@@ -245,7 +245,7 @@ class SparseImage(object):
         f = self.simg_f
         for s, e in remaining:
             for b in range(s, e):
-                idx = bisect.bisect_right(self.offset_index, b) - 1
+                idx = bisect_right(self.offset_index, b) - 1
                 chunk_start, _, filepos, fill_data = self.offset_map[idx]
                 if filepos is not None:
                     filepos += (b - chunk_start) * self.blocksize
