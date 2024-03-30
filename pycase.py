@@ -246,4 +246,3 @@ def ensure_dir_case_sensitive(path: str):
                 CloseHandle(h2)
     finally:
         CloseHandle(h)
-
