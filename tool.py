@@ -1133,9 +1133,7 @@ def mpkman() -> None:
                     print("脚本不存在：%s" % argv)
                     return 1
                 else:
-                    print("开始执行:%s" % os.path.basename(argv))
                     self.__init__(argv)
-                    print("执行完成：%s" % os.path.basename(argv))
             else:
                 print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]')
 
