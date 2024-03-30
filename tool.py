@@ -33,7 +33,7 @@ import zipfile
 from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -286,7 +286,7 @@ class Tool(Tk):
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
         # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         ttk.Label(self.tab4, text="Open Source, Free, Faster", cursor="hand2",
-                         style="Link.TLabel").pack()
+                  style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
@@ -1155,16 +1155,6 @@ def mpkman() -> None:
             super().__init__()
             self.value = []
 
-            def callcmd(cmd):
-                if cmd.split()[0] == "msg":
-                    messagebox.showinfo(cmd.split()[1], cmd.split()[2])
-                elif cmd.split()[0] == "start":
-                    cz(call(cmd[cmd.index(' ') + 1:], 'N'))
-                elif cmd.split()[0] == "exec":
-                    exec(cmd[cmd.index(' ') + 1:])
-                else:
-                    print(lang.text27, cmd)
-
             def generate_sh():
                 temp = os.path.join(elocal, "bin", "temp")
                 if not os.path.exists(temp):
@@ -1216,7 +1206,7 @@ def mpkman() -> None:
                             elif con["type"] == "button":
                                 button_command = con['command']
                                 button = ttk.Button(group_frame, text=con['text'],
-                                                    command=lambda: callcmd(button_command))
+                                                    command=lambda: print(button_command))
                                 button.pack(side='left')
                             elif con["type"] == "filechose":
                                 ft = ttk.Frame(group_frame)

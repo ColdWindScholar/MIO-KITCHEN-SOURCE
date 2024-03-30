@@ -61,15 +61,7 @@ def main(file_arg):
 
     def keytest(data):
         for key in keys:
-            ctx = AES.new(binascii.unhexlify(key), AES.MODE_ECB)
-            dat = ctx.decrypt(data)
-            if dat[0:4] == b'\x50\x4B\x03\x04':
-                print("Found correct AES key: " + key)
-                return binascii.unhexlify(key)
-            elif dat[0:4] == b'\x41\x56\x42\x30':
-                print("Found correct AES key: " + key)
-                return binascii.unhexlify(key)
-            elif dat[0:4] == b'\x41\x4E\x44\x52':
+            if AES.new(binascii.unhexlify(key), AES.MODE_ECB).decrypt(data)[0:4] in [b'\x50\x4B\x03\x04', b'\x41\x56\x42\x30', b'\x41\x4E\x44\x52']:
                 print("Found correct AES key: " + key)
                 return binascii.unhexlify(key)
         return -1
@@ -170,8 +162,7 @@ def main(file_arg):
                             with open(os.path.join(temp, "out"), 'rb') as rr:
                                 if rr.read(12) == b"OPPOENCRYPT!":
                                     rr.seek(0x50)
-                                    data = rr.read(16)
-                                    key = keytest(data)
+                                    key = keytest(rr.read(16))
                                     if key == -1:
                                         print("Unknown AES key, reverse key from recovery first!")
                                         return 1
@@ -270,8 +261,7 @@ def main(file_arg):
                         if zo.extract(fname, outpath):
                             with open(os.path.join(outpath, fname.replace("/", os.sep)), "rb") as rt:
                                 rt.seek(0x1050)
-                                data = rt.read(16)
-                                key = keytest(data)
+                                key = keytest(rt.read(16))
                                 if key == -1:
                                     print("Unknown AES key, reverse key from recovery first!")
                                     return 1
