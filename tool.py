@@ -1079,10 +1079,7 @@ def mpkman() -> None:
 
         def set(self, cmd):
             try:
-                if "=" in cmd:
-                    vn, va = cmd.strip().split("=")
-                else:
-                    vn, va = cmd.strip().split()
+                vn, va = cmd.strip().split("=" if "=" in cmd else None)
             except Exception as e:
                 print("赋值异常：%s\n语句：%s" % (e, cmd))
                 return 1
@@ -1090,7 +1087,8 @@ def mpkman() -> None:
 
         def runline(self, i):
             for key, value in self.envs.items():
-                i = i.replace(f'@{key}@', str(value)).strip()
+                if "@" in i:
+                    i = i.replace(f'@{key}@', str(value)).strip()
             if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
                 if i.split()[0] == "if":
                     self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
