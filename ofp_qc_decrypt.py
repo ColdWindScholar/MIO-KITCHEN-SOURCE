@@ -197,10 +197,7 @@ def decryptfile(key, iv, filename, path, wfilename, start, length, rlength, chec
 def checkhashfile(wfilename, checksums, iscopy):
     sha256sum = checksums[0]
     md5sum = checksums[1]
-    if iscopy:
-        prefix = "Copy: "
-    else:
-        prefix = "Decrypt: "
+    prefix = "Copy: " if iscopy else "Decrypt: "
     with open(wfilename, "rb") as rf:
         size = os.stat(wfilename).st_size
         md5 = hashlib.md5(rf.read(0x40000))
@@ -208,7 +205,7 @@ def checkhashfile(wfilename, checksums, iscopy):
         md5bad = False
         md5status = "empty"
         sha256status = "empty"
-        if sha256sum != "":
+        if sha256sum:
             for x in [0x40000, size]:
                 rf.seek(0)
                 # sha256 = hashlib.sha256(rf.read(x))
@@ -224,7 +221,7 @@ def checkhashfile(wfilename, checksums, iscopy):
                 else:
                     sha256status = "verified"
                     break
-        if md5sum != "":
+        if md5sum:
             if md5sum != md5.hexdigest():
                 md5bad = True
                 md5status = "bad"

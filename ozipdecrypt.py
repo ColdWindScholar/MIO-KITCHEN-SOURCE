@@ -266,7 +266,7 @@ def main(file_arg):
                         fname = "firmware-update/vbmeta.img"
                     elif "vbmeta.img" in clist:
                         fname = 'vbmeta.img'
-                    if fname != '':
+                    if fname:
                         if zo.extract(fname, outpath):
                             with open(os.path.join(outpath, fname.replace("/", os.sep)), "rb") as rt:
                                 rt.seek(0x1050)
