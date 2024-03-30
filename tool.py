@@ -41,7 +41,7 @@ import sv_ttk
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
         input(
-            f"Your Python version: [{sys.version}] is not supported yet\nThe program will now quit\nSorry for any inconvenience caused")
+            f"Your Python version: [{sys.version}] is not supported yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
 from PIL import Image, ImageTk
 import fspatch
