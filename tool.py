@@ -1318,9 +1318,9 @@ def mpkman() -> None:
                 except Exception:
                     ...
         elif not os.path.exists(moduledir + os.sep + value):
-                win.message_pop(lang.warn7.format(value))
-                list_pls()
-                win.tab7.lift()
+            win.message_pop(lang.warn7.format(value))
+            list_pls()
+            win.tab7.lift()
         else:
             print(lang.warn8)
 
