@@ -1,5 +1,5 @@
 import ctypes
-import functools
+from functools import cmp_to_key
 import io
 import math
 import queue
@@ -648,7 +648,7 @@ class Inode:
         else:
             return -1 if file_type_a == InodeType.DIRECTORY else 1
 
-    directory_entry_key = functools.cmp_to_key(directory_entry_comparator)
+    directory_entry_key = cmp_to_key(directory_entry_comparator)
 
     def get_inode(self, *relative_path, decode_name=None):
         if not self.is_dir:
