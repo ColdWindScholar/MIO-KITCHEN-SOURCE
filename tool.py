@@ -846,16 +846,11 @@ class IconGrid(tk.Frame):
         self.canvas = tk.Canvas(self)
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas)
-
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
         self.canvas.pack(side="left", fill="both")
         self.scrollbar.pack(side="right", fill="y")
-
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-
         self.scrollable_frame.bind("<Configure>", lambda *x: self.on_frame_configure())
-
         # Bind mouse wheel event to scrollbar
         self.master.bind_all("<MouseWheel>", self.on_mousewheel)
 
