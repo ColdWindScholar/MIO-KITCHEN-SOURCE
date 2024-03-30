@@ -1313,14 +1313,14 @@ def mpkman() -> None:
                     f.write(
                         "export project='{}'\nsource $1".format(
                             (settings.path + os.sep + dn.get()).replace('\\', '/')))
-                if os.path.exists(file.get()):
-                    call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
-                    try:
-                        os.remove(file.get())
-                    except Exception:
-                        ...
-                elif os.path.exists(msh_tmp := script_path + "main.msh"):
-                    msh_parse(msh_tmp)
+            if os.path.exists(file.get()):
+                call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
+                try:
+                    os.remove(file.get())
+                except Exception:
+                    ...
+            elif os.path.exists(script_path + "main.msh"):
+                msh_parse(script_path + "main.msh")
         else:
             if not os.path.exists(moduledir + os.sep + value):
                 win.message_pop(lang.warn7.format(value))
