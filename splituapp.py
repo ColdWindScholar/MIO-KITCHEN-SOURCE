@@ -8,10 +8,9 @@
 
 from __future__ import print_function
 
+from os import makedirs, sep
 from string import printable
 from struct import unpack
-import sys
-from os import makedirs, name, sep, path
 
 
 def extract(source, flist):
@@ -68,19 +67,6 @@ def extract(source, flist):
                     return
 
                 img_files.append(filename)
-
-                if name != 'nt':
-                    if path.isfile('crc'):
-                        print('Calculating crc value for ' + filename + '.img ...\n')
-
-                        crc_val = []
-                        if sys.version_info.major < 3:
-                            for i in crc_data:
-                                crc_val.append('%02X' % int(i))
-                        else:
-                            for i in crc_data:
-                                crc_val.append('%02X' % i)
-
             else:
                 f.seek(file_size, 1)
 
