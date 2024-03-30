@@ -1,7 +1,7 @@
 import ctypes
 from functools import cmp_to_key
 import io
-import math
+from math import log as log_math
 import queue
 
 
@@ -821,7 +821,7 @@ class Inode:
             return "{0:d} bytes".format(self.inode.i_size) if self.inode.i_size != 1 else "1 byte"
         else:
             units = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
-            unit_idx = min(int(math.log(self.inode.i_size, 1024)), len(units))
+            unit_idx = min(int(log_math(self.inode.i_size, 1024)), len(units))
 
             return f"{self.inode.i_size / (1024 ** unit_idx):.2f} {units[unit_idx - 1]:s}"
 
