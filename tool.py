@@ -2479,11 +2479,11 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     frame_button.pack(side=TOP)
 
     ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
-                                                                            expand=True)
+                                                                             expand=True)
     ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
-                                                                                                pady=5,
-                                                                                                fill=BOTH,
-                                                                                                expand=True)
+                                                                                                 pady=5,
+                                                                                                 fill=BOTH,
+                                                                                                 expand=True)
 
     def close_ask(value_=1):
         value.set(value_)
@@ -2890,17 +2890,6 @@ class unpack_gui(ttk.LabelFrame):
             packxx(lbs)
 
 
-if int(settings.oobe) < 4:
-    welcome()
-win.gui()
-unpackg = unpack_gui()
-project_menu = project_menu_utils()
-project_menu.gui()
-unpackg.gui()
-frame3().gui()
-project_menu.listdir()
-
-
 def img2simg(path):
     call('img2simg {} {}'.format(path, path + 's'))
     if os.path.exists(path + 's'):
@@ -3049,10 +3038,26 @@ class format_conversion(ttk.LabelFrame):
         print(lang.text8)
 
 
-cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
-cartoon.init()
-print(lang.text108)
-win.update()
-jzxs(win)
-print(lang.text134 % (dti() - start))
-win.mainloop()
+def init():
+    if int(settings.oobe) < 4:
+        welcome()
+    win.gui()
+    global unpackg
+    unpackg = unpack_gui()
+    global project_menu
+    project_menu = project_menu_utils()
+    project_menu.gui()
+    unpackg.gui()
+    frame3().gui()
+    project_menu.listdir()
+    cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
+    cartoon.init()
+    print(lang.text108)
+    win.update()
+    jzxs(win)
+    print(lang.text134 % (dti() - start))
+    win.mainloop()
+
+
+if __name__ == "__main__":
+    init()
