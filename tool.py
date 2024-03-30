@@ -308,11 +308,13 @@ class Tool(Tk):
         self.show_local.set(settings.path)
         ai = StringVar()
         ai.set(settings.ai_engine)
+        context = StringVar(value=settings.contextpatch)
 
         def on_value_change():
             settings.set_value('ai_engine', ai.get())
 
         ai.trace("w", lambda *x: on_value_change())
+        context.trace("w", lambda *x: settings.set_value('contextpatch', context.get()))
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -332,6 +334,9 @@ class Tool(Tk):
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
+                        offvalue='0',
+                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')
@@ -2073,7 +2078,8 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
                     print(e)
             fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
             utils.qc(work + "config" + os.sep + dname + "_fs_config")
-            contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
+            if settings.contextpatch == "1":
+                contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
             utils.qc(work + "config" + os.sep + dname + "_file_contexts")
             if erofsext4:
                 if parts_dict[dname] == 'erofs':
