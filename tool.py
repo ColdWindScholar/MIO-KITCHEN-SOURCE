@@ -1177,23 +1177,7 @@ def mpkman() -> None:
                 if not os.path.exists(temp):
                     re_folder(temp)
                 file.set(os.path.join(temp, v_code()))
-                with open(file.get(), "w", encoding='UTF-8', newline="\n") as _f_:
-                    for va in self.value:
-                        if gva := self.gavs[va].get():
-                            if gva is str and os.path.isabs(gva) and os.name == 'nt':
-                                if os.sep in gva:
-                                    gva = gva.replace(os.sep, '/')
-                            _f_.write(f"export {va}='{gva}'\n")
-                        else:
-                            continue
-                    _f_.write('export version="{}"\n'.format(settings.version))
-                    _f_.write('export tool_bin="{}"\n'.format(tool_bin.replace('\\', '/')))
-                    _f_.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
-                    _f_.write(
-                        "export project='{}'\nsource $1".format((settings.path + os.sep + dn.get()).replace('\\', '/')))
                 self.destroy()
-                self.gavs.clear()
-                self.value.clear()
 
             def generate_msh():
                 for va in self.value:
@@ -1310,34 +1294,31 @@ def mpkman() -> None:
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
-                parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
-                if os.path.exists(script_path + "main.sh") and file.get():
-                    call("busybox {} {} {}".format(sh, file.get(),
-                                                   (script_path + "main.sh").replace(
-                                                       '\\',
-                                                       '/')))
-                    os.remove(file.get())
-                elif os.path.exists(os.path.join(moduledir, value, "main.msh")):
-                    msh_parse(os.path.join(moduledir, value, "main.msh"))
-            else:
-                if os.path.exists(os.path.join(moduledir, value, "main.sh")):
-                    if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
-                        re_folder(temp)
-                    if not file.get():
-                        file.set(temp + v_code())
-                    with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                        f.write('export tool_bin="{}"\n'.format(
-                            tool_bin.replace(
-                                '\\',
-                                '/')))
-                        f.write('export version="{}"\n'.format(settings.version))
-                        f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
-                        f.write(
-                            "export project='{}'\nsource $1".format(
-                                (settings.path + os.sep + dn.get()).replace('\\', '/')))
-                    if os.path.exists(file.get()):
-                        call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
+                values = parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
+                if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
+                    re_folder(temp)
+                if not file.get():
+                    file.set(temp + v_code())
+                with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                    for va in values.value:
+                        if gva := values.gavs[va].get():
+                            f.write(f"export {va}='{gva}'\n")
+                    f.write('export tool_bin="{}"\n'.format(
+                        tool_bin.replace(
+                            '\\',
+                            '/')))
+                    f.write('export version="{}"\n'.format(settings.version))
+                    f.write('export language="{}"\n'.format(settings.language))
+                    f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
+                    f.write(
+                        "export project='{}'\nsource $1".format(
+                            (settings.path + os.sep + dn.get()).replace('\\', '/')))
+                if os.path.exists(file.get()):
+                    call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
+                    try:
                         os.remove(file.get())
+                    except Exception:
+                        ...
                 elif os.path.exists(msh_tmp := script_path + "main.msh"):
                     msh_parse(msh_tmp)
         else:
@@ -1492,7 +1473,7 @@ class Install_mpk(Toplevel):
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=('黑体', 12))
         self.state.pack(padx=10, pady=10)
-        self.installb = ttk.Button(self, text=lang.text41, command=lambda: cz(self.install))
+        self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: cz(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         jzxs(self)
         self.wait_window()
