@@ -1284,27 +1284,30 @@ def mpkman() -> None:
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
                 values = parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
-                if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
-                    re_folder(temp)
-                if not file.get():
-                    file.set(temp + v_code())
-                with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+            else:
+                values = None
+            if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
+                re_folder(temp)
+            if not file.get():
+                file.set(temp + v_code())
+            with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
+                if values:
                     for va in values.value:
                         if gva := values.gavs[va].get():
                             f.write(f"export {va}='{gva}'\n")
-                    f.write('export tool_bin="{}"\n'.format(
-                        tool_bin.replace(
-                            '\\',
-                            '/')))
-                    f.write('export version="{}"\n'.format(settings.version))
-                    f.write('export language="{}"\n'.format(settings.language))
-                    f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
-                    f.write(
-                        "export project='{}'\nsource $1".format(
-                            (settings.path + os.sep + dn.get()).replace('\\', '/')))
+                f.write('export tool_bin="{}"\n'.format(
+                    tool_bin.replace(
+                        '\\',
+                        '/')))
+                f.write('export version="{}"\n'.format(settings.version))
+                f.write('export language="{}"\n'.format(settings.language))
+                f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
+                f.write(
+                    "export project='{}'\nsource $1".format(
+                        (settings.path + os.sep + dn.get()).replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
                 msh_parse(script_path + "main.msh")
-            elif os.path.exists(file.get()) and os.path.exists((script_path + "main.sh")):
+            elif os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
                 call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
                 try:
                     os.remove(file.get())
