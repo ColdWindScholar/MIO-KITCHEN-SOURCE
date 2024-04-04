@@ -2409,11 +2409,7 @@ def unpack(chose, form: any = None):
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
                 print(lang.text79 + i + ".img [%s]" % file_type)
-                try:
-                    imgextractor.Extractor().main(work + i + ".img", work + i, work)
-                except Exception as e:
-                    print(f"Unpack failed..{e}")
-                    continue
+                imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 if os.path.exists(work + i):
                     try:
                         os.remove(work + i + ".img")
