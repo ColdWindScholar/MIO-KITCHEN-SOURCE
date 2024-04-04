@@ -400,6 +400,7 @@ def error(code, desc="未知错误"):
     er.resizable(False, False)
     jzxs(er)
     Label(er, text="Error:0x%s" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
+    Label(er, text="It seems that we have encountered a problem").pack(padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er)
