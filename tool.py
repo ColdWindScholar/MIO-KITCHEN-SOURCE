@@ -1284,7 +1284,7 @@ def mpkman() -> None:
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
                 values = parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
-                if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
+                if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
                     re_folder(temp)
                 if not file.get():
                     file.set(temp + v_code())
