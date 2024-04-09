@@ -395,7 +395,7 @@ def error(code, desc="unknown error"):
     pyt = ImageTk.PhotoImage(img)
     Label(er, image=pyt).pack(padx=10, pady=10)
     er.protocol("WM_DELETE_WINDOW", win.destroy)
-    er.title("Error")
+    er.title("Program crash!")
     er.lift()
     er.resizable(False, False)
     jzxs(er)
