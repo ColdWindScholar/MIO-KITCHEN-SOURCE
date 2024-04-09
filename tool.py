@@ -3038,7 +3038,8 @@ class FormatConversion(ttk.LabelFrame):
                             print(e)
         print(lang.text8)
 
-
+project_menu = None
+unpackg = None
 def init():
     if int(settings.oobe) < 4:
         Welcome()
