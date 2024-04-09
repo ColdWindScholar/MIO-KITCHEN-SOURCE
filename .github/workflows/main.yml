@@ -67,9 +67,7 @@ jobs:
       - name: Update pip
         run:  python -m pip install -U --force-reinstall pip
       - name: Pack tool
-        run: |
-             python build.py
-             ls
+        run: python build.py
       - name: Upload Win Build
         if: success()
         uses: actions/upload-artifact@v4
@@ -91,9 +89,7 @@ jobs:
             python3 -m pip install -U --force-reinstall pip
             sudo apt update -y && sudo apt install python3-tk -y
       - name: Pack Tool
-        run: |
-             python3 build.py
-             ls
+        run: python3 build.py
       - name: Upload Linux Build
         if: success()
         uses: actions/upload-artifact@v4
@@ -110,9 +106,7 @@ jobs:
           brew install python-tk python3  tcl-tk
           python3 -m pip install -U --force-reinstall pip
       - name: Pack Tool
-        run: |
-          python3 build.py
-          ls
+        run: python3 build.py
       - name: Upload Macos Build
         if: success()
         uses: actions/upload-artifact@v4
