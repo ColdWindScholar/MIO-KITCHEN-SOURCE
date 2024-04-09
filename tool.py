@@ -128,7 +128,7 @@ class LoadCar:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
-            task_num = len(self.tasks)+1
+            task_num = len(self.tasks) + 1
             self.tasks[task_num] = func
             func(*args, **kwargs)
             del self.tasks[task_num]
@@ -1057,7 +1057,7 @@ def mpkman() -> None:
     global list_pls_plugin
     list_pls_plugin = list_pls
 
-    class msh_parse:
+    class MshParse:
         extra_envs = {}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
@@ -1177,10 +1177,10 @@ def mpkman() -> None:
             def generate_msh():
                 for va in self.value:
                     if gva := self.gavs[va].get():
-                        msh_parse.extra_envs[va] = gva
+                        MshParse.extra_envs[va] = gva
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if '\\' in gva:
-                                msh_parse.extra_envs[va] = gva.replace("\\", '/')
+                                MshParse.extra_envs[va] = gva.replace("\\", '/')
                 self.destroy()
                 self.gavs.clear()
                 self.value.clear()
@@ -1312,12 +1312,12 @@ def mpkman() -> None:
                     "export project='{}'\nsource $1".format(
                         (settings.path + os.sep + dn.get()).replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
-                msh_parse(script_path + "main.msh")
+                MshParse(script_path + "main.msh")
             elif os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
                 call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
                 try:
                     os.remove(file.get())
-                except Exception:
+                except (Exception, BaseException):
                     ...
         elif not os.path.exists(moduledir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
@@ -3038,8 +3038,11 @@ class FormatConversion(ttk.LabelFrame):
                             print(e)
         print(lang.text8)
 
+
 project_menu = None
 unpackg = None
+
+
 def init():
     if int(settings.oobe) < 4:
         Welcome()
