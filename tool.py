@@ -414,17 +414,13 @@ def error(code, desc="未知错误"):
                                             padx=10,
                                             pady=10)
     ttk.Button(er, text="Restart",
-               command=restart,
+               command=lambda: restart(er),
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10)
     ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
     er.wait_window()
     sys.exit()
-
-
-if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
-    error(1, 'Sorry,Not support your device yet.')
 
 
 class welcome(Toplevel):
@@ -3015,6 +3011,8 @@ class format_conversion(ttk.LabelFrame):
 def init():
     if int(settings.oobe) < 4:
         welcome()
+    if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
+        error(1, 'Sorry,Not support your device yet.')
     win.gui()
     global unpackg
     unpackg = unpack_gui()
@@ -3033,8 +3031,13 @@ def init():
     win.mainloop()
 
 
-def restart():
-    win.destroy()
+def restart(er):
+    er.destroy()
+    try:
+        for i in win.children:
+            i.destroy()
+    except:
+        pass
     init()
 
 
