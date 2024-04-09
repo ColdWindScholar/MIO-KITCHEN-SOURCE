@@ -1329,7 +1329,7 @@ def mpkman() -> None:
     class UninstallMpk:
 
         def __init__(self):
-            self.ck = None
+            self.ck:Toplevel
             self.arr = {}
             if chosen.get():
                 self.value = global_mpk[chosen.get()]
