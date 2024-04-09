@@ -285,7 +285,7 @@ class Tool(Tk):
               font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
         # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
-        ttk.Label(self.tab4, text="Open Source, Free, Faster", cursor="hand2",
+        ttk.Label(self.tab4, text="Open Source, Free, Faster",
                   style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
