@@ -3039,8 +3039,8 @@ class FormatConversion(ttk.LabelFrame):
         print(lang.text8)
 
 
-project_menu = None
-unpackg = None
+project_menu : ProjectMenuUtils
+unpackg:UnpackGui
 
 
 def init():
