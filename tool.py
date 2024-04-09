@@ -3034,8 +3034,14 @@ def init():
 def restart(er):
     er.destroy()
     try:
+        if not ask_win("Your operation will not be saved.", "Continue"):
+            return
+    except:
+        pass
+    try:
         for i in win.children:
             i.destroy()
+        win.deiconify()
     except:
         pass
     init()
