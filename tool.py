@@ -414,7 +414,7 @@ def error(code, desc="未知错误"):
                                             padx=10,
                                             pady=10)
     ttk.Button(er, text="Restart",
-               command=restart(),
+               command=restart,
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10)
