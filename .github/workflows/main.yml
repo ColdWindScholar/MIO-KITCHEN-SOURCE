@@ -30,7 +30,7 @@ jobs:
             echo "Note:If u cannot run it in linux,you may need do "chmod a+x ./*"" >> body.md
             echo "Author: MIO-KITCHEN-TEAM" >> body.md
             echo "* MacOS Notice:if you want use brotli,u need "brew install gettext",A few Functions are not support Macos now *" >> body.md
-            echo "Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit),Macos Latest(X86_64)" >> body.md
+            echo "Minimum support: Ubuntu 20.04 (64bit and aarch64),Windows Vista (32bit),Macos Latest(X86_64)" >> body.md
       - name: Rename Tool
         run: |
           cd MIO-KITCHEN-win
