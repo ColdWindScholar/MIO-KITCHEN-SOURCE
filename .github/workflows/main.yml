@@ -29,14 +29,15 @@ jobs:
             echo $ver > version.txt && echo Ok
       - name: Rename Tool
         run: |
+          set ver $(cat version.txt)
           cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{file('./version.txt')}}-win.zip
+          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-$ver-win.zip
           cd ..
           cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{file('./version.txt')}}-linux.zip
+          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-$ver-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{file('./version.txt')}}-macos.zip
+          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-$ver-macos.zip
           cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
