@@ -35,13 +35,13 @@ jobs:
       - name: Rename Tool
         run: |
           cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-win.zip
+          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-win.zip
           cd ..
           cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-linux.zip
+          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
+          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-macos.zip
           cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
