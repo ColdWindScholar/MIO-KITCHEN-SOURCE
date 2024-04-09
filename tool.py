@@ -60,7 +60,7 @@ import opscrypto
 import images
 
 
-class json_edit:
+class JsonEdit:
     def __init__(self, j_f):
         self.file = j_f
 
@@ -83,7 +83,7 @@ class json_edit:
         self.write(data)
 
 
-class load_car:
+class LoadCar:
     gifs = []
 
     def __init__(self, *args):
@@ -133,10 +133,10 @@ class load_car:
         return call_func
 
 
-cartoon = load_car()
+cartoon = LoadCar()
 
 
-class dev_null:
+class DevNull:
     def __init__(self):
         ...
 
@@ -176,7 +176,7 @@ class Tool(Tk):
             self.iconphoto(True,
                            PhotoImage(
                                data=images.icon_byte))
-        sys.stdout = dev_null()
+        sys.stdout = DevNull()
 
     def put_log(self):
         log_ = settings.path + os.sep + v_code() + '.txt'
@@ -361,7 +361,7 @@ class ModuleError(Exception):
     ...
 
 
-class lang_utils:
+class LangUtils:
     def __init__(self):
         ...
 
@@ -372,7 +372,7 @@ class lang_utils:
             return "None"
 
 
-lang = lang_utils()
+lang = LangUtils()
 
 
 def load(name):
@@ -381,9 +381,9 @@ def load(name):
     if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
         error(1)
     elif not os.path.exists(elocal + os.sep + lang_file):
-        _lang = json_edit(elocal + os.sep + 'bin/languages/English.json').read()
+        _lang = JsonEdit(elocal + os.sep + 'bin/languages/English.json').read()
     else:
-        _lang = json_edit(f'{elocal}{os.sep}{lang_file}').read()
+        _lang = JsonEdit(f'{elocal}{os.sep}{lang_file}').read()
     [setattr(lang, i, _lang[i]) for i in _lang]
 
 
@@ -423,7 +423,7 @@ def error(code, desc="unknown error"):
     sys.exit()
 
 
-class welcome(Toplevel):
+class Welcome(Toplevel):
     def __init__(self):
         super().__init__()
         self.title(lang.text135)
@@ -518,7 +518,7 @@ class welcome(Toplevel):
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
 
-class set_utils:
+class SetUtils:
     def __init__(self, set_ini):
         self.path = None
         self.bar_level = '0.9'
@@ -579,7 +579,7 @@ class set_utils:
         self.load()
 
 
-settings = set_utils(settings_file)
+settings = SetUtils(settings_file)
 settings.load()
 
 
@@ -885,10 +885,10 @@ def mpkman() -> None:
     moduledir = os.path.join(elocal, "bin", "module")
 
     def impk():
-        Install_mpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
+        InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
         list_pls()
 
-    class new_(Toplevel):
+    class New(Toplevel):
         def __init__(self):
             super().__init__()
             self.dep = None
@@ -961,7 +961,7 @@ def mpkman() -> None:
             elif os.path.exists(path + 'main.sh'):
                 editor.main(path + 'main.sh')
 
-    class mpk_run_menu:
+    class MpkRunMenu:
         def __init__(self, name):
             self.name = name
 
@@ -1036,7 +1036,7 @@ def mpkman() -> None:
                     images_[i] = ImageTk.PhotoImage(Image.open(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
                 else:
                     images_[i] = ImageTk.PhotoImage(data=images.none_byte)
-                data = json_edit(os.path.join(moduledir, i, "info.json")).read()
+                data = JsonEdit(os.path.join(moduledir, i, "info.json")).read()
                 icon = tk.Label(pls.scrollable_frame,
                                 image=images_[i],
                                 compound="center",
@@ -1044,8 +1044,8 @@ def mpkman() -> None:
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', mpk_run_menu(data['name']).run)
-                icon.bind('<Button-3>', mpk_run_menu(data['name']).popup)
+                icon.bind('<Double-Button-1>', MpkRunMenu(data['name']).run)
+                icon.bind('<Button-3>', MpkRunMenu(data['name']).popup)
                 pls.add_icon(icon)
                 global_mpk[data['name']] = data['identifier']
 
@@ -1155,7 +1155,7 @@ def mpkman() -> None:
             elif modes[mode](var_):
                 self.runline(other)
 
-    class parse(Toplevel):
+    class Parse(Toplevel):
         gavs = {}
 
         def __init__(self, jsons, msh=False):
@@ -1284,7 +1284,7 @@ def mpkman() -> None:
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             if os.path.exists(script_path + "main.json"):
-                values = parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
+                values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
             else:
                 values = None
             if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
@@ -1321,7 +1321,7 @@ def mpkman() -> None:
         else:
             print(lang.warn8)
 
-    class uninstall_mpk:
+    class UninstallMpk:
 
         def __init__(self):
             self.ck = None
@@ -1412,9 +1412,9 @@ def mpkman() -> None:
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
-    rmenu.add_command(label=lang.text115, command=lambda: cz(new_))
+    rmenu.add_command(label=lang.text115, command=lambda: cz(New))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu2.add_command(label=lang.text20, command=lambda: cz(uninstall_mpk))
+    rmenu2.add_command(label=lang.text20, command=lambda: cz(UninstallMpk))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
     rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
@@ -1422,7 +1422,7 @@ def mpkman() -> None:
     lf1.pack(padx=10, pady=10)
 
 
-class Install_mpk(Toplevel):
+class InstallMpk(Toplevel):
     def __init__(self, mpk):
         super().__init__()
         self.inner_filenames = []
@@ -1526,7 +1526,7 @@ class Install_mpk(Toplevel):
         self.installb.config(state='normal')
 
 
-class packxx(Toplevel):
+class Packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
@@ -1620,7 +1620,7 @@ class packxx(Toplevel):
 
 
 @cartoon
-class dbkxyt:
+class Dbkxyt:
     def __init__(self):
         if not dn.get():
             win.message_pop(lang.warn1)
@@ -1689,7 +1689,7 @@ class dbkxyt:
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
 
-class packss(Toplevel):
+class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
         self.title(lang.text53)
@@ -2061,7 +2061,7 @@ def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
     elif not os.path.exists(settings.path + os.sep + dn.get()):
         win.message_pop(lang.warn1, "red")
         return False
-    parts_dict = json_edit((work := rwork()) + "config" + os.sep + "parts_info").read()
+    parts_dict = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info").read()
     for i in parts:
         dname = os.path.basename(i)
         if dname not in parts_dict.keys():
@@ -2186,7 +2186,7 @@ def script2fs(path):
         if not os.path.exists(path + os.sep + "config"):
             os.makedirs(path + os.sep + "config")
         extra.script2fs_context(findfile("updater-script", path + os.sep + "META-INF"), path + os.sep + "config", path)
-        json_ = json_edit(os.path.join(path, "config", "parts_info"))
+        json_ = JsonEdit(os.path.join(path, "config", "parts_info"))
         parts = json_.read()
         for v in os.listdir(path):
             if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
@@ -2295,7 +2295,7 @@ def unpack(chose, form: any = None):
     elif not os.path.exists(settings.path + os.sep + dn.get()):
         win.message_pop(lang.warn1, "red")
         return False
-    json_ = json_edit((work := rwork()) + "config" + os.sep + "parts_info")
+    json_ = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info")
     parts = json_.read()
     if os.access(work + "UPDATE.APP", os.F_OK):
         print(lang.text79 + "UPDATE.APP")
@@ -2489,7 +2489,7 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     return value.get()
 
 
-class dirsize:
+class Dirsize:
     # get-command
     # 1 - return True value of dir size
     # 2 - return Rsize value of dir size
@@ -2592,14 +2592,14 @@ def mkerofs(name, format_, work, level, old_kernel=0):
 def make_ext4fs(name, work, sparse, size=0):
     print(lang.text91 % name)
     if not size:
-        size = dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
+        size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     call(
         f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
 
 def mke2fs(name, work, sparse, size=0):
     print(lang.text91 % name)
-    size = dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
+    size = Dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     if call(
             f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
         rmdir(f'{work + name}_new.img')
@@ -2648,7 +2648,7 @@ def get_all_file_paths(directory) -> Ellipsis:
 
 
 @cartoon
-class zip_file:
+class ZipFile:
     def __init__(self, file, dst_dir, path=None):
         if not path:
             path = settings.path + os.sep
@@ -2673,8 +2673,8 @@ def pack_zip():
     else:
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
-            dbkxyt()
-        zip_file(dn.get() + ".zip", settings.path + os.sep + dn.get())
+            Dbkxyt()
+        ZipFile(dn.get() + ".zip", settings.path + os.sep + dn.get())
 
 
 def dndfile(files):
@@ -2685,7 +2685,7 @@ def dndfile(files):
             fi = fi
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
-                Install_mpk(fi)
+                InstallMpk(fi)
             elif os.path.basename(fi).endswith(".mps"):
                 Process(fi)
             else:
@@ -2694,7 +2694,7 @@ def dndfile(files):
             print(fi + lang.text84)
 
 
-class project_menu_utils(ttk.LabelFrame):
+class ProjectMenuUtils(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
         self.LB1 = None
@@ -2753,20 +2753,20 @@ class project_menu_utils(ttk.LabelFrame):
         self.listdir()
 
 
-class frame3(ttk.LabelFrame):
+class Frame3(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text112)
         self.pack(padx=5, pady=5)
 
     def gui(self):
         ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text123, command=lambda: cz(packss)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10,
                                                                                               pady=10)
-        ttk.Button(self, text=lang.t13, command=lambda: cz(format_conversion)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).pack(side="left", padx=10, pady=10)
 
 
-class unpack_gui(ttk.LabelFrame):
+class UnpackGui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text9)
         self.fm = None
@@ -2871,7 +2871,7 @@ class unpack_gui(ttk.LabelFrame):
         if not os.path.exists(work := rwork()):
             win.message_pop(lang.warn1)
             return False
-        parts_dict = json_edit(work + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit(work + "config" + os.sep + "parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(END, folder)
@@ -2883,7 +2883,7 @@ class unpack_gui(ttk.LabelFrame):
             unpack(lbs, self.fm.get())
             self.refs()
         else:
-            packxx(lbs)
+            Packxx(lbs)
 
 
 def img2simg(path):
@@ -2896,7 +2896,7 @@ def img2simg(path):
             print(e)
 
 
-class format_conversion(ttk.LabelFrame):
+class FormatConversion(ttk.LabelFrame):
     def __init__(self):
         super().__init__(text=lang.t13)
         self.place(relx=0.5, rely=0.5, anchor="center")
@@ -3036,18 +3036,18 @@ class format_conversion(ttk.LabelFrame):
 
 def init():
     if int(settings.oobe) < 4:
-        welcome()
+        Welcome()
     if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
         error(1, 'Sorry,Not support your device yet.')
 
     win.gui()
     global unpackg
-    unpackg = unpack_gui()
+    unpackg = UnpackGui()
     global project_menu
-    project_menu = project_menu_utils()
+    project_menu = ProjectMenuUtils()
     project_menu.gui()
     unpackg.gui()
-    frame3().gui()
+    Frame3().gui()
     project_menu.listdir()
     cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
     cartoon.init()
@@ -3062,14 +3062,14 @@ def restart(er):
     try:
         if not ask_win2("Your operation will not be saved.", "Continue"):
             return
-    except:
+    except (Exception, BaseException):
         pass
     er.destroy()
     try:
         for i in win.children:
             i.destroy()
         win.deiconify()
-    except:
+    except (Exception, BaseException):
         pass
     init()
 
