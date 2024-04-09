@@ -2463,6 +2463,32 @@ def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     return value.get()
 
 
+def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
+    value = IntVar()
+    ask = Toplevel()
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20)).pack(side=TOP)
+    frame_button = ttk.Frame(frame_inner)
+    frame_button.pack(side=TOP)
+
+    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
+                                                                             expand=True)
+    ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
+                                                                                                 pady=5,
+                                                                                                 fill=BOTH,
+                                                                                                 expand=True)
+
+    def close_ask(value_=1):
+        value.set(value_)
+        ask.destroy()
+
+    jzxs(ask)
+
+    ask.wait_window()
+    return value.get()
+
+
 class dirsize:
     # get-command
     # 1 - return True value of dir size
@@ -3013,6 +3039,7 @@ def init():
         welcome()
     if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
         error(1, 'Sorry,Not support your device yet.')
+
     win.gui()
     global unpackg
     unpackg = unpack_gui()
@@ -3032,12 +3059,12 @@ def init():
 
 
 def restart(er):
-    er.destroy()
     try:
-        if not ask_win("Your operation will not be saved.", "Continue"):
+        if not ask_win2("Your operation will not be saved.", "Continue"):
             return
     except:
         pass
+    er.destroy()
     try:
         for i in win.children:
             i.destroy()
