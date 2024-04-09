@@ -413,6 +413,11 @@ def error(code, desc="未知错误"):
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10)
+    ttk.Button(er, text="Restart",
+               command=restart(),
+               style="Accent.TButton").pack(side=LEFT,
+                                            padx=10,
+                                            pady=10)
     ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
     er.wait_window()
     sys.exit()
@@ -3026,6 +3031,11 @@ def init():
     jzxs(win)
     print(lang.text134 % (dti() - start))
     win.mainloop()
+
+
+def restart():
+    win.destroy()
+    init()
 
 
 if __name__ == "__main__":
