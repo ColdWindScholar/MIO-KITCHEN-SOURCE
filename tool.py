@@ -90,6 +90,7 @@ class LoadCar:
         self.frames = []
         self.hide_gif = False
         self.frame = None
+        self.tasks = {}
 
     def run(self, ind: int = 0):
         self.hide_gif = False
@@ -127,8 +128,12 @@ class LoadCar:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
+            task_num = len(self.tasks)+1
+            self.tasks[task_num] = func
             func(*args, **kwargs)
-            self.stop()
+            del self.tasks[task_num]
+            if not self.tasks:
+                self.stop()
 
         return call_func
 
