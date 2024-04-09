@@ -32,8 +32,6 @@ jobs:
             echo "* MacOS Notice:if you want use brotli,u need "brew install gettext",A few Functions are not support Macos now *" >> body.md
             echo "Minimum support: Ubuntu 20.04 (64bit|aarch64),Windows Vista (32bit),Macos Latest(X86_64)" >> body.md
       - name: Rename Tool
-        # Compress-Archive -Path ./* -DestinationPath ../MIO-KITCHEN-linux-aarch64.zip
-        # move MIO-KITCHEN-linux-aarch64.zip MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-linux-aarch64.zip
         run: |
           cd MIO-KITCHEN-win
           move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.tool_version.outputs.version }}-win.zip
