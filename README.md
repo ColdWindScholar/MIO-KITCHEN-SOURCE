@@ -25,6 +25,14 @@
 * Provide backward compatibility with Android 8 and lower and create .img for these versions
 * Use mkc file choose api on Linux, making it easier to use
 ***
+## Supported Os
+
+| Os      | Arch                   |
+|---------|------------------------|
+| Linux   | x86_64 arm64           |
+| Windows | x86_64 x86 amd64 arm64 |
+| Macos   | Arm64  X86             |
+
 ## * macOS Notice
 ``` shell
 # if you want to use [brotli], you need:
