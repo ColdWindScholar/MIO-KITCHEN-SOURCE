@@ -1329,7 +1329,7 @@ def mpkman() -> None:
     class UninstallMpk:
 
         def __init__(self):
-            self.ck:Toplevel
+            self.ck: Toplevel
             self.arr = {}
             if chosen.get():
                 self.value = global_mpk[chosen.get()]
@@ -3039,8 +3039,8 @@ class FormatConversion(ttk.LabelFrame):
         print(lang.text8)
 
 
-project_menu : ProjectMenuUtils
-unpackg:UnpackGui
+project_menu: ProjectMenuUtils
+unpackg: UnpackGui
 
 
 def init():
