@@ -27,17 +27,21 @@ jobs:
             echo "Build times: ${{ github.run_number }}" >> body.md
             echo "Version: $ver" >> body.md && echo Ok
             echo $ver > version.txt && echo Ok
+      - name: Read version.txt
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./version.txt
       - name: Rename Tool
         run: |
-          set ver $(cat version.txt)
           cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-$ver-win.zip
+          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-win.zip
           cd ..
           cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-$ver-linux.zip
+          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-$ver-macos.zip
+          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
           cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
@@ -45,7 +49,7 @@ jobs:
           allowUpdates: true
           omitBodyDuringUpdate: true
           removeArtifacts: true
-          name: "MIO-KITCHEN-${{file('./version.txt')}}"
+          name: "MIO-KITCHEN-${{ steps.version.outputs.content }}"
           tag: "CI_BUILD_${{ github.run_number }}"
           bodyFile: "body.md"
           artifacts: "*.zip"
