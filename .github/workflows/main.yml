@@ -32,16 +32,17 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./version.txt
+          trim: true
       - name: Rename Tool
         run: |
           cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-win.zip
+          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-win.zip
           cd ..
           cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-linux.zip
+          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-linux.zip
           cd ..
           cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs }}-macos.zip
+          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
           cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
@@ -49,7 +50,7 @@ jobs:
           allowUpdates: true
           omitBodyDuringUpdate: true
           removeArtifacts: true
-          name: "MIO-KITCHEN-${{ steps.version.outputs }}"
+          name: "MIO-KITCHEN-${{ steps.version.outputs.content }}"
           tag: "CI_BUILD_${{ github.run_number }}"
           bodyFile: "body.md"
           artifacts: "*.zip"
