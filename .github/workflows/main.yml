@@ -6,7 +6,6 @@ on:
   push:
     paths:
       - "bin/setting.ini"
-  pull_request:
   workflow_dispatch:
 jobs:
   build:
