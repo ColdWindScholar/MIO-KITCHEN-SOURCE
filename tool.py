@@ -119,7 +119,7 @@ class LoadCar:
     def load_gif(self, gif):
         try:
             while True:
-                self.frames.append(ImageTk.PhotoImage(gif.copy()))
+                self.frames.append(ImageTk.PhotoImage(gif))
                 gif.seek(len(self.frames))
         except EOFError:
             ...
