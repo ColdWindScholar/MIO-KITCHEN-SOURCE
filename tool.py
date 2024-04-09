@@ -387,7 +387,7 @@ def load(name):
     [setattr(lang, i, _lang[i]) for i in _lang]
 
 
-def error(code, desc="未知错误"):
+def error(code, desc="unknown error"):
     win.withdraw()
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
