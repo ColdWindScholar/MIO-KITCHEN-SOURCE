@@ -340,8 +340,6 @@ class vbpatch:
 
     def __init__(self, file_):
         self.file = file_
-        self.restore = lambda: self.patchvb(b'\x00')
-        self.disdm = lambda: self.patchvb(b'\x01')
         self.disavb = lambda: self.patchvb(b'\x02')
 
     def checkmagic(self):
