@@ -391,11 +391,10 @@ class BMPHEAD:
 
 class XIAOMI_BLKSTRUCT:
     def __init__(self, buf: bytes):
-        self.structstr = "2I"
         (
             self.img_offset,
             self.blksz,
-        ) = struct.unpack(self.structstr, buf)
+        ) = struct.unpack("2I", buf)
 
 
 class LOGO_DUMPER:
