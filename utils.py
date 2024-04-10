@@ -336,8 +336,6 @@ def jzxs(master):
 # ----CLASSES
 
 class vbpatch:
-    magic = b'AVB0'
-
     def __init__(self, file_):
         self.file = file_
         self.disavb = lambda: self.patchvb(b'\x02')
@@ -345,8 +343,7 @@ class vbpatch:
     def checkmagic(self):
         if os.access(self.file, os.F_OK):
             with open(self.file, "rb") as f:
-                buf = f.read(4)
-                return self.magic == buf
+                return b'AVB0' == f.read(4)
         else:
             print("File does not exist!")
 
