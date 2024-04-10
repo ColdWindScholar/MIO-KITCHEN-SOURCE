@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-import argparse
 import bz2
 import hashlib
 import io
 import lzma
-import os
 import struct
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
