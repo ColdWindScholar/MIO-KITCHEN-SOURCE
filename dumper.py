@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import bz2
 import hashlib
-import io
 import lzma
 import struct
 import sys
