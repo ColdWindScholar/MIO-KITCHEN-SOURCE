@@ -1,4 +1,3 @@
-import errno
 import os
 import struct
 import sys
@@ -72,7 +71,7 @@ class sdat2img:
         try:
             output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
         except IOError as e:
-            if e.errno == errno.EEXIST:
+            if e.errno == 17:
                 print('Error: the output file "{}" already exists'.format(e.filename))
                 print('Remove it, rename it, or choose a different file name.')
                 return
