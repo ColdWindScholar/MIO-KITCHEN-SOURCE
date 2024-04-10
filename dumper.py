@@ -7,7 +7,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
-from enlighten import get_manager
+
 
 import update_metadata_pb2 as um
 
@@ -44,7 +44,6 @@ class Dumper:
         self.images = images
         self.workers = workers
         self.validate_magic()
-        self.manager = get_manager()
 
     def run(self):
         if self.images == "":
@@ -86,7 +85,6 @@ class Dumper:
         self.payloadfile.close()
 
         self.multiprocess_partitions(partitions_with_ops)
-        self.manager.stop()
 
     def multiprocess_partitions(self, partitions):
 
