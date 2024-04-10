@@ -1860,7 +1860,7 @@ class StdoutRedirector:
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
-        self.fileno = open(os.path.join(settings.path, "bin", "temp", v_code()), "r+").fileno
+        self.fileno = open(os.path.join(settings.path, "bin", "temp", v_code()), "w+").fileno
 
     def write(self, string):
         if self.error:
