@@ -8,7 +8,6 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
-import bsdiff4
 from enlighten import get_manager
 
 import update_metadata_pb2 as um
@@ -152,28 +151,6 @@ class Dumper:
             for ext in op.src_extents:
                 old_file.seek(ext.start_block * self.block_size)
                 data = old_file.read(ext.num_blocks * self.block_size)
-                out_file.write(data)
-        elif op.type == op.SOURCE_BSDIFF:
-            if not self.diff:
-                print("SOURCE_BSDIFF supported only for differential OTA")
-                sys.exit(-3)
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            tmp_buff = io.BytesIO()
-            for ext in op.src_extents:
-                old_file.seek(ext.start_block * self.block_size)
-                old_data = old_file.read(ext.num_blocks * self.block_size)
-                tmp_buff.write(old_data)
-            tmp_buff.seek(0)
-            old_data = tmp_buff.read()
-            tmp_buff.seek(0)
-            tmp_buff.write(bsdiff4.patch(old_data, data))
-            n = 0
-            tmp_buff.seek(0)
-            for ext in op.dst_extents:
-                tmp_buff.seek(n * self.block_size)
-                n += ext.num_blocks
-                data = tmp_buff.read(ext.num_blocks * self.block_size)
-                out_file.seek(ext.start_block * self.block_size)
                 out_file.write(data)
         elif op.type == op.ZERO:
             for ext in op.dst_extents:
