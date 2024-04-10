@@ -3072,8 +3072,11 @@ def restart(er):
         pass
     er.destroy()
     try:
-        for i in win.children:
-            i.destroy()
+        for i in win.winfo_children():
+            try:
+                i.destroy()
+            except (Exception, BaseException):
+                pass
         win.deiconify()
     except (Exception, BaseException):
         pass
