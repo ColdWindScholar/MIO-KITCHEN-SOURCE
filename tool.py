@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import mmap
 import platform
 import subprocess
 from functools import wraps
@@ -16,6 +15,8 @@ import os.path
 import shlex
 import sys
 import time
+from dumper import Dumper
+from multiprocessing import cpu_count
 import tkinter as tk
 from configparser import ConfigParser
 from webbrowser import open as openurl
@@ -2307,14 +2308,14 @@ def unpack(chose, form: any = None):
     if form == 'payload':
         print(lang.text79 + "payload")
         with open(work + "payload.bin", 'rb') as pay:
-            try:
-                mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ).close()
-            except ValueError as e:
-                print(e, "Use Old Method")
-                payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
-            else:
-                payload_dumper.ota_payload_dumper(mmap.mmap(pay.fileno(), 0, access=mmap.ACCESS_READ), work, 'old',
-                                                  chose)
+            Dumper(
+                pay,
+                work,
+                diff=False,
+                old='old',
+                images=chose,
+                workers=cpu_count(),
+            ).run()
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
