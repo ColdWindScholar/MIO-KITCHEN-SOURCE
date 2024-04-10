@@ -170,8 +170,17 @@ def gettype(file) -> str:
             buf += bytearray(file_.read(4))
         return buf[1:] == b'\x67\x44\x6c\x61'
 
+    def is_super2(fil) -> any:
+        with open(fil, 'rb') as file_:
+            try:
+                file_.seek(4096, 0)
+            except:
+                return False
+            buf = bytearray(file_.read(4))
+        return buf == b'\x67\x44\x6c\x61'
+
     try:
-        if is_super(file):
+        if is_super(file) or is_super2(file):
             return 'super'
     except IndexError:
         ...
