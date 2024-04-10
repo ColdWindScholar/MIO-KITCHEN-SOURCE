@@ -377,7 +377,6 @@ class BMPHEAD:
     def __init__(self, buf: bytes = None):  # Read bytes buf and use this struct to parse
         assert buf is not None, f"buf Should be bytes, not {type(buf)}"
         # print(buf)
-        self.structstr = "<H6I"
         (
             self.magic,
             self.fsize,
@@ -386,7 +385,7 @@ class BMPHEAD:
             self.dib,
             self.width,
             self.height,
-        ) = struct.unpack(self.structstr, buf)
+        ) = struct.unpack("<H6I", buf)
 
 
 class XIAOMI_BLKSTRUCT:
