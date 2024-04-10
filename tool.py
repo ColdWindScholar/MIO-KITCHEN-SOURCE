@@ -2855,8 +2855,7 @@ class UnpackGui(ttk.LabelFrame):
         if self.fm.get() == 'payload':
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
-                    for i in payload_dumper.ota_payload_dumper(pay, work, 'old', '',
-                                                               0).dam.partitions:
+                    for i in payload_dumper.ota_payload_dumper(pay).dam.partitions:
                         self.lsg.insert(END, i.partition_name)
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
