@@ -13,8 +13,8 @@
 ### Deutsch: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
 ***
 ## Características
-* Desempacote o boot, dtbo, ext4, erofs, payload, logo e assim por diante
-* Empacote o boot, dtbo, ext4, erofs, payload, logo e assim por diante
+* Desempacote o `boot, dtbo, ext4, erofs, payload, logo` e assim por diante.
+* Empacote o `boot, dtbo, ext4, erofs, payload, logo` e assim por diante.
 ***
 ## Vantagens
 * Patch automático de fs_config e fs_context.
@@ -25,6 +25,14 @@
 * Forneça compatibilidade com versões anteriores do Android 8 e inferior e crie .img para essas versões.
 * Use o arquivo mkc e escolha a api no Linux, facilitando o uso.
 ***
+## SO suportado
+
+| SO      | Arquitetura            |
+|---------|------------------------|
+| Linux   | x86_64 arm64           |
+| Windows | x86_64 x86 amd64 arm64 |
+| Macos   | Arm64  X86             |
+
 ## * Aviso macOS
 ``` shell
 # Se quiser usar [brotli], você precisa:
@@ -94,8 +102,8 @@ python build.py
 ***
 ### MIO-KITCHEN
 ```
-Sempre gratuito, primeiros usuários
-Ferramentas de qualidade, apresentadas aqui!
+Sempre gratuito aos primeiros usuários.
+Ferramentas de qualidade estão aqui!
 Escrito por MIO-KITCHEN-TEAM
 ```
 #### ColdWindScholar (3590361911@qq.com) Todos os Direitos Reservados. ####
