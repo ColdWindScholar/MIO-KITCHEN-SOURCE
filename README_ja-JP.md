@@ -11,8 +11,8 @@
 ### German: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
 ***
 ## 機能
-* boot、dtbo、ext4、erofs、payload、logoなどをアンパック
-* boot、dtbo、ext4、erofs、payload、logoなどをパッキング
+* `boot、dtbo、ext4、erofs、payload、logo`などをアンパック
+* `boot、dtbo、ext4、erofs、payload、logo`などをパッキング
 ***
 ## 長所
 * コンテキストの自動修復
@@ -84,7 +84,7 @@ python build.py
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
 ### And MORE...
-### ご協力ありがとうございます!!
+### ご協力ありがとうございます!
 ***
 # このアプリケーションについて
 ***
@@ -94,4 +94,4 @@ python build.py
 素晴らしいツールが勢揃い!
 文章: MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) All Rights Reserved. ####
+#### ColdWindScholar (3590361911@qq.com) All Rights Reserved. ####
