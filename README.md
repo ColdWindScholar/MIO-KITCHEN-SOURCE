@@ -13,8 +13,8 @@
 ### German: [de-DE](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
 ***
 ## Features
-* Unpack boot, dtbo, ext4, erofs, payload, logo and so on
-* Pack boot, dtbo, ext4, erofs, payload, logo and so on
+* Unpack `boot, dtbo, ext4, erofs, payload, logo` and so on
+* Pack `boot, dtbo, ext4, erofs, payload, logo` and so on
 ***
 ## Advantages
 * Automatic fs_config and fs_context patch
@@ -35,8 +35,8 @@
 
 ## * macOS Notice
 ``` shell
-# if you want to use [brotli], you need:
-# You system may had it already, so check first
+# If you want to use [brotli], you need:
+# You system may had it already, so check first.
 # 
 brew install gettext
 ```
@@ -76,7 +76,7 @@ pip install -r requirements.txt
 ### Get started
 ```` shell
 python tool.py
-# to create a binary distribution, you could:
+# To create a binary distribution, you could:
 python build.py
 ````
 ***
@@ -96,7 +96,7 @@ python build.py
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
 ### And MORE...
-### Thanks to people like you for helping out!!
+### Thanks to people like you for helping out!
 ***
 # About
 ***
@@ -106,4 +106,4 @@ Always free, users first
 Quality Tools, presented here!
 Brought you by the MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) All Rights Reserved. ####
+#### ColdWindScholar (3590361911@qq.com) All Rights Reserved. ####
