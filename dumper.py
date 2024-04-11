@@ -7,8 +7,6 @@ import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
-
-
 import update_metadata_pb2 as um
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -27,9 +25,7 @@ def verify_contiguous(exts):
     for ext in exts:
         if ext.start_block != blocks:
             return False
-
         blocks += ext.num_blocks
-
     return True
 
 
@@ -171,4 +167,3 @@ class Dumper:
 
         for op in part["operations"]:
             data = self.data_for_op(op, out_file, old_file)
-

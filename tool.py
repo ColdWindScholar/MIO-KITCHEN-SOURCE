@@ -16,7 +16,6 @@ import shlex
 import sys
 import time
 from dumper import Dumper
-from multiprocessing import cpu_count
 import tkinter as tk
 from configparser import ConfigParser
 from webbrowser import open as openurl
@@ -2314,8 +2313,7 @@ def unpack(chose, form: any = None):
                 work,
                 diff=False,
                 old='old',
-                images=chose,
-                workers=cpu_count(),
+                images=chose
             ).run()
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
