@@ -2310,12 +2310,12 @@ def unpack(chose, form: any = None):
         with open(work + "payload.bin", 'rb') as pay:
             try:
                 Dumper(
-                pay,
-                work,
-                diff=False,
-                old='old',
-                images=chose
-            ).run()
+                    pay,
+                    work,
+                    diff=False,
+                    old='old',
+                    images=chose
+                ).run()
             except MemoryError:
                 print("Too Many Partition you chosen!\nPlease Extract Them One by One!")
 
