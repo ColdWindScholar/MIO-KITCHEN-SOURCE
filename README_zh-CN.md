@@ -9,8 +9,8 @@
 ### 英语: [en-US](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README.md)
 ***
 ## 功能
-* 解包 boot dtbo ext4 erofs payload logo 之类
-* 打包 boot dtbo ext4 erofs payload logo 之类
+* 解包 `boot dtbo ext4 erofs payload logo` 之类
+* 打包 `boot dtbo ext4 erofs payload logo` 之类
 ***
 ## 优势
 * 自动Fs和Context修补
@@ -70,8 +70,8 @@ python build.py
 ***
 ### 开发者邮箱: 3590361911@qq.com
 ### QQ 群: 836898509
-### TG 群: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### TG 频道: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
+### Telegram 群: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
+### Telegram 频道: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # 贡献者:
 ***
@@ -81,7 +81,7 @@ python build.py
 ### 日本语翻译者: [reindex-ot](https://github.com/reindex-ot)
 ### 巴西葡萄牙语翻译者: [igor](https://github.com/igormiguell)
 ### 和更多...
-### 感谢你们的帮助!!
+### 感谢你们的帮助!
 ***
 # 关于
 ***
@@ -91,4 +91,4 @@ python build.py
 好工具，在这里!
 由 MIO-KITCHEN 团队开发
 ```
-#### ColdWindScholar(3590361911@qq.com) 保留所有权利. ####
+#### ColdWindScholar (3590361911@qq.com) 保留所有权利. ####

@@ -11,8 +11,8 @@
 ### Portugiesisch (Brasilien): [pt-BR](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md)
 ***
 ## Eigenschaften
-* Entpacken Sie Boot, dtbo, ext4, erofs, Payload, Logo und so weiter
-* Packen Sie Boot, dtbo, ext4, erofs, Payload, Logo und so weiter
+* Entpacken Sie `Boot, dtbo, ext4, erofs, Payload, Logo` und so weiter
+* Packen Sie `Boot, dtbo, ext4, erofs, Payload, Logo` und so weiter
 ***
 ## Vorteile
 * CONTEXT automatisch reparieren
@@ -84,7 +84,7 @@ python build.py
 ### Portugiesisch (Brasilien) Übersetzer: [igor](https://github.com/igormiguell)
 ### Deutscher Übersetzer: [keldrion](https://github.com/keldrion)
 ### Und MEHR...
-### Danke für deine Hilfe!!
+### Danke für deine Hilfe!
 ***
 # Über uns
 ***
@@ -94,4 +94,4 @@ Für immer kostenlos, der Benutzer zuerst
 Gute Werkzeuge, hier drin!
 Geschrieben von MIO-KITCHEN-TEAM
 ```
-#### ColdWindScholar(3590361911@qq.com) Alle Rechte Vorbehalten. ####
+#### ColdWindScholar (3590361911@qq.com) Alle Rechte Vorbehalten. ####
