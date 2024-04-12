@@ -2506,7 +2506,7 @@ class Dirsize:
         for root, dirs, files in os.walk(dir_):
             try:
                 self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
-                              not os.path.islink(os.path.join(root, name))])
+                                  not os.path.islink(os.path.join(root, name))])
             except:
                 pass
         if self.get == 1:
