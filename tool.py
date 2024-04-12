@@ -405,7 +405,7 @@ def error(code, desc="unknown error"):
     er.resizable(False, False)
     jzxs(er)
     Label(er, text="Error:0x%s" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
-    Label(er, text="It seems that we have encountered a problem").pack(padx=10, pady=10)
+    Label(er, text="It seems that we have encountered a problem\nHere Are crash logs.").pack(padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er)
