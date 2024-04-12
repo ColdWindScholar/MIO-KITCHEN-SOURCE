@@ -98,21 +98,15 @@ class Dumper:
     def validate_magic(self):
         magic = self.payloadfile.read(4)
         assert magic == b"CrAU"
-
         file_format_version = u64(self.payloadfile.read(8))
         assert file_format_version == 2
-
         manifest_size = u64(self.payloadfile.read(8))
-
         metadata_signature_size = 0
-
         if file_format_version > 1:
             metadata_signature_size = u32(self.payloadfile.read(4))
-
         manifest = self.payloadfile.read(manifest_size)
         self.metadata_signature = self.payloadfile.read(metadata_signature_size)
         self.data_offset = self.payloadfile.tell()
-
         self.dam = um.DeltaArchiveManifest()
         self.dam.ParseFromString(manifest)
         self.block_size = self.dam.block_size

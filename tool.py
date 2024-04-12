@@ -2308,13 +2308,17 @@ def unpack(chose, form: any = None):
     if form == 'payload':
         print(lang.text79 + "payload")
         with open(work + "payload.bin", 'rb') as pay:
-            Dumper(
+            try:
+                Dumper(
                 pay,
                 work,
                 diff=False,
                 old='old',
                 images=chose
             ).run()
+            except MemoryError:
+                print("Too Many Partition you chosen!\nPlease Extract Them One by One!")
+
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
                 os.remove(work + "payload.bin")
