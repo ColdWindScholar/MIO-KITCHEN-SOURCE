@@ -313,6 +313,7 @@ class Tool(Tk):
         self.show_local.set(settings.path)
         ai = StringVar()
         ai.set(settings.ai_engine)
+        auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
 
         def on_value_change():
@@ -320,6 +321,7 @@ class Tool(Tk):
 
         ai.trace("w", lambda *x: on_value_change())
         context.trace("w", lambda *x: settings.set_value('contextpatch', context.get()))
+        auto_rm_pay .trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay .get()))
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -342,6 +344,9 @@ class Tool(Tk):
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
+                        offvalue='0',
+                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        ttk.Checkbutton(sf4, text=lang.t9.format("payload.bin"), variable=auto_rm_pay, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         lb3.pack(padx=10, pady=10, side='left')
@@ -2324,8 +2329,7 @@ def unpack(chose, form: any = None):
                         old='old',
                         images=[i]
                     ).run()
-
-        if ask_win(lang.t9.format("payload.bin")) == 1:
+        if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
             except Exception as e:
