@@ -1034,8 +1034,7 @@ def mpkman() -> None:
                 try:
                     rmtree(os.path.join(moduledir, i))
                 finally:
-                    ...
-                continue
+                    continue
             if os.path.isdir(moduledir + os.sep + i):
                 if os.path.exists(os.path.join(moduledir, i, 'icon')):
                     images_[i] = ImageTk.PhotoImage(Image.open(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
