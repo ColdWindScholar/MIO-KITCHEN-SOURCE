@@ -2316,7 +2316,14 @@ def unpack(chose, form: any = None):
                     images=chose
                 ).run()
             except MemoryError:
-                print("Too Many Partition you chosen!\nPlease Extract Them One by One!")
+                for i in chose:
+                    Dumper(
+                        pay,
+                        work,
+                        diff=False,
+                        old='old',
+                        images=[i]
+                    ).run()
 
         if ask_win(lang.t9.format("payload.bin")) == 1:
             try:
