@@ -1289,10 +1289,7 @@ def mpkman() -> None:
                     return 2
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
-            if os.path.exists(script_path + "main.json"):
-                values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh"))
-            else:
-                values = None
+            values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(script_path + "main.json") else None
             if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
                 re_folder(temp)
             if not file.get():
@@ -1318,8 +1315,8 @@ def mpkman() -> None:
                 call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
                 try:
                     os.remove(file.get())
-                except (Exception, BaseException):
-                    ...
+                except (Exception, BaseException) as e:
+                    print(e)
         elif not os.path.exists(moduledir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls()
