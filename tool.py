@@ -264,7 +264,7 @@ class Tool(Tk):
         zyf1.pack(padx=10, pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
-              text='解锁BL是用户的权力！反对禁止解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
+              text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
