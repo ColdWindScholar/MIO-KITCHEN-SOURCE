@@ -113,7 +113,7 @@ class askdirectorys(Toplevel):
     def refs(self):
         self.show.delete(0, END)
         if not self.path.get():
-            self.path.set("/")
+            self.path.set(os.path.abspath("/"))
         for f in os.listdir(self.path.get()):
             if os.path.isdir(os.path.join(self.path.get(), f)):
                 self.show.insert(END, f)
