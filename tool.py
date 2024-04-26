@@ -578,6 +578,8 @@ class SetUtils:
         try:
             self.set_value("language", language.get())
             load(language.get())
+            if ask_win2("We Need to Restart the tool to change the language"):
+                restart()
         except Exception as e:
             print(lang.t130, e)
 
@@ -3080,13 +3082,14 @@ def init():
     win.mainloop()
 
 
-def restart(er):
+def restart(er=None):
     try:
         if not ask_win2("Your operation will not be saved.", "Continue"):
             return
     except (Exception, BaseException):
         pass
-    er.destroy()
+    if er:
+        er.destroy()
     try:
         for i in win.winfo_children():
             try:
