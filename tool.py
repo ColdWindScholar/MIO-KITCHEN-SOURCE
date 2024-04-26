@@ -27,7 +27,6 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 if os.name == 'nt':
     import windnd
     from tkinter import filedialog
-    import mkc_filedialog as filedialog
 else:
     import mkc_filedialog as filedialog
 import zipfile
