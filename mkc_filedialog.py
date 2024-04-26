@@ -46,8 +46,7 @@ class askopenfilenames(Toplevel):
             file = self.show.get(self.show.curselection())
         except:
             file = ""
-        var = os.path.join(self.path.get(), file)
-        var = os.path.abspath(var)
+        var = os.path.abspath(os.path.join(self.path.get(), file))
         if os.path.isdir(var):
             self.path.set(var)
             self.refs()
