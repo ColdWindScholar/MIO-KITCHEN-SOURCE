@@ -1292,11 +1292,8 @@ def mpkman() -> None:
             values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(script_path + "main.json") else None
             if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
                 re_folder(temp)
-            if os.path.exists(script_path + "main.sh"):
-                if not file.get():
-                    file.set(temp + v_code())
-            else:
-                file.set(os.devnull)
+            if not file.get():
+                file.set(temp + v_code())
             with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
                 if values:
                     for va in values.value:
@@ -1314,7 +1311,7 @@ def mpkman() -> None:
                         (settings.path + os.sep + dn.get()).replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
                 MshParse(script_path + "main.msh")
-            elif os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
+            if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
                 call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
                 try:
                     os.remove(file.get())
