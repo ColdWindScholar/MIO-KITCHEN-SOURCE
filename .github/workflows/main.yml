@@ -106,6 +106,7 @@ jobs:
       - name: Install Packages
         run: |
           sudo rm -rf /usr/local/bin/2to3*
+          brew install xyz
           brew install python-tk python3  tcl-tk
           python3 -m pip install -U --force-reinstall pip
       - name: Pack Tool
