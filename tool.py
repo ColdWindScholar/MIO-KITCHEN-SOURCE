@@ -128,7 +128,9 @@ class LoadCar:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
-            task_num = len(self.tasks) + 1
+            task_num = func.__name__
+            if task_num in self.tasks:
+                task_num += str(len(self.tasks)+1)
             self.tasks[task_num] = func
             func(*args, **kwargs)
             del self.tasks[task_num]
