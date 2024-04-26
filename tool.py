@@ -2518,8 +2518,6 @@ class Dirsize:
                 pass
         if self.get == 1:
             self.rsize_v = self.size
-        elif self.get in [2, 3]:
-            self.rsize(self.size, self.num)
         else:
             self.rsize(self.size, self.num)
 
