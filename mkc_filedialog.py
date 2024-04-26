@@ -29,7 +29,7 @@ class askopenfilenames(Toplevel):
         self.path = StringVar()
         self.paths = Entry(self, textvariable=self.path)
         self.paths.bind("<Return>", self.p_bind)
-        self.path.set("/")
+        self.path.set(os.path.abspath("/"))
         self.paths.pack(fill=X, padx=5, pady=5)
         self.show = Listbox(self, activestyle='dotbox', highlightthickness=0)
         self.show.bind("<Double-Button-1>", self.p_bind)
@@ -39,6 +39,7 @@ class askopenfilenames(Toplevel):
         Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
+        self.refs()
         self.wait_window()
 
     def p_bind(self, event):
@@ -96,6 +97,7 @@ class askdirectorys(Toplevel):
         Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
+        self.refs()
         self.wait_window()
 
     def p_bind(self, event):
