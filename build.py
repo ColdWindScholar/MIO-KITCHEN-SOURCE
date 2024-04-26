@@ -13,6 +13,10 @@ if ostype == 'Linux':
     name = 'MIO-KITCHEN-linux.zip'
 elif ostype == 'Darwin':
     name = 'MIO-KITCHEN-macos.zip'
+    try:
+        from tkinter import END
+    except:
+        print("Tkinter IS not exist!\nThe Build may not Work!")
 else:
     name = 'MIO-KITCHEN-win.zip'
 
