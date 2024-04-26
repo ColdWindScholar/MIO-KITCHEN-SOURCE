@@ -107,7 +107,9 @@ jobs:
         run: |
           sudo rm -rf /usr/local/bin/2to3*
           sudo rm -rf /usr/local/Cellar/python@3.12/3.12.1/Frameworks/Python.framework/Versions/3.12/lib/python3.12
-          brew install python-tk@3.11 python3 tcl-tk
+          brew uninstall --force python
+          brew uninstall --force python3
+          brew install python-tk python3 tcl-tk
           python3 -m pip install -U --force-reinstall pip
       - name: Pack Tool
         run: python3 build.py
