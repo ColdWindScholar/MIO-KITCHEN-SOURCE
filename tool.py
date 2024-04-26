@@ -3075,7 +3075,7 @@ def init():
 
 def restart(er=None):
     try:
-        if not ask_win2("Your operation will not be saved.", "Continue"):
+        if not ask_win2("Your operation will not be saved."):
             return
     except (Exception, BaseException):
         pass
