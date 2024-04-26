@@ -311,17 +311,6 @@ class Tool(Tk):
     def setting_tab(self):
         self.show_local = StringVar()
         self.show_local.set(settings.path)
-        ai = StringVar()
-        ai.set(settings.ai_engine)
-        auto_rm_pay = StringVar(value=settings.rm_pay)
-        context = StringVar(value=settings.contextpatch)
-
-        def on_value_change():
-            settings.set_value('ai_engine', ai.get())
-
-        ai.trace("w", lambda *x: on_value_change())
-        context.trace("w", lambda *x: settings.set_value('contextpatch', context.get()))
-        auto_rm_pay .trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay .get()))
         sf1 = ttk.Frame(self.tab3)
         sf2 = ttk.Frame(self.tab3)
         sf3 = ttk.Frame(self.tab3)
@@ -340,6 +329,12 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            value=[str(i.rsplit('.', 1)[0]) for i in
                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+        ai = StringVar(value=settings.ai_engine)
+        auto_rm_pay = StringVar(value=settings.rm_pay)
+        context = StringVar(value=settings.contextpatch)
+        ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
+        context.trace("w", lambda *x: settings.set_value('contextpatch', context.get()))
+        auto_rm_pay.trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay.get()))
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
@@ -995,13 +990,13 @@ def mpkman() -> None:
             data = json.load(f)
             des = data.get("describe", '')
             (info_ := ConfigParser())['module'] = {
-                'name': f'{data["name"]}',
-                'version': f'{data["version"]}',
-                'author': f'{data["author"]}',
-                'describe': f'{des}',
+                'name': data["name"],
+                'version': data["version"],
+                'author': data["author"],
+                'describe': des,
                 'resource': 'main.zip',
-                'identifier': f'{value}',
-                'depend': f'{data["depend"]}'
+                'identifier': value,
+                'depend': data["depend"]
             }
             info_.write((buffer2 := StringIO()))
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
@@ -2442,7 +2437,7 @@ def unpack(chose, form: any = None):
                 print(lang.text79 + i + ".img [%s]" % file_type)
                 if call(exe=f"extract.erofs -i '{os.path.join(settings.path, dn.get(), i + '.img')}' -o '{work}' -x",
                         out=1) != 0:
-                    print(f'Unpack failed...')
+                    print('Unpack failed...')
                     continue
                 if os.path.exists(work + i):
                     try:
@@ -2651,10 +2646,10 @@ def rmdir(path):
     if not path:
         win.message_pop(lang.warn1)
     else:
-        print(lang.text97 + f'{os.path.basename(path)}')
+        print(lang.text97 + os.path.basename(path))
         try:
             try:
-                rmtree(f'{path}')
+                rmtree(path)
             except (Exception, BaseException):
                 call(f'busybox rm -rf "{path}"')
         except (Exception, BaseException):
