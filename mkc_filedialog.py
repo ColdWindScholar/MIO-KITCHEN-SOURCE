@@ -123,8 +123,7 @@ class askdirectorys(Toplevel):
             file = self.show.get(self.show.curselection())
         except:
             file = ""
-        var = os.path.join(self.path.get(), file)
-        self.file = var
+        self.file = os.path.join(self.path.get(), file)
         self.destroy()
 
     def cancel(self):
