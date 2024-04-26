@@ -1324,10 +1324,10 @@ def mpkman() -> None:
         else:
             print(lang.warn8)
 
-    class UninstallMpk:
+    class UninstallMpk(Toplevel):
 
         def __init__(self):
-            self.ck: Toplevel
+            super().__init__()
             self.arr = {}
             if chosen.get():
                 self.value = global_mpk[chosen.get()]
@@ -1338,28 +1338,27 @@ def mpkman() -> None:
                 win.message_pop(lang.warn2)
 
         def ask(self):
-            self.ck = Toplevel()
             try:
-                self.ck.attributes('-topmost', 'true')
+                self.attributes('-topmost', 'true')
             except (Exception, BaseException):
                 ...
-            self.ck.title(lang.t6)
-            jzxs(self.ck)
-            ttk.Label(self.ck, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+            self.title(lang.t6)
+            jzxs(self)
+            ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                                  expand=True)
             if self.arr:
-                ttk.Separator(self.ck, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-                ttk.Label(self.ck, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
+                ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+                ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
                                                                        expand=True)
-                te = Listbox(self.ck, highlightthickness=0, activestyle='dotbox')
+                te = Listbox(self, highlightthickness=0, activestyle='dotbox')
                 for i in self.arr.keys():
                     te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
 
-            ttk.Button(self.ck, text=lang.cancel, command=self.ck.destroy).pack(fill=X, expand=True, side=LEFT,
+            ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                                 pady=10,
                                                                                 padx=10)
-            ttk.Button(self.ck, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
+            ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
                                                                                                    side=LEFT, pady=10,
                                                                                                    padx=10)
 
@@ -1379,7 +1378,7 @@ def mpkman() -> None:
                             break
 
         def uninstall(self):
-            self.ck.destroy()
+            self.destroy()
             for i in self.arr.keys():
                 self.remove(i, self.arr.get(i, 'None'))
             self.remove(self.value, self.value2)
