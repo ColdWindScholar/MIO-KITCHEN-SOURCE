@@ -197,5 +197,6 @@
   "t32": "Automatisch",
   "t33": "Original",
   "t34": "EXT4 <=> EROFS",
-  "t35": "Alte Kernel"
+  "t35": "Alte Kernel",
+  "t36": "Wir müssen neu starten, um die Sprache zu wechseln"
 }

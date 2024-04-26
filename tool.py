@@ -578,7 +578,7 @@ class SetUtils:
         try:
             self.set_value("language", language.get())
             load(language.get())
-            if ask_win2("We Need to Restart the tool to change the language"):
+            if ask_win(lang.t36):
                 restart()
         except Exception as e:
             print(lang.t130, e)

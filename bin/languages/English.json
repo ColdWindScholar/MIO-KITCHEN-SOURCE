@@ -197,5 +197,6 @@
   "t32": "Auto",
   "t33": "Same as Original",
   "t34": "EXT4<=>EROFS",
-  "t35": "Support For Old Kernel"
+  "t35": "Support For Old Kernel",
+  "t36": "We need to restart to switch languages"
 }
