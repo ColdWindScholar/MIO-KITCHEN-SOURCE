@@ -2760,6 +2760,9 @@ class ProjectMenuUtils(ttk.LabelFrame):
         if not (inputvar := input_()):
             win.message_pop(lang.warn12)
         else:
+            inputvar = inputvar.replace(' ', '_')
+            if not inputvar.isprintable():
+                win.message_pop(lang.warn12)
             print(lang.text99 % inputvar)
             os.mkdir(settings.path + os.sep + inputvar)
         self.listdir()
