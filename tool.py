@@ -1615,8 +1615,9 @@ class Packxx(Toplevel):
     def start_(self):
         lg = self.lg
         self.destroy()
-        packrom(self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(), self.erofs_old_kernel.get())
+        values = [self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
+                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(), self.erofs_old_kernel.get()]
+        packrom(values)
 
 
 @cartoon
@@ -2051,8 +2052,8 @@ def dboot(nm: str = 'boot'):
 
 
 @cartoon
-def packrom(edbgs, dbgs, dbfs, scale, parts, spatch, *others) -> any:
-    dely, erofs_level, ext4_size, erofsext4, erofs_old_kernel = others
+def packrom(others) -> any:
+    edbgs, dbgs, dbfs, scale, parts, spatch, dely, erofs_level, ext4_size, erofsext4, erofs_old_kernel = others
     if not dn.get():
         win.message_pop(lang.warn1)
         return False
