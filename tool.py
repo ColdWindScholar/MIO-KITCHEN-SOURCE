@@ -2316,6 +2316,8 @@ def unpack(chose, form: any = None):
                     images=chose
                 ).run()
             except MemoryError:
+                print("Extracting Payload Slowly...")
+                pay.seek(0)
                 for i in chose:
                     Dumper(
                         pay,
