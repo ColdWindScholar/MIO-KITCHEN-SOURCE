@@ -1963,33 +1963,33 @@ def jboot(bn: str = 'boot'):
     if not os.path.exists(boot):
         win.message_pop(lang.warn3.format(bn))
         return
-    if os.path.exists(work + f"{bn}"):
-        if rmdir(work + f"{bn}") != 0:
+    if os.path.exists(work + bn):
+        if rmdir(work + bn) != 0:
             print(lang.text69)
             return
-    re_folder(work + f"{bn}")
-    os.chdir(work + f"{bn}")
+    re_folder(work + bn)
+    os.chdir(work + bn)
     if call("magiskboot unpack -h %s" % boot) != 0:
         print("Unpack %s Fail..." % boot)
         os.chdir(elocal)
-        rmtree((work + f"{bn}"))
+        rmtree(work + bn)
         return
-    if os.access(work + f"{bn}" + os.sep + "ramdisk.cpio", os.F_OK):
-        comp = gettype(work + f"{bn}" + os.sep + "ramdisk.cpio")
+    if os.access(work + bn + os.sep + "ramdisk.cpio", os.F_OK):
+        comp = gettype(work + bn + os.sep + "ramdisk.cpio")
         print("Ramdisk is %s" % comp)
-        with open(work + f"{bn}" + os.sep + "comp", "w") as f:
+        with open(work + bn + os.sep + "comp", "w") as f:
             f.write(comp)
         if comp != "unknown":
-            os.rename(work + f"{bn}" + os.sep + "ramdisk.cpio",
-                      work + f"{bn}" + os.sep + "ramdisk.cpio.comp")
+            os.rename(work + bn + os.sep + "ramdisk.cpio",
+                      work + bn + os.sep + "ramdisk.cpio.comp")
             if call("magiskboot decompress %s %s" % (
-                    work + f"{bn}" + os.sep + "ramdisk.cpio.comp",
-                    work + f"{bn}" + os.sep + "ramdisk.cpio")) != 0:
+                    work + bn + os.sep + "ramdisk.cpio.comp",
+                    work + bn + os.sep + "ramdisk.cpio")) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
-        if not os.path.exists(work + f"{bn}" + os.sep + "ramdisk"):
-            os.mkdir(work + f"{bn}" + os.sep + "ramdisk")
-        os.chdir(work + f"{bn}" + os.sep)
+        if not os.path.exists(work + bn + os.sep + "ramdisk"):
+            os.mkdir(work + bn + os.sep + "ramdisk")
+        os.chdir(work + bn + os.sep)
         print("Unpacking Ramdisk...")
         call("cpio -i -d -F %s -D %s" % ("ramdisk.cpio", "ramdisk"))
         os.chdir(elocal)
