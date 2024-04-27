@@ -779,11 +779,7 @@ class Process(Toplevel):
         self.start.configure(text="正在运行", state='disabled')
         with open(engine := self.dir + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
             for u in self.value:
-                if 'get' in dir(self.gavs[u]):
-                    var = self.gavs[u].get()
-                else:
-                    var = self.gavs[u]
-                en.write(f"export {u}={var}\n")
+                en.write(f"export {u}={self.gavs[u].get() if 'get' in dir(self.gavs[u]) else self.gavs[u]}\n")
             en.write("source $1")
         self.progbar.start()
         for step in self.prc.get('steps', []):
