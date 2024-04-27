@@ -83,12 +83,10 @@ class Dumper:
         self.multiprocess_partitions(partitions_with_ops)
 
     def multiprocess_partitions(self, partitions):
-
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = {executor.submit(self.dump_part, part): part for part in partitions}
             for future in as_completed(futures):
-                part = futures[future]
-                partition_name = part['partition'].partition_name
+                partition_name = futures[future]['partition'].partition_name
                 try:
                     future.result()
                     print(f"{partition_name} Done!")

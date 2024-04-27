@@ -2324,7 +2324,8 @@ def unpack(chose, form: any = None):
                         work,
                         diff=False,
                         old='old',
-                        images=[i]
+                        images=[i],
+                        workers=1
                     ).run()
                     pay.seek(0)
         if settings.rm_pay == '1':
