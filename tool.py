@@ -48,7 +48,8 @@ if sys.version_info.major == 3:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
-from PIL import Image, ImageTk
+from PIL.Image import open as open_img
+from PIL.ImageTk import PhotoImage
 import fspatch
 import imgextractor
 import lpunpack
@@ -124,7 +125,7 @@ class LoadCar:
     def load_gif(self, gif):
         try:
             while True:
-                self.frames.append(ImageTk.PhotoImage(gif))
+                self.frames.append(PhotoImage(gif))
                 gif.seek(len(self.frames))
         except EOFError:
             ...
@@ -310,7 +311,7 @@ class Tool(Tk):
         Label(tab,
               text=f"Wechat Pay/微信支付",
               font=('楷书', 20), fg='#008000').pack(padx=10, pady=10)
-        self.photo = ImageTk.PhotoImage(data=images.wechat_byte)
+        self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
         Label(tab, text=lang.text109, font=('楷书', 12), fg='#00aafA').pack(padx=10, pady=10)
         ttk.Button(tab, text=lang.text17, command=tab.destroy).pack(fill=X, side='bottom')
@@ -403,8 +404,8 @@ def error(code, desc="unknown error"):
     win.withdraw()
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
-    img = Image.open(BytesIO(images.error_logo_byte)).resize((100, 100))
-    pyt = ImageTk.PhotoImage(img)
+    img = open_img(BytesIO(images.error_logo_byte)).resize((100, 100))
+    pyt = PhotoImage(img)
     Label(er, image=pyt).pack(padx=10, pady=10)
     er.protocol("WM_DELETE_WINDOW", win.destroy)
     er.title("Program crash!")
@@ -571,7 +572,7 @@ class SetUtils:
         try:
             self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
-            cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get())))))
+            cartoon.load_gif(open_img(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get())))))
         except Exception as e:
             win.message_pop(lang.text101 % (theme.get(), e))
 
@@ -1042,9 +1043,9 @@ def mpkman() -> None:
                     continue
             if os.path.isdir(moduledir + os.sep + i):
                 if os.path.exists(os.path.join(moduledir, i, 'icon')):
-                    images_[i] = ImageTk.PhotoImage(Image.open(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
+                    images_[i] = PhotoImage(open_img(os.path.join(moduledir, i, 'icon')).resize((70, 70)))
                 else:
-                    images_[i] = ImageTk.PhotoImage(data=images.none_byte)
+                    images_[i] = PhotoImage(data=images.none_byte)
                 data = JsonEdit(os.path.join(moduledir, i, "info.json")).read()
                 icon = tk.Label(pls.scrollable_frame,
                                 image=images_[i],
@@ -1449,12 +1450,12 @@ class InstallMpk(Toplevel):
                 with myfile.open('icon') as myfi:
                     self.icon = myfi.read()
                     try:
-                        pyt = ImageTk.PhotoImage(Image.open(BytesIO(self.icon)))
+                        pyt = PhotoImage(open_img(BytesIO(self.icon)))
                     except Exception as e:
                         print(e)
-                        pyt = ImageTk.PhotoImage(data=images.none_byte)
+                        pyt = PhotoImage(data=images.none_byte)
             except (Exception, BaseException):
-                pyt = ImageTk.PhotoImage(data=images.none_byte)
+                pyt = PhotoImage(data=images.none_byte)
             with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
         Label(self, image=pyt).pack(padx=10, pady=10)
@@ -3077,7 +3078,7 @@ def init():
     unpackg.gui()
     Frame3().gui()
     project_menu.listdir()
-    cartoon.load_gif(Image.open(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
+    cartoon.load_gif(open_img(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
     cartoon.init()
     print(lang.text108)
     win.update()
