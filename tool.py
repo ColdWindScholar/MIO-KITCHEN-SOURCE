@@ -2003,19 +2003,19 @@ def dboot(nm: str = 'boot'):
     work = rwork()
     flag = ''
     boot = findfile(f"{nm}.img", work)
-    if not os.path.exists(work + f"{nm}"):
+    if not os.path.exists(work + nm):
         print(f"Cannot Find {nm}...")
         return
     cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                     f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
         '\\', "/")
 
-    if os.path.isdir(work + f"{nm}" + os.sep + "ramdisk"):
-        os.chdir(work + f"{nm}" + os.sep + "ramdisk")
+    if os.path.isdir(work + nm + os.sep + "ramdisk"):
+        os.chdir(work + nm + os.sep + "ramdisk")
         call(exe="busybox ash -c \"find | sed 1d | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1,
              shstate=True)
-        os.chdir(work + f"{nm}" + os.sep)
-        with open(work + f"{nm}" + os.sep + "comp", "r", encoding='utf-8') as compf:
+        os.chdir(work + nm + os.sep)
+        with open(work + nm + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print("Compressing:%s" % comp)
         if comp != "unknown":
@@ -2036,16 +2036,16 @@ def dboot(nm: str = 'boot'):
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         if comp == "cpio":
             flag = "-n"
-    os.chdir(work + f"{nm}" + os.sep)
+    os.chdir(work + nm + os.sep)
     if call("magiskboot repack %s %s" % (flag, boot)) != 0:
         print("Failed to Pack boot...")
         return
     else:
         os.remove(work + f"{nm}.img")
-        os.rename(work + f"{nm}" + os.sep + "new-boot.img", work + os.sep + "boot.img")
+        os.rename(work + nm + os.sep + "new-boot.img", work + os.sep + "boot.img")
         os.chdir(elocal)
         try:
-            rmdir(work + f"{nm}")
+            rmdir(work + nm)
         except (Exception, BaseException):
             print(lang.warn11.format(nm))
         print("Successfully packed Boot...")
