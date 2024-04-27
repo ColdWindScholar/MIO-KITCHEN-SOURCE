@@ -442,10 +442,8 @@ class LOGO_DUMPER:
                     b.seek(0, 0)
                     self.cfg.imgblkszs[i] = (bmp_head.fsize >> 0xc) + 1
                     self.cfg.imgblkoffs[i] = off
-
                     o.seek(off << 0xc)
                     o.write(b.read(bmp_head.fsize))
-
                     off += self.cfg.imgblkszs[i]
             o.seek(self.cfg.headoff)
             o.write(self.magic)
