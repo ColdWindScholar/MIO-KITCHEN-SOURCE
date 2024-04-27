@@ -139,7 +139,7 @@ class LoadCar:
                 if self.tasks[task_num][1] == args:
                     print(f"Please Wait for task_{self.tasks[task_num][0]}...")
                 else:
-                    task_num += hash(func)
+                    task_num = hash(func)
             self.tasks[task_num] = [hash(func), args]
             func(*args, **kwargs)
             if task_num in self.tasks:
