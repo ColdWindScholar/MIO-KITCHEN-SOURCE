@@ -165,16 +165,16 @@
   "text139": "Licença de código aberto",
   "t1": "Ao clicar em (Próximo), você leu e concorda integralmente com o contrato\ne garante o estrito cumprimento do mesmo.",
   "t2": "Política de Privacidade e Acordo do Usuário",
-  "t3": "Ao clicar em (Próximo), você leu e concordou com todas as políticas de privacidade e acordos do usuário.",
+  "t3": "Ao clicar em (Próximo), você leu e concordou com toda a Política de Privacidade e Acordo do Usuário.",
   "t4": "Tudo pronto",
   "t5": "Experimente o emocionante M.K.C! \nClique em Concluir para fechar esta janela",
   "t6": "Desinstalar plugin",
   "t7": "Desinstalar %s?",
   "t8": "Os seguintes plugins também serão desinstalados:",
   "t9": "Excluir: {}?",
-  "t10": "Tamanho super {} muito pequeno.\nPor favor, digite novamente o tamanho.\nPreenchemos o valor de referência para você",
+  "t10": "Tamanho super {} muito pequeno.\nPor favor, digite novamente o tamanho.\nPreenchemos o valor de referência para você.",
   "t11": "Remover arquivo original",
-  "t12": "Seu OFP é MTK ou QCOM?\nMTK -> Clique em ok\nQCOM -> Clique em cancelar",
+  "t12": "Seu OFP é MTK ou QCOM?\nMTK -> Clique em OK\nQCOM -> Clique em Cancelar",
   "t13": "Converter imagem",
   "t14": "Exportar",
   "t15": "Exportação bem-sucedida: %s",
@@ -198,5 +198,5 @@
   "t33": "Igual ao original",
   "t34": "EXT4<=>EROFS",
   "t35": "Suporte para kernel antigo",
-  "t36": "Precisamos reiniciar para trocar línguas"
+  "t36": "Precisamos reiniciar para mudar de idioma"
 }
