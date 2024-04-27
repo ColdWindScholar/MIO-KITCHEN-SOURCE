@@ -11,11 +11,6 @@ if os.name == 'nt':
 from timeit import default_timer as dti
 from utils import simg2img
 
-try:
-    from pycase import ensure_dir_case_sensitive
-except ImportError:
-    ensure_dir_case_sensitive = lambda *x: ...
-
 
 class Extractor:
     def __init__(self):
@@ -139,11 +134,6 @@ class Extractor:
                         dir_target = dir_target[:-1]
                     if not os.path.isdir(dir_target):
                         os.makedirs(dir_target)
-                        if os.name == 'nt' and windll.shell32.IsUserAnAdmin():
-                            try:
-                                ensure_dir_case_sensitive(dir_target)
-                            except (Exception, BaseException):
-                                ...
                     if os.name == 'posix' and os.geteuid() == 0:
                         os.chmod(dir_target, int(mode, 8))
                         os.chown(dir_target, uid, gid)
@@ -202,7 +192,8 @@ class Extractor:
             self.fs_config.insert(1, f'{dir_r} 0 2000 0755' if dir_r == 'vendor' else '/lost+found 0 0 0700')
             self.fs_config.insert(2 if dir_r == 'system' else 1, f'{dir_r} 0 0 0755')
             self.__write('\n'.join(self.fs_config), self.CONFIG_DIR + os.sep + self.FileName + '_fs_config')
-            self.__write('\n'.join(self.space), os.path.join(self.CONFIG_DIR, self.FileName + '_space.txt'))
+            if self.space:
+                self.__write('\n'.join(self.space), os.path.join(self.CONFIG_DIR, self.FileName + '_space.txt'))
             p1 = p2 = 0
             if self.context:
                 self.context.sort()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import platform
 import subprocess
+from ctypes import windll
 from functools import wraps
 import AI_engine
 import ext4
@@ -23,6 +24,10 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+try:
+    from pycase import ensure_dir_case_sensitive
+except ImportError:
+    ensure_dir_case_sensitive = lambda *x: ...
 
 if os.name == 'nt':
     import windnd
@@ -2287,6 +2292,11 @@ def rwork() -> str:
 
 @cartoon
 def unpack(chose, form: any = None):
+    if os.name == 'nt' and windll.shell32.IsUserAnAdmin():
+        try:
+            ensure_dir_case_sensitive(rwork())
+        except (Exception, BaseException):
+            ...
     if not dn.get():
         win.message_pop(lang.warn1)
         return False
