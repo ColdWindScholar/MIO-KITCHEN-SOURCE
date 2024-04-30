@@ -26,12 +26,12 @@ from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 try:
     from pycase import ensure_dir_case_sensitive
-    from ctypes import windll
 except ImportError:
     ensure_dir_case_sensitive = lambda *x: ...
 
 if os.name == 'nt':
     import windnd
+    from ctypes import windll
     from tkinter import filedialog
 else:
     import mkc_filedialog as filedialog
@@ -2299,11 +2299,12 @@ def rwork() -> str:
 
 @cartoon
 def unpack(chose, form: any = None):
-    if os.name == 'nt' and windll.shell32.IsUserAnAdmin():
-        try:
-            ensure_dir_case_sensitive(rwork())
-        except (Exception, BaseException):
-            ...
+    if os.name == 'nt':
+        if windll.shell32.IsUserAnAdmin():
+            try:
+                ensure_dir_case_sensitive(rwork())
+            except (Exception, BaseException):
+                ...
     if not dn.get():
         win.message_pop(lang.warn1)
         return False
