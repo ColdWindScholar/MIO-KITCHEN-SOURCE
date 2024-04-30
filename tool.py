@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import platform
 import subprocess
-from ctypes import windll
+
 from functools import wraps
 import AI_engine
 import ext4
@@ -26,6 +26,7 @@ from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 try:
     from pycase import ensure_dir_case_sensitive
+    from ctypes import windll
 except ImportError:
     ensure_dir_case_sensitive = lambda *x: ...
 
