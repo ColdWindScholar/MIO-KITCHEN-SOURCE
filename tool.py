@@ -1318,7 +1318,8 @@ def mpkman() -> None:
                         '\\',
                         '/')))
                 f.write('export version="{}"\n'.format(settings.version))
-                f.write('export language="{}"\n'.format(settings.language))
+                f.write(f'export language="{settings.language}"\n')
+                f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
                 f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
                 f.write(
                     "export project='{}'\nsource $1".format(
