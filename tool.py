@@ -578,7 +578,7 @@ class SetUtils:
         try:
             self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
-            cartoon.load_gif(open_img(BytesIO(getattr(images, "loading_{}_byte".format(win.LB2.get())))))
+            cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.LB2.get()}_byte"))))
         except Exception as e:
             win.message_pop(lang.text101 % (theme.get(), e))
 
@@ -800,7 +800,7 @@ class Process(Toplevel):
                 with open(sh_tmp_file := self.dir + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
                     sh_tmp.writelines(step['run'])
                 sh = "ash" if os.name == 'posix' else 'bash'
-                self.error = call("busybox {} {} {}".format(sh, engine, sh_tmp_file))
+                self.error = call(f"busybox {sh} {engine} {sh_tmp_file}")
             elif "use" in step:
                 try:
                     self.use(step)
@@ -1139,7 +1139,7 @@ def mpkman() -> None:
                 f.write("source $1")
             if os.path.exists(file_):
                 sh = "ash" if os.name == 'posix' else "bash"
-                call("busybox {} {} {}".format(sh, file_, cmd.replace('\\', '/')))
+                call(f"busybox {sh} {file_} {cmd.replace(os.sep, '/')}")
                 try:
                     os.remove(file_)
                 except (Exception, BaseException):
@@ -1327,7 +1327,7 @@ def mpkman() -> None:
             if os.path.exists(script_path + "main.msh"):
                 MshParse(script_path + "main.msh")
             if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
-                call("busybox {} {} {}".format(sh, file.get(), (script_path + "main.sh").replace('\\', '/')))
+                call(f"busybox {sh} {file.get} {(script_path + 'main.sh').replace(os.sep, '/')}")
                 try:
                     os.remove(file.get())
                 except (Exception, BaseException) as e:
@@ -1664,7 +1664,7 @@ class Dbkxyt:
             add_line = self.get_line_num(lines, '#Other images')
             for t in os.listdir(dir_ + "images"):
                 if t.endswith('.img') and not os.path.isdir(dir_ + t):
-                    print("Add Flash method {} to update-binary".format(t))
+                    print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(os.path.join(dir_ + 'images', t)) > 209715200:
                         self.zstd_compress(os.path.join(dir_ + 'images', t))
                         lines.insert(add_line,
@@ -1674,7 +1674,7 @@ class Dbkxyt:
                                      'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
             for t in os.listdir(dir_):
                 if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
-                    print("Add Flash method {} to update-binary".format(t))
+                    print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(dir_ + t) > 209715200:
                         self.zstd_compress(dir_ + t)
                         move(os.path.join(dir_, t + ".zst"), os.path.join(dir_ + "images", t + ".zst"))
@@ -1702,7 +1702,7 @@ class Dbkxyt:
                 utils.simg2img(path)
             try:
                 print(f"[Compress] {os.path.basename(path)}...")
-                call("zstd -5 --rm {} -o {}".format(path, path + ".zst"))
+                call(f"zstd -5 --rm {path} -o {path}.zst")
             except Exception as e:
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
@@ -2576,15 +2576,15 @@ class Dirsize:
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
-                content = re.sub("resize {} \\d+".format(part_name),
-                                 "resize {} {}".format(part_name, size), content)
-                content = re.sub("resize {}_a \\d+".format(part_name),
-                                 "resize {}_a {}".format(part_name, size), content)
-                content = re.sub("# Grow partition {} from 0 to \\d+".format(part_name),
-                                 "# Grow partition {} from 0 to {}".format(part_name, size),
+                content = re.sub(f"resize {part_name} \\d+",
+                                 f"resize {part_name} {size}", content)
+                content = re.sub(f"resize {part_name}_a \\d+",
+                                 f"resize {part_name}_a {size}", content)
+                content = re.sub(f"# Grow partition {part_name} from 0 to \\d+",
+                                 f"# Grow partition {part_name} from 0 to {size}",
                                  content)
-                content = re.sub("# Grow partition {}_a from 0 to \\d+".format(part_name),
-                                 "# Grow partition {}_a from 0 to {}".format(part_name, size), content)
+                content = re.sub(f"# Grow partition {part_name}_a from 0 to \\d+",
+                                 f"# Grow partition {part_name}_a from 0 to {size}", content)
                 ff.write(content)
 
 
@@ -2617,7 +2617,7 @@ def datbr(work, name, brl: any, dat_ver=4):
 
 def mkerofs(name, format_, work, level, old_kernel=0):
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
-    extra_ = f'{format_},{level}' if format_ != 'lz4' else f'{format_}'
+    extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
     other_ = '-E legacy-compress' if old_kernel else ''
     cmd = f"mkfs.erofs {other_} -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd, out=1)
@@ -2924,7 +2924,7 @@ class UnpackGui(ttk.LabelFrame):
 
 
 def img2simg(path):
-    call('img2simg {} {}'.format(path, path + 's'))
+    call(f'img2simg {path} {path}s')
     if os.path.exists(path + 's'):
         try:
             os.remove(path)
@@ -3061,8 +3061,7 @@ class FormatConversion(ttk.LabelFrame):
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget == 'dat':
                     print(lang.text88 % os.path.basename(i).split('.')[0])
-                    call("brotli -q {} -j -w 24 {} -o {}".format(0, work + i,
-                                                                 work + i + ".br"))
+                    call(f"brotli -q 0 -j -w 24 {work+i} -o {work + i}.br")
                     if os.access(work + i + '.br', os.F_OK):
                         try:
                             os.remove(work + i)
