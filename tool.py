@@ -898,6 +898,7 @@ class IconGrid(tk.Frame):
 
 def mpkman() -> None:
     chosen = tk.StringVar(value='')
+    name = tk.StringVar(value='')
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
 
@@ -965,7 +966,7 @@ def mpkman() -> None:
             win.message_pop(lang.warn2)
             return 1
         if id_ is None:
-            id_ = global_mpk[chosen.get()]
+            id_ = chosen.get()
         path = os.path.join(moduledir, id_) + os.sep
         if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
@@ -979,8 +980,9 @@ def mpkman() -> None:
                 editor.main(path + 'main.sh')
 
     class MpkRunMenu:
-        def __init__(self, name):
+        def __init__(self, name, name2):
             self.name = name
+            self.name2 = name2
 
         def popup(self, event):
             chosen.set(self.name)
@@ -995,7 +997,7 @@ def mpkman() -> None:
         if not chosen.get():
             win.message_pop(lang.warn2)
             return 1
-        with open(os.path.join(moduledir, (value := global_mpk[chosen.get()]), "info.json"), 'r',
+        with open(os.path.join(moduledir, (value := chosen.get()), "info.json"), 'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
             des = data.get("describe", '')
@@ -1018,16 +1020,16 @@ def mpkman() -> None:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, str(chosen.get()) + ".mpk"), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, str(name.get()) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
             if os.path.exists(os.path.join(moduledir, value, 'icon')):
                 mpk2.write(os.path.join(moduledir, value, 'icon'), 'icon')
             del buffer2, buffer
-        print(lang.t15 % (settings.path + os.sep + chosen.get() + ".mpk")) if os.path.exists(
-            settings.path + os.sep + chosen.get() + ".mpk") else print(
-            lang.t16 % (settings.path + os.sep + chosen.get() + ".mpk"))
+        print(lang.t15 % (settings.path + os.sep + name.get() + ".mpk")) if os.path.exists(
+            settings.path + os.sep + name.get() + ".mpk") else print(
+            lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
 
     def popup(event):
         rmenu.post(event.x_root, event.y_root)
@@ -1060,8 +1062,8 @@ def mpkman() -> None:
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', MpkRunMenu(data['name']).run)
-                icon.bind('<Button-3>', MpkRunMenu(data['name']).popup)
+                icon.bind('<Double-Button-1>', MpkRunMenu(i, data['name']).run)
+                icon.bind('<Button-3>', MpkRunMenu(i, data['name']).popup)
                 pls.add_icon(icon)
                 global_mpk[data['name']] = data['identifier']
 
@@ -1286,7 +1288,7 @@ def mpkman() -> None:
             print(lang.warn1)
             return
         if chosen.get():
-            value = global_mpk[chosen.get()]
+            value = chosen.get()
         else:
             print(lang.warn2)
             return
@@ -1295,7 +1297,7 @@ def mpkman() -> None:
             data = json.load(f)
             for n in data['depend'].split():
                 if not os.path.exists(os.path.join(moduledir, n)):
-                    print(lang.text36 % (chosen.get(), n, n))
+                    print(lang.text36 % (name.get(), n, n))
                     return 2
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
@@ -1340,8 +1342,8 @@ def mpkman() -> None:
             super().__init__()
             self.arr = {}
             if chosen.get():
-                self.value = global_mpk[chosen.get()]
-                self.value2 = chosen.get()
+                self.value = chosen.get()
+                self.value2 = name.get()
                 self.lfdep()
                 self.ask()
             else:
