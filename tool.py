@@ -2606,7 +2606,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text87 % name)
     else:
         print(lang.text88 % name)
-        call("brotli -q {} -j -w 24 {} -o {}".format(brl, work + name + ".new.dat", work + name + ".new.dat.br"))
+        call(f"brotli -q {brl} -j -w 24 {work + name}.new.dat -o {work + name}.new.dat.br")
         if os.access(work + name + ".new.dat", os.F_OK):
             try:
                 os.remove(work + name + ".new.dat")
