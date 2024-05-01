@@ -3050,7 +3050,7 @@ class FormatConversion(ttk.LabelFrame):
                     datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if hget == 'br':
                     print(lang.text79 + i)
-                    call("brotli -dj " + work + i)
+                    call(f"brotli -dj {work + i}")
 
         elif f_get == 'br':
             for i in selection:
