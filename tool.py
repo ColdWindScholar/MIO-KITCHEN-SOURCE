@@ -1323,7 +1323,7 @@ def mpkman() -> None:
                 f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
                 f.write(
                     "export project='{}'\nsource $1".format(
-                        (settings.path + os.sep + dn.get()).replace('\\', '/')))
+                        rwork().replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
                 MshParse(script_path + "main.msh")
             if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
