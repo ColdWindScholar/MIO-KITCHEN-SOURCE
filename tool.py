@@ -986,10 +986,12 @@ def mpkman() -> None:
 
         def popup(self, event):
             chosen.set(self.name)
+            name.set(self.name2)
             rmenu2.post(event.x_root, event.y_root)
 
         def run(self, event):
             chosen.set(self.name)
+            name.set(self.name2)
             cz(run)
 
     @cartoon
