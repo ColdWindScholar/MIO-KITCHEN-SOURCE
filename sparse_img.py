@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from bisect import bisect_right
 import os
-import sys
 import struct
-from hashlib import sha1
+import sys
+from bisect import bisect_right
 
 import rangelib
 
@@ -131,35 +130,9 @@ class SparseImage:
         else:
             self.file_map = {"__DATA": self.care_map}
 
-    def AppendFillChunk(self, data, blocks):
-        f = self.simg_f
-
-        # Append a fill chunk
-        f.seek(0, os.SEEK_END)
-        f.write(struct.pack("<2H3I", 0xCAC2, 0, blocks, 16, data))
-
-        # Update the sparse header
-        self.total_blocks += blocks
-        self.total_chunks += 1
-
-        f.seek(16, os.SEEK_SET)
-        f.write(struct.pack("<2I", self.total_blocks, self.total_chunks))
-
     def ReadRangeSet(self, ranges):
-        return [d for d in self._GetRangeData(ranges)]
-
-    def TotalSha1(self, include_clobbered_blocks=False):
-        """Return the SHA-1 hash of all data in the 'care' regions.
-
-    If include_clobbered_blocks is True, it returns the hash including the
-    clobbered_blocks."""
-        ranges = self.care_map
-        if not include_clobbered_blocks:
-            ranges = ranges.subtract(self.clobbered_blocks)
-        h = sha1()
-        for d in self._GetRangeData(ranges):
-            h.update(d)
-        return h.hexdigest()
+        for f in self._GetRangeData(ranges):
+            yield f
 
     def _GetRangeData(self, ranges):
         """Generator that produces all the image data in 'ranges'.  The
@@ -282,8 +255,3 @@ class SparseImage:
                 out["__NONZERO-%d" % i] = rangelib.RangeSet(data=blocks)
         if clobbered_blocks:
             out["__COPY"] = clobbered_blocks
-
-    def ResetFileMap(self):
-        """Throw away the file map and treat the entire image as
-    undifferentiated data."""
-        self.file_map = {"__DATA": self.care_map}
