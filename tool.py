@@ -615,19 +615,19 @@ def un_dtbo(bn: str = 'dtbo') -> any:
     if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
         print(lang.warn3.format(bn))
         return False
-    re_folder(work + f"{bn}")
-    re_folder(work + f"{bn}" + os.sep + "dtbo")
-    re_folder(work + f"{bn}" + os.sep + "dts")
+    re_folder(work + bn)
+    re_folder(work + bn + os.sep + "dtbo")
+    re_folder(work + bn + os.sep + "dts")
     try:
-        mkdtboimg.dump_dtbo(dtboimg, work + f"{bn}" + os.sep + "dtbo" + os.sep + "dtbo")
+        mkdtboimg.dump_dtbo(dtboimg, work + bn + os.sep + "dtbo" + os.sep + "dtbo")
     except Exception as e:
         print(lang.warn4.format(e))
         return False
-    for dtbo in os.listdir(work + f"{bn}" + os.sep + "dtbo"):
+    for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
-            call(exe="dtc -@ -I dtb -O dts %s -o %s" % (work + f"{bn}" + os.sep + "dtbo" + os.sep + dtbo,
-                                                        os.path.join(work, f"{bn}", "dts", "dts." +
+            call(exe="dtc -@ -I dtb -O dts %s -o %s" % (work + bn + os.sep + "dtbo" + os.sep + dtbo,
+                                                        os.path.join(work, bn, "dts", "dts." +
                                                                      os.path.basename(dtbo).rsplit('.', 1)[1])), out=1)
     print(lang.text5)
     try:
@@ -666,8 +666,8 @@ def logo_dump(bn: str = 'logo'):
     if not (logo := findfile(f'{bn}.img', work := rwork())):
         win.message_pop(lang.warn3.format(bn))
         return False
-    re_folder(work + f"{bn}")
-    utils.LOGO_DUMPER(logo, work + f"{bn}").unpack()
+    re_folder(work + bn)
+    utils.LOGO_DUMPER(logo, work + bn).unpack()
 
 
 @cartoon
