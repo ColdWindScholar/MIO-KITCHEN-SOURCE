@@ -1985,14 +1985,14 @@ def jboot(bn: str = 'boot'):
             return
     re_folder(work + bn)
     os.chdir(work + bn)
-    if call("magiskboot unpack -h %s" % boot) != 0:
-        print("Unpack %s Fail..." % boot)
+    if call(f"magiskboot unpack -h {boot}") != 0:
+        print(f"Unpack {boot} Fail...")
         os.chdir(elocal)
         rmtree(work + bn)
         return
     if os.access(work + bn + os.sep + "ramdisk.cpio", os.F_OK):
         comp = gettype(work + bn + os.sep + "ramdisk.cpio")
-        print("Ramdisk is %s" % comp)
+        print(f"Ramdisk is {comp}")
         with open(work + bn + os.sep + "comp", "w") as f:
             f.write(comp)
         if comp != "unknown":
@@ -2007,7 +2007,7 @@ def jboot(bn: str = 'boot'):
             os.mkdir(work + bn + os.sep + "ramdisk")
         os.chdir(work + bn + os.sep)
         print("Unpacking Ramdisk...")
-        call("cpio -i -d -F %s -D %s" % ("ramdisk.cpio", "ramdisk"))
+        call('cpio -i -d -F ramdisk.cpio -D ramdisk')
         os.chdir(elocal)
     else:
         print("Unpack Done!")
@@ -2088,7 +2088,7 @@ def packrom(others) -> any:
                     if gettype(file) == 'vbmeta':
                         print(lang.text71 % file)
                         utils.vbpatch(file).disavb()
-        if os.access(os.path.join(work + "config", "%s_fs_config" % dname), os.F_OK):
+        if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
             if os.name == 'nt':
                 try:
                     if folder := findfolder(work, "com.google.android.apps.nbu."):
@@ -2107,7 +2107,7 @@ def packrom(others) -> any:
                 elif parts_dict[dname] == 'ext':
                     parts_dict[dname] = 'erofs'
             if parts_dict[dname] == 'erofs':
-                mkerofs(dname, "%s" % (edbgs.get()), work, erofs_level, erofs_old_kernel)
+                mkerofs(dname, str(edbgs.get()), work, erofs_level, erofs_old_kernel)
                 if dely == 1:
                     rdi(work, dname)
                 print(lang.text3.format(dname))
@@ -2358,7 +2358,7 @@ def unpack(chose, form: any = None):
         print(lang.text79 + f"Super")
         file_type = gettype(work + "super.img")
         if file_type == "sparse":
-            print(lang.text79 + "super.img [%s]" % file_type)
+            print(lang.text79 + f"super.img [{file_type}]")
             try:
                 utils.simg2img(work + "super.img")
             except (Exception, BaseException):
@@ -3089,7 +3089,7 @@ def init():
     unpackg.gui()
     Frame3().gui()
     project_menu.listdir()
-    cartoon.load_gif(open_img(BytesIO(getattr(images, "loading_%s_byte" % (win.LB2.get())))))
+    cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.LB2.get()}_byte"))))
     cartoon.init()
     print(lang.text108)
     win.update()
