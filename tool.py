@@ -1304,7 +1304,6 @@ def mpkman() -> None:
                 if not os.path.exists(os.path.join(moduledir, n)):
                     print(lang.text36 % (name.get(), n, n))
                     return 2
-        sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
                 script_path + "main.json") else None
@@ -1331,7 +1330,7 @@ def mpkman() -> None:
             if os.path.exists(script_path + "main.msh"):
                 MshParse(script_path + "main.msh")
             if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
-                call(f"busybox {sh} {file.get} {(script_path + 'main.sh').replace(os.sep, '/')}")
+                call(f"busybox {'ash' if os.name == 'posix' else 'bash'} {file.get()} {(script_path + 'main.sh').replace(os.sep, '/')}")
                 try:
                     os.remove(file.get())
                 except (Exception, BaseException) as e:
