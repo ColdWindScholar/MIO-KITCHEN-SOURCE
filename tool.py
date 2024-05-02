@@ -24,6 +24,7 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+
 try:
     from pycase import ensure_dir_case_sensitive
 except ImportError:
@@ -141,7 +142,7 @@ class LoadCar:
                     print(f"Please Wait for task_{self.tasks[task_num][0]}...")
                     return
                 else:
-                    task_num = hash(func)+len(args)
+                    task_num = hash(func) + len(args)
             self.tasks[task_num] = [hash(func), args]
             func(*args, **kwargs)
             if task_num in self.tasks:
@@ -1303,7 +1304,8 @@ def mpkman() -> None:
                     return 2
         sh = "ash" if os.name == 'posix' else 'bash'
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
-            values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(script_path + "main.json") else None
+            values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
+                script_path + "main.json") else None
             if not os.path.exists((temp := os.path.join(elocal, "bin", "temp") + os.sep)):
                 re_folder(temp)
             if not file.get():
@@ -1360,22 +1362,22 @@ def mpkman() -> None:
             self.title(lang.t6)
             jzxs(self)
             ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                                 expand=True)
+                                                                              expand=True)
             if self.arr:
                 ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
                 ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
-                                                                       expand=True)
+                                                                    expand=True)
                 te = Listbox(self, highlightthickness=0, activestyle='dotbox')
                 for i in self.arr.keys():
                     te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
 
             ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
-                                                                                pady=10,
-                                                                                padx=10)
+                                                                          pady=10,
+                                                                          padx=10)
             ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
-                                                                                                   side=LEFT, pady=10,
-                                                                                                   padx=10)
+                                                                                                side=LEFT, pady=10,
+                                                                                                padx=10)
 
         def lfdep(self, name=None):
             if not name:
@@ -1633,7 +1635,8 @@ class Packxx(Toplevel):
         lg = self.lg
         self.destroy()
         values = [self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(), self.erofs_old_kernel.get()]
+                  int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(),
+                  self.erofs_old_kernel.get()]
         packrom(values)
 
 
@@ -2325,8 +2328,8 @@ def unpack(chose, form: any = None):
         return 1
     if form == 'payload':
         print(lang.text79 + "payload")
-        with open(work + "payload.bin", 'rb') as pay:
-            try:
+        try:
+            with open(work + "payload.bin", 'rb') as pay:
                 Dumper(
                     pay,
                     work,
@@ -2334,10 +2337,10 @@ def unpack(chose, form: any = None):
                     old='old',
                     images=chose
                 ).run()
-            except MemoryError:
-                print("Extracting Payload Slowly...")
-                pay.seek(0)
-                for i in chose:
+        except MemoryError:
+            print("Extracting Payload Slowly...")
+            for i in chose:
+                with open(work + "payload.bin", 'rb') as pay:
                     Dumper(
                         pay,
                         work,
@@ -2346,7 +2349,6 @@ def unpack(chose, form: any = None):
                         images=[i],
                         workers=1
                     ).run()
-                    pay.seek(0)
         if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
@@ -3023,7 +3025,7 @@ class FormatConversion(ttk.LabelFrame):
                 if hget == 'br':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
-                        call(f"brotli -dj {work+i}")
+                        call(f"brotli -dj {work + i}")
                 if hget in ['dat', 'br']:
                     if os.path.exists(work):
                         if hget == 'br':
@@ -3063,7 +3065,7 @@ class FormatConversion(ttk.LabelFrame):
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget == 'dat':
                     print(lang.text88 % os.path.basename(i).split('.')[0])
-                    call(f"brotli -q 0 -j -w 24 {work+i} -o {work + i}.br")
+                    call(f"brotli -q 0 -j -w 24 {work + i} -o {work + i}.br")
                     if os.access(work + i + '.br', os.F_OK):
                         try:
                             os.remove(work + i)
