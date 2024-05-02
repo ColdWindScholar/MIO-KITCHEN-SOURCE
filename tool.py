@@ -3023,7 +3023,7 @@ class FormatConversion(ttk.LabelFrame):
                 if hget == 'br':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
-                        call("brotli -dj " + work + i)
+                        call(f"brotli -dj {work+i}")
                 if hget in ['dat', 'br']:
                     if os.path.exists(work):
                         if hget == 'br':
