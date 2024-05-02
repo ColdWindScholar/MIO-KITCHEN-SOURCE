@@ -1473,9 +1473,9 @@ class InstallMpk(Toplevel):
                 self.inner_zipdata = inner_file.read()
         Label(self, image=pyt).pack(padx=10, pady=10)
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
-        Label(self, text=lang.text32.format((self.mconf.get('module', 'version'))), font=('黑体', 12)).pack(padx=10,
+        Label(self, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
                                                                                                             pady=10)
-        Label(self, text=lang.text33.format((self.mconf.get('module', 'author'))), font=('黑体', 12)).pack(padx=10,
+        Label(self, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
                                                                                                            pady=10)
         text = Text(self)
         text.insert("insert", self.mconf.get('module', 'describe'))
