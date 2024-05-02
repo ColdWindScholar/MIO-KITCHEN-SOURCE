@@ -2038,7 +2038,7 @@ def dboot(nm: str = 'boot'):
             comp = compf.read()
         print("Compressing:%s" % comp)
         if comp != "unknown":
-            if call("magiskboot compress=%s ramdisk-new.cpio" % comp) != 0:
+            if call(f"magiskboot compress={comp} ramdisk-new.cpio") != 0:
                 print("Failed to pack Ramdisk...")
                 os.remove("ramdisk-new.cpio")
                 return
@@ -2056,7 +2056,7 @@ def dboot(nm: str = 'boot'):
         if comp == "cpio":
             flag = "-n"
     os.chdir(work + nm + os.sep)
-    if call("magiskboot repack %s %s" % (flag, boot)) != 0:
+    if call(f"magiskboot repack {flag} {boot}") != 0:
         print("Failed to Pack boot...")
         return
     else:
