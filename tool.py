@@ -672,8 +672,10 @@ def logo_dump(bn: str = 'logo'):
 
 
 @cartoon
-def logo_pack() -> int:
-    origin_logo = findfile('logo.img', work := rwork())
+def logo_pack(origin_logo=None) -> int:
+    work = rwork()
+    if not origin_logo:
+        origin_logo = findfile('logo.img', work)
     logo = work + "logo-new.img"
     if not os.path.exists(dir_ := work + "logo") or not os.path.exists(origin_logo):
         print(lang.warn6)
