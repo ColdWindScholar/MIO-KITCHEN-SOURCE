@@ -1988,7 +1988,7 @@ class Packxx(Toplevel):
         self.scale_erofs = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
-        self.ext4_method = StringVar()
+        self.ext4_method = StringVar(value=lang.t32)
         self.lg = list_
         self.erofsext4 = IntVar()
         self.erofs_old_kernel = IntVar()
@@ -2008,20 +2008,16 @@ class Packxx(Toplevel):
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
-        dbfss.pack(side='left', padx=5, pady=5)
+        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs).pack(side='left', padx=5, pady=5)
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
-        (t := ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method)).pack(
+        ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
             side='left', padx=5, pady=5)
-        t.current(0)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
-        dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
-        dbgss.pack(padx=5, pady=5, side='left')
+        ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5, pady=5, side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
-        edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
-                              values=("lz4", "lz4hc", "lzma", "deflate"))
-        edbgss.pack(side='left', padx=5, pady=5)
+        ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
+                              values=("lz4", "lz4hc", "lzma", "deflate")).pack(side='left', padx=5, pady=5)
         ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
