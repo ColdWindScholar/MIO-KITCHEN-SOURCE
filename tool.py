@@ -458,7 +458,7 @@ class Welcome(Toplevel):
             "4": self.done
         }
         if frames.get(oobe):
-            frames[oobe]()
+            frames.get(oobe, self.main)()
         else:
             ttk.Label(self, text=lang.text135, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
