@@ -1594,7 +1594,8 @@ class Packxx(Toplevel):
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
         # --
-        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=lambda x:self.label_e.config(text=lang.t30.format(int(float(x)))),
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal",
+                                 command=lambda x: self.label_e.config(text=lang.t30.format(int(float(x)))),
                                  variable=self.scale_erofs)
         self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
         self.label_e.pack(side='left', padx=5, pady=5)
@@ -1628,7 +1629,6 @@ class Packxx(Toplevel):
                                                                                                        fill=X,
                                                                                                        expand=True)
         jzxs(self)
-
 
     def start_(self):
         lg = self.lg
