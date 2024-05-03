@@ -1547,98 +1547,6 @@ class InstallMpk(Toplevel):
         self.installb.config(state='normal')
 
 
-class Packxx(Toplevel):
-    def __init__(self, list_):
-        if not list_:
-            return
-        super().__init__()
-        self.title(lang.text42)
-        self.dbfs = StringVar()
-        self.dbgs = StringVar()
-        self.edbgs = StringVar()
-        self.scale = IntVar()
-        self.scale_erofs = IntVar()
-        self.spatchvb = IntVar()
-        self.delywj = IntVar()
-        self.ext4_method = StringVar()
-        self.lg = list_
-        self.erofsext4 = IntVar()
-        self.erofs_old_kernel = IntVar()
-        lf1 = ttk.LabelFrame(self, text=lang.text43)
-        lf1.pack(fill=BOTH, padx=5, pady=5)
-        lf2 = ttk.LabelFrame(self, text=lang.text44)
-        lf2.pack(fill=BOTH, padx=5, pady=5)
-        lf3 = ttk.LabelFrame(self, text=lang.text45)
-        lf3.pack(fill=BOTH, padx=5, pady=5)
-        lf4 = ttk.LabelFrame(self, text=lang.text46)
-        lf4.pack(fill=BOTH, pady=5, padx=5)
-        (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
-        self.scale.set(0)
-        # EXT4 Settings
-        Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
-        dbfss.pack(side='left', padx=5, pady=5)
-        Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
-        (t := ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method)).pack(
-            side='left', padx=5, pady=5)
-        t.current(0)
-        #
-        Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
-        dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
-        dbgss.pack(padx=5, pady=5, side='left')
-        Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
-        edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
-                              values=("lz4", "lz4hc", "lzma", "deflate"))
-        edbgss.pack(side='left', padx=5, pady=5)
-        ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        # --
-        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal",
-                                 command=lambda x: self.label_e.config(text=lang.t30.format(int(float(x)))),
-                                 variable=self.scale_erofs)
-        self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
-        self.label_e.pack(side='left', padx=5, pady=5)
-        scales_erofs.pack(fill="x", padx=5, pady=5)
-        # --
-        scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
-                           command=lambda x: self.label.config(text=lang.text47.format(int(float(x)))),
-                           variable=self.scale)
-        self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
-        self.label.pack(side='left', padx=5, pady=5)
-        scales.pack(fill="x", padx=5, pady=5)
-        ttk.Checkbutton(lf3, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        ttk.Checkbutton(lf3, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        dbfss.current(0)
-        dbgss.current(0)
-        edbgss.current(0)
-
-        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
-                                                                                pady=2,
-                                                                                fill=X,
-                                                                                expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
-                                                                                                       padx=2, pady=2,
-                                                                                                       fill=X,
-                                                                                                       expand=True)
-        jzxs(self)
-
-    def start_(self):
-        lg = self.lg
-        self.destroy()
-        values = [self.edbgs, self.dbgs, self.dbfs, self.scale, lg, self.spatchvb, self.delywj.get(),
-                  int(self.scale_erofs.get()), self.ext4_method.get(), self.erofsext4.get(),
-                  self.erofs_old_kernel.get()]
-        packrom(values)
-
-
 @cartoon
 class Dbkxyt:
     def __init__(self):
@@ -2069,104 +1977,194 @@ def dboot(nm: str = 'boot'):
         print("Successfully packed Boot...")
 
 
-@cartoon
-def packrom(others) -> any:
-    edbgs, dbgs, dbfs, scale, parts, spatch, dely, erofs_level, ext4_size, erofsext4, erofs_old_kernel = others
-    if not dn.get():
-        win.message_pop(lang.warn1)
-        return False
-    elif not os.path.exists(settings.path + os.sep + dn.get()):
-        win.message_pop(lang.warn1, "red")
-        return False
-    parts_dict = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info").read()
-    for i in parts:
-        dname = os.path.basename(i)
-        if dname not in parts_dict.keys():
-            parts_dict[dname] = 'unknown'
-        if spatch == 1:
-            for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
-                file = findfile(j, work)
-                if file:
-                    if gettype(file) == 'vbmeta':
-                        print(lang.text71 % file)
-                        utils.vbpatch(file).disavb()
-        if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
-            if os.name == 'nt':
-                try:
-                    if folder := findfolder(work, "com.google.android.apps.nbu."):
-                        call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
-                                                                      "com.google.android.apps.nbu")))
-                except Exception as e:
-                    print(e)
-            fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
-            utils.qc(work + "config" + os.sep + dname + "_fs_config")
-            if settings.contextpatch == "1":
-                contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
-            utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-            if erofsext4:
+class Packxx(Toplevel):
+    def __init__(self, list_):
+        if not list_:
+            return
+        super().__init__()
+        self.title(lang.text42)
+        self.dbfs = StringVar()
+        self.dbgs = StringVar()
+        self.edbgs = StringVar()
+        self.scale = IntVar()
+        self.scale_erofs = IntVar()
+        self.spatchvb = IntVar()
+        self.delywj = IntVar()
+        self.ext4_method = StringVar()
+        self.lg = list_
+        self.erofsext4 = IntVar()
+        self.erofs_old_kernel = IntVar()
+        lf1 = ttk.LabelFrame(self, text=lang.text43)
+        lf1.pack(fill=BOTH, padx=5, pady=5)
+        lf2 = ttk.LabelFrame(self, text=lang.text44)
+        lf2.pack(fill=BOTH, padx=5, pady=5)
+        lf3 = ttk.LabelFrame(self, text=lang.text45)
+        lf3.pack(fill=BOTH, padx=5, pady=5)
+        lf4 = ttk.LabelFrame(self, text=lang.text46)
+        lf4.pack(fill=BOTH, pady=5, padx=5)
+        (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
+        self.scale.set(0)
+        # EXT4 Settings
+        Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
+        dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
+        dbfss.pack(side='left', padx=5, pady=5)
+        Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
+        (t := ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method)).pack(
+            side='left', padx=5, pady=5)
+        t.current(0)
+        #
+        Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
+        dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
+        dbgss.pack(padx=5, pady=5, side='left')
+        Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
+        edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
+                              values=("lz4", "lz4hc", "lzma", "deflate"))
+        edbgss.pack(side='left', padx=5, pady=5)
+        ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+        # --
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal",
+                                 command=lambda x: self.label_e.config(text=lang.t30.format(int(float(x)))),
+                                 variable=self.scale_erofs)
+        self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
+        self.label_e.pack(side='left', padx=5, pady=5)
+        scales_erofs.pack(fill="x", padx=5, pady=5)
+        # --
+        scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
+                           command=lambda x: self.label.config(text=lang.text47.format(int(float(x)))),
+                           variable=self.scale)
+        self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
+        self.label.pack(side='left', padx=5, pady=5)
+        scales.pack(fill="x", padx=5, pady=5)
+        ttk.Checkbutton(lf3, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+        ttk.Checkbutton(lf3, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+        ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+        dbfss.current(0)
+        dbgss.current(0)
+        edbgss.current(0)
+
+        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
+                                                                                pady=2,
+                                                                                fill=X,
+                                                                                expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
+                                                                                                       padx=2, pady=2,
+                                                                                                       fill=X,
+                                                                                                       expand=True)
+        jzxs(self)
+
+    def start_(self):
+        self.destroy()
+        self.packrom()
+
+    @cartoon
+    def packrom(self) -> any:
+        ext4_size, erofsext4, erofs_old_kernel = [
+                   self.ext4_method.get(), self.erofsext4.get(),
+                  self.erofs_old_kernel.get()]
+        if not dn.get():
+            win.message_pop(lang.warn1)
+            return False
+        elif not os.path.exists(settings.path + os.sep + dn.get()):
+            win.message_pop(lang.warn1, "red")
+            return False
+        parts_dict = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info").read()
+        for i in self.lg:
+            dname = os.path.basename(i)
+            if dname not in parts_dict.keys():
+                parts_dict[dname] = 'unknown'
+            if self.spatchvb.get() == 1:
+                for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
+                    file = findfile(j, work)
+                    if file:
+                        if gettype(file) == 'vbmeta':
+                            print(lang.text71 % file)
+                            utils.vbpatch(file).disavb()
+            if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
+                if os.name == 'nt':
+                    try:
+                        if folder := findfolder(work, "com.google.android.apps.nbu."):
+                            call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
+                                                                          "com.google.android.apps.nbu")))
+                    except Exception as e:
+                        print(e)
+                fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
+                utils.qc(work + "config" + os.sep + dname + "_fs_config")
+                if settings.contextpatch == "1":
+                    contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
+                utils.qc(work + "config" + os.sep + dname + "_file_contexts")
+                if erofsext4:
+                    if parts_dict[dname] == 'erofs':
+                        parts_dict[dname] = 'ext'
+                    elif parts_dict[dname] == 'ext':
+                        parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
-                    parts_dict[dname] = 'ext'
-                elif parts_dict[dname] == 'ext':
-                    parts_dict[dname] = 'erofs'
-            if parts_dict[dname] == 'erofs':
-                mkerofs(dname, str(edbgs.get()), work, erofs_level, erofs_old_kernel)
-                if dely == 1:
-                    rdi(work, dname)
-                print(lang.text3.format(dname))
-                if dbgs.get() in ["dat", "br", "sparse"]:
-                    img2simg(work + dname + ".img")
-                    if dbgs.get() == 'dat':
-                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
-                    elif dbgs.get() == 'br':
-                        datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', 4)))
+                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()), erofs_old_kernel)
+                    if self.delywj.get() == 1:
+                        rdi(work, dname)
+                    print(lang.text3.format(dname))
+                    if self.dbgs.get() in ["dat", "br", "sparse"]:
+                        img2simg(work + dname + ".img")
+                        if self.dbgs.get() == 'dat':
+                            datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                        elif self.dbgs.get() == 'br':
+                            datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                        else:
+                            print(lang.text3.format(dname))
+                else:
+                    ext4_size_value = 0
+                    if ext4_size == lang.t33:
+                        if os.path.exists(work + "dynamic_partitions_op_list"):
+                            with open(work + "dynamic_partitions_op_list") as t:
+                                for _i_ in t.readlines():
+                                    _i = _i_.strip().split()
+                                    if _i.__len__() < 3:
+                                        continue
+                                    if _i[0] != 'resize':
+                                        continue
+                                    if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
+                                        if int(_i[2]) > ext4_size_value:
+                                            ext4_size_value = int(_i[2])
+                        elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
+                            with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
+                                try:
+                                    ext4_size_value = int(f.read().strip())
+                                except ValueError:
+                                    ext4_size_value = 0
+
+                    make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
+                                ext4_size_value) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                                                                            work,
+                                                                                            "y" if self.dbgs.get() in [
+                                                                                                "dat", "br",
+                                                                                                "sparse"] else 'n',
+                                                                                            ext4_size_value)
+                    if self.delywj.get() == 1:
+                        rdi(work, dname)
+                    if self.dbgs.get() == "dat":
+                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
+                    elif self.dbgs.get() == "br":
+                        datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', '4')))
                     else:
                         print(lang.text3.format(dname))
+            elif parts_dict[i] in ['boot', 'vendor_boot']:
+                dboot(i)
+            elif parts_dict[i] == 'dtbo':
+                pack_dtbo()
+            elif parts_dict[i] == 'logo':
+                logo_pack()
             else:
-                ext4_size_value = 0
-                if ext4_size == lang.t33:
-                    if os.path.exists(work + "dynamic_partitions_op_list"):
-                        with open(work + "dynamic_partitions_op_list") as t:
-                            for _i_ in t.readlines():
-                                _i = _i_.strip().split()
-                                if _i.__len__() < 3:
-                                    continue
-                                if _i[0] != 'resize':
-                                    continue
-                                if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
-                                    if int(_i[2]) > ext4_size_value:
-                                        ext4_size_value = int(_i[2])
-                    elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
-                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
-                            try:
-                                ext4_size_value = int(f.read().strip())
-                            except ValueError:
-                                ext4_size_value = 0
-
-                make_ext4fs(dname, work, "-s" if dbgs.get() in ["dat", "br", "sparse"] else '',
-                            ext4_size_value) if dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                        work,
-                                                                                        "y" if dbgs.get() in [
-                                                                                            "dat", "br",
-                                                                                            "sparse"] else 'n',
-                                                                                        ext4_size_value)
-                if dely == 1:
-                    rdi(work, dname)
-                if dbgs.get() == "dat":
-                    datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
-                elif dbgs.get() == "br":
-                    datbr(work, dname, scale.get(), int(parts_dict.get('dat_ver', '4')))
-                else:
-                    print(lang.text3.format(dname))
-        elif parts_dict[i] in ['boot', 'vendor_boot']:
-            dboot(i)
-        elif parts_dict[i] == 'dtbo':
-            pack_dtbo()
-        elif parts_dict[i] == 'logo':
-            logo_pack()
-        else:
-            print(f"Unsupported {i}:{parts_dict[i]}")
-    if settings.ai_engine == '1':
-        AI_engine.suggest(win.show.get(1.0, END), language='cn' if "Chinese" in settings.language else 'en', ok=lang.ok)
+                print(f"Unsupported {i}:{parts_dict[i]}")
+        if settings.ai_engine == '1':
+            AI_engine.suggest(win.show.get(1.0, END), language='cn' if "Chinese" in settings.language else 'en',
+                              ok=lang.ok)
 
 
 def rdi(work, part_name) -> any:
