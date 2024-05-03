@@ -31,7 +31,7 @@ class Extractor:
     def __write(msg, log):
         if not os.path.isfile(log) and not os.path.exists(log):
             open(log, 'tw', encoding='utf-8').close()
-        with open(log, 'w', newline='\n') as file:
+        with open(log, 'w', newline='\n', encoding='utf-8') as file:
             print(str(msg).strip(), file=file)
 
     @staticmethod
