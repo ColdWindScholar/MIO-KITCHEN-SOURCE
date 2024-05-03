@@ -2066,9 +2066,6 @@ class Packxx(Toplevel):
 
     @cartoon
     def packrom(self) -> any:
-        ext4_size, erofsext4, erofs_old_kernel = [
-                   self.ext4_method.get(), self.erofsext4.get(),
-                  self.erofs_old_kernel.get()]
         if not dn.get():
             win.message_pop(lang.warn1)
             return False
@@ -2100,13 +2097,13 @@ class Packxx(Toplevel):
                 if settings.contextpatch == "1":
                     contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
                 utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-                if erofsext4:
+                if self.erofsext4.get():
                     if parts_dict[dname] == 'erofs':
                         parts_dict[dname] = 'ext'
                     elif parts_dict[dname] == 'ext':
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
-                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()), erofs_old_kernel)
+                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()), self.erofs_old_kernel.get())
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     print(lang.text3.format(dname))
@@ -2120,7 +2117,7 @@ class Packxx(Toplevel):
                             print(lang.text3.format(dname))
                 else:
                     ext4_size_value = 0
-                    if ext4_size == lang.t33:
+                    if self.ext4_method.get() == lang.t33:
                         if os.path.exists(work + "dynamic_partitions_op_list"):
                             with open(work + "dynamic_partitions_op_list") as t:
                                 for _i_ in t.readlines():
