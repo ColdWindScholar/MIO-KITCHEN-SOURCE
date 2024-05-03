@@ -1981,12 +1981,10 @@ class Packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
-        super().__init__()
-        self.title(lang.text42)
-        self.dbfs = StringVar()
-        self.dbgs = StringVar()
-        self.edbgs = StringVar()
-        self.scale = IntVar()
+        self.dbfs = StringVar(value='make_ext4fs')
+        self.dbgs = StringVar(value='raw')
+        self.edbgs = StringVar(value='lz4hc')
+        self.scale = IntVar(value=0)
         self.scale_erofs = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
@@ -1994,6 +1992,11 @@ class Packxx(Toplevel):
         self.lg = list_
         self.erofsext4 = IntVar()
         self.erofs_old_kernel = IntVar()
+        if not self.verify():
+            self.start_()
+            return
+        super().__init__()
+        self.title(lang.text42)
         lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
         lf2 = ttk.LabelFrame(self, text=lang.text44)
@@ -2003,7 +2006,6 @@ class Packxx(Toplevel):
         lf4 = ttk.LabelFrame(self, text=lang.text46)
         lf4.pack(fill=BOTH, pady=5, padx=5)
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
-        self.scale.set(0)
         # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
         dbfss = ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs)
@@ -2046,9 +2048,6 @@ class Packxx(Toplevel):
         ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
-        dbfss.current(0)
-        dbgss.current(0)
-        edbgss.current(0)
 
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
                                                                                 pady=2,
@@ -2061,8 +2060,20 @@ class Packxx(Toplevel):
         jzxs(self)
 
     def start_(self):
-        self.destroy()
+        try:
+            self.destroy()
+        except AttributeError:
+            ...
         self.packrom()
+
+    def verify(self):
+        parts_dict = JsonEdit(rwork() + "config" + os.sep + "parts_info").read()
+        for i in self.lg:
+            if i not in parts_dict.keys():
+                parts_dict[i] = 'unknown'
+            if parts_dict[i] in ['ext', 'erofs', 'f2fs']:
+                return True
+        return False
 
     @cartoon
     def packrom(self) -> any:
@@ -2103,7 +2114,8 @@ class Packxx(Toplevel):
                     elif parts_dict[dname] == 'ext':
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
-                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()), self.erofs_old_kernel.get())
+                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
+                            self.erofs_old_kernel.get())
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     print(lang.text3.format(dname))
@@ -2138,11 +2150,11 @@ class Packxx(Toplevel):
 
                     make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
                                 ext4_size_value) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                            work,
-                                                                                            "y" if self.dbgs.get() in [
-                                                                                                "dat", "br",
-                                                                                                "sparse"] else 'n',
-                                                                                            ext4_size_value)
+                                                                                                 work,
+                                                                                                 "y" if self.dbgs.get() in [
+                                                                                                     "dat", "br",
+                                                                                                     "sparse"] else 'n',
+                                                                                                 ext4_size_value)
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
