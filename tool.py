@@ -2388,7 +2388,7 @@ def unpack(chose, form: any = None):
             with open(work + i + ".new.dat", 'ab') as ofd:
                 for n in range(100):
                     if os.access(work + i + f".new.dat.{n}", os.F_OK):
-                        print(lang.text83 % (i + f".new.dat.{n}", i + f".new.dat"))
+                        print(lang.text83 % (i + f".new.dat.{n}", f"{i}.new.dat"))
                         with open(work + i + f".new.dat.{n}", 'rb') as fd:
                             ofd.write(fd.read())
                         os.remove(work + i + f".new.dat.{n}")
