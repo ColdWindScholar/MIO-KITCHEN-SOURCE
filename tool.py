@@ -1979,6 +1979,7 @@ def dboot(nm: str = 'boot'):
 
 class Packxx(Toplevel):
     def __init__(self, list_):
+        self.custom_size = {}
         if not list_:
             return
         self.dbfs = StringVar(value='make_ext4fs')
@@ -2013,7 +2014,7 @@ class Packxx(Toplevel):
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
             side='left', padx=5, pady=5)
-        self.xgdx = ttk.Button(lf1, text='修改大小')
+        self.xgdx = ttk.Button(lf1, text=lang.t37, command=self.modify_custom_size)
         self.xgdx.pack(
             side='left', padx=5, pady=5)
         self.ext4_method.trace('w', self.show_xgdx)
@@ -2086,6 +2087,64 @@ class Packxx(Toplevel):
                 return True
         return False
 
+    def modify_custom_size(self):
+        work = rwork()
+
+        def save():
+            if f.get().isdigit():
+                self.custom_size[h.get()] = f.get()
+            elif not f.get():
+                return
+            else:
+                read_value()
+
+        def read_value():
+            f.delete(0, END)
+            f.insert(0, str(self.custom_size.get(h.get(), 0)))
+
+        def load():
+            for dname in self.lg:
+                if self.custom_size.get(dname, ''):
+                    continue
+                ext4_size_value = 0
+                if self.ext4_method.get() == lang.t33:
+                    if os.path.exists(work + "dynamic_partitions_op_list"):
+                        with open(work + "dynamic_partitions_op_list") as t:
+                            for _i_ in t.readlines():
+                                _i = _i_.strip().split()
+                                if _i.__len__() < 3:
+                                    continue
+                                if _i[0] != 'resize':
+                                    continue
+                                if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
+                                    if int(_i[2]) > ext4_size_value:
+                                        ext4_size_value = int(_i[2])
+                    elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
+                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
+                            try:
+                                ext4_size_value = int(f.read().strip())
+                            except ValueError:
+                                ext4_size_value = 0
+                self.custom_size[dname] = ext4_size_value
+
+        ck = Toplevel()
+        load()
+        ck.title(lang.t37)
+        f1 = Frame(ck)
+        f1.pack(pady=5, padx=5, fill=X)
+        h = ttk.Combobox(f1, values=list(self.custom_size.keys()), state='readonly')
+        h.current(0)
+        h.bind("<<ComboboxSelected>>", lambda *x: read_value())
+        h.pack(side='left', padx=5)
+        Label(f1, text=':').pack(side='left', padx=5)
+        f = ttk.Entry(f1, state='normal')
+        f.bind("<KeyRelease>", lambda x: save())
+        f.pack(side='left', padx=5)
+        read_value()
+        ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
+        jzxs(ck)
+        ck.wait_window()
+
     @cartoon
     def packrom(self) -> any:
         if not dn.get():
@@ -2139,8 +2198,8 @@ class Packxx(Toplevel):
                         else:
                             print(lang.text3.format(dname))
                 else:
-                    ext4_size_value = 0
-                    if self.ext4_method.get() == lang.t33:
+                    ext4_size_value = self.custom_size.get(dname, 0)
+                    if self.ext4_method.get() == lang.t33 and not self.custom_size.get(dname, ''):
                         if os.path.exists(work + "dynamic_partitions_op_list"):
                             with open(work + "dynamic_partitions_op_list") as t:
                                 for _i_ in t.readlines():
