@@ -1330,7 +1330,8 @@ def mpkman() -> None:
             if os.path.exists(script_path + "main.msh"):
                 MshParse(script_path + "main.msh")
             if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
-                call(f"busybox {'ash' if os.name == 'posix' else 'bash'} {file.get()} {(script_path + 'main.sh').replace(os.sep, '/')}")
+                call(
+                    f"busybox {'ash' if os.name == 'posix' else 'bash'} {file.get()} {(script_path + 'main.sh').replace(os.sep, '/')}")
                 try:
                     os.remove(file.get())
                 except (Exception, BaseException) as e:
@@ -1475,9 +1476,9 @@ class InstallMpk(Toplevel):
         Label(self, image=pyt).pack(padx=10, pady=10)
         Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(self, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
-                                                                                                            pady=10)
+                                                                                                          pady=10)
         Label(self, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
-                                                                                                           pady=10)
+                                                                                                         pady=10)
         text = Text(self)
         text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
@@ -1586,20 +1587,22 @@ class Packxx(Toplevel):
         dbgss = ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat"))
         dbgss.pack(padx=5, pady=5, side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
-        edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs)
+        edbgss = ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
+                              values=("lz4", "lz4hc", "lzma", "deflate"))
         edbgss.pack(side='left', padx=5, pady=5)
-        edbgss['value'] = ("lz4", "lz4hc", "lzma", "deflate")
         ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
         # --
-        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=self.update_label_erofs,
+        scales_erofs = ttk.Scale(lf2, from_=0, to=9, orient="horizontal", command=lambda x:self.label_e.config(text=lang.t30.format(int(float(x)))),
                                  variable=self.scale_erofs)
         self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
         self.label_e.pack(side='left', padx=5, pady=5)
         scales_erofs.pack(fill="x", padx=5, pady=5)
         # --
-        scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal", command=self.update_label, variable=self.scale)
+        scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
+                           command=lambda x: self.label.config(text=lang.text47.format(int(float(x)))),
+                           variable=self.scale)
         self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
         self.label.pack(side='left', padx=5, pady=5)
         scales.pack(fill="x", padx=5, pady=5)
@@ -1626,11 +1629,6 @@ class Packxx(Toplevel):
                                                                                                        expand=True)
         jzxs(self)
 
-    def update_label(self, value):
-        self.label.config(text=lang.text47.format(int(float(value))))
-
-    def update_label_erofs(self, value):
-        self.label_e.config(text=lang.t30.format(int(float(value))))
 
     def start_(self):
         lg = self.lg
