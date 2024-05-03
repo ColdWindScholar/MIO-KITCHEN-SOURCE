@@ -2008,16 +2008,24 @@ class Packxx(Toplevel):
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs).pack(side='left', padx=5, pady=5)
+        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs).pack(
+            side='left', padx=5, pady=5)
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
             side='left', padx=5, pady=5)
+        self.xgdx = ttk.Button(lf1, text='修改大小')
+        self.xgdx.pack(
+            side='left', padx=5, pady=5)
+        self.ext4_method.trace('w', self.show_xgdx)
+        self.show_xgdx()
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5, pady=5, side='left')
+        ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5,
+                                                                                                                pady=5,
+                                                                                                                side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
-                              values=("lz4", "lz4hc", "lzma", "deflate")).pack(side='left', padx=5, pady=5)
+                     values=("lz4", "lz4hc", "lzma", "deflate")).pack(side='left', padx=5, pady=5)
         ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
@@ -2061,6 +2069,13 @@ class Packxx(Toplevel):
         except AttributeError:
             ...
         self.packrom()
+
+    def show_xgdx(self, *args):
+        if self.ext4_method.get() == lang.t32:
+            self.xgdx.pack_forget()
+        else:
+            self.xgdx.pack(
+                side='left', padx=5, pady=5)
 
     def verify(self):
         parts_dict = JsonEdit(rwork() + "config" + os.sep + "parts_info").read()
