@@ -103,9 +103,8 @@ class Extractor:
                 tmp_path = self.FileName + entry_inode_path
                 for f, e in entry_inode.xattrs():
                     if f == 'security.selinux':
-                        t_p_mkc = tmp_path
                         for fuk_ in '\\^$.|?*+(){}[]':
-                            t_p_mkc = t_p_mkc.replace(fuk_, '\\' + fuk_)
+                            t_p_mkc = tmp_path.replace(fuk_, '\\' + fuk_)
                         self.context.append(f"/{t_p_mkc} {e.decode('utf8')[:-1]}")
                     elif f == 'security.capability':
                         r = struct.unpack('<5I', e)
