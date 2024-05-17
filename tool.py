@@ -1481,7 +1481,7 @@ class InstallMpk(Toplevel):
         Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
                                                                                                          pady=10)
         f.pack(side=LEFT)
-        text = Text(self)
+        text = Text(self, width=50, height=20)
         text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
         self.prog = ttk.Progressbar(self, length=200, mode='determinate', orient=HORIZONTAL, maximum=100, value=0)
