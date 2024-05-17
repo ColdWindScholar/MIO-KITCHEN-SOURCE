@@ -1473,12 +1473,14 @@ class InstallMpk(Toplevel):
                 pyt = PhotoImage(data=images.none_byte)
             with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
                 self.inner_zipdata = inner_file.read()
-        Label(self, image=pyt).pack(padx=10, pady=10)
-        Label(self, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
-        Label(self, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
+        f = Frame(self)
+        Label(f, image=pyt).pack(padx=10, pady=10)
+        Label(f, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
+        Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
                                                                                                           pady=10)
-        Label(self, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
+        Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
                                                                                                          pady=10)
+        f.pack(side=LEFT)
         text = Text(self)
         text.insert("insert", self.mconf.get('module', 'describe'))
         text.pack(padx=10, pady=10)
