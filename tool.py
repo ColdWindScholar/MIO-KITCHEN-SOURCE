@@ -647,7 +647,7 @@ def pack_dtbo() -> any:
     re_folder(work + "dtbo" + os.sep + "dtbo")
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
         if dts.startswith("dts."):
-            print(f"{lang.text6}:%s" % dts)
+            print(f"{lang.text6}:{dts}")
             call(exe="dtc -@ -I dts -O dtb %s -o %s" % (os.path.join(work, "dtbo", "dts", dts),
                                                         os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' +
                                                                      os.path.basename(dts).rsplit('.', 1)[1])), out=1)
@@ -2793,7 +2793,7 @@ class ZipFile:
         with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED) as zip_:
             # 遍历写入文件
             for file in get_all_file_paths('.'):
-                print(f"{lang.text1}:%s" % file)
+                print(f"{lang.text1}:{file}")
                 try:
                     zip_.write(file)
                 except Exception as e:
