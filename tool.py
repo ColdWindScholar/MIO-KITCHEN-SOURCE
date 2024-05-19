@@ -2227,11 +2227,13 @@ class Packxx(Toplevel):
 
                     make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
                                 ext4_size_value, UTC=self.UTC) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                                 work,
-                                                                                                 "y" if self.dbgs.get() in [
-                                                                                                     "dat", "br",
-                                                                                                     "sparse"] else 'n',
-                                                                                                 ext4_size_value, UTC=self.UTC)
+                                                                                                               work,
+                                                                                                               "y" if self.dbgs.get() in [
+                                                                                                                   "dat",
+                                                                                                                   "br",
+                                                                                                                   "sparse"] else 'n',
+                                                                                                               ext4_size_value,
+                                                                                                               UTC=self.UTC)
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
