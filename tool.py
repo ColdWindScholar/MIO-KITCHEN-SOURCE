@@ -2192,7 +2192,7 @@ class Packxx(Toplevel):
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
                     mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
-                            self.erofs_old_kernel.get(), UTC=self.UTC)
+                            self.erofs_old_kernel.get(), UTC=self.UTC.get())
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     print(lang.text3.format(dname))
@@ -2226,14 +2226,14 @@ class Packxx(Toplevel):
                                     ext4_size_value = 0
 
                     make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                ext4_size_value, UTC=self.UTC) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
                                                                                                                work,
                                                                                                                "y" if self.dbgs.get() in [
                                                                                                                    "dat",
                                                                                                                    "br",
                                                                                                                    "sparse"] else 'n',
                                                                                                                ext4_size_value,
-                                                                                                               UTC=self.UTC)
+                                                                                                               UTC=self.UTC.get())
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
