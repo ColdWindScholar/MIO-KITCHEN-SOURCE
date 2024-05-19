@@ -348,14 +348,28 @@ class Tool(Tk):
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
-        context.trace("w", lambda *x: settings.set_value('contextpatch', context.get()))
+
+        def enable_contextpatch():
+            if context.get() == '1':
+                if ask_win2(
+                        "你确定要开启吗， 此功能可能导致不开机！\nAre you sure turn it on? This feature may cause cannot boot rom!"):
+                    settings.set_value('contextpatch', context.get())
+                else:
+                    context.set('0')
+                    settings.set_value('contextpatch', context.get())
+                    enable_cp.configure(state='off')
+            else:
+                settings.set_value('contextpatch', context.get())
+
+        context.trace("w", lambda *x: enable_contextpatch())
         auto_rm_pay.trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay.get()))
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
-        ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
+        enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                         offvalue='0',
-                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+                        style="Toggle.TButton")
+        enable_cp.pack(padx=10, pady=10, fill=X)
         ttk.Checkbutton(sf4, text=lang.t9.format("payload.bin"), variable=auto_rm_pay, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
@@ -2226,14 +2240,15 @@ class Packxx(Toplevel):
                                     ext4_size_value = 0
 
                     make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
-                                                                                                               work,
-                                                                                                               "y" if self.dbgs.get() in [
-                                                                                                                   "dat",
-                                                                                                                   "br",
-                                                                                                                   "sparse"] else 'n',
-                                                                                                               ext4_size_value,
-                                                                                                               UTC=self.UTC.get())
+                                ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                        dname,
+                        work,
+                        "y" if self.dbgs.get() in [
+                            "dat",
+                            "br",
+                            "sparse"] else 'n',
+                        ext4_size_value,
+                        UTC=self.UTC.get())
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
