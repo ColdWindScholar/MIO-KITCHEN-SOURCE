@@ -1477,9 +1477,9 @@ class InstallMpk(Toplevel):
         Label(f, image=pyt).pack(padx=10, pady=10)
         Label(f, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
         Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
-                                                                                                          pady=10)
+                                                                                                       pady=10)
         Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
-                                                                                                         pady=10)
+                                                                                                      pady=10)
         f.pack(side=LEFT)
         text = Text(self, width=50, height=20)
         text.insert("insert", self.mconf.get('module', 'describe'))
@@ -1988,6 +1988,7 @@ class Packxx(Toplevel):
         self.dbgs = StringVar(value='raw')
         self.edbgs = StringVar(value='lz4hc')
         self.scale = IntVar(value=0)
+        self.UTC = IntVar(value=int(time.time()))
         self.scale_erofs = IntVar()
         self.spatchvb = IntVar()
         self.delywj = IntVar()
@@ -2043,7 +2044,7 @@ class Packxx(Toplevel):
         scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
                            command=lambda x: self.label.config(text=lang.text47.format(int(float(x)))),
                            variable=self.scale)
-        self.label = tk.Label(sf1, text=lang.text47.format(int(scales.get())))
+        self.label = ttk.Label(sf1, text=lang.text47.format(int(scales.get())))
         self.label.pack(side='left', padx=5, pady=5)
         scales.pack(fill="x", padx=5, pady=5)
         ttk.Checkbutton(lf3, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
@@ -2055,6 +2056,10 @@ class Packxx(Toplevel):
         ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
+        f = Frame(lf3)
+        ttk.Label(lf3, text='UTC:').pack(side=LEFT, fill=X)
+        ttk.Entry(f, textvariable=self.UTC).pack(side=LEFT, fill=X)
+        f.pack(fill=X, side=LEFT, padx=5, pady=5)
 
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
                                                                                 pady=2,
@@ -2187,7 +2192,7 @@ class Packxx(Toplevel):
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
                     mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
-                            self.erofs_old_kernel.get())
+                            self.erofs_old_kernel.get(), UTC=self.UTC)
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     print(lang.text3.format(dname))
@@ -2221,12 +2226,12 @@ class Packxx(Toplevel):
                                     ext4_size_value = 0
 
                     make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                ext4_size_value) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
+                                ext4_size_value, UTC=self.UTC) if self.dbfs.get() == "make_ext4fs" else mke2fs(dname,
                                                                                                  work,
                                                                                                  "y" if self.dbgs.get() in [
                                                                                                      "dat", "br",
                                                                                                      "sparse"] else 'n',
-                                                                                                 ext4_size_value)
+                                                                                                 ext4_size_value, UTC=self.UTC)
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
@@ -2702,35 +2707,41 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % name)
 
 
-def mkerofs(name, format_, work, level, old_kernel=0):
+def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
+    if not UTC:
+        UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
     other_ = '-E legacy-compress' if old_kernel else ''
-    cmd = f"mkfs.erofs {other_} -z{extra_} -T {int(time.time())} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
+    cmd = f"mkfs.erofs {other_} -z{extra_} -T {UTC} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
     call(cmd, out=1)
 
 
 @cartoon
-def make_ext4fs(name, work, sparse, size=0):
+def make_ext4fs(name, work, sparse, size=0, UTC=None):
     print(lang.text91 % name)
+    if not UTC:
+        UTC = int(time.time())
     if not size:
         size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     call(
-        f"make_ext4fs -J -T {int(time.time())} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
+        f"make_ext4fs -J -T {UTC} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
 
-def mke2fs(name, work, sparse, size=0):
+def mke2fs(name, work, sparse, size=0, UTC=None):
     print(lang.text91 % name)
     size = Dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
+    if not UTC:
+        UTC = int(time.time())
     if call(
             f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return False
     if call(
-            f"e2fsdroid -e -T {int(time.time())} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img") != 0:
+            f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return False
