@@ -1984,7 +1984,7 @@ def dboot(nm: str = 'boot'):
         return
     else:
         os.remove(work + f"{nm}.img")
-        os.rename(work + nm + os.sep + "new-boot.img", work + os.sep + "boot.img")
+        os.rename(work + nm + os.sep + "new-boot.img", work + os.sep + f"{nm}.img")
         os.chdir(elocal)
         try:
             rmdir(work + nm)
