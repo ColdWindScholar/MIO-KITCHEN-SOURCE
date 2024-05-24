@@ -24,7 +24,10 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
-
+try:
+    import imp
+except ImportError:
+    imp = None
 try:
     from pycase import ensure_dir_case_sensitive
 except ImportError:
@@ -992,9 +995,9 @@ def mpkman() -> None:
             editor.main(path + s)
         else:
             if os.path.exists(path + "main.msh"):
-                editor.main(path + "main.msh")
+                editor.main(path, "main.msh")
             elif os.path.exists(path + 'main.sh'):
-                editor.main(path + 'main.sh')
+                editor.main(path, 'main.sh')
 
     class MpkRunMenu:
         def __init__(self, name, name2):
