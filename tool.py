@@ -2457,16 +2457,8 @@ def unpack(chose, form: any = None):
                 ).run()
         except MemoryError:
             print("Extracting Payload Slowly...")
-            for i in chose:
-                with open(work + "payload.bin", 'rb') as pay:
-                    Dumper(
-                        pay,
-                        work,
-                        diff=False,
-                        old='old',
-                        images=[i],
-                        workers=1
-                    ).run(slow=True)
+            with open(work + "payload.bin", 'rb') as pay:
+                payload_dumper.ota_payload_dumper(pay, work, 'old', chose)
         if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
