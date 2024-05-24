@@ -2448,7 +2448,7 @@ def unpack(chose, form: any = None):
                         old='old',
                         images=[i],
                         workers=1
-                    ).run()
+                    ).run(slow=True)
         if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
