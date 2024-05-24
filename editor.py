@@ -15,6 +15,8 @@ class PythonEditor(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.file_name = file_name
         self.path = path
+        if not os.path.exists(self.path):
+            os.makedirs(self.path, exist_ok=True)
         self.parent = parent
         self.text = CodeView(self, wrap="word", undo=True, lexer=lexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
