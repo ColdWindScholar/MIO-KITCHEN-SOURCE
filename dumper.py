@@ -20,15 +20,6 @@ def u64(x):
     return struct.unpack(">Q", x)[0]
 
 
-def verify_contiguous(exts):
-    blocks = 0
-    for ext in exts:
-        if ext.start_block != blocks:
-            return False
-        blocks += ext.num_blocks
-    return True
-
-
 class Dumper:
     def __init__(
             self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count()
