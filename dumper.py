@@ -32,7 +32,7 @@ class Dumper:
         self.workers = workers
         self.validate_magic()
 
-    def run(self):
+    def run(self, slow=False):
         if self.images == "":
             partitions = self.dam.partitions
         else:
@@ -70,8 +70,14 @@ class Dumper:
             )
 
         self.payloadfile.close()
+        if slow:
+            self.extract_slow(partitions_with_ops)
+        else:
+            self.multiprocess_partitions(partitions_with_ops)
 
-        self.multiprocess_partitions(partitions_with_ops)
+    def extract_slow(self, partitions):
+        for part in partitions:
+            self.dump_part(part)
 
     def multiprocess_partitions(self, partitions):
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
