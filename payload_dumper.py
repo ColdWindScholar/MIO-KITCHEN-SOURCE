@@ -16,8 +16,6 @@ class ota_payload_dumper:
     def __init__(self, payloadfile_, out='output', old='old', images='', command: int = 1):
         self.payloadfile = payloadfile_
         self.args = Namespace(out=out, old=old, images=images, payload=self.payloadfile)
-        if not path.exists(self.args.out):
-            makedirs(self.args.out)
         if self.payloadfile.read(4) != b'CrAU':
             print(f"Magic Check Fail\n")
             self.payloadfile.close()
@@ -34,6 +32,8 @@ class ota_payload_dumper:
         self.dam.ParseFromString(manifest)
         if command == 0:
             return
+        if not path.exists(self.args.out):
+            makedirs(self.args.out)
         self.block_size = self.dam.block_size
         for image in self.args.images:
             partition = [part for part in self.dam.partitions if part.partition_name == image]
