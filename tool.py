@@ -24,6 +24,8 @@ import extra
 import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+import pygments.lexers
+
 try:
     import imp
 except ImportError:
@@ -370,8 +372,8 @@ class Tool(Tk):
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
-                        offvalue='0',
-                        style="Toggle.TButton")
+                                    offvalue='0',
+                                    style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)
         ttk.Checkbutton(sf4, text=lang.t9.format("payload.bin"), variable=auto_rm_pay, onvalue='1',
                         offvalue='0',
@@ -988,16 +990,15 @@ def mpkman() -> None:
         if id_ is None:
             id_ = chosen.get()
         path = os.path.join(moduledir, id_) + os.sep
-        if not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
+        if os.path.exists(path + "main.py"):
+            editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
+        elif not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
             with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
                 sh.write("echo 'MIO-KITCHEN'")
             editor.main(path + s)
         else:
-            if os.path.exists(path + "main.msh"):
-                editor.main(path, "main.msh")
-            elif os.path.exists(path + 'main.sh'):
-                editor.main(path, 'main.sh')
+            editor.main(path, 'main.sh' if not os.path.exists(path + "main.msh") else 'main.msh')
 
     class MpkRunMenu:
         def __init__(self, name, name2):
@@ -1353,6 +1354,20 @@ def mpkman() -> None:
                     os.remove(file.get())
                 except (Exception, BaseException) as e:
                     print(e)
+        elif os.path.exists(script_path + "main.py") and imp:
+            try:
+                module = imp.load_source('module', script_path + "main.py")
+                if hasattr(module, 'main'):
+                    data = {
+                        'version': settings.version, "bin": script_path.replace(os.sep, "/"),
+                        "project": rwork().replace('\\', '/'), 'moddir': moduledir.replace('\\', '/'),
+                        'tool_bin': tool_bin.replace(
+                            '\\',
+                            '/')
+                    }
+                    module.main(data)
+            except Exception as e:
+                print(e)
         elif not os.path.exists(moduledir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls()

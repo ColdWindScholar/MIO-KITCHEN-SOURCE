@@ -11,12 +11,12 @@ from utils import cz, gettype
 
 
 class PythonEditor(tk.Frame):
-    def __init__(self, parent, path, file_name):
+    def __init__(self, parent, path, file_name, lexer=pygments.lexers.BashLexer):
         tk.Frame.__init__(self, parent)
         self.file_name = file_name
         self.path = path
         self.parent = parent
-        self.text = CodeView(self, wrap="word", undo=True, lexer=pygments.lexers.BashLexer, color_scheme="dracula")
+        self.text = CodeView(self, wrap="word", undo=True, lexer=lexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
@@ -72,8 +72,8 @@ class PythonEditor(tk.Frame):
             self.parent.title(f"{self.file_name} - Editor")
 
 
-def main(file_=None, file_name=None):
+def main(file_=None, file_name=None, lexer=pygments.lexers.BashLexer):
     root = tk.Toplevel()
     root.title("Editor")
-    editor = PythonEditor(root, file_, file_name)
+    editor = PythonEditor(root, file_, file_name, lexer=lexer)
     editor.pack(side="top", fill="both", expand=True)
