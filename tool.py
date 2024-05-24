@@ -3022,7 +3022,7 @@ class UnpackGui(ttk.LabelFrame):
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
                 data = lpunpack.get_parts(work + "super.img")
-                if len(data):
+                if data:
                     for i in data:
                         self.lsg.insert(END, i)
         else:
