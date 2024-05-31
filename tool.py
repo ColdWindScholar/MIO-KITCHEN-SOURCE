@@ -2578,7 +2578,11 @@ def unpack(chose, form: any = None):
     print(lang.text8)
 
 
-def ask_win(text='', ok=lang.ok, cancel=lang.cancel) -> int:
+def ask_win(text='', ok=None, cancel=None) -> int:
+    if not ok:
+        ok = lang.ok
+    if not cancel:
+        cancel = lang.cancel
     value = IntVar()
     ask = ttk.LabelFrame(win)
     ask.place(relx=0.5, rely=0.5, anchor="center")
