@@ -26,6 +26,7 @@ from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 import pygments.lexers
 from utils import lang
+
 try:
     import imp
 except ImportError:
@@ -398,9 +399,6 @@ tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + 
 
 class ModuleError(Exception):
     ...
-
-
-
 
 
 def load(name):
@@ -985,7 +983,7 @@ def mpkman() -> None:
             s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
             with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
                 sh.write("echo 'MIO-KITCHEN'")
-            editor.main(path,  s)
+            editor.main(path, s)
         else:
             editor.main(path, 'main.sh' if not os.path.exists(path + "main.msh") else 'main.msh')
 
