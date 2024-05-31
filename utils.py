@@ -334,7 +334,18 @@ def jzxs(master):
 
 
 # ----CLASSES
+class LangUtils:
+    def __init__(self):
+        ...
 
+    def __getattr__(self, item):
+        try:
+            return getattr(self, item)
+        except (Exception, BaseException):
+            return "None"
+
+
+lang = LangUtils()
 class vbpatch:
     def __init__(self, file_):
         self.file = file_

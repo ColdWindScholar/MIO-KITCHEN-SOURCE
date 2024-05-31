@@ -3,6 +3,8 @@ import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import Button, Entry, Frame, Combobox
 
+from utils import lang
+
 
 def askopenfilename(title="Choose File", filetypes=(("*", "*.*"),)):
     return askopenfilenames(title=title, filetypes=filetypes).file
@@ -36,8 +38,8 @@ class askopenfilenames(Toplevel):
         self.show.pack(fill=BOTH, padx=5, pady=5)
         ff = Frame(self)
         Button(ff, text="选择|Choose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
-        Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
-        Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text=lang.cancel, command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
         self.refs()
         self.wait_window()
@@ -94,8 +96,8 @@ class askdirectorys(Toplevel):
         self.show.pack(fill=BOTH, padx=5, pady=5)
         ff = Frame(self)
         Button(ff, text="选择|Choose", command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
-        Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
-        Button(ff, text="取消|Cancel", command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text=lang.cancel, command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
         self.refs()
         self.wait_window()

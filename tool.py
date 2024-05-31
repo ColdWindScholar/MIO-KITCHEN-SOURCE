@@ -25,7 +25,7 @@ import utils
 from extra import *
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 import pygments.lexers
-
+from utils import lang
 try:
     import imp
 except ImportError:
@@ -400,18 +400,7 @@ class ModuleError(Exception):
     ...
 
 
-class LangUtils:
-    def __init__(self):
-        ...
 
-    def __getattr__(self, item):
-        try:
-            return getattr(self, item)
-        except (Exception, BaseException):
-            return "None"
-
-
-lang = LangUtils()
 
 
 def load(name):
