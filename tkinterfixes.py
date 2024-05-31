@@ -12,6 +12,7 @@ _SV_FONT_NAMES = ['TkDefaultFont', 'SunValleyCaptionFont', 'SunValleyBodyFont',
                   'SunValleyBodyStrongFont', 'SunValleyBodyLargeFont', 'SunValleySubtitleFont',
                   'SunValleyTitleFont', 'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
 
+
 def _FIX_TKINTER() -> bool:
     if os.name != 'nt':
         return False
@@ -25,6 +26,7 @@ def _FIX_TKINTER() -> bool:
 
     return False
 
+
 def _label_init_wrapper(orig_init, *args, **kwargs):
     if _FIX_TKINTER():
         font_arr = kwargs.get('font', (None,))
@@ -33,15 +35,18 @@ def _label_init_wrapper(orig_init, *args, **kwargs):
 
     return orig_init(*args, **kwargs)
 
+
 def _do_hook_label_init():
     orig_init = ttk.Label.__init__
     ttk.Label.__init__ = lambda *args, **kwargs: _label_init_wrapper(orig_init, *args, **kwargs)
+
 
 def do_set_window_deffont(root):
     if not _FIX_TKINTER():
         return
 
     root.option_add("*Font", f'"{_DEFFONT}"')
+
 
 def do_override_sv_font():
     if not _FIX_TKINTER():
