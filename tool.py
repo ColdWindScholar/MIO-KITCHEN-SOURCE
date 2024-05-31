@@ -47,6 +47,7 @@ from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 from tkinter import ttk
+from tkinterfixes import *
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -177,6 +178,7 @@ class DevNull:
 class Tool(Tk):
     def __init__(self):
         super().__init__()
+        do_set_window_deffont(self)
         self.show = None
         self.scroll = None
         self.frame_bg = None
@@ -594,6 +596,8 @@ class SetUtils:
         try:
             self.set_value("language", language.get())
             load(language.get())
+            if language.get() == 'Japanese':
+                ask_win('フォントを切り替えるためにこの後で完全にツールを再起動してください')
             if ask_win(lang.t36):
                 restart()
         except Exception as e:
@@ -3213,6 +3217,7 @@ def init():
     win.update()
     jzxs(win)
     print(lang.text134 % (dti() - start))
+    do_override_sv_font()
     win.mainloop()
 
 
