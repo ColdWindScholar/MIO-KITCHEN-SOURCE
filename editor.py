@@ -7,7 +7,7 @@ from tkinter.ttk import Button
 
 import pygments.lexers
 from chlorophyll import CodeView
-from utils import cz, gettype
+from utils import cz, gettype, lang
 
 
 class PythonEditor(tk.Frame):
@@ -21,7 +21,7 @@ class PythonEditor(tk.Frame):
         self.text = CodeView(self, wrap="word", undo=True, lexer=lexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
         f1 = ttk.Frame(self.parent)
-        ttk.Button(f1, text="关闭 | Close", command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
+        ttk.Button(f1, text=lang.text17, command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                               expand=1)
         self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save), style="Accent.TButton")
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
@@ -30,7 +30,7 @@ class PythonEditor(tk.Frame):
         self.show.bind("<Double-Button-1>", self.p_bind)
         self.show.pack(fill=tk.BOTH, padx=5, pady=5)
         ff = ttk.Frame(self)
-        Button(ff, text="刷新|Refresh", command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
+        Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
         self.refs()
 
