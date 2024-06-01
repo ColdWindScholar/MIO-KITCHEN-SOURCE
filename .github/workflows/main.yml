@@ -18,7 +18,7 @@ jobs:
       - uses: actions/download-artifact@v4
       - name: Generate Release Body
         run: |
-            set ver $(cat curl -S https://raw.githubusercontent.com/ColdWindScholar/MIO-KITCHEN-SOURCE/main/bin/setting.ini | findstr version).Split()[2]
+            set ver $(curl -S https://raw.githubusercontent.com/ColdWindScholar/MIO-KITCHEN-SOURCE/main/bin/setting.ini | findstr version).Split()[2]
             echo "Changelog:"  > body.md
             echo "Build times: ${{ github.run_number }}" >> body.md
             echo "Version: $ver" >> body.md && echo Ok
