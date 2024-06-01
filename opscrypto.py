@@ -77,10 +77,7 @@ class QCSparse:
         self.total_chunks = None
         self.image_checksum = None
 
-        self.info = print
-        self.debug = print
         self.error = print
-        self.warning = print
 
     def readheader(self, offset):
         self.rf.seek(offset)
@@ -100,9 +97,9 @@ class QCSparse:
             self.error("The file header size was expected to be 28, but is %u." % self.file_hdr_sz)
             return False
         if self.chunk_hdr_sz != 12:
-            self.error("The chunk header size was expected to be 12, but is %u." % self.chunk_hdr_sz)
+            print("The chunk header size was expected to be 12, but is %u." % self.chunk_hdr_sz)
             return False
-        self.info("Sparse Format detected. Using unpacked image.")
+        print("Sparse Format detected. Using unpacked image.")
         return True
 
     def get_chunk_size(self):
@@ -139,7 +136,7 @@ class QCSparse:
                 self.rf.seek(self.rf.tell() + 4)
                 return 0
         else:
-            self.debug("Unknown chunk type 0x%04X" % chunk_type)
+            print("Unknown chunk type 0x%04X" % chunk_type)
             return -1
 
     def unsparse(self):
@@ -649,6 +646,3 @@ def main(args):
         fsize = os.stat(filename).st_size
         decryptfile(key, filename, "", filename + ".dec", 0, fsize)
         print("Done.")
-    else:
-        print("Usage:./opsdecrypt.py decrypt [filename.ops]")
-        exit(0)
