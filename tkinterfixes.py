@@ -8,9 +8,12 @@ _SETTING_FILE = 'bin/setting.ini'
 
 _DEFFONT = 'Yu Gothic UI'
 
-_SV_FONT_NAMES = ['TkDefaultFont', 'SunValleyCaptionFont', 'SunValleyBodyFont',
-                  'SunValleyBodyStrongFont', 'SunValleyBodyLargeFont', 'SunValleySubtitleFont',
-                  'SunValleyTitleFont', 'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
+_TK_DEFFONT = 'TkDefaultFont'
+
+_OVERRIDE_FONT_NAMES = [_TK_DEFFONT] + ['SunValleyCaptionFont', 'SunValleyBodyFont',
+                                        'SunValleyBodyStrongFont', 'SunValleyBodyLargeFont',
+                                        'SunValleySubtitleFont', 'SunValleyTitleFont',
+                                        'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
 
 
 def _FIX_TKINTER() -> bool:
@@ -48,11 +51,11 @@ def do_set_window_deffont(root):
     root.option_add("*Font", f'"{_DEFFONT}"')
 
 
-def do_override_sv_font():
+def do_override_fonts():
     if not _FIX_TKINTER():
         return
 
-    for _override_font_name in _SV_FONT_NAMES:
+    for _override_font_name in _OVERRIDE_FONT_NAMES:
         tkinter.font.nametofont(_override_font_name).configure(family=_DEFFONT)
 
 

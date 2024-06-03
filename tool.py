@@ -3258,7 +3258,7 @@ def init():
     win.update()
     jzxs(win)
     print(lang.text134 % (dti() - start))
-    do_override_sv_font()
+    do_override_fonts()
     win.mainloop()
 
 
