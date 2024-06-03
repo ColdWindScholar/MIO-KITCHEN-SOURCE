@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import platform
 import subprocess
+import threading
 
 from functools import wraps
 import AI_engine
@@ -13,6 +14,7 @@ if not platform.system() == 'Darwin':
         ...
 import json
 import os.path
+import pathlib
 import shlex
 import sys
 import time
@@ -396,6 +398,7 @@ settings_file = os.path.join((elocal := utils.e_local), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
+tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + os.sep
 
 
@@ -637,8 +640,6 @@ class SetUtils:
         try:
             self.set_value("language", language.get())
             load(language.get())
-            if language.get() == 'Japanese':
-                ask_win('フォントを切り替えるためにこの後で完全にツールを再起動してください')
             if ask_win(lang.t36):
                 restart()
         except Exception as e:
@@ -3269,6 +3270,17 @@ def restart(er=None):
                 return
     except (Exception, BaseException):
         pass
+
+    def _inner():
+        argv = [sys.executable]
+        if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
+            # only needed when running within a Python intepreter
+            argv.append(tool_self)
+        argv.extend(sys.argv[1:])
+        p = subprocess.Popen(argv)
+        p.wait()
+        sys.exit(p.returncode)
+
     if er:
         er.destroy()
     try:
@@ -3278,9 +3290,12 @@ def restart(er=None):
             except (Exception, BaseException):
                 pass
         win.deiconify()
+        win.withdraw()
+        win.destroy()
     except (Exception, BaseException):
         pass
-    init()
+
+    threading.Thread(target=_inner).start()
 
 
 if __name__ == "__main__":
