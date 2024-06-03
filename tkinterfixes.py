@@ -48,7 +48,8 @@ def do_set_window_deffont(root):
     if not _FIX_TKINTER():
         return
 
-    root.option_add("*Font", f'"{_DEFFONT}"')
+    deffont = tkinter.font.nametofont(_TK_DEFFONT)
+    root.option_add("*Font", deffont)
 
 
 def do_override_fonts():
