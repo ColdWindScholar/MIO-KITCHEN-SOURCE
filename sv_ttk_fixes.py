@@ -12,7 +12,7 @@ def _tk_get_font(family: str = 'TkDefaultFont'):
     return tkinter.font.nametofont(family)
 
 
-def _tk_get_font_family(font_ = None) -> str:
+def _tk_get_font_family(font_=None) -> str:
     if font_ is None:
         font_ = _tk_get_font()
 
