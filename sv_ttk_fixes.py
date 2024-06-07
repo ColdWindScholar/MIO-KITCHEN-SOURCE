@@ -1,40 +1,28 @@
-from configparser import ConfigParser
-import os
 import tkinter.font
 from tkinter import Label as orig_Label
 from tkinter import ttk
 
-_SETTING_FILE = 'bin/setting.ini'
-
-_DEFFONT = 'Yu Gothic UI'
-
-_TK_DEFFONT = 'TkDefaultFont'
-
-_OVERRIDE_FONT_NAMES = [_TK_DEFFONT] + ['SunValleyCaptionFont', 'SunValleyBodyFont',
-                                        'SunValleyBodyStrongFont', 'SunValleyBodyLargeFont',
-                                        'SunValleySubtitleFont', 'SunValleyTitleFont',
-                                        'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
+_SV_TTK_FONT_NAMES = ['SunValleyCaptionFont', 'SunValleyBodyFont',
+                      'SunValleyBodyStrongFont', 'SunValleyBodyLargeFont',
+                      'SunValleySubtitleFont', 'SunValleyTitleFont',
+                      'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
 
 
-def _FIX_TKINTER() -> bool:
-    if os.name != 'nt':
-        return False
+def _tk_get_font(family: str = 'TkDefaultFont'):
+    return tkinter.font.nametofont(family)
 
-    cp = ConfigParser()
-    try:
-        cp.read(_SETTING_FILE)
-        return cp.get('setting', 'language') == 'Japanese'
-    except:
-        pass
 
-    return False
+def _tk_get_font_family(font_ = None) -> str:
+    if font_ is None:
+        font_ = _tk_get_font()
+
+    return font_.config()['family']
 
 
 def _label_init_wrapper(orig_init, *args, **kwargs):
-    if _FIX_TKINTER():
-        font_arr = kwargs.get('font', (None,))
-        new_font_arr = (_DEFFONT,) + font_arr[1:]
-        kwargs['font'] = new_font_arr
+    font_arr = kwargs.get('font', (None,))
+    new_font_arr = (_tk_get_font_family(),) + font_arr[1:]
+    kwargs['font'] = new_font_arr
 
     return orig_init(*args, **kwargs)
 
@@ -45,19 +33,12 @@ def _do_hook_label_init():
 
 
 def do_set_window_deffont(root):
-    if not _FIX_TKINTER():
-        return
-
-    deffont = tkinter.font.nametofont(_TK_DEFFONT)
-    root.option_add("*Font", deffont)
+    root.option_add("*Font", _tk_get_font())
 
 
-def do_override_fonts():
-    if not _FIX_TKINTER():
-        return
-
-    for _override_font_name in _OVERRIDE_FONT_NAMES:
-        tkinter.font.nametofont(_override_font_name).configure(family=_DEFFONT)
+def do_override_sv_ttk_fonts():
+    for _sv_ttk_font_name in _SV_TTK_FONT_NAMES:
+        _tk_get_font(_sv_ttk_font_name).configure(family=_tk_get_font_family())
 
 
 class Label(orig_Label):

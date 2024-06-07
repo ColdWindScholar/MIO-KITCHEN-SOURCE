@@ -20,6 +20,7 @@ import sys
 import time
 from dumper import Dumper
 import tkinter as tk
+from configparser import ConfigParser
 from webbrowser import open as openurl
 import extra
 import utils
@@ -48,7 +49,7 @@ from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 from tkinter import ttk
-from tkinterfixes import *
+from sv_ttk_fixes import *
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -3259,7 +3260,7 @@ def init():
     win.update()
     jzxs(win)
     print(lang.text134 % (dti() - start))
-    do_override_fonts()
+    do_override_sv_ttk_fonts()
     win.mainloop()
 
 
