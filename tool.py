@@ -1691,6 +1691,7 @@ class PackSuper(Toplevel):
         self.title(lang.text53)
 
         def refresh():
+            tl.delete(0, END)
             for file_name in os.listdir(work):
                 if file_name.endswith(".img"):
                     if gettype(work + file_name) in ["ext", "erofs"]:
