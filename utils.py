@@ -346,6 +346,8 @@ class LangUtils:
 
 
 lang = LangUtils()
+
+
 class vbpatch:
     def __init__(self, file_):
         self.file = file_
