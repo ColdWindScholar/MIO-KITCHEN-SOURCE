@@ -1689,6 +1689,13 @@ class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
         self.title(lang.text53)
+
+        def refresh():
+            for file_name in os.listdir(work):
+                if file_name.endswith(".img"):
+                    if gettype(work + file_name) in ["ext", "erofs"]:
+                        tl.insert(END, file_name[:-4])
+
         supers = IntVar()
         ssparse = IntVar()
         supersz = IntVar()
@@ -1714,10 +1721,7 @@ class PackSuper(Toplevel):
 
         (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
         work = rwork()
-        for file_name in os.listdir(work):
-            if file_name.endswith(".img"):
-                if gettype(work + file_name) in ["ext", "erofs"]:
-                    tl.insert(END, file_name[:-4])
+
         tl.pack(padx=10, pady=10, fill=BOTH)
 
         ttk.Checkbutton(self, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
@@ -1727,9 +1731,11 @@ class PackSuper(Toplevel):
         ttk.Checkbutton(t_frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
+        ttk.Button(t_frame, text=lang.text23, command=refresh).pack(side=RIGHT, padx=10, pady=10)
         g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(generate))
         g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
+        refresh()
         jzxs(self)
 
         def read_list():
