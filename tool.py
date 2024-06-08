@@ -1828,7 +1828,7 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
                 part, os.path.getsize(work + part + ".img"), dbfz.get(), part, work + part)
         command += "--group %s_b:%s " % (dbfz.get(), size.get())
         for part in lb:
-            command += "--partition %s_b:readonly:0:%s_b " % (part, dbfz.get())
+            command += f"--partition {part}_b:readonly:0:{dbfz.get()}_b "
         if set_.get() == 2:
             command += "--virtual-ab "
     if sparse.get() == 1:
