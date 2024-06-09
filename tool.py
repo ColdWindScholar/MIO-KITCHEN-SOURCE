@@ -1707,7 +1707,7 @@ class PackSuper(Toplevel):
         scywj = IntVar()
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
-        (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH)
+        (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
         supersz.set(1)
         # 自动设置
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
@@ -1726,7 +1726,7 @@ class PackSuper(Toplevel):
         (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
         work = rwork()
 
-        tl.pack(padx=10, pady=10, fill=BOTH)
+        tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
 
         ttk.Checkbutton(self, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
