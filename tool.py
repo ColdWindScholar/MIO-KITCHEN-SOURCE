@@ -443,13 +443,10 @@ class TaskManager(ttk.LabelFrame):
         self.frame_inner.configure(yscrollcommand=sv.set)
         sv.config(command=self.frame_inner.yview)
         self.frame_inner.config(yscrollincrement=1)
-        self.frame_inner.bind("<MouseWheel>", self.event1)
+        self.frame_inner.bind("<MouseWheel>",
+                              lambda event: self.frame_inner.yview_scroll(int(-event.delta / 120), 'units'))
         ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, side=BOTTOM)
         self.refresh()
-
-    def event1(self, event):
-        number = int(-event.delta / 120)
-        self.frame_inner.yview_scroll(number, 'units')
 
     def refresh(self):
         for i in self.list:
