@@ -4,7 +4,6 @@ import lzma
 import struct
 import sys
 import threading
-import math
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
@@ -173,7 +172,7 @@ class Dumper:
                 out_file.seek(ext.start_block * self.block_size)
                 data_length = ext.num_blocks * self.block_size
                 while processed_len < data_length:
-                    data = bytes(math.min(data_length - processed_len, buffsize))
+                    data = bytes(min(data_length - processed_len, buffsize))
                     out_file.write(data)
                     processed_len += len(data)
                 processed_len = 0
