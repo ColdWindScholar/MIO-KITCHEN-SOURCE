@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import bz2
-import hashlib
 import lzma
 import struct
 import sys
@@ -146,7 +145,6 @@ class Dumper:
     def dump_part(self, part):
         name = part["partition"].partition_name
         out_file = open("%s/%s.img" % (self.out, name), "wb")
-        h = hashlib.sha256()
 
         if self.diff:
             old_file = open("%s/%s.img" % (self.old, name), "rb")
