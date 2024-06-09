@@ -154,4 +154,4 @@ class Dumper:
             old_file = None
 
         for op in part["operations"]:
-            data = self.data_for_op(op, out_file, old_file)
+            self.data_for_op(op, out_file, old_file)
