@@ -6,7 +6,10 @@ from os import F_OK, access, makedirs, path
 from struct import unpack
 from timeit import default_timer
 import update_metadata_pb2 as um
-
+try:
+    from gc import collect
+except ImportError:
+    collect = print
 
 def u64(x):
     return unpack('>Q', x)[0]
@@ -76,3 +79,4 @@ class ota_payload_dumper:
         else:
             print("Unsupported type = %d\n" % op.type)
             exit(-2)
+        collect()
