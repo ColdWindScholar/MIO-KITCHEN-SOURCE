@@ -2878,7 +2878,7 @@ def rmdir(path):
         win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
 
 
-def get_all_file_paths(directory) -> Ellipsis:
+def get_all_file_paths(directory):
     for root, directories, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
