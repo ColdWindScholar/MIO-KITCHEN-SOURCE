@@ -6,7 +6,10 @@ import threading
 from functools import wraps
 import AI_engine
 import ext4
-
+try:
+    from gc import collect
+except ImportError:
+    collect = None
 if not platform.system() == 'Darwin':
     try:
         import load_window
@@ -2497,6 +2500,8 @@ def unpack(chose, form: any = None):
                     images=chose
                 ).run()
         except MemoryError:
+            if collect:
+                collect()
             print("Extracting Payload Slowly...")
             with open(work + "payload.bin", 'rb') as pay:
                 payload_dumper.ota_payload_dumper(payloadfile_=pay, out=work, old='old', images=chose)
