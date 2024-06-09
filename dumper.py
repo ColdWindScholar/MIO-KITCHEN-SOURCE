@@ -3,6 +3,8 @@ import bz2
 import lzma
 import struct
 import sys
+import threading
+import math
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
@@ -21,18 +23,25 @@ def u64(x):
 
 class Dumper:
     def __init__(
-            self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count()
+            self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), buffsize=8192
     ):
+        self.payloadpath = payloadfile
+        payloadfile = self.open_payloadfile()
         self.payloadfile = payloadfile
+        self.tls = threading.local()
         self.out = out
         self.diff = diff
         self.old = old
         self.images = images
         self.workers = workers
+        self.buffsize = buffsize
         self.validate_magic()
 
+    def open_payloadfile(self):
+        return open(self.payloadpath, 'rb')
+
     def run(self, slow=False):
-        if not self.images:
+        if self.images == "":
             partitions = self.dam.partitions
         else:
             partitions = []
@@ -57,8 +66,9 @@ class Dumper:
                 self.payloadfile.seek(self.data_offset + operation.data_offset)
                 operations.append(
                     {
+                        "data_offset": self.payloadfile.tell(),
                         "operation": operation,
-                        "data": self.payloadfile.read(operation.data_length),
+                        "data_length": operation.data_length,
                     }
                 )
             partitions_with_ops.append(
@@ -106,24 +116,45 @@ class Dumper:
         self.block_size = self.dam.block_size
 
     def data_for_op(self, operation, out_file, old_file):
-        data = operation["data"]
+        payloadfile = self.tls.payloadfile
+        payloadfile.seek(operation["data_offset"])
+        buffsize = self.buffsize
+        processed_len = 0
+        data_length = operation["data_length"]
         op = operation["operation"]
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
 
         if op.type == op.REPLACE_XZ:
             dec = lzma.LZMADecompressor()
-            data = dec.decompress(data)
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            out_file.write(data)
+            while processed_len < data_length:
+                data = payloadfile.read(buffsize)
+                processed_len += len(data)
+                while True:
+                    data = dec.decompress(data, max_length=buffsize)
+                    out_file.write(data)
+                    if dec.needs_input or dec.eof:
+                        break
+                    data = b''
         elif op.type == op.REPLACE_BZ:
             dec = bz2.BZ2Decompressor()
-            data = dec.decompress(data)
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            out_file.write(data)
+            while processed_len < data_length:
+                data = payloadfile.read(buffsize)
+                processed_len += len(data)
+                while True:
+                    data = dec.decompress(data, max_length=buffsize)
+                    out_file.write(data)
+                    if dec.needs_input or dec.eof:
+                        break
+                    data = b''
         elif op.type == op.REPLACE:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            out_file.write(data)
+            while processed_len < data_length:
+                data = payloadfile.read(buffsize)
+                processed_len += len(data)
+                out_file.write(data)
         elif op.type == op.SOURCE_COPY:
             if not self.diff:
                 print("SOURCE_COPY supported only for differential OTA")
@@ -131,12 +162,21 @@ class Dumper:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             for ext in op.src_extents:
                 old_file.seek(ext.start_block * self.block_size)
-                data = old_file.read(ext.num_blocks * self.block_size)
-                out_file.write(data)
+                data_length = ext.num_blocks * self.block_size
+                while processed_len < data_length:
+                    data = old_file.read(buffsize)
+                    processed_len += len(data)
+                    out_file.write(data)
+                processed_len = 0
         elif op.type == op.ZERO:
             for ext in op.dst_extents:
                 out_file.seek(ext.start_block * self.block_size)
-                out_file.write(b"\x00" * ext.num_blocks * self.block_size)
+                data_length = ext.num_blocks * self.block_size
+                while processed_len < data_length:
+                    data = bytes(math.min(data_length - processed_len, buffsize))
+                    out_file.write(data)
+                    processed_len += len(data)
+                processed_len = 0
         else:
             print("Unsupported type = %d" % op.type)
             sys.exit(-1)
@@ -151,5 +191,10 @@ class Dumper:
         else:
             old_file = None
 
+        with self.open_payloadfile() as payloadfile:
+            self.tls.payloadfile = payloadfile
+            self.do_ops_for_part(part, out_file, old_file)
+
+    def do_ops_for_part(self, part, out_file, old_file):
         for op in part["operations"]:
             self.data_for_op(op, out_file, old_file)

@@ -2512,9 +2512,8 @@ def unpack(chose, form: any = None):
     if form == 'payload':
         print(lang.text79 + "payload")
         try:
-            with open(work + "payload.bin", 'rb') as pay:
-                Dumper(
-                    pay,
+            Dumper(
+                    work + "payload.bin",
                     work,
                     diff=False,
                     old='old',
