@@ -2501,7 +2501,7 @@ def unpack(chose, form: any = None):
                 ).run()
         except MemoryError:
             if collect:
-                collect()
+                win.message_pop(f"Clean Memory {collect()}")
             print("Extracting Payload Slowly...")
             with open(work + "payload.bin", 'rb') as pay:
                 payload_dumper.ota_payload_dumper(payloadfile_=pay, out=work, old='old', images=chose)
