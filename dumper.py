@@ -32,7 +32,7 @@ class Dumper:
         self.validate_magic()
 
     def run(self, slow=False):
-        if self.images == "":
+        if not self.images:
             partitions = self.dam.partitions
         else:
             partitions = []
