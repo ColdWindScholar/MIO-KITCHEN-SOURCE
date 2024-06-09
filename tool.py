@@ -264,7 +264,7 @@ class Tool(Tk):
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
         self.setting_tab()
-        self.notepad.pack(fill=BOTH)
+        self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=('楷书', 15))
         self.tsk.bind('<Button-1>')
