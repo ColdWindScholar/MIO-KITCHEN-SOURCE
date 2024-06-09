@@ -141,8 +141,7 @@ class Dumper:
         else:
             print("Unsupported type = %d" % op.type)
             sys.exit(-1)
-
-        return data
+        del data
 
     def dump_part(self, part):
         name = part["partition"].partition_name
