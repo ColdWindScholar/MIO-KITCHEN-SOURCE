@@ -4,8 +4,11 @@ import subprocess
 import threading
 
 from functools import wraps
+from random import randint
+
 import AI_engine
 import ext4
+
 try:
     from gc import collect
 except ImportError:
@@ -309,7 +312,29 @@ class Tool(Tk):
         self.scrollbar.config(command=self.canvas1.yview)
 
     def tab4_n(self):
-        Label(self.tab4, text="MIO-KITCHEN", font=('楷书', 30)).pack(padx=20, pady=10)
+        self.rotate_angle = 0
+
+        def getColor():
+            color1 = randint(16, 255)
+            color2 = randint(16, 255)
+            color3 = randint(16, 255)
+            color1 = hex(color1)
+            color2 = hex(color2)
+            color3 = hex(color3)
+            ans = "#" + color1[2:] + color2[2:] + color3[2:]
+            return ans
+
+        def update_angle(event):
+            self.rotate_angle -= 10
+            canvas.itemconfigure(text_item, angle=self.rotate_angle)
+
+        canvas = tk.Canvas(self.tab4, width=400, height=100)
+        canvas.pack()
+        text_item = canvas.create_text(200, 50, text='MIO-KITCHEN', font=('Arial', 30), fill='white')
+
+        canvas.tag_bind(text_item, '<B1-Motion>', update_angle)
+        canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
+
         Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
         Label(self.tab4,
               text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
