@@ -1,3 +1,4 @@
+import io
 import os
 import struct
 import sys
@@ -6,7 +7,7 @@ from os import getcwd
 from os.path import exists
 from random import randint, choice
 from threading import Thread
-
+import update_metadata_pb2 as um
 import blockimgdiff
 import sparse_img
 from lpunpack import SparseImage
@@ -346,6 +347,26 @@ class LangUtils:
 
 
 lang = LangUtils()
+
+
+def u64(x):
+    return struct.unpack('>Q', x)[0]
+
+
+def payload_reader(payloadfile):
+    if payloadfile.read(4) != b'CrAU':
+        print(f"Magic Check Fail\n")
+        payloadfile.close()
+        return
+    file_format_version = u64(payloadfile.read(8))
+    assert file_format_version == 2
+    manifest_size = u64(payloadfile.read(8))
+    metadata_signature_size = struct.unpack('>I', payloadfile.read(4))[0] if file_format_version > 1 else 0
+    manifest = payloadfile.read(manifest_size)
+    payloadfile.read(metadata_signature_size)
+    dam = um.DeltaArchiveManifest()
+    dam.ParseFromString(manifest)
+    return dam
 
 
 class vbpatch:

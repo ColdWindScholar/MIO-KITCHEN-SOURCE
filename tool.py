@@ -72,7 +72,6 @@ import imgextractor
 import lpunpack
 import mkdtboimg
 import ozipdecrypt
-import payload_dumper
 import splituapp
 from timeit import default_timer as dti
 import ofp_qc_decrypt
@@ -2522,11 +2521,7 @@ def unpack(chose, form: any = None):
                     images=chose
                 ).run()
         except MemoryError:
-            if collect:
-                win.message_pop(f"Clean Memory {collect()}")
-            print("Extracting Payload Slowly...")
-            with open(work + "payload.bin", 'rb') as pay:
-                payload_dumper.ota_payload_dumper(payloadfile_=pay, out=work, old='old', images=chose)
+            print('Error: CANNOT Extract Payload')
         if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
@@ -3089,7 +3084,7 @@ class UnpackGui(ttk.LabelFrame):
         if self.fm.get() == 'payload':
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
-                    for i in payload_dumper.ota_payload_dumper(pay, command=0).dam.partitions:
+                    for i in utils.payload_reader(pay).partitions:
                         self.lsg.insert(END, i.partition_name)
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
