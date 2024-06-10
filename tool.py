@@ -594,7 +594,7 @@ class Welcome(Toplevel):
     def private(self):
         settings.set_value("oobe", "3")
         self.reframe()
-        ttk.Label(self.frame, text=lang.t2, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
+        ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         with open(os.path.join(elocal, "bin", "licenses", "private.txt"), 'r',
@@ -607,10 +607,10 @@ class Welcome(Toplevel):
     def done(self):
         settings.set_value("oobe", "4")
         self.reframe()
-        ttk.Label(self.frame, text=lang.t4, font=("宋体", 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
+        ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                     expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        ttk.Label(self.frame, text=lang.t5, font=("宋体", 20)).pack(
+        ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10)
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
@@ -621,6 +621,8 @@ class SetUtils:
         self.bar_level = '0.9'
         self.set_file = set_ini
         self.ai_engine = '0'
+        self.version = 'basic'
+        self.language = 'English'
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
             self.load()
@@ -2513,12 +2515,12 @@ def unpack(chose, form: any = None):
         print(lang.text79 + "payload")
         try:
             Dumper(
-                    work + "payload.bin",
-                    work,
-                    diff=False,
-                    old='old',
-                    images=chose
-                ).run()
+                work + "payload.bin",
+                work,
+                diff=False,
+                old='old',
+                images=chose
+            ).run()
         except MemoryError:
             print('Error: CANNOT Extract Payload')
         if settings.rm_pay == '1':
