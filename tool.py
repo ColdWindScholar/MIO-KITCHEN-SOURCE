@@ -2328,7 +2328,7 @@ class Packxx(Toplevel):
                                 except ValueError:
                                     ext4_size_value = 0
 
-                    make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
+                    if make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
                                 ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
                         dname,
                         work,
@@ -2337,7 +2337,9 @@ class Packxx(Toplevel):
                             "br",
                             "sparse"] else 'n',
                         ext4_size_value,
-                        UTC=self.UTC.get())
+                        UTC=self.UTC.get()) != 0:
+                        print(lang.text75 % dname)
+                        continue
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
@@ -2824,7 +2826,7 @@ def make_ext4fs(name, work, sparse, size=0, UTC=None):
     if not size:
         size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
-    call(
+    return call(
         f"make_ext4fs -J -T {UTC} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
 
 
@@ -2838,12 +2840,12 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
             f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
-        return False
+        return 1
     if call(
             f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
-        return False
+        return 1
     if sparse == "y":
         call(f"img2simg {work + name}_new.img {work + name}.img")
         try:
