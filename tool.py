@@ -2094,7 +2094,7 @@ class Packxx(Toplevel):
         self.ext4_method = StringVar(value=lang.t32)
         self.lg = list_
         self.erofsext4 = IntVar()
-        self.erofs_old_kernel = IntVar()
+        self.erofs_old_kernel = IntVar(value=0)
         if not self.verify():
             self.start_()
             return
