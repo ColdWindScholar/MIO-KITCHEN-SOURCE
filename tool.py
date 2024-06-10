@@ -2290,19 +2290,23 @@ class Packxx(Toplevel):
                     elif parts_dict[dname] == 'ext':
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
-                    mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
-                            self.erofs_old_kernel.get(), UTC=self.UTC.get())
-                    if self.delywj.get() == 1:
-                        rdi(work, dname)
-                    print(lang.text3.format(dname))
-                    if self.dbgs.get() in ["dat", "br", "sparse"]:
-                        img2simg(work + dname + ".img")
-                        if self.dbgs.get() == 'dat':
-                            datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
-                        elif self.dbgs.get() == 'br':
-                            datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
-                        else:
-                            print(lang.text3.format(dname))
+                    if mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
+                            self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
+                        print(lang.text75 % dname)
+                        continue
+                    else:
+                        if self.delywj.get() == 1:
+                            rdi(work, dname)
+                        print(lang.text3.format(dname))
+                        if self.dbgs.get() in ["dat", "br", "sparse"]:
+                            img2simg(work + dname + ".img")
+                            if self.dbgs.get() == 'dat':
+                                datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                            elif self.dbgs.get() == 'br':
+                                datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                            else:
+                                print(lang.text3.format(dname))
+
                 else:
                     ext4_size_value = self.custom_size.get(dname, 0)
                     if self.ext4_method.get() == lang.t33 and not self.custom_size.get(dname, ''):
@@ -2809,7 +2813,7 @@ def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
     other_ = '-E legacy-compress' if old_kernel else ''
     cmd = f"mkfs.erofs {other_} -z{extra_} -T {UTC} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
-    call(cmd, out=1)
+    return call(cmd, out=1)
 
 
 @cartoon
