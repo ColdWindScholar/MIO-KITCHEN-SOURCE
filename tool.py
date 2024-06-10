@@ -595,7 +595,7 @@ class Welcome(Toplevel):
         settings.set_value("oobe", "3")
         self.reframe()
         ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                    expand=True)
+                                                                  expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         with open(os.path.join(elocal, "bin", "licenses", "private.txt"), 'r',
                   encoding='UTF-8') as f:
@@ -608,7 +608,7 @@ class Welcome(Toplevel):
         settings.set_value("oobe", "4")
         self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                    expand=True)
+                                                                  expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10)
@@ -2290,8 +2290,8 @@ class Packxx(Toplevel):
                     elif parts_dict[dname] == 'ext':
                         parts_dict[dname] = 'erofs'
                 if parts_dict[dname] == 'erofs':
-                    if mkerofs(dname, str(self.edbgs.get()), work, int(self.scale_erofs.get()),
-                            self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
+                    if mkerofs(dname, str(self.edbgs.get()), work, level=int(self.scale_erofs.get()),
+                               old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                         continue
                     else:
@@ -2329,7 +2329,7 @@ class Packxx(Toplevel):
                                     ext4_size_value = 0
 
                     if make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                                   ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
                         dname,
                         work,
                         "y" if self.dbgs.get() in [
