@@ -153,12 +153,13 @@ class LoadCar:
             task_num = func.__name__
             info = [hash(func), args]
             if task_num in self.tasks:
-                for i in self.tasks.get(task_num):
-                    if i[1] == args:
-                        print(f"Please Wait for task_{i[0]} with args {i[1]}...\n")
-                        return
-                    else:
-                        self.tasks[task_num].append(info)
+                try:
+                    i = self.tasks[task_num][self.tasks[task_num].index(info)]
+                except ValueError:
+                    self.tasks[task_num].append(info)
+                else:
+                    print(f"Please Wait for task_{i[0]} with args {i[1]}...\n")
+                    return
             else:
                 self.tasks[task_num] = [info]
             func(*args, **kwargs)
