@@ -151,7 +151,8 @@ class LoadCar:
         def call_func(*args, **kwargs):
             cz(self.run())
             task_num = func.__name__
-            info = [hash(func), args]
+            task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
+            info = [hash(func), args, task_real]
             if task_num in self.tasks:
                 try:
                     i = self.tasks[task_num][self.tasks[task_num].index(info)]
@@ -162,7 +163,8 @@ class LoadCar:
                     return
             else:
                 self.tasks[task_num] = [info]
-            func(*args, **kwargs)
+            task_real.start()
+            task_real.join()
             if task_num in self.tasks:
                 if len(self.tasks.get(task_num)) - 1 >= 0:
                     del self.tasks[task_num][self.tasks[task_num].index(info)]
