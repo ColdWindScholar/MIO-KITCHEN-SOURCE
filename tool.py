@@ -2105,7 +2105,12 @@ class Packxx(Toplevel):
         self.delywj = IntVar()
         self.ext4_method = StringVar(value=lang.t32)
         self.lg = list_
-        self.erofsext4 = IntVar()
+
+        self.origin_fs = StringVar(value='ext')
+        self.modify_fs = StringVar(value='ext')
+
+        self.fs_conver = BooleanVar(value=False)
+
         self.erofs_old_kernel = IntVar(value=0)
         if not self.verify():
             self.start_()
@@ -2158,19 +2163,32 @@ class Packxx(Toplevel):
         self.label = ttk.Label(sf1, text=lang.text47.format(int(scales.get())))
         self.label.pack(side='left', padx=5, pady=5)
         scales.pack(fill="x", padx=5, pady=5)
-        ttk.Checkbutton(lf3, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        ttk.Checkbutton(lf3, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
-        ttk.Checkbutton(lf3, text=lang.t34, variable=self.erofsext4, onvalue=1, offvalue=0,
-                        style="Switch.TCheckbutton").pack(
-            padx=5, pady=5, fill=BOTH)
         f = Frame(lf3)
-        ttk.Label(lf3, text='UTC:').pack(side=LEFT, fill=X)
-        ttk.Entry(f, textvariable=self.UTC).pack(side=LEFT, fill=X)
-        f.pack(fill=X, side=LEFT, padx=5, pady=5)
+        ttk.Label(f, text='UTC:').pack(side=LEFT, fill=X, padx=5, pady=5)
+        ttk.Entry(f, textvariable=self.UTC).pack(side=LEFT, fill=X, padx=5, pady=5)
+        f.pack(fill=X, padx=5, pady=5)
+
+        Frame_T = Frame(lf3)
+        ttk.Checkbutton(Frame_T, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=X, side=LEFT)
+        ttk.Checkbutton(Frame_T, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=X, side=LEFT)
+        Frame_T.pack(fill=X, padx=5, pady=5, side=BOTTOM)
+        ttk.Checkbutton(lf3, text='Fs Converter', variable=self.fs_conver, onvalue=True, offvalue=False,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+        fs_conver = ttk.Frame(lf3, width=20)
+        ttk.Combobox(fs_conver, textvariable=self.origin_fs, values=('ext', 'f2fs', 'erofs'), width=6,
+                     state='readonly').pack(
+            padx=2, pady=2, fill=X, side=LEFT)
+        ttk.Label(fs_conver, text='==>').pack(side=LEFT, fill=X, padx=1, pady=1)
+        ttk.Combobox(fs_conver, textvariable=self.modify_fs, values=('ext', 'f2fs', 'erofs'), width=6,
+                     state='readonly').pack(
+            padx=2, pady=2, fill=X, side=LEFT)
+        self.fs_conver.trace('w', lambda *z: fs_conver.pack_forget() if not self.fs_conver.get() else fs_conver.pack(
+            padx=5, pady=5, fill=X))
 
         ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
                                                                                 pady=2,
@@ -2296,14 +2314,28 @@ class Packxx(Toplevel):
                 if settings.contextpatch == "1":
                     contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
                 utils.qc(work + "config" + os.sep + dname + "_file_contexts")
-                if self.erofsext4.get():
-                    if parts_dict[dname] == 'erofs':
-                        parts_dict[dname] = 'ext'
-                    elif parts_dict[dname] == 'ext':
-                        parts_dict[dname] = 'erofs'
+                if self.fs_conver.get():
+                    if parts_dict[dname] == self.origin_fs.get():
+                        parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
                     if mkerofs(dname, str(self.edbgs.get()), work, level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
+                        print(lang.text75 % dname)
+                        continue
+                    else:
+                        if self.delywj.get() == 1:
+                            rdi(work, dname)
+                        print(lang.text3.format(dname))
+                        if self.dbgs.get() in ["dat", "br", "sparse"]:
+                            img2simg(work + dname + ".img")
+                            if self.dbgs.get() == 'dat':
+                                datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                            elif self.dbgs.get() == 'br':
+                                datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                            else:
+                                print(lang.text3.format(dname))
+                elif parts_dict[dname] == 'f2fs':
+                    if make_f2fs(dname, work, UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                         continue
                     else:
@@ -2840,6 +2872,23 @@ def make_ext4fs(name, work, sparse, size=0, UTC=None):
     print(f"{name}:[{size}]")
     return call(
         f"make_ext4fs -J -T {UTC} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
+
+
+@cartoon
+def make_f2fs(name, work, UTC=None):
+    print(lang.text91 % name)
+    size = Dirsize(work + name, 1, 1).rsize_v
+    print(f"{name}:[{size}]")
+    size_f2fs = (54 * 1024 * 1024) + size
+    size_f2fs = int(size_f2fs * 1.15) + 1
+    if not UTC:
+        UTC = int(time.time())
+    with open(f"{work + name}.img", 'wb') as f:
+        f.truncate(size_f2fs)
+    if call(f'mkfs.f2fs {work + name}.img -O extra_attr -O inode_checksum -O sb_checksum -O compression -f') != 0:
+        return 1
+    return call(
+        f'sload.f2fs -f {work + name} -C {work}config{os.sep}{name}_fs_config -T {UTC} -s {work}config{os.sep}{name}_file_contexts -t /{name} -c {work + name}.img')
 
 
 def mke2fs(name, work, sparse, size=0, UTC=None):
