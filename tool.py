@@ -151,21 +151,25 @@ class LoadCar:
         def call_func(*args, **kwargs):
             cz(self.run())
             task_num = func.__name__
+            info = [hash(func), args]
             if task_num in self.tasks:
                 for i in self.tasks.get(task_num):
                     if i[1] == args:
-                        print(f"Please Wait for task_{i[0]} with args {i[1]}...")
+                        print(f"Please Wait for task_{i[0]} with args {i[1]}...\n")
                         return
                     else:
-                        self.tasks[task_num].append([hash(func), args])
+                        self.tasks[task_num].append(info)
             else:
-                self.tasks[task_num] = [[hash(func), args]]
+                self.tasks[task_num] = [info]
             func(*args, **kwargs)
             if task_num in self.tasks:
                 if len(self.tasks.get(task_num)) - 1 >= 0:
-                    del self.tasks[task_num][len(self.tasks.get(task_num)) - 1]
+                    del self.tasks[task_num][self.tasks[task_num].index(info)]
                 else:
                     del self.tasks[task_num]
+                if not self.tasks[task_num]:
+                    del self.tasks[task_num]
+            del info, task_num
             if not self.tasks:
                 self.stop()
 
