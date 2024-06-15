@@ -2899,8 +2899,9 @@ def make_f2fs(name, work, UTC=None):
     if call(f'mkfs.f2fs {work + name}.img -O extra_attr -O inode_checksum -O sb_checksum -O compression -f') != 0:
         return 1
     #todo:Its A Stupid method, we need a new!
-    with open(f'{work}config{os.sep}{name}_file_contexts', 'a') as f:
-        f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
+    with open(f'{work}config{os.sep}{name}_file_contexts', 'a+') as f:
+        if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
+            f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
         f'sload.f2fs -f {work + name} -C {work}config{os.sep}{name}_fs_config -T {UTC} -s {work}config{os.sep}{name}_file_contexts -t /{name} -c {work + name}.img')
 
