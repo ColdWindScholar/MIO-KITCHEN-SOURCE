@@ -2,7 +2,7 @@
 import os
 import shutil
 import zipfile
-from platform import system
+from platform import system, machine
 from pip._internal.cli.main import main as _main
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
@@ -119,6 +119,10 @@ for i in os.listdir(local + os.sep + "bin"):
             shutil.rmtree(local + os.sep + "bin" + os.sep + i)
         else:
             os.remove(local + os.sep + "bin" + os.sep + i)
+if ostype == 'Linux':
+    for i in os.listdir(local + os.sep + "bin"+os.sep+ostype):
+        if i != machine():
+            shutil.rmtree(local + os.sep + "bin"+os.sep+ostype + os.sep + i)
 for i in os.listdir(local):
     if i not in ['tool', 'tool.exe', 'bin', 'LICENSE']:
         print(f"Removing {i}")
