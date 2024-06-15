@@ -155,11 +155,11 @@ class LoadCar:
             info = [hash(func), args, task_real]
             if task_num in self.tasks:
                 try:
-                    i = self.tasks[task_num][self.tasks[task_num].index(info)]
+                    self.tasks[task_num].index(info)
                 except ValueError:
                     self.tasks[task_num].append(info)
                 else:
-                    print(f"Please Wait for task_{i[0]} with args {i[1]}...\n")
+                    print(f"Please Wait for task_{task_real.native_id} with args {info[1]}...\n")
                     return
             else:
                 self.tasks[task_num] = [info]
