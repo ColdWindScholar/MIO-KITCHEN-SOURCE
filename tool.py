@@ -2698,6 +2698,17 @@ def unpack(chose, form: any = None):
                         os.remove(work + i + ".img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
+            if file_type == 'f2fs':
+                print(lang.text79 + i + ".img [%s]" % file_type)
+                if call(exe=f"extract.f2fs -o '{work}' '{os.path.join(settings.path, dn.get(), i + '.img')}'",
+                        out=1) != 0:
+                    print('Unpack failed...')
+                    continue
+                if os.path.exists(work + i):
+                    try:
+                        os.remove(work + i + ".img")
+                    except (Exception, BaseException):
+                        win.message_pop(lang.warn11.format(i + ".img"))
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
     json_.write(parts)

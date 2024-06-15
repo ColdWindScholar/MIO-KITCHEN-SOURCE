@@ -35,7 +35,7 @@ else:
 dn = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
-           [b"AVB0", "vbmeta"], [b'\xd7\xb7\xab\x1e', "dtbo"],
+           [b"AVB0", "vbmeta"], [b'\xd7\xb7\xab\x1e', "dtbo"], [b'\x10\x20\xF5\xF2', 'f2fs', 1024],
            [b'\xd0\x0d\xfe\xed', "dtb"], [b"MZ", "exe"], [b".ELF", 'elf'],
            [b"ANDROID!", "boot"], [b"VNDRBOOT", "vendor_boot"],
            [b'AVBf', "avb_foot"], [b'BZh', "bzip2"],
