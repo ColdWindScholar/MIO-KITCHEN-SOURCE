@@ -82,6 +82,11 @@ import opscrypto
 import images
 
 
+class States:
+    update_window = False
+    donate_window = False
+
+
 class JsonEdit:
     def __init__(self, j_f):
         self.file = j_f
@@ -363,6 +368,9 @@ class Tool(Tk):
         link.pack()
 
     def support(self):
+        if states.donate_window:
+            return
+        states.donate_window = True
         tab = ttk.LabelFrame(text=lang.text16)
         tab.place(relx=0.5, rely=0.5, anchor="center")
         Label(tab,
@@ -371,7 +379,8 @@ class Tool(Tk):
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
         Label(tab, text=lang.text109, font=(None, 12), fg='#00aafA').pack(padx=10, pady=10)
-        ttk.Button(tab, text=lang.text17, command=tab.destroy).pack(fill=X, side='bottom')
+        ttk.Button(tab, text=lang.text17, command=lambda: tab.destroy() == setattr(states, 'donate_window', False)).pack(
+            fill=X, side='bottom')
 
     def setting_tab(self):
         self.show_local = StringVar()
@@ -398,6 +407,7 @@ class Tool(Tk):
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
+        ttk.Button(sf4, text="检查更新", command=Upgrade).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
             if context.get() == '1':
@@ -440,6 +450,7 @@ theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + os.sep
+states = States()
 
 
 class TaskManager(ttk.LabelFrame):
@@ -482,6 +493,129 @@ class TaskManager(ttk.LabelFrame):
 
 class ModuleError(Exception):
     ...
+
+
+class Upgrade(Toplevel):
+
+    def __init__(self):
+        super().__init__()
+        self.title("检查更新")
+        self.protocol("WM_DELETE_WINDOW", self.close)
+        if states.update_window:
+            self.destroy()
+        states.update_window = True
+        self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+        self.package_head = ''
+        self.update_download_url = ''
+        self.update_size = 0
+        self.update_assets = []
+        f = ttk.Frame(self)
+        ttk.Label(f, text='MIO-KITCHEN', font=(None, 20)).pack(side=LEFT, padx=5, pady=2)
+        ttk.Label(f, text=settings.version, foreground='gray').pack(side=LEFT, padx=2, pady=2)
+        f.pack(padx=5, pady=5, side=TOP)
+        f2 = ttk.LabelFrame(self, text='更新信息')
+        self.notice = ttk.Label(f2, text='单击‘检查更新’按钮获取更新')
+        self.notice.pack(padx=5, pady=5)
+        self.change_log = Text(f2, width=50, height=15)
+        self.change_log.pack(padx=5, pady=5)
+        f2.pack(fill=BOTH, padx=5, pady=5)
+        self.progressbar = ttk.Progressbar(self, length=200, mode='determinate', orient=tkinter.HORIZONTAL
+                                           )
+        self.progressbar['maximum'] = 100
+        self.progressbar.pack(padx=5, pady=10)
+        f3 = ttk.Frame(self)
+        self.update_button = ttk.Button(f3, text='检查更新', style='Accent.TButton',
+                                        command=lambda: cz(self.get_update))
+        ttk.Button(f3, text='取消', command=self.close).pack(fill=X, expand=True, side=LEFT,
+                                                             pady=10,
+                                                             padx=10)
+        self.update_button.pack(fill=X, expand=True, side=LEFT,
+                                pady=10,
+                                padx=10)
+        f3.pack(padx=5, pady=5, fill=X)
+        cz(self.get_update)
+        jzxs(self)
+
+    def get_update(self):
+        if self.update_button.cget('text') == '立即更新':
+            self.update_button.configure(state='disabled', text='正在更新')
+            try:
+                self.download()
+            except (Exception, BaseException):
+                self.notice.configure(text="下载失败， 请检查网络", foreground='red')
+                self.progressbar.stop()
+                return
+            return
+        self.notice.configure(text="正在获取数据...", foreground='')
+        self.change_log.delete(1.0, END)
+        try:
+            url = requests.get(self.update_url)
+        except (Exception, BaseException):
+            if not states.update_window:
+                return
+            self.notice.configure(text="无法获取更新", foreground='red')
+            return
+        if not states.update_window:
+            return
+        try:
+            json_ = json.loads(url.text)
+        except (Exception, BaseException):
+            self.notice.configure(text="更新数据解析失败， 可能服务器异常", foreground='red')
+            return
+        if not (new_version := json_.get('name')).endswith(settings.version):
+            self.package_head = new_version
+            self.notice.configure(text=f"发现新版本：{new_version}", foreground='orange')
+            self.change_log.insert('insert', json_.get('body'))
+            self.update_assets = json_.get('assets')
+            self.get_download_url()
+            if not self.update_download_url:
+                self.update_button.configure(text='重试')
+            else:
+                self.update_button.configure(text='立即更新')
+        else:
+            self.notice.configure(text=f"您的版本已是最新！", foreground='green')
+
+    def get_download_url(self):
+        package = f'{self.package_head}'
+        if platform.system() == 'Windows':
+            package += '-win.zip'
+        elif platform.system() == 'Linux':
+            package += '-linux.zip'
+        elif platform.system() == 'Darwin':
+            package += '-macos.zip'
+        for i in self.update_assets:
+            if i.get('name') == package:
+                if platform.machine() in ['AMD64', 'X86_64']:
+                    self.update_download_url = i.get('browser_download_url')
+                    self.update_size = i.get('size')
+                    return
+                else:
+                    break
+        self.notice.configure(text="没有查找到适用于您设备的更新", foreground='red')
+
+    def download(self):
+        mode = 'indeterminate'
+        self.progressbar.configure(mode='indeterminate')
+        self.progressbar.start()
+        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.update_download_url,
+                                                                                    os.path.join(elocal, "bin",
+                                                                                                 "temp"),
+                                                                                    size_=self.update_size):
+            if not states.update_window:
+                return
+            if percentage != 'None':
+                if mode == 'indeterminate':
+                    self.progressbar.configure(mode='determinate')
+                    mode = ''
+                    self.progressbar.stop()
+                self.progressbar['value'] = percentage
+                self.progressbar.update()
+        self.progressbar['value'] = 100
+        self.progressbar.update()
+
+    def close(self):
+        states.update_window = False
+        self.destroy()
 
 
 def load(name):
@@ -1940,11 +2074,13 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
     return ret.returncode
 
 
-def download_api(url, path=None):
+def download_api(url, path=None, int_=True, size_=0):
     start_time = time.time()
     response = requests.Session().head(url)
     file_size = int(response.headers.get("Content-Length", 0))
     response = requests.Session().get(url, stream=True, verify=False)
+    if file_size == 0 and size_:
+        file_size = size_
     with open((settings.path if path is None else path) + os.sep + os.path.basename(url), "wb") as f:
         chunk_size = 2048576
         bytes_downloaded = 0
@@ -1953,7 +2089,13 @@ def download_api(url, path=None):
             bytes_downloaded += len(data)
             elapsed = time.time() - start_time
             speed = bytes_downloaded / (1024 * elapsed)
-            percentage = int(bytes_downloaded * 100 / file_size)
+            if file_size != 0:
+                if int_:
+                    percentage = int((bytes_downloaded / file_size) * 100)
+                else:
+                    percentage = (bytes_downloaded / file_size) * 100
+            else:
+                percentage = 'None'
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
 
@@ -2898,7 +3040,7 @@ def make_f2fs(name, work, UTC=None):
         f.truncate(size_f2fs)
     if call(f'mkfs.f2fs {work + name}.img -O extra_attr -O inode_checksum -O sb_checksum -O compression -f') != 0:
         return 1
-    #todo:Its A Stupid method, we need a new!
+    # todo:Its A Stupid method, we need a new!
     with open(f'{work}config{os.sep}{name}_file_contexts', 'a+') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
