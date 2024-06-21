@@ -548,7 +548,7 @@ class Upgrade(Toplevel):
         f3 = ttk.Frame(self)
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
                                         command=lambda: cz(self.get_update))
-        ttk.Button(f3, text='取消', command=self.close).pack(fill=X, expand=True, side=LEFT,
+        ttk.Button(f3, text=lang.cancel, command=self.close).pack(fill=X, expand=True, side=LEFT,
                                                              pady=10,
                                                              padx=10)
         self.update_button.pack(fill=X, expand=True, side=LEFT,
