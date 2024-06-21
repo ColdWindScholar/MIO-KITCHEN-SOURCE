@@ -568,6 +568,7 @@ class Upgrade(Toplevel):
                 self.download()
             except (Exception, BaseException):
                 self.notice.configure(text="下载失败， 请检查网络", foreground='red')
+                self.update_button.configure(state='normal', text='重试')
                 self.progressbar.stop()
                 return
             return
