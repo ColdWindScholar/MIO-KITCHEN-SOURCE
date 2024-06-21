@@ -557,6 +557,8 @@ class Upgrade(Toplevel):
         f3.pack(padx=5, pady=5, fill=X)
         if 'upgrade' in os.path.basename(tool_self) and settings.updating == '1':
             self.update_process2()
+        elif 'tool' in os.path.basename(tool_self) and settings.updating == '2':
+            self.update_process3()
         else:
             cz(self.get_update)
         jzxs(self)
@@ -656,7 +658,8 @@ class Upgrade(Toplevel):
                         zip_ref.extract(file, os.path.join(elocal, "bin"))
             settings.set_value('updating', '1')
             settings.set_value('new_tool', os.path.join(elocal, "bin", "tool" + ('' if os.name != 'nt' else '.exe')))
-            subprocess.Popen([os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen([os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text="无法更新", foreground='red')
@@ -665,7 +668,24 @@ class Upgrade(Toplevel):
     def update_process2(self):
         self.notice.configure(text="正在应用更新包...")
         if os.path.exists(settings.new_tool):
-            shutil.copyfile(settings.new_tool, os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe'))))
+            shutil.copyfile(settings.new_tool,
+                            os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe'))))
+            subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            settings.set_value('updating', '2')
+            terminate_process(os.getpid())
+        else:
+            self.notice.configure(text="无法更新", foreground='red')
+            self.update_button.configure(state='normal', text='重试')
+
+    def update_process3(self):
+        self.notice.configure(text="正在清理...")
+        if os.path.exists(settings.new_tool):
+            try:
+                os.remove(settings.new_tool)
+                os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+            except:
+                pass
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             settings.set_value('updating', '')
@@ -3566,7 +3586,7 @@ unpackg: UnpackGui
 def init():
     if int(settings.oobe) < 4:
         Welcome()
-    if settings.updating == '1':
+    if settings.updating in ['1', '2']:
         Upgrade()
     if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
         error(1, 'Sorry,Not support your device yet.')
