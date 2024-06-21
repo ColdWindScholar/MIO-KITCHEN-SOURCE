@@ -410,7 +410,7 @@ class Tool(Tk):
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
-        ttk.Button(sf4, text="检查更新", command=Upgrade).pack(padx=10, pady=10, fill=X)
+        ttk.Button(sf4, text=lang.t38, command=Upgrade).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
             if context.get() == '1':
@@ -520,7 +520,7 @@ class Upgrade(Toplevel):
 
     def __init__(self):
         super().__init__()
-        self.title("检查更新")
+        self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         if states.update_window:
             self.destroy()
@@ -546,7 +546,7 @@ class Upgrade(Toplevel):
         self.progressbar['maximum'] = 100
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
-        self.update_button = ttk.Button(f3, text='检查更新', style='Accent.TButton',
+        self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
                                         command=lambda: cz(self.get_update))
         ttk.Button(f3, text='取消', command=self.close).pack(fill=X, expand=True, side=LEFT,
                                                              pady=10,
