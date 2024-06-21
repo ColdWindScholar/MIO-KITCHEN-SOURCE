@@ -597,10 +597,7 @@ class Upgrade(Toplevel):
             self.change_log.insert('insert', json_.get('body'))
             self.update_assets = json_.get('assets')
             self.get_download_url()
-            if not self.update_download_url:
-                self.update_button.configure(text='重试')
-            else:
-                self.update_button.configure(text='立即更新')
+            self.update_button.configure(text='重试' if not self.update_download_url else '立即更新')
         else:
             self.notice.configure(text=f"您的版本已是最新！", foreground='green')
 
