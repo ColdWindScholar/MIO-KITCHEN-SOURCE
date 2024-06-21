@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import ctypes
 import platform
+import shutil
 import subprocess
 import threading
 
@@ -635,6 +636,12 @@ class Upgrade(Toplevel):
 
     def close_programs(self):
         [terminate_process(i) for i in states.open_pids]
+        if os.path.exists(tool_self):
+            shutil.copy(tool_self,
+                        os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+        else:
+            self.notice.configure(text="无法更新", foreground='red')
+            self.update_button.configure(state='normal', text='重试')
 
     def close(self):
         states.update_window = False
