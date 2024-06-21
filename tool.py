@@ -686,6 +686,7 @@ class Upgrade(Toplevel):
             try:
                 os.remove(settings.new_tool)
                 os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+                re_folder(os.path.join(elocal, "bin","temp"))
             except:
                 pass
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
