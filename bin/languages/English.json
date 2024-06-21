@@ -209,5 +209,6 @@
   "t45": "Getting data...",
   "t46": "Unable to get updates",
   "t47": "Update data parsing failed, possibly server exception",
-  "t48": "New Version: %s"
+  "t48": "New Version: %s",
+  "t49": "Your version is already the latest!"
 }

@@ -209,5 +209,6 @@
   "t45": "Daten abrufen...",
   "t46": "Updates können nicht abgerufen werden",
   "t47": "Update Data Parsing fehlgeschlagen, möglicherweise Serverausnahme",
-  "t48": "Neue Version entdeckt: %s"
+  "t48": "Neue Version entdeckt: %s",
+  "t49": "Ihre Version ist bereits die neueste!"
 }
