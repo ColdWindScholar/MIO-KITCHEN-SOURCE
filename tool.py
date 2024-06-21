@@ -666,6 +666,8 @@ class Upgrade(Toplevel):
             shutil.copyfile(settings.new_tool, os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe'))))
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            settings.set_value('updating', '')
+            settings.set_value('new_tool', '')
             terminate_process(os.getpid())
         else:
             self.notice.configure(text="无法更新", foreground='red')
