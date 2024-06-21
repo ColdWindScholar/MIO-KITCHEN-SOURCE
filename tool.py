@@ -565,7 +565,7 @@ class Upgrade(Toplevel):
 
     def get_update(self):
         if self.update_button.cget('text') == lang.t40:
-            self.update_button.configure(state='disabled', text='正在更新')
+            self.update_button.configure(state='disabled', text=lang.t43)
             try:
                 self.download()
                 self.update_process()
