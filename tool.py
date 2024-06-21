@@ -1114,7 +1114,10 @@ class IconGrid(tk.Frame):
 
     def clean(self):
         for i in self.icons:
-            i.destroy()
+            try:
+                i.destroy()
+            except:
+                pass
         self.icons.clear()
 
     def on_frame_configure(self):
