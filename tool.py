@@ -529,6 +529,7 @@ class Upgrade(Toplevel):
         self.package_head = ''
         self.update_download_url = ''
         self.update_size = 0
+        self.update_zip = ''
         self.update_assets = []
         f = ttk.Frame(self)
         ttk.Label(f, text='MIO-KITCHEN', font=(None, 20)).pack(side=LEFT, padx=5, pady=2)
@@ -618,6 +619,8 @@ class Upgrade(Toplevel):
         mode = 'indeterminate'
         self.progressbar.configure(mode='indeterminate')
         self.progressbar.start()
+        self.update_zip = os.path.normpath(
+            os.path.join(elocal, "bin", "temp", os.path.basename(self.update_download_url)))
         for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.update_download_url,
                                                                                     os.path.join(elocal, "bin",
                                                                                                  "temp"),
@@ -640,6 +643,11 @@ class Upgrade(Toplevel):
             shutil.copy(tool_self,
                         os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
             self.notice.configure(text="正在应用更新包...")
+            with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
+                for file in zip_ref.namelist():
+                    if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
+                        zip_ref.extract(file, elocal)
+            terminate_process(os.getpid())
         else:
             self.notice.configure(text="无法更新", foreground='red')
             self.update_button.configure(state='normal', text='重试')
