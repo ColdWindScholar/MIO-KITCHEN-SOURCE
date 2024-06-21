@@ -85,6 +85,7 @@ import images
 class States:
     update_window = False
     donate_window = False
+    open_pids = []
 
 
 class JsonEdit:
@@ -379,7 +380,8 @@ class Tool(Tk):
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
         Label(tab, text=lang.text109, font=(None, 12), fg='#00aafA').pack(padx=10, pady=10)
-        ttk.Button(tab, text=lang.text17, command=lambda: tab.destroy() == setattr(states, 'donate_window', False)).pack(
+        ttk.Button(tab, text=lang.text17,
+                   command=lambda: tab.destroy() == setattr(states, 'donate_window', False)).pack(
             fill=X, side='bottom')
 
     def setting_tab(self):
@@ -2056,6 +2058,8 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
     try:
         ret = subprocess.Popen(cmd, shell=shstate, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, creationflags=conf)
+        pid = ret.pid
+        states.open_pids.append(pid)
         for i in iter(ret.stdout.readline, b""):
             if out == 0:
                 try:
@@ -2063,6 +2067,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
                 except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
+        states.open_pids.remove(pid)
     except subprocess.CalledProcessError as e:
         ret = lambda: print(f"Error!{exe}")
         ret.returncode = 2
