@@ -26,16 +26,12 @@ except ImportError:
     # Platform doesn't support dynamic loading.
     create_dynamic = None
 # DEPRECATED
-SEARCH_ERROR = 0
 PY_SOURCE = 1
 PY_COMPILED = 2
 C_EXTENSION = 3
-PY_RESOURCE = 4
 PKG_DIRECTORY = 5
 C_BUILTIN = 6
 PY_FROZEN = 7
-PY_CODERESOURCE = 8
-IMP_HOOK = 9
 
 
 def new_module(name):
