@@ -570,7 +570,7 @@ class Upgrade(Toplevel):
                 self.download()
                 self.update_process()
             except (Exception, BaseException):
-                self.notice.configure(text="下载失败， 请检查网络", foreground='red')
+                self.notice.configure(text=lang.t44, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
                 self.progressbar.stop()
                 return
