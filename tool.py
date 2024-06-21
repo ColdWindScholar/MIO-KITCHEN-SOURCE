@@ -583,7 +583,7 @@ class Upgrade(Toplevel):
             if not states.update_window:
                 return
             try:
-                self.notice.configure(text="无法获取更新", foreground='red')
+                self.notice.configure(text=lang.t46, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
             except (Exception, BaseException):
                 pass
