@@ -579,7 +579,10 @@ class Upgrade(Toplevel):
         except (Exception, BaseException):
             if not states.update_window:
                 return
-            self.notice.configure(text="无法获取更新", foreground='red')
+            try:
+                self.notice.configure(text="无法获取更新", foreground='red')
+            except (Exception, BaseException):
+                pass
             return
         if not states.update_window:
             return
