@@ -207,5 +207,6 @@
   "t43": "Actualizar",
   "t44": "A descarga falhou, por favor verifique a rede",
   "t45": "Receber dados...",
-  "t46": "Não foi possível obter atualizações"
+  "t46": "Não foi possível obter atualizações",
+  "t47": "A atualização da análise de dados falhou, possivelmente exceção do servidor"
 }

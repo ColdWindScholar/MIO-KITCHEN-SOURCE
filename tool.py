@@ -593,7 +593,7 @@ class Upgrade(Toplevel):
         try:
             json_ = json.loads(url.text)
         except (Exception, BaseException):
-            self.notice.configure(text="更新数据解析失败， 可能服务器异常", foreground='red')
+            self.notice.configure(text=lang.t47, foreground='red')
             return
         if not (new_version := json_.get('name')).endswith(settings.version):
             self.package_head = new_version

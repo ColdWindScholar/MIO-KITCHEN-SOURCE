@@ -207,5 +207,6 @@
   "t43": "Aktualisierung",
   "t44": "Download fehlgeschlagen, bitte überprüfen Sie das Netzwerk",
   "t45": "Daten abrufen...",
-  "t46": "Updates können nicht abgerufen werden"
+  "t46": "Updates können nicht abgerufen werden",
+  "t47": "Update Data Parsing fehlgeschlagen, möglicherweise Serverausnahme"
 }
