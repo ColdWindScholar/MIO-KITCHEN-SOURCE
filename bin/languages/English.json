@@ -208,5 +208,6 @@
   "t44": "Download failed, please check the network",
   "t45": "Getting data...",
   "t46": "Unable to get updates",
-  "t47": "Update data parsing failed, possibly server exception"
+  "t47": "Update data parsing failed, possibly server exception",
+  "t48": "New Version: %s"
 }

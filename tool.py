@@ -597,7 +597,7 @@ class Upgrade(Toplevel):
             return
         if not (new_version := json_.get('name')).endswith(settings.version):
             self.package_head = new_version
-            self.notice.configure(text=f"发现新版本：{new_version}", foreground='orange')
+            self.notice.configure(text=lang.t48 % new_version, foreground='orange')
             self.change_log.insert('insert', json_.get('body'))
             self.update_assets = json_.get('assets')
             self.get_download_url()
