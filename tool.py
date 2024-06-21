@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import ctypes
 import platform
 import subprocess
 import threading
@@ -360,7 +361,6 @@ class Tool(Tk):
               text=lang.text127,
               font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
-        # ttk.Button(self.tab4, text="检查更新", command=lambda: cz(upgrade())).pack(padx=10, pady=10)
         ttk.Label(self.tab4, text="Open Source, Free, Faster",
                   style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
@@ -497,6 +497,24 @@ class ModuleError(Exception):
     ...
 
 
+# Some Functions for Upgrade
+if os.name == 'nt':
+    PROCESS_TERMINATE = 0x0001
+    kernel32 = ctypes.windll.kernel32
+
+
+    def terminate_process(pid):
+        h_process = kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
+        if h_process:
+            kernel32.TerminateProcess(h_process, 0)
+            kernel32.CloseHandle(h_process)
+        else:
+            print(f"Failed to open process with PID {pid}")
+else:
+    def terminate_process(pid):
+        os.kill(pid, 9)
+
+
 class Upgrade(Toplevel):
 
     def __init__(self):
@@ -614,6 +632,9 @@ class Upgrade(Toplevel):
                 self.progressbar.update()
         self.progressbar['value'] = 100
         self.progressbar.update()
+
+    def close_programs(self):
+        [terminate_process(i) for i in states.open_pids]
 
     def close(self):
         states.update_window = False
