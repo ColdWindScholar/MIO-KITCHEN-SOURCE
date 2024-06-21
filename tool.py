@@ -582,10 +582,11 @@ class Upgrade(Toplevel):
         self.change_log.delete(1.0, END)
         try:
             url = requests.get(self.update_url)
-        except (Exception, BaseException):
+        except (Exception, BaseException) as e:
             if states.update_window:
                 self.notice.configure(text=lang.t46, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
+                self.change_log.insert('insert', e)
             return
         if not states.update_window:
             return
