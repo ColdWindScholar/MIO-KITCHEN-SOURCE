@@ -664,7 +664,7 @@ class Upgrade(Toplevel):
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
         else:
-            self.notice.configure(text="无法更新", foreground='red')
+            self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
 
     def update_process2(self):
@@ -677,7 +677,7 @@ class Upgrade(Toplevel):
             settings.set_value('updating', '2')
             terminate_process(os.getpid())
         else:
-            self.notice.configure(text="无法更新", foreground='red')
+            self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
 
     def update_process3(self):
@@ -694,7 +694,7 @@ class Upgrade(Toplevel):
             settings.set_value('new_tool', '')
             terminate_process(os.getpid())
         else:
-            self.notice.configure(text="无法更新", foreground='red')
+            self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
 
     def close(self):
