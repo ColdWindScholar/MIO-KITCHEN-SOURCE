@@ -84,8 +84,6 @@ python build.py
 ***
 ### Developer's Email: 3590361911@qq.com
 ### QQ Group: 836898509
-### Telegram Group: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
-### Telegram Channel: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
 # Contributors:
 ***
