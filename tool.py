@@ -566,6 +566,7 @@ class Upgrade(Toplevel):
             self.update_button.configure(state='disabled', text='正在更新')
             try:
                 self.download()
+                self.update_process()
             except (Exception, BaseException):
                 self.notice.configure(text="下载失败， 请检查网络", foreground='red')
                 self.update_button.configure(state='normal', text='重试')
