@@ -681,7 +681,7 @@ class Upgrade(Toplevel):
             self.update_button.configure(state='normal', text=lang.text37)
 
     def update_process3(self):
-        self.notice.configure(text="正在清理...")
+        self.notice.configure(text=lang.t52)
         if os.path.exists(settings.new_tool):
             try:
                 os.remove(settings.new_tool)

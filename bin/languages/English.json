@@ -212,5 +212,6 @@
   "t48": "New Version: %s",
   "t49": "Your version is already the latest!",
   "t50": "No updates found for your device",
-  "t51": "Applying Update Package..."
+  "t51": "Applying Update Package...",
+  "t52": "Cleaning..."
 }
