@@ -525,7 +525,10 @@ class Upgrade(Toplevel):
         if states.update_window:
             self.destroy()
         states.update_window = True
-        self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+        if settings.update_url:
+            self.update_url = settings.update_url
+        else:
+            self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.package_head = ''
         self.update_download_url = ''
         self.update_size = 0
@@ -549,8 +552,8 @@ class Upgrade(Toplevel):
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
                                         command=lambda: cz(self.get_update))
         ttk.Button(f3, text=lang.cancel, command=self.close).pack(fill=X, expand=True, side=LEFT,
-                                                             pady=10,
-                                                             padx=10)
+                                                                  pady=10,
+                                                                  padx=10)
         self.update_button.pack(fill=X, expand=True, side=LEFT,
                                 pady=10,
                                 padx=10)
@@ -855,6 +858,7 @@ class SetUtils:
         self.language = 'English'
         self.updating = ''
         self.new_tool = ''
+        self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
             self.load()
