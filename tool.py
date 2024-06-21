@@ -575,7 +575,7 @@ class Upgrade(Toplevel):
                 self.progressbar.stop()
                 return
             return
-        self.notice.configure(text="正在获取数据...", foreground='')
+        self.notice.configure(text=lang.t45, foreground='')
         self.change_log.delete(1.0, END)
         try:
             url = requests.get(self.update_url)
