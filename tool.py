@@ -571,7 +571,7 @@ class Upgrade(Toplevel):
                 self.update_process()
             except (Exception, BaseException):
                 self.notice.configure(text="下载失败， 请检查网络", foreground='red')
-                self.update_button.configure(state='normal', text='重试')
+                self.update_button.configure(state='normal', text=lang.text37)
                 self.progressbar.stop()
                 return
             return
@@ -584,6 +584,7 @@ class Upgrade(Toplevel):
                 return
             try:
                 self.notice.configure(text="无法获取更新", foreground='red')
+                self.update_button.configure(state='normal', text=lang.text37)
             except (Exception, BaseException):
                 pass
             return
@@ -600,7 +601,7 @@ class Upgrade(Toplevel):
             self.change_log.insert('insert', json_.get('body'))
             self.update_assets = json_.get('assets')
             self.get_download_url()
-            self.update_button.configure(text='重试' if not self.update_download_url else '立即更新')
+            self.update_button.configure(text=lang.text37 if not self.update_download_url else '立即更新')
         else:
             self.notice.configure(text=f"您的版本已是最新！", foreground='green')
 
