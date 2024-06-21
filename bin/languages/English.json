@@ -210,5 +210,6 @@
   "t46": "Unable to get updates",
   "t47": "Update data parsing failed, possibly server exception",
   "t48": "New Version: %s",
-  "t49": "Your version is already the latest!"
+  "t49": "Your version is already the latest!",
+  "t50": "No updates found for your device"
 }

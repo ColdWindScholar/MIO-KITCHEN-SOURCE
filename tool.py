@@ -621,7 +621,7 @@ class Upgrade(Toplevel):
                     return
                 else:
                     break
-        self.notice.configure(text="没有查找到适用于您设备的更新", foreground='red')
+        self.notice.configure(text=lang.t50, foreground='red')
 
     def download(self):
         mode = 'indeterminate'

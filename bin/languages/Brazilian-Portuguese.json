@@ -210,5 +210,6 @@
   "t46": "Não foi possível obter atualizações",
   "t47": "A atualização da análise de dados falhou, possivelmente exceção do servidor",
   "t48": "Descobriu uma nova versão: %s",
-  "t49": "Sua versão já é a mais recente!"
+  "t49": "Sua versão já é a mais recente!",
+  "t50": "Não se encontraram actualizações para seu dispositivo"
 }

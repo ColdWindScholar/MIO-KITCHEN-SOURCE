@@ -210,5 +210,6 @@
   "t46": "Updates können nicht abgerufen werden",
   "t47": "Update Data Parsing fehlgeschlagen, möglicherweise Serverausnahme",
   "t48": "Neue Version entdeckt: %s",
-  "t49": "Ihre Version ist bereits die neueste!"
+  "t49": "Ihre Version ist bereits die neueste!",
+  "t50": "Keine Updates für Ihr Gerät gefunden"
 }
