@@ -829,6 +829,8 @@ class SetUtils:
         self.ai_engine = '0'
         self.version = 'basic'
         self.language = 'English'
+        self.updating = ''
+        self.new_tool = ''
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
             self.load()
