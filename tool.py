@@ -583,13 +583,9 @@ class Upgrade(Toplevel):
         try:
             url = requests.get(self.update_url)
         except (Exception, BaseException):
-            if not states.update_window:
-                return
-            try:
+            if states.update_window:
                 self.notice.configure(text=lang.t46, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
-            except (Exception, BaseException):
-                pass
             return
         if not states.update_window:
             return
