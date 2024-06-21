@@ -650,7 +650,7 @@ class Upgrade(Toplevel):
         if os.path.exists(tool_self):
             shutil.copy(tool_self,
                         os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-            self.notice.configure(text="正在应用更新包...")
+            self.notice.configure(text=lang.t51)
             with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
                 for file in zip_ref.namelist():
                     if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
@@ -668,7 +668,7 @@ class Upgrade(Toplevel):
             self.update_button.configure(state='normal', text=lang.text37)
 
     def update_process2(self):
-        self.notice.configure(text="正在应用更新包...")
+        self.notice.configure(text=lang.t51)
         if os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe'))))
