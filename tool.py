@@ -564,7 +564,7 @@ class Upgrade(Toplevel):
         jzxs(self)
 
     def get_update(self):
-        if self.update_button.cget('text') == '立即更新':
+        if self.update_button.cget('text') == lang.t40:
             self.update_button.configure(state='disabled', text='正在更新')
             try:
                 self.download()
@@ -601,7 +601,7 @@ class Upgrade(Toplevel):
             self.change_log.insert('insert', json_.get('body'))
             self.update_assets = json_.get('assets')
             self.get_download_url()
-            self.update_button.configure(text=lang.text37 if not self.update_download_url else '立即更新')
+            self.update_button.configure(text=lang.text37 if not self.update_download_url else lang.t40)
         else:
             self.notice.configure(text=f"您的版本已是最新！", foreground='green')
 
