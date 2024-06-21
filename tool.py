@@ -634,7 +634,7 @@ class Upgrade(Toplevel):
         self.progressbar['value'] = 100
         self.progressbar.update()
 
-    def update(self):
+    def update_process(self):
         [terminate_process(i) for i in states.open_pids]
         if os.path.exists(tool_self):
             shutil.copy(tool_self,
