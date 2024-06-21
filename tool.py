@@ -536,7 +536,7 @@ class Upgrade(Toplevel):
         ttk.Label(f, text=settings.version, foreground='gray').pack(side=LEFT, padx=2, pady=2)
         f.pack(padx=5, pady=5, side=TOP)
         f2 = ttk.LabelFrame(self, text=lang.t39)
-        self.notice = ttk.Label(f2, text='单击‘检查更新’按钮获取更新')
+        self.notice = ttk.Label(f2, text=lang.t42)
         self.notice.pack(padx=5, pady=5)
         self.change_log = Text(f2, width=50, height=15)
         self.change_log.pack(padx=5, pady=5)
