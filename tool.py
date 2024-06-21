@@ -634,11 +634,12 @@ class Upgrade(Toplevel):
         self.progressbar['value'] = 100
         self.progressbar.update()
 
-    def close_programs(self):
+    def update(self):
         [terminate_process(i) for i in states.open_pids]
         if os.path.exists(tool_self):
             shutil.copy(tool_self,
                         os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+            self.notice.configure(text="正在应用更新包...")
         else:
             self.notice.configure(text="无法更新", foreground='red')
             self.update_button.configure(state='normal', text='重试')
