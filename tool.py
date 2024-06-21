@@ -647,6 +647,11 @@ class Upgrade(Toplevel):
                 for file in zip_ref.namelist():
                     if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
                         zip_ref.extract(file, elocal)
+                    else:
+                        zip_ref.extract(file, os.path.join(elocal, "bin"))
+            settings.set_value('updating', '1')
+            settings.set_value('new_tool', os.path.join(elocal, "bin", "tool" + ('' if os.name != 'nt' else '.exe')))
+            subprocess.Popen([os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text="无法更新", foreground='red')
