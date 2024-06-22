@@ -607,6 +607,7 @@ class Upgrade(Toplevel):
             self.update_button.configure(text=lang.text37 if not self.update_download_url else lang.t40)
         else:
             self.notice.configure(text=lang.t49, foreground='green')
+            self.change_log.insert('insert', json_.get('body'))
 
     def get_download_url(self):
         package = f'{self.package_head}'
