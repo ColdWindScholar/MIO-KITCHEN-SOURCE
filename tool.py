@@ -8,7 +8,6 @@ import threading
 from functools import wraps
 from random import randint
 
-from _ctypes import sizeof, byref
 
 import AI_engine
 import ext4
@@ -51,6 +50,7 @@ if os.name == 'nt':
     import windnd
     from ctypes import windll
     from tkinter import filedialog
+    import py_win_style
 else:
     import mkc_filedialog as filedialog
 import zipfile
@@ -3599,7 +3599,6 @@ def init():
 
     win.gui()
     if os.name == 'nt':
-        import py_win_style
         try:
             py_win_style.apply_style(win, "mica")
         except:
