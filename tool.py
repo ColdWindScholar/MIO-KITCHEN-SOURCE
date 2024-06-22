@@ -564,6 +564,7 @@ class Upgrade(Toplevel):
             self.update_process3()
         else:
             cz(self.get_update)
+        self.resizable(width=False, height=False)
         jzxs(self)
 
     def get_update(self):
