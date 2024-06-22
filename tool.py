@@ -3600,7 +3600,10 @@ def init():
     win.gui()
     if os.name == 'nt':
         import py_win_style
-        py_win_style.apply_style(win, "mica")
+        try:
+            py_win_style.apply_style(win, "mica")
+        except:
+            pass
     global unpackg
     unpackg = UnpackGui()
     global project_menu
