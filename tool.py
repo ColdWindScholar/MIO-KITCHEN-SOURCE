@@ -520,12 +520,12 @@ else:
 class Upgrade(Toplevel):
 
     def __init__(self):
+        if states.update_window:
+            self.destroy()
         super().__init__()
         py_win_style.apply_style(self, 'mica')
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
-        if states.update_window:
-            self.destroy()
         states.update_window = True
         if settings.update_url:
             self.update_url = settings.update_url
