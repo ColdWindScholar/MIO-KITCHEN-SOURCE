@@ -8,7 +8,6 @@ from __future__ import annotations
 from typing import Any, Union, Callable
 
 try:
-    import winreg
     from ctypes import (POINTER, Structure, byref, c_int, pointer, sizeof,
                         windll, c_buffer, WINFUNCTYPE, c_uint64)
     from ctypes.wintypes import DWORD, ULONG
@@ -44,13 +43,13 @@ class MARGINS(Structure):
     ]
 
 
-class apply_style():
+class apply_style:
     """different styles for windows"""
 
     def __init__(self, window, style: str) -> None:
 
         styles = ["dark", "mica", "aero", "transparent", "acrylic", "win7",
-                "inverse", "popup", "native", "optimised", "light", "normal"]
+                  "inverse", "popup", "native", "optimised", "light", "normal"]
 
         if style not in styles:
             raise ValueError(
@@ -102,7 +101,8 @@ class apply_style():
             ChangeDWMAccent(self.HWND, 19, 0)
             DisableFrameIntoClientArea(self.HWND)
 
-class change_header_color():
+
+class change_header_color:
     """change the titlebar background color"""
 
     def __init__(self, window: Any, color: str) -> None:
@@ -120,29 +120,27 @@ class change_header_color():
         ChangeDWMAttrib(self.HWND, self.attrib, self.color)
 
 
-class change_border_color():
+class change_border_color:
     """change the window border color"""
 
     def __init__(self, window: Any, color: str) -> None:
-
         self.HWND = detect(window)
         self.color = DWORD(int(convert_color(color), base=16))
         self.attrib = 34
         ChangeDWMAttrib(self.HWND, self.attrib, self.color)
 
 
-class change_title_color():
+class change_title_color:
     """change the title color"""
 
     def __init__(self, window: Any, color: str) -> None:
-
         self.HWND = detect(window)
         self.color = DWORD(int(convert_color(color), base=16))
         self.attrib = 36
         ChangeDWMAttrib(self.HWND, self.attrib, self.color)
 
 
-class set_opacity():
+class set_opacity:
     """change opacity of individual widgets"""
 
     def __init__(self, widget: int, value: float = 1.0, color: str = None) -> None:
@@ -165,10 +163,11 @@ class set_opacity():
             self.widget_id, self.color, self.opacity, 3
         )
 
-class apply_dnd():
+
+class apply_dnd:
     """apply file drag and drop in a widget"""
-    
-    def __init__(self, widget: int, func: Callable, char_limit: int=260) -> None:
+
+    def __init__(self, widget: int, func: Callable, char_limit: int = 260) -> None:
 
         try:
             # check for tkinter widgets exclusively
@@ -177,7 +176,7 @@ class apply_dnd():
             hwnd = widget
         if not isinstance(hwnd, int):
             raise ValueError("widget ID should be passed, not the widget name.")
-        
+
         if platform.architecture()[0] == "32bit":
             GetWindowLong = windll.user32.GetWindowLongW
             SetWindowLong = windll.user32.SetWindowLongW
@@ -192,7 +191,7 @@ class apply_dnd():
         WM_DROP_FILES = 0x233
         GWL_WND_PROC = -4
         create_buffer = c_buffer
-        func_DragQueryFile = (windll.shell32.DragQueryFile)
+        func_DragQueryFile = windll.shell32.DragQueryFile
 
         def py_drop_func(hwnd, msg, wp, lp):
             global files
@@ -227,9 +226,11 @@ class apply_dnd():
         windll.shell32.DragAcceptFiles(hwnd, True)
         globals()[old] = GetWindowLong(hwnd, GWL_WND_PROC)
         SetWindowLong(hwnd, GWL_WND_PROC, globals()[new])
-        
+
+
 def ChangeDWMAttrib(hWnd: int, attrib: int, color) -> None:
     windll.dwmapi.DwmSetWindowAttribute(hWnd, attrib, byref(color), sizeof(c_int))
+
 
 def ChangeDWMAccent(hWnd: int, attrib: int, state: int, color: Union[str, None] = None) -> None:
     accentPolicy = ACCENT_POLICY()
@@ -249,21 +250,11 @@ def ChangeDWMAccent(hWnd: int, attrib: int, state: int, color: Union[str, None] 
 def ExtendFrameIntoClientArea(HWND: int) -> None:
     margins = MARGINS(-1, -1, -1, -1)
     windll.dwmapi.DwmExtendFrameIntoClientArea(HWND, byref(margins))
-    
+
+
 def DisableFrameIntoClientArea(HWND: int) -> None:
     margins = MARGINS(0, 0, 0, 0)
     windll.dwmapi.DwmExtendFrameIntoClientArea(HWND, byref(margins))
-
-
-def get_accent_color() -> str:
-    """returns current accent color of windows
-    code provided by Zane (Zingzy) https://github.com/Zingzy
-    """
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\DWM")
-    value, type = winreg.QueryValueEx(key, "ColorizationAfterglow")
-    winreg.CloseKey(key)
-    color = f"#{str(hex(value))[4:]}"
-    return color
 
 
 def detect(window: Any):
