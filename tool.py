@@ -521,6 +521,7 @@ class Upgrade(Toplevel):
 
     def __init__(self):
         super().__init__()
+        py_win_style.apply_style(self, 'mica')
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         if states.update_window:
