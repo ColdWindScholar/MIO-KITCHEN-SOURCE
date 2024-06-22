@@ -727,12 +727,11 @@ def error(code, desc="unknown error"):
     er.title("Program crash!")
     er.lift()
     er.resizable(False, False)
-    jzxs(er)
-    Label(er, text="Error:0x%s" % code, font=(None, 20), fg='red').pack(padx=10, pady=10)
-    Label(er, text="It seems that we have encountered a problem\nHere Are crash logs.").pack(padx=10, pady=10)
+    ttk.Label(er, text="Error:0x%s" % code, font=(None, 20), foreground='red').pack(padx=10, pady=10)
+    ttk.Label(er, text="It seems that we have encountered a problem\nHere Are crash logs.", font=(None, 10)).pack(padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
-    te = Text(er)
+    te = Text(er, height=20, width=60)
     scroll.config(command=te.yview)
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
@@ -741,13 +740,14 @@ def error(code, desc="unknown error"):
                command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"),
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
-                                            pady=10)
+                                            pady=10, expand=True, fill=BOTH)
     ttk.Button(er, text="Restart",
                command=lambda: restart(er),
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
-                                            pady=10)
-    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10)
+                                            pady=10, expand=True, fill=BOTH)
+    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10, expand=True, fill=BOTH)
+    jzxs(er)
     er.wait_window()
     sys.exit()
 
