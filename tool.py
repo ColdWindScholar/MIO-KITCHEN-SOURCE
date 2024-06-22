@@ -8,9 +8,10 @@ import threading
 from functools import wraps
 from random import randint
 
+from _ctypes import sizeof, byref
+
 import AI_engine
 import ext4
-
 try:
     from gc import collect
 except ImportError:
@@ -3597,6 +3598,9 @@ def init():
         error(1, 'Sorry,Not support your device yet.')
 
     win.gui()
+    if os.name == 'nt':
+        import py_win_style
+        py_win_style.apply_style(win, "mica")
     global unpackg
     unpackg = UnpackGui()
     global project_menu
