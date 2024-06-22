@@ -8,9 +8,9 @@ import threading
 from functools import wraps
 from random import randint
 
-
 import AI_engine
 import ext4
+
 try:
     from gc import collect
 except ImportError:
@@ -729,7 +729,8 @@ def error(code, desc="unknown error"):
     er.lift()
     er.resizable(False, False)
     ttk.Label(er, text="Error:0x%s" % code, font=(None, 20), foreground='red').pack(padx=10, pady=10)
-    ttk.Label(er, text="It seems that we have encountered a problem\nHere Are crash logs.", font=(None, 10)).pack(padx=10, pady=10)
+    ttk.Label(er, text="It seems that we have encountered a problem\nHere Are crash logs.", font=(None, 10)).pack(
+        padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er, height=20, width=60)
