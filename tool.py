@@ -501,12 +501,11 @@ class ModuleError(Exception):
 
 # Some Functions for Upgrade
 if os.name == 'nt':
-    PROCESS_TERMINATE = 0x0001
     kernel32 = ctypes.windll.kernel32
 
 
     def terminate_process(pid):
-        h_process = kernel32.OpenProcess(PROCESS_TERMINATE, False, pid)
+        h_process = kernel32.OpenProcess(0x0001, False, pid)
         if h_process:
             kernel32.TerminateProcess(h_process, 0)
             kernel32.CloseHandle(h_process)
