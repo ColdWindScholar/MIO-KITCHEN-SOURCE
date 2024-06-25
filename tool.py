@@ -629,7 +629,7 @@ class Upgrade(Toplevel):
     def download(self):
         if not os.path.exists(os.path.join(elocal, "bin", "temp")):
             os.makedirs(os.path.join(elocal, "bin", "temp"))
-        mode = 'indeterminate'
+        mode = True
         self.progressbar.configure(mode='indeterminate')
         self.progressbar.start()
         self.update_zip = os.path.normpath(
@@ -641,9 +641,9 @@ class Upgrade(Toplevel):
             if not states.update_window:
                 return
             if percentage != 'None':
-                if mode == 'indeterminate':
+                if mode:
                     self.progressbar.configure(mode='determinate')
-                    mode = ''
+                    mode = False
                     self.progressbar.stop()
                 self.progressbar['value'] = percentage
                 self.progressbar.update()
