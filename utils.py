@@ -1,4 +1,3 @@
-import io
 import os
 import struct
 import sys
@@ -7,9 +6,10 @@ from os import getcwd
 from os.path import exists
 from random import randint, choice
 from threading import Thread
-import update_metadata_pb2 as um
+
 import blockimgdiff
 import sparse_img
+import update_metadata_pb2 as um
 from lpunpack import SparseImage
 
 DataImage = blockimgdiff.DataImage

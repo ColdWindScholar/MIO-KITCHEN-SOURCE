@@ -5,7 +5,8 @@ Version: 1.8
 """
 
 from __future__ import annotations
-from typing import Any, Union, Callable
+
+from typing import Any, Union
 
 try:
     from ctypes import (POINTER, Structure, byref, c_int, pointer, sizeof,
