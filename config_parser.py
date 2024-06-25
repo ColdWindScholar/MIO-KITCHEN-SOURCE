@@ -3,6 +3,9 @@ class ConfigParser:
         self.dict = {'__init__': {}}
         self.dict_index = '__init__'
 
+    def __setitem__(self, key, value):
+        self.dict[key] = value
+
     def read(self, file):
         with open(file, encoding='utf-8') as f:
             for i in f.readlines():
