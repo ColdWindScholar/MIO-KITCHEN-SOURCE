@@ -26,7 +26,7 @@ class ConfigParser:
             yield []
         else:
             for i in items:
-                yield [i, items[i]]
+                yield i, items[i]
 
     def write(self, fd):
         for i in self.dict.keys():
