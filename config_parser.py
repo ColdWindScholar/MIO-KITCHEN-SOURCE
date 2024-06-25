@@ -49,6 +49,8 @@ class ConfigParser:
 
     def write(self, fd):
         for i in self.dict.keys():
+            if not self.dict.get(i):
+                continue
             fd.write(f"[{i}]\n")
             for i_ in self.dict[i]:
                 fd.write(f"{i_} = {self.dict[i][i_]}\n")
