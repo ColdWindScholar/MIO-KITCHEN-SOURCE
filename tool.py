@@ -6,7 +6,7 @@ import subprocess
 import threading
 
 from functools import wraps
-from random import randint
+from random import randrange
 
 import AI_engine
 import ext4
@@ -335,9 +335,9 @@ class Tool(Tk):
         self.rotate_angle = 0
 
         def getColor():
-            color1 = randint(16, 255)
-            color2 = randint(16, 255)
-            color3 = randint(16, 255)
+            color1 = randrange(16, 256)
+            color2 = randrange(16, 256)
+            color3 = randrange(16, 256)
             color1 = hex(color1)
             color2 = hex(color2)
             color3 = hex(color3)
