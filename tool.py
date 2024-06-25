@@ -708,15 +708,15 @@ class Upgrade(Toplevel):
         self.destroy()
 
 
-def load(name):
-    lang_file = f'bin/languages/{name}.json'
+def load_language(name):
+    lang_file = f'{elocal}/bin/languages/{name}.json'
     _lang: dict = {}
-    if not name and not os.path.exists(elocal + os.sep + 'bin/languages/English.json'):
+    if not name and not os.path.exists(f'{elocal}/bin/languages/English.json'):
         error(1)
-    elif not os.path.exists(elocal + os.sep + lang_file):
-        _lang = JsonEdit(elocal + os.sep + 'bin/languages/English.json').read()
+    elif not os.path.exists(lang_file):
+        _lang = JsonEdit(f'{elocal}/bin/languages/English.json').read()
     else:
-        _lang = JsonEdit(f'{elocal}{os.sep}{lang_file}').read()
+        _lang = JsonEdit(lang_file).read()
     [setattr(lang, i, _lang[i]) for i in _lang]
 
 
@@ -881,7 +881,7 @@ class SetUtils:
         else:
             self.path = os.getcwd()
         language.set(self.language)
-        load(language.get())
+        load_language(language.get())
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
         win.attributes("-alpha", self.bar_level)
@@ -906,7 +906,7 @@ class SetUtils:
         print(lang.text129 + language.get())
         try:
             self.set_value("language", language.get())
-            load(language.get())
+            load_language(language.get())
             if ask_win(lang.t36):
                 restart()
         except Exception as e:
