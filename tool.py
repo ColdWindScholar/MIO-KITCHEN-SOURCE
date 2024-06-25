@@ -627,6 +627,8 @@ class Upgrade(Toplevel):
         self.notice.configure(text=lang.t50, foreground='red')
 
     def download(self):
+        if not os.path.exists(os.path.join(elocal, "bin", "temp")):
+            os.makedirs(os.path.join(elocal, "bin", "temp"))
         mode = 'indeterminate'
         self.progressbar.configure(mode='indeterminate')
         self.progressbar.start()
