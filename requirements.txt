@@ -6,7 +6,6 @@ sv_ttk
 windnd
 pyinstaller
 chlorophyll
-pyyaml
 future
 pip
 Pygments
