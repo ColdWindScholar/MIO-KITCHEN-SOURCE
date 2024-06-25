@@ -28,7 +28,7 @@ import sys
 import time
 from dumper import Dumper
 import tkinter as tk
-from configparser import ConfigParser
+from config_parser import ConfigParser
 from webbrowser import open as openurl
 import extra
 import utils
