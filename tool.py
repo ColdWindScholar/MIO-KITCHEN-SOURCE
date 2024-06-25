@@ -80,7 +80,6 @@ from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
-import yaml
 import opscrypto
 import images
 
@@ -1003,185 +1002,6 @@ def logo_pack(origin_logo=None) -> int:
     os.remove(origin_logo)
     os.rename(logo, origin_logo)
     rmdir(dir_)
-
-
-class Process(Toplevel):
-    def __init__(self, mps):
-        super().__init__()
-        self.prc = None
-        self.dir = os.path.join(elocal + os.sep + 'bin' + os.sep + 'temp', v_code(10))
-        self.project = os.path.join(self.dir, v_code())
-        self.mps = mps
-        self.in_process = False
-        self.error = 1
-        dn.set(os.path.basename(self.project))
-        self.gavs = {
-            'bin': self.dir,
-            'tool_bin': tool_bin.replace('\\', '/'),
-            'mkc_env': os.path.join(self.dir, v_code(10)),
-            'project': self.project.replace('\\', '/')
-        }
-        self.value = list(self.gavs.keys())
-        self.control = []
-        self.able = True
-        self.protocol("WM_DELETE_WINDOW", self.exit)
-        try:
-            win.withdraw()
-        finally:
-            ...
-        self.notice = Label(self, text='Preparing...', font=(None, 15))
-        self.notice.pack(padx=10, pady=10)
-        self.title("Preparing...")
-        self.start = ttk.Button(self, text='Preparing', state='disabled', command=lambda: cz(self.run))
-        self.start.pack(side=BOTTOM, padx=30, pady=30)
-        self.progbar = ttk.Progressbar(self, orient=HORIZONTAL, length=200, mode='indeterminate')
-        self.progbar.pack(side=TOP, fill=X)
-        self.prepare()
-
-    def prepare(self):
-        zipfile.ZipFile(self.mps).extractall(self.dir)
-        jzxs(self)
-        with open(self.dir + os.sep + "main.yml", 'r', encoding='utf-8') as yml:
-            self.prc = yaml.load(yml.read(), Loader=yaml.FullLoader)
-        self.title(self.prc['name'])
-        if "system" in self.prc['support']:
-            if sys.platform not in self.prc['support']['system']:
-                self.notice.configure(text="未满足系统要求", fg='red')
-                self.able = False
-        if "version" in self.prc['support']:
-            if settings.version not in self.prc['support']['version']:
-                self.notice.configure(text="未满足版本要求", fg='red')
-                self.able = False
-        self.start.configure(state='normal')
-        if not self.able:
-            self.start.configure(text="退出")
-        else:
-            self.controls()
-            self.notice.configure(text="准备就绪", fg='green')
-            self.start.configure(text="运行")
-
-    def controls(self):
-        for key in self.prc['inputs']:
-            con = self.prc['inputs'][key]
-            self.value.append(key)
-            if con["type"] == "radio":
-                radio_var_name = key
-                self.gavs[radio_var_name] = StringVar()
-                options = con['opins'].split()
-                pft1 = ttk.LabelFrame(self, text=con['text']) if 'text' in con else ttk.Frame(self)
-                self.control.append(pft1)
-                pft1.pack(padx=10, pady=10)
-                for option in options:
-                    text, value = option.split('|')
-                    self.gavs[radio_var_name].set(value)
-                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
-                                    value=value).pack(side=LEFT, padx=5, pady=5)
-            elif con["type"] in ['entry', 'Entry']:
-                input_frame = Frame(self)
-                input_frame.pack(padx=10, pady=10)
-                self.control.append(input_frame)
-                input_var_name = key
-                self.gavs[input_var_name] = StringVar()
-                if 'text' in con:
-                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
-                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
-                                                                                    padx=5,
-                                                                                    fill=X)
-            elif con['type'] == 'checkbutton':
-                b_var_name = key
-                self.gavs[b_var_name] = IntVar()
-                text = 'M.K.C' if 'text' not in con else con['text']
-                self.control.append(cb := ttk.Checkbutton(self, text=text, variable=self.gavs[b_var_name], onvalue=1,
-                                                          offvalue=0,
-                                                          style="Switch.TCheckbutton"))
-                cb.pack(
-                    padx=5, pady=5, fill=BOTH)
-            else:
-                print(lang.warn14.format(con['type']))
-
-    def run(self):
-        if not self.able:
-            self.exit()
-            return
-        for c in self.control:
-            c.destroy()
-        self.in_process = True
-        process = Text(self)
-        process.pack(fill=BOTH)
-        sys.stdout = StdoutRedirector(process)
-        sys.stderr = StdoutRedirector(process, error_=True)
-        self.start.configure(text="正在运行", state='disabled')
-        with open(engine := self.dir + os.sep + v_code() + "_engine", 'w', encoding='utf-8') as en:
-            for u in self.value:
-                en.write(f"export {u}={self.gavs[u].get() if 'get' in dir(self.gavs[u]) else self.gavs[u]}\n")
-            en.write("source $1")
-        self.progbar.start()
-        for step in self.prc.get('steps', []):
-            self.notice.configure(text=step['name'])
-            if 'run' in step:
-                with open(sh_tmp_file := self.dir + os.sep + v_code(), 'w', encoding='utf-8') as sh_tmp:
-                    sh_tmp.writelines(step['run'])
-                sh = "ash" if os.name == 'posix' else 'bash'
-                self.error = call(f"busybox {sh} {engine} {sh_tmp_file}")
-            elif "use" in step:
-                try:
-                    self.use(step)
-                except Exception as e:
-                    print(e)
-                    self.error = 0
-                    self.stop()
-                    break
-            else:
-                print(f"Unsupported {step}")
-        self.progbar.stop()
-        self.able = False
-        self.in_process = False
-        self.start.configure(text="退出", state='normal')
-
-    def use(self, step):
-        def download(url):
-            try:
-                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url, self.project):
-                    print(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
-            except BaseException or Exception:
-                self.error = 0
-            else:
-                self.error = 1
-
-        def unzip(file, folder):
-            print(f"Unzipping {file}...")
-            with zipfile.ZipFile(file) as zip_:
-                for file_ in zip_.namelist():
-                    try:
-                        file = str(file_).encode('cp437').decode('gbk')
-                    except (BaseException, Exception):
-                        file = str(file_).encode('utf-8').decode('utf-8')
-                    print(lang.text38.format(file_))
-                    zip_.extract(file, folder)
-
-        actions = {
-            'download': lambda url: download(url['url']),
-            'unzip': lambda cmd: unzip(os.path.abspath(cmd['src']), os.path.abspath(cmd['dst']))
-        }
-        actions[step['use']](step)
-
-    def stop(self):
-        self.in_process = False
-        self.able = False
-        self.progbar.stop()
-        self.notice.configure(text="错误！", fg='red')
-        self.start.configure(text="退出", state='normal')
-
-    def exit(self):
-        if self.in_process:
-            return
-        settings.load()
-        sys.stdout = StdoutRedirector(win.show)
-        sys.stderr = StdoutRedirector(win.show)
-        project_menu.listdir()
-        rmdir(self.dir)
-        self.destroy()
-        win.deiconify()
 
 
 class IconGrid(tk.Frame):
@@ -3240,8 +3060,6 @@ def dndfile(files):
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
                 InstallMpk(fi)
-            elif os.path.basename(fi).endswith(".mps"):
-                Process(fi)
             else:
                 cz(unpackrom, fi)
         else:
