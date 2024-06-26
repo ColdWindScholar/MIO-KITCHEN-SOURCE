@@ -104,42 +104,19 @@ elif os.name == 'nt':
         '--splash',
         'splash.png'
     ])
-if os.name == 'nt':
-    if os.path.exists(local + os.sep + "dist" + os.sep + "tool.exe"):
-        shutil.move(local + os.sep + "dist" + os.sep + "tool.exe", local)
-else:
-    if os.path.exists(local + os.sep + "dist" + os.sep + "tool"):
-        shutil.move(local + os.sep + "dist" + os.sep + "tool", local)
+if not os.path.exists('dist/bin'):
+    os.makedirs('dist/bin', exist_ok=True)
 pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype]
 for i in os.listdir(local + os.sep + "bin"):
     if i in pclist:
-        continue
-    else:
         if os.path.isdir(local + os.sep + "bin" + os.sep + i):
-            shutil.rmtree(local + os.sep + "bin" + os.sep + i)
+            shutil.copytree(local + os.sep + "bin" + os.sep + i, local + os.sep + 'dist' + os.sep + 'bin')
         else:
-            os.remove(local + os.sep + "bin" + os.sep + i)
-if ostype == 'Linux':
-    for i in os.listdir(local + os.sep + "bin"+os.sep+ostype):
-        if i != machine():
-            shutil.rmtree(local + os.sep + "bin"+os.sep+ostype + os.sep + i)
-for i in os.listdir(local):
-    if i not in ['tool', 'tool.exe', 'bin', 'LICENSE']:
-        print(f"Removing {i}")
-        if os.path.isdir(local + os.sep + i):
-            try:
-                shutil.rmtree(local + os.sep + i)
-            except Exception or OSError as e:
-                print(e)
-        elif os.path.isfile(local + os.sep + i):
-            try:
-                os.remove(local + os.sep + i)
-            except Exception or OSError as e:
-                print(e)
-    else:
-        print(i)
+            shutil.copy(local + os.sep + "bin" + os.sep + i, local + os.sep + 'dist' + os.sep + 'bin' + os.sep + i)
+if not os.path.exists('dist/LICENSE'):
+    shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep+'LICENSE')
 if os.name == 'posix':
-    for root, dirs, files in os.walk(local, topdown=True):
+    for root, dirs, files in os.walk(local + os.sep + 'dist', topdown=True):
         for i in files:
             print(f"Chmod {os.path.join(root, i)}")
             os.system(f"chmod a+x {os.path.join(root, i)}")
