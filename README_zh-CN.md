@@ -3,9 +3,6 @@
 #### 一款Python编写的Rom工具
 ***
 > [!CAUTION]
-> 无耻! Gitcode 非法冒充我并且 [克隆本项目](https://gitcode.com/ColdWindScholar/) 到用我名字的虚拟账号中. 望周知.[仓库已被其隐藏]
-***
-> [!CAUTION]
 > 此项目非发布在gitcode， 如果您在gitcode发现此项目，请联系我们并保留截图证据
 ***
 ## 此工具使用了许多开源项目， 向开发者们致敬!

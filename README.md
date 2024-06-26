@@ -5,9 +5,6 @@
 > Unauthorized commercial use prohibited
 ***
 > [!CAUTION]
-> So Shameless! Gitcode illegally impersonates me and [clones this project](https://gitcode.com/ColdWindScholar/) to Gitcode of Virtual user with my name. Please be aware of this.[仓库已被其隐藏]
-***
-> [!CAUTION]
 > 此项目非发布在gitcode， 如果您在gitcode发现此项目，请联系我们并保留截图证据
 ***
 ## This tool uses many open source projects. Huge shout out to the developers!
