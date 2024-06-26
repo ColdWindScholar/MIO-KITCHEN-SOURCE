@@ -3042,7 +3042,7 @@ class ZipFile:
 
 @cartoon
 def pack_zip():
-    if ask_win(lang.t25) != 1:
+    if ask_win(lang.t53) != 1:
         return
     if not dn.get():
         win.message_pop(lang.warn1)
