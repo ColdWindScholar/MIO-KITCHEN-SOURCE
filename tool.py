@@ -3289,7 +3289,10 @@ class FormatConversion(ttk.LabelFrame):
         self.list_b = Listbox(self, highlightthickness=0, activestyle='dotbox', selectmode=MULTIPLE)
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         cz(self.relist)
-        ttk.Button(self, text=lang.ok, command=lambda: cz(self.conversion)).pack(side=BOTTOM, fill=BOTH)
+        t = Frame(self)
+        ttk.Button(t, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=5, pady=5, fill=BOTH, expand=True)
+        ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left', padx=5, pady=5, fill=BOTH, expand=True)
+        t.pack(side=BOTTOM, fill=BOTH)
 
     def relist(self):
         work = rwork()
