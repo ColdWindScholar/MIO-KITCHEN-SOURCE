@@ -2,6 +2,8 @@
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
 #### 一款Python编写的Rom工具
 ***
+> [!CAUTION]
+> 无耻! Gitcode 非法冒充我并且 [克隆本项目](https://gitcode.com/ColdWindScholar/MIO-KITCHEN-SOURCE/overview) 到用我名字的虚拟账号中. 望周知.
 ## 此工具使用了许多开源项目， 向开发者们致敬!
 ***
 ## 国际化
