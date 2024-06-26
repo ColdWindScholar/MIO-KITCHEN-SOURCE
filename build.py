@@ -109,10 +109,10 @@ if not os.path.exists('dist/bin'):
 pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype]
 for i in os.listdir(local + os.sep + "bin"):
     if i in pclist:
-        if os.path.isdir(local + os.sep + "bin" + os.sep + i):
-            shutil.copytree(local + os.sep + "bin" + os.sep + i, local + os.sep + 'dist' + os.sep + 'bin')
+        if os.path.isdir(f"{local}/bin/{i}"):
+            shutil.copytree(f"{local}/bin/{i}", f"{local}/dist/bin/{i}", dirs_exist_ok=True)
         else:
-            shutil.copy(local + os.sep + "bin" + os.sep + i, local + os.sep + 'dist' + os.sep + 'bin' + os.sep + i)
+            shutil.copy(f"{local}/bin/{i}", f"{local}/dist/bin/{i}")
 if not os.path.exists('dist/LICENSE'):
     shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep+'LICENSE')
 if os.name == 'posix':
@@ -120,5 +120,5 @@ if os.name == 'posix':
         for i in files:
             print(f"Chmod {os.path.join(root, i)}")
             os.system(f"chmod a+x {os.path.join(root, i)}")
-
+os.chdir(f'{local}/dist')
 zip_folder(".")
