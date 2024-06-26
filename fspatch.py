@@ -129,5 +129,5 @@ def fs_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
 def main(dir_path, fs_config):
     new_fs, new_add = fs_patch(scanfs(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w", encoding='utf-8', newline='\n') as f:
-        f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
+        f.writelines([f"{i} {' '.join(new_fs[i])}\n" for i in sorted(new_fs.keys())])
     print('FsPatcher: Added %d' % new_add + " entries")
