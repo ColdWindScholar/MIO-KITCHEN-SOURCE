@@ -3,7 +3,8 @@
 #### A Rom Tool Written in Python
 > [!CAUTION]
 > Unauthorized commercial use prohibited
-### Gitcode illegally impersonates me and [clones this project](https://gitcode.com/ColdWindScholar/MIO-KITCHEN-SOURCE/overview) to Gitcode of Virtual user with me name. Please be aware of this.
+> [!CAUTION]
+> So Shameless! Gitcode illegally impersonates me and [clones this project](https://gitcode.com/ColdWindScholar/MIO-KITCHEN-SOURCE/overview) to Gitcode of Virtual user with me name. Please be aware of this.
 ***
 ## This tool uses many open source projects. Huge shout out to the developers!
 ***
