@@ -23,7 +23,7 @@ class PythonEditor(tk.Frame):
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text=lang.text17, command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                               expand=1)
-        self.save_b = ttk.Button(f1, text="保存 | Save", command=lambda: cz(self.save), style="Accent.TButton")
+        self.save_b = ttk.Button(f1, text=lang.t54, command=lambda: cz(self.save), style="Accent.TButton")
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         self.show = tk.Listbox(self, activestyle='dotbox', highlightthickness=0)
@@ -53,11 +53,11 @@ class PythonEditor(tk.Frame):
         self.load()
 
     def save(self):
-        self.save_b.configure(text='已保存 | Saved', state='disabled')
+        self.save_b.configure(text=lang.t55, state='disabled')
         with open(os.path.join(self.path, self.file_name), 'w+', encoding='utf-8', newline='\n') as txt:
             txt.write(self.text.get(1.0, tk.END))
         time.sleep(1)
-        self.save_b.configure(text='保存 | Save', state='normal')
+        self.save_b.configure(text=lang.t54, state='normal')
 
     def load(self):
         if self.file_name:
