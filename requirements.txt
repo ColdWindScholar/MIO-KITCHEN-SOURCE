@@ -9,3 +9,4 @@ chlorophyll
 future
 pip
 Pygments
+zstandard
