@@ -17,7 +17,8 @@ except ImportError:
     collect = None
 if not platform.system() == 'Darwin':
     try:
-        import load_window
+        import pyi_splash
+        pyi_splash.close()
     except ModuleNotFoundError:
         ...
 import json
