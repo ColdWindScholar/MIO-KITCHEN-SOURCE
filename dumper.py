@@ -196,7 +196,7 @@ class Dumper:
             self.do_ops_for_part(part, out_file, old_file)
         out_file.close()
         if gettype("%s/%s.img" % (self.out, name)) == 'zstd':
-            ZstdImageExtract("%s/%s.img" % (self.out, name), "%s/%s_e.img" % (self.out, name)).extract(cover=True)
+            ZstdImageExtract("%s/%s.img" % (self.out, name), "%s/%s_e.img" % (self.out, name)).extract(overwrite=True)
 
     def do_ops_for_part(self, part, out_file, old_file):
         for op in part["operations"]:

@@ -15,7 +15,7 @@ class ZstdImageExtract:
         self.BUFSIZE = 8192
         self.ALIGN = 0x2000000
 
-    def extract(self, cover=False):
+    def extract(self, overwrite=False):
         file_size = os.path.getsize(self.file)
         if file_size < self.ALIGN:
             cnt = 1
@@ -28,7 +28,7 @@ class ZstdImageExtract:
                 while not dec.eof:
                     f2.write(dec.decompress(f.read(self.BUFSIZE)))
                 f2.write(dec.flush())
-        if cover:
+        if overwrite:
             os.remove(self.file)
             os.rename(self.output, self.file)
 
