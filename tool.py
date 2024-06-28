@@ -758,12 +758,11 @@ def error(code, desc="unknown error"):
     sys.exit()
 
 
-class Welcome(Toplevel):
+class Welcome(ttk.LabelFrame):
     def __init__(self):
-        super().__init__()
-        self.title(lang.text135)
-        self.resizable(False, False)
-        self.protocol("WM_DELETE_WINDOW", lambda: print())
+        super().__init__(master=win)
+        self.config(text=lang.text135)
+        self.pack(fill=BOTH, expand=True)
         self.frame = None
         oobe = settings.oobe
         frames = {
@@ -779,9 +778,7 @@ class Welcome(Toplevel):
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             ttk.Label(self, text=lang.text137, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
-        win.withdraw()
         self.wait_window()
-        win.deiconify()
 
     def reframe(self):
         if self.frame:
