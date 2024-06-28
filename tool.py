@@ -1706,8 +1706,8 @@ class InstallMpk(Toplevel):
                 self.inner_zipdata = inner_file.read()
         self.name_label.config(text=self.mconf.get('module', 'name'))
         self.logo.config(image=self.pyt)
-        self.author.config(text=self.mconf.get('module', 'author'))
-        self.version.config(text=self.mconf.get('module', 'version'))
+        self.author.config(text=lang.text33.format(self.mconf.get('module', 'author')))
+        self.version.config(text=lang.text32.format(self.mconf.get('module', 'version')))
         self.text.insert("insert", self.mconf.get('module', 'describe'))
 
     def unavailable(self):
