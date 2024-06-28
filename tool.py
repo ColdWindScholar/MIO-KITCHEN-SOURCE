@@ -1229,7 +1229,7 @@ def mpkman() -> None:
                     try:
                         self.runline(i)
                     except AttributeError as e:
-                        print("未知的参数或命令：%s\n错误：%s" % (i, str(e).replace("msh_parse", 'MSH解释器')))
+                        print("未知的参数或命令：%s\n错误：%s" % (i, str(e)))
                     except ModuleError as e:
                         print("异常:%s" % e)
                         return
