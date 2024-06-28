@@ -1635,11 +1635,11 @@ class InstallMpk(Toplevel):
         self.installb.config(state=DISABLED)
         try:
             supports = self.mconf.get('module', 'supports').split()
+            if sys.platform not in supports:
+                self.state['text'] = lang.warn15.format(sys.platform)
+                return 0
         except (Exception, BaseException):
-            supports = [sys.platform]
-        if sys.platform not in supports:
-            self.state['text'] = lang.warn15.format(sys.platform)
-            return 0
+            ...
         for dep in self.mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(elocal, "bin", "module", dep)):
                 self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
