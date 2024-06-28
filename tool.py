@@ -11,10 +11,6 @@ from random import randrange
 import AI_engine
 import ext4
 
-try:
-    from gc import collect
-except ImportError:
-    collect = None
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
