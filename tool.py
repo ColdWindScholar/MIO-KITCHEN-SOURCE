@@ -1476,7 +1476,7 @@ def mpkman() -> None:
                 module = imp.load_source('module', script_path + "main.py")
                 if hasattr(module, 'main'):
                     data = {
-                        "win":win,
+                        "win": win,
                         'version': settings.version, "bin": script_path.replace(os.sep, "/"),
                         "project": rwork().replace('\\', '/'), 'moddir': moduledir.replace('\\', '/'),
                         'tool_bin': tool_bin.replace(
