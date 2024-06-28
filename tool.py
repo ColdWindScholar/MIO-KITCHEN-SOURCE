@@ -1229,21 +1229,21 @@ def mpkman() -> None:
                     try:
                         self.runline(i)
                     except AttributeError as e:
-                        print("未知的参数或命令：%s\n错误：%s" % (i, str(e)))
+                        print(f"未知的参数或命令：{i}\n错误：{e}")
                     except ModuleError as e:
-                        print("异常:%s" % e)
+                        print(f"异常:{e}")
                         return
                     except Exception as e:
-                        print("运行错误:%s\n错误：%s" % (i, e))
+                        print(f"运行错误:{i}\n错误：{e}")
                     except (Exception, BaseException):
-                        print("运行错误:%s" % i)
+                        print(f"运行错误:{i}")
             self.envs.clear()
 
         def set(self, cmd):
             try:
                 vn, va = cmd.strip().split("=" if "=" in cmd else None)
             except Exception as e:
-                print("赋值异常：%s\n语句：%s" % (e, cmd))
+                print(f"赋值异常：{e}\n语句：{cmd}")
                 return 1
             self.envs[vn] = str(va)
 
