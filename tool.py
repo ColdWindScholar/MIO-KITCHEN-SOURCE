@@ -1141,12 +1141,11 @@ def mpkman() -> None:
         with open(os.path.join(moduledir, (value := chosen.get()), "info.json"), 'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
-            des = data.get("describe", '')
             (info_ := ConfigParser())['module'] = {
                 'name': data["name"],
                 'version': data["version"],
                 'author': data["author"],
-                'describe': des,
+                'describe': data.get("describe", ''),
                 'resource': 'main.zip',
                 'identifier': value,
                 'depend': data["depend"]
