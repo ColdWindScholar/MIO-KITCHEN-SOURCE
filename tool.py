@@ -1287,10 +1287,10 @@ def mpkman() -> None:
             try:
                 cmd_, argv = cmd.split()
             except Exception:
-                raise ModuleError("MSH解释器: 不支持的命令 %s" % cmd)
+                raise ModuleError(f"MSH解释器: 不支持的命令 {cmd}")
             if cmd_ == 'run':
                 if not os.path.exists(argv.replace("\\", '/')):
-                    print("脚本不存在：%s" % argv)
+                    print(f"脚本不存在：{argv}")
                     return 1
                 else:
                     self.__init__(argv)
