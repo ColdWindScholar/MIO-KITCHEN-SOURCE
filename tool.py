@@ -18,6 +18,7 @@ except ImportError:
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
+
         pyi_splash.close()
     except ModuleNotFoundError:
         ...
@@ -1600,52 +1601,36 @@ def mpkman() -> None:
 
 
 class InstallMpk(Toplevel):
-    def __init__(self, mpk):
+    def __init__(self, mpk=None):
         super().__init__()
+        self.inner_zipdata = None
+        self.pyt = None
         self.inner_filenames = []
         self.mconf = ConfigParser()
-        if not mpk:
-            win.message_pop(lang.warn2)
-            self.destroy()
-            return
+        self.installable = True
+        self.mpk = mpk
         self.title(lang.text31)
         self.icon = None
         self.resizable(False, False)
-        with zipfile.ZipFile(mpk, 'r') as myfile:
-            if 'info' not in myfile.namelist():
-                self.destroy()
-                return
-            with myfile.open('info') as info_file:
-                self.mconf.read_string(info_file.read().decode('utf-8'))
-            try:
-                with myfile.open('icon') as myfi:
-                    self.icon = myfi.read()
-                    try:
-                        pyt = PhotoImage(open_img(BytesIO(self.icon)))
-                    except Exception as e:
-                        print(e)
-                        pyt = PhotoImage(data=images.none_byte)
-            except (Exception, BaseException):
-                pyt = PhotoImage(data=images.none_byte)
-            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
-                self.inner_zipdata = inner_file.read()
         f = Frame(self)
-        Label(f, image=pyt).pack(padx=10, pady=10)
-        Label(f, text=self.mconf.get('module', 'name'), font=('黑体', 14)).pack(padx=10, pady=10)
-        Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12)).pack(padx=10,
-                                                                                                       pady=10)
-        Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12)).pack(padx=10,
-                                                                                                      pady=10)
+        self.logo = Label(f)
+        self.logo.pack(padx=10, pady=10)
+        self.name_label = Label(f, text=self.mconf.get('module', 'name'), font=('黑体', 14))
+        self.name_label.pack(padx=10, pady=10)
+        self.version = Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12))
+        self.version.pack(padx=10, pady=10)
+        self.author = Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12))
+        self.author.pack(padx=10, pady=10)
         f.pack(side=LEFT)
-        text = Text(self, width=50, height=20)
-        text.insert("insert", self.mconf.get('module', 'describe'))
-        text.pack(padx=10, pady=10)
+        self.text = Text(self, width=50, height=20)
+        self.text.pack(padx=10, pady=10)
         self.prog = ttk.Progressbar(self, length=200, mode='determinate', orient=HORIZONTAL, maximum=100, value=0)
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=('黑体', 12))
         self.state.pack(padx=10, pady=10)
         self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: cz(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
+        self.load()
         jzxs(self)
         self.wait_window()
         list_pls_plugin()
@@ -1703,6 +1688,44 @@ class InstallMpk(Toplevel):
         self.state['text'] = lang.text39
         self.installb['text'] = lang.text34
         self.installb.config(state='normal')
+
+    def load(self):
+        if not self.mpk:
+            self.unavailable()
+            return
+        with zipfile.ZipFile(self.mpk, 'r') as myfile:
+            if 'info' not in myfile.namelist():
+                self.unavailable()
+                return
+            with myfile.open('info') as info_file:
+                self.mconf.read_string(info_file.read().decode('utf-8'))
+            try:
+                with myfile.open('icon') as myfi:
+                    self.icon = myfi.read()
+                    try:
+                        self.pyt = PhotoImage(data=self.icon)
+                    except Exception as e:
+                        print(e)
+                        self.pyt = PhotoImage(data=images.none_byte)
+            except (Exception, BaseException):
+                self.pyt = PhotoImage(data=images.none_byte)
+            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
+                self.inner_zipdata = inner_file.read()
+        self.name_label.config(text=self.mconf.get('module', 'name'))
+        self.logo.config(image=self.pyt)
+        self.author.config(text=self.mconf.get('module', 'author'))
+        self.version.config(text=self.mconf.get('module', 'version'))
+        self.text.insert("insert", self.mconf.get('module', 'describe'))
+
+    def unavailable(self):
+        self.pyt = PhotoImage(data=images.error_logo_byte)
+        self.name_label.config(text=lang.warn2, foreground='yellow')
+        self.logo.config(image=self.pyt)
+        self.author.destroy()
+        self.version.destroy()
+        self.prog.destroy()
+        self.state.config()
+        self.installb.config(state=DISABLED)
 
 
 @cartoon
@@ -3291,8 +3314,12 @@ class FormatConversion(ttk.LabelFrame):
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         cz(self.relist)
         t = Frame(self)
-        ttk.Button(t, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=5, pady=5, fill=BOTH, expand=True)
-        ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left', padx=5, pady=5, fill=BOTH, expand=True)
+        ttk.Button(t, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=5, pady=5, fill=BOTH,
+                                                                             expand=True)
+        ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left',
+                                                                                                      padx=5, pady=5,
+                                                                                                      fill=BOTH,
+                                                                                                      expand=True)
         t.pack(side=BOTTOM, fill=BOTH)
 
     def relist(self):
