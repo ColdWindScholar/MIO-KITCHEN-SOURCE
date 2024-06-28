@@ -15,7 +15,7 @@ try:
     from gc import collect
 except ImportError:
     collect = None
-if not platform.system() == 'Darwin':
+if platform.system() != 'Darwin':
     try:
         import pyi_splash
         pyi_splash.close()
