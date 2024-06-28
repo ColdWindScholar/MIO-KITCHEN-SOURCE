@@ -3003,8 +3003,9 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
-    if call(
-            f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img") != 0:
+    ret = call(
+            f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img")
+    if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
@@ -3021,6 +3022,7 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
             except (Exception, BaseException):
                 ...
         os.rename(work + name + "_new.img", work + name + ".img")
+    return 0
 
 
 @cartoon
