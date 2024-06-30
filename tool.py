@@ -856,6 +856,7 @@ class SetUtils:
         self.language = 'English'
         self.updating = ''
         self.new_tool = ''
+        self.theme = 'dark'
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
