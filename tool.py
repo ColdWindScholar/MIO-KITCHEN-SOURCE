@@ -355,12 +355,11 @@ class Tool(Tk):
         Label(self.tab4,
               text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
               font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
-        Label(self.tab4,
-              text=lang.text127,
-              font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
+        # Label(self.tab4,text=lang.text127,font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
+        ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
+                  background='gray').pack()
         Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
-        ttk.Label(self.tab4, text="Open Source, Free, Faster",
-                  style="Link.TLabel").pack()
+        ttk.Label(self.tab4, text="Open Source, Free, Faster", style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
