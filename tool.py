@@ -309,7 +309,6 @@ class Tool(Tk):
         zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
         zyf1.pack(padx=10, pady=10)
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
-        # ttk.Button(zyf1, text="任务管理", command=lambda: cz(TaskManager)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
               text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
               font=(None, 10)).pack(
@@ -452,44 +451,6 @@ language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + os.sep
 states = States()
-
-
-class TaskManager(ttk.LabelFrame):
-    def __init__(self):
-        super().__init__(master=win, text='任务管理')
-        self.place(relx=0.5, rely=0.5, anchor="center")
-        self.list = []
-        self.frame_inner = Canvas(self)
-        self.frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-        sv = ttk.Scrollbar(self.frame_inner)
-        sv.pack(side=RIGHT, fill=Y)
-        self.frame_inner.configure(yscrollcommand=sv.set)
-        sv.config(command=self.frame_inner.yview)
-        self.frame_inner.config(yscrollincrement=1)
-        self.frame_inner.bind("<MouseWheel>",
-                              lambda event: self.frame_inner.yview_scroll(int(-event.delta / 120), 'units'))
-        ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, side=BOTTOM)
-        self.refresh()
-
-    def refresh(self):
-        for i in self.list:
-            i.destroy()
-        if not cartoon.tasks:
-            ttk.Label(self.frame_inner, text='NO Any').pack()
-        for i in cartoon.tasks.keys():
-            a = ttk.Frame(self.frame_inner, width=200)
-            self.list.append(a)
-            ttk.Label(a, text=i).pack(side=LEFT)
-            ttk.Button(a, text='杀死', command=lambda: self.kill(a)).pack(side=RIGHT)
-            ttk.Button(a, text='详情').pack(side=RIGHT)
-            a.pack(padx=5, pady=5)
-
-    def kill(self, hash_):
-        try:
-            del cartoon.tasks[hash_]
-        except:
-            pass
-        self.refresh()
 
 
 class ModuleError(Exception):
@@ -2998,7 +2959,7 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
         print(lang.text75 % name)
         return 1
     ret = call(
-            f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img")
+        f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img")
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
