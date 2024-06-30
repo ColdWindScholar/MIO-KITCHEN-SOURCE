@@ -754,10 +754,10 @@ def error(code, desc="unknown error"):
     sys.exit()
 
 
-class Welcome(ttk.LabelFrame):
+class Welcome(ttk.Frame):
     def __init__(self):
         super().__init__(master=win)
-        self.config(text=lang.text135)
+        # self.config(text=lang.text135)
         self.pack(fill=BOTH, expand=True)
         self.frame = None
         oobe = settings.oobe
