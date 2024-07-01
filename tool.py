@@ -1557,7 +1557,6 @@ def mpkman():
 class InstallMpk(Toplevel):
     def __init__(self, mpk=None):
         super().__init__()
-        self.inner_zipdata = None
         self.pyt = None
         self.mconf = ConfigParser()
         self.installable = True
@@ -1608,19 +1607,22 @@ class InstallMpk(Toplevel):
                 return 0
         if os.path.exists(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'))):
             rmtree(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier')))
-        fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
-        uncompress_size = sum((file.file_size for file in fz.infolist()))
-        extracted_size = 0
-        for file in fz.namelist():
-            try:
-                file = str(file).encode('cp437').decode('gbk')
-            except (Exception, BaseException):
-                file = str(file).encode('utf-8').decode('utf-8')
-            info = fz.getinfo(file)
-            extracted_size += info.file_size
-            self.state['text'] = lang.text38.format(file)
-            fz.extract(file, os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier')))
-            self.prog['value'] = extracted_size * 100 / uncompress_size
+        install_dir = self.mconf.get('module', 'identifier')
+        with zipfile.ZipFile(self.mpk, 'r') as myfile:
+            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
+                fz = zipfile.ZipFile(inner_file, 'r')
+                uncompress_size = sum((file.file_size for file in fz.infolist()))
+                extracted_size = 0
+                for file in fz.namelist():
+                    try:
+                        file = str(file).encode('cp437').decode('gbk')
+                    except (Exception, BaseException):
+                        file = str(file).encode('utf-8').decode('utf-8')
+                    info = fz.getinfo(file)
+                    extracted_size += info.file_size
+                    self.state['text'] = lang.text38.format(file)
+                    fz.extract(file, os.path.join(elocal, "bin", "module", install_dir).__str__())
+                    self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
         except (Exception, BaseException):
@@ -1661,8 +1663,6 @@ class InstallMpk(Toplevel):
                         self.pyt = PhotoImage(data=images.none_byte)
             except (Exception, BaseException):
                 self.pyt = PhotoImage(data=images.none_byte)
-            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
-                self.inner_zipdata = inner_file.read()
         self.name_label.config(text=self.mconf.get('module', 'name'))
         self.logo.config(image=self.pyt)
         self.author.config(text=lang.text33.format(self.mconf.get('module', 'author')))
