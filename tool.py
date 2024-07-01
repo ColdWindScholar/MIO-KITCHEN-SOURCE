@@ -1559,7 +1559,6 @@ class InstallMpk(Toplevel):
         super().__init__()
         self.inner_zipdata = None
         self.pyt = None
-        self.inner_filenames = []
         self.mconf = ConfigParser()
         self.installable = True
         self.mpk = mpk
@@ -1612,8 +1611,7 @@ class InstallMpk(Toplevel):
         fz = zipfile.ZipFile(BytesIO(self.inner_zipdata), 'r')
         uncompress_size = sum((file.file_size for file in fz.infolist()))
         extracted_size = 0
-        self.inner_filenames = zipfile.ZipFile(BytesIO(self.inner_zipdata)).namelist()
-        for file in self.inner_filenames:
+        for file in fz.namelist():
             try:
                 file = str(file).encode('cp437').decode('gbk')
             except (Exception, BaseException):
