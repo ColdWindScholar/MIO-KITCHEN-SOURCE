@@ -42,7 +42,7 @@ class ConfigParser:
     def items(self, item):
         items = self.dict[item]
         if item not in self.dict.keys():
-            yield []
+            yield None, None
         else:
             for i in items:
                 yield i, items[i]
