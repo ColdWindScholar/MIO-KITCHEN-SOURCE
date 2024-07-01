@@ -997,7 +997,7 @@ class IconGrid(tk.Frame):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
-def mpkman() -> None:
+def mpkman():
     chosen = tk.StringVar(value='')
     name = tk.StringVar(value='')
     global_mpk = {}
@@ -1884,15 +1884,13 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     work = rwork()
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
-        command += "2 -device super:%s --group %s:%s " % (size.get(), dbfz.get(), size.get())
+        command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
         for part in lb:
-            command += "--partition %s:readonly:%s:%s --image %s=%s.img " % (
-                part, os.path.getsize(work + part + ".img"), dbfz.get(), part, work + part)
+            command += f"--partition {part}:readonly:{os.path.getsize(work + part + '.img')}:{dbfz.get()} --image {part}={work + part}.img "
     else:
-        command += "3 -device super:%s --group %s_a:%s " % (size.get(), dbfz.get(), size.get())
+        command += f"3 -device super:{size.get()} --group {dbfz.get()}_a:{size.get()} "
         for part in lb:
-            command += "--partition %s_a:readonly:%s:%s_a --image %s_a=%s.img " % (
-                part, os.path.getsize(work + part + ".img"), dbfz.get(), part, work + part)
+            command += f"--partition {part}_a:readonly:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a --image {part}_a={work + part}.img "
         command += "--group %s_b:%s " % (dbfz.get(), size.get())
         for part in lb:
             command += f"--partition {part}_b:readonly:0:{dbfz.get()}_b "
