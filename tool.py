@@ -825,7 +825,7 @@ class SetUtils:
         else:
             sv_ttk.set_theme("dark")
             error(1,
-                  '缺失配置文件，请重新安装此软件\nSome necessary files were lost, please reinstall this software to fix the problem!')
+                  'Some necessary files were lost, please reinstall this software to fix the problem!')
 
     def load(self):
         self.config.read(self.set_file)
