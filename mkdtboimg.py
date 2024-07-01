@@ -660,8 +660,7 @@ def parse_dt_entries(global_args, arg_list):
     return dt_entries
 
 
-def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="0", rev="0", flags='0', custom0='0',
-                      custom1='0', custom2='0', custom3='0'):
+def create_dtbo_image(fout, list, page_size=2048, dt_type='dtb',  flags='0'):
     """Create Device Tree Blob Overlay image using provided arguments.
 
     Args:
@@ -670,10 +669,10 @@ def create_dtbo_image(fout, list, page_size=2048, version=0, dt_type='dtb', id="
     """
 
     assert list, 'List of dt_images to add to DTBO not provided'
-    data = argparse.Namespace(id=id, rev=rev, flags=flags, custom0=custom0, custom1=custom1, custom2=custom2,
-                              custom3=custom3, version=version)
+    data = argparse.Namespace(id='0', rev='0', flags=flags, custom0='0', custom1='0', custom2='0',
+                              custom3='0', version=0)
     dt_entries = parse_dt_entries(data, list)
-    dtbo = Dtbo(fout, dt_type, page_size, version)
+    dtbo = Dtbo(fout, dt_type, page_size, 0)
     dt_entry_buf = dtbo.add_dt_entries(dt_entries)
     dtbo.commit(dt_entry_buf)
     fout.close()
