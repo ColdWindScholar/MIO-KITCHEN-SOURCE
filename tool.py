@@ -1118,7 +1118,7 @@ def mpkman():
             for i in get_all_file_paths("."):
                 print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
                 try:
-                    mpk.write(i)
+                    mpk.write(str(i))
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
@@ -1866,8 +1866,8 @@ class PackSuper(Toplevel):
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
-                                                                                fill=X,
-                                                                                expand=True)
+                                                                      fill=X,
+                                                                      expand=True)
         ttk.Button(self, text=lang.pack, command=lambda: cz(start_), style="Accent.TButton").pack(side='left',
                                                                                                   padx=5,
                                                                                                   pady=5, fill=X,
@@ -2228,9 +2228,9 @@ class Packxx(Toplevel):
             padx=5, pady=5, fill=X))
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=2,
-                                                                                pady=2,
-                                                                                fill=X,
-                                                                                expand=True)
+                                                                      pady=2,
+                                                                      fill=X,
+                                                                      expand=True)
         ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
                                                                                                        padx=2, pady=2,
                                                                                                        fill=X,
@@ -3268,7 +3268,7 @@ class FormatConversion(ttk.LabelFrame):
         cz(self.relist)
         t = Frame(self)
         ttk.Button(t, text=lang.cancel, command=self.destroy).pack(side='left', padx=5, pady=5, fill=BOTH,
-                                                                             expand=True)
+                                                                   expand=True)
         ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left',
                                                                                                       padx=5, pady=5,
                                                                                                       fill=BOTH,
