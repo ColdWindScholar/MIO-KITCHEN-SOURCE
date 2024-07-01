@@ -1865,7 +1865,7 @@ class PackSuper(Toplevel):
             self.destroy()
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
 
-        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=10, pady=10,
+        ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                                 fill=X,
                                                                                 expand=True)
         ttk.Button(self, text=lang.pack, command=lambda: cz(start_), style="Accent.TButton").pack(side='left',
@@ -2227,7 +2227,7 @@ class Packxx(Toplevel):
         self.fs_conver.trace('w', lambda *z: fs_conver.pack_forget() if not self.fs_conver.get() else fs_conver.pack(
             padx=5, pady=5, fill=X))
 
-        ttk.Button(self, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=2,
+        ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=2,
                                                                                 pady=2,
                                                                                 fill=X,
                                                                                 expand=True)
@@ -3267,7 +3267,7 @@ class FormatConversion(ttk.LabelFrame):
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         cz(self.relist)
         t = Frame(self)
-        ttk.Button(t, text=lang.cancel, command=lambda: self.destroy()).pack(side='left', padx=5, pady=5, fill=BOTH,
+        ttk.Button(t, text=lang.cancel, command=self.destroy).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                              expand=True)
         ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left',
                                                                                                       padx=5, pady=5,
