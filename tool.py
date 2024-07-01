@@ -808,6 +808,7 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini):
+        self.oobe = '0'
         self.path = None
         self.bar_level = '0.9'
         self.set_file = set_ini
