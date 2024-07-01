@@ -634,9 +634,9 @@ class Upgrade(Toplevel):
         if os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe'))))
+            settings.set_value('updating', '2')
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            settings.set_value('updating', '2')
             terminate_process(os.getpid())
         else:
             self.notice.configure(text=lang.t41, foreground='red')
@@ -651,10 +651,10 @@ class Upgrade(Toplevel):
                 re_folder(os.path.join(elocal, "bin", "temp"))
             except:
                 pass
-            subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             settings.set_value('updating', '')
             settings.set_value('new_tool', '')
+            subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text=lang.t41, foreground='red')
