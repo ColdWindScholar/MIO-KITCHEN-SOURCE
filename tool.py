@@ -283,7 +283,7 @@ class Tool(Tk):
         self.setting_tab()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
-        self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=('楷书', 15))
+        self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
         self.tsk.bind('<Button-1>')
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
@@ -351,14 +351,14 @@ class Tool(Tk):
         canvas.tag_bind(text_item, '<B1-Motion>', update_angle)
         canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
 
-        Label(self.tab4, text=lang.text111, font=('楷书', 15), fg='#00BFFF').pack(padx=10, pady=10)
+        Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
         Label(self.tab4,
               text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
-              font=('楷书', 11), fg='#00aaff').pack(padx=10, pady=10)
+              font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
         # Label(self.tab4,text=lang.text127,font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
-        Label(self.tab4, text=lang.text110, font=('楷书', 10)).pack(padx=10, pady=10, side='bottom')
+        Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
         ttk.Label(self.tab4, text="Open Source, Free, Faster", style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
@@ -372,7 +372,7 @@ class Tool(Tk):
         tab = ttk.LabelFrame(text=lang.text16)
         tab.place(relx=0.5, rely=0.5, anchor="center")
         Label(tab,
-              text=f"Wechat Pay/微信支付",
+              text=f"Wechat Pay",
               font=(None, 20), fg='#008000').pack(padx=10, pady=10)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
@@ -411,7 +411,7 @@ class Tool(Tk):
         def enable_contextpatch():
             if context.get() == '1':
                 if ask_win2(
-                        "你确定要开启吗， 此功能可能导致不开机！\nAre you sure turn it on? This feature may cause cannot boot rom!"):
+                        "Are you sure turn it on? This feature may cause cannot boot rom!"):
                     settings.set_value('contextpatch', context.get())
                 else:
                     context.set('0')
@@ -730,9 +730,9 @@ class Welcome(ttk.Frame):
         if frames.get(oobe):
             frames.get(oobe, self.main)()
         else:
-            ttk.Label(self, text=lang.text135, font=("宋体", 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+            ttk.Label(self, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Label(self, text=lang.text137, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+            ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
         self.wait_window()
 
@@ -1191,21 +1191,21 @@ def mpkman():
                     try:
                         self.runline(i)
                     except AttributeError as e:
-                        print(f"未知的参数或命令：{i}\n错误：{e}")
+                        print(f"Unknown Order：{i}\nReason：{e}")
                     except ModuleError as e:
-                        print(f"异常:{e}")
+                        print(f"Exception:{e}")
                         return
                     except Exception as e:
-                        print(f"运行错误:{i}\n错误：{e}")
+                        print(f"Runtime Error:{i}\nReason：{e}")
                     except (Exception, BaseException):
-                        print(f"运行错误:{i}")
+                        print(f"Runtime Error:{i}")
             self.envs.clear()
 
         def set(self, cmd):
             try:
                 vn, va = cmd.strip().split("=" if "=" in cmd else None)
             except Exception as e:
-                print(f"赋值异常：{e}\n语句：{cmd}")
+                print(f"SetValue Exception：{e}\nSentence：{cmd}")
                 return 1
             self.envs[vn] = str(va)
 
@@ -1249,15 +1249,15 @@ def mpkman():
             try:
                 cmd_, argv = cmd.split()
             except Exception:
-                raise ModuleError(f"MSH解释器: 不支持的命令 {cmd}")
+                raise ModuleError(f"MSH: Unsupported {cmd}")
             if cmd_ == 'run':
                 if not os.path.exists(argv.replace("\\", '/')):
-                    print(f"脚本不存在：{argv}")
+                    print(f"Script Not Exist：{argv}")
                     return 1
                 else:
                     self.__init__(argv)
             else:
-                print('-------\nMSH解释器\n-------\n用法：\nmsh run [script]')
+                print('Usage：\nmsh run [script]')
 
         @staticmethod
         def exit(value):
@@ -1534,7 +1534,7 @@ def mpkman():
             else:
                 win.message_pop(lang.warn2)
 
-    ttk.Label(win.tab7, text=lang.text19, font=("宋体", 20)).pack(padx=10, pady=10, fill=BOTH)
+    ttk.Label(win.tab7, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(win.tab7, text=lang.text24).pack(padx=5, pady=5)
     pls = IconGrid(win.tab7)
@@ -1568,18 +1568,18 @@ class InstallMpk(Toplevel):
         f = Frame(self)
         self.logo = Label(f)
         self.logo.pack(padx=10, pady=10)
-        self.name_label = Label(f, text=self.mconf.get('module', 'name'), font=('黑体', 14))
+        self.name_label = Label(f, text=self.mconf.get('module', 'name'), font=(None, 14))
         self.name_label.pack(padx=10, pady=10)
-        self.version = Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=('黑体', 12))
+        self.version = Label(f, text=lang.text32.format(self.mconf.get('module', 'version')), font=(None, 12))
         self.version.pack(padx=10, pady=10)
-        self.author = Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=('黑体', 12))
+        self.author = Label(f, text=lang.text33.format(self.mconf.get('module', 'author')), font=(None, 12))
         self.author.pack(padx=10, pady=10)
         f.pack(side=LEFT)
         self.text = Text(self, width=50, height=20)
         self.text.pack(padx=10, pady=10)
         self.prog = ttk.Progressbar(self, length=200, mode='determinate', orient=HORIZONTAL, maximum=100, value=0)
         self.prog.pack()
-        self.state = Label(self, text=lang.text40, font=('黑体', 12))
+        self.state = Label(self, text=lang.text40, font=(None, 12))
         self.state.pack(padx=10, pady=10)
         self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: cz(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
