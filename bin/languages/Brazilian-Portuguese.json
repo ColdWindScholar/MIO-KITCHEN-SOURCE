@@ -164,7 +164,7 @@
   "text137": "Bem-vindo ao novo MIO-KITCHEN!\nVamos começar!",
   "text138": "Próximo",
   "text139": "Licença de código aberto",
-  "text140": "Passo anterior",
+  "text140": "Voltar",
   "t1": "Ao clicar em (Próximo), você leu e concorda integralmente com o contrato\ne garante o estrito cumprimento do mesmo.",
   "t2": "Política de Privacidade e Acordo do Usuário",
   "t3": "Ao clicar em (Próximo), você leu e concordou com toda a Política de Privacidade e Acordo do Usuário.",
@@ -189,7 +189,7 @@
   "t22": "Versão:",
   "t23": "Bibliotecas necessárias:",
   "t24": "Descrição:",
-  "t25": "Incluir também as ferramentas de flash para usar em um PC?",
+  "t25": "Adicionar ferramentas ao arquivo ZIP para que o firmware possa ser atualizado através do fastboot usando um PC e através do recovery?",
   "t26": "Por favor, insira o código do seu dispositivo.",
   "t27": "Gerar LISTA",
   "t28": "Em execução",
@@ -218,7 +218,7 @@
   "t52": "Limpando...",
   "t53": "Embalar ZIP?",
   "t54": "Salvar",
-  "t55": "Salvado",
+  "t55": "Salvo",
   "t56": "Escolher",
-  "t57": "lista de partição"
+  "t57": "Lista de partições"
 }
