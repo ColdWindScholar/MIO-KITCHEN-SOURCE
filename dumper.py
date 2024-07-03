@@ -6,8 +6,9 @@ import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
-from extra import ZstdImageExtract
-from utils import gettype
+
+import zstandard
+
 import update_metadata_pb2 as um
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -151,10 +152,22 @@ class Dumper:
                     data = b''
         elif op.type == op.REPLACE:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            while processed_len < data_length:
-                data = payloadfile.read(buffsize)
-                processed_len += len(data)
-                out_file.write(data)
+            dec = zstandard.ZstdDecompressor().decompressobj()
+            if payloadfile.read(4) == b'\x28\xb5\x2f\xfd':
+                payloadfile.seek(payloadfile.tell() - 4)
+                while processed_len < data_length:
+                    data = payloadfile.read(buffsize)
+                    processed_len += len(data)
+                    data = dec.decompress(data)
+                    out_file.write(data)
+                out_file.write(dec.flush())
+            else:
+                payloadfile.seek(payloadfile.tell() - 4)
+                while processed_len < data_length:
+                    data = payloadfile.read(buffsize)
+                    processed_len += len(data)
+                    out_file.write(data)
+
         elif op.type == op.SOURCE_COPY:
             if not self.diff:
                 print("SOURCE_COPY supported only for differential OTA")
@@ -195,8 +208,6 @@ class Dumper:
             self.tls.payloadfile = payloadfile
             self.do_ops_for_part(part, out_file, old_file)
         out_file.close()
-        if gettype("%s/%s.img" % (self.out, name)) == 'zstd':
-            ZstdImageExtract("%s/%s.img" % (self.out, name), "%s/%s_e.img" % (self.out, name)).extract(overwrite=True)
 
     def do_ops_for_part(self, part, out_file, old_file):
         for op in part["operations"]:
