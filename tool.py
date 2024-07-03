@@ -845,7 +845,7 @@ class SetUtils:
     def set_value(self, name, value):
         self.config.read(settings_file)
         self.config.set("setting", name, value)
-        with open(self.set_file, 'w') as fil:
+        with open(self.set_file, 'w', encoding='utf-8') as fil:
             self.config.write(fil)
         self.load()
 
