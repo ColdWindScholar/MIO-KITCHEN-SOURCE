@@ -3178,7 +3178,7 @@ class UnpackGui(ttk.LabelFrame):
             for i in data:
                 info.append(i)
         scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
-        columns = ['信息/Name', '参数/Value']
+        columns = ['Name', 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
