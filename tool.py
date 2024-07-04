@@ -1034,19 +1034,26 @@ def mpkman():
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             #
-            self.name = self.label_entry(self, lang.t20, TOP)
+            f_b = ttk.Frame(self)
+            f = ttk.Frame(f_b)
+            self.name = self.label_entry(f, lang.t20, TOP)
             #
-            self.aou = self.label_entry(self, lang.t21, TOP)
+            self.aou = self.label_entry(f, lang.t21, TOP)
             #
-            self.ver = self.label_entry(self, lang.t22, TOP)
+            self.ver = self.label_entry(f, lang.t22, TOP)
             #
-            self.dep = self.label_entry(self, lang.t23, TOP)
-            self.identifier = self.label_entry(self, 'identifier', TOP)
+            self.dep = self.label_entry(f, lang.t23, TOP)
+            self.identifier = self.label_entry(f, 'identifier', TOP)
+            f.pack(padx=5, pady=5, side=LEFT)
             #
-            ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
-            self.intro = Text(self)
-            self.intro.pack(fill=BOTH, padx=5, pady=5, expand=1)
-            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
+            f = ttk.Frame(f_b)
+            ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
+            self.intro = Text(f, width=40, height=15)
+            self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
+            f.pack(padx=5, pady=5, side=LEFT)
+            f_b.pack(padx=5, pady=5)
+            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=X, padx=5, pady=5)
 
         def create(self):
             if not self.identifier.get():
