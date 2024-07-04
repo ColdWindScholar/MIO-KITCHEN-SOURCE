@@ -1056,7 +1056,7 @@ def mpkman():
                 return
             data = {
                 "name": self.name.get(),
-                "author": self.aou.get(),
+                "author": 'MIO-KITCHEN' if not self.aou.get() else self.aou.get(),
                 "version": self.ver.get(),
                 "identifier": (iden := self.identifier.get()),
                 "describe": self.intro.get(1.0, END),
