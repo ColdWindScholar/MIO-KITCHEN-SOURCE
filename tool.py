@@ -1012,14 +1012,15 @@ def mpkman():
     class New(Toplevel):
         def __init__(self):
             super().__init__()
+            self.title(lang.text115)
+            self.identifier = None
             self.dep = None
             self.intro = None
             self.ver = None
             self.aou = None
             self.name = None
-            jzxs(self)
-            self.title(lang.text115)
             self.gui()
+            jzxs(self)
 
         @staticmethod
         def label_entry(master, text, side):
@@ -1033,19 +1034,14 @@ def mpkman():
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            #
             f_b = ttk.Frame(self)
             f = ttk.Frame(f_b)
             self.name = self.label_entry(f, lang.t20, TOP)
-            #
             self.aou = self.label_entry(f, lang.t21, TOP)
-            #
             self.ver = self.label_entry(f, lang.t22, TOP)
-            #
             self.dep = self.label_entry(f, lang.t23, TOP)
             self.identifier = self.label_entry(f, 'identifier', TOP)
             f.pack(padx=5, pady=5, side=LEFT)
-            #
             f = ttk.Frame(f_b)
             ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
             self.intro = Text(f, width=40, height=15)
