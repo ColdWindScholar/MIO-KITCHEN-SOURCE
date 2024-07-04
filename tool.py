@@ -3222,6 +3222,8 @@ class UnpackGui(ttk.LabelFrame):
                         self.lsg.insert(END, i.partition_name)
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
+                if gettype(work + "super.img") == 'sparse':
+                    cz(utils.simg2img, work + "super.img", join=True)
                 data = lpunpack.get_parts(work + "super.img")
                 if data:
                     for i in data:

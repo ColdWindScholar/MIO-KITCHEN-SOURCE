@@ -276,8 +276,11 @@ def qc(file_) -> None:
     del data
 
 
-def cz(func, *args):
-    Thread(target=func, args=args, daemon=True).start()
+def cz(func, *args, join=False):
+    t = Thread(target=func, args=args, daemon=True)
+    t.start()
+    if join:
+        t.join()
 
 
 def simg2img(path):
