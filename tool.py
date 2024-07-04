@@ -2487,7 +2487,7 @@ def script2fs(path):
 
 @cartoon
 def unpackrom(ifile) -> None:
-    print(lang.text77 + (zip_src := ifile))
+    print(lang.text77 + (zip_src := ifile), f'Type:[{gettype(ifile)}]')
     if (ftype := gettype(ifile)) == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
