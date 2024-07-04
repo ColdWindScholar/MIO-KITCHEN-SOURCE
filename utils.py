@@ -146,6 +146,8 @@ class sdat2img:
 
 
 def gettype(file) -> str:
+    if not os.path.isfile(file):
+        return 'fnf'
     if not os.path.exists(file):
         return "fne"
 
