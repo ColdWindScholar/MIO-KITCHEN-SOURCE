@@ -1085,7 +1085,7 @@ def mpkman():
                 sh.write("echo 'MIO-KITCHEN'")
             editor.main(path, s)
         else:
-            editor.main(path, 'main.sh' if not os.path.exists(path + "main.msh") else 'main.msh')
+            editor.main(path, 'main.msh' if os.path.exists(path + "main.msh") else 'main.sh')
 
     class MpkRunMenu:
         def __init__(self, name, name2):
