@@ -405,6 +405,7 @@ class Tool(Tk):
         ai = StringVar(value=settings.ai_engine)
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
+        New_Project_Structure = StringVar(value=settings.nps)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
         ttk.Button(sf4, text=lang.t38, command=Upgrade).pack(padx=10, pady=10, fill=X)
 
@@ -421,8 +422,12 @@ class Tool(Tk):
                 settings.set_value('contextpatch', context.get())
 
         context.trace("w", lambda *x: enable_contextpatch())
+        New_Project_Structure.trace("w", lambda *x: settings.set_value('nps', New_Project_Structure.get()))
         auto_rm_pay.trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay.get()))
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
+                        offvalue='0',
+                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
