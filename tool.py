@@ -427,9 +427,9 @@ class Tool(Tk):
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
-        ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
-                        offvalue='0',
-                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
+           #             offvalue='0',
+             #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
