@@ -808,6 +808,7 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini):
+        self.contextpatch = '0'
         self.oobe = '0'
         self.path = None
         self.bar_level = '0.9'
