@@ -1041,6 +1041,7 @@ def mpkman():
             self.ver = self.label_entry(self, lang.t22, TOP)
             #
             self.dep = self.label_entry(self, lang.t23, TOP)
+            self.identifier = self.label_entry(self, 'identifier', TOP)
             #
             ttk.Label(self, text=lang.t24).pack(padx=5, pady=5, expand=1)
             self.intro = Text(self)
@@ -1048,11 +1049,13 @@ def mpkman():
             ttk.Button(self, text=lang.text115, command=self.create).pack(fill=BOTH, side=BOTTOM)
 
         def create(self):
+            if not self.identifier.get():
+                return
             data = {
                 "name": self.name.get(),
                 "author": self.aou.get(),
                 "version": self.ver.get(),
-                "identifier": (iden := v_code()),
+                "identifier": (iden := self.identifier.get()),
                 "describe": self.intro.get(1.0, END),
                 "depend": self.dep.get()
             }
