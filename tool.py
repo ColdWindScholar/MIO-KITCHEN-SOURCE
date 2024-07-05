@@ -1979,7 +1979,7 @@ class PackSuper(Toplevel):
         g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(generate))
         g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
-        refresh()
+        cz(refresh)
         jzxs(self)
 
         def read_list():
