@@ -1714,7 +1714,7 @@ class MpkStore(Toplevel):
         self.init_repo()
         ff = ttk.Frame(self)
         ttk.Label(ff, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
-        ttk.Button(ff, text="Modify plugin repository", command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
+        ttk.Button(ff, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
         ttk.Button(ff, text=lang.text23, command=lambda: cz(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
         ff.pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
@@ -1792,7 +1792,7 @@ class MpkStore(Toplevel):
     def modify_repo(self):
         (input_var := StringVar()).set(settings.plugin_repo)
         a = Toplevel(width=200)
-        a.title("Modify plugin repository")
+        a.title(lang.t58)
         ttk.Entry(a, textvariable=input_var, width=60).pack(pady=5, padx=5, fill=BOTH)
         ttk.Button(a, text=lang.ok,
                    command=lambda: settings.set_value('plugin_repo', input_var.get()) == a.destroy()).pack(pady=5,
