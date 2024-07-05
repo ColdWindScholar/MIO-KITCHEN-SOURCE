@@ -22,7 +22,7 @@ jobs:
             set ver $(cat bin\setting.ini | findstr version).Split()[2]
             echo "Build times: ${{ github.run_number }}" >> body.md
             echo "Version: $ver" >> body.md && echo Ok
-            echo "Changelog:"  > body.md
+            echo "Changelog:"  >> body.md
             echo '```' >> body.md
             git log -1 --pretty=%B $(git rev-parse HEAD) >> body.md
             echo '```' >> body.md
