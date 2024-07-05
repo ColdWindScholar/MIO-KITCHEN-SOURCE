@@ -1720,7 +1720,7 @@ class MpkStore(Toplevel):
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.search = ttk.Entry(self)
         self.search.pack(fill=X, padx=5, pady=5)
-        self.search.bind("<KeyRelease>",
+        self.search.bind("<Return>",
                          lambda *x: self.add_app([i for i in self.data if self.search.get() in i.get('name')]))
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.logo = PhotoImage(data=images.none_byte)
@@ -1785,7 +1785,7 @@ class MpkStore(Toplevel):
     def clear(self):
         for i in self.deque:
             try:
-                i.destroy()
+                i.pack_forget()
             except (BaseException, Exception):
                 pass
 
