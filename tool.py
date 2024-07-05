@@ -1761,16 +1761,16 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"作者：{data.get('author')}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"版本：{data.get('version')}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"大小：{self.hum_convert(data.get('size'))}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"{lang.t21}：{data.get('author')}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"{lang.t22}：{data.get('version')}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"Size：{self.hum_convert(data.get('size'))}").pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
             ttk.Label(f3, text=f"{data.get('desc')[:30]}").pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id')
-            bu = ttk.Button(f, text='安装',
+            bu = ttk.Button(f, text=lang.text21,underline=1,
                             command=lambda a=args: cz(self.download, *a))
             self.control[data.get('id')] = bu
             bu.pack(side=LEFT, padx=5, pady=5)
@@ -1790,7 +1790,7 @@ class MpkStore(Toplevel):
         a = Toplevel(width=200)
         a.title("修改插件仓库")
         ttk.Entry(a, textvariable=input_var, width=60).pack(pady=5, padx=5, fill=BOTH)
-        ttk.Button(a, text="确认",
+        ttk.Button(a, text=lang.ok,
                    command=lambda: settings.set_value('plugin_repo', input_var.get()) == a.destroy()).pack(pady=5,
                                                                                                            padx=5,
                                                                                                            fill=BOTH)
@@ -1820,7 +1820,7 @@ class MpkStore(Toplevel):
                 os.remove(os.path.join(elocal, "bin", "temp", i))
             except (Exception, BaseException) as e:
                 print(e)
-        control.config(state='normal', text='安装')
+        control.config(state='normal', text=lang.text21)
 
     def get_db(self):
         self.clear()
