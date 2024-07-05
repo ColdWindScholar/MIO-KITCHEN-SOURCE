@@ -4,6 +4,7 @@ import platform
 import shutil
 import subprocess
 import threading
+from collections import deque
 
 from functools import wraps
 from random import randrange
@@ -85,6 +86,7 @@ import images
 class States:
     update_window = False
     donate_window = False
+    mpk_store = False
     open_pids = []
 
 
@@ -428,8 +430,8 @@ class Tool(Tk):
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
-           #             offvalue='0',
-             #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        #             offvalue='0',
+        #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
@@ -813,6 +815,7 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini):
+        self.plugin_repo = None
         self.contextpatch = '0'
         self.oobe = '0'
         self.path = None
@@ -1546,7 +1549,10 @@ def mpkman():
             else:
                 win.message_pop(lang.warn2)
 
-    ttk.Label(win.tab7, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
+    f = ttk.Frame(win.tab7)
+    ttk.Label(f, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, side=LEFT)
+    ttk.Button(f, text='Mpk Store', command=lambda: cz(MpkStore)).pack(side="right", padx=10, pady=10)
+    f.pack(padx=10, pady=10, fill=BOTH)
     ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
     Label(win.tab7, text=lang.text24).pack(padx=5, pady=5)
     pls = IconGrid(win.tab7)
@@ -1691,6 +1697,146 @@ class InstallMpk(Toplevel):
         self.prog.destroy()
         self.state.config()
         self.installb.config(state=DISABLED)
+
+
+class MpkStore(Toplevel):
+    # Data Format: {"name": "app1", "version": "1.0", "size": "10MB", "desc": "app1", id:"", split:"1", file:""}
+    def __init__(self):
+        if states.mpk_store:
+            return
+        states.mpk_store = True
+        super().__init__()
+        self.title('Mpk Store')
+        self.data = []
+        self.apps = []
+        self.protocol("WM_DELETE_WINDOW", lambda: setattr(states, 'mpk_store', False) == self.destroy())
+        self.repo = ''
+        self.init_repo()
+        ff = ttk.Frame(self)
+        ttk.Label(ff, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
+        ttk.Button(ff, text="修改插件仓库", command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
+        ff.pack(padx=10, pady=10, fill=BOTH)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        ttk.Entry(self).pack(fill=X, padx=5, pady=5)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        self.logo = PhotoImage(data=images.none_byte)
+        self.deque = deque()
+        self.control = {}
+        frame = tk.Frame(self)
+        frame.pack(fill='both', padx=10, pady=10, expand=True)
+        scrollbar = ttk.Scrollbar(frame, orient='vertical')
+        scrollbar.pack(side='right', fill='y', padx=10, pady=10)
+        self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set, width=600)
+        self.canvas.pack(fill='both', expand=True)
+        scrollbar.config(command=self.canvas.yview)
+        self.label_frame = ttk.Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        cz(self.get_db)
+        self.label_frame.update_idletasks()
+        self.canvas.bind_all("<MouseWheel>",
+                             lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+    def init_repo(self):
+        if not hasattr(settings, 'plugin_repo'):
+            self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
+        else:
+            if not settings.plugin_repo:
+                self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
+            else:
+                self.repo = settings.plugin_repo
+
+    def add_app(self, app_dict=None):
+        if app_dict is None:
+            app_dict = []
+        for data in app_dict:
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=500)
+            self.deque.append(f)
+            ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
+            fb = ttk.Frame(f)
+            f2 = ttk.Frame(fb)
+            ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
+            #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"作者：{data.get('author')}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"版本：{data.get('version')}").pack(side=LEFT, padx=5, pady=5)
+            ttk.Label(f2, text=f"大小：{self.hum_convert(data.get('size'))}").pack(side=LEFT, padx=5, pady=5)
+            f2.pack(side=TOP)
+            f3 = ttk.Frame(fb)
+            ttk.Label(f3, text=f"{data.get('desc')[:30]}").pack(padx=5, pady=5)
+            f3.pack(side=BOTTOM)
+            fb.pack(side=LEFT, padx=5, pady=5)
+            args = data.get('files'), data.get('size'), data.get('id')
+            bu = ttk.Button(f, text='安装',
+                            command=lambda a=args: cz(self.download, *a))
+            self.control[data.get('id')] = bu
+            bu.pack(side=LEFT, padx=5, pady=5)
+            f.pack(padx=5, pady=5)
+
+    def clear(self):
+        for i in self.deque:
+            try:
+                i.destroy()
+            except (BaseException, Exception):
+                pass
+
+    def modify_repo(self):
+        (input_var := StringVar()).set(settings.plugin_repo)
+        a = Toplevel(width=200)
+        a.title("修改插件仓库")
+        ttk.Entry(a, textvariable=input_var, width=60).pack(pady=5, padx=5, fill=BOTH)
+        ttk.Button(a, text="确认",
+                   command=lambda: settings.set_value('plugin_repo', input_var.get()) == a.destroy()).pack(pady=5,
+                                                                                                           padx=5,
+                                                                                                           fill=BOTH)
+        jzxs(a)
+        a.wait_window()
+        if settings.plugin_repo != self.repo:
+            self.init_repo()
+            cz(self.get_db)
+
+    def download(self, files, size, id_):
+        if id_ in self.control.keys():
+            control = self.control.get(id_)
+            control.config(state='disabled')
+        else:
+            control = None
+
+        for i in files:
+            for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.repo + i,
+                                                                                        os.path.join(elocal, "bin",
+                                                                                                     "temp"),
+                                                                                        size_=size):
+                if control:
+                    control.config(text=f"{percentage} %")
+
+            InstallMpk(os.path.join(elocal, "bin", "temp", i))
+            try:
+                os.remove(os.path.join(elocal, "bin", "temp", i))
+            except (Exception, BaseException) as e:
+                print(e)
+        control.config(state='normal', text='安装')
+
+    def get_db(self):
+        self.clear()
+        try:
+            url = requests.get(self.repo + 'plugin.json')
+            self.data = json.loads(url.text)
+        except (Exception, BaseException) as e:
+            print(e)
+            self.apps = self.data = []
+        else:
+            self.apps = self.data
+        self.add_app(self.apps)
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    @staticmethod
+    def hum_convert(value):
+        units = ["B", "KB", "MB", "GB", "TB", "PB"]
+        size = 1024.0
+        for i in range(len(units)):
+            if (value / size) < 1:
+                return "%.2f%s" % (value, units[i])
+            value = value / size
 
 
 @cartoon
