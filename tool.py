@@ -1814,10 +1814,12 @@ class MpkStore(Toplevel):
                                                                                         os.path.join(elocal, "bin",
                                                                                                      "temp"),
                                                                                         size_=size):
-                if control:
+                if control and states.mpk_store:
                     control.config(text=f"{percentage} %")
+                else:
+                    return False
 
-            InstallMpk(os.path.join(elocal, "bin", "temp", i))
+            cz(InstallMpk, os.path.join(elocal, "bin", "temp", i), join=True)
             try:
                 os.remove(os.path.join(elocal, "bin", "temp", i))
             except (Exception, BaseException) as e:
