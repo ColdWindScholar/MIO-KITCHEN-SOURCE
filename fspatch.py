@@ -7,6 +7,9 @@ def scanfs(file) -> dict:
     filesystem_config = {}
     with open(file, "r") as file_:
         for i in file_.readlines():
+            if not i.strip():
+                print("[W] data is empty!")
+                continue
             try:
                 filepath, *other = i.strip().split()
             except Exception or BaseException:
