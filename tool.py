@@ -1766,12 +1766,14 @@ class MpkStore(Toplevel):
             ttk.Label(f2, text=f"Size：{self.hum_convert(data.get('size'))}").pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
-            ttk.Label(f3, text=f"{data.get('desc')[:30]}").pack(padx=5, pady=5)
+            ttk.Label(f3, text=f"{data.get('desc')[:25]}").pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id')
-            bu = ttk.Button(f, text=lang.text21,underline=1,
+            bu = ttk.Button(f, text=lang.text21,
                             command=lambda a=args: cz(self.download, *a))
+            if not os.path.exists(os.path.join(elocal, "bin", "module", data.get('id'))):
+                bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
             bu.pack(side=LEFT, padx=5, pady=5)
             f.pack(padx=5, pady=5)
@@ -1821,6 +1823,8 @@ class MpkStore(Toplevel):
             except (Exception, BaseException) as e:
                 print(e)
         control.config(state='normal', text=lang.text21)
+        if os.path.exists(os.path.join(elocal, "bin", "module", id_)):
+            control.config(style="")
 
     def get_db(self):
         self.clear()
