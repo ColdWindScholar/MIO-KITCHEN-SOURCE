@@ -22,6 +22,9 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
     with open(file, "r", encoding='utf-8') as file_:
         for i in file_.readlines():
+            if not i.strip():
+                print('[W] data is empty!')
+                continue
             filepath, *other = i.strip().split()
             filepath = filepath.replace(r'\@', '@')
             context[filepath] = other
