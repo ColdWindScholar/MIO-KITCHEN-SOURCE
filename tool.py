@@ -1717,7 +1717,9 @@ class MpkStore(Toplevel):
         ttk.Button(ff, text="修改插件仓库", command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
         ff.pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        ttk.Entry(self).pack(fill=X, padx=5, pady=5)
+        self.search = ttk.Entry(self)
+        self.search.pack(fill=X, padx=5, pady=5)
+        self.search.bind("<KeyRelease>", lambda *x:self.add_app([i for i in self.data if self.search.get() in i.get('name')]))
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.logo = PhotoImage(data=images.none_byte)
         self.deque = deque()
@@ -1736,6 +1738,8 @@ class MpkStore(Toplevel):
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+        jzxs(self)
+
     def init_repo(self):
         if not hasattr(settings, 'plugin_repo'):
             self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
@@ -1746,6 +1750,7 @@ class MpkStore(Toplevel):
                 self.repo = settings.plugin_repo
 
     def add_app(self, app_dict=None):
+        self.clear()
         if app_dict is None:
             app_dict = []
         for data in app_dict:
@@ -1770,6 +1775,8 @@ class MpkStore(Toplevel):
             self.control[data.get('id')] = bu
             bu.pack(side=LEFT, padx=5, pady=5)
             f.pack(padx=5, pady=5)
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def clear(self):
         for i in self.deque:
