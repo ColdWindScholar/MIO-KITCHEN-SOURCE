@@ -2427,6 +2427,9 @@ class Packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
+        if not self.verify():
+            self.start_()
+            return
         self.custom_size = {}
         self.dbfs = StringVar(value='make_ext4fs')
         self.dbgs = StringVar(value='raw')
@@ -2445,9 +2448,6 @@ class Packxx(Toplevel):
         self.fs_conver = BooleanVar(value=False)
 
         self.erofs_old_kernel = IntVar(value=0)
-        if not self.verify():
-            self.start_()
-            return
         super().__init__()
         self.title(lang.text42)
         lf1 = ttk.LabelFrame(self, text=lang.text43)
