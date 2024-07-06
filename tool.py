@@ -1666,6 +1666,9 @@ class InstallMpk(Toplevel):
         if not self.mpk:
             self.unavailable()
             return
+        if not zipfile.is_zipfile(self.mpk):
+            self.unavailable()
+            return
         with zipfile.ZipFile(self.mpk, 'r') as myfile:
             if 'info' not in myfile.namelist():
                 self.unavailable()
