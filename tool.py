@@ -1866,7 +1866,7 @@ class MpkStore(Toplevel):
                 except (Exception, BaseException) as e:
                     print(e)
         except:
-           pass
+            pass
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
             control.config(style="")
