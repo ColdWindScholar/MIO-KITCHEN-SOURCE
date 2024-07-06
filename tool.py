@@ -3296,7 +3296,6 @@ def get_all_file_paths(directory):
             yield os.path.join(root, filename)
 
 
-
 @cartoon
 def pack_zip():
     if ask_win(lang.t53) != 1:
@@ -3308,7 +3307,8 @@ def pack_zip():
         if ask_win(lang.t25) == 1:
             Dbkxyt()
         os.chdir(settings.path + os.sep + dn.get())
-        with zipfile.ZipFile(relpath := settings.path + os.sep + dn.get() + ".zip", 'w', compression=zipfile.ZIP_DEFLATED) as zip_:
+        with zipfile.ZipFile(relpath := settings.path + os.sep + dn.get() + ".zip", 'w',
+                             compression=zipfile.ZIP_DEFLATED) as zip_:
             for file in get_all_file_paths('.'):
                 print(f"{lang.text1}:{file}")
                 try:
