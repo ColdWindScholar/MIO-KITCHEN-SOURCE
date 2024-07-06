@@ -241,7 +241,7 @@ class Tool(Tk):
         print(lang.text95 + log_)
 
     def get_time(self):
-        self.tsk.config(text=time.strftime("%H:%M:%S"), bg=win.cget('bg'))
+        self.tsk.config(text=time.strftime("%H:%M:%S"))
         self.after(1000, self.get_time)
 
     def message_pop(self, message, color='orange') -> None:
@@ -286,7 +286,6 @@ class Tool(Tk):
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
-        self.tsk.bind('<Button-1>')
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
         Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
