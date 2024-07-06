@@ -3297,22 +3297,21 @@ def get_all_file_paths(directory):
 
 
 @cartoon
-class ZipFile:
-    def __init__(self, file, dst_dir, path=None):
-        if not path:
-            path = settings.path + os.sep
-        os.chdir(dst_dir)
-        with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED) as zip_:
-            # 遍历写入文件
-            for file in get_all_file_paths('.'):
-                print(f"{lang.text1}:{file}")
-                try:
-                    zip_.write(file)
-                except Exception as e:
-                    print(lang.text2.format(file, e))
-        if os.path.exists(relpath):
-            print(lang.text3.format(relpath))
-        os.chdir(elocal)
+def ZipFile(file, dst_dir, path=None):
+    if not path:
+        path = settings.path + os.sep
+    os.chdir(dst_dir)
+    with zipfile.ZipFile(relpath := path + file, 'w', compression=zipfile.ZIP_DEFLATED) as zip_:
+        # 遍历写入文件
+        for file in get_all_file_paths('.'):
+            print(f"{lang.text1}:{file}")
+            try:
+                zip_.write(file)
+            except Exception as e:
+                print(lang.text2.format(file, e))
+    if os.path.exists(relpath):
+        print(lang.text3.format(relpath))
+    os.chdir(elocal)
 
 
 @cartoon
