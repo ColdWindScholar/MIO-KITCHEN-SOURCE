@@ -1242,9 +1242,6 @@ def mpkman():
             settings.path + os.sep + name.get() + ".mpk") else print(
             lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
 
-    def popup(event):
-        rmenu.post(event.x_root, event.y_root)
-
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
     file = StringVar()
@@ -1573,8 +1570,8 @@ def mpkman():
     pls = IconGrid(win.tab7)
     lf1 = Frame(win.tab7)
     pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
-    pls.canvas.bind('<Button-3>', popup)
-    pls.bind('<Button-3>', popup)
+    pls.canvas.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
+    pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
