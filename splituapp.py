@@ -63,7 +63,7 @@ def extract(source, flist):
                             o.write(f.read(chunk))
                             file_size -= chunk
                 except Exception as e:
-                    print('ERROR: Failed to create ' + filename + '.img:%s\n' % e)
+                    print(f'ERROR: Failed to create {filename}.img:%s\n' % e)
                     return
 
                 img_files.append(filename)
