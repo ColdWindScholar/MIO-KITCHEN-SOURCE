@@ -1016,6 +1016,44 @@ class ModuleManager:
     def get_installed(self, id_):
         return os.path.exists(os.path.join(self.module_dir, id_))
 
+    @cartoon
+    def export(self, chosen: StringVar, name:StringVar):
+        if not chosen.get():
+            win.message_pop(lang.warn2)
+            return 1
+        with open(os.path.join(self.module_dir, (value := chosen.get()), "info.json"), 'r',
+                  encoding='UTF-8') as f:
+            data = json.load(f)
+            (info_ := ConfigParser())['module'] = {
+                'name': data["name"],
+                'version': data["version"],
+                'author': data["author"],
+                'describe': data.get("describe", ''),
+                'resource': 'main.zip',
+                'identifier': value,
+                'depend': data["depend"]
+            }
+            info_.write((buffer2 := StringIO()))
+        with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
+            os.chdir(self.module_dir + os.sep + value)
+            for i in get_all_file_paths("."):
+                print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
+                try:
+                    mpk.write(str(i))
+                except Exception as e:
+                    print(lang.text2.format(i, e))
+            os.chdir(elocal)
+        with zipfile.ZipFile(os.path.join(settings.path, str(name.get()) + ".mpk"), 'w',
+                             compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
+            mpk2.writestr('main.zip', buffer.getvalue())
+            mpk2.writestr('info', buffer2.getvalue())
+            if os.path.exists(os.path.join(self.module_dir, value, 'icon')):
+                mpk2.write(os.path.join(self.module_dir, value, 'icon'), 'icon')
+            del buffer2, buffer
+        print(lang.t15 % (settings.path + os.sep + name.get() + ".mpk")) if os.path.exists(
+            settings.path + os.sep + name.get() + ".mpk") else print(
+            lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
+
     class UninstallMpk(Toplevel):
 
         def __init__(self, chosen: StringVar, name: StringVar):
@@ -1199,44 +1237,6 @@ def mpkman():
             chosen.set(self.name)
             name.set(self.name2)
             cz(run)
-
-    @cartoon
-    def export():
-        if not chosen.get():
-            win.message_pop(lang.warn2)
-            return 1
-        with open(os.path.join(moduledir, (value := chosen.get()), "info.json"), 'r',
-                  encoding='UTF-8') as f:
-            data = json.load(f)
-            (info_ := ConfigParser())['module'] = {
-                'name': data["name"],
-                'version': data["version"],
-                'author': data["author"],
-                'describe': data.get("describe", ''),
-                'resource': 'main.zip',
-                'identifier': value,
-                'depend': data["depend"]
-            }
-            info_.write((buffer2 := StringIO()))
-        with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-            os.chdir(moduledir + os.sep + value)
-            for i in get_all_file_paths("."):
-                print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
-                try:
-                    mpk.write(str(i))
-                except Exception as e:
-                    print(lang.text2.format(i, e))
-            os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, str(name.get()) + ".mpk"), 'w',
-                             compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
-            mpk2.writestr('main.zip', buffer.getvalue())
-            mpk2.writestr('info', buffer2.getvalue())
-            if os.path.exists(os.path.join(moduledir, value, 'icon')):
-                mpk2.write(os.path.join(moduledir, value, 'icon'), 'icon')
-            del buffer2, buffer
-        print(lang.t15 % (settings.path + os.sep + name.get() + ".mpk")) if os.path.exists(
-            settings.path + os.sep + name.get() + ".mpk") else print(
-            lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
 
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
@@ -1570,13 +1570,13 @@ def mpkman():
     pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
     rmenu.add_command(label=lang.text21, command=lambda:
-        InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == list_pls())
+    InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == list_pls())
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(New))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
     rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, chosen, name))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
-    rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
+    rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, chosen, name))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
     list_pls()
     lf1.pack(padx=10, pady=10)
