@@ -1519,7 +1519,6 @@ class MpkMan(ttk.Frame):
         super().__init__(master=win.tab7)
         self.pack(padx=10, pady=10, fill=BOTH)
         self.chosen = tk.StringVar(value='')
-        self.global_mpk = {}
         self.moduledir = ModuleManager.module_dir
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
@@ -1551,7 +1550,6 @@ class MpkMan(ttk.Frame):
                 icon.bind('<Double-Button-1>', lambda event, ar=i: cz(ModuleManager.run, ar))
                 icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
                 self.pls.add_icon(icon)
-                self.global_mpk[data['name']] = data['identifier']
 
     def popup(self, name, event):
         self.chosen.set(name)
