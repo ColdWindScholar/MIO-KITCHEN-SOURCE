@@ -1631,6 +1631,7 @@ class MpkMan(ttk.Frame):
 
     def refresh(self):
         self.pls.clean()
+        self.pls.apps.clear()
         self.list_pls()
 
     def popup(self, name, event):
@@ -1644,7 +1645,9 @@ class MpkMan(ttk.Frame):
         ttk.Label(self, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, side=LEFT)
         ttk.Button(self, text='Mpk Store', command=lambda: cz(MpkStore)).pack(side="right", padx=10, pady=10)
         ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        Label(win.tab7, text=lang.text24).pack(padx=5, pady=5)
+        a = Label(win.tab7, text=lang.text24)
+        a.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
+        a.pack(padx=5, pady=5)
         self.pls = IconGrid(win.tab7)
         lf1 = Frame(win.tab7)
         self.pls.pack(padx=5, pady=5, fill=BOTH, side=LEFT, expand=True)
