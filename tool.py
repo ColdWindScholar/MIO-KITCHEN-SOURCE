@@ -1849,22 +1849,24 @@ class MpkStore(Toplevel):
                 for i_ in self.data:
                     if i == i_.get('id') and not ModuleManager.get_installed(i):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
+        try:
+            for i in files:
+                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.repo + i,
+                                                                                            os.path.join(elocal, "bin",
+                                                                                                         "temp"),
+                                                                                            size_=size):
+                    if control and states.mpk_store:
+                        control.config(text=f"{percentage} %")
+                    else:
+                        return False
 
-        for i in files:
-            for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.repo + i,
-                                                                                        os.path.join(elocal, "bin",
-                                                                                                     "temp"),
-                                                                                        size_=size):
-                if control and states.mpk_store:
-                    control.config(text=f"{percentage} %")
-                else:
-                    return False
-
-            cz(InstallMpk, os.path.join(elocal, "bin", "temp", i), join=True)
-            try:
-                os.remove(os.path.join(elocal, "bin", "temp", i))
-            except (Exception, BaseException) as e:
-                print(e)
+                cz(InstallMpk, os.path.join(elocal, "bin", "temp", i), join=True)
+                try:
+                    os.remove(os.path.join(elocal, "bin", "temp", i))
+                except (Exception, BaseException) as e:
+                    print(e)
+        except:
+           pass
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
             control.config(style="")
