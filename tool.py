@@ -1113,7 +1113,7 @@ class ModuleManager:
             print(lang.warn2)
             return
         with zipfile.ZipFile(mpk) as f:
-            if 'info' in f.namelist():
+            if 'info' not in f.namelist():
                 print(lang.warn2)
                 return
         mconf = ConfigParser()
@@ -1919,7 +1919,7 @@ class MpkStore(Toplevel):
                     else:
                         return False
 
-                cz(InstallMpk, os.path.join(elocal, "bin", "temp", i), join=True)
+                cz(ModuleManager.install, os.path.join(elocal, "bin", "temp", i), join=True)
                 try:
                     os.remove(os.path.join(elocal, "bin", "temp", i))
                 except (Exception, BaseException) as e:
