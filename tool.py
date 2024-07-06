@@ -1108,6 +1108,63 @@ class ModuleManager:
     def get_installed(self, id_) -> bool:
         return os.path.exists(os.path.join(self.module_dir, id_))
 
+    def install(self, mpk):
+        if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
+            print(lang.warn2)
+            return
+        with zipfile.ZipFile(mpk) as f:
+            if 'info' in f.namelist():
+                print(lang.warn2)
+                return
+        mconf = ConfigParser()
+        with zipfile.ZipFile(mpk) as f:
+            with f.open('info') as info_file:
+                mconf.read_string(info_file.read().decode('utf-8'))
+        try:
+            supports = mconf.get('module', 'supports').split()
+            if sys.platform not in supports:
+                return 0
+        except (Exception, BaseException):
+            ...
+        for dep in mconf.get('module', 'depend').split():
+            if not os.path.isdir(os.path.join(elocal, "bin", "module", dep)):
+                print(lang.text36 % (mconf.get('module', 'name'), dep, dep))
+                return 0
+        if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
+            rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
+        install_dir = mconf.get('module', 'identifier')
+        with zipfile.ZipFile(mpk, 'r') as myfile:
+            with myfile.open(mconf.get('module', 'resource'), 'r') as inner_file:
+                fz = zipfile.ZipFile(inner_file, 'r')
+                extracted_size = 0
+                for file in fz.namelist():
+                    try:
+                        file = str(file).encode('cp437').decode('gbk')
+                    except (Exception, BaseException):
+                        file = str(file).encode('utf-8').decode('utf-8')
+                    info = fz.getinfo(file)
+                    extracted_size += info.file_size
+                    fz.extract(file, os.path.join(elocal, "bin", "module", install_dir).__str__())
+        try:
+            depends = mconf.get('module', 'depend')
+        except (Exception, BaseException):
+            depends = ''
+        minfo = {}
+        for i in mconf.items('module'):
+            minfo[i[0]] = i[1]
+        minfo['depend'] = depends
+        with open(os.path.join(elocal, "bin", "module", mconf.get('module', 'identifier'), "info.json"),
+                  'w') as f:
+            json.dump(minfo, f, indent=2)
+        with zipfile.ZipFile(mpk) as mpk_f:
+            if 'icon' in mpk_f.namelist():
+                with open(os.path.join(self.module_dir, mconf.get('module', 'identifier'), "icon"),
+                      'wb') as f:
+                    with mpk_f.open('icon') as i:
+                        f.write(i.read())
+
+        print(lang.text39)
+
     @cartoon
     def export(self, id_: str):
         name: str = self.get_name(id_)
