@@ -1107,10 +1107,6 @@ def mpkman():
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
 
-    def impk():
-        InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),)))
-        list_pls()
-
     class New(Toplevel):
         def __init__(self):
             super().__init__()
@@ -1573,7 +1569,8 @@ def mpkman():
     pls.canvas.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
     pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
     rmenu = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu.add_command(label=lang.text21, command=lambda: cz(impk))
+    rmenu.add_command(label=lang.text21, command=lambda:
+        InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == list_pls())
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(New))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
