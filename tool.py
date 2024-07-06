@@ -815,6 +815,8 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini):
+        self.nps = '0'
+        self.rm_pay = '0'
         self.plugin_repo = None
         self.contextpatch = '0'
         self.oobe = '0'
