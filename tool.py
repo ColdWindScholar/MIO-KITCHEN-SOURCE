@@ -1756,7 +1756,7 @@ class MpkStore(Toplevel):
         if app_dict is None:
             app_dict = []
         for data in app_dict:
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=500)
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'))
             self.deque.append(f)
             ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
             fb = ttk.Frame(f)
@@ -1778,7 +1778,7 @@ class MpkStore(Toplevel):
                 bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
             bu.pack(side=LEFT, padx=5, pady=5)
-            f.pack(padx=5, pady=5)
+            f.pack(padx=5, pady=5, anchor='nw')
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
