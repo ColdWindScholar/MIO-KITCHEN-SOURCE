@@ -1540,25 +1540,11 @@ class MpkMan(ttk.Frame):
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', self.MpkRunMenu(i, data['name']).run)
-                icon.bind('<Button-3>', self.MpkRunMenu(i, data['name']).popup)
+                icon.bind('<Double-Button-1>', cz(ModuleManager.run, i, StringVar(value=data['name'])))
+                icon.bind('<Button-3>', lambda event:self.rmenu2.post(event.x_root, event.y_root))
                 self.pls.add_icon(icon)
                 self.global_mpk[data['name']] = data['identifier']
 
-    class MpkRunMenu:
-        def __init__(self, name, name2):
-            self.name = name
-            self.name2 = name2
-
-        def popup(self, event):
-            chosen.set(self.name)
-            name.set(self.name2)
-            rmenu2.post(event.x_root, event.y_root)
-
-        def run(self, event):
-            chosen.set(self.name)
-            name.set(self.name2)
-            cz(ModuleManager.run, chosen.get(), name)
 
     def gui(self):
         global list_pls_plugin
@@ -1575,14 +1561,16 @@ class MpkMan(ttk.Frame):
         self.pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
         rmenu = Menu(self.pls, tearoff=False, borderwidth=0)
         rmenu.add_command(label=lang.text21, command=lambda:
-        InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
+        InstallMpk(
+            filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
         rmenu.add_command(label=lang.text23, command=lambda: cz(self.list_pls))
         rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
-        rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
-        rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
-        rmenu2.add_command(label=lang.text22, command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name))
-        rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
-        rmenu2.add_command(label=lang.t17, command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
+        self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
+        self.rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
+        self.rmenu2.add_command(label=lang.text22, command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name))
+        self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
+        self.rmenu2.add_command(label=lang.t17,
+                           command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
         self.list_pls()
         lf1.pack(padx=10, pady=10)
 
