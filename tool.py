@@ -1050,6 +1050,7 @@ class ModuleManager:
             if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
                 re_folder(temp)
             if not file:
+                file = temp + v_code()
                 while os.path.exists(file):
                     file = temp + v_code()
             with open(file, "w", encoding='UTF-8', newline="\n") as f:
