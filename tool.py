@@ -1104,7 +1104,7 @@ class ModuleManager:
 
     @cartoon
     def export(self, id_: str):
-        name:str = self.get_name(id_)
+        name: str = self.get_name(id_)
         if not id_:
             win.message_pop(lang.warn2)
             return 1
@@ -1725,6 +1725,7 @@ class MpkStore(Toplevel):
         self.data = []
         self.tasks = deque()
         self.apps = []
+        self.app_infos = {}
         self.protocol("WM_DELETE_WINDOW", lambda: setattr(states, 'mpk_store', False) == self.destroy())
         self.repo = ''
         self.init_repo()
@@ -1737,7 +1738,7 @@ class MpkStore(Toplevel):
         self.search = ttk.Entry(self)
         self.search.pack(fill=X, padx=5, pady=5)
         self.search.bind("<Return>",
-                         lambda *x: self.add_app([i for i in self.data if self.search.get() in i.get('name')]))
+                         lambda *x: self.search_apps())
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.logo = PhotoImage(data=images.none_byte)
         self.deque = deque()
@@ -1767,12 +1768,20 @@ class MpkStore(Toplevel):
             else:
                 self.repo = settings.plugin_repo
 
+    def search_apps(self):
+        for i in self.data:
+            if self.search.get() not in i.get('name'):
+                self.app_infos.get(i.get('id')).pack_forget()
+            else:
+                self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
+
     def add_app(self, app_dict=None):
         self.clear()
         if app_dict is None:
             app_dict = []
         for data in app_dict:
             f = ttk.LabelFrame(self.label_frame, text=data.get('name'))
+            self.app_infos[data.get('id')] = f
             self.deque.append(f)
             ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
             fb = ttk.Frame(f)
