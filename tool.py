@@ -1833,7 +1833,7 @@ class MpkStore(Toplevel):
         if depends:
             for i in depends:
                 for i_ in self.data:
-                    if i == i_.get('id'):
+                    if i == i_.get('id') and not ModuleManager.get_installed(i):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
 
         for i in files:
