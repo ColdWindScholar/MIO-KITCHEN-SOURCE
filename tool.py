@@ -1810,7 +1810,7 @@ class MpkStore(Toplevel):
     def clear(self):
         for i in self.deque:
             try:
-                i.pack_forget()
+                i.destroy()
             except (BaseException, Exception):
                 pass
 
