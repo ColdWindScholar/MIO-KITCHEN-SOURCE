@@ -1716,7 +1716,6 @@ class InstallMpk(Toplevel):
 
 
 class MpkStore(Toplevel):
-    # Data Format: {"name": "app1", "version": "1.0", "size": "10MB", "desc": "app1", id:"", split:"1", file:""}
     def __init__(self):
         if states.mpk_store:
             return
