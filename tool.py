@@ -319,10 +319,10 @@ class Tool(Tk):
               text='反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!',
               font=(None, 10)).pack(
             padx=5, pady=5)
-        MpkMan().gui()
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
-        self.get_time()
+        MpkMan().gui()
+        cz(self.get_time)
 
     def up_progressbar(self):
         self.frame_bg.update_idletasks()
@@ -1540,11 +1540,21 @@ class MpkMan(ttk.Frame):
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', cz(ModuleManager.run, i, StringVar(value=data['name'])))
-                icon.bind('<Button-3>', lambda event:self.rmenu2.post(event.x_root, event.y_root))
+                args = (i, data['name'])
+                icon.bind('<Double-Button-1>', lambda event, ar=args: self.run(*ar, event))
+                icon.bind('<Button-3>', lambda event, ar=args: self.popup(*ar, event))
                 self.pls.add_icon(icon)
                 self.global_mpk[data['name']] = data['identifier']
 
+    def popup(self, name, name2, event):
+        self.chosen.set(name)
+        self.name.set(name2)
+        self.rmenu2.post(event.x_root, event.y_root)
+
+    def run(self, name, name2, event):
+        self.chosen.set(name)
+        self.name.set(name2)
+        cz(ModuleManager.run, self.chosen.get(), name)
 
     def gui(self):
         global list_pls_plugin
@@ -1566,11 +1576,12 @@ class MpkMan(ttk.Frame):
         rmenu.add_command(label=lang.text23, command=lambda: cz(self.list_pls))
         rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
-        self.rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
+        self.rmenu2.add_command(label=lang.text20,
+                                command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
         self.rmenu2.add_command(label=lang.text22, command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name))
         self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
         self.rmenu2.add_command(label=lang.t17,
-                           command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
+                                command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
         self.list_pls()
         lf1.pack(padx=10, pady=10)
 
