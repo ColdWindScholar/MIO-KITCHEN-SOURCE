@@ -1786,7 +1786,7 @@ class MpkStore(Toplevel):
             ttk.Label(f3, text=f"{data.get('desc')[:25]}").pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
-            args = data.get('files'), data.get('size'), data.get('id')
+            args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
             bu = ttk.Button(f, text=lang.text21,
                             command=lambda a=args: cz(self.download, *a))
             if not ModuleManager.get_installed(data.get('id')):
@@ -1819,12 +1819,17 @@ class MpkStore(Toplevel):
             self.init_repo()
             cz(self.get_db)
 
-    def download(self, files, size, id_):
+    def download(self, files, size, id_, depends):
         if id_ in self.control.keys():
             control = self.control.get(id_)
             control.config(state='disabled')
         else:
             control = None
+        if depends:
+            for i in depends:
+                for i_ in self.data:
+                    if i == i_.get('id'):
+                        self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
 
         for i in files:
             for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.repo + i,
