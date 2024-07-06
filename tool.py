@@ -1163,7 +1163,7 @@ class ModuleManager:
                     with mpk_f.open('icon') as i:
                         f.write(i.read())
 
-        print(lang.text39)
+        print(mconf.get('module', 'name'), lang.text39)
 
     @cartoon
     def export(self, id_: str):
