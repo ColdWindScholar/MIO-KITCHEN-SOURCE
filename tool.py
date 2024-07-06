@@ -1016,7 +1016,7 @@ class ModuleManager:
         self.uninstall_gui.module_dir = self.module_dir
         self.MshParse.module_dir = self.module_dir
 
-    def get_name(self, id_):
+    def get_name(self, id_) -> str:
         info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
         if not os.path.exists(info_file):
             return ''
@@ -1025,7 +1025,7 @@ class ModuleManager:
             return data.get('name', '')
 
     @cartoon
-    def run(self, id_, name: str = None):
+    def run(self, id_):
         if not dn.get():
             print(lang.warn1)
             return
@@ -1034,15 +1034,15 @@ class ModuleManager:
         else:
             print(lang.warn2)
             return
-        if not name:
-            name = value
+
+        name = self.get_name(id_)
         script_path = self.module_dir + os.sep + value + os.sep
         file = ''
         with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
             data = json.load(f)
             for n in data['depend'].split():
                 if not os.path.exists(os.path.join(self.module_dir, n)):
-                    print(lang.text36 % (name.get(), n, n))
+                    print(lang.text36 % (name, n, n))
                     return 2
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             values = self.Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
@@ -1099,15 +1099,16 @@ class ModuleManager:
         else:
             print(lang.warn8)
 
-    def get_installed(self, id_):
+    def get_installed(self, id_) -> bool:
         return os.path.exists(os.path.join(self.module_dir, id_))
 
     @cartoon
-    def export(self, chosen: StringVar, name: StringVar):
-        if not chosen.get():
+    def export(self, id_: str):
+        name:str = self.get_name(id_)
+        if not id_:
             win.message_pop(lang.warn2)
             return 1
-        with open(os.path.join(self.module_dir, (value := chosen.get()), "info.json"), 'r',
+        with open(os.path.join(self.module_dir, (value := id_), "info.json"), 'r',
                   encoding='UTF-8') as f:
             data = json.load(f)
             (info_ := ConfigParser())['module'] = {
@@ -1129,16 +1130,16 @@ class ModuleManager:
                 except Exception as e:
                     print(lang.text2.format(i, e))
             os.chdir(elocal)
-        with zipfile.ZipFile(os.path.join(settings.path, str(name.get()) + ".mpk"), 'w',
+        with zipfile.ZipFile(os.path.join(settings.path, str(name) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
             mpk2.writestr('info', buffer2.getvalue())
             if os.path.exists(os.path.join(self.module_dir, value, 'icon')):
                 mpk2.write(os.path.join(self.module_dir, value, 'icon'), 'icon')
             del buffer2, buffer
-        print(lang.t15 % (settings.path + os.sep + name.get() + ".mpk")) if os.path.exists(
-            settings.path + os.sep + name.get() + ".mpk") else print(
-            lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
+        print(lang.t15 % (settings.path + os.sep + name + ".mpk")) if os.path.exists(
+            settings.path + os.sep + name + ".mpk") else print(
+            lang.t16 % (settings.path + os.sep + name + ".mpk"))
 
     class New(Toplevel):
         def __init__(self):
@@ -1430,7 +1431,7 @@ class ModuleManager:
 
     class UninstallMpk(Toplevel):
 
-        def __init__(self, id_: StringVar):
+        def __init__(self, id_: str):
             super().__init__()
             self.arr = {}
             # self.module_dir = ''
@@ -1518,7 +1519,6 @@ class MpkMan(ttk.Frame):
         super().__init__(master=win.tab7)
         self.pack(padx=10, pady=10, fill=BOTH)
         self.chosen = tk.StringVar(value='')
-        self.name = tk.StringVar(value='')
         self.global_mpk = {}
         self.moduledir = ModuleManager.module_dir
         if not os.path.exists(self.moduledir):
@@ -1544,19 +1544,17 @@ class MpkMan(ttk.Frame):
                 icon = tk.Label(self.pls.scrollable_frame,
                                 image=self.images_[i],
                                 compound="center",
-                                text=data['name'],
+                                text=data.get('name'),
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                args = (i, data['name'])
-                icon.bind('<Double-Button-1>', lambda event, ar=args: cz(ModuleManager.run, *ar))
-                icon.bind('<Button-3>', lambda event, ar=args: self.popup(*ar, event))
+                icon.bind('<Double-Button-1>', lambda event, ar=i: cz(ModuleManager.run, ar))
+                icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
                 self.pls.add_icon(icon)
                 self.global_mpk[data['name']] = data['identifier']
 
-    def popup(self, name, name2, event):
+    def popup(self, name, event):
         self.chosen.set(name)
-        self.name.set(name2)
         self.rmenu2.post(event.x_root, event.y_root)
 
     def gui(self):
@@ -1582,8 +1580,8 @@ class MpkMan(ttk.Frame):
         self.rmenu2.add_command(label=lang.text20,
                                 command=lambda: cz(ModuleManager.uninstall_gui, self.chosen.get()))
         self.rmenu2.add_command(label=lang.text22,
-                                command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name.get()))
-        self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
+                                command=lambda: cz(ModuleManager.run, self.chosen.get()))
+        self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
                                 command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
         self.list_pls()
