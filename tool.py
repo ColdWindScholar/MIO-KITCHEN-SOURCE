@@ -977,6 +977,7 @@ class IconGrid(tk.Frame):
         super().__init__(master, **kwargs)
         self.master = master
         self.icons = []
+        self.apps = {}
         self.canvas = tk.Canvas(self)
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scrollable_frame = tk.Frame(self.canvas)
@@ -988,8 +989,9 @@ class IconGrid(tk.Frame):
         # Bind mouse wheel event to scrollbar
         self.master.bind_all("<MouseWheel>", self.on_mousewheel)
 
-    def add_icon(self, icon, num=4):
+    def add_icon(self, icon, id_, num=4):
         self.icons.append(icon)
+        self.apps[id_] = icon
         row = (len(self.icons) - 1) // num
         col = (len(self.icons) - 1) % num
         icon.grid(row=row, column=col, padx=10, pady=10)
@@ -1001,6 +1003,12 @@ class IconGrid(tk.Frame):
             except:
                 pass
         self.icons.clear()
+
+    def remove(self, id_):
+        try:
+            self.apps.get(id_).destroy()
+        except:
+            pass
 
     def on_frame_configure(self):
         self.scrollable_frame.update_idletasks()
@@ -1159,7 +1167,7 @@ class ModuleManager:
         with zipfile.ZipFile(mpk) as mpk_f:
             if 'icon' in mpk_f.namelist():
                 with open(os.path.join(self.module_dir, mconf.get('module', 'identifier'), "icon"),
-                      'wb') as f:
+                          'wb') as f:
                     with mpk_f.open('icon') as i:
                         f.write(i.read())
 
@@ -1587,10 +1595,16 @@ class MpkMan(ttk.Frame):
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
         self.images_ = {}
+        self.addeds = {}
 
     def list_pls(self):
-        self.pls.clean()
+        # self.pls.clean()
         for i in os.listdir(self.moduledir):
+            if not ModuleManager.get_installed(i):
+                self.pls.remove(i)
+                continue
+            if i in self.pls.apps.keys():
+                continue
             if not os.path.isdir(os.path.join(self.moduledir, i)):
                 continue
             if not os.path.exists(os.path.join(self.moduledir, i, "info.json")):
@@ -1613,7 +1627,11 @@ class MpkMan(ttk.Frame):
                                 justify='center')
                 icon.bind('<Double-Button-1>', lambda event, ar=i: cz(ModuleManager.run, ar))
                 icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
-                self.pls.add_icon(icon)
+                self.pls.add_icon(icon, i)
+
+    def refresh(self):
+        self.pls.clean()
+        self.list_pls()
 
     def popup(self, name, event):
         self.chosen.set(name)
@@ -1636,7 +1654,7 @@ class MpkMan(ttk.Frame):
         rmenu.add_command(label=lang.text21, command=lambda:
         InstallMpk(
             filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
-        rmenu.add_command(label=lang.text23, command=lambda: cz(self.list_pls))
+        rmenu.add_command(label=lang.text23, command=lambda: cz(self.refresh))
         rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
         self.rmenu2.add_command(label=lang.text20,
