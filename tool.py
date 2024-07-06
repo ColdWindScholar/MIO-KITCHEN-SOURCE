@@ -2391,7 +2391,7 @@ class Packxx(Toplevel):
         self.xgdx = ttk.Button(lf1, text=lang.t37, command=self.modify_custom_size)
         self.xgdx.pack(
             side='left', padx=5, pady=5)
-        self.ext4_method.trace('w', self.show_modify_size)
+        self.ext4_method.trace('w', lambda *x: self.show_modify_size())
         self.show_modify_size()
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
@@ -2462,7 +2462,7 @@ class Packxx(Toplevel):
             ...
         self.packrom()
 
-    def show_modify_size(self, *args):
+    def show_modify_size(self):
         if self.ext4_method.get() == lang.t32:
             self.xgdx.pack_forget()
         else:
