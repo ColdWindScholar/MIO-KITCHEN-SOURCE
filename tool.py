@@ -1083,6 +1083,7 @@ class ModuleManager:
         def editor_(self, id_=None):
             if not id_:
                 win.message_pop(lang.warn2)
+                return
             path = os.path.join(self.module_dir, id_) + os.sep
             if os.path.exists(path + "main.py"):
                 editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
@@ -1224,23 +1225,6 @@ def mpkman():
     name = tk.StringVar(value='')
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
-
-    def editor_(id_=None):
-        if not chosen.get():
-            win.message_pop(lang.warn2)
-            return 1
-        if id_ is None:
-            id_ = chosen.get()
-        path = os.path.join(moduledir, id_) + os.sep
-        if os.path.exists(path + "main.py"):
-            editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
-        elif not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
-            s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
-            with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
-                sh.write("echo 'MIO-KITCHEN'")
-            editor.main(path, s)
-        else:
-            editor.main(path, 'main.msh' if os.path.exists(path + "main.msh") else 'main.sh')
 
     class MpkRunMenu:
         def __init__(self, name, name2):
@@ -1596,7 +1580,7 @@ def mpkman():
     rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, chosen, name))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
     rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, chosen, name))
-    rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
+    rmenu2.add_command(label=lang.t17, command=lambda: cz(ModuleManager.new.editor_, ModuleManager, chosen.get()))
     list_pls()
     lf1.pack(padx=10, pady=10)
 
