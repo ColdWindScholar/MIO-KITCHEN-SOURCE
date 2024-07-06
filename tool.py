@@ -1013,6 +1013,9 @@ class ModuleManager:
         self.uninstall_gui = self.UninstallMpk
         self.uninstall_gui.module_dir = self.module_dir
 
+    def get_installed(self, id_):
+        return os.path.exists(os.path.join(self.module_dir, id_))
+
     class UninstallMpk(Toplevel):
 
         def __init__(self, chosen: StringVar, name: StringVar):
@@ -1789,7 +1792,7 @@ class MpkStore(Toplevel):
             args = data.get('files'), data.get('size'), data.get('id')
             bu = ttk.Button(f, text=lang.text21,
                             command=lambda a=args: cz(self.download, *a))
-            if not os.path.exists(os.path.join(elocal, "bin", "module", data.get('id'))):
+            if not ModuleManager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
             bu.pack(side=LEFT, padx=5, pady=5)
@@ -1842,7 +1845,7 @@ class MpkStore(Toplevel):
             except (Exception, BaseException) as e:
                 print(e)
         control.config(state='normal', text=lang.text21)
-        if os.path.exists(os.path.join(elocal, "bin", "module", id_)):
+        if ModuleManager.get_installed(id_):
             control.config(style="")
 
     def get_db(self):
