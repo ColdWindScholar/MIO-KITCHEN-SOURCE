@@ -6,7 +6,6 @@
 
 # Based on the app_structure file in split_up_data.pl by McSpoon
 
-from __future__ import print_function
 
 from os import makedirs, sep
 from string import printable
