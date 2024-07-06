@@ -1001,10 +1001,12 @@ class IconGrid(tk.Frame):
         self.icons.clear()
 
     def on_frame_configure(self):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.scrollable_frame.update_idletasks()
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
     def on_mousewheel(self, event):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        # self.on_frame_configure()
 
 
 class ModuleManager:
