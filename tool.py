@@ -1164,6 +1164,7 @@ class ModuleManager:
                         f.write(i.read())
 
         print(mconf.get('module', 'name'), lang.text39)
+        list_pls_plugin()
 
     @cartoon
     def export(self, id_: str):
