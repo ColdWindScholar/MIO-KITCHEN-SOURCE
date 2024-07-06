@@ -1007,6 +1007,97 @@ class IconGrid(tk.Frame):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
+class ModuleManager:
+    def __init__(self):
+        self.module_dir = os.path.join(elocal, "bin", "module")
+        self.uninstall_gui = self.UninstallMpk
+        self.uninstall_gui.module_dir = self.module_dir
+
+    class UninstallMpk(Toplevel):
+
+        def __init__(self, chosen: StringVar, name: StringVar):
+            super().__init__()
+            self.arr = {}
+            # self.module_dir = ''
+            if not hasattr(self, 'module_dir'):
+                self.module_dir = os.path.join(elocal, "bin", "module")
+            if chosen.get():
+                self.value = chosen.get()
+                self.value2 = name.get()
+                self.lfdep()
+                self.ask()
+            else:
+                win.message_pop(lang.warn2)
+
+        def ask(self):
+            try:
+                self.attributes('-topmost', 'true')
+            except (Exception, BaseException):
+                ...
+            self.title(lang.t6)
+            jzxs(self)
+            ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+                                                                              expand=True)
+            if self.arr:
+                ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+                ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
+                                                                    expand=True)
+                te = Listbox(self, highlightthickness=0, activestyle='dotbox')
+                for i in self.arr.keys():
+                    te.insert("end", self.arr.get(i, 'None'))
+                te.pack(fill=BOTH, padx=10, pady=10)
+
+            ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
+                                                                          pady=10,
+                                                                          padx=10)
+            ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
+                                                                                                side=LEFT, pady=10,
+                                                                                                padx=10)
+
+        def lfdep(self, name=None):
+            if not name:
+                name = self.value
+            for i in [i for i in os.listdir(self.module_dir) if os.path.isdir(self.module_dir + os.sep + i)]:
+                if not os.path.exists(os.path.join(self.module_dir, i, "info.json")):
+                    continue
+                with open(os.path.join(self.module_dir, i, "info.json"), 'r', encoding='UTF-8') as f:
+                    data = json.load(f)
+                    for n in data['depend'].split():
+                        if name == n:
+                            self.arr[i] = data['name']
+                            self.lfdep(i)
+                            # 检测到依赖后立即停止
+                            break
+
+        def uninstall(self):
+            self.destroy()
+            for i in self.arr.keys():
+                self.remove(i, self.arr.get(i, 'None'))
+            self.remove(self.value, self.value2)
+
+        def remove(self, name=None, show_name='') -> None:
+            if name:
+                print(lang.text29.format(name if not show_name else show_name))
+                if os.path.exists(self.module_dir + os.sep + name):
+                    try:
+                        rmtree(self.module_dir + os.sep + name)
+                    except PermissionError as e:
+                        print(e)
+                if os.path.exists(self.module_dir + os.sep + name):
+                    win.message_pop(lang.warn9, 'red')
+                else:
+                    print(lang.text30)
+                    try:
+                        list_pls_plugin()
+                    except (Exception, BaseException):
+                        ...
+            else:
+                win.message_pop(lang.warn2)
+
+
+ModuleManager = ModuleManager()
+
+
 def mpkman():
     chosen = tk.StringVar(value='')
     name = tk.StringVar(value='')
@@ -1470,85 +1561,6 @@ def mpkman():
         else:
             print(lang.warn8)
 
-    class UninstallMpk(Toplevel):
-
-        def __init__(self):
-            super().__init__()
-            self.arr = {}
-            if chosen.get():
-                self.value = chosen.get()
-                self.value2 = name.get()
-                self.lfdep()
-                self.ask()
-            else:
-                win.message_pop(lang.warn2)
-
-        def ask(self):
-            try:
-                self.attributes('-topmost', 'true')
-            except (Exception, BaseException):
-                ...
-            self.title(lang.t6)
-            jzxs(self)
-            ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                              expand=True)
-            if self.arr:
-                ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-                ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
-                                                                    expand=True)
-                te = Listbox(self, highlightthickness=0, activestyle='dotbox')
-                for i in self.arr.keys():
-                    te.insert("end", self.arr.get(i, 'None'))
-                te.pack(fill=BOTH, padx=10, pady=10)
-
-            ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
-                                                                          pady=10,
-                                                                          padx=10)
-            ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
-                                                                                                side=LEFT, pady=10,
-                                                                                                padx=10)
-
-        def lfdep(self, name=None):
-            if not name:
-                name = self.value
-            for i in [i for i in os.listdir(moduledir) if os.path.isdir(moduledir + os.sep + i)]:
-                if not os.path.exists(os.path.join(moduledir, i, "info.json")):
-                    continue
-                with open(os.path.join(moduledir, i, "info.json"), 'r', encoding='UTF-8') as f:
-                    data = json.load(f)
-                    for n in data['depend'].split():
-                        if name == n:
-                            self.arr[i] = data['name']
-                            self.lfdep(i)
-                            # 检测到依赖后立即停止
-                            break
-
-        def uninstall(self):
-            self.destroy()
-            for i in self.arr.keys():
-                self.remove(i, self.arr.get(i, 'None'))
-            self.remove(self.value, self.value2)
-
-        @staticmethod
-        def remove(name=None, show_name='') -> None:
-            if name:
-                print(lang.text29.format(name if not show_name else show_name))
-                if os.path.exists(moduledir + os.sep + name):
-                    try:
-                        rmtree(moduledir + os.sep + name)
-                    except PermissionError as e:
-                        print(e)
-                if os.path.exists(moduledir + os.sep + name):
-                    win.message_pop(lang.warn9, 'red')
-                else:
-                    print(lang.text30)
-                    try:
-                        list_pls()
-                    except (Exception, BaseException):
-                        ...
-            else:
-                win.message_pop(lang.warn2)
-
     f = ttk.Frame(win.tab7)
     ttk.Label(f, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, side=LEFT)
     ttk.Button(f, text='Mpk Store', command=lambda: cz(MpkStore)).pack(side="right", padx=10, pady=10)
@@ -1565,7 +1577,7 @@ def mpkman():
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
     rmenu.add_command(label=lang.text115, command=lambda: cz(New))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
-    rmenu2.add_command(label=lang.text20, command=lambda: cz(UninstallMpk))
+    rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, chosen, name))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
     rmenu2.add_command(label=lang.t14, command=lambda: cz(export))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(editor_))
