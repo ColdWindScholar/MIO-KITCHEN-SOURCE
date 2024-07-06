@@ -1551,7 +1551,6 @@ class MpkMan(ttk.Frame):
         self.name.set(name2)
         self.rmenu2.post(event.x_root, event.y_root)
 
-
     def gui(self):
         global list_pls_plugin
         list_pls_plugin = self.list_pls
@@ -1574,7 +1573,8 @@ class MpkMan(ttk.Frame):
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
         self.rmenu2.add_command(label=lang.text20,
                                 command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
-        self.rmenu2.add_command(label=lang.text22, command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name.get()))
+        self.rmenu2.add_command(label=lang.text22,
+                                command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name.get()))
         self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
         self.rmenu2.add_command(label=lang.t17,
                                 command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
