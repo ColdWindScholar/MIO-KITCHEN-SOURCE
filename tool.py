@@ -1774,6 +1774,7 @@ class MpkStore(Toplevel):
                 self.app_infos.get(i.get('id')).pack_forget()
             else:
                 self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
+        self.canvas.yview_moveto(0.0)
 
     def add_app(self, app_dict=None):
         self.clear()
