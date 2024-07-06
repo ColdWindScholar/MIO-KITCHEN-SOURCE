@@ -1045,9 +1045,10 @@ class ModuleManager:
                 file = temp + v_code()
             with open(file, "w", encoding='UTF-8', newline="\n") as f:
                 if values:
-                    for va in values.value:
+                    for va in values.gavs.keys():
                         if gva := values.gavs[va].get():
                             f.write(f"export {va}='{gva}'\n")
+                    values.gavs.clear()
                 f.write('export tool_bin="{}"\n'.format(
                     tool_bin.replace(
                         '\\',
@@ -1320,7 +1321,6 @@ class ModuleManager:
 
         def __init__(self, jsons, msh=False):
             super().__init__()
-            self.value = []
 
             def generate_sh():
                 temp = os.path.join(elocal, "bin", "temp")
@@ -1329,15 +1329,14 @@ class ModuleManager:
                 self.destroy()
 
             def generate_msh():
-                for va in self.value:
+                for va in self.gavs.keys():
                     if gva := self.gavs[va].get():
-                        MshParse.extra_envs[va] = gva
+                        ModuleManager.MshParse.extra_envs[va] = gva
                         if gva is str and os.path.isabs(gva) and os.name == 'nt':
                             if '\\' in gva:
-                                MshParse.extra_envs[va] = gva.replace("\\", '/')
+                                ModuleManager.MshParse.extra_envs[va] = gva.replace("\\", '/')
                 self.destroy()
                 self.gavs.clear()
-                self.value.clear()
 
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
@@ -1363,8 +1362,6 @@ class ModuleManager:
                         group_frame = ttk.LabelFrame(self, text=group_data['title'])
                         group_frame.pack(padx=10, pady=10)
                         for con in group_data['controls']:
-                            if 'set' in con:
-                                self.value.append(con['set'])
                             if con["type"] == "text":
                                 text_label = ttk.Label(group_frame, text=con['text'],
                                                        font=(None, int(con['fontsize'])))
