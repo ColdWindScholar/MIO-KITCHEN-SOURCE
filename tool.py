@@ -1599,10 +1599,10 @@ class MpkMan(ttk.Frame):
 
     def list_pls(self):
         # self.pls.clean()
-        for i in os.listdir(self.moduledir):
+        for i in self.pls.apps.keys():
             if not ModuleManager.get_installed(i):
                 self.pls.remove(i)
-                continue
+        for i in os.listdir(self.moduledir):
             if i in self.pls.apps.keys():
                 continue
             if not os.path.isdir(os.path.join(self.moduledir, i)):
