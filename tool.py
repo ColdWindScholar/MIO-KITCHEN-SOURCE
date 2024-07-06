@@ -1723,6 +1723,7 @@ class MpkStore(Toplevel):
         super().__init__()
         self.title('Mpk Store')
         self.data = []
+        self.tasks = deque()
         self.apps = []
         self.protocol("WM_DELETE_WINDOW", lambda: setattr(states, 'mpk_store', False) == self.destroy())
         self.repo = ''
@@ -1820,6 +1821,10 @@ class MpkStore(Toplevel):
             cz(self.get_db)
 
     def download(self, files, size, id_, depends):
+        if id_ not in self.tasks:
+            self.tasks.append(id_)
+        else:
+            return
         if id_ in self.control.keys():
             control = self.control.get(id_)
             control.config(state='disabled')
