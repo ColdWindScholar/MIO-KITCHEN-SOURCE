@@ -1016,6 +1016,14 @@ class ModuleManager:
         self.uninstall_gui.module_dir = self.module_dir
         self.MshParse.module_dir = self.module_dir
 
+    def get_name(self, id_):
+        info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
+        if not os.path.exists(info_file):
+            return ''
+        with open(info_file, 'r', encoding='UTF-8') as f:
+            data = json.load(f)
+            return data.get('name', '')
+
     @cartoon
     def run(self, id_, name: str = None):
         if not dn.get():
@@ -1422,15 +1430,15 @@ class ModuleManager:
 
     class UninstallMpk(Toplevel):
 
-        def __init__(self, chosen: StringVar, name: StringVar):
+        def __init__(self, id_: StringVar):
             super().__init__()
             self.arr = {}
             # self.module_dir = ''
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(elocal, "bin", "module")
-            if chosen.get():
-                self.value = chosen.get()
-                self.value2 = name.get()
+            if id_:
+                self.value = id_
+                self.value2 = ModuleManager.get_name(id_)
                 self.lfdep()
                 self.ask()
             else:
@@ -1572,7 +1580,7 @@ class MpkMan(ttk.Frame):
         rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
         self.rmenu2.add_command(label=lang.text20,
-                                command=lambda: cz(ModuleManager.uninstall_gui, self.chosen, self.name))
+                                command=lambda: cz(ModuleManager.uninstall_gui, self.chosen.get()))
         self.rmenu2.add_command(label=lang.text22,
                                 command=lambda: cz(ModuleManager.run, self.chosen.get(), self.name.get()))
         self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen, self.name))
