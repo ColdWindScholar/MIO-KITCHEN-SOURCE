@@ -2425,9 +2425,9 @@ def dboot(nm: str = 'boot'):
 
 class Packxx(Toplevel):
     def __init__(self, list_):
-        self.custom_size = {}
         if not list_:
             return
+        self.custom_size = {}
         self.dbfs = StringVar(value='make_ext4fs')
         self.dbgs = StringVar(value='raw')
         self.edbgs = StringVar(value='lz4hc')
