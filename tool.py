@@ -1014,6 +1014,81 @@ class ModuleManager:
         self.new = self.New
         self.new.module_dir = self.module_dir
         self.uninstall_gui.module_dir = self.module_dir
+        self.MshParse.module_dir = self.module_dir
+
+    @cartoon
+    def run(self, id_, name: StringVar = None):
+        if not dn.get():
+            print(lang.warn1)
+            return
+        if id_:
+            value = id_
+        else:
+            print(lang.warn2)
+            return
+        if not name:
+            name = StringVar(value=value)
+        script_path = self.module_dir + os.sep + value + os.sep
+        file = ''
+        with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
+            data = json.load(f)
+            for n in data['depend'].split():
+                if not os.path.exists(os.path.join(self.module_dir, n)):
+                    print(lang.text36 % (name.get(), n, n))
+                    return 2
+        if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
+            values = self.Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
+                script_path + "main.json") else None
+            if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
+                re_folder(temp)
+            if not file:
+                file = temp + v_code()
+            with open(file, "w", encoding='UTF-8', newline="\n") as f:
+                if values:
+                    for va in values.value:
+                        if gva := values.gavs[va].get():
+                            f.write(f"export {va}='{gva}'\n")
+                f.write('export tool_bin="{}"\n'.format(
+                    tool_bin.replace(
+                        '\\',
+                        '/')))
+                f.write(f'export version="{settings.version}"\n')
+                f.write(f'export language="{settings.language}"\n')
+                f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
+                f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
+                f.write(
+                    "export project='{}'\nsource $1".format(
+                        rwork().replace('\\', '/')))
+            if os.path.exists(script_path + "main.msh"):
+                self.MshParse(script_path + "main.msh")
+            if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
+                call(
+                    f"busybox {'ash' if os.name == 'posix' else 'bash'} {file} {(script_path + 'main.sh').replace(os.sep, '/')}")
+                try:
+                    os.remove(file)
+                except (Exception, BaseException) as e:
+                    print(e)
+        elif os.path.exists(script_path + "main.py") and imp:
+            try:
+                module = imp.load_source('module', script_path + "main.py")
+                if hasattr(module, 'main'):
+                    data = {
+                        "win": win,
+                        'version': settings.version, "bin": script_path.replace(os.sep, "/"),
+                        "project": rwork().replace('\\', '/'), 'moddir': self.module_dir.replace('\\', '/'),
+                        'tool_bin': tool_bin.replace(
+                            '\\',
+                            '/')
+                    }
+                    module.main(data)
+            except Exception as e:
+                print(e)
+        elif not os.path.exists(self.module_dir + os.sep + value):
+            win.message_pop(lang.warn7.format(value))
+            list_pls_plugin()
+            win.tab7.lift()
+        else:
+            print(lang.warn8)
 
     def get_installed(self, id_):
         return os.path.exists(os.path.join(self.module_dir, id_))
@@ -1135,6 +1210,219 @@ class ModuleManager:
             list_pls_plugin()
             self.editor_(iden)
 
+    class MshParse:
+        extra_envs = {}
+        grammar_words = {"echo": lambda strings: print(strings),
+                         "rmdir": lambda path: rmdir(path.strip()),
+                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
+                         'gettype': lambda file_: gettype(file_),
+                         'exist': lambda x: '1' if os.path.exists(x) else '0'}
+
+        def __init__(self, sh):
+            if not hasattr(self, 'module_dir'):
+                self.module_dir = os.path.join(elocal, "bin", "module")
+            self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
+                         'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
+                         'moddir': self.module_dir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
+            for n, v in self.extra_envs.items():
+                self.envs[n] = v
+            with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
+                for i in shell.readlines():
+                    try:
+                        self.runline(i)
+                    except AttributeError as e:
+                        print(f"Unknown Order：{i}\nReason：{e}")
+                    except ModuleError as e:
+                        print(f"Exception:{e}")
+                        return
+                    except Exception as e:
+                        print(f"Runtime Error:{i}\nReason：{e}")
+                    except (Exception, BaseException):
+                        print(f"Runtime Error:{i}")
+            self.envs.clear()
+
+        def set(self, cmd):
+            try:
+                vn, va = cmd.strip().split("=" if "=" in cmd else None)
+            except Exception as e:
+                print(f"SetValue Exception：{e}\nSentence：{cmd}")
+                return 1
+            self.envs[vn] = str(va)
+
+        def runline(self, i):
+            for key, value in self.envs.items():
+                if "@" in i:
+                    i = i.replace(f'@{key}@', str(value)).strip()
+            if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
+                if i.split()[0] == "if":
+                    self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
+                elif i.split()[0] == "for":
+                    self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
+                else:
+                    if i.split()[0] in self.grammar_words.keys():
+                        self.envs["result"] = self.grammar_words[i.split()[0]](' '.join(i.split()[1:]))
+                    else:
+                        self.envs["result"] = getattr(self, i.split()[0])(' '.join(i.split()[1:]))
+                    if not self.envs['result']:
+                        self.envs['result'] = ""
+
+        def sfor(self, vn, vs, do):
+            for v in vs.split(',' if ',' in vs else None):
+                self.runline(do.replace(f'@{vn}@', v))
+
+        def sh(self, cmd):
+            with open(file_ := (os.path.join(elocal, "bin", "temp", v_code())), "w",
+                      encoding='UTF-8',
+                      newline="\n") as f:
+                for i in self.envs:
+                    f.write(f'export {i}="{self.envs.get(i, "")}"\n')
+                f.write("source $1")
+            if os.path.exists(file_):
+                sh = "ash" if os.name == 'posix' else "bash"
+                call(f"busybox {sh} {file_} {cmd.replace(os.sep, '/')}")
+                try:
+                    os.remove(file_)
+                except (Exception, BaseException):
+                    ...
+
+        def msh(self, cmd):
+            try:
+                cmd_, argv = cmd.split()
+            except Exception:
+                raise ModuleError(f"MSH: Unsupported {cmd}")
+            if cmd_ == 'run':
+                if not os.path.exists(argv.replace("\\", '/')):
+                    print(f"Script Not Exist：{argv}")
+                    return 1
+                else:
+                    self.__init__(argv)
+            else:
+                print('Usage：\nmsh run [script]')
+
+        @staticmethod
+        def exit(value):
+            raise ModuleError(value)
+
+        def sif(self, mode, var_, other):
+            modes = {
+                'exist': lambda var: os.path.exists(str(var)),
+                'equ': lambda var: var.split('--')[0] == var.split('--')[1],
+                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
+            }
+            if mode[:1] == "!":
+                if not modes[mode[1:]](var_):
+                    self.runline(other)
+            elif modes[mode](var_):
+                self.runline(other)
+
+    class Parse(Toplevel):
+        gavs = {}
+
+        def __init__(self, jsons, msh=False):
+            super().__init__()
+            self.value = []
+
+            def generate_sh():
+                temp = os.path.join(elocal, "bin", "temp")
+                if not os.path.exists(temp):
+                    re_folder(temp)
+                self.destroy()
+
+            def generate_msh():
+                for va in self.value:
+                    if gva := self.gavs[va].get():
+                        MshParse.extra_envs[va] = gva
+                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
+                            if '\\' in gva:
+                                MshParse.extra_envs[va] = gva.replace("\\", '/')
+                self.destroy()
+                self.gavs.clear()
+                self.value.clear()
+
+            with open(jsons, 'r', encoding='UTF-8') as f:
+                try:
+                    data = json.load(f)
+                except Exception as e:
+                    win.message_pop(lang.text133 + str(e))
+                    print(lang.text133 + str(e))
+                    self.destroy()
+                self.title(data['main']['info']['title'])
+                # 设置窗口大小和位置
+                height = data['main']['info']['height']
+                width = data['main']['info']['weight']
+                if height != 'none' and width != 'none':
+                    self.geometry(f"{width}x{height}")
+                resizable = data['main']['info']['resize']
+                try:
+                    self.attributes('-topmost', 'true')
+                except (Exception, BaseException):
+                    ...
+                self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
+                for group_name, group_data in data['main'].items():
+                    if group_name != "info":
+                        group_frame = ttk.LabelFrame(self, text=group_data['title'])
+                        group_frame.pack(padx=10, pady=10)
+                        for con in group_data['controls']:
+                            if 'set' in con:
+                                self.value.append(con['set'])
+                            if con["type"] == "text":
+                                text_label = ttk.Label(group_frame, text=con['text'],
+                                                       font=(None, int(con['fontsize'])))
+                                text_label.pack(side=con['side'], padx=5, pady=5)
+                            elif con["type"] == "button":
+                                button_command = con['command']
+                                button = ttk.Button(group_frame, text=con['text'],
+                                                    command=lambda: print(button_command))
+                                button.pack(side='left')
+                            elif con["type"] == "filechose":
+                                ft = ttk.Frame(group_frame)
+                                ft.pack(fill=X)
+                                file_var_name = con['set']
+                                self.gavs[file_var_name] = StringVar()
+                                file_label = ttk.Label(ft, text=con['text'])
+                                file_label.pack(side='left', padx=10, pady=10)
+                                file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
+                                file_entry.pack(side='left', padx=5, pady=5)
+                                file_button = ttk.Button(ft, text=lang.text28,
+                                                         command=lambda: self.gavs[file_var_name].set(
+                                                             filedialog.askopenfilename()))
+                                file_button.pack(side='left', padx=10, pady=10)
+                            elif con["type"] == "radio":
+                                radio_var_name = con['set']
+                                self.gavs[radio_var_name] = StringVar()
+                                options = con['opins'].split()
+                                pft1 = ttk.Frame(group_frame)
+                                pft1.pack(padx=10, pady=10)
+                                for option in options:
+                                    text, value = option.split('|')
+                                    self.gavs[radio_var_name].set(value)
+                                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
+                                                    value=value).pack(side=con['side'])
+                            elif con["type"] == 'input':
+                                input_frame = Frame(group_frame)
+                                input_frame.pack(fill=X)
+                                input_var_name = con['set']
+                                self.gavs[input_var_name] = StringVar()
+                                if 'text' in con:
+                                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
+                                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
+                                                                                                    padx=5,
+                                                                                                    fill=X)
+                            elif con['type'] == 'checkbutton':
+                                b_var_name = con['set']
+                                self.gavs[b_var_name] = IntVar()
+                                text = 'M.K.C' if 'text' not in con else con['text']
+                                ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
+                                                offvalue=0,
+                                                style="Switch.TCheckbutton").pack(
+                                    padx=5, pady=5, fill=BOTH)
+                            else:
+                                print(lang.warn14.format(con['type']))
+                ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X,
+                                                                                                              side='bottom')
+            jzxs(self)
+            self.wait_window()
+
     class UninstallMpk(Toplevel):
 
         def __init__(self, chosen: StringVar, name: StringVar):
@@ -1239,11 +1527,10 @@ def mpkman():
         def run(self, event):
             chosen.set(self.name)
             name.set(self.name2)
-            cz(run)
+            cz(ModuleManager.run, chosen.get(), name)
 
     if not os.path.exists(moduledir):
         os.makedirs(moduledir)
-    file = StringVar()
     images_ = {}
 
     def list_pls():
@@ -1277,289 +1564,6 @@ def mpkman():
     global list_pls_plugin
     list_pls_plugin = list_pls
 
-    class MshParse:
-        extra_envs = {}
-        grammar_words = {"echo": lambda strings: print(strings),
-                         "rmdir": lambda path: rmdir(path.strip()),
-                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
-                         'gettype': lambda file_: gettype(file_),
-                         'exist': lambda x: '1' if os.path.exists(x) else '0'}
-
-        def __init__(self, sh):
-            self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
-                         'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
-                         'moddir': moduledir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
-            for n, v in self.extra_envs.items():
-                self.envs[n] = v
-            with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
-                for i in shell.readlines():
-                    try:
-                        self.runline(i)
-                    except AttributeError as e:
-                        print(f"Unknown Order：{i}\nReason：{e}")
-                    except ModuleError as e:
-                        print(f"Exception:{e}")
-                        return
-                    except Exception as e:
-                        print(f"Runtime Error:{i}\nReason：{e}")
-                    except (Exception, BaseException):
-                        print(f"Runtime Error:{i}")
-            self.envs.clear()
-
-        def set(self, cmd):
-            try:
-                vn, va = cmd.strip().split("=" if "=" in cmd else None)
-            except Exception as e:
-                print(f"SetValue Exception：{e}\nSentence：{cmd}")
-                return 1
-            self.envs[vn] = str(va)
-
-        def runline(self, i):
-            for key, value in self.envs.items():
-                if "@" in i:
-                    i = i.replace(f'@{key}@', str(value)).strip()
-            if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
-                if i.split()[0] == "if":
-                    self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
-                elif i.split()[0] == "for":
-                    self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
-                else:
-                    if i.split()[0] in self.grammar_words.keys():
-                        self.envs["result"] = self.grammar_words[i.split()[0]](' '.join(i.split()[1:]))
-                    else:
-                        self.envs["result"] = getattr(self, i.split()[0])(' '.join(i.split()[1:]))
-                    if not self.envs['result']:
-                        self.envs['result'] = ""
-
-        def sfor(self, vn, vs, do):
-            for v in vs.split(',' if ',' in vs else None):
-                self.runline(do.replace(f'@{vn}@', v))
-
-        def sh(self, cmd):
-            with open(file_ := (os.path.join(elocal, "bin", "temp", v_code())), "w",
-                      encoding='UTF-8',
-                      newline="\n") as f:
-                for i in self.envs:
-                    f.write(f'export {i}="{self.envs.get(i, "")}"\n')
-                f.write("source $1")
-            if os.path.exists(file_):
-                sh = "ash" if os.name == 'posix' else "bash"
-                call(f"busybox {sh} {file_} {cmd.replace(os.sep, '/')}")
-                try:
-                    os.remove(file_)
-                except (Exception, BaseException):
-                    ...
-
-        def msh(self, cmd):
-            try:
-                cmd_, argv = cmd.split()
-            except Exception:
-                raise ModuleError(f"MSH: Unsupported {cmd}")
-            if cmd_ == 'run':
-                if not os.path.exists(argv.replace("\\", '/')):
-                    print(f"Script Not Exist：{argv}")
-                    return 1
-                else:
-                    self.__init__(argv)
-            else:
-                print('Usage：\nmsh run [script]')
-
-        @staticmethod
-        def exit(value):
-            raise ModuleError(value)
-
-        def sif(self, mode, var_, other):
-            modes = {
-                'exist': lambda var: os.path.exists(str(var)),
-                'equ': lambda var: var.split('--')[0] == var.split('--')[1],
-                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
-            }
-            if mode[:1] == "!":
-                if not modes[mode[1:]](var_):
-                    self.runline(other)
-            elif modes[mode](var_):
-                self.runline(other)
-
-    class Parse(Toplevel):
-        gavs = {}
-
-        def __init__(self, jsons, msh=False):
-            super().__init__()
-            self.value = []
-
-            def generate_sh():
-                temp = os.path.join(elocal, "bin", "temp")
-                if not os.path.exists(temp):
-                    re_folder(temp)
-                file.set(os.path.join(temp, v_code()))
-                self.destroy()
-
-            def generate_msh():
-                for va in self.value:
-                    if gva := self.gavs[va].get():
-                        MshParse.extra_envs[va] = gva
-                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
-                            if '\\' in gva:
-                                MshParse.extra_envs[va] = gva.replace("\\", '/')
-                self.destroy()
-                self.gavs.clear()
-                self.value.clear()
-
-            with open(jsons, 'r', encoding='UTF-8') as f:
-                try:
-                    data = json.load(f)
-                except Exception as e:
-                    win.message_pop(lang.text133 + str(e))
-                    print(lang.text133 + str(e))
-                    self.destroy()
-                self.title(data['main']['info']['title'])
-                # 设置窗口大小和位置
-                height = data['main']['info']['height']
-                width = data['main']['info']['weight']
-                if height != 'none' and width != 'none':
-                    self.geometry(f"{width}x{height}")
-                resizable = data['main']['info']['resize']
-                try:
-                    self.attributes('-topmost', 'true')
-                except (Exception, BaseException):
-                    ...
-                self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
-                for group_name, group_data in data['main'].items():
-                    if group_name != "info":
-                        group_frame = ttk.LabelFrame(self, text=group_data['title'])
-                        group_frame.pack(padx=10, pady=10)
-                        for con in group_data['controls']:
-                            if 'set' in con:
-                                self.value.append(con['set'])
-                            if con["type"] == "text":
-                                text_label = ttk.Label(group_frame, text=con['text'],
-                                                       font=(None, int(con['fontsize'])))
-                                text_label.pack(side=con['side'], padx=5, pady=5)
-                            elif con["type"] == "button":
-                                button_command = con['command']
-                                button = ttk.Button(group_frame, text=con['text'],
-                                                    command=lambda: print(button_command))
-                                button.pack(side='left')
-                            elif con["type"] == "filechose":
-                                ft = ttk.Frame(group_frame)
-                                ft.pack(fill=X)
-                                file_var_name = con['set']
-                                self.gavs[file_var_name] = StringVar()
-                                file_label = ttk.Label(ft, text=con['text'])
-                                file_label.pack(side='left', padx=10, pady=10)
-                                file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
-                                file_entry.pack(side='left', padx=5, pady=5)
-                                file_button = ttk.Button(ft, text=lang.text28,
-                                                         command=lambda: self.gavs[file_var_name].set(
-                                                             filedialog.askopenfilename()))
-                                file_button.pack(side='left', padx=10, pady=10)
-                            elif con["type"] == "radio":
-                                radio_var_name = con['set']
-                                self.gavs[radio_var_name] = StringVar()
-                                options = con['opins'].split()
-                                pft1 = ttk.Frame(group_frame)
-                                pft1.pack(padx=10, pady=10)
-                                for option in options:
-                                    text, value = option.split('|')
-                                    self.gavs[radio_var_name].set(value)
-                                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
-                                                    value=value).pack(side=con['side'])
-                            elif con["type"] == 'input':
-                                input_frame = Frame(group_frame)
-                                input_frame.pack(fill=X)
-                                input_var_name = con['set']
-                                self.gavs[input_var_name] = StringVar()
-                                if 'text' in con:
-                                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
-                                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
-                                                                                                    padx=5,
-                                                                                                    fill=X)
-                            elif con['type'] == 'checkbutton':
-                                b_var_name = con['set']
-                                self.gavs[b_var_name] = IntVar()
-                                text = 'M.K.C' if 'text' not in con else con['text']
-                                ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
-                                                offvalue=0,
-                                                style="Switch.TCheckbutton").pack(
-                                    padx=5, pady=5, fill=BOTH)
-                            else:
-                                print(lang.warn14.format(con['type']))
-                ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X,
-                                                                                                              side='bottom')
-            jzxs(self)
-            self.wait_window()
-
-    @cartoon
-    def run():
-        if not dn.get():
-            print(lang.warn1)
-            return
-        if chosen.get():
-            value = chosen.get()
-        else:
-            print(lang.warn2)
-            return
-        script_path = moduledir + os.sep + value + os.sep
-        with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
-            data = json.load(f)
-            for n in data['depend'].split():
-                if not os.path.exists(os.path.join(moduledir, n)):
-                    print(lang.text36 % (name.get(), n, n))
-                    return 2
-        if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
-            values = Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
-                script_path + "main.json") else None
-            if not os.path.exists(temp := os.path.join(elocal, "bin", "temp") + os.sep):
-                re_folder(temp)
-            if not file.get():
-                file.set(temp + v_code())
-            with open(file.get(), "w", encoding='UTF-8', newline="\n") as f:
-                if values:
-                    for va in values.value:
-                        if gva := values.gavs[va].get():
-                            f.write(f"export {va}='{gva}'\n")
-                f.write('export tool_bin="{}"\n'.format(
-                    tool_bin.replace(
-                        '\\',
-                        '/')))
-                f.write(f'export version="{settings.version}"\n')
-                f.write(f'export language="{settings.language}"\n')
-                f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
-                f.write('export moddir="{}"\n'.format(moduledir.replace('\\', '/')))
-                f.write(
-                    "export project='{}'\nsource $1".format(
-                        rwork().replace('\\', '/')))
-            if os.path.exists(script_path + "main.msh"):
-                MshParse(script_path + "main.msh")
-            if os.path.exists(file.get()) and os.path.exists(script_path + "main.sh"):
-                call(
-                    f"busybox {'ash' if os.name == 'posix' else 'bash'} {file.get()} {(script_path + 'main.sh').replace(os.sep, '/')}")
-                try:
-                    os.remove(file.get())
-                except (Exception, BaseException) as e:
-                    print(e)
-        elif os.path.exists(script_path + "main.py") and imp:
-            try:
-                module = imp.load_source('module', script_path + "main.py")
-                if hasattr(module, 'main'):
-                    data = {
-                        "win": win,
-                        'version': settings.version, "bin": script_path.replace(os.sep, "/"),
-                        "project": rwork().replace('\\', '/'), 'moddir': moduledir.replace('\\', '/'),
-                        'tool_bin': tool_bin.replace(
-                            '\\',
-                            '/')
-                    }
-                    module.main(data)
-            except Exception as e:
-                print(e)
-        elif not os.path.exists(moduledir + os.sep + value):
-            win.message_pop(lang.warn7.format(value))
-            list_pls()
-            win.tab7.lift()
-        else:
-            print(lang.warn8)
-
     f = ttk.Frame(win.tab7)
     ttk.Label(f, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, side=LEFT)
     ttk.Button(f, text='Mpk Store', command=lambda: cz(MpkStore)).pack(side="right", padx=10, pady=10)
@@ -1578,7 +1582,7 @@ def mpkman():
     rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
     rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, chosen, name))
-    rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
+    rmenu2.add_command(label=lang.text22, command=lambda: cz(ModuleManager.run, chosen.get(), name))
     rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, chosen, name))
     rmenu2.add_command(label=lang.t17, command=lambda: cz(ModuleManager.new.editor_, ModuleManager, chosen.get()))
     list_pls()
