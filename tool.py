@@ -1011,13 +1011,15 @@ class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(elocal, "bin", "module")
         self.uninstall_gui = self.UninstallMpk
+        self.new = self.New
+        self.new.module_dir = self.module_dir
         self.uninstall_gui.module_dir = self.module_dir
 
     def get_installed(self, id_):
         return os.path.exists(os.path.join(self.module_dir, id_))
 
     @cartoon
-    def export(self, chosen: StringVar, name:StringVar):
+    def export(self, chosen: StringVar, name: StringVar):
         if not chosen.get():
             win.message_pop(lang.warn2)
             return 1
@@ -1053,6 +1055,84 @@ class ModuleManager:
         print(lang.t15 % (settings.path + os.sep + name.get() + ".mpk")) if os.path.exists(
             settings.path + os.sep + name.get() + ".mpk") else print(
             lang.t16 % (settings.path + os.sep + name.get() + ".mpk"))
+
+    class New(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title(lang.text115)
+            self.identifier = None
+            self.dep = None
+            self.intro = None
+            self.ver = None
+            self.aou = None
+            self.name = None
+            if not hasattr(self, 'module_dir'):
+                self.module_dir = os.path.join(elocal, "bin", "module")
+            self.gui()
+            jzxs(self)
+
+        @staticmethod
+        def label_entry(master, text, side):
+            frame = Frame(master)
+            ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
+            entry = ttk.Entry(frame)
+            entry.pack(padx=5, pady=5, side=LEFT)
+            frame.pack(padx=5, pady=5, fill=X, side=side)
+            return entry
+
+        def editor_(self, id_=None):
+            if not id_:
+                win.message_pop(lang.warn2)
+            path = os.path.join(self.module_dir, id_) + os.sep
+            if os.path.exists(path + "main.py"):
+                editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
+            elif not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
+                s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
+                with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
+                    sh.write("echo 'MIO-KITCHEN'")
+                editor.main(path, s)
+            else:
+                editor.main(path, 'main.msh' if os.path.exists(path + "main.msh") else 'main.sh')
+
+        def gui(self):
+            ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
+            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+            f_b = ttk.Frame(self)
+            f = ttk.Frame(f_b)
+            self.name = self.label_entry(f, lang.t20, TOP)
+            self.aou = self.label_entry(f, lang.t21, TOP)
+            self.ver = self.label_entry(f, lang.t22, TOP)
+            self.dep = self.label_entry(f, lang.t23, TOP)
+            self.identifier = self.label_entry(f, 'identifier', TOP)
+            f.pack(padx=5, pady=5, side=LEFT)
+            f = ttk.Frame(f_b)
+            ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
+            self.intro = Text(f, width=40, height=15)
+            self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
+            f.pack(padx=5, pady=5, side=LEFT)
+            f_b.pack(padx=5, pady=5)
+            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=X, padx=5, pady=5)
+
+        def create(self):
+            if not self.identifier.get():
+                return
+            data = {
+                "name": self.name.get(),
+                "author": 'MIO-KITCHEN' if not self.aou.get() else self.aou.get(),
+                "version": self.ver.get(),
+                "identifier": (iden := self.identifier.get()),
+                "describe": self.intro.get(1.0, END),
+                "depend": self.dep.get()
+            }
+            self.destroy()
+            if not os.path.exists(self.module_dir + os.sep + iden):
+                os.makedirs(self.module_dir + os.sep + iden)
+            with open(self.module_dir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8',
+                      newline='\n') as js:
+                js.write(json.dumps(data))
+            list_pls_plugin()
+            self.editor_(iden)
 
     class UninstallMpk(Toplevel):
 
@@ -1144,67 +1224,6 @@ def mpkman():
     name = tk.StringVar(value='')
     global_mpk = {}
     moduledir = os.path.join(elocal, "bin", "module")
-
-    class New(Toplevel):
-        def __init__(self):
-            super().__init__()
-            self.title(lang.text115)
-            self.identifier = None
-            self.dep = None
-            self.intro = None
-            self.ver = None
-            self.aou = None
-            self.name = None
-            self.gui()
-            jzxs(self)
-
-        @staticmethod
-        def label_entry(master, text, side):
-            frame = Frame(master)
-            ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
-            entry = ttk.Entry(frame)
-            entry.pack(padx=5, pady=5, side=LEFT)
-            frame.pack(padx=5, pady=5, fill=X, side=side)
-            return entry
-
-        def gui(self):
-            ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
-            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            f_b = ttk.Frame(self)
-            f = ttk.Frame(f_b)
-            self.name = self.label_entry(f, lang.t20, TOP)
-            self.aou = self.label_entry(f, lang.t21, TOP)
-            self.ver = self.label_entry(f, lang.t22, TOP)
-            self.dep = self.label_entry(f, lang.t23, TOP)
-            self.identifier = self.label_entry(f, 'identifier', TOP)
-            f.pack(padx=5, pady=5, side=LEFT)
-            f = ttk.Frame(f_b)
-            ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
-            self.intro = Text(f, width=40, height=15)
-            self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
-            f.pack(padx=5, pady=5, side=LEFT)
-            f_b.pack(padx=5, pady=5)
-            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=X, padx=5, pady=5)
-
-        def create(self):
-            if not self.identifier.get():
-                return
-            data = {
-                "name": self.name.get(),
-                "author": 'MIO-KITCHEN' if not self.aou.get() else self.aou.get(),
-                "version": self.ver.get(),
-                "identifier": (iden := self.identifier.get()),
-                "describe": self.intro.get(1.0, END),
-                "depend": self.dep.get()
-            }
-            self.destroy()
-            if not os.path.exists(moduledir + os.sep + iden):
-                os.makedirs(moduledir + os.sep + iden)
-            with open(moduledir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8', newline='\n') as js:
-                js.write(json.dumps(data))
-            list_pls()
-            editor_(iden)
 
     def editor_(id_=None):
         if not chosen.get():
@@ -1572,7 +1591,7 @@ def mpkman():
     rmenu.add_command(label=lang.text21, command=lambda:
     InstallMpk(filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == list_pls())
     rmenu.add_command(label=lang.text23, command=lambda: cz(list_pls))
-    rmenu.add_command(label=lang.text115, command=lambda: cz(New))
+    rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
     rmenu2 = Menu(pls, tearoff=False, borderwidth=0)
     rmenu2.add_command(label=lang.text20, command=lambda: cz(ModuleManager.uninstall_gui, chosen, name))
     rmenu2.add_command(label=lang.text22, command=lambda: cz(run))
