@@ -1505,7 +1505,8 @@ class ModuleManager:
                                     padx=5, pady=5, fill=BOTH)
                             else:
                                 print(lang.warn14.format(con['type']))
-            ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X, side='bottom')
+            ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X,
+                                                                                                          side='bottom')
             jzxs(self)
             self.wait_window()
 
@@ -1885,11 +1886,9 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            a__ = ttk.Label(f2,
-                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[
-                               :50])
-            a__.pack_propagate(False)
-            a__.pack(side=LEFT, padx=5, pady=5)
+            O = ttk.Label(f2,text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:50])
+            O.pack_propagate(False)
+            O.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
             ttk.Label(f3, text=f"{data.get('desc')[:27]}").pack(padx=5, pady=5)
@@ -3135,7 +3134,7 @@ class Dirsize:
             try:
                 self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
                                   not os.path.islink(os.path.join(root, name))])
-            except (PermissionError, BaseException ,Exception):
+            except (PermissionError, BaseException, Exception):
                 pass
         if self.get == 1:
             self.rsize_v = self.size
