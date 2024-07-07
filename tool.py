@@ -40,7 +40,8 @@ else:
 import zipfile
 from io import BytesIO, StringIO
 from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
-                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE, VERTICAL)
+                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE,
+                     VERTICAL)
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -229,6 +230,7 @@ class Tool(Tk):
         self.show_local = None
         self.LB2 = None
         self.notepad = None
+        self.message_pop = warn_win
         self.title('MIO-KITCHEN')
         if os.name != "posix":
             self.iconphoto(True,
@@ -246,9 +248,6 @@ class Tool(Tk):
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
         self.after(1000, self.get_time)
-
-    def message_pop(self, message, color='orange') -> None:
-        self.tsk.config(text=message, bg=color)
 
     def get_frame(self, title):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
@@ -2189,7 +2188,7 @@ class PackSuper(Toplevel):
 @cartoon
 def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
     if not dn.get():
-        win.message_pop(lang.warn1)
+        warn_win(text=lang.warn1)
         return False
     work = rwork()
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
@@ -3061,6 +3060,17 @@ def unpack(chose, form: any = None):
     json_.write(parts)
     parts.clear()
     print(lang.text8)
+
+
+def warn_win(text='', color='orange', title=""):
+    ask = ttk.LabelFrame(win, text=title)
+    ask.place(relx=0.5, rely=0.5, anchor="center")
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
+    frame_button = ttk.Frame(frame_inner)
+    frame_button.pack(side=TOP)
+    ask.after(1000, ask.destroy)
 
 
 def ask_win(text='', ok=None, cancel=None) -> int:
