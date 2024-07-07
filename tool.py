@@ -39,8 +39,8 @@ else:
 import zipfile
 from io import BytesIO, StringIO
 from platform import machine
-from tkinter import *
-from tkinter import ttk
+from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE, VERTICAL)
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
