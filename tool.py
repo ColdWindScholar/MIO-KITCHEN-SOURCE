@@ -1880,7 +1880,7 @@ class MpkStore(Toplevel):
             a.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
-            ttk.Label(f3, text=f"{data.get('desc')[:25]}").pack(padx=5, pady=5)
+            ttk.Label(f3, text=f"{data.get('desc')[:40]}").pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
