@@ -1003,6 +1003,7 @@ class IconGrid(tk.Frame):
             except:
                 pass
         self.icons.clear()
+        self.update_idletasks()
 
     def remove(self, id_):
         try:
