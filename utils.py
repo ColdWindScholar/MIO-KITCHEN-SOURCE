@@ -205,6 +205,11 @@ def gettype(file) -> str:
 
 
 def dynamic_list_reader(path):
+    """
+    read dynamic_list and return a dict
+    :param path:
+    :return:
+    """
     data = {}
     with open(path, 'r', encoding='utf-8') as l_f:
         for p in l_f.readlines():
@@ -254,6 +259,11 @@ def generate_dynamic_list(dbfz, size, set_, lb, work):
 
 
 def v_code(num=6) -> str:
+    """
+    Get Random Str in Number and words
+    :param num: number of Random Str
+    :return:
+    """
     ret = ""
     for i in range(num):
         num = randint(0, i)
@@ -278,6 +288,13 @@ def qc(file_) -> None:
 
 
 def cz(func, *args, join=False):
+    """
+    Multithreaded running tasks
+    :param func: Function
+    :param args:Args for the task
+    :param join:if wait the task
+    :return:
+    """
     t = Thread(target=func, args=args, daemon=True)
     t.start()
     if join:
