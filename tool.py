@@ -43,7 +43,8 @@ except ImportError:
 try:
     from pycase import ensure_dir_case_sensitive
 except ImportError:
-    ensure_dir_case_sensitive = lambda *x: ...
+    def ensure_dir_case_sensitive(*x):
+        print(f'Cannot sensitive {x}, Not Supported')
 
 if os.name == 'nt':
     import windnd
@@ -755,7 +756,7 @@ class Welcome(ttk.Frame):
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             values=[i.rsplit('.', 1)[0] for i in
-                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3_.pack(padx=10, pady=10, side='top')
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
@@ -773,7 +774,7 @@ class Welcome(ttk.Frame):
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           values=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if
-                                 i != 'private.txt'])
+                                  i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
         ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
