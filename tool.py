@@ -254,7 +254,6 @@ class Tool(Tk):
         self.frame_bg.update_idletasks()
         self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
         self.scrollbar.config(command=self.canvas1.yview)
-
         return frame
 
     def gui(self):
