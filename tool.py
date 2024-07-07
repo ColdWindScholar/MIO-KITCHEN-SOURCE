@@ -5,14 +5,9 @@ import shutil
 import subprocess
 import threading
 from collections import deque
-
 from functools import wraps
 from random import randrange
-
 from requests import ConnectTimeout, HTTPError
-
-import AI_engine
-import ext4
 
 if platform.system() != 'Darwin':
     try:
@@ -29,24 +24,10 @@ import sys
 import time
 from dumper import Dumper
 import tkinter as tk
-from config_parser import ConfigParser
 from webbrowser import open as openurl
-import extra
-import utils
-from extra import *
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 import pygments.lexers
 from utils import lang
-
-try:
-    import imp
-except ImportError:
-    imp = None
-try:
-    from pycase import ensure_dir_case_sensitive
-except ImportError:
-    def ensure_dir_case_sensitive(*x):
-        print(f'Cannot sensitive {x}, Not Supported')
+from timeit import default_timer as dti
 
 if os.name == 'nt':
     import windnd
@@ -60,7 +41,6 @@ from io import BytesIO, StringIO
 from platform import machine
 from tkinter import *
 from tkinter import ttk
-from sv_ttk_fixes import *
 from shutil import rmtree, copy, move
 import requests
 import sv_ttk
@@ -78,12 +58,29 @@ import lpunpack
 import mkdtboimg
 import ozipdecrypt
 import splituapp
-from timeit import default_timer as dti
 import ofp_qc_decrypt
 import ofp_mtk_decrypt
 import editor
 import opscrypto
 import images
+import extra
+import AI_engine
+import ext4
+from config_parser import ConfigParser
+import utils
+from sv_ttk_fixes import *
+from extra import *
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+
+try:
+    import imp
+except ImportError:
+    imp = None
+try:
+    from pycase import ensure_dir_case_sensitive
+except ImportError:
+    def ensure_dir_case_sensitive(*x):
+        print(f'Cannot sensitive {x}, Not Supported')
 
 elocal = utils.e_local
 
