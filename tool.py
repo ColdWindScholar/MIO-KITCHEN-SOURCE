@@ -2226,7 +2226,7 @@ class StdoutRedirector:
             self.error_info += string
             return
         self.text_space.insert(END, string)
-        self.text_space.yview('end')
+        self.text_space.see('end')
 
     def flush(self):
         if self.error_info:
