@@ -9,6 +9,8 @@ from collections import deque
 from functools import wraps
 from random import randrange
 
+from requests import ConnectTimeout, HTTPError
+
 import AI_engine
 import ext4
 
@@ -1958,8 +1960,8 @@ class MpkStore(Toplevel):
                     os.remove(os.path.join(elocal, "bin", "temp", i))
                 except (Exception, BaseException) as e:
                     print(e)
-        except:
-            pass
+        except (ConnectTimeout, HTTPError, BaseException, Exception, TclError) as e:
+            print(e)
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
             control.config(style="")
