@@ -1032,7 +1032,7 @@ class ModuleManager:
     def get_name(self, id_) -> str:
         return self.get_info(id_, 'name')
 
-    def get_info(self, id_: str, item: str):
+    def get_info(self, id_: str, item: str) -> str:
         info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
         if not os.path.exists(info_file):
             return ''
