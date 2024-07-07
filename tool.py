@@ -652,11 +652,13 @@ class Upgrade(Toplevel):
         self.notice.configure(text=lang.t52)
         if os.path.exists(settings.new_tool):
             try:
-                os.remove(settings.new_tool)
-                os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+                if os.path.isfile(settings.new_tool):
+                    os.remove(settings.new_tool)
+                if os.path.isfile(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))):
+                    os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
                 re_folder(os.path.join(elocal, "bin", "temp"))
-            except:
-                pass
+            except (Exception, BaseException, FileNotFoundError, PermissionError) as e:
+                print(e)
             settings.set_value('updating', '')
             settings.set_value('new_tool', '')
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "tool" + ('' if os.name != 'nt' else '.exe')))],
