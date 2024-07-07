@@ -1866,7 +1866,8 @@ class MpkStore(Toplevel):
         if app_dict is None:
             app_dict = []
         for data in app_dict:
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'))
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=550, height=100)
+            f.pack_propagate(False)
             self.app_infos[data.get('id')] = f
             self.deque.append(f)
             ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
@@ -1874,9 +1875,9 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"{lang.t21}：{data.get('author')}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"{lang.t22}：{data.get('version')}").pack(side=LEFT, padx=5, pady=5)
-            ttk.Label(f2, text=f"Size：{self.hum_convert(data.get('size'))}").pack(side=LEFT, padx=5, pady=5)
+            a = ttk.Label(f2, text=f"{lang.t21}:{data.get('author')} {lang.t22}:{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:40])
+            a.pack_propagate(False)
+            a.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
             ttk.Label(f3, text=f"{data.get('desc')[:25]}").pack(padx=5, pady=5)
@@ -1888,8 +1889,8 @@ class MpkStore(Toplevel):
             if not ModuleManager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
-            bu.pack(side=LEFT, padx=5, pady=5)
-            f.pack(padx=5, pady=5, anchor='nw')
+            bu.pack(side=RIGHT, padx=5, pady=5)
+            f.pack(padx=5, pady=5, anchor='nw', expand=1)
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
