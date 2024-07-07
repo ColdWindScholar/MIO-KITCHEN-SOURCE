@@ -1197,16 +1197,15 @@ class ModuleManager:
             }
             info_.write((buffer2 := StringIO()))
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-            os.chdir(self.module_dir + os.sep + value)
-            for i in get_all_file_paths("."):
+            for i in get_all_file_paths(self.module_dir + os.sep + value):
+                arch_name = str(i).replace(self.module_dir + os.sep + value, '')
                 if os.path.basename(i) == 'info.json':
                     continue
-                print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
+                print(f"{lang.text1}:{arch_name}")
                 try:
-                    mpk.write(str(i))
+                    mpk.write(str(i), arcname=arch_name)
                 except Exception as e:
                     print(lang.text2.format(i, e))
-            os.chdir(elocal)
         with zipfile.ZipFile(os.path.join(settings.path, str(name) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
             mpk2.writestr('main.zip', buffer.getvalue())
