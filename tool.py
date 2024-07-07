@@ -321,7 +321,6 @@ class Tool(Tk):
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
-        cz(self.get_time)
 
     def up_progressbar(self):
         self.frame_bg.update_idletasks()
@@ -3723,6 +3722,7 @@ def init():
     print(lang.text108)
     win.update()
     jzxs(win)
+    cz(win.get_time)
     print(lang.text134 % (dti() - start))
     do_override_sv_ttk_fonts()
     win.mainloop()
