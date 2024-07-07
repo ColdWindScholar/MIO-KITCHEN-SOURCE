@@ -1593,6 +1593,8 @@ ModuleManager = ModuleManager()
 class MpkMan(ttk.Frame):
     def __init__(self):
         super().__init__(master=win.tab7)
+        self.rmenu2 = None
+        self.pls = None
         self.pack(padx=10, pady=10, fill=BOTH)
         self.chosen = tk.StringVar(value='')
         self.moduledir = ModuleManager.module_dir
