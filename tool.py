@@ -69,7 +69,7 @@ import ext4
 from config_parser import ConfigParser
 import utils
 from sv_ttk_fixes import *
-from extra import *
+from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
 
 try:
