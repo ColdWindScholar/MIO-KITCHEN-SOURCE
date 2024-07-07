@@ -54,9 +54,9 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 class sdat2img:
     def __init__(self, transfer_list_file, new_data_file, output_image_file):
         print('sdat2img binary - version: 1.3\n')
-        self.TRANSFER_LIST_FILE = transfer_list_file
-        self.NEW_DATA_FILE = new_data_file
-        self.OUTPUT_IMAGE_FILE = output_image_file
+        self.transfer_list_file = transfer_list_file
+        self.new_data_file = new_data_file
+        self.output_image_file = output_image_file
         self.list_file = self.parse_transfer_list_file()
         block_size = 4096
         version = next(self.list_file)
@@ -71,7 +71,7 @@ class sdat2img:
         print('Android {} detected!\n'.format(versions.get(version, f'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
-            output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
+            output_img = open(self.output_image_file, 'wb')
         except IOError as e:
             if e.errno == 17:
                 print(f'Error: the output file "{e.filename}" already exists')
@@ -80,7 +80,7 @@ class sdat2img:
             else:
                 print(e)
 
-        new_data_file = open(self.NEW_DATA_FILE, 'rb')
+        new_data_file = open(self.new_data_file, 'rb')
         max_file_size = 0
 
         for command in self.list_file:
@@ -120,7 +120,7 @@ class sdat2img:
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
 
     def parse_transfer_list_file(self):
-        with open(self.TRANSFER_LIST_FILE, 'r') as trans_list:
+        with open(self.transfer_list_file, 'r') as trans_list:
             # First line in transfer list is the version number
             # Second line in transfer list is the total number of blocks we expect to write
             if (version := int(trans_list.readline())) >= 2 and (new_blocks := int(trans_list.readline())):
