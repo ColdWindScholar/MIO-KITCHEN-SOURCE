@@ -3315,18 +3315,18 @@ def pack_zip():
         print(lang.text91 % dn.get())
         if ask_win(lang.t25) == 1:
             Dbkxyt()
-        os.chdir(settings.path + os.sep + dn.get())
         with zipfile.ZipFile(relpath := settings.path + os.sep + dn.get() + ".zip", 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
-            for file in get_all_file_paths('.'):
-                print(f"{lang.text1}:{file}")
+            for file in get_all_file_paths(settings.path + os.sep + dn.get()):
+                file = str(file)
+                arch_name = file.replace(settings.path + os.sep + dn.get(), '')
+                print(f"{lang.text1}:{arch_name}")
                 try:
-                    zip_.write(file)
+                    zip_.write(file, arcname=arch_name)
                 except Exception as e:
                     print(lang.text2.format(file, e))
         if os.path.exists(relpath):
             print(lang.text3.format(relpath))
-        os.chdir(elocal)
 
 
 def dndfile(files):
