@@ -2261,8 +2261,6 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
                 print(out_put)
         states.open_pids.remove(pid)
     except subprocess.CalledProcessError as e:
-        ret = lambda: print(f"Error!{exe}")
-        ret.returncode = 2
         for i in iter(e.stdout.readline, b""):
             if out == 0:
                 try:
@@ -2270,6 +2268,7 @@ def call(exe, kz='Y', out=0, shstate=False, sp=0):
                 except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
+        return 2
     ret.wait()
     return ret.returncode
 
