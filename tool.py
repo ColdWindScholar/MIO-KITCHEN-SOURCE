@@ -1189,17 +1189,10 @@ class ModuleManager:
             return 1
         with open(os.path.join(self.module_dir, (value := id_), "info.json"), 'r',
                   encoding='UTF-8') as f:
-            data = json.load(f)
-            (info_ := ConfigParser())['module'] = {
-                'name': data["name"],
-                'version': data["version"],
-                'author': data["author"],
-                'describe': data.get("describe", ''),
-                'resource': 'main.zip',
-                'identifier': value,
-                'depend': data["depend"]
-            }
-            info_.write((buffer2 := StringIO()))
+            data: dict = json.load(f)
+            data.setdefault('resource', "main.zip")
+            (info_ := ConfigParser())['module'] = data
+            info_.write(buffer2 := StringIO())
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
             for i in get_all_file_paths(self.module_dir + os.sep + value):
                 arch_name = str(i).replace(self.module_dir + os.sep + value, '')
