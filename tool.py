@@ -119,7 +119,7 @@ class JsonEdit:
 class LoadCar:
     gifs = []
 
-    def __init__(self, *args):
+    def __init__(self):
         self.frames = []
         self.hide_gif = False
         self.frame = None
