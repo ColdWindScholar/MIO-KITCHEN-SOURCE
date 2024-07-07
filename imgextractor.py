@@ -3,6 +3,7 @@ import re
 import struct
 
 import ext4
+from posix import symlink
 
 if os.name == 'nt':
     from ctypes.wintypes import LPCSTR, DWORD
@@ -155,16 +156,7 @@ class Extractor:
                             os.remove(target)
                         finally:
                             ...
-                    if os.name == 'posix':
-                        os.symlink(link_target, target)
-                    elif os.name == 'nt':
-                        with open(target.replace('/', os.sep), 'wb') as out:
-                            out.write(b'!<symlink>' + link_target.encode('utf-16') + b'\x00\x00')
-                            try:
-                                windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
-                                                                   DWORD(FILE_ATTRIBUTE_SYSTEM))
-                            except Exception as e:
-                                print(e.__str__())
+                    symlink(link_target, target)
                 except BaseException and Exception:
                     try:
                         if link_target and link_target.isprintable():
