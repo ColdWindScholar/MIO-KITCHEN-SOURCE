@@ -1667,8 +1667,7 @@ class MpkMan(ttk.Frame):
         self.pls.canvas.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
         self.pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
         rmenu = Menu(self.pls, tearoff=False, borderwidth=0)
-        rmenu.add_command(label=lang.text21, command=lambda:
-        InstallMpk(
+        rmenu.add_command(label=lang.text21, command=lambda: InstallMpk(
             filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
         rmenu.add_command(label=lang.text23, command=lambda: cz(self.refresh))
         rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
