@@ -1821,6 +1821,90 @@ class InstallMpk(Toplevel):
         self.installb.config(state=DISABLED)
 
 
+class Debugger(Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.title("MIO-KITCHEN Debugger")
+        self.gui()
+        jzxs(self)
+
+    def gui(self):
+        ttk.Button(self, text='Globals', command=self.loaded_module).grid(row=0, column=0, padx=5, pady=5)
+        ttk.Button(self, text='Settings', command=self.settings).grid(row=0, column=1, padx=5, pady=5)
+
+    @staticmethod
+    def settings():
+        def save():
+            if f.get():
+                settings.set_value(h.get(), f.get())
+            else:
+                read_value()
+
+        def read_value():
+            f.delete(0, END)
+            f.insert(0, getattr(settings, h.get()))
+
+        ck = Toplevel()
+        ck.title('Settings')
+        f1 = Frame(ck)
+        f1.pack(pady=5, padx=5, fill=X, expand=True)
+        h = ttk.Combobox(f1, values=[i for i in dir(settings) if isinstance(getattr(settings, i), str)], state='readonly')
+        h.current(0)
+        h.bind("<<ComboboxSelected>>", lambda *x: read_value())
+        h.pack(side='left', padx=5)
+        Label(f1, text=':').pack(side='left', padx=5)
+        f = ttk.Entry(f1, state='normal')
+        f.bind("<KeyRelease>", lambda x: save())
+        f.pack(padx=5, fill=BOTH)
+        read_value()
+        ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
+        jzxs(ck)
+        ck.wait_window()
+
+    @staticmethod
+    def loaded_module():
+        def save():
+            if f.get():
+                if len(f.get().split()) >= 2:
+                    if f.get().split()[0] == 'load':
+                        try:
+                            globals()[h.get()] = __import__(f.get().split()[1])
+                            read_value()
+                        except ImportError:
+                            pass
+                    elif f.get().split()[0] == 'global':
+                        try:
+                            globals()[h.get()] = globals()[f.get().split()[1]]
+                            read_value()
+                        except (Exception, BaseException):
+                            pass
+                else:
+                    globals()[h.get()] = f.get()
+            else:
+                read_value()
+
+        def read_value():
+            f.delete(0, END)
+            f.insert(0, str(globals().get(h.get(), 0)))
+
+        ck = Toplevel()
+        ck.title('Globals')
+        f1 = Frame(ck)
+        f1.pack(pady=5, padx=5, fill=X, expand=True)
+        h = ttk.Combobox(f1, values=list(globals().keys()), state='readonly')
+        h.current(0)
+        h.bind("<<ComboboxSelected>>", lambda *x: read_value())
+        h.pack(side='left', padx=5)
+        Label(f1, text=':').pack(side='left', padx=5)
+        f = ttk.Entry(f1, state='normal')
+        f.bind("<KeyRelease>", lambda x: save())
+        f.pack(padx=5, fill=BOTH)
+        read_value()
+        ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
+        jzxs(ck)
+        ck.wait_window()
+
+
 class MpkStore(Toplevel):
     def __init__(self):
         if states.mpk_store:
@@ -2790,7 +2874,11 @@ def input_(title: str = lang.text76, text: str = "") -> str:
     ttk.Entry(input__, textvariable=input_var).pack(pady=5, padx=5, fill=BOTH)
     ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
     input__.wait_window()
-    return input_var.get()
+    a = input_var.get()
+    if a == 'debugger':
+        Debugger()
+        return ''
+    return a
 
 
 def script2fs(path):
