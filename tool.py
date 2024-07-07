@@ -205,6 +205,17 @@ class DevNull:
         ...
 
 
+def warn_win(text='', color='orange', title=""):
+    ask = ttk.LabelFrame(win, text=title)
+    ask.place(relx=0.5, rely=0.5, anchor="center")
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
+    frame_button = ttk.Frame(frame_inner)
+    frame_button.pack(side=TOP)
+    ask.after(1000, ask.destroy)
+
+
 class Tool(Tk):
     def __init__(self):
         super().__init__()
@@ -3060,17 +3071,6 @@ def unpack(chose, form: any = None):
     json_.write(parts)
     parts.clear()
     print(lang.text8)
-
-
-def warn_win(text='', color='orange', title=""):
-    ask = ttk.LabelFrame(win, text=title)
-    ask.place(relx=0.5, rely=0.5, anchor="center")
-    frame_inner = ttk.Frame(ask)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
-    frame_button = ttk.Frame(frame_inner)
-    frame_button.pack(side=TOP)
-    ask.after(1000, ask.destroy)
 
 
 def ask_win(text='', ok=None, cancel=None) -> int:
