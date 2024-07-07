@@ -3708,7 +3708,10 @@ def init():
         Upgrade()
     if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
         error(1, 'Sorry,Not support your device yet.')
-
+    try:
+        win.winfo_exists()
+    except TclError:
+        return
     win.gui()
     if os.name == 'nt':
         py_win_style.apply_style(win, "mica")
