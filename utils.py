@@ -176,7 +176,7 @@ def gettype(file) -> str:
         with open(fil, 'rb') as file_:
             try:
                 file_.seek(4096, 0)
-            except:
+            except EOFError:
                 return False
             buf = bytearray(file_.read(4))
         return buf == b'\x67\x44\x6c\x61'
@@ -255,7 +255,7 @@ def generate_dynamic_list(dbfz, size, set_, lb, work):
 def v_code(num=6) -> str:
     ret = ""
     for i in range(num):
-        num = randint(0, 9)
+        num = randint(0, i)
         # num = chr(random.randint(48,57))#ASCII表示数字
         letter = chr(randint(97, 122))  # 取小写字母
         letter_ = chr(randint(65, 90))  # 取大写字母
