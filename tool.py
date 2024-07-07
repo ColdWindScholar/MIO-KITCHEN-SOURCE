@@ -22,10 +22,11 @@ import pathlib
 import shlex
 import sys
 import time
+from platform import machine
+import pygments.lexers
+from webbrowser import open as openurl
 from dumper import Dumper
 import tkinter as tk
-from webbrowser import open as openurl
-import pygments.lexers
 from utils import lang
 from timeit import default_timer as dti
 
@@ -38,7 +39,6 @@ else:
     import mkc_filedialog as filedialog
 import zipfile
 from io import BytesIO, StringIO
-from platform import machine
 from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE, VERTICAL)
 from shutil import rmtree, copy, move
