@@ -82,6 +82,8 @@ import editor
 import opscrypto
 import images
 
+elocal = utils.e_local
+
 
 class States:
     update_window = False
@@ -409,7 +411,7 @@ class Tool(Tk):
         def enable_contextpatch():
             if context.get() == '1':
                 if ask_win2(
-                        "Are you sure turn it on? This feature may cause cannot boot rom!"):
+                        "Are you sure enable it? This feature may cause cannot boot rom!"):
                     settings.set_value('contextpatch', context.get())
                 else:
                     context.set('0')
@@ -445,7 +447,6 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-settings_file = os.path.join((elocal := utils.e_local), "bin", "setting.ini")
 dn = utils.dn = StringVar()
 theme = StringVar()
 language = StringVar()
@@ -810,7 +811,11 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini):
+    def __init__(self, set_ini: str = None):
+        if set_ini:
+            self.set_file = set_ini
+        else:
+            self.set_file = os.path.join(elocal, "bin", "setting.ini")
         self.nps = '0'
         self.rm_pay = '0'
         self.plugin_repo = None
@@ -818,7 +823,6 @@ class SetUtils:
         self.oobe = '0'
         self.path = None
         self.bar_level = '0.9'
-        self.set_file = set_ini
         self.ai_engine = '0'
         self.version = 'basic'
         self.language = 'English'
@@ -850,7 +854,7 @@ class SetUtils:
         win.attributes("-alpha", self.bar_level)
 
     def set_value(self, name, value):
-        self.config.read(settings_file)
+        self.config.read(self.set_file)
         self.config.set("setting", name, value)
         with open(self.set_file, 'w', encoding='utf-8') as fil:
             self.config.write(fil)
@@ -883,7 +887,7 @@ class SetUtils:
         self.load()
 
 
-settings = SetUtils(settings_file)
+settings = SetUtils()
 settings.load()
 
 
