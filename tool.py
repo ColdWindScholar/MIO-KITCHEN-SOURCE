@@ -654,7 +654,7 @@ class Upgrade(Toplevel):
             try:
                 if os.path.isfile(settings.new_tool):
                     os.remove(settings.new_tool)
-                if os.path.isfile(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))):
+                if os.path.isfile(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))):
                     os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
                 re_folder(os.path.join(elocal, "bin", "temp"))
             except (Exception, BaseException, FileNotFoundError, PermissionError) as e:
