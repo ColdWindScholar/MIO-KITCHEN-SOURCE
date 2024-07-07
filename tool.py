@@ -957,7 +957,7 @@ def logo_dump(bn: str = 'logo'):
         win.message_pop(lang.warn3.format(bn))
         return False
     re_folder(work + bn)
-    utils.LOGO_DUMPER(logo, work + bn).unpack()
+    utils.LogoDumper(logo, work + bn).unpack()
 
 
 @cartoon
@@ -969,7 +969,7 @@ def logo_pack(origin_logo=None) -> int:
     if not os.path.exists(dir_ := work + "logo") or not os.path.exists(origin_logo):
         print(lang.warn6)
         return 1
-    utils.LOGO_DUMPER(origin_logo, logo, dir_).repack()
+    utils.LogoDumper(origin_logo, logo, dir_).repack()
     os.remove(origin_logo)
     os.rename(logo, origin_logo)
     rmdir(dir_)
@@ -2990,7 +2990,7 @@ def unpack(chose, form: any = None):
                 jboot(i)
             if i == 'logo':
                 try:
-                    utils.LOGO_DUMPER(work + i + ".img", work + i).check_img(work + i + ".img")
+                    utils.LogoDumper(work + i + ".img", work + i).check_img(work + i + ".img")
                 except AssertionError:
                     pass
                 else:

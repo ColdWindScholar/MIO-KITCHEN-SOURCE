@@ -51,11 +51,11 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 
 
 class sdat2img:
-    def __init__(self, TRANSFER_LIST_FILE, NEW_DATA_FILE, OUTPUT_IMAGE_FILE):
+    def __init__(self, transfer_list_file, new_data_file, output_image_file):
         print('sdat2img binary - version: 1.3\n')
-        self.TRANSFER_LIST_FILE = TRANSFER_LIST_FILE
-        self.NEW_DATA_FILE = NEW_DATA_FILE
-        self.OUTPUT_IMAGE_FILE = OUTPUT_IMAGE_FILE
+        self.TRANSFER_LIST_FILE = transfer_list_file
+        self.NEW_DATA_FILE = new_data_file
+        self.OUTPUT_IMAGE_FILE = output_image_file
         self.list_file = self.parse_transfer_list_file()
         block_size = 4096
         version = next(self.list_file)
@@ -194,7 +194,7 @@ def gettype(file) -> str:
             if compare(f_[0], f_[2]):
                 return f_[1]
     try:
-        if LOGO_DUMPER(file, str(None)).check_img(file):
+        if LogoDumper(file, str(None)).check_img(file):
             return 'logo'
     except AssertionError:
         ...
@@ -359,10 +359,15 @@ def u64(x):
 
 
 def payload_reader(payloadfile):
+    """
+    Read Payload.bin Return dam
+    :param payloadfile: File Path
+    :return:
+    """
     if payloadfile.read(4) != b'CrAU':
         print(f"Magic Check Fail\n")
         payloadfile.close()
-        return
+        return um
     file_format_version = u64(payloadfile.read(8))
     assert file_format_version == 2
     manifest_size = u64(payloadfile.read(8))
@@ -402,7 +407,7 @@ class Vbpatch:
             print("File not Found")
 
 
-class DUMPCFG:
+class Dumpcfg:
     blksz = 0x1 << 0xc
     headoff = 0x4000
     magic = b"LOGO!!!!"
@@ -411,7 +416,7 @@ class DUMPCFG:
     imgblkszs = []
 
 
-class BMPHEAD:
+class Bmphead:
     def __init__(self, buf: bytes = None):  # Read bytes buf and use this struct to parse
         assert buf is not None, f"buf Should be bytes, not {type(buf)}"
         # print(buf)
@@ -426,7 +431,7 @@ class BMPHEAD:
         ) = struct.unpack("<H6I", buf)
 
 
-class XIAOMI_BLKSTRUCT:
+class XiaomiBlkstruct:
     def __init__(self, buf: bytes):
         (
             self.img_offset,
@@ -434,14 +439,14 @@ class XIAOMI_BLKSTRUCT:
         ) = struct.unpack("2I", buf)
 
 
-class LOGO_DUMPER:
+class LogoDumper:
     def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.magic = None
         self.out = out
         self.img = img
         self.dir = dir__
         self.struct_str = "<8s"
-        self.cfg = DUMPCFG()
+        self.cfg = Dumpcfg()
         self.check_img(img)
 
     def check_img(self, img: str):
@@ -452,7 +457,7 @@ class LOGO_DUMPER:
                 self.struct_str, f.read(struct.calcsize(self.struct_str))
             )[0]
             while True:
-                m = XIAOMI_BLKSTRUCT(f.read(8))
+                m = XiaomiBlkstruct(f.read(8))
                 if m.img_offset != 0:
                     self.cfg.imgblkszs.append(m.blksz << 0xc)
                     self.cfg.imgblkoffs.append(m.img_offset << 0xc)
@@ -468,7 +473,7 @@ class LOGO_DUMPER:
                   "BMP\tSize\tWidth\tHeight")
             for i in range(self.cfg.imgnum):
                 f.seek(self.cfg.imgblkoffs[i], 0)
-                bmp_h = BMPHEAD(f.read(26))
+                bmp_h = Bmphead(f.read(26))
                 f.seek(self.cfg.imgblkoffs[i], 0)
                 print(f"{i:d}\t{bmp_h.fsize:d}\t{bmp_h.width:d}\t{bmp_h.height:d}")
                 with open(os.path.join(self.out, f"{i}.bmp"), 'wb') as o:
@@ -481,7 +486,7 @@ class LOGO_DUMPER:
             for i in range(self.cfg.imgnum):
                 print(f"Write BMP [{i:d}.bmp] at offset 0x{off << 0xc:X}")
                 with open(os.path.join(self.dir, f"{i}.bmp"), 'rb') as b:
-                    bmp_head = BMPHEAD(b.read(26))
+                    bmp_head = Bmphead(b.read(26))
                     b.seek(0, 0)
                     self.cfg.imgblkszs[i] = (bmp_head.fsize >> 0xc) + 1
                     self.cfg.imgblkoffs[i] = off
