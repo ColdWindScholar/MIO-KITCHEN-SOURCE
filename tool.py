@@ -1097,8 +1097,9 @@ class ModuleManager:
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
+                shell = 'ash' if os.name == 'posix' else 'bash'
                 call(
-                    f"busybox {'ash' if os.name == 'posix' else 'bash'} {file} {(script_path + 'main.sh').replace(os.sep, '/')}")
+                    f"busybox {shell} {file} {(script_path + 'main.sh').replace(os.sep, '/')}")
                 try:
                     os.remove(file)
                 except (Exception, BaseException) as e:
