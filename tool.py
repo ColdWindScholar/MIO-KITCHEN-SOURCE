@@ -3136,7 +3136,7 @@ class Dirsize:
             try:
                 self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
                                   not os.path.islink(os.path.join(root, name))])
-            except (PermissionError, BaseException, Exception):
+            except (PermissionError, BaseException ,Exception):
                 pass
         if self.get == 1:
             self.rsize_v = self.size
