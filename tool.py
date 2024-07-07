@@ -2600,9 +2600,9 @@ class Packxx(Toplevel):
                                     if int(_i[2]) > ext4_size_value:
                                         ext4_size_value = int(_i[2])
                     elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
-                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
+                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as size_f:
                             try:
-                                ext4_size_value = int(f.read().strip())
+                                ext4_size_value = int(size_f.read().strip())
                             except ValueError:
                                 ext4_size_value = 0
                 self.custom_size[dname] = ext4_size_value
