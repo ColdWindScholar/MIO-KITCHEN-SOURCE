@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import platform
 import shutil
 import zipfile
 from platform import system, machine
@@ -116,6 +117,11 @@ for i in os.listdir(local + os.sep + "bin"):
 if not os.path.exists('dist/LICENSE'):
     shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep+'LICENSE')
 if os.name == 'posix':
+    if platform.machine() == 'x86_64' and os.path.exists(f'{local}/dist/bin/Linux/aarch64'):
+        try:
+            shutil.rmtree(f'{local}/dist/bin/Linux/aarch64')
+        except:
+            pass
     for root, dirs, files in os.walk(local + os.sep + 'dist', topdown=True):
         for i in files:
             print(f"Chmod {os.path.join(root, i)}")
