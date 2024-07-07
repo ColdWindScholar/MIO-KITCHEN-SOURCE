@@ -1415,7 +1415,7 @@ class ModuleManager:
             def generate_sh():
                 temp = os.path.join(elocal, "bin", "temp")
                 if not os.path.exists(temp):
-                    re_folder(temp)
+                    os.mkdir(temp)
                 self.destroy()
 
             def generate_msh():
@@ -1505,8 +1505,7 @@ class ModuleManager:
                                     padx=5, pady=5, fill=BOTH)
                             else:
                                 print(lang.warn14.format(con['type']))
-                ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X,
-                                                                                                              side='bottom')
+            ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X, side='bottom')
             jzxs(self)
             self.wait_window()
 
