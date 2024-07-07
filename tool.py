@@ -251,13 +251,11 @@ class Tool(Tk):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
         frame.pack(padx=10, pady=10)
         ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
-        self.up_progressbar()
-        return frame
-
-    def up_progressbar(self):
         self.frame_bg.update_idletasks()
         self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
         self.scrollbar.config(command=self.canvas1.yview)
+
+        return frame
 
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
