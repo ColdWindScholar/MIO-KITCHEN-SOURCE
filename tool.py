@@ -1595,6 +1595,8 @@ class ModuleManager:
 ModuleManager = ModuleManager()
 
 list_pls_plugin = print
+
+
 class MpkMan(ttk.Frame):
     def __init__(self):
         super().__init__(master=win.tab7)
