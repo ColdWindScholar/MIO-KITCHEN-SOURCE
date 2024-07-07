@@ -1866,7 +1866,7 @@ class MpkStore(Toplevel):
         if app_dict is None:
             app_dict = []
         for data in app_dict:
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=550, height=100)
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=100)
             f.pack_propagate(False)
             self.app_infos[data.get('id')] = f
             self.deque.append(f)
@@ -1875,7 +1875,7 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            a = ttk.Label(f2, text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:42])
+            a = ttk.Label(f2, text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:50])
             a.pack_propagate(False)
             a.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
