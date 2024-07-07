@@ -2441,6 +2441,7 @@ class Packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
+        self.lg = list_
         if not self.verify():
             self.start_()
             return
@@ -2454,7 +2455,6 @@ class Packxx(Toplevel):
         self.spatchvb = IntVar()
         self.delywj = IntVar()
         self.ext4_method = StringVar(value=lang.t32)
-        self.lg = list_
 
         self.origin_fs = StringVar(value='ext')
         self.modify_fs = StringVar(value='ext')
