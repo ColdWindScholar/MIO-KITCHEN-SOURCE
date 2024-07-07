@@ -254,6 +254,11 @@ class Tool(Tk):
         self.up_progressbar()
         return frame
 
+    def up_progressbar(self):
+        self.frame_bg.update_idletasks()
+        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
+        self.scrollbar.config(command=self.canvas1.yview)
+
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -321,11 +326,6 @@ class Tool(Tk):
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
-
-    def up_progressbar(self):
-        self.frame_bg.update_idletasks()
-        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
-        self.scrollbar.config(command=self.canvas1.yview)
 
     def tab4_n(self):
         self.rotate_angle = 0
