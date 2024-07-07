@@ -67,17 +67,17 @@ class sdat2img:
             3: "Marshmallow 6.x",
             4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
         }
-        print("Android {} detected!\n".format(versions.get(version, f'Unknown Android version {version}!\n')))
+        print('Android {} detected!\n'.format(versions.get(version, f'Unknown Android version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
             output_img = open(self.OUTPUT_IMAGE_FILE, 'wb')
         except IOError as e:
             if e.errno == 17:
-                print('Error: the output file "{}" already exists'.format(e.filename))
+                print(f'Error: the output file "{e.filename}" already exists')
                 print('Remove it, rename it, or choose a different file name.')
                 return
             else:
-                raise
+                print(e)
 
         new_data_file = open(self.NEW_DATA_FILE, 'rb')
         max_file_size = 0
@@ -380,6 +380,10 @@ class Vbpatch:
         self.disavb = lambda: self.patchvb(b'\x02')
 
     def checkmagic(self):
+        """
+        Check The Magic if vbmeta
+        :return:
+        """
         if os.access(self.file, os.F_OK):
             with open(self.file, "rb") as f:
                 return b'AVB0' == f.read(4)
@@ -467,7 +471,7 @@ class LOGO_DUMPER:
                 bmp_h = BMPHEAD(f.read(26))
                 f.seek(self.cfg.imgblkoffs[i], 0)
                 print(f"{i:d}\t{bmp_h.fsize:d}\t{bmp_h.width:d}\t{bmp_h.height:d}")
-                with open(os.path.join(self.out, "%d.bmp" % i), 'wb') as o:
+                with open(os.path.join(self.out, f"{i}.bmp"), 'wb') as o:
                     o.write(f.read(bmp_h.fsize))
             print("\tDone!")
 
