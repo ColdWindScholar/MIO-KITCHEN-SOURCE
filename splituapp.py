@@ -43,7 +43,8 @@ def extract(source, flist):
                 filename = ''
 
             f.seek(22, 1)
-            crc_data = f.read(header_size - 98)
+            # Its Crc_data
+            f.read(header_size - 98)
 
             if not flist or filename in flist:
                 if filename in img_files:

@@ -8,8 +8,7 @@ import threading
 from collections import deque
 from functools import wraps
 from random import randrange
-
-from requests import ConnectTimeout, HTTPError
+import json
 
 if platform.system() != 'Darwin':
     try:
@@ -18,7 +17,6 @@ if platform.system() != 'Darwin':
         pyi_splash.close()
     except ModuleNotFoundError:
         ...
-import json
 import os.path
 import pathlib
 import shlex
@@ -52,6 +50,7 @@ if sys.version_info.major == 3:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
+from requests import ConnectTimeout, HTTPError
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 import imgextractor
@@ -902,10 +901,10 @@ def re_folder(path):
 
 
 @cartoon
-def un_dtbo(bn: str = 'dtbo') -> any:
+def un_dtbo(bn: str = 'dtbo') -> None:
     if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
         print(lang.warn3.format(bn))
-        return False
+        return
     re_folder(work + bn)
     re_folder(work + bn + os.sep + "dtbo")
     re_folder(work + bn + os.sep + "dts")
@@ -913,7 +912,7 @@ def un_dtbo(bn: str = 'dtbo') -> any:
         mkdtboimg.dump_dtbo(dtboimg, work + bn + os.sep + "dtbo" + os.sep + "dtbo")
     except Exception as e:
         print(lang.warn4.format(e))
-        return False
+        return
     for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
