@@ -208,6 +208,7 @@ class DevNull:
 class Tool(Tk):
     def __init__(self):
         super().__init__()
+        self.rotate_angle = 0
         do_set_window_deffont(self)
         self.show = None
         self.scroll = None
@@ -340,7 +341,7 @@ class Tool(Tk):
             ans = "#" + color1[2:] + color2[2:] + color3[2:]
             return ans
 
-        def update_angle(event):
+        def update_angle():
             self.rotate_angle -= 10
             canvas.itemconfigure(text_item, angle=self.rotate_angle)
 
@@ -348,7 +349,7 @@ class Tool(Tk):
         canvas.pack()
         text_item = canvas.create_text(200, 50, text='MIO-KITCHEN', font=('Arial', 30), fill='white')
 
-        canvas.tag_bind(text_item, '<B1-Motion>', update_angle)
+        canvas.tag_bind(text_item, '<B1-Motion>', lambda event: update_angle())
         canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
 
         Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
@@ -1877,7 +1878,7 @@ class MpkStore(Toplevel):
             fb = ttk.Frame(f)
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
-            #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
+            # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
             a = ttk.Label(f2,
                           text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[
                                :50])
