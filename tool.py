@@ -2496,7 +2496,7 @@ class Packxx(Toplevel):
         self.xgdx.pack(
             side='left', padx=5, pady=5)
         self.ext4_method.trace('w', lambda *x: self.show_modify_size())
-        self.show_modify_size()
+        cz(self.show_modify_size)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5,
