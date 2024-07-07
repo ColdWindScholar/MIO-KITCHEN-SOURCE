@@ -2647,7 +2647,7 @@ class Packxx(Toplevel):
                     if file:
                         if gettype(file) == 'vbmeta':
                             print(lang.text71 % file)
-                            utils.vbpatch(file).disavb()
+                            utils.Vbpatch(file).disavb()
             if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
                 if os.name == 'nt':
                     try:
@@ -2997,7 +2997,7 @@ def unpack(chose, form: any = None):
                     logo_dump(i)
             if gettype(work + i + ".img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{i}")
-                utils.vbpatch(work + i + ".img").disavb()
+                utils.Vbpatch(work + i + ".img").disavb()
             file_type = gettype(work + i + ".img")
             if file_type == "sparse":
                 print(lang.text79 + i + ".img [%s]" % file_type)

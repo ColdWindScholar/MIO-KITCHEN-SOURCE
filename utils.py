@@ -88,7 +88,7 @@ class sdat2img:
                 for block in command[1]:
                     begin = block[0]
                     block_count = block[1] - begin
-                    print('Copying {} blocks into position {}...'.format(block_count, begin))
+                    print(f'Copying {block_count} blocks into position {begin}...')
 
                     # Position output file
                     output_img.seek(begin * block_size)
@@ -98,7 +98,7 @@ class sdat2img:
                         output_img.write(new_data_file.read(block_size))
                         block_count -= 1
             else:
-                print('Skipping command {}...'.format(command[0]))
+                print(f'Skipping command {command[0]}...')
 
         # Make file larger if necessary
         if output_img.tell() < max_file_size:
@@ -106,14 +106,14 @@ class sdat2img:
 
         output_img.close()
         new_data_file.close()
-        print('Done! Output image: {}'.format(os.path.realpath(output_img.name)))
+        print(f'Done! Output image: {os.path.realpath(output_img.name)}')
 
     @staticmethod
     def rangeset(src):
         src_set = src.split(',')
         num_set = [int(item) for item in src_set]
         if len(num_set) != num_set[0] + 1:
-            print('Error on parsing following data to rangeset:\n{}'.format(src))
+            print(f'Error on parsing following data to rangeset:\n{src}')
             return
 
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
@@ -141,7 +141,7 @@ class sdat2img:
                         continue
                     # Skip lines starting with numbers, they are not commands anyway
                     if not cmd[0].isdigit():
-                        print('Command "{}" is not valid.'.format(cmd))
+                        print(f'Command "{cmd}" is not valid.')
                         return
 
 
@@ -374,7 +374,7 @@ def payload_reader(payloadfile):
     return dam
 
 
-class vbpatch:
+class Vbpatch:
     def __init__(self, file_):
         self.file = file_
         self.disavb = lambda: self.patchvb(b'\x02')
@@ -466,17 +466,17 @@ class LOGO_DUMPER:
                 f.seek(self.cfg.imgblkoffs[i], 0)
                 bmp_h = BMPHEAD(f.read(26))
                 f.seek(self.cfg.imgblkoffs[i], 0)
-                print("%d\t%d\t%d\t%d" % (i, bmp_h.fsize, bmp_h.width, bmp_h.height))
+                print(f"{i:d}\t{bmp_h.fsize:d}\t{bmp_h.width:d}\t{bmp_h.height:d}")
                 with open(os.path.join(self.out, "%d.bmp" % i), 'wb') as o:
                     o.write(f.read(bmp_h.fsize))
             print("\tDone!")
 
-    def repack(self):
+    def repack(self) -> None:
         with open(self.out, 'wb') as o:
             off = 0x5
             for i in range(self.cfg.imgnum):
-                print("Write BMP [%d.bmp] at offset 0x%X" % (i, off << 0xc))
-                with open(os.path.join(self.dir, "%d.bmp" % i), 'rb') as b:
+                print(f"Write BMP [{i:d}.bmp] at offset 0x{off << 0xc:X}")
+                with open(os.path.join(self.dir, f"{i}.bmp"), 'rb') as b:
                     bmp_head = BMPHEAD(b.read(26))
                     b.seek(0, 0)
                     self.cfg.imgblkszs[i] = (bmp_head.fsize >> 0xc) + 1
