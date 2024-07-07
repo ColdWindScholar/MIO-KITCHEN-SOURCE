@@ -312,6 +312,11 @@ def cz(func, *args, join=False):
 
 
 def simg2img(path):
+    """
+    convert Sparse image to Raw Image
+    :param path:
+    :return:
+    """
     with open(path, 'rb') as fd:
         if SparseImage(fd).check():
             print('Sparse image detected.')
