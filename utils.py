@@ -281,6 +281,11 @@ def v_code(num=6) -> str:
 
 
 def qc(file_) -> None:
+    """
+    remove Same Line of File
+    :param file_:
+    :return:
+    """
     if not exists(file_):
         return
     with open(file_, 'r+', encoding='utf-8', newline='\n') as f:
@@ -346,6 +351,12 @@ def findfile(file, dir_) -> str:
 
 
 def findfolder(dir__, folder_name):
+    """
+    Find Folder
+    :param dir__: dir that need Search
+    :param folder_name: folder name need found
+    :return:
+    """
     for root, dirnames, filenames in os.walk(dir__):
         for dirname in dirnames:
             if dirname == folder_name:
@@ -354,6 +365,11 @@ def findfolder(dir__, folder_name):
 
 
 def jzxs(master):
+    """
+    Replace Toplevel or Tk to Center
+    :param master: Window
+    :return:
+    """
     master.geometry('+{}+{}'.format(int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2),
                                     int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)))
     try:
