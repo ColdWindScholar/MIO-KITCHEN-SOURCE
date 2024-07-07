@@ -1030,12 +1030,15 @@ class ModuleManager:
         self.MshParse.module_dir = self.module_dir
 
     def get_name(self, id_) -> str:
+        return self.get_info(id_, 'name')
+
+    def get_info(self, id_: str, item: str):
         info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
         if not os.path.exists(info_file):
             return ''
         with open(info_file, 'r', encoding='UTF-8') as f:
             data = json.load(f)
-            return data.get('name', '')
+            return data.get(item, '')
 
     @cartoon
     def run(self, id_):
@@ -1878,7 +1881,9 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             #ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            a = ttk.Label(f2, text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:50])
+            a = ttk.Label(f2,
+                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[
+                               :50])
             a.pack_propagate(False)
             a.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
