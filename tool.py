@@ -1004,7 +1004,7 @@ class IconGrid(tk.Frame):
         for i in self.icons:
             try:
                 i.destroy()
-            except:
+            except TclError:
                 pass
         self.icons.clear()
         self.update_idletasks()
@@ -1012,7 +1012,7 @@ class IconGrid(tk.Frame):
     def remove(self, id_):
         try:
             self.apps.get(id_).destroy()
-        except:
+        except (TclError, Exception):
             pass
 
     def on_frame_configure(self):
