@@ -1886,7 +1886,9 @@ class MpkStore(Toplevel):
             f2 = ttk.Frame(fb)
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            o = ttk.Label(f2,text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[:50])
+            o = ttk.Label(f2,
+                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[
+                               :50])
             o.pack_propagate(False)
             o.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
