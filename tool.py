@@ -1199,7 +1199,7 @@ class ModuleManager:
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
             for i in get_all_file_paths(self.module_dir + os.sep + value):
                 arch_name = str(i).replace(self.module_dir + os.sep + value, '')
-                if os.path.basename(i) == 'info.json':
+                if os.path.basename(i) in ['info.json', 'icon']:
                     continue
                 print(f"{lang.text1}:{arch_name}")
                 try:
