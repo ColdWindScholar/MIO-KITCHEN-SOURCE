@@ -1029,7 +1029,11 @@ class ModuleManager:
         self.MshParse.module_dir = self.module_dir
 
     def get_name(self, id_) -> str:
-        return self.get_info(id_, 'name')
+        name = self.get_info(id_, 'name')
+        if name:
+            return name
+        else:
+            return id_
 
     def get_info(self, id_: str, item: str) -> str:
         info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
