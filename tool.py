@@ -7,6 +7,7 @@ import threading
 from collections import deque
 from functools import wraps
 from random import randrange
+
 from requests import ConnectTimeout, HTTPError
 
 if platform.system() != 'Darwin':
@@ -52,7 +53,6 @@ if sys.version_info.major == 3:
         sys.exit(1)
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
-import fspatch
 import imgextractor
 import lpunpack
 import mkdtboimg
