@@ -1975,7 +1975,7 @@ class MpkStore(Toplevel):
             self.apps = self.data
         try:
             self.add_app(self.apps)
-        except:
+        except (TclError, Exception, BaseException):
             if not states.mpk_store:
                 return
         self.label_frame.update_idletasks()
