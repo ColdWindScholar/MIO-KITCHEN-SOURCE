@@ -1197,6 +1197,8 @@ class ModuleManager:
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
             os.chdir(self.module_dir + os.sep + value)
             for i in get_all_file_paths("."):
+                if os.path.basename(i) == 'info.json':
+                    continue
                 print(f"{lang.text1}:%s" % i.rsplit(".\\")[1])
                 try:
                     mpk.write(str(i))
