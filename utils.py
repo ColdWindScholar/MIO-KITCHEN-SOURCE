@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 import os
 import struct
 import sys

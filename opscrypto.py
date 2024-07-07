@@ -2,7 +2,7 @@
 
 # Oneplus Decrypter (c) V 1.4 B.Kerler 2019-2022
 # Licensed under MIT License
-
+# pylint: disable=line-too-long
 
 import shutil
 
