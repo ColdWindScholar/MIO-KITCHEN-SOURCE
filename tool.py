@@ -2442,6 +2442,7 @@ class Packxx(Toplevel):
         if not list_:
             return
         self.lg = list_
+        self.spatchvb = IntVar()
         if not self.verify():
             self.start_()
             return
@@ -2452,7 +2453,6 @@ class Packxx(Toplevel):
         self.scale = IntVar(value=0)
         self.UTC = IntVar(value=int(time.time()))
         self.scale_erofs = IntVar()
-        self.spatchvb = IntVar()
         self.delywj = IntVar()
         self.ext4_method = StringVar(value=lang.t32)
 
