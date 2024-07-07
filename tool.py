@@ -399,8 +399,8 @@ class Tool(Tk):
 
         ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
-                           value=[str(i.rsplit('.', 1)[0]) for i in
-                                  os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
+                           values=[str(i.rsplit('.', 1)[0]) for i in
+                                   os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         ai = StringVar(value=settings.ai_engine)
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
@@ -754,7 +754,7 @@ class Welcome(ttk.Frame):
         ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
-                            value=[i.rsplit('.', 1)[0] for i in
+                            values=[i.rsplit('.', 1)[0] for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         lb3_.pack(padx=10, pady=10, side='top')
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
@@ -772,7 +772,7 @@ class Welcome(ttk.Frame):
 
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
-                          value=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if
+                          values=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if
                                  i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
