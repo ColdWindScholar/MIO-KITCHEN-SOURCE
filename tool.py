@@ -2493,9 +2493,7 @@ def jboot(bn: str = 'boot'):
         if comp != "unknown":
             os.rename(work + bn + os.sep + "ramdisk.cpio",
                       work + bn + os.sep + "ramdisk.cpio.comp")
-            if call("magiskboot decompress %s %s" % (
-                    work + bn + os.sep + "ramdisk.cpio.comp",
-                    work + bn + os.sep + "ramdisk.cpio")) != 0:
+            if call(f"magiskboot decompress {work + bn + os.sep + 'ramdisk.cpio.comp'} {work + bn + os.sep + 'ramdisk.cpio'}") != 0:
                 print("Failed to decompress Ramdisk...")
                 return
         if not os.path.exists(work + bn + os.sep + "ramdisk"):
@@ -2523,7 +2521,7 @@ def dboot(nm: str = 'boot'):
 
     if os.path.isdir(work + nm + os.sep + "ramdisk"):
         os.chdir(work + nm + os.sep + "ramdisk")
-        call(exe="busybox ash -c \"find | sed 1d | %s -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"" % cpio, sp=1,
+        call(exe=f"busybox ash -c \"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"", sp=1,
              shstate=True)
         os.chdir(work + nm + os.sep)
         with open(work + nm + os.sep + "comp", "r", encoding='utf-8') as compf:
@@ -2540,7 +2538,7 @@ def dboot(nm: str = 'boot'):
                     os.remove("ramdisk.cpio")
                 except (Exception, BaseException):
                     ...
-                os.rename("ramdisk-new.cpio.%s" % comp.split('_')[0], "ramdisk.cpio")
+                os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
         else:
             print("Successfully packed Ramdisk..")
             os.remove("ramdisk.cpio")

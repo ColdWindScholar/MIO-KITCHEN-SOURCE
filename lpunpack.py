@@ -625,7 +625,7 @@ class SparseImage:
         self._fd.seek(self.header.file_hdr_sz - SPARSE_HEADER_SIZE, 1)
         unsparse_file_dir = os.path.dirname(self._fd.name)
         unsparse_file = os.path.join(unsparse_file_dir,
-                                     "{}.unsparse.img".format(os.path.splitext(os.path.basename(self._fd.name))[0]))
+                                     f"{os.path.splitext(os.path.basename(self._fd.name))[0]}.unsparse.img")
         with open(str(unsparse_file), 'wb') as out:
             sector_base = 82528
             output_len = 0
@@ -894,7 +894,7 @@ class LpUnpack:
 def unpack(file: str, out: str, parts: list = None):
     namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
     if not os.path.exists(namespace.SUPER_IMAGE):
-        raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
+        raise FileNotFoundError(f"{namespace.SUPER_IMAGE} Cannot Find")
     else:
         LpUnpack(**vars(namespace)).unpack()
 
@@ -902,6 +902,6 @@ def unpack(file: str, out: str, parts: list = None):
 def get_parts(file_):
     namespace = argparse.Namespace(SUPER_IMAGE=file_, SHOW_INFO=False)
     if not os.path.exists(namespace.SUPER_IMAGE):
-        raise FileNotFoundError("%s Cannot Find" % namespace.SUPER_IMAGE)
+        raise FileNotFoundError(f"{namespace.SUPER_IMAGE} Cannot Find")
     else:
         return LpUnpack(**vars(namespace)).get_info()

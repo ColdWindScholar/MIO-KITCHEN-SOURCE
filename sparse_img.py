@@ -48,19 +48,15 @@ class SparseImage:
         self.total_chunks = total_chunks = header[7]
 
         if magic != 0xED26FF3A:
-            raise ValueError("Magic should be 0xED26FF3A but is 0x%08X" % (magic,))
+            raise ValueError(f"Magic should be 0xED26FF3A but is 0x{magic:08X}")
         if major_version != 1 or minor_version != 0:
-            raise ValueError("I know about version 1.0, but this is version %u.%u" %
-                             (major_version, minor_version))
+            raise ValueError(f"I know about version 1.0, but this is version {major_version:d}.{minor_version:d}")
         if file_hdr_sz != 28:
-            raise ValueError("File header size was expected to be 28, but is %u." %
-                             (file_hdr_sz,))
+            raise ValueError(f"File header size was expected to be 28, but is {file_hdr_sz:d}.")
         if chunk_hdr_sz != 12:
-            raise ValueError("Chunk header size was expected to be 12, but is %u." %
-                             (chunk_hdr_sz,))
+            raise ValueError(f"Chunk header size was expected to be 12, but is {chunk_hdr_sz:d}.")
 
-        print("Total of %u %u-byte output blocks in %u input chunks."
-              % (total_blks, blk_sz, total_chunks))
+        print(f"Total of {total_blks:d} {blk_sz:d}-byte output blocks in {total_chunks:d} input chunks.")
 
         if not build_map:
             return
@@ -99,8 +95,7 @@ class SparseImage:
 
             elif chunk_type == 0xCAC3:
                 if data_sz != 0:
-                    raise ValueError("Don't care chunk input size is non-zero (%u)" %
-                                     data_sz)
+                    raise ValueError(f"Don't care chunk input size is non-zero ({data_sz:d})")
                 else:
                     pos += chunk_sz
 

@@ -95,8 +95,7 @@ class DtEntry:
 
         missing_keys = set(required_keys) - set(kwargs)
         if missing_keys:
-            raise ValueError('Missing keys in DtEntry constructor: %r' %
-                             sorted(missing_keys))
+            raise ValueError(f'Missing keys in DtEntry constructor: {sorted(missing_keys)!r}')
 
         self.__dt_file = kwargs['dt_file']
         self.__dt_offset = kwargs['dt_offset']
@@ -112,24 +111,15 @@ class DtEntry:
             self.__custom3 = self.__get_number_or_prop(kwargs['custom3'])
 
     def __str__(self):
-        sb = ['{key:>20} = {value:d}'.format(key='dt_size',
-                                             value=self.__dt_size), '{key:>20} = {value:d}'.format(key='dt_offset',
-                                                                                                   value=self.__dt_offset),
-              '{key:>20} = {value:08x}'.format(key='id',
-                                               value=self.__id), '{key:>20} = {value:08x}'.format(key='rev',
-                                                                                                  value=self.__rev)]
+        sb = [f'{"dt_size":>20} = {self.__dt_size:d}', f'{"dt_offset":>20} = {self.__dt_offset:d}',
+              f'{"id":>20} = {self.__id:08x}', f'{"rev":>20} = {self.__rev:08x}']
         if self.__version == 1:
-            sb.append('{key:>20} = {value:08x}'.format(key='flags',
-                                                       value=self.__flags))
-        sb.append('{key:>20} = {value:08x}'.format(key='custom[0]',
-                                                   value=self.__custom0))
-        sb.append('{key:>20} = {value:08x}'.format(key='custom[1]',
-                                                   value=self.__custom1))
-        sb.append('{key:>20} = {value:08x}'.format(key='custom[2]',
-                                                   value=self.__custom2))
+            sb.append(f'{"flags":>20} = {self.__flags:08x}')
+        sb.append(f'{"custom[0]":>20} = {self.__custom0:08x}')
+        sb.append(f'{"custom[1]":>20} = {self.__custom1:08x}')
+        sb.append(f'{"custom[2]":>20} = {self.__custom2:08x}')
         if self.__version == 0:
-            sb.append('{key:>20} = {value:08x}'.format(key='custom[3]',
-                                                       value=self.__custom3))
+            sb.append(f'{"custom[3]":>20} = {self.__custom3:08x}')
         return '\n'.join(sb)
 
     def compression_info(self):
