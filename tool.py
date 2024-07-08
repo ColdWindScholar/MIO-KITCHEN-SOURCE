@@ -3175,7 +3175,7 @@ def unpack(chose, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                print(lang.text79 + i + ".img [%s]" % file_type)
+                print(lang.text79 + i + f".img [{file_type}]")
                 if call(exe=f"extract.f2fs -o '{work}' '{os.path.join(settings.path, dn.get(), i + '.img')}'",
                         out=1) != 0:
                     print('Unpack failed...')

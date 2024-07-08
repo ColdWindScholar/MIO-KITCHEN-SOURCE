@@ -54,7 +54,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     # 定义已修补过的 避免重复修补
     r_new_fs = {}
     add_new = 0
-    print("ContextPatcher: the Original File Has %d" % (len(fs_file.keys())) + " entries")
+    print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d}" + " entries")
     # 定义默认SeLinux标签
     permission_d = [f'u:object_r:{os.path.basename(dir_path).replace("_a", "")}_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
@@ -102,4 +102,4 @@ def main(dir_path, fs_config) -> None:
     new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
         f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
-    print('ContextPatcher: Add %d' % add_new + " entries")
+    print(f'ContextPatcher: Add {add_new:d} entries')
