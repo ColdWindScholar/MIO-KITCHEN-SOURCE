@@ -102,8 +102,8 @@ class JsonEdit:
             return {}
         with open(self.file, 'r+', encoding='utf-8') as pf:
             try:
-                return json.loads(pf.read())
-            except (BaseException, Exception):
+                return json.load(pf)
+            except (AttributeError, ValueError, json.decoder.JSONDecodeError):
                 return {}
 
     def write(self, data):
@@ -3752,7 +3752,7 @@ class FormatConversion(ttk.LabelFrame):
                                 os.remove(transferfile)
                                 try:
                                     os.remove(work + basename + '.patch.dat')
-                                except (Exception, BaseException):
+                                except (IOError, PermissionError, FileNotFoundError):
                                     ...
                         else:
                             print("transferpath" + lang.text84)
@@ -3782,7 +3782,7 @@ class FormatConversion(ttk.LabelFrame):
                                     os.remove(work + i)
                                     os.remove(transferfile)
                                     os.remove(work + basename + '.patch.dat')
-                                except (Exception, BaseException):
+                                except (PermissionError, IOError,FileNotFoundError, IsADirectoryError):
                                     ...
                         else:
                             print("transferfile" + lang.text84)
@@ -3859,7 +3859,7 @@ def restart(er=None):
         if cartoon.tasks:
             if not ask_win2("Your operation will not be saved."):
                 return
-    except (Exception, BaseException):
+    except (TclError, ValueError, AttributeError):
         pass
 
     def _inner():

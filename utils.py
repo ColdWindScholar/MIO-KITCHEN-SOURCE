@@ -392,7 +392,7 @@ class LangUtils:
     def __getattr__(self, item):
         try:
             return getattr(self, item)
-        except (Exception, BaseException):
+        except (AttributeError, ):
             return "None"
 
 
