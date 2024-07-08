@@ -76,8 +76,8 @@ def script2fs_context(input_f, outdir, project):
     print("生成fs_config 和 file_contexts")
     fs_label.sort()
     fc_label.sort()
-    with open(os.path.join(outdir, "system_fs_config"), 'w', newline='\n') as fs_config, open(
-            os.path.join(outdir, "system_file_contexts"), 'w', newline='\n') as file_contexts:
+    with open(os.path.join(outdir, "system_fs_config"), 'w', newline='\n', encoding='utf-8') as fs_config, open(
+            os.path.join(outdir, "system_file_contexts"), 'w', newline='\n', encoding='utf-8') as file_contexts:
         for fs in fs_label:
             fs_config.write(" ".join(fs) + '\n')
         for fc in fc_label:

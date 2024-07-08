@@ -1188,8 +1188,8 @@ class ModuleManager:
             minfo[i[0]] = i[1]
         minfo['depend'] = depends
         with open(os.path.join(elocal, "bin", "module", mconf.get('module', 'identifier'), "info.json"),
-                  'w') as f:
-            json.dump(minfo, f, indent=2)
+                  'w', encoding='utf-8') as f:
+            json.dump(minfo, f, indent=2, ensure_ascii=False)
         with zipfile.ZipFile(mpk) as mpk_f:
             if 'icon' in mpk_f.namelist():
                 with open(os.path.join(self.module_dir, mconf.get('module', 'identifier'), "icon"),
@@ -1772,8 +1772,8 @@ class InstallMpk(Toplevel):
             minfo[i[0]] = i[1]
         minfo['depend'] = depends
         with open(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'), "info.json"),
-                  'w') as f:
-            json.dump(minfo, f, indent=2)
+                  'w', encoding='utf-8') as f:
+            json.dump(minfo, f, indent=2, ensure_ascii=False)
         if self.icon:
             with open(os.path.join(elocal, "bin", "module", self.mconf.get('module', 'identifier'), "icon"),
                       'wb') as f:
@@ -2492,7 +2492,7 @@ def jboot(bn: str = 'boot'):
     if os.access(work + bn + os.sep + "ramdisk.cpio", os.F_OK):
         comp = gettype(work + bn + os.sep + "ramdisk.cpio")
         print(f"Ramdisk is {comp}")
-        with open(work + bn + os.sep + "comp", "w") as f:
+        with open(work + bn + os.sep + "comp", "w", encoding='utf-8') as f:
             f.write(comp)
         if comp != "unknown":
             os.rename(work + bn + os.sep + "ramdisk.cpio",
@@ -2721,7 +2721,7 @@ class Packxx(Toplevel):
                 ext4_size_value = 0
                 if self.ext4_method.get() == lang.t33:
                     if os.path.exists(work + "dynamic_partitions_op_list"):
-                        with open(work + "dynamic_partitions_op_list") as t:
+                        with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
                             for _i_ in t.readlines():
                                 _i = _i_.strip().split()
                                 if _i.__len__() < 3:
@@ -2830,7 +2830,7 @@ class Packxx(Toplevel):
                     ext4_size_value = self.custom_size.get(dname, 0)
                     if self.ext4_method.get() == lang.t33 and not self.custom_size.get(dname, ''):
                         if os.path.exists(work + "dynamic_partitions_op_list"):
-                            with open(work + "dynamic_partitions_op_list") as t:
+                            with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
                                 for _i_ in t.readlines():
                                     _i = _i_.strip().split()
                                     if _i.__len__() < 3:
@@ -3376,7 +3376,7 @@ def make_f2fs(name, work, UTC=None):
     if call(f'mkfs.f2fs {work + name}.img -O extra_attr -O inode_checksum -O sb_checksum -O compression -f') != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
-    with open(f'{work}config{os.sep}{name}_file_contexts', 'a+') as f:
+    with open(f'{work}config{os.sep}{name}_file_contexts', 'a+', encoding='utf-8') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
