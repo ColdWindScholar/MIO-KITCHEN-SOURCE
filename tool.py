@@ -1829,8 +1829,38 @@ class Debugger(Toplevel):
         jzxs(self)
 
     def gui(self):
-        ttk.Button(self, text='Globals', command=self.loaded_module).grid(row=0, column=0, padx=5, pady=5)
-        ttk.Button(self, text='Settings', command=self.settings).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(self, text='Globals', command=self.loaded_module).grid(row=2, column=0, padx=5, pady=5)
+        ttk.Button(self, text='Settings', command=self.settings).grid(row=2, column=1, padx=5, pady=5)
+        ttk.Button(self, text='Info', command=self.show_info).grid(row=2, column=2, padx=5, pady=5)
+
+    def show_info(self):
+        ck = Toplevel()
+        ck.title('Info')
+        ttk.Label(ck, text=f'MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
+                                                                                      sticky='nw')
+        ttk.Label(ck, text=f'Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE', foreground='gray').grid(row=5,
+                                                                                                              column=0,
+                                                                                                              padx=5,
+                                                                                                              pady=5,
+                                                                                                              sticky='nw')
+        ttk.Label(ck, text=f'Python: {sys.version}', foreground='gray').grid(row=1, column=0, padx=5, pady=5,
+                                                                             sticky='nw')
+        ttk.Label(ck, text=f'Platform: {sys.platform}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
+                                                                                sticky='nw')
+        ttk.Label(ck, text=f'Exec Command: {sys.argv}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
+                                                                                sticky='nw')
+        ttk.Label(ck, text=f'Tool Version: {settings.version}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
+                                                                                        sticky='nw')
+        ttk.Label(ck, text=f'Source code running: {"Yes" if gettype(sys.argv[0]) == "unknown" else "No"}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
+                                                                                        sticky='nw')
+        ttk.Label(ck, text=f'python Implementation: {platform.python_implementation()}', foreground='gray').grid(row=4,
+                                                                                                                 column=0,
+                                                                                                                 padx=5,
+                                                                                                                 pady=5,
+                                                                                                                 sticky='nw')
+        ttk.Label(ck, text=f'Uname: {platform.uname()}', foreground='gray').grid(row=5, column=0, padx=5, pady=5,
+                                                                                 sticky='nw')
+        jzxs(ck)
 
     @staticmethod
     def settings():
