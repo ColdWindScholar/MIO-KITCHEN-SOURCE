@@ -71,7 +71,7 @@ from config_parser import ConfigParser
 import utils
 from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, sdat2img
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 
 try:
     import imp
@@ -460,7 +460,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-dn = utils.dn = StringVar()
+dn = utils.project_name = StringVar()
 theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
@@ -942,7 +942,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
 
 
 @cartoon
-def pack_dtbo() -> any:
+def pack_dtbo() -> bool:
     work = rwork()
     if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
@@ -2757,7 +2757,7 @@ class Packxx(Toplevel):
         ck.wait_window()
 
     @cartoon
-    def packrom(self) -> any:
+    def packrom(self) -> bool:
         if not dn.get():
             win.message_pop(lang.warn1)
             return False
@@ -2879,7 +2879,7 @@ class Packxx(Toplevel):
                               ok=lang.ok)
 
 
-def rdi(work, part_name) -> any:
+def rdi(work, part_name) -> bool:
     if not os.listdir(work + "config"):
         rmtree(work + "config")
         return False
@@ -3017,7 +3017,7 @@ def rwork() -> str:
 
 
 @cartoon
-def unpack(chose, form: any = None):
+def unpack(chose, form: str = '') -> bool:
     if os.name == 'nt':
         if windll.shell32.IsUserAnAdmin():
             try:
@@ -3036,7 +3036,7 @@ def unpack(chose, form: any = None):
         print(lang.text79 + "UPDATE.APP")
         splituapp.extract(work + "UPDATE.APP", "")
     if not chose:
-        return 1
+        return False
     if form == 'payload':
         print(lang.text79 + "payload")
         try:
@@ -3055,7 +3055,7 @@ def unpack(chose, form: any = None):
             except Exception as e:
                 print(lang.text72 + " payload.bin:%s" % e)
                 os.remove(work + "payload.bin")
-        return 1
+        return True
     elif form == 'super':
         print(lang.text79 + "Super")
         file_type = gettype(work + "super.img")
@@ -3074,12 +3074,12 @@ def unpack(chose, form: any = None):
                     if wjm.endswith('_b.img'):
                         if not os.path.getsize(work + wjm):
                             os.remove(work + wjm)
-        return 1
+        return True
     for i in chose:
         if os.access(work + i + ".zstd", os.F_OK):
             print(lang.text79 + i + ".zstd")
             call('zstd --rm -d ' + work + i + '.zstd')
-            return
+            return True
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
             call("brotli -dj " + work + i + ".new.dat.br")
@@ -3096,7 +3096,7 @@ def unpack(chose, form: any = None):
             if os.path.getsize(work + i + ".new.dat") != 0:
                 transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
                 if os.access(transferfile, os.F_OK):
-                    parts['dat_ver'] = sdat2img(transferfile, work + i + ".new.dat", work + i + ".img").version
+                    parts['dat_ver'] = Sdat2img(transferfile, work + i + ".new.dat", work + i + ".img").version
                     if os.access(work + i + ".img", os.F_OK):
                         os.remove(work + i + ".new.dat")
                         os.remove(transferfile)
@@ -3190,6 +3190,7 @@ def unpack(chose, form: any = None):
     json_.write(parts)
     parts.clear()
     print(lang.text8)
+    return True
 
 
 def ask_win(text='', ok=None, cancel=None) -> int:
@@ -3755,7 +3756,7 @@ class FormatConversion(ttk.LabelFrame):
                         print(lang.text79 + work + i)
                         transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                            sdat2img(transferfile, work + i, work + basename + ".img")
+                            Sdat2img(transferfile, work + i, work + basename + ".img")
                             if os.access(work + basename + ".img", os.F_OK):
                                 os.remove(work + i)
                                 os.remove(transferfile)
@@ -3785,7 +3786,7 @@ class FormatConversion(ttk.LabelFrame):
                         print(lang.text79 + work + i)
                         transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + basename + ".transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                            sdat2img(transferfile, work + i, work + basename + ".img")
+                            Sdat2img(transferfile, work + i, work + basename + ".img")
                             if os.access(work + basename + ".img", os.F_OK):
                                 try:
                                     os.remove(work + i)

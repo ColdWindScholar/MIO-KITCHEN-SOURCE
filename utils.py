@@ -33,7 +33,7 @@ if os.name == 'nt':
     e_local = getcwd()
 else:
     e_local = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0])))
-dn = None
+project_name = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
            [b"AVB0", "vbmeta"], [b'\xd7\xb7\xab\x1e', "dtbo"], [b'\x10\x20\xF5\xF2', 'f2fs', 1024],
@@ -51,7 +51,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 # ----DEFS
 
 
-class sdat2img:
+class Sdat2img:
     def __init__(self, transfer_list_file, new_data_file, output_image_file):
         print('sdat2img binary - version: 1.3\n')
         self.transfer_list_file = transfer_list_file
@@ -342,6 +342,8 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
         2: "Android Lollipop 5.1",
         3: "Android Marshmallow 6.0",
         4: "Android Nougat 7.0/7.1/8.0/8.1"}
+    if version not in versions.keys():
+        version = 4
     print("Img2sdat(1.7):" + versions[version])
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
         out_dir + '/' + prefix)
