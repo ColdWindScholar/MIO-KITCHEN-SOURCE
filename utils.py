@@ -350,7 +350,7 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
 
 
 def findfile(file, dir_) -> str:
-    for root, dirs, files in os.walk(dir_, topdown=True):
+    for root, _, files in os.walk(dir_, topdown=True):
         if file in files:
             if os.name == 'nt':
                 return (root + os.sep + file).replace("\\", '/')
@@ -366,7 +366,7 @@ def findfolder(dir__, folder_name):
     :param folder_name: folder name need found
     :return:
     """
-    for root, dirnames, filenames in os.walk(dir__):
+    for root, dirnames, _ in os.walk(dir__):
         for dirname in dirnames:
             if dirname == folder_name:
                 return os.path.join(root, dirname).replace("\\", '/')

@@ -49,7 +49,6 @@ if os.name == 'nt':
 else:
     import mkc_filedialog as filedialog
 
-
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
         input(
@@ -608,10 +607,7 @@ class Upgrade(Toplevel):
         self.progressbar.start()
         self.update_zip = os.path.normpath(
             os.path.join(elocal, "bin", "temp", os.path.basename(self.update_download_url)))
-        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.update_download_url,
-                                                                                    os.path.join(elocal, "bin",
-                                                                                                 "temp"),
-                                                                                    size_=self.update_size):
+        for percentage, _, _, _, _ in download_api(self.update_download_url,os.path.join(elocal, "bin","temp"),size_=self.update_size):
             if not states.update_window:
                 return
             if percentage != 'None':
@@ -2076,10 +2072,10 @@ class MpkStore(Toplevel):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
         try:
             for i in files:
-                for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(self.repo + i,
-                                                                                            os.path.join(elocal, "bin",
-                                                                                                         "temp"),
-                                                                                            size_=size):
+                for percentage, _, _, _, _ in download_api(self.repo + i,
+                                                           os.path.join(elocal, "bin",
+                                                                        "temp"),
+                                                           size_=size):
                     if control and states.mpk_store:
                         control.config(text=f"{percentage} %")
                     else:
@@ -3258,7 +3254,7 @@ class Dirsize:
         self.list_f = list_f
         self.dname = os.path.basename(dir_)
         self.size = 0
-        for root, dirs, files in os.walk(dir_):
+        for root, _, files in os.walk(dir_):
             try:
                 self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
                                   not os.path.islink(os.path.join(root, name))])
@@ -3431,7 +3427,7 @@ def rmdir(path):
 
 
 def get_all_file_paths(directory):
-    for root, directories, files in os.walk(directory):
+    for root, _, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
 

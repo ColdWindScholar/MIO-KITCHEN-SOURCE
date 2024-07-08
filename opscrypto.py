@@ -233,7 +233,7 @@ def key_update(iv1, asbox):
 
     g = 8
 
-    for f in range(asbox[0x3c] - 2):
+    for _ in range(asbox[0x3c] - 2):
         d = e >> 0x18  # 35
         m = h >> 0x10  # cf
         s = h >> 0x18
@@ -502,7 +502,7 @@ def main(args):
                     if item.tag == "File":
                         wfilename = item.attrib["Path"]
                         start = int(item.attrib["FileOffsetInSrc"]) * 0x200
-                        slength = int(item.attrib["SizeInSectorInSrc"]) * 0x200
+                        # slength = int(item.attrib["SizeInSectorInSrc"]) * 0x200
                         length = int(item.attrib["SizeInByteInSrc"])
                         decryptfile(key, filename, path, wfilename, start, length)
             elif child.tag == "UFS_PROVISION":
@@ -524,7 +524,7 @@ def main(args):
                         if wfilename == "":
                             continue
                         start = int(item.attrib["FileOffsetInSrc"]) * 0x200
-                        slength = int(item.attrib["SizeInSectorInSrc"]) * 0x200
+                        # slength = int(item.attrib["SizeInSectorInSrc"]) * 0x200
                         length = int(item.attrib["SizeInByteInSrc"])
                         sha256 = item.attrib["Sha256"]
                         copyfile(filename, path, wfilename, start, length)
@@ -539,7 +539,7 @@ def main(args):
                                 if wfilename == "":
                                     continue
                                 start = int(subitem.attrib["FileOffsetInSrc"]) * 0x200
-                                slength = int(subitem.attrib["SizeInSectorInSrc"]) * 0x200
+                                # slength = int(subitem.attrib["SizeInSectorInSrc"]) * 0x200
                                 length = int(subitem.attrib["SizeInByteInSrc"])
                                 sha256 = subitem.attrib["Sha256"]
                                 copyfile(filename, path, wfilename, start, length)

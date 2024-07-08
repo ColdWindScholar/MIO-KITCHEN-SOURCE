@@ -32,7 +32,7 @@ def zip_folder(folder_path):
     archive = zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED)
 
     # 遍历文件夹中的所有文件和子文件夹
-    for root, dirs, files in os.walk(abs_folder_path):
+    for root, _, files in os.walk(abs_folder_path):
         for file in files:
             if file == name:
                 continue

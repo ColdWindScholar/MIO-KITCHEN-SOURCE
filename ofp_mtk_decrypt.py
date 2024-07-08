@@ -121,7 +121,8 @@ def main(filename, outdir):
         aeskey, aesiv = brutekey(rf)
         rf.seek(filesize - hdrlength)
         hdr = mtk_shuffle(hdrkey, len(hdrkey), bytearray(rf.read(hdrlength)), hdrlength)
-        prjname, unknownval, reserved, cpu, flashtype, hdr2entries, prjinfo, crc = unpack("46s Q 4s 7s 5s H 32s H", hdr)
+        # _,_,_ = unknownval, reserved, crc
+        prjname, _, _, cpu, flashtype, hdr2entries, prjinfo, _ = unpack("46s Q 4s 7s 5s H 32s H", hdr)
         hdr2length = hdr2entries * 0x60
         prjname = cleancstring(prjname)
         prjinfo = cleancstring(prjinfo)
@@ -135,7 +136,8 @@ def main(filename, outdir):
         rf.seek(filesize - hdr2length - hdrlength)
         hdr2 = mtk_shuffle(hdrkey, len(hdrkey), bytearray(rf.read(hdr2length)), hdr2length)
         for i in range(0, len(hdr2) // 0x60):
-            name, start, length, enclength, filename, crc = unpack("<32s Q Q Q 32s Q", hdr2[i * 0x60:(i * 0x60) + 0x60])
+            # _=crc
+            name, start, length, enclength, filename, _ = unpack("<32s Q Q Q 32s Q", hdr2[i * 0x60:(i * 0x60) + 0x60])
             name = name.replace(b"\x00", b"").decode('utf-8')
             filename = filename.replace(b"\x00", b"").decode('utf-8')
             print(f"Writing \"{name}\" as \"{outdir}/{filename}\"...")
