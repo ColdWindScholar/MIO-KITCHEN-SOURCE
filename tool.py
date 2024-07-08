@@ -2798,7 +2798,6 @@ class Packxx(Toplevel):
                     if mkerofs(dname, str(self.edbgs.get()), work, level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
-                        continue
                     else:
                         if self.delywj.get() == 1:
                             rdi(work, dname)
@@ -2814,7 +2813,6 @@ class Packxx(Toplevel):
                 elif parts_dict[dname] == 'f2fs':
                     if make_f2fs(dname, work, UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
-                        continue
                     else:
                         if self.delywj.get() == 1:
                             rdi(work, dname)
