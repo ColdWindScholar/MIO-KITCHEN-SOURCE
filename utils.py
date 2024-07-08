@@ -380,10 +380,7 @@ def jzxs(master):
     """
     master.geometry(
         f'+{int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2)}+{int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)}')
-    try:
-        master.update()
-    except (Exception, BaseException):
-        ...
+    master.update()
 
 
 # ----CLASSES
@@ -497,6 +494,11 @@ class LogoDumper:
         self.check_img(img)
 
     def check_img(self, img: str):
+        """
+        Check The Img If Unpack Able
+        :param img:
+        :return:
+        """
         assert os.access(img, os.F_OK), f"{img} does not exist!"
         with open(img, 'rb') as f:
             f.seek(self.cfg.headoff, 0)
@@ -515,6 +517,10 @@ class LogoDumper:
         return True
 
     def unpack(self):
+        """
+        Unpack Logo Img, Output To self.out
+        :return:
+        """
         with open(self.img, 'rb') as f:
             print("Unpack:\n"
                   "BMP\tSize\tWidth\tHeight")
@@ -528,6 +534,10 @@ class LogoDumper:
             print("\tDone!")
 
     def repack(self) -> None:
+        """
+        Repack Logo Img
+        :return:
+        """
         with open(self.out, 'wb') as o:
             off = 0x5
             for i in range(self.cfg.imgnum):

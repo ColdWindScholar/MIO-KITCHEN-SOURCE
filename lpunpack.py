@@ -828,7 +828,7 @@ class LpUnpack:
             metadata = self._read_metadata()
 
             filter_partition = []
-            for index, partition in enumerate(metadata.partitions):
+            for partition in metadata.partitions:
                 filter_partition.append(partition.name)
 
             if not filter_partition:
@@ -858,7 +858,7 @@ class LpUnpack:
 
             if self._partition_name:
                 filter_partition = []
-                for index, partition in enumerate(metadata.partitions):
+                for partition in metadata.partitions:
                     if partition.name in self._partition_name:
                         filter_partition.append(partition)
 

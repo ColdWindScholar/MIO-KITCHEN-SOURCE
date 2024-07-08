@@ -684,8 +684,6 @@ class Upgrade(Toplevel):
         self.destroy()
 
 
-
-
 def error(code, desc="unknown error"):
     win.withdraw()
     sv_ttk.use_dark_theme()
@@ -698,7 +696,8 @@ def error(code, desc="unknown error"):
     er.lift()
     er.resizable(False, False)
     ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
-    ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.", font=(None, 10)).pack(
+    ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.",
+              font=(None, 10)).pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -930,7 +929,9 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
-            call(exe=f"dtc -@ -I dtb -O dts {work + bn + os.sep + 'dtbo' + os.sep + dtbo} -o {os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])}", out=1)
+            call(
+                exe=f"dtc -@ -I dtb -O dts {work + bn + os.sep + 'dtbo' + os.sep + dtbo} -o {os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])}",
+                out=1)
     print(lang.text5)
     try:
         os.remove(dtboimg)
@@ -949,7 +950,9 @@ def pack_dtbo() -> bool:
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
-            call(exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}", out=1)
+            call(
+                exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}",
+                out=1)
     print(f"{lang.text7}:dtbo.img")
     list_ = []
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
@@ -1835,12 +1838,12 @@ class Debugger(Toplevel):
         ck = Toplevel()
         ck.title('Info')
         ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
-                                                                                      sticky='nw')
+                                                                                     sticky='nw')
         ttk.Label(ck, text='Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE', foreground='gray').grid(row=5,
-                                                                                                              column=0,
-                                                                                                              padx=5,
-                                                                                                              pady=5,
-                                                                                                              sticky='nw')
+                                                                                                             column=0,
+                                                                                                             padx=5,
+                                                                                                             pady=5,
+                                                                                                             sticky='nw')
         ttk.Label(ck, text=f'Python: {sys.version}', foreground='gray').grid(row=1, column=0, padx=5, pady=5,
                                                                              sticky='nw')
         ttk.Label(ck, text=f'Platform: {sys.platform}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
@@ -1849,8 +1852,9 @@ class Debugger(Toplevel):
                                                                                 sticky='nw')
         ttk.Label(ck, text=f'Tool Version: {settings.version}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
                                                                                         sticky='nw')
-        ttk.Label(ck, text=f'Source code running: {"Yes" if gettype(sys.argv[0]) == "unknown" else "No"}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
-                                                                                        sticky='nw')
+        ttk.Label(ck, text=f'Source code running: {"Yes" if gettype(sys.argv[0]) == "unknown" else "No"}',
+                  foreground='gray').grid(row=3, column=0, padx=5, pady=5,
+                                          sticky='nw')
         ttk.Label(ck, text=f'python Implementation: {platform.python_implementation()}', foreground='gray').grid(row=4,
                                                                                                                  column=0,
                                                                                                                  padx=5,
