@@ -207,7 +207,8 @@ def load_module(name, file, filename, details):
     The module name must include the full package name, if any.
 
     """
-    suffix, mode, type_ = details
+    # _=suffix
+    _, mode, type_ = details
     if mode and (not mode.startswith('r') or '+' in mode):
         raise ValueError(f'invalid file open mode {mode!r}')
     elif file is None and type_ in {PY_SOURCE, PY_COMPILED}:
