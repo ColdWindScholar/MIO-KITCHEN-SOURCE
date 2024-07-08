@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, missing-class-docstring
 import ctypes
 import platform
 import shutil

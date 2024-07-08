@@ -1,4 +1,4 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, missing-class-docstring
 import os
 import struct
 import sys
