@@ -33,7 +33,7 @@ class Extractor:
     @staticmethod
     def __get_perm(arg):
         if len(arg) < 9 or len(arg) > 10:
-            return
+            return ''
         if len(arg) > 8:
             arg = arg[1:]
         o = s = w = g = 0

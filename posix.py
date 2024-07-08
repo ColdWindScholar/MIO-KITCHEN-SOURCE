@@ -32,3 +32,4 @@ def readlink(path):
             return os.readlink(path)
         else:
             return ''
+    return ''

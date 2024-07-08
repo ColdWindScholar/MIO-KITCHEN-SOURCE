@@ -897,7 +897,7 @@ class SetUtils:
 
     def modpath(self):
         if not (folder := filedialog.askdirectory()):
-            return False
+            return
         self.set_value("path", folder)
         win.show_local.set(folder)
         self.load()
@@ -962,6 +962,7 @@ def pack_dtbo() -> bool:
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
     print(lang.text8)
+    return True
 
 
 @cartoon
@@ -1061,15 +1062,15 @@ class ModuleManager:
             return data.get(item, '')
 
     @cartoon
-    def run(self, id_):
+    def run(self, id_) -> int:
         if not dn.get():
             print(lang.warn1)
-            return
+            return 1
         if id_:
             value = id_
         else:
             print(lang.warn2)
-            return
+            return 1
 
         name = self.get_name(id_)
         script_path = self.module_dir + os.sep + value + os.sep
@@ -1137,6 +1138,7 @@ class ModuleManager:
             win.tab7.lift()
         else:
             print(lang.warn8)
+        return 0
 
     def get_installed(self, id_) -> bool:
         return os.path.exists(os.path.join(self.module_dir, id_))
@@ -3509,10 +3511,10 @@ class ProjectMenuUtils(ttk.LabelFrame):
         else:
             self.combobox.current(0)
 
-    def rename(self):
+    def rename(self) -> bool:
         if not dn.get():
             print(lang.warn1)
-            return
+            return False
         if os.path.exists(settings.path + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
             print(lang.text103)
             return False
@@ -3521,6 +3523,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
             self.listdir()
         else:
             print(lang.text104)
+        return True
 
     def remove(self):
         win.message_pop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())

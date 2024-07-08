@@ -356,6 +356,7 @@ def findfile(file, dir_) -> str:
                 return (root + os.sep + file).replace("\\", '/')
             else:
                 return root + os.sep + file
+    return ''
 
 
 def findfolder(dir__, folder_name):
@@ -428,7 +429,7 @@ class Vbpatch:
         self.file = file_
         self.disavb = lambda: self.patchvb(b'\x02')
 
-    def checkmagic(self):
+    def checkmagic(self) -> bool:
         """
         Check The Magic if vbmeta
         :return:
@@ -438,6 +439,7 @@ class Vbpatch:
                 return b'AVB0' == f.read(4)
         else:
             print("File does not exist!")
+        return False
 
     def patchvb(self, flag):
         if not self.checkmagic():
@@ -449,6 +451,8 @@ class Vbpatch:
             print("Done!")
         else:
             print("File not Found")
+            return False
+        return True
 
 
 class Dumpcfg:

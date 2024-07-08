@@ -109,7 +109,7 @@ def extract_xml(filename, key, iv):
                 break
         if pagesize == 0:
             print("Unknown pagesize. Aborting")
-            exit(0)
+            return
 
         xmloffset = filesize - pagesize
         rf.seek(xmloffset + 0x14)
@@ -275,7 +275,7 @@ def main(filename, outdir):
                 print("Extracting " + zfile + " to " + outdir)
                 file.extract(zfile, pwd=zippw, path=outdir)
             print("Files extracted to " + outdir)
-            exit(0)
+            return
 
     pagesize, key, iv, data = generatekey2(filename)
     if pagesize == 0:

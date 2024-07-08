@@ -41,7 +41,7 @@ class Dumper:
     def open_payloadfile(self):
         return open(self.payloadpath, 'rb')
 
-    def run(self, slow=False):
+    def run(self, slow=False) -> bool:
         if self.images == "":
             partitions = self.dam.partitions
         else:
@@ -58,7 +58,7 @@ class Dumper:
 
         if len(partitions) == 0:
             print("Not operating on any partitions")
-            return 0
+            return False
 
         partitions_with_ops = []
         for partition in partitions:
@@ -84,6 +84,7 @@ class Dumper:
             self.extract_slow(partitions_with_ops)
         else:
             self.multiprocess_partitions(partitions_with_ops)
+        return True
 
     def extract_slow(self, partitions):
         for part in partitions:
