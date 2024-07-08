@@ -34,6 +34,10 @@ from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM
 from shutil import rmtree, copy, move
 import pygments.lexers
 import requests
+from requests import ConnectTimeout, HTTPError
+import sv_ttk
+from PIL.Image import open as open_img
+from PIL.ImageTk import PhotoImage
 from dumper import Dumper
 from utils import lang
 
@@ -44,16 +48,13 @@ if os.name == 'nt':
     import py_win_style
 else:
     import mkc_filedialog as filedialog
-import sv_ttk
+
 
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8 or sys.version_info.minor > 12:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
-from requests import ConnectTimeout, HTTPError
-from PIL.Image import open as open_img
-from PIL.ImageTk import PhotoImage
 import imgextractor
 import lpunpack
 import mkdtboimg
