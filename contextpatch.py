@@ -42,8 +42,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
             yield os.path.join(root, dir_).replace(folder, '/' + part_name).replace('\\', '/')
         for file in files:
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
-        for rv in allfiles:
-            yield rv
+        yield from allfiles
 
 
 def str_to_selinux(string: str):
