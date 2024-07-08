@@ -28,7 +28,7 @@ import tkinter as tk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
-from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+from tkinter import (Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE,
                      VERTICAL)
 from shutil import rmtree, copy, move
