@@ -1,9 +1,8 @@
 import os
 import re
-
+from posix import symlink
 import contextpatch
 import fspatch
-from posix import symlink
 
 
 class updaterutil:

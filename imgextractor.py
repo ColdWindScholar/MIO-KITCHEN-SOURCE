@@ -2,9 +2,9 @@
 import os
 import re
 import struct
-import ext4
 from posix import symlink
 from timeit import default_timer as dti
+import ext4
 from utils import simg2img
 
 

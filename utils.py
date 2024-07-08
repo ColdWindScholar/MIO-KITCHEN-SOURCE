@@ -481,10 +481,7 @@ class Bmphead:
 
 class XiaomiBlkstruct:
     def __init__(self, buf: bytes):
-        (
-            self.img_offset,
-            self.blksz,
-        ) = struct.unpack("2I", buf)
+        self.img_offset, self.blksz = struct.unpack("2I", buf)
 
 
 class LogoDumper:

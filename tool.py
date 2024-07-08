@@ -24,11 +24,18 @@ import sys
 import time
 from platform import machine
 from webbrowser import open as openurl
-import pygments.lexers
-from dumper import Dumper
 import tkinter as tk
-from utils import lang
 from timeit import default_timer as dti
+import zipfile
+from io import BytesIO, StringIO
+from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE,
+                     VERTICAL)
+from shutil import rmtree, copy, move
+import pygments.lexers
+import requests
+from dumper import Dumper
+from utils import lang
 
 if os.name == 'nt':
     import windnd
@@ -37,13 +44,6 @@ if os.name == 'nt':
     import py_win_style
 else:
     import mkc_filedialog as filedialog
-import zipfile
-from io import BytesIO, StringIO
-from tkinter import (ttk, Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
-                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE,
-                     VERTICAL)
-from shutil import rmtree, copy, move
-import requests
 import sv_ttk
 
 if sys.version_info.major == 3:
