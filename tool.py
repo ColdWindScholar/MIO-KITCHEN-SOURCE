@@ -1618,7 +1618,6 @@ class MpkMan(ttk.Frame):
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
         self.images_ = {}
-        self.addeds = {}
 
     def list_pls(self):
         # self.pls.clean()
