@@ -1180,7 +1180,7 @@ class ModuleManager:
                         file = str(file).encode('utf-8').decode('utf-8')
                     info = fz.getinfo(file)
                     extracted_size += info.file_size
-                    fz.extract(file, os.path.join(elocal, "bin", "module", install_dir).__str__())
+                    fz.extract(file, str(os.path.join(elocal, "bin", "module", install_dir)))
         try:
             depends = mconf.get('module', 'depend')
         except (Exception, BaseException):
@@ -1763,7 +1763,7 @@ class InstallMpk(Toplevel):
                     info = fz.getinfo(file)
                     extracted_size += info.file_size
                     self.state['text'] = lang.text38.format(file)
-                    fz.extract(file, os.path.join(elocal, "bin", "module", install_dir).__str__())
+                    fz.extract(file, str(os.path.join(elocal, "bin", "module", install_dir)))
                     self.prog['value'] = extracted_size * 100 / uncompress_size
         try:
             depends = self.mconf.get('module', 'depend')
@@ -2539,7 +2539,6 @@ def dboot(nm: str = 'boot'):
             if call(f"magiskboot compress={comp} ramdisk-new.cpio") != 0:
                 print("Failed to pack Ramdisk...")
                 os.remove("ramdisk-new.cpio")
-                return
             else:
                 print("Successfully packed Ramdisk..")
                 try:
@@ -2556,7 +2555,6 @@ def dboot(nm: str = 'boot'):
     os.chdir(work + nm + os.sep)
     if call(f"magiskboot repack {flag} {boot}") != 0:
         print("Failed to Pack boot...")
-        return
     else:
         os.remove(work + f"{nm}.img")
         os.rename(work + nm + os.sep + "new-boot.img", work + os.sep + f"{nm}.img")
@@ -2726,7 +2724,7 @@ class Packxx(Toplevel):
                         with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
                             for _i_ in t.readlines():
                                 _i = _i_.strip().split()
-                                if _i.__len__() < 3:
+                                if len(_i) < 3:
                                     continue
                                 if _i[0] != 'resize':
                                     continue
@@ -2833,7 +2831,7 @@ class Packxx(Toplevel):
                             with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
                                 for _i_ in t.readlines():
                                     _i = _i_.strip().split()
-                                    if _i.__len__() < 3:
+                                    if len(_i) < 3:
                                         continue
                                     if _i[0] != 'resize':
                                         continue

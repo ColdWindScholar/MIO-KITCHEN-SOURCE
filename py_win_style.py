@@ -140,7 +140,7 @@ def detect(window: Any):
     except:
         pass
     try:  # pyqt/pyside
-        return window.winId().__int__()
+        return int(window.winId())
     except:
         pass
     try:  # wxpython

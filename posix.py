@@ -16,7 +16,7 @@ def symlink(link_target, target):
                 windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
                                                    DWORD(FILE_ATTRIBUTE_SYSTEM))
             except Exception as e:
-                print(e.__str__())
+                print(str(e))
 
 
 def readlink(path):
