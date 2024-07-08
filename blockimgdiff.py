@@ -31,7 +31,7 @@ from rangelib import RangeSet
 __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
 
 
-class Settings(object):
+class Settings:
     # Stash size cannot exceed cache_size * threshold.
     cache_size = None
     stash_threshold = 0.8
@@ -76,7 +76,7 @@ def compute_patch(src, tgt, imgdiff=False):
             pass
 
 
-class Image(object):
+class Image:
     def ReadRangeSet(self, ranges):
         raise NotImplementedError
 
@@ -175,7 +175,7 @@ class DataImage(Image):
             return sha1(self.data).hexdigest()
 
 
-class Transfer(object):
+class Transfer:
     def __init__(self, tgt_name, src_name, tgt_ranges, src_ranges, style, by_id):
         self.tgt_name = tgt_name
         self.src_name = src_name
@@ -212,7 +212,7 @@ class Transfer(object):
 
 
 @total_ordering
-class HeapItem(object):
+class HeapItem:
     def __init__(self, item):
         self.item = item
         # Negate the score since python's heap is a min-heap and we want
@@ -268,7 +268,7 @@ class HeapItem(object):
 # case the list of transfers produced will never read from the
 # original image.
 
-class BlockImageDiff(object):
+class BlockImageDiff:
     def __init__(self, tgt, src=None, version=4, threads=None,
                  disable_imgdiff=False):
         if threads is None:

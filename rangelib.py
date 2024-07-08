@@ -19,7 +19,7 @@ from itertools import cycle
 __all__ = ["RangeSet"]
 
 
-class RangeSet(object):
+class RangeSet:
     """A RangeSet represents a set of non-overlapping ranges on the
   integers (ie, a set of integers, but efficient when the set contains
   lots of runs.)"""

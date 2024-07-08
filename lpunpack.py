@@ -134,7 +134,7 @@ class ShowJsonInfo(json.JSONEncoder):
         return super().encode(result)
 
 
-class SparseHeader(object):
+class SparseHeader:
     def __init__(self, buffer):
         fmt = '<I4H4I'
         (
@@ -150,7 +150,7 @@ class SparseHeader(object):
         ) = struct.unpack(fmt, buffer[0:struct.calcsize(fmt)])
 
 
-class SparseChunkHeader(object):
+class SparseChunkHeader:
     """
         Following a Raw or Fill or CRC32 chunk is data.
         For a Raw chunk, it's the data in chunk_sz * blk_sz.
@@ -675,7 +675,7 @@ class SparseImage:
 T = TypeVar('T')
 
 
-class LpUnpack(object):
+class LpUnpack:
     def __init__(self, **kwargs):
         self._partition_name = kwargs.get('NAME')
         self._show_info = kwargs.get('SHOW_INFO', True)

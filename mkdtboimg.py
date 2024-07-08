@@ -24,7 +24,7 @@ import zlib
 from array import array
 
 
-class CompressionFormat(object):
+class CompressionFormat:
     """Enum representing DT compression format for a DT entry.
     """
     NO_COMPRESSION = 0x00
@@ -32,7 +32,7 @@ class CompressionFormat(object):
     GZIP_COMPRESSION = 0x02
 
 
-class DtEntry(object):
+class DtEntry:
     """Provides individual DT image file arguments to be added to a DTBO.
 
     Attributes:
@@ -202,7 +202,7 @@ class DtEntry(object):
         return self.__custom3
 
 
-class Dtbo(object):
+class Dtbo:
     """
     Provides parser, reader, writer for dumping and creating Device Tree Blob
     Overlay (DTBO) images.
