@@ -858,7 +858,8 @@ class SetUtils:
         sv_ttk.set_theme(self.theme)
         win.attributes("-alpha", self.bar_level)
 
-    def load_language(self, name):
+    @staticmethod
+    def load_language(name):
         lang_file = f'{elocal}/bin/languages/{name}.json'
         _lang: dict = {}
         if not name and not os.path.exists(f'{elocal}/bin/languages/English.json'):
