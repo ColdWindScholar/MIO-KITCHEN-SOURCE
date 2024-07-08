@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 import argparse
 import copy
 import enum

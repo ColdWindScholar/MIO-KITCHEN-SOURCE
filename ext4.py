@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 import ctypes
 from functools import cmp_to_key
 import io

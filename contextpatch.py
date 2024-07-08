@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# pylint: disable=line-too-long
 import os
 from difflib import SequenceMatcher
 from re import escape
