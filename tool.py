@@ -2806,8 +2806,7 @@ class Packxx(Toplevel):
                                     if _i[0] != 'resize':
                                         continue
                                     if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
-                                        if int(_i[2]) > ext4_size_value:
-                                            ext4_size_value = int(_i[2])
+                                        ext4_size_value = max(ext4_size_value, int(_i[2]))
                         elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
                             with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
                                 try:
@@ -3437,7 +3436,7 @@ def dndfile(files):
         try:
             fi = fi.decode('gbk')
         except (Exception, BaseException):
-            fi = fi
+            ...
         if os.path.exists(fi):
             if os.path.basename(fi).endswith(".mpk"):
                 InstallMpk(fi)
