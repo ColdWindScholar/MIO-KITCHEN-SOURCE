@@ -335,8 +335,7 @@ class Dtbo:
         self.__metadata_size = (self.header_size +
                                 self.dt_entry_count * self.dt_entry_size)
         if file_size < self.__metadata_size:
-            raise ValueError('Invalid or truncated DTBO file of size %d expected %d' %
-                             file_size, self.__metadata_size)
+            raise ValueError(f'Invalid or truncated DTBO file of size {file_size:d} expected {self.__metadata_size:d}')
 
         num_ints = (self._DT_TABLE_HEADER_INTS +
                     self.dt_entry_count * self._DT_ENTRY_HEADER_INTS)
@@ -404,14 +403,12 @@ class Dtbo:
                  'dt_entry_count', 'dt_entries_offset', 'page_size', 'version')
         for key in _keys:
             if key == 'magic':
-                sb.append('{key:>20} = {value:08x}'.format(key=key,
-                                                           value=self.__dict__[key]))
+                sb.append(f'{key:>20} = {self.__dict__[key]:08x}')
             else:
-                sb.append('{key:>20} = {value:d}'.format(key=key,
-                                                         value=self.__dict__[key]))
+                sb.append(f'{key:>20} = {self.__dict__[key]:d}')
         count = 0
         for dt_entry in self.__dt_entries:
-            sb.append('dt_table_entry[{0:d}]:'.format(count))
+            sb.append(f'dt_table_entry[{count:d}]:')
             sb.append(str(dt_entry))
             count = count + 1
         return '\n'.join(sb)
@@ -444,7 +441,7 @@ class Dtbo:
         }
 
         if compression_format not in compression_obj_dict:
-            ValueError("Bad compression format %d" % compression_format)
+            ValueError(f"Bad compression format {compression_format:d}")
 
         if compression_format is CompressionFormat.NO_COMPRESSION:
             dt_entry = dt_entry_file.read()
@@ -519,7 +516,7 @@ class Dtbo:
             ValueError: if invalid DT entry index or compression format is detected.
         """
         if idx > self.dt_entry_count:
-            raise ValueError('Invalid index %d of DtEntry' % idx)
+            raise ValueError(f'Invalid index {idx:d} of DtEntry')
 
         size = self.dt_entries[idx].size
         offset = self.dt_entries[idx].dt_offset
@@ -680,7 +677,7 @@ def dump_dtbo_image(fin, dtfilename, decompress=False):
     if dtfilename:
         num_entries = len(dtbo.dt_entries)
         for idx in range(0, num_entries):
-            with open(dtfilename + '.{:d}'.format(idx), 'wb') as fout:
+            with open(dtfilename + f'.{idx:d}', 'wb') as fout:
                 dtbo.extract_dt_file(idx, fout, decompress)
     print(str(dtbo) + '\n')
 
