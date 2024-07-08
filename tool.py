@@ -2085,6 +2085,7 @@ class MpkStore(Toplevel):
                     print(e)
         except (ConnectTimeout, HTTPError, BaseException, Exception, TclError) as e:
             print(e)
+            return
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
             control.config(style="")
