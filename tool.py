@@ -708,7 +708,7 @@ def error(code, desc="unknown error"):
     er.lift()
     er.resizable(False, False)
     ttk.Label(er, text="Error:0x%s" % code, font=(None, 20), foreground='red').pack(padx=10, pady=10)
-    ttk.Label(er, text="Dont Worry!Its our problem.You just need to Report the bug to us.", font=(None, 10)).pack(
+    ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.", font=(None, 10)).pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
