@@ -607,7 +607,8 @@ class Upgrade(Toplevel):
         self.progressbar.start()
         self.update_zip = os.path.normpath(
             os.path.join(elocal, "bin", "temp", os.path.basename(self.update_download_url)))
-        for percentage, _, _, _, _ in download_api(self.update_download_url,os.path.join(elocal, "bin","temp"),size_=self.update_size):
+        for percentage, _, _, _, _ in download_api(self.update_download_url, os.path.join(elocal, "bin", "temp"),
+                                                   size_=self.update_size):
             if not states.update_window:
                 return
             if percentage != 'None':
