@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# pylint: disable=line-too-long, missing-class-docstring
+# pylint: disable=line-too-long, missing-class-docstring, missing-function-docstring
 import ctypes
 import platform
 import shutil
@@ -2929,7 +2929,7 @@ def unpackrom(ifile) -> None:
         ozipdecrypt.main(ifile)
         try:
             os.remove(ifile)
-        except Exception as e:
+        except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif os.path.splitext(ifile)[1] == '.ofp':
@@ -2938,20 +2938,14 @@ def unpackrom(ifile) -> None:
         else:
             ofp_qc_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
             script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-        try:
-            unpackg.refs()
-        except (Exception, BaseException):
-            ...
+        unpackg.refs()
         return
     elif os.path.splitext(ifile)[1] == '.ops':
         args = {'decrypt': True,
                 "<filename>": ifile,
                 'outdir': os.path.join(settings.path, os.path.basename(ifile).split('.')[0])}
         opscrypto.main(args)
-        try:
-            unpackg.refs()
-        except (Exception, BaseException):
-            ...
+        unpackg.refs()
         return
     if gettype(zip_src) == 'zip':
         fz = zipfile.ZipFile(zip_src, 'r')
