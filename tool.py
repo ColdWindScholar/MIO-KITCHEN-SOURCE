@@ -2438,7 +2438,7 @@ def download_file():
     var1 = IntVar()
     down = win.get_frame(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     win.message_pop(lang.text62, "green")
-    progressbar = tk.ttk.Progressbar(down, length=200, mode="determinate")
+    progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
     var1.set(0)
     ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
@@ -3458,7 +3458,7 @@ def dndfile(files):
         except (Exception, BaseException):
             ...
         if os.path.exists(fi):
-            if os.path.basename(fi).endswith(".mpk"):
+            if fi.endswith(".mpk"):
                 InstallMpk(fi)
             else:
                 cz(unpackrom, fi)
