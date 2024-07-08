@@ -2433,7 +2433,7 @@ def download_file():
                 try:
                     down.destroy()
                 except Exception as e:
-                    win.message_pop(e)
+                    win.message_pop(str(e))
                 win.message_pop(lang.text68, "red")
 
 
@@ -2971,7 +2971,7 @@ def unpackrom(ifile) -> None:
         try:
             os.mkdir(folder)
         except Exception as e:
-            win.message_pop(e)
+            win.message_pop(str(e))
         copy(ifile, str(folder))
         project_menu.listdir()
         dn.set(os.path.basename(folder))
