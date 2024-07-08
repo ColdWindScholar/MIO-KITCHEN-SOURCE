@@ -131,8 +131,7 @@ class SparseImage:
             self.file_map = {"__DATA": self.care_map}
 
     def ReadRangeSet(self, ranges):
-        for f in self._GetRangeData(ranges):
-            yield f
+        yield from self._GetRangeData(ranges)
 
     def _GetRangeData(self, ranges):
         """Generator that produces all the image data in 'ranges'.  The

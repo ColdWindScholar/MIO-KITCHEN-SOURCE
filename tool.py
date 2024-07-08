@@ -2611,14 +2611,14 @@ class Packxx(Toplevel):
         ttk.Entry(f, textvariable=self.UTC).pack(side=LEFT, fill=X, padx=5, pady=5)
         f.pack(fill=X, padx=5, pady=5)
 
-        Frame_T = Frame(lf3)
-        ttk.Checkbutton(Frame_T, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
+        frame_t = Frame(lf3)
+        ttk.Checkbutton(frame_t, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=X, side=LEFT)
-        ttk.Checkbutton(Frame_T, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
+        ttk.Checkbutton(frame_t, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=X, side=LEFT)
-        Frame_T.pack(fill=X, padx=5, pady=5, side=BOTTOM)
+        frame_t.pack(fill=X, padx=5, pady=5, side=BOTTOM)
         ttk.Checkbutton(lf3, text='Fs Converter', variable=self.fs_conver, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
