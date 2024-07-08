@@ -886,7 +886,7 @@ class LpUnpack:
                     print(f"{metadata.to_json()}\n")
 
             if not self._show_info and self._out_dir is None:
-                raise LpUnpackError(message=f'Not specified directory for extraction')
+                raise LpUnpackError(message='Not specified directory for extraction')
 
             if self._out_dir:
                 for partition in metadata.partitions:

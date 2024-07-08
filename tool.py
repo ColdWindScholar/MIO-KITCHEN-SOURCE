@@ -384,7 +384,7 @@ class Tool(Tk):
         tab = ttk.LabelFrame(text=lang.text16)
         tab.place(relx=0.5, rely=0.5, anchor="center")
         Label(tab,
-              text=f"Wechat Pay",
+              text="Wechat Pay",
               font=(None, 20), fg='#008000').pack(padx=10, pady=10)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
@@ -1838,9 +1838,9 @@ class Debugger(Toplevel):
     def show_info(self):
         ck = Toplevel()
         ck.title('Info')
-        ttk.Label(ck, text=f'MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
+        ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
                                                                                       sticky='nw')
-        ttk.Label(ck, text=f'Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE', foreground='gray').grid(row=5,
+        ttk.Label(ck, text='Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE', foreground='gray').grid(row=5,
                                                                                                               column=0,
                                                                                                               padx=5,
                                                                                                               pady=5,

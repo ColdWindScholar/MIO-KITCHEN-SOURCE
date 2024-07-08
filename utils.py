@@ -121,7 +121,7 @@ class Sdat2img:
         return tuple([(num_set[i], num_set[i + 1]) for i in range(1, len(num_set), 2)])
 
     def parse_transfer_list_file(self):
-        with open(self.transfer_list_file, 'r') as trans_list:
+        with open(self.transfer_list_file, 'r', encoding='utf-8') as trans_list:
             # First line in transfer list is the version number
             # Second line in transfer list is the total number of blocks we expect to write
             if (version := int(trans_list.readline())) >= 2 and (new_blocks := int(trans_list.readline())):
@@ -412,7 +412,7 @@ def payload_reader(payloadfile):
     :return:
     """
     if payloadfile.read(4) != b'CrAU':
-        print(f"Magic Check Fail\n")
+        print("Magic Check Fail\n")
         payloadfile.close()
         return um
     file_format_version = u64(payloadfile.read(8))

@@ -44,7 +44,7 @@ def zip_folder(folder_path):
 
     # 关闭zip文件
     archive.close()
-    print(f"Done!")
+    print("Done!")
 
 
 local = os.getcwd()
