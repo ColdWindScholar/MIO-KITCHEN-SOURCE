@@ -707,7 +707,7 @@ def error(code, desc="unknown error"):
     er.title(f"Program crash! [{settings.version}]")
     er.lift()
     er.resizable(False, False)
-    ttk.Label(er, text="Error:0x%s" % code, font=(None, 20), foreground='red').pack(padx=10, pady=10)
+    ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
     ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.", font=(None, 10)).pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
