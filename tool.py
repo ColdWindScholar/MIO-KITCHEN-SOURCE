@@ -23,8 +23,8 @@ import shlex
 import sys
 import time
 from platform import machine
-import pygments.lexers
 from webbrowser import open as openurl
+import pygments.lexers
 from dumper import Dumper
 import tkinter as tk
 from utils import lang
