@@ -561,32 +561,23 @@ class Metadata:
         layouts = "\n".join(data["partition_layout"])
         partitions = "------------------------\n".join(
             [
-                "  Name: {}\n  Group: {}\n  Attributes: {}\n  Extents:\n    {}\n".format(
-                    item["name"],
-                    item["group_name"],
-                    item["attributes"],
-                    "\n".join(item["extents"])
-                ) for item in data["partition_table"]
+                "  Name: {}\n  Group: {}\n  Attributes: {}\n  Extents:\n    {}\n".format(item["name"],
+                                                                                         item["group_name"],
+                                                                                         item["attributes"],
+                                                                                         "\n".join(item["extents"])) for
+                item in data["partition_table"]
             ]
         )[:-1]
         blocks = "\n".join(
             [
-                "  Partition name: {}\n  First sector: {}\n  Size: {} bytes\n  Flags: {}".format(
-                    item["name"],
-                    item["first_sector"],
-                    item["size"],
-                    item["flags"]
-                )
+                f"  Partition name: {item['name']}\n  First sector: {item['first_sector']}\n  Size: {item['size']} bytes\n  Flags: {item['flags']}"
                 for item in data["block_devices"]
             ]
         )
         groups = "------------------------\n".join(
             [
-                "  Name: {}\n  Maximum size: {} bytes\n  Flags: {}\n".format(
-                    item["name"],
-                    item["maximum_size"],
-                    item["flags"]
-                ) for item in data["group_table"]
+                f"  Name: {item['name']}\n  Maximum size: {item['maximum_size']} bytes\n  Flags: {item['flags']}\n" for
+                item in data["group_table"]
             ]
         )[:-1]
         return template.substitute(partitions=partitions, layouts=layouts, blocks=blocks, groups=groups, **data)
@@ -702,7 +693,7 @@ class LpUnpack:
                 offset, size = part
                 self._write_extent_to_file(out, offset, size, unpack_job.geometry.logical_block_size)
 
-        print('Done:[%s]' % (dti() - start))
+        print(f'Done:[{dti() - start}]')
 
     def _extract(self, partition, metadata):
         unpack_job = UnpackJob(name=partition.name, geometry=metadata.geometry)

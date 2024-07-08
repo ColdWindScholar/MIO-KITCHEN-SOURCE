@@ -569,7 +569,7 @@ class Volume:
     def uuid(self):
         uuid = self.superblock.s_uuid
         uuid = [uuid[:4], uuid[4: 6], uuid[6: 8], uuid[8: 10], uuid[10:]]
-        return "-".join("".join("{0:02X}".format(c) for c in part) for part in uuid)
+        return "-".join("".join(f"{c:02X}" for c in part) for part in uuid)
 
 
 class Inode:

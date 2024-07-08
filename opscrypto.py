@@ -130,7 +130,7 @@ class QCSparse:
             return chunk_sz * self.blk_sz
         elif chunk_type == 0xCAC4:
             if data_sz != 4:
-                self.error("CRC32 chunk should have 4 bytes of CRC, but this has %u" % data_sz)
+                self.error(f"CRC32 chunk should have 4 bytes of CRC, but this has {data_sz:d}")
                 return -1
             else:
                 self.rf.seek(self.rf.tell() + 4)

@@ -2326,7 +2326,7 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
         command += f"3 -device super:{size.get()} --group {dbfz.get()}_a:{size.get()} "
         for part in lb:
             command += f"--partition {part}_a:readonly:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a --image {part}_a={work + part}.img "
-        command += "--group %s_b:%s " % (dbfz.get(), size.get())
+        command += f"--group {dbfz.get()}_b:{size.get()} "
         for part in lb:
             command += f"--partition {part}_b:readonly:0:{dbfz.get()}_b "
         if set_.get() == 2:
@@ -2528,7 +2528,7 @@ def dboot(nm: str = 'boot'):
         os.chdir(work + nm + os.sep)
         with open(work + nm + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
-        print("Compressing:%s" % comp)
+        print(f"Compressing:{comp}")
         if comp != "unknown":
             if call(f"magiskboot compress={comp} ramdisk-new.cpio") != 0:
                 print("Failed to pack Ramdisk...")
@@ -2776,8 +2776,8 @@ class Packxx(Toplevel):
                 if os.name == 'nt':
                     try:
                         if folder := findfolder(work, "com.google.android.apps.nbu."):
-                            call("mv {} {}".format(folder, folder.replace("com.google.android.apps.nbu.",
-                                                                          "com.google.android.apps.nbu")))
+                            call(
+                                f"mv {folder} {folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')}")
                     except Exception as e:
                         print(e)
                 fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
@@ -3049,7 +3049,7 @@ def unpack(chose, form: str = '') -> bool:
             try:
                 os.remove(work + "payload.bin")
             except Exception as e:
-                print(lang.text72 + " payload.bin:%s" % e)
+                print(lang.text72 + f" payload.bin:{e}")
                 os.remove(work + "payload.bin")
         return True
     elif form == 'super':
@@ -3152,7 +3152,7 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                print(lang.text79 + i + ".img [%s]" % file_type)
+                print(lang.text79 + i + f".img [{file_type}]")
                 imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 if os.path.exists(work + i):
                     try:
