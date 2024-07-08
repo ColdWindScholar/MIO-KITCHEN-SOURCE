@@ -818,7 +818,7 @@ class Inode:
     @property
     def size_readable(self):
         if self.inode.i_size < 1024:
-            return "{0:d} bytes".format(self.inode.i_size) if self.inode.i_size != 1 else "1 byte"
+            return f"{self.inode.i_size:d} bytes" if self.inode.i_size != 1 else "1 byte"
         else:
             units = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
             unit_idx = min(int(log_math(self.inode.i_size, 1024)), len(units))
@@ -928,8 +928,7 @@ class BlockReader:
 
         # Check read
         if len(result) != end_of_stream_check:
-            raise EndOfStreamError(
-                "The volume's underlying stream ended {0:d} bytes before EOF.".format(byte_len - len(result)))
+            raise EndOfStreamError(f"The volume's underlying stream ended {byte_len - len(result):d} bytes before EOF.")
 
         self.cursor += len(result)
         return result

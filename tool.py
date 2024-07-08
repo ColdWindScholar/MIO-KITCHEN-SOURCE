@@ -930,9 +930,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
-            call(exe="dtc -@ -I dtb -O dts %s -o %s" % (work + bn + os.sep + "dtbo" + os.sep + dtbo,
-                                                        os.path.join(work, bn, "dts", "dts." +
-                                                                     os.path.basename(dtbo).rsplit('.', 1)[1])), out=1)
+            call(exe=f"dtc -@ -I dtb -O dts {work + bn + os.sep + 'dtbo' + os.sep + dtbo} -o {os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])}", out=1)
     print(lang.text5)
     try:
         os.remove(dtboimg)
@@ -951,9 +949,7 @@ def pack_dtbo() -> bool:
     for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
-            call(exe="dtc -@ -I dts -O dtb %s -o %s" % (os.path.join(work, "dtbo", "dts", dts),
-                                                        os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' +
-                                                                     os.path.basename(dts).rsplit('.', 1)[1])), out=1)
+            call(exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}", out=1)
     print(f"{lang.text7}:dtbo.img")
     list_ = []
     for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
@@ -2117,7 +2113,7 @@ class MpkStore(Toplevel):
         size = 1024.0
         for i in range(len(units)):
             if (value / size) < 1:
-                return "%.2f%s" % (value, units[i])
+                return f"{value:.2f}{units[i]}"
             value = value / size
 
 
@@ -3164,7 +3160,7 @@ def unpack(chose, form: str = '') -> bool:
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
-                print(lang.text79 + i + ".img [%s]" % file_type)
+                print(lang.text79 + i + f".img [{file_type}]")
                 if call(exe=f"extract.erofs -i '{os.path.join(settings.path, dn.get(), i + '.img')}' -o '{work}' -x",
                         out=1) != 0:
                     print('Unpack failed...')

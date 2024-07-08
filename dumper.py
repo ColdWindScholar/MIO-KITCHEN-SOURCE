@@ -54,7 +54,7 @@ class Dumper:
                         found = True
                         break
                 if not found:
-                    print("Partition %s not found in image" % image)
+                    print(f"Partition {image} not found in image")
 
         if len(partitions) == 0:
             print("Not operating on any partitions")
@@ -191,16 +191,16 @@ class Dumper:
                     processed_len += len(data)
                 processed_len = 0
         else:
-            print("Unsupported type = %d" % op.type)
+            print(f"Unsupported type = {op.type:d}")
             sys.exit(-1)
         del data
 
     def dump_part(self, part):
         name = part["partition"].partition_name
-        out_file = open("%s/%s.img" % (self.out, name), "wb")
+        out_file = open(f"{self.out}/{name}.img", "wb")
 
         if self.diff:
-            old_file = open("%s/%s.img" % (self.old, name), "rb")
+            old_file = open(f"{self.old}/{name}.img", "rb")
         else:
             old_file = None
 
