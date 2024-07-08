@@ -3098,7 +3098,7 @@ def unpack(chose, form: any = None):
                 utils.Vbpatch(work + i + ".img").disavb()
             file_type = gettype(work + i + ".img")
             if file_type == "sparse":
-                print(lang.text79 + i + ".img [%s]" % file_type)
+                print(lang.text79 + i + f".img [{file_type}]")
                 try:
                     utils.simg2img(work + i + ".img")
                 except (Exception, BaseException):

@@ -361,7 +361,7 @@ class BlockImageDiff(object):
             total = 0
             while to_zero.size() > 0:
                 zero_blocks = to_zero.first(zero_blocks_limit)
-                out.append("zero %s\n" % (zero_blocks.to_string_raw(),))
+                out.append(f"zero {zero_blocks.to_string_raw()}\n")
                 total += zero_blocks.size()
                 to_zero = to_zero.subtract(zero_blocks)
             return total
@@ -393,7 +393,7 @@ class BlockImageDiff(object):
                 stashes[s] = sid
                 if self.version == 2:
                     stashed_blocks += sr.size()
-                    out.append("stash %d %s\n" % (sid, sr.to_string_raw()))
+                    out.append(f"stash {sid:d} {sr.to_string_raw()}\n")
                 else:
                     sh = self.HashBlocks(self.src, sr)
                     if sh in stashes:
@@ -402,7 +402,7 @@ class BlockImageDiff(object):
                         stashes[sh] = 1
                         stashed_blocks += sr.size()
                         self.touched_src_ranges = self.touched_src_ranges.union(sr)
-                        out.append("stash %s %s\n" % (sh, sr.to_string_raw()))
+                        out.append(f"stash {sh} {sr.to_string_raw()}\n")
 
             if stashed_blocks > max_stashed_blocks:
                 max_stashed_blocks = stashed_blocks
@@ -432,21 +432,21 @@ class BlockImageDiff(object):
                     sr = xf.src_ranges.map_within(sr)
                     mapped_stashes.append(sr)
                     if self.version == 2:
-                        src_str.append("%d:%s" % (sid, sr.to_string_raw()))
+                        src_str.append(f"{sid:d}:{sr.to_string_raw()}")
                         # A stash will be used only once. We need to free the stash
                         # immediately after the use, instead of waiting for the automatic
                         # clean-up at the end. Because otherwise it may take up extra space
                         # and lead to OTA failures.
                         # Bug: 23119955
-                        free_string.append("free %d\n" % (sid,))
+                        free_string.append(f"free {sid:d}\n")
                         free_size += sr.size()
                     else:
                         assert sh in stashes
-                        src_str.append("%s:%s" % (sh, sr.to_string_raw()))
+                        src_str.append(f"{sh}:{sr.to_string_raw()}")
                         stashes[sh] -= 1
                         if stashes[sh] == 0:
                             free_size += sr.size()
-                            free_string.append("free %s\n" % sh)
+                            free_string.append(f"free {sh}\n")
                             stashes.pop(sh)
                     heappush(free_stash_ids, sid)
 
@@ -487,20 +487,16 @@ class BlockImageDiff(object):
 
             if xf.style == "new":
                 assert xf.tgt_ranges
-                out.append("%s %s\n" % (xf.style, xf.tgt_ranges.to_string_raw()))
+                out.append(f"{xf.style} {xf.tgt_ranges.to_string_raw()}\n")
                 total += tgt_size
             elif xf.style == "move":
                 assert xf.tgt_ranges
                 assert xf.src_ranges.size() == tgt_size
                 if xf.src_ranges != xf.tgt_ranges:
                     if self.version == 1:
-                        out.append("%s %s %s\n" % (
-                            xf.style,
-                            xf.src_ranges.to_string_raw(), xf.tgt_ranges.to_string_raw()))
+                        out.append(f"{xf.style} {xf.src_ranges.to_string_raw()} {xf.tgt_ranges.to_string_raw()}\n")
                     elif self.version == 2:
-                        out.append("%s %s %s\n" % (
-                            xf.style,
-                            xf.tgt_ranges.to_string_raw(), src_str))
+                        out.append(f"{xf.style} {xf.tgt_ranges.to_string_raw()} {src_str}\n")
                     elif self.version >= 3:
                         # take into account automatic stashing of overlapping blocks
                         if xf.src_ranges.overlaps(xf.tgt_ranges):
@@ -511,10 +507,8 @@ class BlockImageDiff(object):
                         self.touched_src_ranges = self.touched_src_ranges.union(
                             xf.src_ranges)
 
-                        out.append("%s %s %s %s\n" % (
-                            xf.style,
-                            self.HashBlocks(self.tgt, xf.tgt_ranges),
-                            xf.tgt_ranges.to_string_raw(), src_str))
+                        out.append(
+                            f"{xf.style} {self.HashBlocks(self.tgt, xf.tgt_ranges)} {xf.tgt_ranges.to_string_raw()} {src_str}\n")
                     total += tgt_size
             elif xf.style in ("bsdiff", "imgdiff"):
                 assert xf.tgt_ranges
