@@ -79,6 +79,7 @@ class sdat2img:
                 return
             else:
                 print(e)
+                return
 
         new_data_file = open(self.new_data_file, 'rb')
         max_file_size = 0
@@ -375,8 +376,8 @@ def jzxs(master):
     :param master: Window
     :return:
     """
-    master.geometry('+{}+{}'.format(int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2),
-                                    int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)))
+    master.geometry(
+        f'+{int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2)}+{int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)}')
     try:
         master.update()
     except (Exception, BaseException):

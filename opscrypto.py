@@ -494,7 +494,7 @@ def main(args):
                     print("MBox4")
                 else:
                     print("Unsupported key !")
-                    exit(0)
+
         root = et.fromstring(xml)
         for child in root:
             if child.tag == "SAHARA":
@@ -549,7 +549,7 @@ def main(args):
             # else:
             #    print (child.tag, child.attrib)
         print("Done. Extracted files to " + path)
-        exit(0)
+
     elif args["encrypt"]:
         if args["--mbox"] == "4":
             mbox = mbox4
@@ -634,7 +634,7 @@ def main(args):
                 print("Done. Created " + outfilename)
             except Exception as e:
                 print(e)
-        exit(0)
+
     elif args["encryptfile"]:
         filename = args["<filename>"].replace("\\", "/")
         mbox = mbox5
