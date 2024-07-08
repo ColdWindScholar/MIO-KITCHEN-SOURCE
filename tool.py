@@ -3450,7 +3450,7 @@ def dndfile(files):
 class ProjectMenuUtils(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
-        self.LB1 = None
+        self.combobox = None
         self.pack(padx=5, pady=5)
 
     @staticmethod
@@ -3460,27 +3460,27 @@ class ProjectMenuUtils(ttk.LabelFrame):
             print(lang.t29 + dn.get())
 
     def gui(self):
-        self.LB1 = ttk.Combobox(self, textvariable=dn, state='readonly')
-        self.LB1.pack(side="top", padx=10, pady=10, fill=X)
-        self.LB1.bind('<<ComboboxSelected>>', lambda *x: self.select_print())
+        self.combobox = ttk.Combobox(self, textvariable=dn, state='readonly')
+        self.combobox.pack(side="top", padx=10, pady=10, fill=X)
+        self.combobox.bind('<<ComboboxSelected>>', lambda *x: self.select_print())
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text115, command=self.new_project).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove_project)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text117, command=lambda: cz(self.rename_project)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text115, command=self.new).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text117, command=lambda: cz(self.rename)).pack(side="left", padx=10, pady=10)
 
     def listdir(self):
         array = []
         for f in os.listdir(settings.path + os.sep + "."):
             if os.path.isdir(settings.path + os.sep + f) and f != 'bin' and not f.startswith('.'):
                 array.append(f)
-        self.LB1["value"] = array
+        self.combobox["value"] = array
         if not array:
             dn.set("")
-            self.LB1.current()
+            self.combobox.current()
         else:
-            self.LB1.current(0)
+            self.combobox.current(0)
 
-    def rename_project(self):
+    def rename(self):
         if not dn.get():
             print(lang.warn1)
             return
@@ -3493,11 +3493,11 @@ class ProjectMenuUtils(ttk.LabelFrame):
         else:
             print(lang.text104)
 
-    def remove_project(self):
+    def remove(self):
         win.message_pop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
         self.listdir()
 
-    def new_project(self):
+    def new(self):
         if not (inputvar := input_()):
             win.message_pop(lang.warn12)
         else:
@@ -3557,7 +3557,7 @@ class UnpackGui(ttk.LabelFrame):
         self.ch.trace("w", lambda *x: self.hd())
 
     def show_menu(self, event):
-        if self.lsg.curselection().__len__() == 1 and self.fm.get() == 'img':
+        if len(self.lsg.curselection()) == 1 and self.fm.get() == 'img':
             self.menu.post(event.x_root, event.y_root)
 
     def info(self):
