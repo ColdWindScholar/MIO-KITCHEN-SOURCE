@@ -10,9 +10,8 @@ from typing import Any, Union
 
 try:
     from ctypes import (POINTER, Structure, byref, c_int, pointer, sizeof,
-                        windll, c_buffer, WINFUNCTYPE, c_uint64)
+                        windll)
     from ctypes.wintypes import DWORD, ULONG
-    import platform
 
 except ImportError:
     raise ImportError("pywinstyles import errror: No windows environment detected!")

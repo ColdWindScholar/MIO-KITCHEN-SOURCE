@@ -4,7 +4,7 @@ import os
 import platform
 import shutil
 import zipfile
-from platform import system, machine
+from platform import system
 from pip._internal.cli.main import main as _main
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
