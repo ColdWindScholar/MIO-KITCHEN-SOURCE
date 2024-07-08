@@ -684,16 +684,6 @@ class Upgrade(Toplevel):
         self.destroy()
 
 
-def load_language(name):
-    lang_file = f'{elocal}/bin/languages/{name}.json'
-    _lang: dict = {}
-    if not name and not os.path.exists(f'{elocal}/bin/languages/English.json'):
-        error(1)
-    elif not os.path.exists(lang_file):
-        _lang = JsonEdit(f'{elocal}/bin/languages/English.json').read()
-    else:
-        _lang = JsonEdit(lang_file).read()
-    [setattr(lang, i, _lang[i]) for i in _lang]
 
 
 def error(code, desc="unknown error"):
@@ -863,10 +853,21 @@ class SetUtils:
         else:
             self.path = os.getcwd()
         language.set(self.language)
-        load_language(language.get())
+        self.load_language(language.get())
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
         win.attributes("-alpha", self.bar_level)
+
+    def load_language(self, name):
+        lang_file = f'{elocal}/bin/languages/{name}.json'
+        _lang: dict = {}
+        if not name and not os.path.exists(f'{elocal}/bin/languages/English.json'):
+            error(1)
+        elif not os.path.exists(lang_file):
+            _lang = JsonEdit(f'{elocal}/bin/languages/English.json').read()
+        else:
+            _lang = JsonEdit(lang_file).read()
+        [setattr(lang, i, _lang[i]) for i in _lang]
 
     def set_value(self, name, value):
         self.config.read(self.set_file)
@@ -888,7 +889,7 @@ class SetUtils:
         print(lang.text129 + language.get())
         try:
             self.set_value("language", language.get())
-            load_language(language.get())
+            self.load_language(language.get())
             if ask_win(lang.t36):
                 restart()
         except Exception as e:
