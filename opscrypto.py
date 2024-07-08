@@ -136,13 +136,13 @@ class QCSparse:
                 self.rf.seek(self.rf.tell() + 4)
                 return 0
         else:
-            print("Unknown chunk type 0x%04X" % chunk_type)
+            print(f"Unknown chunk type 0x{chunk_type:04X}")
             return -1
 
     def unsparse(self):
         if self.total_blks < self.offset:
             self.error(
-                "The header said we should have %u output blocks, but we saw %u" % (self.total_blks, self.offset))
+                f"The header said we should have {self.total_blks:d} output blocks, but we saw {self.offset:d}")
             return -1
         header = unpack("<2H2I", self.rf.read(self.chunk_hdr_sz))
         chunk_type = header[0]
@@ -152,7 +152,7 @@ class QCSparse:
         if chunk_type == 0xCAC1:
             if data_sz != (chunk_sz * self.blk_sz):
                 self.error(
-                    "Raw chunk input size (%u) does not match output size (%u)" % (data_sz, chunk_sz * self.blk_sz))
+                    f"Raw chunk input size ({data_sz:d}) does not match output size ({chunk_sz * self.blk_sz:d})")
                 return -1
             else:
                 # self.debug("Raw data")
@@ -161,7 +161,7 @@ class QCSparse:
                 return data
         elif chunk_type == 0xCAC2:
             if data_sz != 4:
-                self.error("Fill chunk should have 4 bytes of fill, but this has %u" % data_sz)
+                self.error(f"Fill chunk should have 4 bytes of fill, but this has {data_sz:d}")
                 return -1
             else:
                 fill_bin = self.rf.read(4)
@@ -175,7 +175,7 @@ class QCSparse:
             return data
         elif chunk_type == 0xCAC4:
             if data_sz != 4:
-                self.error("CRC32 chunk should have 4 bytes of CRC, but this has %u" % data_sz)
+                self.error(f"CRC32 chunk should have 4 bytes of CRC, but this has {data_sz:d}")
                 return -1
             else:
                 # self.debug(format("Unverified CRC32 0x%08X" % crc))
