@@ -280,7 +280,7 @@ def main(filename, outdir):
     pagesize, key, iv, data = generatekey2(filename)
     if pagesize == 0:
         print("Unknown key. Aborting")
-        exit(0)
+        return
     else:
         xml = data[:data.rfind(b">") + 1].decode('utf-8')
 
@@ -323,6 +323,5 @@ def main(filename, outdir):
             else:
                 decryptfile(key, iv, filename, path, wfilename, start, length, rlength, checksums, decryptsize)
     print("\nDone. Extracted files to " + path)
-    exit(0)
 
     # main(filename_, outdir_)

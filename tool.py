@@ -241,7 +241,7 @@ class Tool(Tk):
         self.gif_label = None
         self.photo = None
         self.show_local = None
-        self.LB2 = None
+        self.list2 = None
         self.notepad = None
         self.message_pop = warn_win
         self.title('MIO-KITCHEN')
@@ -401,9 +401,9 @@ class Tool(Tk):
         sf3 = ttk.Frame(self.tab3)
         sf4 = ttk.Frame(self.tab3, width=20)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
-        self.LB2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
-        self.LB2.pack(padx=10, pady=10, side='left')
-        self.LB2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
+        self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
+        self.list2.pack(padx=10, pady=10, side='left')
+        self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.show_local)
         slo.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
@@ -880,7 +880,7 @@ class SetUtils:
         try:
             self.set_value("theme", theme.get())
             sv_ttk.set_theme(theme.get())
-            cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.LB2.get()}_byte"))))
+            cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
         except Exception as e:
             win.message_pop(lang.text101 % (theme.get(), e))
 
@@ -1848,7 +1848,8 @@ class Debugger(Toplevel):
         ck.title('Settings')
         f1 = Frame(ck)
         f1.pack(pady=5, padx=5, fill=X, expand=True)
-        h = ttk.Combobox(f1, values=[i for i in dir(settings) if isinstance(getattr(settings, i), str)], state='readonly')
+        h = ttk.Combobox(f1, values=[i for i in dir(settings) if isinstance(getattr(settings, i), str)],
+                         state='readonly')
         h.current(0)
         h.bind("<<ComboboxSelected>>", lambda *x: read_value())
         h.pack(side='left', padx=5)
@@ -2944,8 +2945,6 @@ def unpackrom(ifile) -> None:
             except Exception as e:
                 print(lang.text80 % (file_, e))
                 win.message_pop(lang.warn4.format(file_))
-            finally:
-                ...
         print(lang.text81)
         if os.path.exists(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
             project_menu.listdir()
@@ -3821,7 +3820,7 @@ def init():
     unpackg.gui()
     Frame3().gui()
     project_menu.listdir()
-    cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.LB2.get()}_byte"))))
+    cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
     cartoon.init()
     print(lang.text108)
     win.update()

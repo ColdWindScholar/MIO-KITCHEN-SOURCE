@@ -57,8 +57,7 @@ def extract(source, flist):
                 try:
                     with open(out_dir + sep + filename + '.img', 'wb') as o:
                         while file_size > 0:
-                            if chunk > file_size:
-                                chunk = file_size
+                            chunk = min(chunk, file_size)
 
                             o.write(f.read(chunk))
                             file_size -= chunk

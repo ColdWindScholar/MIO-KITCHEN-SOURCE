@@ -156,7 +156,7 @@ class DataImage(Image):
 
         assert zero_blocks or nonzero_blocks or clobbered_blocks
 
-        self.file_map = dict()
+        self.file_map = {}
         if zero_blocks:
             self.file_map["__ZERO"] = RangeSet(data=zero_blocks)
         if nonzero_blocks:
@@ -404,8 +404,7 @@ class BlockImageDiff(object):
                         self.touched_src_ranges = self.touched_src_ranges.union(sr)
                         out.append(f"stash {sh} {sr.to_string_raw()}\n")
 
-            if stashed_blocks > max_stashed_blocks:
-                max_stashed_blocks = stashed_blocks
+            max_stashed_blocks = max(max_stashed_blocks, stashed_blocks)
 
             free_string = []
             free_size = 0
@@ -501,8 +500,7 @@ class BlockImageDiff(object):
                         # take into account automatic stashing of overlapping blocks
                         if xf.src_ranges.overlaps(xf.tgt_ranges):
                             temp_stash_usage = stashed_blocks + xf.src_ranges.size()
-                            if temp_stash_usage > max_stashed_blocks:
-                                max_stashed_blocks = temp_stash_usage
+                            max_stashed_blocks = max(max_stashed_blocks, temp_stash_usage)
 
                         self.touched_src_ranges = self.touched_src_ranges.union(
                             xf.src_ranges)
@@ -525,8 +523,7 @@ class BlockImageDiff(object):
                     # take into account automatic stashing of overlapping blocks
                     if xf.src_ranges.overlaps(xf.tgt_ranges):
                         temp_stash_usage = stashed_blocks + xf.src_ranges.size()
-                        if temp_stash_usage > max_stashed_blocks:
-                            max_stashed_blocks = temp_stash_usage
+                        max_stashed_blocks = max(max_stashed_blocks, temp_stash_usage)
 
                     self.touched_src_ranges = self.touched_src_ranges.union(
                         xf.src_ranges)
