@@ -666,7 +666,7 @@ class Upgrade(Toplevel):
                 if os.path.isfile(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))):
                     os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
                 re_folder(os.path.join(elocal, "bin", "temp"))
-            except (Exception, BaseException, FileNotFoundError, PermissionError) as e:
+            except (IOError, IsADirectoryError, FileNotFoundError, PermissionError) as e:
                 print(e)
             settings.set_value('updating', '')
             settings.set_value('new_tool', '')
@@ -3782,7 +3782,7 @@ class FormatConversion(ttk.LabelFrame):
                                     os.remove(work + i)
                                     os.remove(transferfile)
                                     os.remove(work + basename + '.patch.dat')
-                                except (PermissionError, IOError,FileNotFoundError, IsADirectoryError):
+                                except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     ...
                         else:
                             print("transferfile" + lang.text84)
