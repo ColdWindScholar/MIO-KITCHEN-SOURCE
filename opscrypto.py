@@ -94,10 +94,10 @@ class QCSparse:
         if magic != 0xED26FF3A:
             return False
         if self.file_hdr_sz != 28:
-            self.error("The file header size was expected to be 28, but is %u." % self.file_hdr_sz)
+            self.error(f"The file header size was expected to be 28, but is {self.file_hdr_sz:d}.")
             return False
         if self.chunk_hdr_sz != 12:
-            print("The chunk header size was expected to be 12, but is %u." % self.chunk_hdr_sz)
+            print(f"The chunk header size was expected to be 12, but is {self.chunk_hdr_sz:d}.")
             return False
         print("Sparse Format detected. Using unpacked image.")
         return True
@@ -105,7 +105,7 @@ class QCSparse:
     def get_chunk_size(self):
         if self.total_blks < self.offset:
             self.error(
-                "The header said we should have %u output blocks, but we saw %u" % (self.total_blks, self.offset))
+                f"The header said we should have {self.total_blks:d} output blocks, but we saw {self.offset:d}")
             return -1
         header = unpack("<2H2I", self.rf.read(self.chunk_hdr_sz))
         chunk_type = header[0]
@@ -115,14 +115,14 @@ class QCSparse:
         if chunk_type == 0xCAC1:
             if data_sz != (chunk_sz * self.blk_sz):
                 self.error(
-                    "Raw chunk input size (%u) does not match output size (%u)" % (data_sz, chunk_sz * self.blk_sz))
+                    f"Raw chunk input size ({data_sz:d}) does not match output size ({chunk_sz * self.blk_sz:d})")
                 return -1
             else:
                 self.rf.seek(self.rf.tell() + chunk_sz * self.blk_sz)
                 return chunk_sz * self.blk_sz
         elif chunk_type == 0xCAC2:
             if data_sz != 4:
-                self.error("Fill chunk should have 4 bytes of fill, but this has %u" % data_sz)
+                self.error(f"Fill chunk should have 4 bytes of fill, but this has {data_sz:d}")
                 return -1
             else:
                 return chunk_sz * self.blk_sz // 4

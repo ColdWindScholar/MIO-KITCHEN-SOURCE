@@ -283,16 +283,13 @@ class Dtbo:
 
         # verify the header
         if self.magic != self._DTBO_MAGIC and self.magic != self._ACPIO_MAGIC:
-            raise ValueError('Invalid magic number 0x%x in DTBO/ACPIO file' %
-                             self.magic)
+            raise ValueError(f'Invalid magic number 0x{self.magic:x} in DTBO/ACPIO file')
 
         if self.header_size != self._DT_TABLE_HEADER_SIZE:
-            raise ValueError('Invalid header size (%d) in DTBO/ACPIO file' %
-                             self.header_size)
+            raise ValueError(f'Invalid header size ({self.header_size:d}) in DTBO/ACPIO file')
 
         if self.dt_entry_size != self._DT_ENTRY_HEADER_SIZE:
-            raise ValueError('Invalid DT entry header size (%d) in DTBO/ACPIO file' %
-                             self.dt_entry_size)
+            raise ValueError(f'Invalid DT entry header size ({self.dt_entry_size:d}) in DTBO/ACPIO file')
 
     def _read_dt_entries_from_metadata(self):
         """Reads individual DT entry headers from metadata buffer.

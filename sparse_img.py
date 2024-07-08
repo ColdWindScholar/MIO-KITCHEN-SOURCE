@@ -77,8 +77,7 @@ class SparseImage:
             if chunk_type == 0xCAC1:
                 if data_sz != (chunk_sz * blk_sz):
                     raise ValueError(
-                        "Raw chunk input size (%u) does not match output size (%u)" %
-                        (data_sz, chunk_sz * blk_sz))
+                        f"Raw chunk input size ({data_sz:d}) does not match output size ({chunk_sz * blk_sz:d})")
                 else:
                     care_data.append(pos)
                     care_data.append(pos + chunk_sz)
@@ -103,8 +102,7 @@ class SparseImage:
                 raise ValueError("CRC32 chunks are not supported")
 
             else:
-                raise ValueError("Unknown chunk type 0x%04X not supported" %
-                                 (chunk_type,))
+                raise ValueError(f"Unknown chunk type 0x{chunk_type:04X} not supported")
 
         self.care_map = rangelib.RangeSet(care_data)
         self.offset_index = [i[0] for i in offset_map]
@@ -246,6 +244,6 @@ class SparseImage:
             out["__ZERO"] = rangelib.RangeSet(data=zero_blocks)
         if nonzero_groups:
             for i, blocks in enumerate(nonzero_groups):
-                out["__NONZERO-%d" % i] = rangelib.RangeSet(data=blocks)
+                out[f"__NONZERO-{i:d}"] = rangelib.RangeSet(data=blocks)
         if clobbered_blocks:
             out["__COPY"] = clobbered_blocks

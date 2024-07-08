@@ -2148,10 +2148,10 @@ class Dbkxyt:
                     if os.path.getsize(os.path.join(dir_ + 'images', t)) > 209715200:
                         self.zstd_compress(os.path.join(dir_ + 'images', t))
                         lines.insert(add_line,
-                                     'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                                     f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
                     else:
                         lines.insert(add_line,
-                                     'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                                     f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
             for t in os.listdir(dir_):
                 if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
                     print(f"Add Flash method {t} to update-binary")
@@ -2159,10 +2159,10 @@ class Dbkxyt:
                         self.zstd_compress(dir_ + t)
                         move(os.path.join(dir_, t + ".zst"), os.path.join(dir_ + "images", t + ".zst"))
                         lines.insert(add_line,
-                                     'package_extract_zstd "images/{}.zst" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                                     f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
                     else:
                         lines.insert(add_line,
-                                     'package_extract_file "images/{}" "/dev/block/by-name/{}"\n'.format(t, t[:-4]))
+                                     f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
                         move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
             script.seek(0)
             script.truncate()
@@ -2333,7 +2333,7 @@ def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
             command += "--virtual-ab "
     if sparse.get() == 1:
         command += "--sparse "
-    command += " --out %s" % (work + "super.img")
+    command += f" --out {work + 'super.img'}"
     if return_cmd == 1:
         return command
     if call(command) == 0:
