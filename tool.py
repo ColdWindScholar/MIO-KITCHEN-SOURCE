@@ -10,6 +10,7 @@ from functools import wraps
 from random import randrange
 import json
 import hashlib
+
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
@@ -3006,6 +3007,7 @@ def unpackrom(ifile) -> None:
 def rwork() -> str:
     return os.path.join(settings.path, dn.get()) + os.sep
 
+
 def sha1(path) -> str:
     if not os.path.exists(path) or not os.path.isfile(path):
         return ''
@@ -3016,6 +3018,8 @@ def sha1(path) -> str:
             sha1sum.update(block)
             block = source.read(2 ** 16)
         return sha1sum.hexdigest()
+
+
 @cartoon
 def unpack(chose, form: str = '') -> bool:
     if os.name == 'nt':
