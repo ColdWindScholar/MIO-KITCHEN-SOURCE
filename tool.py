@@ -9,7 +9,7 @@ from collections import deque
 from functools import wraps
 from random import randrange
 import json
-
+import hashlib
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
@@ -3006,7 +3006,16 @@ def unpackrom(ifile) -> None:
 def rwork() -> str:
     return os.path.join(settings.path, dn.get()) + os.sep
 
-
+def sha1(path) -> str:
+    if not os.path.exists(path) or not os.path.isfile(path):
+        return ''
+    with open(path, 'rb') as source:
+        sha1sum = hashlib.sha1()
+        block = source.read(2 ** 16)
+        while len(block) != 0:
+            sha1sum.update(block)
+            block = source.read(2 ** 16)
+        return sha1sum.hexdigest()
 @cartoon
 def unpack(chose, form: str = '') -> bool:
     if os.name == 'nt':
@@ -3133,7 +3142,11 @@ def unpack(chose, form: str = '') -> bool:
                 if os.access(work + "system_a.img", os.F_OK):
                     for wjm in os.listdir(work):
                         if wjm.endswith('_a.img'):
-                            os.rename(work + wjm, work + wjm.replace('_a', ''))
+                            if os.path.exists(work + wjm) and os.path.exists(work + wjm.replace('_a', '')):
+                                if sha1(work + wjm) == sha1(work + wjm.replace('_a', '')):
+                                    os.remove(work + wjm)
+                                else:
+                                    os.rename(work + wjm, work + wjm.replace('_a', ''))
                         if wjm.endswith('_b.img'):
                             if os.path.getsize(work + wjm) == 0:
                                 os.remove(work + wjm)
