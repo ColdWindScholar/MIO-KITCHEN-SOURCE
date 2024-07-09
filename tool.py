@@ -469,8 +469,6 @@ tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + 
 states = States()
 
 
-class ModuleError(Exception):
-    ...
 
 
 # Some Functions for Upgrade
@@ -955,7 +953,8 @@ def pack_dtbo() -> bool:
                 exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}",
                 out=1)
     print(f"{lang.text7}:dtbo.img")
-    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if f.startswith("dtbo.")]
+    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
+             f.startswith("dtbo.")]
     list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
@@ -1334,7 +1333,7 @@ class ModuleManager:
                         self.runline(i)
                     except AttributeError as e:
                         print(f"Unknown Order：{i}\nReason：{e}")
-                    except ModuleError as e:
+                    except ValueError as e:
                         print(f"Exception:{e}")
                         return
                     except Exception as e:
@@ -1391,7 +1390,7 @@ class ModuleManager:
             try:
                 cmd_, argv = cmd.split()
             except Exception:
-                raise ModuleError(f"MSH: Unsupported {cmd}")
+                raise ValueError(f"MSH: Unsupported {cmd}")
             if cmd_ == 'run':
                 if not os.path.exists(argv.replace("\\", '/')):
                     print(f"Script Not Exist：{argv}")
@@ -1403,7 +1402,7 @@ class ModuleManager:
 
         @staticmethod
         def exit(value):
-            raise ModuleError(value)
+            raise ValueError(value)
 
         def sif(self, mode, var_, other):
             modes = {
@@ -2373,6 +2372,9 @@ class StdoutRedirector:
         self.error_info = ''
 
     def write(self, string):
+        cz(self.__write(string))
+
+    def __write(self, string):
         if self.error:
             self.error_info += string
             return
@@ -3869,11 +3871,11 @@ def init():
     global project_menu
     project_menu = ProjectMenuUtils()
     project_menu.gui()
-    unpackg.gui()
+    cz(unpackg.gui)
     Frame3().gui()
-    project_menu.listdir()
+    cz(project_menu.listdir)
     cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
-    cartoon.init()
+    cz(cartoon.init)
     print(lang.text108)
     win.update()
     jzxs(win)
