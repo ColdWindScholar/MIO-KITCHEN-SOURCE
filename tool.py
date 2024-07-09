@@ -3146,6 +3146,8 @@ def unpack(chose, form: str = '') -> bool:
                                 os.remove(work + wjm)
                             else:
                                 os.rename(work + wjm, work + wjm.replace('_a', ''))
+                        else:
+                            os.rename(work + wjm, work + wjm.replace('_a', ''))
                     if wjm.endswith('_b.img'):
                         if os.path.getsize(work + wjm) == 0:
                             os.remove(work + wjm)
