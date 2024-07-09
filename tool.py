@@ -2005,6 +2005,8 @@ class MpkStore(Toplevel):
             else:
                 self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
         self.canvas.yview_moveto(0.0)
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def add_app(self, app_dict=None):
         self.clear()
