@@ -468,9 +468,6 @@ tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(elocal, 'bin', platform.system(), platform.machine()) + os.sep
 states = States()
 
-
-
-
 # Some Functions for Upgrade
 if os.name == 'nt':
     kernel32 = ctypes.windll.kernel32
