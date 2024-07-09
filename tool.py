@@ -3148,6 +3148,7 @@ def unpack(chose, form: str = '') -> bool:
                             if sha1(work + wjm) == sha1(work + wjm.replace('_a', '')):
                                 os.remove(work + wjm)
                             else:
+                                os.remove(work + wjm.replace('_a', ''))
                                 os.rename(work + wjm, work + wjm.replace('_a', ''))
                         else:
                             os.rename(work + wjm, work + wjm.replace('_a', ''))
