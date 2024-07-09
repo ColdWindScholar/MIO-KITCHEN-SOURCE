@@ -1088,23 +1088,24 @@ class ModuleManager:
                 file = temp + v_code()
                 while os.path.exists(file):
                     file = temp + v_code()
-            with open(file, "w", encoding='UTF-8', newline="\n") as f:
-                if values:
-                    for va in values.gavs.keys():
-                        if gva := values.gavs[va].get():
-                            f.write(f"export {va}='{gva}'\n")
-                    values.gavs.clear()
-                f.write('export tool_bin="{}"\n'.format(
-                    tool_bin.replace(
-                        '\\',
-                        '/')))
-                f.write(f'export version="{settings.version}"\n')
-                f.write(f'export language="{settings.language}"\n')
-                f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
-                f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
-                f.write(
-                    "export project='{}'\nsource $1".format(
-                        rwork().replace('\\', '/')))
+            if os.path.exists(script_path + "main.sh"):
+                with open(file, "w", encoding='UTF-8', newline="\n") as f:
+                    if values:
+                        for va in values.gavs.keys():
+                            if gva := values.gavs[va].get():
+                                f.write(f"export {va}='{gva}'\n")
+                        values.gavs.clear()
+                    f.write('export tool_bin="{}"\n'.format(
+                        tool_bin.replace(
+                            '\\',
+                            '/')))
+                    f.write(f'export version="{settings.version}"\n')
+                    f.write(f'export language="{settings.language}"\n')
+                    f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
+                    f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
+                    f.write(
+                        "export project='{}'\nsource $1".format(
+                            rwork().replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
