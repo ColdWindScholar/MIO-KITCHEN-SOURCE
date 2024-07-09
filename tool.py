@@ -1686,7 +1686,7 @@ class MpkMan(ttk.Frame):
         self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
                                 command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
-        self.list_pls()
+        cz(self.list_pls)
         lf1.pack(padx=10, pady=10)
 
 
@@ -2036,7 +2036,7 @@ class MpkStore(Toplevel):
         for i in self.deque:
             try:
                 i.destroy()
-            except (BaseException, Exception):
+            except (TclError, ValueError):
                 pass
 
     def modify_repo(self):
