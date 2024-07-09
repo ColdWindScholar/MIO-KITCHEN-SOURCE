@@ -1721,7 +1721,7 @@ class InstallMpk(Toplevel):
         self.load()
         jzxs(self)
         self.wait_window()
-        list_pls_plugin()
+        cz(list_pls_plugin)
 
     def install(self):
         if self.installb.cget('text') == lang.text34:
