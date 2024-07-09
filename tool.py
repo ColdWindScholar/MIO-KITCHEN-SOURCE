@@ -3047,9 +3047,6 @@ def unpack(chose, form: str = '') -> bool:
         return False
     json_ = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info")
     parts = json_.read()
-    if os.access(work + "UPDATE.APP", os.F_OK):
-        print(lang.text79 + "UPDATE.APP")
-        splituapp.extract(work + "UPDATE.APP", "")
     if not chose:
         return False
     if form == 'payload':
@@ -3088,6 +3085,9 @@ def unpack(chose, form: str = '') -> bool:
                 if wjm.endswith('_b.img'):
                     if not os.path.getsize(work + wjm):
                         os.remove(work + wjm)
+        return True
+    elif form == 'update.app':
+        splituapp.extract(work + "UPDATE.APP", work, chose)
         return True
     for i in chose:
         if os.access(work + i + ".zstd", os.F_OK):
@@ -3586,7 +3586,7 @@ class UnpackGui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch.set(1)
         self.fm = ttk.Combobox(self, state="readonly",
-                               values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super'))
+                               values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super', 'update.app'))
         self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
         self.menu.add_command(label=lang.attribute, command=self.info)
@@ -3670,6 +3670,11 @@ class UnpackGui(ttk.LabelFrame):
                 if data:
                     for i in data:
                         self.lsg.insert(END, i)
+        elif self.fm.get() == 'update.app':
+            if os.path.exists(work + "UPDATE.APP"):
+                for i in splituapp.get_parts(work + "UPDATE.APP"):
+                    self.lsg.insert(END, i)
+
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
