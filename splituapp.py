@@ -72,7 +72,7 @@ def extract(source, out_dir: str, flist: list):
             if x_bytes < byte_num:
                 f.seek(x_bytes, 1)
 
-    print('\nExtraction complete')
+    print('Extraction complete')
 
 
 def get_parts(source):
