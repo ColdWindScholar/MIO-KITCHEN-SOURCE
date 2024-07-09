@@ -953,10 +953,7 @@ def pack_dtbo() -> bool:
                 exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}",
                 out=1)
     print(f"{lang.text7}:dtbo.img")
-    list_ = []
-    for f in os.listdir(work + "dtbo" + os.sep + "dtbo"):
-        if f.startswith("dtbo."):
-            list_.append(os.path.join(work, "dtbo", "dtbo", f))
+    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if f.startswith("dtbo.")]
     list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
     mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
