@@ -1832,7 +1832,7 @@ class Debugger(Toplevel):
         ttk.Button(self, text='Globals', command=self.loaded_module).grid(row=2, column=0, padx=5, pady=5)
         ttk.Button(self, text='Settings', command=self.settings).grid(row=2, column=1, padx=5, pady=5)
         ttk.Button(self, text='Info', command=self.show_info).grid(row=2, column=2, padx=5, pady=5)
-        ttk.Button(self, text='Crash Tool!', command=self.crash).grid(row=2, column=3, padx=5, pady=5)
+        ttk.Button(self, text='Crash it!', command=self.crash).grid(row=2, column=3, padx=5, pady=5)
 
     @staticmethod
     def crash():
