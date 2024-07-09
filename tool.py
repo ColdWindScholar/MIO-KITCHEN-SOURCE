@@ -1944,7 +1944,7 @@ class MpkStore(Toplevel):
         super().__init__()
         self.title('Mpk Store')
         self.data = []
-        self.tasks = deque()
+        self.tasks = []
         self.apps = []
         self.app_infos = {}
         self.protocol("WM_DELETE_WINDOW", lambda: setattr(states, 'mpk_store', False) == self.destroy())
