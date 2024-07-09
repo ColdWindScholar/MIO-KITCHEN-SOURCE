@@ -92,6 +92,7 @@ class States:
     donate_window = False
     mpk_store = False
     open_pids = []
+    in_oobe = False
 
 
 class JsonEdit:
@@ -724,6 +725,7 @@ class Welcome(ttk.Frame):
         self.pack(fill=BOTH, expand=True)
         self.frame = None
         oobe = settings.oobe
+        states.in_oobe = True
         frames = {
             "1": self.main,
             "2": self.license,
@@ -738,6 +740,7 @@ class Welcome(ttk.Frame):
             ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
         self.wait_window()
+        states.in_oobe = False
 
     def reframe(self):
         if self.frame:
@@ -886,8 +889,9 @@ class SetUtils:
         try:
             self.set_value("language", language.get())
             self.load_language(language.get())
-            if ask_win(lang.t36):
-                restart()
+            if not states.in_oobe:
+                if ask_win(lang.t36):
+                    restart()
         except Exception as e:
             print(lang.t130, e)
 
