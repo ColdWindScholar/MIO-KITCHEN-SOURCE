@@ -1834,8 +1834,10 @@ class Debugger(Toplevel):
         ttk.Button(self, text='Info', command=self.show_info).grid(row=2, column=2, padx=5, pady=5)
         ttk.Button(self, text='Crash Tool!', command=self.crash).grid(row=2, column=3, padx=5, pady=5)
 
-    def crash(self):
-        raise RuntimeError("The Tool Crashed!")
+    @staticmethod
+    def crash():
+        sys.stderr.write('Crashed!')
+        sys.stderr.flush()
 
     @staticmethod
     def show_info():
