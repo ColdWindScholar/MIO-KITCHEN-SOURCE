@@ -23,7 +23,7 @@ def suggest(string: str = '', language='cn', ok='ok'):
     if string:
         for i in library.keys():
             similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
-            if similarity_ >= 0.85:
+            if similarity_ >= 0.8:
                 text = library[i][language]
                 break
             else:
