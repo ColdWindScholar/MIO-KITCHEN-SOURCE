@@ -3071,13 +3071,12 @@ def unpack(chose, form: str = '') -> bool:
                 win.message_pop(lang.warn11.format("super.img"))
         if gettype(work + "super.img") == 'super':
             lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
-            if os.access(work + "system_a.img", os.F_OK):
-                for wjm in os.listdir(work):
-                    if wjm.endswith('_a.img') and not os.path.exists(work + wjm.replace('_a', '')):
-                        os.rename(work + wjm, work + wjm.replace('_a', ''))
-                    if wjm.endswith('_b.img'):
-                        if not os.path.getsize(work + wjm):
-                            os.remove(work + wjm)
+            for wjm in os.listdir(work):
+                if wjm.endswith('_a.img') and not os.path.exists(work + wjm.replace('_a', '')):
+                    os.rename(work + wjm, work + wjm.replace('_a', ''))
+                if wjm.endswith('_b.img'):
+                    if not os.path.getsize(work + wjm):
+                        os.remove(work + wjm)
         return True
     for i in chose:
         if os.access(work + i + ".zstd", os.F_OK):
