@@ -3896,7 +3896,7 @@ def restart(er=None):
         for i in win.winfo_children():
             try:
                 i.destroy()
-            except (Exception, BaseException):
+            except (TclError, ValueError, AttributeError):
                 pass
         win.deiconify()
         win.withdraw()
