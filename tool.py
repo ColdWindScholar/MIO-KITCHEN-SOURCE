@@ -3139,17 +3139,17 @@ def unpack(chose, form: str = '') -> bool:
             if gettype(work + i + ".img") == 'super':
                 print(lang.text79 + i + ".img")
                 lpunpack.unpack(work + i + ".img", work)
-                if os.access(work + "system_a.img", os.F_OK):
-                    for wjm in os.listdir(work):
-                        if wjm.endswith('_a.img'):
-                            if os.path.exists(work + wjm) and os.path.exists(work + wjm.replace('_a', '')):
-                                if sha1(work + wjm) == sha1(work + wjm.replace('_a', '')):
-                                    os.remove(work + wjm)
-                                else:
-                                    os.rename(work + wjm, work + wjm.replace('_a', ''))
-                        if wjm.endswith('_b.img'):
-                            if os.path.getsize(work + wjm) == 0:
+                for wjm in os.listdir(work):
+                    if wjm.endswith('_a.img'):
+                        if os.path.exists(work + wjm) and os.path.exists(work + wjm.replace('_a', '')):
+                            if sha1(work + wjm) == sha1(work + wjm.replace('_a', '')):
                                 os.remove(work + wjm)
+                            else:
+                                os.rename(work + wjm, work + wjm.replace('_a', ''))
+                    if wjm.endswith('_b.img'):
+                        if os.path.getsize(work + wjm) == 0:
+                            os.remove(work + wjm)
+
             if (file_type := gettype(work + i + ".img")) == "ext":
                 with open(work + i + ".img", 'rb+') as e:
                     mount = ext4.Volume(e).get_mount_point
