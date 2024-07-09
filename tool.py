@@ -3872,7 +3872,7 @@ def init():
     project_menu = ProjectMenuUtils()
     project_menu.gui()
     cz(unpackg.gui)
-    Frame3().gui()
+    cz(Frame3().gui)
     cz(project_menu.listdir)
     cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
     cz(cartoon.init)
