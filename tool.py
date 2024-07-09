@@ -684,7 +684,8 @@ class Upgrade(Toplevel):
 
 
 def error(code, desc="unknown error"):
-    win.withdraw()
+    if settings.debug_mode == 'No':
+        win.withdraw()
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
     img = open_img(BytesIO(images.error_logo_byte)).resize((100, 100))
@@ -831,6 +832,7 @@ class SetUtils:
         self.language = 'English'
         self.updating = ''
         self.new_tool = ''
+        self.debug_mode = 'No'
         self.theme = 'dark'
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.config = ConfigParser()
