@@ -3648,7 +3648,7 @@ class UnpackGui(ttk.LabelFrame):
         scroll.config(command=table.yview)
         scroll.pack(side=RIGHT, fill=Y)
         table.pack(fill=BOTH, expand=True)
-        for index, data in enumerate(info):
+        for data in info:
             table.insert('', END, values=data)
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5)
 
