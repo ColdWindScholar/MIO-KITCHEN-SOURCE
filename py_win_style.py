@@ -20,21 +20,11 @@ except ImportError:
 class apply_style:
     """different styles for windows"""
 
-    def __init__(self, window, style: str) -> None:
-
-        styles = ["dark", "mica", "aero", "transparent", "acrylic", "win7",
-                  "inverse", "popup", "native", "optimised", "light", "normal"]
-
-        if style not in styles:
-            raise ValueError(
-                f"Invalid style name! No such window style exists: {style} \nAvailable styles: {styles}"
-            )
-
+    def __init__(self, window) -> None:
         self.HWND = detect(window)
 
-        if style == "mica":
-            ChangeDWMAttrib(self.HWND, 19, c_int(1))
-            ChangeDWMAttrib(self.HWND, 1029, c_int(0x01))
+        ChangeDWMAttrib(self.HWND, 19, c_int(1))
+        ChangeDWMAttrib(self.HWND, 1029, c_int(0x01))
 
 
 def ChangeDWMAttrib(hWnd: int, attrib: int, color) -> None:

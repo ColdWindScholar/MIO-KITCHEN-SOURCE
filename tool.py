@@ -492,7 +492,7 @@ class Upgrade(Toplevel):
         if states.update_window:
             self.destroy()
         super().__init__()
-        py_win_style.apply_style(self, 'mica')
+        py_win_style.apply_style(self)
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         states.update_window = True
@@ -3871,7 +3871,7 @@ def init():
         return
     win.gui()
     if os.name == 'nt':
-        py_win_style.apply_style(win, "mica")
+        py_win_style.apply_style(win)
     global unpackg
     unpackg = UnpackGui()
     global project_menu
