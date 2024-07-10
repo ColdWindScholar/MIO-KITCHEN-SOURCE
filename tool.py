@@ -3632,7 +3632,7 @@ class UnpackGui(ttk.LabelFrame):
             ck_.destroy()
             return
         f_type = gettype(f_path)
-        info = [["File Path", f_path], ['File Type', f_type]]
+        info = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
         if f_type == 'ext':
             with open(f_path, 'rb') as e:
                 t = ext4.Volume(e)
