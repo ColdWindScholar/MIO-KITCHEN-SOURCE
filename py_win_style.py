@@ -6,12 +6,8 @@ Version: 1.8
 
 from __future__ import annotations
 
-from typing import Any
-
 try:
-    from ctypes import (POINTER, Structure, byref, c_int, pointer, sizeof,
-                        windll)
-    from ctypes.wintypes import DWORD, ULONG
+    from ctypes import byref, c_int, sizeof, windll
 
 except ImportError:
     raise ImportError("pywinstyles import errror: No windows environment detected!")
