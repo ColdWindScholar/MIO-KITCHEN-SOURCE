@@ -2333,6 +2333,12 @@ def packsuper(sparse, dbfz, size, set_, lb: list[str], del_=0, return_cmd=0):
         return False
     work = rwork()
     lb = [part.replace('_a', '').replace('_b', '') for part in lb]
+    for part in lb:
+        if not os.path.exists(work + part + '.img') and os.path.exists(work + part + '_a.img'):
+            try:
+                os.rename(work + part + '_a.img', work + part + '.img')
+            except:
+                pass
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
         command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
