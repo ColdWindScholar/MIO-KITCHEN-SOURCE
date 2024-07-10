@@ -2211,7 +2211,7 @@ class PackSuper(Toplevel):
             tl.delete(0, END)
             for file_name in os.listdir(work):
                 if file_name.endswith(".img"):
-                    if gettype(work + file_name) in ["ext", "erofs"]:
+                    if gettype(work + file_name) in ["ext", "erofs", 'f2fs']:
                         tl.insert(END, file_name[:-4])
 
         supers = IntVar()
