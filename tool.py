@@ -3871,7 +3871,7 @@ def init():
         Welcome()
     if settings.updating in ['1', '2']:
         Upgrade()
-    if not os.path.exists(f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}'):
+    if not os.path.exists(tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     try:
         win.winfo_exists()
@@ -3925,8 +3925,6 @@ def restart(er=None):
                 i.destroy()
             except (TclError, ValueError, AttributeError):
                 pass
-        win.deiconify()
-        win.withdraw()
         win.destroy()
     except (Exception, BaseException):
         pass
