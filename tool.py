@@ -3868,9 +3868,9 @@ def init():
         win.winfo_exists()
     except TclError:
         return
-    win.gui()
     if os.name == 'nt':
         py_win_style.apply_style(win)
+    win.gui()
     global unpackg
     unpackg = UnpackGui()
     global project_menu
