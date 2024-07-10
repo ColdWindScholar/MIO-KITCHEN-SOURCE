@@ -2995,10 +2995,7 @@ def unpackrom(ifile) -> None:
         else:
             project_menu.listdir()
         script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-        try:
-            unpackg.refs()
-        except (Exception, BaseException):
-            ...
+        unpackg.refs()
         fz.close()
         return
     elif ftype != 'unknown':
