@@ -21,6 +21,7 @@ class apply_style:
     """different styles for windows"""
 
     def __init__(self, window) -> None:
+        window.update()
         self.HWND = windll.user32.GetParent(window.winfo_id())
 
         ChangeDWMAttrib(self.HWND, 19, c_int(1))
