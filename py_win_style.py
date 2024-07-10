@@ -21,7 +21,7 @@ class apply_style:
     """different styles for windows"""
 
     def __init__(self, window) -> None:
-        self.HWND = detect(window)
+        self.HWND = windll.user32.GetParent(window.winfo_id())
 
         ChangeDWMAttrib(self.HWND, 19, c_int(1))
         ChangeDWMAttrib(self.HWND, 1029, c_int(0x01))
@@ -29,24 +29,3 @@ class apply_style:
 
 def ChangeDWMAttrib(hWnd: int, attrib: int, color) -> None:
     windll.dwmapi.DwmSetWindowAttribute(hWnd, attrib, byref(color), sizeof(c_int))
-
-
-def detect(window: Any):
-    """detect the type of UI library and return HWND"""
-    try:  # tkinter
-        window.update()
-        return windll.user32.GetParent(window.winfo_id())
-    except:
-        pass
-    try:  # pyqt/pyside
-        return int(window.winId())
-    except:
-        pass
-    try:  # wxpython
-        return window.GetHandle()
-    except:
-        pass
-    if isinstance(window, int):
-        return window  # other ui windows hwnd
-    else:
-        return windll.user32.GetActiveWindow()  # get active hwnd
