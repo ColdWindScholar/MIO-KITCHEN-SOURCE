@@ -3754,7 +3754,7 @@ class FormatConversion(ttk.LabelFrame):
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
                 if os.path.isfile(work + i):
-                    if gettype(work + i) in ['ext', 'erofs', 'super']:
+                    if gettype(work + i) in ['ext', 'erofs', 'super', 'f2fs']:
                         self.list_b.insert('end', i)
 
     @staticmethod
