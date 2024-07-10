@@ -84,7 +84,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
                     permission = permission_d
             if " " in permission[0]:
                 permission = [permission[0].replace(' ', '')]
-            print(f"ADD [{i} {permission}], May be Inaccurate")
+            print(f"ADD [{i} {permission}]")
             add_new += 1
             r_new_fs[i] = permission
             new_fs[i] = permission
