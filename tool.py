@@ -2327,11 +2327,12 @@ class PackSuper(Toplevel):
 
 
 @cartoon
-def packsuper(sparse, dbfz, size, set_, lb, del_=0, return_cmd=0):
+def packsuper(sparse, dbfz, size, set_, lb: list[str], del_=0, return_cmd=0):
     if not dn.get():
         warn_win(text=lang.warn1)
         return False
     work = rwork()
+    lb = [part.replace('_a', '').replace('_b', '') for part in lb]
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
         command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
