@@ -2309,7 +2309,7 @@ class PackSuper(Toplevel):
             except (Exception, BaseException):
                 supers.set(0)
             if not versize():
-                ask_win(lang.t10)
+                ask_win2(lang.t10.format(supers.get()))
                 return False
             lbs = [tl.get(index) for index in tl.curselection()]
             sc = scywj.get()
