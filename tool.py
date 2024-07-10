@@ -3150,16 +3150,16 @@ def unpack(chose, form: str = '') -> bool:
                 print(f"{lang.text85}AVB:{i}")
                 utils.Vbpatch(work + i + ".img").disavb()
             file_type = gettype(work + i + ".img")
+            print(lang.text79 + i + f".img ({file_type})")
             if file_type == "sparse":
-                print(lang.text79 + i + f".img [{file_type}]")
                 try:
                     utils.simg2img(work + i + ".img")
                 except (Exception, BaseException):
                     win.message_pop(lang.warn11.format(i + ".img"))
             if i not in parts.keys():
                 parts[i] = gettype(work + i + ".img")
+            print(lang.text79 + i + f".img[{file_type}]")
             if gettype(work + i + ".img") == 'super':
-                print(lang.text79 + i + ".img")
                 lpunpack.unpack(work + i + ".img", work)
                 for wjm in os.listdir(work):
                     if wjm.endswith('_a.img'):
@@ -3185,7 +3185,6 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                print(lang.text79 + i + f".img [{file_type}]")
                 imgextractor.Extractor().main(work + i + ".img", work + i, work)
                 if os.path.exists(work + i):
                     try:
@@ -3193,7 +3192,6 @@ def unpack(chose, form: str = '') -> bool:
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
-                print(lang.text79 + i + f".img [{file_type}]")
                 if call(exe=f"extract.erofs -i '{os.path.join(settings.path, dn.get(), i + '.img')}' -o '{work}' -x",
                         out=1) != 0:
                     print('Unpack failed...')
@@ -3204,7 +3202,6 @@ def unpack(chose, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                print(lang.text79 + i + f".img [{file_type}]")
                 if call(exe=f"extract.f2fs -o '{work}' '{os.path.join(settings.path, dn.get(), i + '.img')}'",
                         out=1) != 0:
                     print('Unpack failed...')
