@@ -2343,7 +2343,7 @@ class PackSuper(Toplevel):
 
 
 @cartoon
-def packsuper(sparse, dbfz, size, set_, lb: list[str], del_=0, return_cmd=0):
+def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0):
     if not dn.get():
         warn_win(text=lang.warn1)
         return False
