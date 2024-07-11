@@ -2561,7 +2561,7 @@ def dboot(nm: str = 'boot'):
         print(f"Cannot Find {nm}...")
         return
     cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                    f'{elocal}{os.sep}bin{os.sep}{platform.system()}{os.sep}{platform.machine()}{os.sep}').replace(
+                    tool_bin).replace(
         '\\', "/")
 
     if os.path.isdir(work + nm + os.sep + "ramdisk"):
