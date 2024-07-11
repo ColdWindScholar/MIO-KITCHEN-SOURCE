@@ -2587,7 +2587,7 @@ def dboot(nm: str = 'boot'):
             print("Successfully packed Ramdisk..")
             os.remove("ramdisk.cpio")
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
-        if comp == "cpio":
+        if comp == "unknown":
             flag = "-n"
     os.chdir(work + nm + os.sep)
     if call(f"magiskboot repack {flag} {boot}") != 0:
