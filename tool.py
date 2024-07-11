@@ -3882,7 +3882,7 @@ def init():
     except TclError:
         return
     if os.name == 'nt':
-        py_win_style.apply_style(win)
+        cz(py_win_style.apply_style, win)
     win.gui()
     global unpackg
     unpackg = UnpackGui()
