@@ -2378,7 +2378,6 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
     command += f" --out {work + 'super.img'}"
     if return_cmd == 1:
         return command
-    print(command)
     if call(command) == 0:
         if os.access(work + "super.img", os.F_OK):
             print(lang.text59 % (work + "super.img"))
