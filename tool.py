@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+import json
 import platform
 import shutil
 import subprocess
@@ -21,8 +22,6 @@ import threading
 from collections import deque
 from functools import wraps
 from random import randrange
-import json
-import hashlib
 
 if platform.system() != 'Darwin':
     try:
@@ -3044,16 +3043,7 @@ def rwork() -> str:
     return os.path.join(settings.path, dn.get()) + os.sep
 
 
-def sha1(path) -> str:
-    if not os.path.exists(path) or not os.path.isfile(path):
-        return ''
-    with open(path, 'rb') as source:
-        sha1sum = hashlib.sha1()
-        block = source.read(2 ** 16)
-        while len(block) != 0:
-            sha1sum.update(block)
-            block = source.read(2 ** 16)
-        return sha1sum.hexdigest()
+
 
 
 @cartoon
@@ -3181,7 +3171,7 @@ def unpack(chose, form: str = '') -> bool:
                 for wjm in os.listdir(work):
                     if wjm.endswith('_a.img'):
                         if os.path.exists(work + wjm) and os.path.exists(work + wjm.replace('_a', '')):
-                            if sha1(work + wjm) == sha1(work + wjm.replace('_a', '')):
+                            if pathlib.Path(work + wjm).samefile(work + wjm.replace('_a', '')):
                                 os.remove(work + wjm)
                             else:
                                 os.remove(work + wjm.replace('_a', ''))
