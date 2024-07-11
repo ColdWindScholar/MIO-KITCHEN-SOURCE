@@ -3885,7 +3885,7 @@ def init():
     except TclError:
         return
     if os.name == 'nt':
-        cz(py_win_style.apply_style, win)
+        py_win_style.apply_style(win)
     win.gui()
     global unpackg
     unpackg = UnpackGui()
@@ -3893,14 +3893,14 @@ def init():
     project_menu = ProjectMenuUtils()
     project_menu.gui()
     unpackg.gui()
-    cz(Frame3().gui)
-    cz(project_menu.listdir)
+    Frame3().gui()
+    project_menu.listdir()
     cartoon.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
-    cz(cartoon.init)
+    cartoon.init()
     print(lang.text108)
     win.update()
     jzxs(win)
-    cz(win.get_time)
+    win.get_time()
     print(lang.text134 % (dti() - start))
     do_override_sv_ttk_fonts()
     win.mainloop()
