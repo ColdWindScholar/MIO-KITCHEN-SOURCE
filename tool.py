@@ -2233,9 +2233,11 @@ class PackSuper(Toplevel):
         supers = IntVar()
         ssparse = IntVar()
         supersz = IntVar()
+        attrib = StringVar(value='readonly')
         sdbfz = StringVar()
         scywj = IntVar()
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
+        (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
         (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
         supersz.set(1)
@@ -2243,6 +2245,8 @@ class PackSuper(Toplevel):
         ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
         ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1_r, text="Readonly", variable=attrib, value='readonly').pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1_r, text="None", variable=attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
         (sdbfzs := ttk.Combobox(lf2, textvariable=sdbfz)).pack(side='left', padx=10, pady=10, fill='both')
         sdbfzs['value'] = ("qti_dynamic_partitions", "main")
@@ -2330,7 +2334,7 @@ class PackSuper(Toplevel):
             lbs = [tl.get(index) for index in tl.curselection()]
             sc = scywj.get()
             self.destroy()
-            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc)
+            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc, attrib=attrib.get())
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                       fill=X,
@@ -2343,7 +2347,7 @@ class PackSuper(Toplevel):
 
 
 @cartoon
-def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0):
+def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly'):
     if not dn.get():
         warn_win(text=lang.warn1)
         return False
@@ -2359,14 +2363,14 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0):
     if set_.get() == 1:
         command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
         for part in lb:
-            command += f"--partition {part}:readonly:{os.path.getsize(work + part + '.img')}:{dbfz.get()} --image {part}={work + part}.img "
+            command += f"--partition {part}:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()} --image {part}={work + part}.img "
     else:
         command += f"3 -device super:{size.get()} --group {dbfz.get()}_a:{size.get()} "
         for part in lb:
-            command += f"--partition {part}_a:readonly:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a --image {part}_a={work + part}.img "
+            command += f"--partition {part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a --image {part}_a={work + part}.img "
         command += f"--group {dbfz.get()}_b:{size.get()} "
         for part in lb:
-            command += f"--partition {part}_b:readonly:0:{dbfz.get()}_b "
+            command += f"--partition {part}_b:{attrib}:0:{dbfz.get()}_b "
         if set_.get() == 2:
             command += "--virtual-ab "
     if sparse.get() == 1:
@@ -2374,6 +2378,7 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0):
     command += f" --out {work + 'super.img'}"
     if return_cmd == 1:
         return command
+    print(command)
     if call(command) == 0:
         if os.access(work + "super.img", os.F_OK):
             print(lang.text59 % (work + "super.img"))
