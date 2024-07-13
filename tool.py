@@ -86,7 +86,7 @@ import utils
 from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
-
+from controls import ListBox
 try:
     import imp
 except ImportError:
@@ -1961,6 +1961,15 @@ class Debugger(Toplevel):
         ck.wait_window()
 
 
+def hum_convert(value):
+    units = ["B", "KB", "MB", "GB", "TB", "PB"]
+    size = 1024.0
+    for i in range(len(units)):
+        if (value / size) < 1:
+            return f"{value:.2f}{units[i]}"
+        value = value / size
+
+
 class MpkStore(Toplevel):
     def __init__(self):
         if states.mpk_store:
@@ -2039,7 +2048,7 @@ class MpkStore(Toplevel):
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
             o = ttk.Label(f2,
-                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{self.hum_convert(data.get('size'))}"[
+                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{hum_convert(data.get('size'))}"[
                                :50])
             o.pack_propagate(False)
             o.pack(side=LEFT, padx=5, pady=5)
@@ -2136,15 +2145,6 @@ class MpkStore(Toplevel):
                 return
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
-
-    @staticmethod
-    def hum_convert(value):
-        units = ["B", "KB", "MB", "GB", "TB", "PB"]
-        size = 1024.0
-        for i in range(len(units)):
-            if (value / size) < 1:
-                return f"{value:.2f}{units[i]}"
-            value = value / size
 
 
 @cartoon
@@ -3599,14 +3599,15 @@ class UnpackGui(ttk.LabelFrame):
         self.ch.set(1)
         self.fm = ttk.Combobox(self, state="readonly",
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super', 'update.app'))
-        self.lsg = Listbox(self, activestyle='dotbox', selectmode=MULTIPLE, highlightthickness=0)
+        self.lsg = ListBox(self)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
-
-        self.lsg.pack(padx=5, pady=5, fill=X, side='top')
+        self.lsg.gui()
+        self.lsg.canvas.bind('<Button-3>', self.show_menu)
+        self.lsg.pack(padx=5, pady=5, fill=X, side='top', expand=True)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
         ff1 = ttk.Frame(self)
         ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
@@ -3621,17 +3622,17 @@ class UnpackGui(ttk.LabelFrame):
         self.ch.trace("w", lambda *x: self.hd())
 
     def show_menu(self, event):
-        if len(self.lsg.curselection()) == 1 and self.fm.get() == 'img':
+        if len(self.lsg.selected) == 1 and self.fm.get() == 'img':
             self.menu.post(event.x_root, event.y_root)
 
     def info(self):
         ck_ = Toplevel()
         jzxs(ck_)
         ck_.title(lang.attribute)
-        if not self.lsg.curselection():
+        if not self.lsg.selected:
             ck_.destroy()
             return
-        f_path = os.path.join(rwork(), [self.lsg.get(index) for index in self.lsg.curselection()][0] + ".img")
+        f_path = os.path.join(rwork(), self.lsg.selected[0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
             return
@@ -3665,7 +3666,7 @@ class UnpackGui(ttk.LabelFrame):
             self.refs2()
 
     def refs(self):
-        self.lsg.delete(0, END)
+        self.lsg.clear()
         if not os.path.exists(work := rwork()):
             win.message_pop(lang.warn1)
             return False
@@ -3673,7 +3674,7 @@ class UnpackGui(ttk.LabelFrame):
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
-                        self.lsg.insert(END, i.partition_name)
+                        self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}", i.partition_name)
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
                 if gettype(work + "super.img") == 'sparse':
@@ -3681,29 +3682,29 @@ class UnpackGui(ttk.LabelFrame):
                 data = lpunpack.get_parts(work + "super.img")
                 if data:
                     for i in data:
-                        self.lsg.insert(END, i)
+                        self.lsg.insert(i, i)
         elif self.fm.get() == 'update.app':
             if os.path.exists(work + "UPDATE.APP"):
                 for i in splituapp.get_parts(work + "UPDATE.APP"):
-                    self.lsg.insert(END, i)
+                    self.lsg.insert(i, i)
 
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(END, file_name.split("." + self.fm.get())[0])
+                    self.lsg.insert(file_name.split("." + self.fm.get())[0], file_name.split("." + self.fm.get())[0])
 
     def refs2(self):
-        self.lsg.delete(0, END)
+        self.lsg.clear()
         if not os.path.exists(work := rwork()):
             win.message_pop(lang.warn1)
             return False
         parts_dict = JsonEdit(work + "config" + os.sep + "parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
-                self.lsg.insert(END, folder)
+                self.lsg.insert(folder, folder)
 
     def close_(self):
-        lbs = [self.lsg.get(index) for index in self.lsg.curselection()]
+        lbs = self.lsg.selected.copy()
         self.hd()
         if self.ch.get() == 1:
             unpack(lbs, self.fm.get())
