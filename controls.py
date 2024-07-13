@@ -85,7 +85,7 @@ class ListBox(Frame):
 
 if __name__ == '__main__':
     a = Tk()
-    b = ListBox(a, '测试')
+    b = ListBox(a)
     b.gui()
     b.insert('nb', 'n')
     b.insert('nb', 'n')
