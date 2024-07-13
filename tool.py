@@ -3691,7 +3691,7 @@ class UnpackGui(ttk.LabelFrame):
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    self.lsg.insert(file_name.split("." + self.fm.get())[0], file_name.split("." + self.fm.get())[0])
+                    self.lsg.insert(f'{file_name.split("." + self.fm.get())[0]} [{gettype(work+file_name)}]', file_name.split("." + self.fm.get())[0])
 
     def refs2(self):
         self.lsg.clear()
