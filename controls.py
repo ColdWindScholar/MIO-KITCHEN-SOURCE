@@ -13,10 +13,11 @@
 # limitations under the License.
 from tkinter.ttk import Frame, Scrollbar, Checkbutton, Separator
 from tkinter import Canvas, Tk, X, BooleanVar, HORIZONTAL, TclError
+from utils import lang
 
 
 class ListBox(Frame):
-    def __init__(self, master, text=''):
+    def __init__(self, master):
         super().__init__(master=master)
         self.var = None
         self.set_all = None
@@ -50,7 +51,7 @@ class ListBox(Frame):
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.__on_mouse(event))
         Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        self.set_all = Checkbutton(self, text='全选', variable=self.var, onvalue=True, offvalue=False,
+        self.set_all = Checkbutton(self, text=lang.set_all, variable=self.var, onvalue=True, offvalue=False,
                                    command=lambda *x, var_=self.var: [i.set(True) for i in
                                                                       self.vars] if var_.get() else [i.set(False) for i
                                                                                                      in self.vars])
