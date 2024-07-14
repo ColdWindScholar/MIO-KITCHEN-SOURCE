@@ -87,6 +87,7 @@ from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 from controls import ListBox
+
 try:
     import imp
 except ImportError:
@@ -2401,9 +2402,6 @@ class StdoutRedirector:
         self.error_info = ''
 
     def write(self, string):
-        cz(self.__write(string))
-
-    def __write(self, string):
         if self.error:
             self.error_info += string
             return
@@ -3044,9 +3042,6 @@ def rwork() -> str:
     return os.path.join(settings.path, dn.get()) + os.sep
 
 
-
-
-
 @cartoon
 def unpack(chose, form: str = '') -> bool:
     if os.name == 'nt':
@@ -3675,7 +3670,8 @@ class UnpackGui(ttk.LabelFrame):
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
-                        self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}", i.partition_name)
+                        self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}",
+                                        i.partition_name)
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
                 if gettype(work + "super.img") == 'sparse':
@@ -3692,10 +3688,11 @@ class UnpackGui(ttk.LabelFrame):
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
-                    f_type = gettype(work+file_name)
+                    f_type = gettype(work + file_name)
                     if f_type == 'unknown':
                         f_type = self.fm.get()
-                    self.lsg.insert(f'{file_name.split("." + self.fm.get())[0]} [{f_type}]', file_name.split("." + self.fm.get())[0])
+                    self.lsg.insert(f'{file_name.split("." + self.fm.get())[0]} [{f_type}]',
+                                    file_name.split("." + self.fm.get())[0])
 
     def refs2(self):
         self.lsg.clear()
