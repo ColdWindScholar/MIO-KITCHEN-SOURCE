@@ -99,20 +99,17 @@ class Sdat2img:
 
         for cmd, block_list in self.list_file:
             max_file_size = max(pair[1] for pair in [i for i in block_list]) * block_size
-            if cmd == 'new':
-                for begin, block_all in block_list:
-                    block_count = block_all - begin
-                    print(f'Copying {block_count} blocks into position {begin}...')
+            for begin, block_all in block_list:
+                block_count = block_all - begin
+                print(f'Copying {block_count} blocks into position {begin}...')
 
-                    # Position output file
-                    output_img.seek(begin * block_size)
+                # Position output file
+                output_img.seek(begin * block_size)
 
-                    # Copy one block at a time
-                    while block_count > 0:
-                        output_img.write(new_data_file.read(block_size))
-                        block_count -= 1
-            else:
-                print(f'Skipping command {cmd}...')
+                # Copy one block at a time
+                while block_count > 0:
+                    output_img.write(new_data_file.read(block_size))
+                    block_count -= 1
 
         # Make file larger if necessary
         if output_img.tell() < max_file_size:
@@ -152,6 +149,7 @@ class Sdat2img:
                     yield [cmd, self.rangeset(line[1])]
                 else:
                     if cmd in ['erase', 'new', 'zero']:
+                        print(f'Skipping command {cmd}...')
                         continue
                     # Skip lines starting with numbers, they are not commands anyway
                     if not cmd[0].isdigit():
