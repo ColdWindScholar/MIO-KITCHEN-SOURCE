@@ -2223,11 +2223,11 @@ class PackSuper(Toplevel):
         self.title(lang.text53)
 
         def refresh():
-            tl.delete(0, END)
+            tl.clear()
             for file_name in os.listdir(work):
                 if file_name.endswith(".img"):
                     if gettype(work + file_name) in ["ext", "erofs", 'f2fs']:
-                        tl.insert(END, file_name[:-4])
+                        tl.insert(file_name[:-4], file_name[:-4])
 
         supers = IntVar()
         ssparse = IntVar()
@@ -2256,7 +2256,8 @@ class PackSuper(Toplevel):
         super_size.bind("<KeyRelease>",
                         lambda *x: super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
 
-        (tl := Listbox(lf3, selectmode=MULTIPLE, activestyle='dotbox')).config(highlightthickness=0)
+        tl = ListBox(lf3)
+        tl.gui()
         work = rwork()
 
         tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
@@ -2294,7 +2295,7 @@ class PackSuper(Toplevel):
                     supersz.set(1)
 
         def versize():
-            size = sum([os.path.getsize(work + i + ".img") for i in [tl.get(index) for index in tl.curselection()]])
+            size = sum([os.path.getsize(work + i + ".img") for i in tl.selected])
             diff_size = size
             if size > supers.get():
                 for i in range(20):
@@ -2317,7 +2318,7 @@ class PackSuper(Toplevel):
         def generate():
             g_b.config(text=lang.t28, state='disabled')
             utils.generate_dynamic_list(dbfz=sdbfz.get(), size=supers.get(), set_=supersz.get(),
-                                        lb=[tl.get(index) for index in tl.curselection()], work=rwork())
+                                        lb=tl.selected.copy(), work=rwork())
             g_b.config(text=lang.text34)
             time.sleep(1)
             g_b.config(text=lang.t27, state='normal')
@@ -2330,7 +2331,7 @@ class PackSuper(Toplevel):
             if not versize():
                 ask_win2(lang.t10.format(supers.get()))
                 return False
-            lbs = [tl.get(index) for index in tl.curselection()]
+            lbs = tl.selected.copy()
             sc = scywj.get()
             self.destroy()
             packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc, attrib=attrib.get())
