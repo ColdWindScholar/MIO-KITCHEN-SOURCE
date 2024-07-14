@@ -81,7 +81,7 @@ class Sdat2img:
             3: "Marshmallow 6.x",
             4: "Nougat 7.x / Oreo 8.x / Pie 9.x",
         }
-        print('Android {} detected!\n'.format(versions.get(version, f'Unknown Android version {version}!\n')))
+        print("Android {} detected!\n".format(versions.get(version, f'Unknown version {version}!\n')))
         # Don't clobber existing files to avoid accidental data loss
         try:
             output_img = open(self.output_image_file, 'wb')
@@ -97,12 +97,11 @@ class Sdat2img:
         new_data_file = open(self.new_data_file, 'rb')
         max_file_size = 0
 
-        for command in self.list_file:
-            max_file_size = max(pair[1] for pair in [i for i in command[1]]) * block_size
-            if command[0] == 'new':
-                for block in command[1]:
-                    begin = block[0]
-                    block_count = block[1] - begin
+        for cmd, block_list in self.list_file:
+            max_file_size = max(pair[1] for pair in [i for i in block_list]) * block_size
+            if cmd == 'new':
+                for begin, block_all in block_list:
+                    block_count = block_all - begin
                     print(f'Copying {block_count} blocks into position {begin}...')
 
                     # Position output file
@@ -113,7 +112,7 @@ class Sdat2img:
                         output_img.write(new_data_file.read(block_size))
                         block_count -= 1
             else:
-                print(f'Skipping command {command[0]}...')
+                print(f'Skipping command {cmd}...')
 
         # Make file larger if necessary
         if output_img.tell() < max_file_size:
