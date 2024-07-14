@@ -3588,11 +3588,11 @@ class UnpackGui(ttk.LabelFrame):
         self.fm = None
         self.lsg = None
         self.menu = None
-        self.ch = IntVar()
+        self.ch = BooleanVar()
 
     def gui(self):
         self.pack(padx=5, pady=5)
-        self.ch.set(1)
+        self.ch.set(True)
         self.fm = ttk.Combobox(self, state="readonly",
                                values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super', 'update.app'))
         self.lsg = ListBox(self)
@@ -3607,9 +3607,9 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
         ff1 = ttk.Frame(self)
         ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
-                        value=1).pack(padx=5, pady=5, side='left')
+                        value=True).pack(padx=5, pady=5, side='left')
         ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
-                        value=0).pack(padx=5, pady=5, side='left')
+                        value=False).pack(padx=5, pady=5, side='left')
         ff1.pack(padx=5, pady=5, fill=X)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
@@ -3654,7 +3654,7 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5)
 
     def hd(self):
-        if self.ch.get() == 1:
+        if self.ch.get():
             self.fm.configure(state='readonly')
             self.refs()
         else:
