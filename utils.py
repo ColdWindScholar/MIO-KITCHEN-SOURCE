@@ -98,7 +98,7 @@ class Sdat2img:
         max_file_size = 0
 
         for cmd, block_list in self.list_file:
-            max_file_size = max(pair[1] for pair in [i for i in block_list]) * block_size
+            max_file_size = max(pair[1] for pair in block_list) * block_size
             for begin, block_all in block_list:
                 block_count = block_all - begin
                 print(f'Copying {block_count} blocks into position {begin}...')
