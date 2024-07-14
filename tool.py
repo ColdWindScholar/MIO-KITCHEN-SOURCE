@@ -3740,7 +3740,8 @@ class FormatConversion(ttk.LabelFrame):
         self.f = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
         self.f.current(0)
         self.f.pack(side='left', padx=5)
-        self.list_b = Listbox(self, highlightthickness=0, activestyle='dotbox', selectmode=MULTIPLE)
+        self.list_b = ListBox(self)
+        self.list_b.gui()
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
         cz(self.relist)
         t = Frame(self)
@@ -3754,22 +3755,22 @@ class FormatConversion(ttk.LabelFrame):
 
     def relist(self):
         work = rwork()
-        self.list_b.delete(0, "end")
+        self.list_b.clear()
         if self.h.get() == "br":
             for i in self.refile(".new.dat.br"):
-                self.list_b.insert('end', i)
+                self.list_b.insert(i, i)
         elif self.h.get() == 'dat':
             for i in self.refile(".new.dat"):
-                self.list_b.insert('end', i)
+                self.list_b.insert(i, i)
         elif self.h.get() == 'sparse':
             for i in os.listdir(work):
                 if os.path.isfile(work + i) and gettype(work + i) == 'sparse':
-                    self.list_b.insert('end', i)
+                    self.list_b.insert(i, i)
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
                 if os.path.isfile(work + i):
                     if gettype(work + i) in ['ext', 'erofs', 'super', 'f2fs']:
-                        self.list_b.insert('end', i)
+                        self.list_b.insert(i, i)
 
     @staticmethod
     def refile(f):
@@ -3782,7 +3783,7 @@ class FormatConversion(ttk.LabelFrame):
         work = rwork()
         f_get = self.f.get()
         hget = self.h.get()
-        selection = [self.list_b.get(index) for index in self.list_b.curselection()]
+        selection = self.list_b.selected.copy()
         self.destroy()
         if f_get == hget:
             ...
