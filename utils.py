@@ -73,7 +73,7 @@ class Sdat2img:
         self.list_file = self.parse_transfer_list_file()
         block_size = 4096
         version = next(self.list_file)
-        self.version = str(version)
+        self.version = version
         next(self.list_file)
         versions = {
             1: "Lollipop 5.0",
