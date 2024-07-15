@@ -37,6 +37,7 @@ class ListBox(Frame):
                 i.destroy()
             except (TclError, AttributeError, ValueError):
                 pass
+        self.var.set(False)
 
     def gui(self):
         self.var = BooleanVar(value=False)
