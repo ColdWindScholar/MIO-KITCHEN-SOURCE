@@ -2910,7 +2910,7 @@ class Packxx(Toplevel):
             else:
                 print(f"Unsupported {i}:{parts_dict[i]}")
         if settings.ai_engine == '1':
-            AI_engine.suggest(win.show.get(1.0, END), language='cn' if "Chinese" in settings.language else 'en',
+            AI_engine.suggest(win.show.get(1.0, tk.END), language='cn' if "Chinese" in settings.language else 'en',
                               ok=lang.ok)
 
 
@@ -3641,7 +3641,7 @@ class UnpackGui(ttk.LabelFrame):
         scroll.pack(side=RIGHT, fill=Y)
         table.pack(fill=BOTH, expand=True)
         for data in info:
-            table.insert('', END, values=data)
+            table.insert('', tk.END, values=data)
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
