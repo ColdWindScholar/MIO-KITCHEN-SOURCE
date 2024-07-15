@@ -43,8 +43,7 @@ from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
 from tkinter import (Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
-                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER, MULTIPLE,
-                     VERTICAL)
+                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
 import pygments.lexers
 import requests
@@ -3638,12 +3637,12 @@ class UnpackGui(ttk.LabelFrame):
             with open(f_path, 'rb') as e:
                 for i in ext4.Volume(e).get_info_list:
                     info.append(i)
-        scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
+        scroll = ttk.Scrollbar(ck_, orient='vertical')
         columns = ['Name', 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
-            table.column(column=column, anchor=CENTER, )
+            table.column(column=column, anchor=CENTER)
         scroll.config(command=table.yview)
         scroll.pack(side=RIGHT, fill=Y)
         table.pack(fill=BOTH, expand=True)
@@ -3674,10 +3673,8 @@ class UnpackGui(ttk.LabelFrame):
             if os.path.exists(work + "super.img"):
                 if gettype(work + "super.img") == 'sparse':
                     cz(utils.simg2img, work + "super.img", join=True)
-                data = lpunpack.get_parts(work + "super.img")
-                if data:
-                    for i in data:
-                        self.lsg.insert(i, i)
+                for i in lpunpack.get_parts(work + "super.img"):
+                    self.lsg.insert(i, i)
         elif self.fm.get() == 'update.app':
             if os.path.exists(work + "UPDATE.APP"):
                 for i in splituapp.get_parts(work + "UPDATE.APP"):
