@@ -1862,11 +1862,11 @@ class Debugger(Toplevel):
         ck.title('Info')
         ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
                                                                                      sticky='nw')
-        ttk.Label(ck, text='Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE', foreground='gray').grid(row=5,
-                                                                                                             column=0,
-                                                                                                             padx=5,
-                                                                                                             pady=5,
-                                                                                                             sticky='nw')
+        ttk.Label(ck, text='Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE V3', foreground='gray').grid(row=5,
+                                                                                                                column=0,
+                                                                                                                padx=5,
+                                                                                                                pady=5,
+                                                                                                                sticky='nw')
         ttk.Label(ck, text=f'Python: {sys.version}', foreground='gray').grid(row=1, column=0, padx=5, pady=5,
                                                                              sticky='nw')
         ttk.Label(ck, text=f'Platform: {sys.platform}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
