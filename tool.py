@@ -364,8 +364,16 @@ class Tool(Tk):
 
     def tab4_n(self):
         self.rotate_angle = 0
+        debugger_num = 0
 
         def getColor():
+            nonlocal debugger_num
+            debugger_num += 1
+            if debugger_num >= 5:
+                debugger_num = 0
+                a = Debugger()
+                a.lift()
+                a.focus_force()
             color1 = randrange(16, 256)
             color2 = randrange(16, 256)
             color3 = randrange(16, 256)
