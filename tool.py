@@ -328,6 +328,8 @@ class Tool(Tk):
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
+        else:
+            print(f'{platform.system()} Dont Support Drop File.\nReason: I am Lazy.')
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
