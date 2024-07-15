@@ -173,7 +173,6 @@ class Extractor:
                         ...
 
     def __ext4extractor(self):
-
         if not os.path.isdir(self.CONFIG_DIR):
             os.makedirs(self.CONFIG_DIR)
         self.__write(os.path.getsize(self.OUTPUT_IMAGE_FILE), self.CONFIG_DIR + os.sep + self.FileName + '_size.txt')

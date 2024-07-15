@@ -3534,7 +3534,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
                 array.append(f)
         self.combobox["value"] = array
         if not array:
-            dn.set("")
+            dn.set('')
             self.combobox.current()
         else:
             self.combobox.current(0)
@@ -3636,10 +3636,8 @@ class UnpackGui(ttk.LabelFrame):
         info = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
         if f_type == 'ext':
             with open(f_path, 'rb') as e:
-                t = ext4.Volume(e)
-                data = t.get_info_list
-            for i in data:
-                info.append(i)
+                for i in ext4.Volume(e).get_info_list:
+                    info.append(i)
         scroll = ttk.Scrollbar(ck_, orient=VERTICAL)
         columns = ['Name', 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
@@ -3651,7 +3649,7 @@ class UnpackGui(ttk.LabelFrame):
         table.pack(fill=BOTH, expand=True)
         for data in info:
             table.insert('', END, values=data)
-        ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5)
+        ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
         if self.ch.get():
