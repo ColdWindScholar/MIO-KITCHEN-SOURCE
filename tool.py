@@ -334,9 +334,10 @@ class Tool(Tk):
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(side='bottom', padx=10,
-                                                                                                 pady=5,
-                                                                                                 expand=True)
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(side='bottom',
+                                                                                                    padx=10,
+                                                                                                    pady=5,
+                                                                                                    expand=True)
         ttk.Button(self.rzf, text=lang.text106, command=lambda: self.put_log()).pack(side='bottom', padx=10, pady=5,
                                                                                      expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
@@ -347,6 +348,10 @@ class Tool(Tk):
         ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
               text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
+              font=(None, 10)).pack(
+            padx=5, pady=5)
+        Label(self.tab,
+              text='我们的设备是我们自己的，我们才是主人\nOur device is ours! We Are Host!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
