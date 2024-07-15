@@ -1555,7 +1555,6 @@ class ModuleManager:
         def __init__(self, id_: str):
             super().__init__()
             self.arr = {}
-            # self.module_dir = ''
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(elocal, "bin", "module")
             if id_:
@@ -1864,7 +1863,7 @@ class Debugger(Toplevel):
         ttk.Button(self, text='Info', command=self.show_info).grid(row=2, column=2, padx=5, pady=5)
         ttk.Button(self, text='Crash it!', command=self.crash).grid(row=2, column=3, padx=5, pady=5)
         ttk.Button(self, text='Hacker panel',
-                   command=lambda: openurl('https://vdse.bdstatic.com//192d9a98d782d9c74c96f09db9378d93.mp4')).grid(
+                   command=lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')).grid(
             row=2, column=4, padx=5, pady=5)
 
     @staticmethod
