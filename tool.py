@@ -351,7 +351,7 @@ class Tool(Tk):
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
-              text='我们的设备是我们自己的，我们才是主人\nOur device is ours! We Are Host!',
+              text='我们的设备属于我们，我们才是主人！\nOur device is ours! We Are Host!',
               font=(None, 10)).pack(
             padx=5, pady=5)
         Label(self.tab,
