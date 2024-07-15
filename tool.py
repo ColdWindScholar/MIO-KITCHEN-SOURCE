@@ -3061,16 +3061,7 @@ def unpack(chose, form: str = '') -> bool:
         return False
     if form == 'payload':
         print(lang.text79 + "payload")
-        try:
-            Dumper(
-                work + "payload.bin",
-                work,
-                diff=False,
-                old='old',
-                images=chose
-            ).run()
-        except MemoryError:
-            print('Error: CANNOT Extract Payload')
+        Dumper(work + "payload.bin", work, diff=False, old='old', images=chose).run()
         if settings.rm_pay == '1':
             try:
                 os.remove(work + "payload.bin")
