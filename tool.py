@@ -2942,7 +2942,7 @@ def input_(title: str = lang.text76, text: str = "") -> str:
     a = input_var.get()
     if a == 'debugger':
         Debugger()
-        return ''
+        return 'custom'
     return a
 
 
