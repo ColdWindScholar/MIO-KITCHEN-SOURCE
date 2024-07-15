@@ -42,7 +42,7 @@ import tkinter as tk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
-from tkinter import (Tk, END, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+from tkinter import (Tk, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
 import pygments.lexers
@@ -269,8 +269,8 @@ class Tool(Tk):
     def put_log(self):
         log_ = settings.path + os.sep + v_code() + '.txt'
         with open(log_, 'w', encoding='utf-8', newline='\n') as f:
-            f.write(self.show.get(1.0, END))
-            self.show.delete(1.0, END)
+            f.write(self.show.get(1.0, tk.END))
+            self.show.delete(1.0, tk.END)
         print(lang.text95 + log_)
 
     def get_time(self):
@@ -281,10 +281,13 @@ class Tool(Tk):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
         frame.pack(padx=10, pady=10)
         ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
-        self.frame_bg.update_idletasks()
-        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
+        self.update_frame()
         self.scrollbar.config(command=self.canvas1.yview)
         return frame
+
+    def update_frame(self):
+        self.frame_bg.update_idletasks()
+        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
 
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
@@ -331,7 +334,7 @@ class Tool(Tk):
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, END)).pack(side='bottom', padx=10,
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(side='bottom', padx=10,
                                                                                                  pady=5,
                                                                                                  expand=True)
         ttk.Button(self.rzf, text=lang.text106, command=lambda: self.put_log()).pack(side='bottom', padx=10, pady=5,
@@ -564,7 +567,7 @@ class Upgrade(Toplevel):
                 return
             return
         self.notice.configure(text=lang.t45, foreground='')
-        self.change_log.delete(1.0, END)
+        self.change_log.delete(1.0, tk.END)
         try:
             url = requests.get(self.update_url)
         except (Exception, BaseException) as e:
@@ -780,7 +783,7 @@ class Welcome(ttk.Frame):
         lce = StringVar()
 
         def load_license():
-            te.delete(1.0, END)
+            te.delete(1.0, tk.END)
             with open(os.path.join(elocal, "bin", "licenses", lce.get() + ".txt"), 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
@@ -1313,7 +1316,7 @@ class ModuleManager:
                 "author": 'MIO-KITCHEN' if not self.aou.get() else self.aou.get(),
                 "version": self.ver.get(),
                 "identifier": (iden := self.identifier.get()),
-                "describe": self.intro.get(1.0, END),
+                "describe": self.intro.get(1.0, tk.END),
                 "depend": self.dep.get()
             }
             self.destroy()
@@ -1896,7 +1899,7 @@ class Debugger(Toplevel):
                 read_value()
 
         def read_value():
-            f.delete(0, END)
+            f.delete(0, tk.END)
             f.insert(0, getattr(settings, h.get()))
 
         ck = Toplevel()
@@ -1940,7 +1943,7 @@ class Debugger(Toplevel):
                 read_value()
 
         def read_value():
-            f.delete(0, END)
+            f.delete(0, tk.END)
             f.insert(0, str(globals().get(h.get(), 0)))
 
         ck = Toplevel()
@@ -2404,7 +2407,7 @@ class StdoutRedirector:
         if self.error:
             self.error_info += string
             return
-        self.text_space.insert(END, string)
+        self.text_space.insert(tk.END, string)
         self.text_space.see('end')
 
     def flush(self):
@@ -2745,7 +2748,7 @@ class Packxx(Toplevel):
                 read_value()
 
         def read_value():
-            f.delete(0, END)
+            f.delete(0, tk.END)
             f.insert(0, str(self.custom_size.get(h.get(), 0)))
 
         def load():

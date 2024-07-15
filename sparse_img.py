@@ -128,7 +128,7 @@ class SparseImage:
 
     def _GetRangeData(self, ranges):
         """Generator that produces all the image data in 'ranges'.  The
-    number of individual pieces returned is arbitrary (and in
+    number of individual pieces returned is arbitrary and in
     particular is not necessarily equal to the number of ranges in
     'ranges'.
 
