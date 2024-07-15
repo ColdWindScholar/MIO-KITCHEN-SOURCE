@@ -514,12 +514,12 @@ class Volume:
 
     @property
     def get_info_list(self):
-        data = [
+        return [
             ['Magic number', hex(self.superblock.s_magic).upper()],
             ["Volume name", self.superblock.s_volume_name.decode()],
             ["UUID", self.uuid],
             ['Last mounted on', self.superblock.s_last_mounted.decode()],
-            ["Block size", f"{1 << (10 + self.superblock.s_log_block_size)}"],
+            ["Block size", 1 << (10 + self.superblock.s_log_block_size)],
             ["Block count", self.superblock.s_blocks_count],
             ["Free inodes", self.superblock.s_free_inodes_count],
             ["Free blocks", self.superblock.s_free_blocks_count],
@@ -529,9 +529,7 @@ class Volume:
             ['Reserved GDT blocks', self.superblock.s_reserved_gdt_blocks],
             ["Inode size", self.superblock.s_inode_size],
             ['Filesystem created', self.superblock.s_mkfs_time],
-            ["Current Size", self.get_block_count * self.block_size]
-        ]
-        return data
+            ["Current Size", self.get_block_count * self.block_size]]
 
     def get_inode(self, inode_idx, file_type=InodeType.UNKNOWN):
         group_idx, inode_table_entry_idx = self.get_inode_group(inode_idx)
