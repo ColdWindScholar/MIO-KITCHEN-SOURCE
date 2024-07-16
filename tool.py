@@ -3880,7 +3880,6 @@ unpackg: UnpackGui
 def init():
     if settings.updating in ['1', '2']:
         Upgrade()
-        sys.exit(0)
     if int(settings.oobe) < 4:
         Welcome()
     if not os.path.exists(tool_bin):
