@@ -2369,7 +2369,12 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
         warn_win(text=lang.warn1)
         return False
     work = rwork()
-    lb = [part.replace('_a', '').replace('_b', '') for part in lb]
+    lb_c = []
+    for part in lb:
+        if part.endswith('_b') or part.endswith('_a'):
+            part = part.replace('_a', '').replace('_b', '')
+        lb_c.append(part)
+    lb = lb_c
     for part in lb:
         if not os.path.exists(work + part + '.img') and os.path.exists(work + part + '_a.img'):
             try:
