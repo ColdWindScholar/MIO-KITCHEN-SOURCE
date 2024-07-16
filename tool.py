@@ -660,10 +660,14 @@ class Upgrade(Toplevel):
                         zip_ref.extract(file, elocal)
                     else:
                         zip_ref.extract(file, os.path.join(elocal, "bin"))
-            settings.set_value('updating', '1')
-            settings.set_value('language', settings.language)
-            settings.set_value('oobe', settings.oobe)
-            settings.set_value('new_tool', os.path.join(elocal, "bin", "tool" + ('' if os.name != 'nt' else '.exe')))
+            update_dict = {
+                'updating': '1',
+                'language': settings.language,
+                'oobe': settings.oobe,
+                'new_tool': os.path.join(elocal, "bin", "tool" + ('' if os.name != 'nt' else '.exe'))
+            }
+            for i in update_dict.keys():
+                settings.set_value(i, update_dict.get(i, ''))
             subprocess.Popen([os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
