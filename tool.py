@@ -546,9 +546,8 @@ class Upgrade(Toplevel):
         self.change_log = Text(f2, width=50, height=15)
         self.change_log.pack(padx=5, pady=5)
         f2.pack(fill=BOTH, padx=5, pady=5)
-        self.progressbar = ttk.Progressbar(self, length=200, mode='determinate', orient=tkinter.HORIZONTAL
+        self.progressbar = ttk.Progressbar(self, length=200, mode='determinate', orient=tkinter.HORIZONTAL, maximum=100
                                            )
-        self.progressbar['maximum'] = 100
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
