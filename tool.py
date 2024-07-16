@@ -3879,10 +3879,10 @@ unpackg: UnpackGui
 
 
 def init():
-    if int(settings.oobe) < 4:
-        Welcome()
     if settings.updating in ['1', '2']:
         Upgrade()
+    if int(settings.oobe) < 4:
+        Welcome()
     if not os.path.exists(tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     try:
