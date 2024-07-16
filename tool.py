@@ -804,7 +804,7 @@ class Welcome(ttk.Frame):
 
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
-                          values=[i.rsplit('.')[0] for i in os.listdir(elocal + os.sep + "bin" + os.sep + "licenses") if
+                          values=[i.rsplit('.')[0] for i in os.listdir(elocal + "/bin/licenses") if
                                   i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
