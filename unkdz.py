@@ -269,14 +269,14 @@ class KDZFileTools(kdz.KDZFile):
         self.header_type = self.kdz_header[verify_header]
 
     def cmdExtractSingle(self, partID):
-        print("[+] Extracting single partition from v{:d} file!\n".format(self.header_type))
+        print(f"[+] Extracting single partition from v{self.header_type:d} file!\n")
         print("[+] Extracting " + str(self.partList[partID][0]) + " to " + os.path.join(self.outdir,
                                                                                         self.partList[partID][0].decode(
                                                                                             "utf8")))
         self.extractPartition(partID)
 
     def cmdExtractAll(self):
-        print("[+] Extracting all partitions from v{:d} file!\n".format(self.header_type))
+        print(f"[+] Extracting all partitions from v{self.header_type:d} file!\n")
         for part in enumerate(self.partList):
             print("[+] Extracting " + part[1][0].decode("utf8") + " to " + os.path.join(self.outdir,
                                                                                         part[1][0].decode("utf8")))
