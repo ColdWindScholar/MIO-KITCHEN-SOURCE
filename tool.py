@@ -3006,6 +3006,7 @@ def unpackrom(ifile) -> None:
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif ftype == 'kdz':
         project_dir = settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+        project_dir = os.path.normpath(project_dir)
         if not os.path.exists(project_dir):
             re_folder(project_dir)
         KDZFileTools(ifile, project_dir, extract_all=True)
