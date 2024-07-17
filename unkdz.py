@@ -19,15 +19,14 @@ Copyright (C) 2013 IOMonster (thecubed on XDA)
 """
 
 from __future__ import print_function
+
 import os
-import argparse
-import sys
 from binascii import b2a_hex
 
-# our tools are in "libexec"
-
-
 import kdz
+
+
+# our tools are in "libexec"
 
 
 class KDZFileTools(kdz.KDZFile):
@@ -36,7 +35,7 @@ class KDZFileTools(kdz.KDZFile):
 	"""
 
     # Setup variables
-    def __init__(self, kdzfile: str, outdir: str, extract_id: int, list_only:bool=False, extract_all:bool=False):
+    def __init__(self, kdzfile: str, outdir: str, extract_id: int, list_only: bool = False, extract_all: bool = False):
         self.kdzfile = kdzfile
         self.openFile(kdzfile)
         self.partList = self.getPartitions()
@@ -88,16 +87,16 @@ class KDZFileTools(kdz.KDZFile):
             if type(kdz_item[key]) is str or type(kdz_item[key]) is bytes:
                 kdz_item[key] = kdz_item[key].rstrip(b'\x00')
                 if b'\x00' in kdz_item[key]:
-                    print("[!] Error: extraneous data found IN " + key, file=sys.stderr)
-                    sys.exit(1)
+                    print("[!] Error: extraneous data found IN " + key)
+                    return
             elif type(kdz_item[key]) is int:
                 if kdz_item[key] != 0:
                     print('[!] Error: field "' + key + '" is non-zero (' + b2a_hex(kdz_item[key]) + ')',
-                          file=sys.stderr)
-                    sys.exit(1)
+                          )
+                    return
             else:
-                print("[!] Error: internal error", file=sys.stderr)
-                sys.exit(-1)
+                print("[!] Error: internal error")
+                return
 
         return kdz_item
 
@@ -145,8 +144,7 @@ class KDZFileTools(kdz.KDZFile):
         buf = self.infile.read(self.dataStart - self.headerEnd - 1)
         if len(buf.lstrip(b'\x00')) > 0:
             print("[!] Warning: Data between headers and payload! (offsets {:d} to {:d})".format(self.headerEnd,
-                                                                                                 self.dataStart),
-                  file=sys.stderr)
+                                                                                                 self.dataStart))
             self.hasExtra = True
 
         # Make partition list
@@ -246,15 +244,13 @@ class KDZFileTools(kdz.KDZFile):
 
         params.close()
 
-
-
     def openFile(self, kdzfile):
         # Open the file
         try:
             self.infile = open(kdzfile, "rb")
         except IOError as err:
-            print(err, file=sys.stderr)
-            sys.exit(1)
+            print(err)
+            return
 
         # Get length of whole file
         self.infile.seek(0, os.SEEK_END)
@@ -268,7 +264,7 @@ class KDZFileTools(kdz.KDZFile):
         if verify_header not in self.kdz_header:
             print("[!] Error: Unsupported KDZ file format.")
             print('[ ] Received header "{:s}".'.format(" ".join(b2a_hex(n) for n in verify_header)))
-            sys.exit(1)
+            return
 
         self.header_type = self.kdz_header[verify_header]
 
@@ -290,6 +286,6 @@ class KDZFileTools(kdz.KDZFile):
 
     def cmdListPartitions(self):
         print(
-            "[+] KDZ Partition List (format v{:d})\n=========================================".format(self.header_type))
+            f"[+] KDZ Partition List (format v{self.header_type:d})\n=========================================")
         for part in enumerate(self.partList):
-            print("{:2d} : {:s} ({:d} bytes)".format(part[0], part[1][0].decode("utf8"), part[1][1]))
+            print(f"{part[0]:2d} : {part[1][0].decode('utf8'):s} ({part[1][1]:d} bytes)")
