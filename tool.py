@@ -2292,128 +2292,132 @@ class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
         self.title(lang.text53)
-
-        def refresh():
-            tl.clear()
-            for file_name in os.listdir(work):
-                if file_name.endswith(".img"):
-                    if (file_type := gettype(work + file_name)) in ["ext", "erofs", 'f2fs', 'sparse']:
-                        tl.insert(f"{file_name[:-4]} [{file_type}]", file_name[:-4])
-
-        supers = IntVar()
-        ssparse = IntVar()
-        supersz = IntVar()
-        attrib = StringVar(value='readonly')
-        sdbfz = StringVar()
-        scywj = IntVar()
+        self.supers = IntVar(value=9126805504)
+        self.ssparse = IntVar()
+        self.supersz = IntVar()
+        self.attrib = StringVar(value='readonly')
+        self.sdbfz = StringVar()
+        self.scywj = IntVar()
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
         (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
-        supersz.set(1)
+        self.supersz.set(1)
         # 自动设置
-        ttk.Radiobutton(lf1, text="A-only", variable=supersz, value=1).pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1, text="Virtual-ab", variable=supersz, value=2).pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1, text="A/B", variable=supersz, value=3).pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1_r, text="Readonly", variable=attrib, value='readonly').pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1_r, text="None", variable=attrib, value='none').pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1, text="A-only", variable=self.supersz, value=1).pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1, text="Virtual-ab", variable=self.supersz, value=2).pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1, text="A/B", variable=self.supersz, value=3).pack(side='left', padx=10, pady=10)
+        ttk.Radiobutton(lf1_r, text="Readonly", variable=self.attrib, value='readonly').pack(side='left', padx=10,
+                                                                                             pady=10)
+        ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
-        (sdbfzs := ttk.Combobox(lf2, textvariable=sdbfz, values=("qti_dynamic_partitions", "main"))).pack(side='left', padx=10, pady=10, fill='both')
+        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz, values=("qti_dynamic_partitions", "main"))).pack(
+            side='left',
+            padx=10,
+            pady=10,
+            fill='both')
         sdbfzs.current(0)
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
-        supers.set(9126805504)
-        (super_size := ttk.Entry(lf2, textvariable=supers)).pack(side='left', padx=10, pady=10)
+        (super_size := ttk.Entry(lf2, textvariable=self.supers)).pack(side='left', padx=10, pady=10)
         super_size.bind("<KeyRelease>",
                         lambda *x: super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
 
-        tl = ListBox(lf3)
-        tl.gui()
-        work = rwork()
+        self.tl = ListBox(lf3)
+        self.tl.gui()
+        self.work = rwork()
 
-        tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
+        self.tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
 
-        ttk.Checkbutton(self, text=lang.text58, variable=ssparse, onvalue=1, offvalue=0,
+        ttk.Checkbutton(self, text=lang.text58, variable=self.ssparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
         t_frame = Frame(self)
-        ttk.Checkbutton(t_frame, text=lang.t11, variable=scywj, onvalue=1, offvalue=0,
+        ttk.Checkbutton(t_frame, text=lang.t11, variable=self.scywj, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
-        ttk.Button(t_frame, text=lang.text23, command=refresh).pack(side=RIGHT, padx=10, pady=10)
-        g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(generate))
-        g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
+        ttk.Button(t_frame, text=lang.text23, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
+        self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(self.generate))
+        self.g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
-        cz(refresh)
+        cz(self.refresh)
         jzxs(self)
-
-        def read_list():
-            if os.path.exists(work + "dynamic_partitions_op_list"):
-                try:
-                    data = utils.dynamic_list_reader(work + "dynamic_partitions_op_list")
-                except (Exception, BaseException):
-                    return
-                if len(data) > 1:
-                    fir, sec = data
-                    if fir[:-2] == sec[:-2]:
-                        sdbfz.set(fir[:-2])
-                        supersz.set(2)
-                        supers.set(int(data[fir]['size']))
-                else:
-                    dbfz, = data
-                    sdbfz.set(dbfz)
-                    supers.set(int(data[dbfz]['size']))
-                    supersz.set(1)
-
-        def versize():
-            size = sum([os.path.getsize(work + i + ".img") for i in tl.selected])
-            diff_size = size
-            if size > supers.get():
-                for i in range(20):
-                    if not i:
-                        continue
-                    i = i - 0.5
-                    t = 1024 * 1024 * 1024 * i - size
-                    if t < 0:
-                        continue
-                    if t < diff_size:
-                        diff_size = t
-                    else:
-                        size = i * 1024 * 1024 * 1024
-                        break
-                supers.set(int(size))
-                return False
-            else:
-                return True
-
-        def generate():
-            g_b.config(text=lang.t28, state='disabled')
-            utils.generate_dynamic_list(dbfz=sdbfz.get(), size=supers.get(), set_=supersz.get(),
-                                        lb=tl.selected.copy(), work=rwork())
-            g_b.config(text=lang.text34)
-            time.sleep(1)
-            g_b.config(text=lang.t27, state='normal')
-
-        def start_():
-            try:
-                supers.get()
-            except (Exception, BaseException):
-                supers.set(0)
-            if not versize():
-                ask_win2(lang.t10.format(supers.get()))
-                return False
-            lbs = tl.selected.copy()
-            sc = scywj.get()
-            self.destroy()
-            packsuper(sparse=ssparse, dbfz=sdbfz, size=supers, set_=supersz, lb=lbs, del_=sc, attrib=attrib.get())
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                       fill=X,
                                                                       expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: cz(start_), style="Accent.TButton").pack(side='left',
-                                                                                                  padx=5,
-                                                                                                  pady=5, fill=X,
-                                                                                                  expand=True)
-        read_list()
+        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
+                                                                                                       padx=5,
+                                                                                                       pady=5, fill=X,
+                                                                                                       expand=True)
+        self.read_list()
+
+    def start_(self):
+        try:
+            self.supers.get()
+        except (Exception, BaseException):
+            self.supers.set(0)
+        if not self.versize():
+            ask_win2(lang.t10.format(self.supers.get()))
+            return False
+        lbs = self.tl.selected.copy()
+        sc = self.scywj.get()
+        self.destroy()
+        packsuper(sparse=self.ssparse, dbfz=self.sdbfz, size=self.supers, set_=self.supersz, lb=lbs, del_=sc,
+                  attrib=self.attrib.get())
+
+    def versize(self):
+        size = sum([os.path.getsize(self.work + i + ".img") for i in self.tl.selected])
+        diff_size = size
+        if size > self.supers.get():
+            for i in range(20):
+                if not i:
+                    continue
+                i = i - 0.5
+                t = 1024 * 1024 * 1024 * i - size
+                if t < 0:
+                    continue
+                if t < diff_size:
+                    diff_size = t
+                else:
+                    size = i * 1024 * 1024 * 1024
+                    break
+            self.supers.set(int(size))
+            return False
+        else:
+            return True
+
+    def generate(self):
+        self.g_b.config(text=lang.t28, state='disabled')
+        utils.generate_dynamic_list(dbfz=self.sdbfz.get(), size=self.supers.get(), set_=self.supersz.get(),
+                                    lb=self.tl.selected.copy(), work=rwork())
+        self.g_b.config(text=lang.text34)
+        time.sleep(1)
+        self.g_b.config(text=lang.t27, state='normal')
+
+    def refresh(self):
+        self.tl.clear()
+        for file_name in os.listdir(self.work):
+            if file_name.endswith(".img"):
+                if (file_type := gettype(self.work + file_name)) in ["ext", "erofs", 'f2fs', 'sparse']:
+                    self.tl.insert(f"{file_name[:-4]} [{file_type}]", file_name[:-4])
+
+    def read_list(self):
+        if os.path.exists(self.work + "dynamic_partitions_op_list"):
+            try:
+                data = utils.dynamic_list_reader(self.work + "dynamic_partitions_op_list")
+            except (Exception, BaseException):
+                return
+            if len(data) > 1:
+                fir, sec = data
+                if fir[:-2] == sec[:-2]:
+                    self.sdbfz.set(fir[:-2])
+                    self.supersz.set(2)
+                    self.supers.set(int(data[fir]['size']))
+            else:
+                dbfz, = data
+                self.sdbfz.set(dbfz)
+                self.supers.set(int(data[dbfz]['size']))
+                self.supersz.set(1)
 
 
 @cartoon
