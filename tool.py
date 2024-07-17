@@ -809,13 +809,13 @@ class Welcome(ttk.Frame):
         # self.config(text=lang.text135)
         self.pack(fill=BOTH, expand=True)
         self.frame = None
-        oobe = settings.oobe
+        oobe = int(settings.oobe)
         states.in_oobe = True
         frames = {
-            "1": self.main,
-            "2": self.license,
-            "3": self.private,
-            "4": self.done
+            1: self.main,
+            2: self.license,
+            3: self.private,
+            4: self.done
         }
         if frames.get(oobe):
             frames.get(oobe, self.main)()
@@ -834,7 +834,7 @@ class Welcome(ttk.Frame):
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
-        settings.set_value("oobe", "1")
+        settings.set_value("oobe", 1)
         for i in self.winfo_children():
             i.destroy()
         self.reframe()
@@ -848,7 +848,7 @@ class Welcome(ttk.Frame):
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
     def license(self):
-        settings.set_value("oobe", "2")
+        settings.set_value("oobe", 2)
         lce = StringVar()
 
         def load_license():
@@ -874,7 +874,7 @@ class Welcome(ttk.Frame):
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
     def private(self):
-        settings.set_value("oobe", "3")
+        settings.set_value("oobe", 3)
         self.reframe()
         ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                   expand=True)
@@ -887,7 +887,7 @@ class Welcome(ttk.Frame):
         ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
 
     def done(self):
-        settings.set_value("oobe", "4")
+        settings.set_value("oobe", 4)
         self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                   expand=True)
