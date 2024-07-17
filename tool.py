@@ -22,7 +22,7 @@ import threading
 from collections import deque
 from functools import wraps
 from random import randrange
-
+from unkdz import KDZFileTools
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
