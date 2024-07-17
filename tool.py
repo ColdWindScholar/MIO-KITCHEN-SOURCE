@@ -3116,10 +3116,8 @@ def unpackrom(ifile) -> None:
         dn.set(os.path.basename(folder))
     else:
         print(lang.text82 % ftype)
-    try:
-        unpackg.refs()
-    except (Exception, BaseException):
-        ...
+    unpackg.refs()
+
 
 
 def rwork() -> str:
