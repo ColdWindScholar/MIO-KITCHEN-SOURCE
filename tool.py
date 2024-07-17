@@ -2790,10 +2790,7 @@ class Packxx(Toplevel):
         jzxs(self)
 
     def start_(self):
-        try:
-            self.destroy()
-        except AttributeError:
-            ...
+        self.destroy()
         self.packrom()
 
     def show_modify_size(self):
