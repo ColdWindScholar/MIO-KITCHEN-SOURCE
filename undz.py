@@ -6,7 +6,6 @@
 """
 import os
 import sys
-import time
 import zlib
 from collections import OrderedDict
 from struct import *
