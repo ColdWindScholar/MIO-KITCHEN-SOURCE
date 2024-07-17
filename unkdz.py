@@ -36,15 +36,34 @@ class KDZFileTools(kdz.KDZFile):
 	"""
 
     # Setup variables
-    partitions = []
-    outdir = "kdzextracted"
-    infile = None
+    def __init__(self, kdzfile: str, outdir: str, extract_id: int, list_only:bool=False, extract_all:bool=False):
+        self.kdzfile = kdzfile
+        self.openFile(kdzfile)
+        self.partList = self.getPartitions()
 
-    kdz_header = {
-        b"\x28\x05\x00\x00"b"\x34\x31\x25\x80": 0,
-        b"\x18\x05\x00\x00"b"\x32\x79\x44\x50": 1,
-        kdz.KDZFile._dz_header: 2,
-    }
+        if outdir:
+            self.outdir = outdir
+
+        if list_only:
+            self.cmdListPartitions()
+
+        elif extract_id is not None:
+            if 0 <= extract_id < len(self.partList):
+                self.cmdExtractSingle(extract_id)
+            else:
+                print("[!] Segment {:d} is out of range!".format(extract_id))
+
+        elif extract_all:
+            self.cmdExtractAll()
+        """"""
+        self.partitions = []
+        self.infile = None
+
+        self.kdz_header = {
+            b"\x28\x05\x00\x00"b"\x34\x31\x25\x80": 0,
+            b"\x18\x05\x00\x00"b"\x32\x79\x44\x50": 1,
+            kdz.KDZFile._dz_header: 2,
+        }
 
     def readKDZHeader(self):
         """
@@ -227,17 +246,7 @@ class KDZFileTools(kdz.KDZFile):
 
         params.close()
 
-    def parseArgs(self):
-        # Parse arguments
-        parser = argparse.ArgumentParser(description='LG KDZ File Extractor originally by IOMonster')
-        parser.add_argument('-f', '--file', help='KDZ File to read', action='store', required=True, dest='kdzfile')
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('-l', '--list', help='list partitions', action='store_true', dest='listOnly')
-        group.add_argument('-x', '--extract', help='extract all partitions', action='store_true', dest='extractAll')
-        group.add_argument('-s', '--single', help='single Extract by ID', action='store', dest='extractID', type=int)
-        parser.add_argument('-d', '--dir', '-o', '--out', help='output directory', action='store', dest='outdir')
 
-        return parser.parse_args()
 
     def openFile(self, kdzfile):
         # Open the file
@@ -284,29 +293,3 @@ class KDZFileTools(kdz.KDZFile):
             "[+] KDZ Partition List (format v{:d})\n=========================================".format(self.header_type))
         for part in enumerate(self.partList):
             print("{:2d} : {:s} ({:d} bytes)".format(part[0], part[1][0].decode("utf8"), part[1][1]))
-
-    def main(self):
-        args = self.parseArgs()
-        self.kdzfile = args.kdzfile
-        self.openFile(args.kdzfile)
-        self.partList = self.getPartitions()
-
-        if args.outdir:
-            self.outdir = args.outdir
-
-        if args.listOnly:
-            self.cmdListPartitions()
-
-        elif args.extractID is not None:
-            if 0 <= args.extractID < len(self.partList):
-                self.cmdExtractSingle(args.extractID)
-            else:
-                print("[!] Segment {:d} is out of range!".format(args.extractID), file=sys.stderr)
-
-        elif args.extractAll:
-            self.cmdExtractAll()
-
-
-if __name__ == "__main__":
-    kdztools = KDZFileTools()
-    kdztools.main()
