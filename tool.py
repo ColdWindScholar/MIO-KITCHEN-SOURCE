@@ -3590,11 +3590,11 @@ class Frame3(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
-        ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).pack(side="left", padx=10,
-                                                                                              pady=10)
-        ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).pack(side="left", padx=10, pady=10)
+        ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).grid(row=0, column=0, padx=5, pady=5)
+        ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5, pady=5)
+        ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
+        ttk.Button(self, text='工具箱', command=lambda: cz(pack_zip)).grid(row=1, column=0, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):

@@ -43,7 +43,7 @@ class ListBox(Frame):
         self.var = BooleanVar(value=False)
         scrollbar = Scrollbar(self, orient='vertical')
         scrollbar.pack(side='right', fill='y', padx=10, pady=10)
-        self.canvas = Canvas(self, yscrollcommand=scrollbar.set, width=300, height=150)
+        self.canvas = Canvas(self, yscrollcommand=scrollbar.set, width=250, height=150)
         self.canvas.pack_propagate(False)
         self.canvas.pack(fill='both', expand=True)
         scrollbar.config(command=self.canvas.yview)
