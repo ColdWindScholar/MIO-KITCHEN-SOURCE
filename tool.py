@@ -745,7 +745,9 @@ class Upgrade(Toplevel):
                     os.remove(settings.new_tool)
                 if os.path.isfile(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))):
                     os.remove(os.path.normpath(os.path.join(elocal, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-                re_folder(os.path.join(elocal, "bin", "temp"))
+                if os.path.exists(os.path.join(elocal, "bin", "temp")):
+                    shutil.rmtree(os.path.join(elocal, "bin", "temp"))
+                os.makedirs(os.path.join(elocal, "bin", "temp"), exist_ok=True)
             except (IOError, IsADirectoryError, FileNotFoundError, PermissionError) as e:
                 print(e)
             settings.set_value('updating', '')
