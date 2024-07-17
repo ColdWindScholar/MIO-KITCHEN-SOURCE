@@ -2551,12 +2551,11 @@ def download_api(url, path=None, int_=True, size_=0):
 
 
 def download_file():
-    var1 = IntVar()
+    var1 = IntVar(value=0)
     down = win.get_frame(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     win.message_pop(lang.text62, "green")
     progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
-    var1.set(0)
     ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
     c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=1, offvalue=0)
     c1.pack(padx=10, pady=10)
