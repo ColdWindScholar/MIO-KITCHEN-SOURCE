@@ -1722,7 +1722,7 @@ class MpkMan(ttk.Frame):
         self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
                                 command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
-        cz(self.list_pls)
+        self.list_pls()
         lf1.pack(padx=10, pady=10)
 
 
