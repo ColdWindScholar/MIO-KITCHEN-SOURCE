@@ -3629,7 +3629,7 @@ class UnpackGui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch.set(True)
         self.fm = ttk.Combobox(self, state="readonly",
-                               values=('new.dat.br', "new.dat", 'img', 'zstd', 'payload', 'super', 'update.app'))
+                               values=('new.dat.br', "new.dat", 'img', 'zst', 'payload', 'super', 'update.app'))
         self.lsg = ListBox(self)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
         self.menu.add_command(label=lang.attribute, command=self.info)
