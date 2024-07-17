@@ -3015,11 +3015,7 @@ def input_(title: str = lang.text76, text: str = "") -> str:
     entry__.bind("<Return>", lambda *x: input__.destroy())
     ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
     input__.wait_window()
-    a = input_var.get()
-    if a == 'debugger':
-        Debugger()
-        return 'custom'
-    return a
+    return input_var.get()
 
 
 def script2fs(path):
