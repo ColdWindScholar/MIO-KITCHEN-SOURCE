@@ -236,6 +236,7 @@ def warn_win(text='', color='orange', title="Warn"):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
+        self.tab6 = None
         self.rotate_angle = 0
         do_set_window_deffont(self)
         self.show = None
@@ -302,6 +303,7 @@ class Tool(Tk):
         self.tab3 = ttk.Frame(self.notepad)
         self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
+        self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
         self.notepad.add(self.tab, text=lang.text11)
         self.notepad.add(self.tab2, text=lang.text12)
@@ -309,6 +311,7 @@ class Tool(Tk):
         self.notepad.add(self.tab3, text=lang.text13)
         self.notepad.add(self.tab4, text=lang.text14)
         self.notepad.add(self.tab5, text=lang.text15)
+        self.notepad.add(self.tab6, text=lang.toolbox)
         self.scrollbar = ttk.Scrollbar(self.tab5, orient=tk.VERTICAL)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas1 = Canvas(self.tab5, yscrollcommand=self.scrollbar.set)
@@ -3594,7 +3597,6 @@ class Frame3(ttk.LabelFrame):
         ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
-        ttk.Button(self, text='工具箱', command=lambda: cz(pack_zip)).grid(row=1, column=0, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):
