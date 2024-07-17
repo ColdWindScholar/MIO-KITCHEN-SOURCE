@@ -35,7 +35,7 @@ class KDZFileTools(kdz.KDZFile):
 	"""
 
     # Setup variables
-    def __init__(self, kdzfile: str, outdir: str, extract_id: int, list_only: bool = False, extract_all: bool = False):
+    def __init__(self, kdzfile: str, outdir: str, extract_id: int = None, list_only: bool = False, extract_all: bool = False):
         self.kdzfile = kdzfile
         self.openFile(kdzfile)
         self.partList = self.getPartitions()
