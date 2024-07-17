@@ -3094,11 +3094,8 @@ def unpackrom(ifile) -> None:
                 print(lang.text80 % (file_, e))
                 win.message_pop(lang.warn4.format(file_))
         print(lang.text81)
-        if os.path.exists(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
-            project_menu.listdir()
-            dn.set(os.path.splitext(os.path.basename(zip_src))[0])
-        else:
-            project_menu.listdir()
+        if os.path.isdir(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
+            project_menu.set_project(os.path.splitext(os.path.basename(zip_src))[0])
         script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         unpackg.refs()
         fz.close()
@@ -3604,6 +3601,12 @@ class ProjectMenuUtils(ttk.LabelFrame):
         ttk.Button(self, text=lang.text115, command=self.new).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove)).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text117, command=lambda: cz(self.rename)).pack(side="left", padx=10, pady=10)
+
+    def set_project(self, name):
+        if not os.path.isdir(os.path.join(settings.path, name)):
+            return
+        self.listdir()
+        dn.set(name)
 
     def listdir(self):
         array = []
