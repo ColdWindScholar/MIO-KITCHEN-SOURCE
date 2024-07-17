@@ -255,10 +255,14 @@ class ToolBox(ttk.Frame):
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.__on_mouse(event))
+
     def gui(self):
         self.pack_basic()
         """"""
-
+        ttk.Button(self.label_frame, text='1').grid(row=0, column=0, padx=5, pady=5)
+        ttk.Button(self.label_frame, text='2').grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
+        ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
         self.update_ui()
 
