@@ -32,7 +32,6 @@ class KDZFileTools(kdz.KDZFile):
 
     indir = "kdzextracted"
 
-    #kdz.KDZFile._dz_header
 
     def loadParams(self):
         """
