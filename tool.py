@@ -86,7 +86,7 @@ from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 from controls import ListBox
-
+from undz import DZFileTools
 try:
     import imp
 except ImportError:
@@ -3009,6 +3009,11 @@ def unpackrom(ifile) -> None:
         if not os.path.exists(project_dir):
             re_folder(project_dir)
         KDZFileTools(ifile, project_dir, extract_all=True)
+        for i in os.listdir(project_dir):
+            if not os.path.isfile(project_dir+os.sep+i):
+                continue
+            if i.endswith('.dz') and gettype(project_dir+os.sep+i) == 'dz':
+                DZFileTools(project_dir+os.sep+i, project_dir, extract_all=True)
         return
     elif os.path.splitext(ifile)[1] == '.ofp':
         if ask_win(lang.t12) == 1:
