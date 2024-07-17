@@ -320,6 +320,7 @@ class Tool(Tk):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab4_n()
+        self.tab6_n()
         self.setting_tab()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
@@ -366,6 +367,10 @@ class Tool(Tk):
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
+
+    def tab6_n(self):
+        ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
+        ttk.Separator(self.tab6, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
 
     def tab4_n(self):
         self.rotate_angle = 0
@@ -3595,7 +3600,8 @@ class Frame3(ttk.LabelFrame):
     def gui(self):
         ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).grid(row=0, column=1, padx=5, pady=5)
-        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5, pady=5)
+        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5,
+                                                                                              pady=5)
         ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
 
 
