@@ -22,7 +22,10 @@ import threading
 from collections import deque
 from functools import wraps
 from random import randrange
+from tkinter.ttk import Scrollbar
+
 from unkdz import KDZFileTools
+
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
@@ -87,6 +90,7 @@ from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 from controls import ListBox
 from undz import DZFileTools
+
 try:
     import imp
 except ImportError:
@@ -233,6 +237,36 @@ def warn_win(text='', color='orange', title="Warn"):
     ask.after(1500, ask.destroy)
 
 
+class ToolBox(ttk.Frame):
+    def __init__(self, master):
+        super().__init__(master=master)
+
+    def __on_mouse(self, event):
+        self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
+
+    def pack_basic(self):
+        scrollbar = Scrollbar(self, orient='vertical')
+        scrollbar.pack(side='right', fill='y', padx=10, pady=10)
+        self.canvas = Canvas(self, yscrollcommand=scrollbar.set)
+        self.canvas.pack_propagate(False)
+        self.canvas.pack(fill='both', expand=True)
+        scrollbar.config(command=self.canvas.yview)
+        self.label_frame = Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        self.canvas.bind_all("<MouseWheel>",
+                             lambda event: self.__on_mouse(event))
+    def gui(self):
+        self.pack_basic()
+        """"""
+
+        """"""
+        self.update_ui()
+
+    def update_ui(self):
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+
 class Tool(Tk):
     def __init__(self):
         super().__init__()
@@ -371,6 +405,9 @@ class Tool(Tk):
     def tab6_n(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.tab6, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        tool_box = ToolBox(self.tab6)
+        tool_box.gui()
+        tool_box.pack(fill=BOTH, expand=True)
 
     def tab4_n(self):
         self.rotate_angle = 0
@@ -3011,10 +3048,10 @@ def unpackrom(ifile) -> None:
             re_folder(project_dir)
         KDZFileTools(ifile, project_dir, extract_all=True)
         for i in os.listdir(project_dir):
-            if not os.path.isfile(project_dir+os.sep+i):
+            if not os.path.isfile(project_dir + os.sep + i):
                 continue
-            if i.endswith('.dz') and gettype(project_dir+os.sep+i) == 'dz':
-                DZFileTools(project_dir+os.sep+i, project_dir, extract_all=True)
+            if i.endswith('.dz') and gettype(project_dir + os.sep + i) == 'dz':
+                DZFileTools(project_dir + os.sep + i, project_dir, extract_all=True)
         return
     elif os.path.splitext(ifile)[1] == '.ofp':
         if ask_win(lang.t12) == 1:
