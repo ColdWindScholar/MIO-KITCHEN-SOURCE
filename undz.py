@@ -172,12 +172,12 @@ class DZFileTools:
     def cmdListPartitions(self):
         print("[+] DZ Partition List\n=========================================")
         for part in enumerate(self.partList):
-            print("%2d : %s (%d bytes)" % (part[0], part[1][0], part[1][1]))
+            print("%2d : %s (%d bytes)" % (part[0], part[1][0].decode(), part[1][1]))
 
     def cmdExtractSingle(self, partID):
         print("[+] Extracting single partition!\n")
-        print("[+] Extracting " + str(self.partList[partID][0]) + " to " + os.path.join(self.outdir,
-                                                                                        self.partList[partID][0]))
+        print("[+] Extracting {self.partList[partID][0].decode()} to " + os.path.join(self.outdir,
+                                                                                        self.partList[partID][0].decode(())))
         self.extractPartition(partID)
 
     def cmdExtractAll(self):
