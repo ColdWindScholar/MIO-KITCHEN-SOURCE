@@ -187,7 +187,7 @@ class MKDZFile(dz.DZFile):
 		"""
 
         for name in os.listdir("."):
-            if name[-6:] == ".chunk":
+            if name.endswith('.chunk'):
                 self.chunks.append(MKDZChunk(name, self.blockShift))
 
         self.chunks.sort(
