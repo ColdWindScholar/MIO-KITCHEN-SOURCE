@@ -3004,6 +3004,12 @@ def unpackrom(ifile) -> None:
         except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
+    elif ftype == 'kdz':
+        project_dir = settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
+        if not os.path.exists(project_dir):
+            re_folder(project_dir)
+        KDZFileTools(ifile, project_dir, extract_all=True)
+        return
     elif os.path.splitext(ifile)[1] == '.ofp':
         if ask_win(lang.t12) == 1:
             ofp_mtk_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])

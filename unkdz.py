@@ -38,6 +38,14 @@ class KDZFileTools(kdz.KDZFile):
     def __init__(self, kdzfile: str, outdir: str, extract_id: int = None, list_only: bool = False,
                  extract_all: bool = False):
         super().__init__()
+        self.partitions = []
+        self.infile = None
+
+        self.kdz_header = {
+            b'(\x05\x00\x0041%\x80': 0,
+            b'\x18\x05\x00\x002yDP': 1,
+            kdz.KDZFile._dz_header: 2,
+        }
         self.kdzfile = kdzfile
         self.openFile(kdzfile)
         self.partList = self.getPartitions()
@@ -57,14 +65,7 @@ class KDZFileTools(kdz.KDZFile):
         elif extract_all:
             self.cmdExtractAll()
         """"""
-        self.partitions = []
-        self.infile = None
 
-        self.kdz_header = {
-            b'(\x05\x00\x0041%\x80': 0,
-            b'\x18\x05\x00\x002yDP': 1,
-            kdz.KDZFile._dz_header: 2,
-        }
 
     def readKDZHeader(self):
         """
