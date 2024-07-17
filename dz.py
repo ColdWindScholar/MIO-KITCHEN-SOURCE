@@ -24,7 +24,7 @@ from struct import Struct
 from collections import OrderedDict
 
 
-class DZStruct(object):
+class DZStruct:
     """
 	Common class for DZ file structures
 	"""

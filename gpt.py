@@ -37,7 +37,7 @@ class NoGPT(Exception):
         return self.errmsg
 
 
-class GPTSlice(object):
+class GPTSlice:
     """
 	Class for handling invidual slices^Wpartitions of a GUID table
 	"""
@@ -92,7 +92,7 @@ class GPTSlice(object):
         self.name = data['name'].decode("utf16").rstrip('\x00')
 
 
-class GPT(object):
+class GPT:
     """
 	Class for handling of GUID Partition Tables
 	(https://en.wikipedia.org/wiki/GUID_Partition_Table)
