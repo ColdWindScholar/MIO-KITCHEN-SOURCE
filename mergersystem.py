@@ -22,16 +22,6 @@ from __future__ import print_function
 import os
 import subprocess
 
-print(
-    "System Image Merger Copyright (C) 2013  Cybojenix <anthonydking@slimroms.net>\n"
-    "This program comes with ABSOLUTELY NO WARRANTY\n"
-    "This is free software, and you are welcome to redistribute it\n"
-    "under certain conditions"
-)
-
-if not os.name == "posix":
-    raise Exception("This script is designed for Linux, it will not work on Windows")
-
 
 def dd_main(dd_if, dd_of="system.img", args=None):
     """
@@ -74,13 +64,12 @@ def dd_seek(dd_if, seek, dd_of="system.img", args=None):
     dd_main(dd_if, dd_of, extension)
 
 
-def find_files():
+def find_files(list_dir: str = '.'):
     """
         returns: a list of files found that match the form "system_.*.bin"
     """
-    listing = os.listdir(".")
     found = []
-    for bin_file in listing:
+    for bin_file in os.listdir(list_dir):
         if bin_file.startswith("system_") and bin_file.endswith(".bin"):
             found.append(bin_file)
     return found
@@ -133,15 +122,6 @@ def bin_to_image(file_list, offset):
         dd_seek(system_bin[1], seek, args=["bs=512", "conv=notrunc"])
 
 
-def print_after():
-    print(
-        "the system image has been made. to mount it, run\n"
-        "Lazy Script mod by @Innfinite4evr\n"
-        "...\n"
-        "sudo mkdir -p /mnt/lgimg && mount system.img /mnt/lgimg\n"
-    )
-
-
 def main():
     if os.path.isfile("system.img"):
         os.remove("system.img")
@@ -150,7 +130,12 @@ def main():
     offset = ordered[0][0]
     start_image(ordered, offset)
     bin_to_image(ordered, offset)
-    print_after()
+    print(
+        "the system image has been made. to mount it, run\n"
+        "Lazy Script mod by @Innfinite4evr\n"
+        "...\n"
+        "sudo mkdir -p /mnt/lgimg && mount system.img /mnt/lgimg\n"
+    )
 
 
 if __name__ == '__main__':

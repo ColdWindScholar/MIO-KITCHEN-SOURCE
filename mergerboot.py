@@ -22,16 +22,6 @@ from __future__ import print_function
 import os
 import subprocess
 
-print(
-      "boot Image Merger Copyright (C) 2013  Cybojenix <anthonydking@slimroms.net>\n"
-      "This program comes with ABSOLUTELY NO WARRANTY\n"
-      "This is free software, and you are welcome to redistribute it\n"
-      "under certain conditions"
-     )
-
-if not os.name == "posix":
-    raise Exception("This script is designed for Linux, it will not work on Windows")
-
 
 def dd_main(dd_if, dd_of="boot.img", args=None):
     """
@@ -42,10 +32,10 @@ def dd_main(dd_if, dd_of="boot.img", args=None):
         returns: nothing
     """
     cmd_line = [
-                "dd",
-                "=".join(["if", dd_if]),
-                "=".join(["of", dd_of]),
-               ]
+        "dd",
+        "=".join(["if", dd_if]),
+        "=".join(["of", dd_of]),
+    ]
     if not args is None:
         cmd_line.extend(args)
 
@@ -82,7 +72,7 @@ def find_files():
     found = []
     for bin_file in listing:
         if bin_file.startswith("boot_") and bin_file.endswith(".bin"):
-             found.append(bin_file)
+            found.append(bin_file)
     return found
 
 
@@ -116,7 +106,7 @@ def start_image(file_list, offset):
         returns: nothing
     """
     last = file_list[-1:][0][0]
-    size = last # - offset # fudge factor to extend the boot image more. allows for mounting
+    size = last  # - offset # fudge factor to extend the boot image more. allows for mounting
     print("writing zero's to the base of the image. this can take a while")
     dd_main("/dev/zero", args=["bs=512", "=".join(["count", str(size)])])
 
@@ -127,17 +117,10 @@ def bin_to_image(file_list, offset):
         returns: nothing
     """
     #dd_main(file_list[0][1], args=["conv=notrunc", "bs=512"])
-    for boot_bin in file_list:#[1:]:
+    for boot_bin in file_list:  #[1:]:
         seek = str(boot_bin[0] - offset)
         print("writing %s to boot.img" % boot_bin[1])
         dd_seek(boot_bin[1], seek, args=["bs=512", "conv=notrunc"])
-
-
-def print_after():
-    print(
-          "the boot image has been made.\n"
-          "...\n"
-         )          
 
 
 def main():
@@ -148,13 +131,14 @@ def main():
     offset = ordered[0][0]
     start_image(ordered, offset)
     bin_to_image(ordered, offset)
-    print_after()
-
+    print(
+        "the boot image has been made.\n"
+        "...\n"
+    )
 
 
 if __name__ == '__main__':
     main()
-
 
 """
 boot_binss = find_files()
@@ -166,4 +150,3 @@ bin_to_image(ordered, offset)
 for turple_file in ordered:
     print(", ".join([turple_file[1], str(turple_file[0])]))
 """
-

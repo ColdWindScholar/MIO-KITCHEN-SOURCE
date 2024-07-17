@@ -4,12 +4,11 @@
 
   Please do not distribute without permission from the author of this software.
 """
+import os
 import sys
 import zlib
-import os
-import argparse
-from struct import *
 from collections import OrderedDict
+from struct import *
 
 
 class DZFileTools:
@@ -19,7 +18,6 @@ class DZFileTools:
 
     # Setup variables
     partitions = []
-    outdir = "dzextracted"
 
     dz_header = "\x32\x96\x18\x74"
     dz_sub_header = "\x30\x12\x95\x78"
@@ -50,6 +48,20 @@ class DZFileTools:
     # Generate list of items that can be collapsed (truncated)
     dz_collapsibles = zip(dz_sub_dict.keys(), [x[1] for x in dz_sub_dict.values()])
 
+    def __init__(self, input_, output, extract_id: int, extract_all: bool = False, listonly: bool = False):
+        self.outdir = output
+        self.openFile(input_)
+        self.partList = self.getPartitions()
+
+        if listonly:
+            self.cmdListPartitions()
+
+        elif extract_id >= 0:
+            self.cmdExtractSingle(extract_id)
+
+        elif extract_all:
+            self.cmdExtractAll()
+
     def readDZHeader(self):
         """
         Reads the DZ header, and returns a single dz_item
@@ -63,12 +75,7 @@ class DZFileTools:
         # Create a new dict using the keys from the format string
         # and the format string itself
         # and apply the format to the buffer
-        dz_item = dict(
-            zip(
-                self.dz_sub_dict.keys(),
-                unpack(self.dz_formatstring, buf)
-            )
-        )
+        dz_item = dict(zip(self.dz_sub_dict.keys(), unpack(self.dz_formatstring, buf)))
 
         # Add an "offset" key to the dict
         # self allows us to remember where in the file the compressed data exists
@@ -142,18 +149,6 @@ class DZFileTools:
         # Close the file
         outfile.close()
 
-    def parseArgs(self):
-        # Parse arguments
-        parser = argparse.ArgumentParser(description='LG Compressed DZ File Extractor by IOMonster')
-        parser.add_argument('-f', '--file', help='DZ File to read', action='store', required=True, dest='dzfile')
-        group = parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('-l', '--list', help='List partitions', action='store_true', dest='listOnly')
-        group.add_argument('-x', '--extract', help='Extract all partitions', action='store_true', dest='extractAll')
-        group.add_argument('-s', '--single', help='Single Extract by ID', action='store', dest='extractID', type=int)
-        parser.add_argument('-o', '--out', help='Output directory', action='store', dest='outdir')
-
-        return parser.parse_args()
-
     def openFile(self, dzfile):
         # Open the file
         self.infile = open(dzfile, "rb")
@@ -168,7 +163,7 @@ class DZFileTools:
         if verify_header != self.dz_header:
             print("[!] Error: Unsupported DZ file format.")
             print("[ ] Expected: %s ,\n\tbut received %s ." % (
-            " ".join(hex(ord(n)) for n in self.dz_header), " ".join(hex(ord(n)) for n in verify_header)))
+                " ".join(hex(ord(n)) for n in self.dz_header), " ".join(hex(ord(n)) for n in verify_header)))
             sys.exit(0)
 
         # Skip to end of DZ header
@@ -190,22 +185,3 @@ class DZFileTools:
         for part in enumerate(self.partList):
             print("[+] Extracting " + str(part[1][0]) + " to " + os.path.join(self.outdir, part[1][0]))
             self.extractPartition(part[0])
-
-    def main(self):
-        args = self.parseArgs()
-        self.openFile(args.dzfile)
-        self.partList = self.getPartitions()
-
-        if args.listOnly:
-            self.cmdListPartitions()
-
-        elif args.extractID >= 0:
-            self.cmdExtractSingle(args.extractID)
-
-        elif args.extractAll:
-            self.cmdExtractAll()
-
-
-if __name__ == "__main__":
-    dztools = DZFileTools()
-    dztools.main()
