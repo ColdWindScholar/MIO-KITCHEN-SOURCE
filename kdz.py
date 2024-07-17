@@ -18,7 +18,6 @@ Copyright (C) 2013 IOMonster (thecubed on XDA)
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function
 
 from collections import OrderedDict
 
@@ -29,7 +28,7 @@ class KDZFile(dz.DZStruct):
     """LGE KDZ File tools"""
 
     _dz_length = 272
-    _dz_header = b"\x28\x05\x00\x00"b"\x24\x38\x22\x25"
+    _dz_header = b'(\x05\x00\x00$8"%'
 
     # Format string dict
     #   itemName is the new dict key for the data to be stored under

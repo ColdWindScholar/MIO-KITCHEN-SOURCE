@@ -18,7 +18,6 @@ Copyright (C) 2013 IOMonster (thecubed on XDA)
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import print_function
 import sys
 from struct import Struct
 from collections import OrderedDict
@@ -104,7 +103,7 @@ class DZChunk(DZStruct):
 	"""
 
     _dz_area = "chunk"
-    _dz_header = b"\x30\x12\x95\x78"
+    _dz_header = b'0\x12\x95x'
 
     # Format string dict
     #   itemName is the new dict key for the data to be stored under
@@ -140,7 +139,7 @@ class DZFile(DZStruct):
 	"""
 
     _dz_area = "file"
-    _dz_header = b"\x32\x96\x18\x74"
+    _dz_header = b'2\x96\x18t'
 
     # Format string dict
     #   itemName is the new dict key for the data to be stored under
@@ -180,8 +179,3 @@ class DZFile(DZStruct):
 		"""
         super(DZFile, self).__init__(DZFile)
 
-
-if __name__ == "__main__":
-    print("Sorry, this file is an internal library and doesn't do anything interesting by", file=sys.stderr)
-    print("itself.", file=sys.stderr)
-    sys.exit(1)

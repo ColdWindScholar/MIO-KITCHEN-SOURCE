@@ -59,8 +59,8 @@ class KDZFileTools(kdz.KDZFile):
         self.infile = None
 
         self.kdz_header = {
-            b"\x28\x05\x00\x00"b"\x34\x31\x25\x80": 0,
-            b"\x18\x05\x00\x00"b"\x32\x79\x44\x50": 1,
+            b'(\x05\x00\x0041%\x80': 0,
+            b'\x18\x05\x00\x002yDP': 1,
             kdz.KDZFile._dz_header: 2,
         }
 
