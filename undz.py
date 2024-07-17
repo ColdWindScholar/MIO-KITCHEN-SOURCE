@@ -48,7 +48,7 @@ class DZFileTools:
     # Generate list of items that can be collapsed (truncated)
     dz_collapsibles = zip(dz_sub_dict.keys(), [x[1] for x in dz_sub_dict.values()])
 
-    def __init__(self, input_, output, extract_id: int, extract_all: bool = False, listonly: bool = False):
+    def __init__(self, input_, output, extract_id: int = -1, extract_all: bool = False, listonly: bool = False):
         self.outdir = output
         self.openFile(input_)
         self.partList = self.getPartitions()
