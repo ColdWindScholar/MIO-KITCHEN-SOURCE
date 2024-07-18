@@ -90,7 +90,7 @@ python build.py
 ### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
-### Russian translator: [@Rayne Kobayashi]
+### Russian translator: [@Rayne Kobayashi](https://github.com/MinDeaDBlood)
 ### And MORE...
 ### Thanks to people like you for helping out!
 ***
