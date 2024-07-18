@@ -608,6 +608,8 @@ class Upgrade(Toplevel):
         self.update_button.pack(fill=X, expand=True, side=LEFT,
                                 pady=10,
                                 padx=10)
+        if states.run_source:
+            self.update_button.configure(state='disabled')
         f3.pack(padx=5, pady=5, fill=X)
         if 'upgrade' in os.path.basename(tool_self) and settings.updating == '1':
             self.update_process2()
