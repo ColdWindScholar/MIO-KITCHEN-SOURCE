@@ -10,3 +10,4 @@ future
 pip
 Pygments
 zstandard
+pywinstyles

@@ -61,7 +61,7 @@ if os.name == 'nt':
     import windnd
     from ctypes import windll
     from tkinter import filedialog
-    import py_win_style
+    import pywinstyles
 else:
     import mkc_filedialog as filedialog
 
@@ -573,7 +573,8 @@ class Upgrade(Toplevel):
         if states.update_window:
             self.destroy()
         super().__init__()
-        py_win_style.apply_style(self)
+        if os.name == 'nt':
+            pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         states.update_window = True
@@ -945,7 +946,8 @@ class SetUtils:
         self.load_language(language.get())
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
-        win.attributes("-alpha", self.bar_level)
+        if os.name != 'nt':
+            win.attributes("-alpha", self.bar_level)
 
     @staticmethod
     def load_language(name):
@@ -3958,7 +3960,7 @@ def init():
     except TclError:
         return
     if os.name == 'nt':
-        py_win_style.apply_style(win)
+        pywinstyles.apply_style(win, 'acrylic')
     win.gui()
     global unpackg
     unpackg = UnpackGui()
