@@ -2810,7 +2810,7 @@ class Packxx(Toplevel):
         for i in self.lg:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
-            if parts_dict[i] in ['ext', 'erofs', 'f2fs']:
+            if parts_dict[i] in ['ext', 'erofs', 'f2fs','vendor_boot']:
                 return True
         return False
 
