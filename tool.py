@@ -109,6 +109,7 @@ class States:
     donate_window = False
     mpk_store = False
     open_pids = []
+    run_source = True if gettype(sys.argv[0]) == "unknown" else False
     in_oobe = False
 
 
@@ -1946,7 +1947,7 @@ class Debugger(Toplevel):
                                                                                 sticky='nw')
         ttk.Label(ck, text=f'Tool Version: {settings.version}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
                                                                                         sticky='nw')
-        ttk.Label(ck, text=f'Source code running: {"Yes" if gettype(sys.argv[0]) == "unknown" else "No"}',
+        ttk.Label(ck, text=f'Source code running: {states.run_source}',
                   foreground='gray').grid(row=3, column=0, padx=5, pady=5,
                                           sticky='nw')
         ttk.Label(ck, text=f'python Implementation: {platform.python_implementation()}', foreground='gray').grid(row=4,
