@@ -593,6 +593,11 @@ class Upgrade(Toplevel):
         f2 = ttk.LabelFrame(self, text=lang.t39)
         self.notice = ttk.Label(f2, text=lang.t42)
         self.notice.pack(padx=5, pady=5)
+        if states.run_source:
+            ttk.Label(self, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray', justify='center').pack(fill=X, pady=10,
+                                                                  padx=10, anchor='center')
+            jzxs(self)
+            return
         self.change_log = Text(f2, width=50, height=15)
         self.change_log.pack(padx=5, pady=5)
         f2.pack(fill=BOTH, padx=5, pady=5)
@@ -600,11 +605,6 @@ class Upgrade(Toplevel):
                                            )
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
-        if states.run_source:
-            ttk.Label(f3, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray').pack(fill=X, pady=10,
-                                                                  padx=10)
-            f3.pack(padx=5, pady=5, fill=X)
-            return
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
                                         command=lambda: cz(self.get_update))
         ttk.Button(f3, text=lang.cancel, command=self.close).pack(fill=X, expand=True, side=LEFT,
