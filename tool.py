@@ -2716,6 +2716,8 @@ class Packxx(Toplevel):
             self.start_()
             return
         super().__init__()
+        if os.name == 'nt':
+            pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.text42)
         lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
