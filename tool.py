@@ -2299,6 +2299,8 @@ class Dbkxyt:
 class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
+        if os.name == 'nt':
+            pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.text53)
         self.supers = IntVar(value=9126805504)
         self.ssparse = IntVar()
