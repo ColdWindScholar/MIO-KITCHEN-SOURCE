@@ -2055,6 +2055,8 @@ class MpkStore(Toplevel):
             return
         states.mpk_store = True
         super().__init__()
+        if os.name == 'nt':
+            pywinstyles.apply_style(self, 'acrylic')
         self.title('Mpk Store')
         self.data = []
         self.tasks = []
