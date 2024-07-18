@@ -334,8 +334,8 @@ class Tool(Tk):
             print(lang.warn13)
         self.sub_win2 = ttk.Frame(self)
         self.sub_win3 = ttk.Frame(self)
-        self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True, padx=5)
-        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True, pady=5, padx=5)
+        self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True)
+        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True)
         self.notepad = ttk.Notebook(self.sub_win2)
         self.tab = ttk.Frame(self.notepad)
         self.tab2 = ttk.Frame(self.notepad)
@@ -498,10 +498,12 @@ class Tool(Tk):
                            values=[str(i.rsplit('.', 1)[0]) for i in
                                    os.listdir(elocal + os.sep + "bin" + os.sep + "languages")])
         ai = StringVar(value=settings.ai_engine)
+        treff = StringVar(value=settings.treff)
         auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
         New_Project_Structure = StringVar(value=settings.nps)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
+        treff.trace("w", lambda *x: settings.set_value('treff', treff.get()))
         ttk.Button(sf4, text=lang.t38, command=Upgrade).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
@@ -520,6 +522,9 @@ class Tool(Tk):
         New_Project_Structure.trace("w", lambda *x: settings.set_value('nps', New_Project_Structure.get()))
         auto_rm_pay.trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay.get()))
         ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
+                        offvalue='0',
+                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        ttk.Checkbutton(sf4, text='透明效果', variable=treff, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
@@ -573,7 +578,7 @@ class Upgrade(Toplevel):
         if states.update_window:
             self.destroy()
         super().__init__()
-        if os.name == 'nt':
+        if os.name == 'nt' and settings.treff == '1':
             pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -595,8 +600,9 @@ class Upgrade(Toplevel):
         self.notice = ttk.Label(f2, text=lang.t42)
         self.notice.pack(padx=5, pady=5)
         if states.run_source:
-            ttk.Label(self, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray', justify='center').pack(fill=X, pady=10,
-                                                                  padx=10, anchor='center')
+            ttk.Label(self, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray',
+                      justify='center').pack(fill=X, pady=10,
+                                             padx=10, anchor='center')
             jzxs(self)
             return
         self.change_log = Text(f2, width=50, height=15)
@@ -906,6 +912,7 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini: str = None):
+        self.treff = '0'
         if set_ini:
             self.set_file = set_ini
         else:
@@ -948,6 +955,11 @@ class SetUtils:
         sv_ttk.set_theme(self.theme)
         if os.name != 'nt':
             win.attributes("-alpha", self.bar_level)
+        else:
+            if self.treff == '1':
+                pywinstyles.apply_style(win, 'acrylic')
+            else:
+                pywinstyles.apply_style(win, 'normal')
 
     @staticmethod
     def load_language(name):
@@ -2055,7 +2067,7 @@ class MpkStore(Toplevel):
             return
         states.mpk_store = True
         super().__init__()
-        if os.name == 'nt':
+        if os.name == 'nt' and settings.treff == '1':
             pywinstyles.apply_style(self, 'acrylic')
         self.title('Mpk Store')
         self.data = []
@@ -2301,7 +2313,7 @@ class Dbkxyt:
 class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
-        if os.name == 'nt':
+        if os.name == 'nt' and settings.treff == '1':
             pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.text53)
         self.supers = IntVar(value=9126805504)
@@ -2716,7 +2728,7 @@ class Packxx(Toplevel):
             self.start_()
             return
         super().__init__()
-        if os.name == 'nt':
+        if os.name == 'nt' and settings.treff == '1':
             pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.text42)
         lf1 = ttk.LabelFrame(self, text=lang.text43)
@@ -3126,7 +3138,6 @@ def unpackrom(ifile) -> None:
     else:
         print(lang.text82 % ftype)
     unpackg.refs()
-
 
 
 def rwork() -> str:
@@ -3965,7 +3976,7 @@ def init():
         win.winfo_exists()
     except TclError:
         return
-    if os.name == 'nt':
+    if os.name == 'nt' and settings.treff == '1':
         pywinstyles.apply_style(win, 'acrylic')
     win.gui()
     global unpackg
