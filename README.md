@@ -7,7 +7,7 @@
 ## This tool uses many open source projects. Huge shout out to the developers!
 ***
 ## Localization
-### [日本語](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md) | [中文](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md) | [Português brasileiro](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md) | [Deutsch](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md)
+### [日本語](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md) | [中文](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md) | [Português brasileiro](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md) | [Deutsch](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md) | [Русский язык](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ru-RU.md)
 ***
 ## Features
 * Unpack `boot, dtbo, ext4, erofs, payload, logo` and so on
@@ -90,6 +90,7 @@ python build.py
 ### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
 ### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
 ### German translator: [keldrion](https://github.com/keldrion)
+### Russian translator: [@Rayne Kobayashi]
 ### And MORE...
 ### Thanks to people like you for helping out!
 ***
