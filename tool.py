@@ -600,6 +600,11 @@ class Upgrade(Toplevel):
                                            )
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
+        if states.run_source:
+            ttk.Label(f3, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray').pack(fill=X, pady=10,
+                                                                  padx=10)
+            f3.pack(padx=5, pady=5, fill=X)
+            return
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
                                         command=lambda: cz(self.get_update))
         ttk.Button(f3, text=lang.cancel, command=self.close).pack(fill=X, expand=True, side=LEFT,
@@ -608,8 +613,6 @@ class Upgrade(Toplevel):
         self.update_button.pack(fill=X, expand=True, side=LEFT,
                                 pady=10,
                                 padx=10)
-        if states.run_source:
-            self.update_button.configure(state='disabled')
         f3.pack(padx=5, pady=5, fill=X)
         if 'upgrade' in os.path.basename(tool_self) and settings.updating == '1':
             self.update_process2()
