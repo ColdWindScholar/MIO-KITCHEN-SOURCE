@@ -263,7 +263,7 @@ class ToolBox(ttk.Frame):
         """"""
         ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5,
                                                                                                 pady=5)
-        ttk.Button(self.label_frame, text='Get File Info', command=self.GetFileInfo).grid(row=0, column=1, padx=5,
+        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo).grid(row=0, column=1, padx=5,
                                                                                           pady=5)
         ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
@@ -277,7 +277,7 @@ class ToolBox(ttk.Frame):
     class GetFileInfo(Toplevel):
         def __init__(self):
             super().__init__()
-            self.title("Get File Info")
+            self.title(lang.t59)
             self.controls = []
             self.gui()
             self.geometry("400x450")
