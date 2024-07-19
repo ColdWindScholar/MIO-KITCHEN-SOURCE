@@ -263,7 +263,8 @@ class ToolBox(ttk.Frame):
         """"""
         ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5,
                                                                                                 pady=5)
-        ttk.Button(self.label_frame, text='Get File Info', command=self.GetFileInfo).grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(self.label_frame, text='Get File Info', command=self.GetFileInfo).grid(row=0, column=1, padx=5,
+                                                                                          pady=5)
         ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
@@ -281,7 +282,16 @@ class ToolBox(ttk.Frame):
             jzxs(self)
 
         def gui(self):
-            a = ttk.LabelFrame(self, text='info')
+            a = ttk.LabelFrame(self, text='Drop')
+            ttk.Label(a, text="Drop File Here").pack(fill=BOTH)
+            a.pack(fill=BOTH, side=TOP, padx=5, pady=5)
+            self.b = ttk.LabelFrame(self, text='Drop')
+            self.b.pack(fill=BOTH, side=BOTTOM)
+        def put_info(self, name, value):
+            pass
+        def dnd(self, file_list:list):
+            pass
+
 
 
 class Tool(Tk):
