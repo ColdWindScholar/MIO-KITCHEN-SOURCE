@@ -287,11 +287,12 @@ class ToolBox(ttk.Frame):
             a.pack(fill=BOTH, side=TOP, padx=5, pady=5)
             self.b = ttk.LabelFrame(self, text='Drop')
             self.b.pack(fill=BOTH, side=BOTTOM)
+
         def put_info(self, name, value):
             pass
-        def dnd(self, file_list:list):
-            pass
 
+        def dnd(self, file_list: list):
+            pass
 
 
 class Tool(Tk):
