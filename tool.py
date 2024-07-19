@@ -260,7 +260,7 @@ class ToolBox(ttk.Frame):
     def gui(self):
         self.pack_basic()
         """"""
-        ttk.Button(self.label_frame, text='1').grid(row=0, column=0, padx=5, pady=5)
+        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5, pady=5)
         ttk.Button(self.label_frame, text='2').grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
@@ -388,9 +388,6 @@ class Tool(Tk):
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show, error_=True)
-        zyf1 = ttk.LabelFrame(self.tab, text=lang.text9)
-        zyf1.pack(padx=10, pady=10)
-        ttk.Button(zyf1, text=lang.text114, command=lambda: cz(download_file)).pack(side='left', padx=10, pady=10)
         Label(self.tab,
               text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
               font=(None, 10)).pack(
