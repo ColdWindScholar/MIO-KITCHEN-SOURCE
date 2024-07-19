@@ -278,6 +278,7 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.title("Get File Info")
+            self.controls = []
             self.gui()
             jzxs(self)
 
@@ -285,18 +286,20 @@ class ToolBox(ttk.Frame):
             a = ttk.LabelFrame(self, text='Drop')
             ttk.Label(a, text="Drop File Here").pack(fill=BOTH)
             a.pack(fill=BOTH, side=TOP, padx=5, pady=5)
+            windnd.hook_dropfiles(a, self.dnd)
             self.b = ttk.LabelFrame(self, text='Drop')
             self.b.pack(fill=BOTH, side=BOTTOM)
 
         def put_info(self, name, value):
             f = Frame(self.b)
+            self.controls.append(f)
             ttk.Label(f, text=f"{name}:").pack(fill=X, side='left')
             f_e = ttk.Entry(f)
             f_e.insert(0, value)
-            f_e.pack(fill=X, side='left')
+            f_e.pack(fill=X, side='left', padx=5, pady=5)
             f_b = ttk.Button(f, text="复制")
             f_b.configure(command=lambda e=f_e, b=f_b: self.copy_to_clipboard(e.get(), b))
-            f_b.pack(fill=X, side='left')
+            f_b.pack(fill=X, side='left', padx=5, pady=5)
             f.pack(fill=X)
 
         @staticmethod
@@ -306,8 +309,21 @@ class ToolBox(ttk.Frame):
             win.clipboard_append(value)
             b.after(1500, lambda: b.configure(text="复制", state='normal'))
 
+        def clear(self):
+            for i in self.controls:
+                try:
+                    i.destroy()
+                except:
+                    pass
+
         def dnd(self, file_list: list):
-            pass
+            self.clear()
+            file = file_list[0]
+            if not os.path.isfile(file) or not file:
+                self.put_info('Warn', 'Please Select A File')
+                return
+            self.put_info("Path", file)
+            self.put_info("Type", gettype(file))
 
 
 class Tool(Tk):
