@@ -280,15 +280,16 @@ class ToolBox(ttk.Frame):
             self.title("Get File Info")
             self.controls = []
             self.gui()
+            self.geometry("400x250")
             jzxs(self)
 
         def gui(self):
             a = ttk.LabelFrame(self, text='Drop')
-            ttk.Label(a, text="Drop File Here").pack(fill=BOTH)
-            a.pack(fill=BOTH, side=TOP, padx=5, pady=5)
+            ttk.Label(a, text="Drop File Here").pack(fill=BOTH, padx=5, pady=5)
+            a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
             windnd.hook_dropfiles(a, self.dnd)
-            self.b = ttk.LabelFrame(self, text='Drop')
-            self.b.pack(fill=BOTH, side=BOTTOM)
+            self.b = ttk.LabelFrame(self, text='iNFO')
+            self.b.pack(fill=BOTH, side=TOP)
 
         def put_info(self, name, value):
             f = Frame(self.b)
@@ -296,7 +297,7 @@ class ToolBox(ttk.Frame):
             ttk.Label(f, text=f"{name}:").pack(fill=X, side='left')
             f_e = ttk.Entry(f)
             f_e.insert(0, value)
-            f_e.pack(fill=X, side='left', padx=5, pady=5)
+            f_e.pack(fill=X, side='left', padx=5, pady=5, expand=True)
             f_b = ttk.Button(f, text="复制")
             f_b.configure(command=lambda e=f_e, b=f_b: self.copy_to_clipboard(e.get(), b))
             f_b.pack(fill=X, side='left', padx=5, pady=5)
@@ -318,7 +319,11 @@ class ToolBox(ttk.Frame):
 
         def dnd(self, file_list: list):
             self.clear()
-            file = file_list[0]
+            try:
+                file = file_list[0].decode('utf-8')
+            except:
+                file = file_list[0].decode('gbk')
+            print(file)
             if not os.path.isfile(file) or not file:
                 self.put_info('Warn', 'Please Select A File')
                 return
