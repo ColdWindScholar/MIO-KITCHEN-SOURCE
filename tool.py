@@ -285,7 +285,7 @@ class ToolBox(ttk.Frame):
 
         def gui(self):
             a = ttk.LabelFrame(self, text='Drop')
-            (tl:=ttk.Label(a, text="Drop File Here\nOr Click It To Choose File")).pack(fill=BOTH, padx=5, pady=5)
+            (tl := ttk.Label(a, text="Drop File Here\nOr Click It To Choose File")).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
             windnd.hook_dropfiles(a, self.dnd)
@@ -319,7 +319,12 @@ class ToolBox(ttk.Frame):
                     pass
 
         def dnd(self, file_list: list):
+            cz(self.__dnd, file_list)
+
+        def __dnd(self, file_list: list):
             self.clear()
+            self.lift()
+            self.focus_force()
             file = file_list[0]
             if isinstance(file, bytes):
                 try:
