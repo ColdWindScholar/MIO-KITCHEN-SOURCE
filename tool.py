@@ -277,10 +277,11 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.title("Get File Info")
+            self.gui()
             jzxs(self)
 
         def gui(self):
-            pass
+            a = ttk.LabelFrame(self, text='info')
 
 
 class Tool(Tk):
