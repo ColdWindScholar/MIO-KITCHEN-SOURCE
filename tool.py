@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+import hashlib
 import json
 import platform
 import shutil
@@ -260,8 +261,9 @@ class ToolBox(ttk.Frame):
     def gui(self):
         self.pack_basic()
         """"""
-        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5, pady=5)
-        ttk.Button(self.label_frame, text='2').grid(row=0, column=1, padx=5, pady=5)
+        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5,
+                                                                                                pady=5)
+        ttk.Button(self.label_frame, text='Get File Info', command=self.GetFileInfo).grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
@@ -270,6 +272,15 @@ class ToolBox(ttk.Frame):
     def update_ui(self):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class GetFileInfo(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title("Get File Info")
+            jzxs(self)
+
+        def gui(self):
+            pass
 
 
 class Tool(Tk):
@@ -523,8 +534,8 @@ class Tool(Tk):
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         if os.name == 'nt':
             ttk.Checkbutton(sf4, text='Transparent effect', variable=treff, onvalue='1',
-                        offvalue='0',
-                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+                            offvalue='0',
+                            style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
         #             offvalue='0',
         #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
@@ -728,8 +739,9 @@ class Updater(Toplevel):
             }
             for i in update_dict.keys():
                 settings.set_value(i, update_dict.get(i, ''))
-            subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(
+                [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text=lang.t41, foreground='red')
@@ -1073,6 +1085,14 @@ def logo_dump(bn: str = 'logo'):
         return False
     re_folder(work + bn)
     utils.LogoDumper(logo, work + bn).unpack()
+
+
+def calculate_md5_file(file_path):
+    md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            md5.update(chunk)
+    return md5.hexdigest()
 
 
 @animation
