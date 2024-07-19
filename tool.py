@@ -281,6 +281,7 @@ class ToolBox(ttk.Frame):
             self.controls = []
             self.gui()
             self.geometry("400x450")
+            self.resizable(False, False)
             jzxs(self)
 
         def gui(self):
