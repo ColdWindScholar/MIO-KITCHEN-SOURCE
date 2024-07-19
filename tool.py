@@ -280,7 +280,7 @@ class ToolBox(ttk.Frame):
             self.title("Get File Info")
             self.controls = []
             self.gui()
-            self.geometry("400x400")
+            self.geometry("400x450")
             jzxs(self)
 
         def gui(self):
@@ -289,7 +289,7 @@ class ToolBox(ttk.Frame):
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
             windnd.hook_dropfiles(a, self.dnd)
-            self.b = ttk.LabelFrame(self, text='iNFO')
+            self.b = ttk.LabelFrame(self, text='INFO')
             self.b.pack(fill=BOTH, side=TOP)
 
         def put_info(self, name, value):
@@ -334,11 +334,14 @@ class ToolBox(ttk.Frame):
             if not os.path.isfile(file) or not file:
                 self.put_info('Warn', 'Please Select A File')
                 return
+            self.put_info("Name", os.path.basename(file))
             self.put_info("Path", file)
             self.put_info("Type", gettype(file))
             self.put_info("Size", hum_convert(os.path.getsize(file)))
             self.put_info("Size(B)", os.path.getsize(file))
+            self.put_info("Time", os.path.getctime(file))
             self.put_info("MD5", calculate_md5_file(file))
+            self.put_info("SHA256", calculate_sha256_file(file))
 
 
 class Tool(Tk):
@@ -1152,7 +1155,12 @@ def calculate_md5_file(file_path):
             md5.update(chunk)
     return md5.hexdigest()
 
-
+def calculate_sha256_file(file_path):
+    sha256 = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            sha256.update(chunk)
+    return sha256.hexdigest()
 @animation
 def logo_pack(origin_logo=None) -> int:
     work = rwork()
