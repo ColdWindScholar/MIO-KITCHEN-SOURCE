@@ -358,8 +358,8 @@ class Tool(Tk):
         self.frame_bg = ttk.Frame(self.canvas1)
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
-        self.tab4_n()
-        self.tab6_n()
+        self.tab4_content()
+        self.tab6_content()
         self.setting_tab()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
@@ -404,14 +404,14 @@ class Tool(Tk):
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
 
-    def tab6_n(self):
+    def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.tab6, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         tool_box = ToolBox(self.tab6)
         tool_box.gui()
         tool_box.pack(fill=BOTH, expand=True)
 
-    def tab4_n(self):
+    def tab4_content(self):
         self.rotate_angle = 0
         debugger_num = 0
 
