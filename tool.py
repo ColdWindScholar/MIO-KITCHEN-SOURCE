@@ -501,7 +501,7 @@ class Tool(Tk):
         New_Project_Structure = StringVar(value=settings.nps)
         ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
         treff.trace("w", lambda *x: settings.set_value('treff', treff.get()))
-        ttk.Button(sf4, text=lang.t38, command=Upgrade).pack(padx=10, pady=10, fill=X)
+        ttk.Button(sf4, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
             if context.get() == '1':
@@ -569,7 +569,7 @@ else:
         os.kill(pid, 9)
 
 
-class Upgrade(Toplevel):
+class Updater(Toplevel):
 
     def __init__(self):
         if states.update_window:
@@ -3964,7 +3964,7 @@ unpackg: UnpackGui
 
 def init():
     if settings.updating in ['1', '2']:
-        Upgrade()
+        Updater()
     if int(settings.oobe) < 4:
         Welcome()
     if not os.path.exists(tool_bin):
