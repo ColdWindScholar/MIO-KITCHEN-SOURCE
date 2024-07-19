@@ -289,7 +289,12 @@ class ToolBox(ttk.Frame):
             self.b.pack(fill=BOTH, side=BOTTOM)
 
         def put_info(self, name, value):
-            pass
+            f = Frame(self.b)
+            ttk.Label(f, text=f"{name}:").pack(fill=X, side='left')
+            f_e = ttk.Entry(f)
+            f_e.insert(0, "Default Text")
+            f_e.pack(fill=X, side='left')
+            f.pack(fill=X)
 
         def dnd(self, file_list: list):
             pass
