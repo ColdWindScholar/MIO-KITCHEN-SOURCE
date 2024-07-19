@@ -340,7 +340,7 @@ class ToolBox(ttk.Frame):
             self.put_info("Type", gettype(file))
             self.put_info("Size", hum_convert(os.path.getsize(file)))
             self.put_info("Size(B)", os.path.getsize(file))
-            self.put_info("Time", os.path.getctime(file))
+            self.put_info("Time", time.ctime(os.path.getctime(file)))
             self.put_info("MD5", calculate_md5_file(file))
             self.put_info("SHA256", calculate_sha256_file(file))
 
