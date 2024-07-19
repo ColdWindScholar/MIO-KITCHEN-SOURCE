@@ -280,12 +280,13 @@ class ToolBox(ttk.Frame):
             self.title("Get File Info")
             self.controls = []
             self.gui()
-            self.geometry("400x250")
+            self.geometry("400x400")
             jzxs(self)
 
         def gui(self):
             a = ttk.LabelFrame(self, text='Drop')
-            ttk.Label(a, text="Drop File Here").pack(fill=BOTH, padx=5, pady=5)
+            (tl:=ttk.Label(a, text="Drop File Here\nOr Click It To Choose File")).pack(fill=BOTH, padx=5, pady=5)
+            tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
             windnd.hook_dropfiles(a, self.dnd)
             self.b = ttk.LabelFrame(self, text='iNFO')
@@ -294,7 +295,7 @@ class ToolBox(ttk.Frame):
         def put_info(self, name, value):
             f = Frame(self.b)
             self.controls.append(f)
-            ttk.Label(f, text=f"{name}:").pack(fill=X, side='left')
+            ttk.Label(f, text=f"{name}:", width=7).pack(fill=X, side='left')
             f_e = ttk.Entry(f)
             f_e.insert(0, value)
             f_e.pack(fill=X, side='left', padx=5, pady=5, expand=True)
@@ -319,16 +320,20 @@ class ToolBox(ttk.Frame):
 
         def dnd(self, file_list: list):
             self.clear()
-            try:
-                file = file_list[0].decode('utf-8')
-            except:
-                file = file_list[0].decode('gbk')
-            print(file)
+            file = file_list[0]
+            if isinstance(file, bytes):
+                try:
+                    file = file_list[0].decode('utf-8')
+                except:
+                    file = file_list[0].decode('gbk')
             if not os.path.isfile(file) or not file:
                 self.put_info('Warn', 'Please Select A File')
                 return
             self.put_info("Path", file)
             self.put_info("Type", gettype(file))
+            self.put_info("Size", hum_convert(os.path.getsize(file)))
+            self.put_info("Size(B)", os.path.getsize(file))
+            self.put_info("MD5", calculate_md5_file(file))
 
 
 class Tool(Tk):
