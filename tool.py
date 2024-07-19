@@ -292,9 +292,19 @@ class ToolBox(ttk.Frame):
             f = Frame(self.b)
             ttk.Label(f, text=f"{name}:").pack(fill=X, side='left')
             f_e = ttk.Entry(f)
-            f_e.insert(0, "Default Text")
+            f_e.insert(0, value)
             f_e.pack(fill=X, side='left')
+            f_b = ttk.Button(f, text="复制")
+            f_b.configure(command=lambda e=f_e, b=f_b: self.copy_to_clipboard(e.get(), b))
+            f_b.pack(fill=X, side='left')
             f.pack(fill=X)
+
+        @staticmethod
+        def copy_to_clipboard(value, b: ttk.Button):
+            b.configure(text="已复制", state='disabled')
+            win.clipboard_clear()
+            win.clipboard_append(value)
+            b.after(1500, lambda: b.configure(text="复制", state='normal'))
 
         def dnd(self, file_list: list):
             pass
