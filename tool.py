@@ -305,15 +305,13 @@ class ToolBox(ttk.Frame):
             jzxs(self)
 
         def calc(self):
-            if not self.origin_size.get().isdigit():
-                return
             self.result_size.delete(0, tk.END)
             self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
 
         def __calc(self, origin: str, convert: str, size) -> str:
             if origin == convert:
                 return size
-            origin_size = int(size)
+            origin_size = float(size)
 
             units = {
                 "B": 1,
