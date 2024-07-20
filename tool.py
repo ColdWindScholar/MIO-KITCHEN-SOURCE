@@ -300,17 +300,17 @@ class ToolBox(ttk.Frame):
             f_e = ttk.Entry(f)
             f_e.insert(0, value)
             f_e.pack(fill=X, side='left', padx=5, pady=5, expand=True)
-            f_b = ttk.Button(f, text="复制")
+            f_b = ttk.Button(f, text=lang.scopy)
             f_b.configure(command=lambda e=f_e, b=f_b: self.copy_to_clipboard(e.get(), b))
             f_b.pack(fill=X, side='left', padx=5, pady=5)
             f.pack(fill=X)
 
         @staticmethod
         def copy_to_clipboard(value, b: ttk.Button):
-            b.configure(text="已复制", state='disabled')
+            b.configure(text=lang.scopied, state='disabled')
             win.clipboard_clear()
             win.clipboard_append(value)
-            b.after(1500, lambda: b.configure(text="复制", state='normal'))
+            b.after(1500, lambda: b.configure(text=lang.scopy, state='normal'))
 
         def clear(self):
             for i in self.controls:
@@ -335,7 +335,7 @@ class ToolBox(ttk.Frame):
             if not os.path.isfile(file) or not file:
                 self.put_info('Warn', 'Please Select A File')
                 return
-            self.put_info("Name", os.path.basename(file))
+            self.put_info(lang.name, os.path.basename(file))
             self.put_info("Path", file)
             self.put_info("Type", gettype(file))
             self.put_info("Size", hum_convert(os.path.getsize(file)))
@@ -3826,7 +3826,7 @@ class UnpackGui(ttk.LabelFrame):
                 for i in ext4.Volume(e).get_info_list:
                     info.append(i)
         scroll = ttk.Scrollbar(ck_, orient='vertical')
-        columns = ['Name', 'Value']
+        columns = [lang.name, 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
