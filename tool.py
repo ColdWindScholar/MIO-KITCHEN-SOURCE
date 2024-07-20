@@ -267,7 +267,8 @@ class ToolBox(ttk.Frame):
                                                                                                 pady=5)
         ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo).grid(row=0, column=1, padx=5,
                                                                                    pady=5)
-        ttk.Button(self.label_frame, text='Byte Calculator', command=self.FileBytes).grid(row=0, column=2, padx=5, pady=5)
+        ttk.Button(self.label_frame, text='Byte Calculator', command=self.FileBytes).grid(row=0, column=2, padx=5,
+                                                                                          pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
         self.update_ui()
@@ -279,7 +280,22 @@ class ToolBox(ttk.Frame):
     class FileBytes(Toplevel):
         def __init__(self):
             super().__init__()
+            self.values = ("B", "GIB", "KIB", "MIB")
             self.title("Byte Calculator")
+            self.gui()
+
+        def gui(self):
+            self.f = Frame(self)
+            self.f.pack(pady=5, padx=5, fill=X)
+            self.h = ttk.Combobox(self.f, values=self.values, state='readonly')
+            self.h.current(0)
+            self.h.bind("<<ComboboxSelected>>", lambda *x: self.relist())
+            self.h.pack(side='left', padx=5)
+            Label(self.f, text='=').pack(side='left', padx=5)
+            self.f = ttk.Combobox(self.f, values=self.values, state='readonly')
+            self.f.current(0)
+            self.f.pack(side='left', padx=5)
+            jzxs(self)
 
     class GetFileInfo(Toplevel):
         def __init__(self):
