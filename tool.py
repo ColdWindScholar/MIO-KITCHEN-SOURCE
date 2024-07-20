@@ -300,17 +300,18 @@ class ToolBox(ttk.Frame):
             self.f_.current(0)
             self.f_.bind("<<ComboboxSelected>>", lambda *x: self.calc())
             self.f_.pack(side='left', padx=5)
-            ttk.Button(self, text=lang.text17).pack(fill=BOTH, padx=5, pady=5)
+            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, padx=5, pady=5)
             jzxs(self)
 
         def calc(self):
-            if not self.origin_size.get().isdigit() or not self.result_size.get().isdigit():
+            if not self.origin_size.get().isdigit():
                 return
             self.result_size.delete(0, tk.END)
             self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
 
         def __calc(self, origin: str, convert: str, size) -> str:
-            pass
+            if origin == convert:
+                return size
 
     class GetFileInfo(Toplevel):
         def __init__(self):
