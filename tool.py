@@ -286,7 +286,7 @@ class ToolBox(ttk.Frame):
 
         def gui(self):
             a = ttk.LabelFrame(self, text='Drop')
-            (tl := ttk.Label(a, text="Drop File Here\nOr Click It To Choose File")).pack(fill=BOTH, padx=5, pady=5)
+            (tl := ttk.Label(a, text=lang.text132_e)).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
             windnd.hook_dropfiles(a, self.dnd)
@@ -338,9 +338,9 @@ class ToolBox(ttk.Frame):
             self.put_info(lang.name, os.path.basename(file))
             self.put_info(lang.path, file)
             self.put_info(lang.type, gettype(file))
-            self.put_info("Size", hum_convert(os.path.getsize(file)))
-            self.put_info("Size(B)", os.path.getsize(file))
-            self.put_info("Time", time.ctime(os.path.getctime(file)))
+            self.put_info(lang.size, hum_convert(os.path.getsize(file)))
+            self.put_info(f"{lang.size}(B)", os.path.getsize(file))
+            self.put_info(lang.time, time.ctime(os.path.getctime(file)))
             self.put_info("MD5", calculate_md5_file(file))
             self.put_info("SHA256", calculate_sha256_file(file))
 
