@@ -288,6 +288,7 @@ class ToolBox(ttk.Frame):
             self.f = Frame(self)
             self.f.pack(pady=5, padx=5, fill=X)
             self.origin_size = ttk.Entry(self.f)
+            self.origin_size.bind("<KeyRelease>", lambda *x: self.calc())
             self.origin_size.pack(side='left', padx=5)
             self.h = ttk.Combobox(self.f, values=self.values, state='readonly', width=3)
             self.h.current(0)
