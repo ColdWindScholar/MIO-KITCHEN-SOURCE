@@ -31,12 +31,9 @@ def te_to_cil(te_rules):
             cil_rules.append(cil_rule)
         except Exception as e:
             skipped_lines.append((i, line, str(e)))
-            print(f"跳过了 line {i}: {line}, Error: {str(e)}")
+            print(f"Skip line {i}: {line}, Error: {str(e)}")
 
     return '\n'.join(cil_rules), skipped_lines
-
-
-
 
 
 def main(input_, output):
@@ -45,7 +42,7 @@ def main(input_, output):
     cil_content, skipped_lines = te_to_cil(te_rules)
     with open(output, 'w') as cil_file:
         cil_file.write(cil_content)
-        print(f"转换完成")
+        print(f"Done")
 
     for line_info in skipped_lines:
-        print(f"跳过了 invalid line {line_info[0]}: {line_info[1]}, Error: {line_info[2]}")
+        print(f"Skip invalid line {line_info[0]}: {line_info[1]}, Error: {line_info[2]}")
