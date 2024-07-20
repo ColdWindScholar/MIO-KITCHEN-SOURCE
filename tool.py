@@ -304,7 +304,8 @@ class ToolBox(ttk.Frame):
 
         def calc(self):
             pass
-        def __calc(self, origin:str, convert:str, size):
+
+        def __calc(self, origin: str, convert: str, size):
             pass
 
     class GetFileInfo(Toplevel):
