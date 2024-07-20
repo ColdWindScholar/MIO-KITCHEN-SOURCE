@@ -266,8 +266,8 @@ class ToolBox(ttk.Frame):
         ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5,
                                                                                                 pady=5)
         ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo).grid(row=0, column=1, padx=5,
-                                                                                          pady=5)
-        ttk.Button(self.label_frame, text='3').grid(row=0, column=2, padx=5, pady=5)
+                                                                                   pady=5)
+        ttk.Button(self.label_frame, text='File byte conversion', command=self.FileBytes).grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
         self.update_ui()
@@ -275,6 +275,11 @@ class ToolBox(ttk.Frame):
     def update_ui(self):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class FileBytes(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title("File byte conversion")
 
     class GetFileInfo(Toplevel):
         def __init__(self):
@@ -1159,12 +1164,15 @@ def calculate_md5_file(file_path):
             md5.update(chunk)
     return md5.hexdigest()
 
+
 def calculate_sha256_file(file_path):
     sha256 = hashlib.sha256()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
             sha256.update(chunk)
     return sha256.hexdigest()
+
+
 @animation
 def logo_pack(origin_logo=None) -> int:
     work = rwork()
