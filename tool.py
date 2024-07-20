@@ -267,7 +267,7 @@ class ToolBox(ttk.Frame):
                                                                                                 pady=5)
         ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo).grid(row=0, column=1, padx=5,
                                                                                    pady=5)
-        ttk.Button(self.label_frame, text='Byte Calculator', command=self.FileBytes).grid(row=0, column=2, padx=5,
+        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes).grid(row=0, column=2, padx=5,
                                                                                           pady=5)
         ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
         """"""
@@ -281,7 +281,7 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.values = ("B", "GB", "KB", "MB")
-            self.title("Byte Calculator")
+            self.title(lang.t60)
             self.gui()
 
         def gui(self):
