@@ -235,6 +235,8 @@ def warn_win(text='', color='orange', title="Warn"):
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
     frame_button = ttk.Frame(frame_inner)
     frame_button.pack(side=TOP)
+    ask.lift()
+    ask.focus_force()
     jzxs(ask)
     ask.after(1500, ask.destroy)
 
