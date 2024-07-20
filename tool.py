@@ -312,6 +312,16 @@ class ToolBox(ttk.Frame):
         def __calc(self, origin: str, convert: str, size) -> str:
             if origin == convert:
                 return size
+            origin_size = int(size)
+
+            units = {
+                "B": 1,
+                "KIB": 2 ** 10,
+                "MIB": 2 ** 20,
+                "GIB": 2 ** 30
+            }
+
+            return str(origin_size * units[origin] / units[convert])
 
     class GetFileInfo(Toplevel):
         def __init__(self):
