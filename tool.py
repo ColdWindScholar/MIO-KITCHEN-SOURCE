@@ -311,7 +311,10 @@ class ToolBox(ttk.Frame):
         def __calc(self, origin: str, convert: str, size) -> str:
             if origin == convert:
                 return size
-            origin_size = float(size)
+            try:
+                origin_size = float(size)
+            except ValueError as e:
+                return "0"
 
             units = {
                 "B": 1,
