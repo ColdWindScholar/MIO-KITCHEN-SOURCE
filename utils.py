@@ -402,7 +402,7 @@ class LangUtils:
 
     def __getattr__(self, item):
         try:
-            return getattr(self, item)
+            return self.__getattribute__(item)
         except (AttributeError, ):
             return "None"
 
