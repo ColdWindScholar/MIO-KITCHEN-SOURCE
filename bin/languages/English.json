@@ -10,6 +10,8 @@
   "set_all": "Select All",
   "toolbox": "ToolBox",
   "run": "Run",
+  "path": "Path",
+  "type": "Type",
   "scopy":"Copy",
   "scopied":"Copied",
   "lang": "Language:",

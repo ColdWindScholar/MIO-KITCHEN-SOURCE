@@ -336,8 +336,8 @@ class ToolBox(ttk.Frame):
                 self.put_info('Warn', 'Please Select A File')
                 return
             self.put_info(lang.name, os.path.basename(file))
-            self.put_info("Path", file)
-            self.put_info("Type", gettype(file))
+            self.put_info(lang.path, file)
+            self.put_info(lang.type, gettype(file))
             self.put_info("Size", hum_convert(os.path.getsize(file)))
             self.put_info("Size(B)", os.path.getsize(file))
             self.put_info("Time", time.ctime(os.path.getctime(file)))
