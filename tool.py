@@ -246,7 +246,7 @@ class ToolBox(ttk.Frame):
         super().__init__(master=master)
 
     def __on_mouse(self, event):
-        self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
+        self.canvas.yview_scroll(-1 * int(event.delta / 120), "units")
 
     def pack_basic(self):
         scrollbar = Scrollbar(self, orient='vertical')
