@@ -294,8 +294,11 @@ class ToolBox(ttk.Frame):
             Label(self.f, text='=').pack(side='left', padx=5)
             self.f = ttk.Combobox(self.f, values=self.values, state='readonly')
             self.f.current(0)
+            self.f.bind("<<ComboboxSelected>>", lambda *x: self.relist())
             self.f.pack(side='left', padx=5)
             jzxs(self)
+        def calc(self):
+            pass
 
     class GetFileInfo(Toplevel):
         def __init__(self):
