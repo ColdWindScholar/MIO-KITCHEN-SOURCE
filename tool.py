@@ -1043,6 +1043,7 @@ class SetUtils:
             _lang = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
         else:
             _lang = JsonEdit(lang_file).read()
+        lang.second = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
         [setattr(lang, i, _lang[i]) for i in _lang]
 
     def set_value(self, name, value):

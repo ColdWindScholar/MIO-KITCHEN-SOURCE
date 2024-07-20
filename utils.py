@@ -398,13 +398,13 @@ def jzxs(master):
 # ----CLASSES
 class LangUtils:
     def __init__(self):
-        ...
+        self.second = {}
 
     def __getattr__(self, item):
         try:
             return self.__getattribute__(item)
         except (AttributeError, ):
-            return "None"
+            return self.second.get(item, 'None')
 
 
 lang = LangUtils()
