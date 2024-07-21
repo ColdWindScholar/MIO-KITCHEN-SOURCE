@@ -295,7 +295,7 @@ class ToolBox(ttk.Frame):
             self.choose_file = StringVar(value='')
             ttk.Label(f, text="Log File:").pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Entry(f, textvariable=self.choose_file).pack(side=LEFT, fill=X, padx=5, pady=5)
-            ttk.Button(f, text="Choose", command=lambda: self.choose_file.set(
+            ttk.Button(f, text=lang.choose, command=lambda: self.choose_file.set(
                 filedialog.askopenfilename(title=lang.text25, filetypes=(
                 ('Log File', "*.log"), ('Log File', "*.txt")))) == self.lift()).pack(side=LEFT,
                                                                                      fill=X, padx=5,
@@ -306,7 +306,7 @@ class ToolBox(ttk.Frame):
             self.output_dir = StringVar(value='')
             ttk.Label(f2, text="Output Folder:").pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Entry(f2, textvariable=self.output_dir).pack(side=LEFT, fill=X, padx=5, pady=5)
-            ttk.Button(f2, text="Choose",
+            ttk.Button(f2, text=lang.choose,
                        command=lambda: self.output_dir.set(filedialog.askdirectory()) == self.lift()).pack(side=LEFT,
                                                                                                            fill=X,
                                                                                                            padx=5,
@@ -316,11 +316,11 @@ class ToolBox(ttk.Frame):
             self.button.pack(padx=5, pady=5, fill=X)
 
         def run(self):
-            if self.button.cget('text') == 'Done':
+            if self.button.cget('text') == lang.done:
                 self.destroy()
-            self.button.configure(text="Running", state='disabled')
+            self.button.configure(text=lang.running, state='disabled')
             cz(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
-            self.button.configure(text="Done", state='normal', style='')
+            self.button.configure(text=lang.done, state='normal', style='')
 
     class FileBytes(Toplevel):
         def __init__(self):
