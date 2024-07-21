@@ -313,6 +313,7 @@ class ToolBox(ttk.Frame):
                                                                                                            padx=5,
                                                                                                            pady=5)
             f2.pack(padx=5, pady=5, anchor='nw', fill=X)
+            ttk.Label(self, text='By github@Deercall').pack()
             self.button = ttk.Button(self, text=lang.text22, command=self.run, style='Accent.TButton')
             self.button.pack(padx=5, pady=5, fill=X)
 
