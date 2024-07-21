@@ -293,7 +293,7 @@ class ToolBox(ttk.Frame):
         def gui(self):
             f = Frame(self)
             self.choose_file = StringVar(value='')
-            ttk.Label(f, text="Log File:").pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Label(f, text=lang.log_file).pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Entry(f, textvariable=self.choose_file).pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Button(f, text=lang.choose, command=lambda: self.choose_file.set(
                 filedialog.askopenfilename(title=lang.text25, filetypes=(
@@ -304,7 +304,7 @@ class ToolBox(ttk.Frame):
             ##
             f2 = Frame(self)
             self.output_dir = StringVar(value='')
-            ttk.Label(f2, text="Output Folder:").pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Label(f2, text=lang.output_folder).pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Entry(f2, textvariable=self.output_dir).pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Button(f2, text=lang.choose,
                        command=lambda: self.output_dir.set(filedialog.askdirectory()) == self.lift()).pack(side=LEFT,
@@ -312,7 +312,7 @@ class ToolBox(ttk.Frame):
                                                                                                            padx=5,
                                                                                                            pady=5)
             f2.pack(padx=5, pady=5, anchor='nw', fill=X)
-            self.button = ttk.Button(self, text='Run', command=self.run, style='Accent.TButton')
+            self.button = ttk.Button(self, text=lang.text22, command=self.run, style='Accent.TButton')
             self.button.pack(padx=5, pady=5, fill=X)
 
         def run(self):

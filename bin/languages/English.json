@@ -18,6 +18,8 @@
   "time": "Time",
   "running": "Running",
   "choose": "Choose",
+  "output_folder": "Output Folder:",
+  "log_file": "Log File:",
   "scopied":"Copied",
   "lang": "Language:",
   "ai_engine": "AI ENGINE",
