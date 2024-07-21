@@ -264,18 +264,19 @@ class ToolBox(ttk.Frame):
     def gui(self):
         self.pack_basic()
         """"""
-        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file), width=17).grid(row=0,
-                                                                                                          column=0,
-                                                                                                          padx=5,
-                                                                                                          pady=5)
-        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo, width=17).grid(row=0, column=1, padx=5,
-                                                                                             pady=5)
-        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes, width=17).grid(row=0, column=2, padx=5,
-                                                                                           pady=5)
-        ttk.Button(self.label_frame, text=lang.audit_allow, command=self.SelinuxAuditAllow, width=17).grid(row=1,
-                                                                                                                column=0,
-                                                                                                                padx=5,
-                                                                                                                pady=5)
+        width = 17
+        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file), width=width).grid(row=0,
+                                                                                                             column=0,
+                                                                                                             padx=5,
+                                                                                                             pady=5)
+        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo, width=width).grid(row=0, column=1, padx=5,
+                                                                                                pady=5)
+        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes, width=width).grid(row=0, column=2, padx=5,
+                                                                                              pady=5)
+        ttk.Button(self.label_frame, text=lang.audit_allow, command=self.SelinuxAuditAllow, width=width).grid(row=1,
+                                                                                                              column=0,
+                                                                                                              padx=5,
+                                                                                                              pady=5)
         """"""
         self.update_ui()
 
@@ -297,9 +298,9 @@ class ToolBox(ttk.Frame):
             ttk.Entry(f, textvariable=self.choose_file).pack(side=LEFT, fill=X, padx=5, pady=5)
             ttk.Button(f, text=lang.choose, command=lambda: self.choose_file.set(
                 filedialog.askopenfilename(title=lang.text25, filetypes=(
-                ('Log File', "*.log"), ('Log File', "*.txt")))) == self.lift()).pack(side=LEFT,
-                                                                                     fill=X, padx=5,
-                                                                                     pady=5)
+                    ('Log File', "*.log"), ('Log File', "*.txt")))) == self.lift()).pack(side=LEFT,
+                                                                                         fill=X, padx=5,
+                                                                                         pady=5)
             f.pack(padx=5, pady=5, anchor='nw', fill=X)
             ##
             f2 = Frame(self)
