@@ -272,7 +272,7 @@ class ToolBox(ttk.Frame):
                                                                                              pady=5)
         ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes, width=17).grid(row=0, column=2, padx=5,
                                                                                            pady=5)
-        ttk.Button(self.label_frame, text='Selinux Audit Allow', command=self.SelinuxAuditAllow, width=17).grid(row=1,
+        ttk.Button(self.label_frame, text=lang.audit_allow, command=self.SelinuxAuditAllow, width=17).grid(row=1,
                                                                                                                 column=0,
                                                                                                                 padx=5,
                                                                                                                 pady=5)
@@ -286,7 +286,7 @@ class ToolBox(ttk.Frame):
     class SelinuxAuditAllow(Toplevel):
         def __init__(self):
             super().__init__()
-            self.title("Selinux Audit Allow")
+            self.title(lang.audit_allow)
             self.gui()
             jzxs(self)
 

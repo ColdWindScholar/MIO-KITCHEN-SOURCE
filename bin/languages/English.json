@@ -24,6 +24,7 @@
   "lang": "Language:",
   "ai_engine": "AI ENGINE",
   "settings": "Settings",
+  "audit_allow": "Selinux Audit Allow",
   "warn1": "Please select a project",
   "warn2": "Please select a plugin",
   "warn3": "{} is not found",
