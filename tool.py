@@ -91,6 +91,7 @@ from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 from controls import ListBox
 from undz import DZFileTools
+from selinux_audit_allow import main as selinux_audit_allow
 
 try:
     import imp
@@ -263,19 +264,63 @@ class ToolBox(ttk.Frame):
     def gui(self):
         self.pack_basic()
         """"""
-        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file)).grid(row=0, column=0, padx=5,
-                                                                                                pady=5)
-        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo).grid(row=0, column=1, padx=5,
-                                                                                   pady=5)
-        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes).grid(row=0, column=2, padx=5,
-                                                                                          pady=5)
-        ttk.Button(self.label_frame, text='4').grid(row=0, column=3, padx=5, pady=5)
+        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file), width=17).grid(row=0,
+                                                                                                          column=0,
+                                                                                                          padx=5,
+                                                                                                          pady=5)
+        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo, width=17).grid(row=0, column=1, padx=5,
+                                                                                             pady=5)
+        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes, width=17).grid(row=0, column=2, padx=5,
+                                                                                           pady=5)
+        ttk.Button(self.label_frame, text='Selinux Audit Allow', command=self.SelinuxAuditAllow, width=17).grid(row=1,
+                                                                                                                column=0,
+                                                                                                                padx=5,
+                                                                                                                pady=5)
         """"""
         self.update_ui()
 
     def update_ui(self):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class SelinuxAuditAllow(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title("Selinux Audit Allow")
+            self.gui()
+            jzxs(self)
+
+        def gui(self):
+            f = Frame(self)
+            self.choose_file = StringVar(value='')
+            ttk.Label(f, text="Log File:").pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Entry(f, textvariable=self.choose_file).pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Button(f, text="Choose", command=lambda: self.choose_file.set(
+                filedialog.askopenfilename(title=lang.text25, filetypes=(
+                ('Log File', "*.log"), ('Log File', "*.txt")))) == self.lift()).pack(side=LEFT,
+                                                                                     fill=X, padx=5,
+                                                                                     pady=5)
+            f.pack(padx=5, pady=5, anchor='nw', fill=X)
+            ##
+            f2 = Frame(self)
+            self.output_dir = StringVar(value='')
+            ttk.Label(f2, text="Output Folder:").pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Entry(f2, textvariable=self.output_dir).pack(side=LEFT, fill=X, padx=5, pady=5)
+            ttk.Button(f2, text="Choose",
+                       command=lambda: self.output_dir.set(filedialog.askdirectory()) == self.lift()).pack(side=LEFT,
+                                                                                                           fill=X,
+                                                                                                           padx=5,
+                                                                                                           pady=5)
+            f2.pack(padx=5, pady=5, anchor='nw', fill=X)
+            self.button = ttk.Button(self, text='Run', command=self.run, style='Accent.TButton')
+            self.button.pack(padx=5, pady=5, fill=X)
+
+        def run(self):
+            if self.button.cget('text') == 'Done':
+                self.destroy()
+            self.button.configure(text="Running", state='disabled')
+            cz(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
+            self.button.configure(text="Done", state='normal', style='')
 
     class FileBytes(Toplevel):
         def __init__(self):
