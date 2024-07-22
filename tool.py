@@ -1130,7 +1130,7 @@ class SetUtils:
             if self.treff == '1':
                 pywinstyles.apply_style(win, 'acrylic')
             else:
-                pywinstyles.apply_style(win, 'normal')
+                pywinstyles.apply_style(win, 'mica')
 
     @staticmethod
     def load_language(name):
