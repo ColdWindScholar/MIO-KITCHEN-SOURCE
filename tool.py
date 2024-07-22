@@ -2585,7 +2585,7 @@ class PackSuper(Toplevel):
             for i in range(20):
                 if not i:
                     continue
-                i = i - 0.5
+                i = i - 0.25
                 t = 1024 * 1024 * 1024 * i - size
                 if t < 0:
                     continue
