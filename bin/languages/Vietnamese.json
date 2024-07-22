@@ -1,4 +1,4 @@
-{
+`{
   "language_file_by": "Zurimuka亗 @hokhoa07_marble",
   "ok": "OK",
   "cancel": "Hủy",
@@ -73,7 +73,7 @@
   "text44": "Đối với EROFS",
   "text45": "Cài đặt bổ sung",
   "text46": "Phân vùng để đóng gói",
-  "text47": "Cấp độ Brotli: {}",
+  "text47": "Cấp độ %s: {}",
   "text48": "Đóng gói với:",
   "text49": "Định dạng đầu ra:",
   "text50": "Phương pháp nén",
@@ -114,8 +114,8 @@
   "text85": "Đang xử lý:",
   "text86": "Đang chuyển đổi %s thành %s.new.dat",
   "text87": "Hoàn tất chuyển đổi cho %s.new.dat",
-  "text88": "Bắt đầu nén %s.new.dat.br",
-  "text89": "Hoàn tất nén %s.new.dat.br",
+  "text88": "Bắt đầu nén %s.new.dat.%s",
+  "text89": "Hoàn tất nén %s.new.dat.%s",
   "text90": "Bắt đầu đóng gói: %s [erofs] \nĐịnh dạng nén: %s \nphiên bản: %s",
   "text91": "Bắt đầu đóng gói: %s",
   "text92": "Trạng thái:",
