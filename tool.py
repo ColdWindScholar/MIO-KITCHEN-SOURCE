@@ -387,7 +387,8 @@ class ToolBox(ttk.Frame):
             (tl := ttk.Label(a, text=lang.text132_e)).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
-            windnd.hook_dropfiles(a, self.dnd)
+            if os.name == 'nt':
+                windnd.hook_dropfiles(a, self.dnd)
             self.b = ttk.LabelFrame(self, text='INFO')
             self.b.pack(fill=BOTH, side=TOP)
 
