@@ -24,11 +24,11 @@
 ***
 ## Supported Os
 
-| Os      | Arch                   |
-|---------|------------------------|
-| Linux   | x86_64 arm64           |
-| Windows | x86_64 x86 amd64 arm64 |
-| Macos   | Arm64  X86             |
+| Os      | Arch                        |
+|---------|-----------------------------|
+| Linux   | x86_64 arm64                |
+| Windows | x86_64 x86 amd64 arm64(by sewzj) |
+| Macos   | Arm64  X86                  |
 
 ## * macOS Notice
 ``` shell
