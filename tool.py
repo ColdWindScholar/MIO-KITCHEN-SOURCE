@@ -2960,9 +2960,9 @@ class Packxx(Toplevel):
         scales_erofs.pack(fill="x", padx=5, pady=5)
         # --
         scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
-                           command=lambda x: self.label.config(text=lang.text47.format(int(float(x)))),
+                           command=lambda x: self.label.config(text=lang.text47.format(int(float(x))) % "Brotli"),
                            variable=self.scale)
-        self.label = ttk.Label(sf1, text=lang.text47.format(int(scales.get())))
+        self.label = ttk.Label(sf1, text=lang.text47.format(int(scales.get())) % "Brotli")
         self.label.pack(side='left', padx=5, pady=5)
         scales.pack(fill="x", padx=5, pady=5)
         f = Frame(lf3)
@@ -3643,14 +3643,14 @@ def datbr(work, name, brl: any, dat_ver=4):
     if brl == "dat":
         print(lang.text87 % name)
     else:
-        print(lang.text88 % name)
+        print(lang.text88 % (name, 'br'))
         call(f"brotli -q {brl} -j -w 24 {work + name}.new.dat -o {work + name}.new.dat.br")
         if os.access(work + name + ".new.dat", os.F_OK):
             try:
                 os.remove(work + name + ".new.dat")
             except Exception as e:
                 print(e)
-        print(lang.text89 % name)
+        print(lang.text89 % (name, 'br'))
 
 
 def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
