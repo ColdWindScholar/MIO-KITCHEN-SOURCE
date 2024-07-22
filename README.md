@@ -26,7 +26,7 @@
 
 | Os      | Arch                   |
 |---------|------------------------|
-| Linux   | x86_64 arm64           |
+| Linux   | x86_64 arm64(by sewzj) |
 | Windows | x86_64 x86 amd64 arm64 |
 | Macos   | Arm64  X86             |
 
