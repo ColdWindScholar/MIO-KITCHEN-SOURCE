@@ -3212,7 +3212,7 @@ def rdi(work, part_name) -> bool:
         print(lang.text72 % part_name)
         try:
             rmdir(work + part_name)
-            for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config']:
+            for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config', '%s_fs_options']:
                 path_ = os.path.join(work, "config", i_ % part_name)
                 if os.access(path_, os.F_OK):
                     os.remove(path_)
