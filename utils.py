@@ -468,8 +468,8 @@ class Vbpatch:
 
 
 class Dumpcfg:
-    blksz = 0x1 << 0xc
-    headoff = 0x4000
+    blksz = 4096
+    headoff = 16384
     magic = b"LOGO!!!!"
     imgnum = 0
     imgblkoffs = []
