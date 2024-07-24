@@ -126,8 +126,15 @@ class Dumper:
         op = operation["operation"]
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
-
-        if op.type == op.REPLACE_XZ:
+        if op.type == op.REPLACE_ZSTD:
+            dec = zstandard.ZstdDecompressor().decompressobj()
+            while processed_len < data_length:
+                data = payloadfile.read(buffsize)
+                processed_len += len(data)
+                data = dec.decompress(data)
+                out_file.write(data)
+                out_file.write(dec.flush())
+        elif op.type == op.REPLACE_XZ:
             dec = lzma.LZMADecompressor()
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
@@ -153,18 +160,8 @@ class Dumper:
                     data = b''
         elif op.type == op.REPLACE:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            dec = zstandard.ZstdDecompressor().decompressobj()
-            if payloadfile.read(4) == b'\x28\xb5\x2f\xfd':
-                payloadfile.seek(payloadfile.tell() - 4)
-                while processed_len < data_length:
-                    data = payloadfile.read(buffsize)
-                    processed_len += len(data)
-                    data = dec.decompress(data)
-                    out_file.write(data)
-                out_file.write(dec.flush())
-            else:
-                payloadfile.seek(payloadfile.tell() - 4)
-                while processed_len < data_length:
+            payloadfile.seek(payloadfile.tell() - 4)
+            while processed_len < data_length:
                     data = payloadfile.read(buffsize)
                     processed_len += len(data)
                     out_file.write(data)

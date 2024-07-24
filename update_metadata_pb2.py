@@ -85,6 +85,10 @@ _INSTALLOPERATION_TYPE = _descriptor.EnumDescriptor(
             name='LZ4DIFF_PUFFDIFF', index=13, number=13,
             serialized_options=None,
             type=None),
+        _descriptor.EnumValueDescriptor(
+            name='REPLACE_ZSTD', index=14, number=14,
+            serialized_options=None,
+            type=None)
     ],
     containing_type=None,
     serialized_options=None,
