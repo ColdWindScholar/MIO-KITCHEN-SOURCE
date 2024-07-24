@@ -561,6 +561,9 @@ class Tool(Tk):
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show, error_=True)
+        self.gif_label = Label(self.rzf)
+        self.gif_label.pack(padx=10, pady=10)
+        MpkMan().gui()
 
     def tab_content(self):
         Label(self.tab,
@@ -575,9 +578,7 @@ class Tool(Tk):
               text='反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!',
               font=(None, 10)).pack(
             padx=5, pady=5)
-        self.gif_label = Label(self.rzf)
-        self.gif_label.pack(padx=10, pady=10)
-        MpkMan().gui()
+
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
