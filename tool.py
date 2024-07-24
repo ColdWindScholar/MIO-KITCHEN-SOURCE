@@ -539,9 +539,12 @@ class Tool(Tk):
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
-        Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
+        tr2 = Label(tr, text=lang.text132)
+        tr2.pack(padx=10, pady=10, side='bottom')
         tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
+        tr2.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
+        tr2.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
@@ -549,6 +552,7 @@ class Tool(Tk):
         sys.stderr = StdoutRedirector(self.show, error_=True)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
+            windnd.hook_dropfiles(tr2, func=dndfile)
         else:
             print(f'{platform.system()} Dont Support Drop File.\nReason: I am Lazy.')
         self.scroll.pack(side=LEFT, fill=BOTH)
