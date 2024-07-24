@@ -573,8 +573,8 @@ class Tool(Tk):
         global kemiaojiang
         img = open_img(open('bin/kemiaojiang.png', 'rb')).resize((280, 540))
         kemiaojiang = PhotoImage(img)
-        Label(self.tab, image=kemiaojiang).pack()
-        Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠").pack()
+        Label(self.tab, image=kemiaojiang).pack(side='left')
+        Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠").pack(side='left')
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
