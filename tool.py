@@ -571,13 +571,18 @@ class Tool(Tk):
 
     def tab_content(self):
         texts = """
-        解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!
-        我们的设备属于我们，我们才是主人！\nOur device is ours! We Are Host!
-        反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!
+        解锁BL是用户的权力！反对禁止限制解锁BL!
+        Unlocking BL is user's right! 
+        We oppose the ban on BL unlocking!
+        我们的设备属于我们，我们才是主人！
+        Our device is ours! We Are Host!
+        反对肆意违反开源协议！
+        We also strongly oppose the companies 
+        those are violating open source licenses!
         """
         Label(self.tab,
               text=texts,
-              font=(None, 10)).pack(
+              font=(None, 12)).pack(
             padx=5, pady=5)
 
     def tab6_content(self):
