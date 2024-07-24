@@ -533,6 +533,7 @@ class Tool(Tk):
         self.tab4_content()
         self.tab6_content()
         self.setting_tab()
+        self.tab_content()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
@@ -560,6 +561,8 @@ class Tool(Tk):
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show, error_=True)
+
+    def tab_content(self):
         Label(self.tab,
               text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
               font=(None, 10)).pack(
