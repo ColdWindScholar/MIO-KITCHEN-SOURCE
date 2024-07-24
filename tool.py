@@ -580,10 +580,7 @@ class Tool(Tk):
         We also strongly oppose the companies 
         those are violating open source licenses!
         """
-        Label(self.tab,
-              text=texts,
-              font=(None, 12)).pack(
-            padx=5, pady=5)
+        Label(self.tab, text=texts, font=(None, 12)).pack(padx=5, pady=5)
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
