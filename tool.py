@@ -542,13 +542,15 @@ class Tool(Tk):
         Label(tr, text=lang.text132).pack(padx=10, pady=10, side='bottom')
         tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
+        self.scroll = ttk.Scrollbar(self.rzf)
+        self.show = Text(self.rzf)
+        self.show.pack(side=LEFT, fill=BOTH, expand=True)
+        sys.stdout = StdoutRedirector(self.show)
+        sys.stderr = StdoutRedirector(self.show, error_=True)
         if os.name == 'nt':
             windnd.hook_dropfiles(tr, func=dndfile)
         else:
             print(f'{platform.system()} Dont Support Drop File.\nReason: I am Lazy.')
-        self.scroll = ttk.Scrollbar(self.rzf)
-        self.show = Text(self.rzf)
-        self.show.pack(side=LEFT, fill=BOTH, expand=True)
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
@@ -559,8 +561,6 @@ class Tool(Tk):
         ttk.Button(self.rzf, text=lang.text106, command=lambda: self.put_log()).pack(side='bottom', padx=10, pady=5,
                                                                                      expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
-        sys.stdout = StdoutRedirector(self.show)
-        sys.stderr = StdoutRedirector(self.show, error_=True)
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
@@ -578,7 +578,6 @@ class Tool(Tk):
               text='反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!',
               font=(None, 10)).pack(
             padx=5, pady=5)
-
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
