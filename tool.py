@@ -570,16 +570,13 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
+        texts = """
+        解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!
+        我们的设备属于我们，我们才是主人！\nOur device is ours! We Are Host!
+        反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!
+        """
         Label(self.tab,
-              text='解锁BL是用户的权力！反对禁止限制解锁BL!\nUnlocking BL is user\'s right! We oppose the ban on BL unlocking!',
-              font=(None, 10)).pack(
-            padx=5, pady=5)
-        Label(self.tab,
-              text='我们的设备属于我们，我们才是主人！\nOur device is ours! We Are Host!',
-              font=(None, 10)).pack(
-            padx=5, pady=5)
-        Label(self.tab,
-              text='反对肆意违反开源协议！\nWe also strongly oppose the companies \nthose are violating open source licenses!',
+              text=texts,
               font=(None, 10)).pack(
             padx=5, pady=5)
 
