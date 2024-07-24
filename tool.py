@@ -570,17 +570,10 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
-        texts = """
-        解锁BL是用户的权力！反对禁止限制解锁BL!
-        Unlocking BL is user's right! 
-        We oppose the ban on BL unlocking!
-        我们的设备属于我们，我们才是主人！
-        Our device is ours! We Are Host!
-        反对肆意违反开源协议！
-        We also strongly oppose the companies 
-        those are violating open source licenses!
-        """
-        Label(self.tab, text=texts, font=(None, 12)).pack(padx=5, pady=5)
+        global kemiaojiang
+        img = open_img(open('bin/kemiaojiang.png', 'rb')).resize((280, 540))
+        kemiaojiang = PhotoImage(img)
+        Label(self.tab, image=kemiaojiang).pack()
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
@@ -2136,6 +2129,17 @@ class Debugger(Toplevel):
         ttk.Button(self, text='Hacker panel',
                    command=lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')).grid(
             row=2, column=4, padx=5, pady=5)
+        texts = """
+                解锁BL是用户的权力！反对禁止限制解锁BL!
+                Unlocking BL is user's right! 
+                We oppose the ban on BL unlocking!
+                我们的设备属于我们，我们才是主人！
+                Our device is ours! We Are Host!
+                反对肆意违反开源协议！
+                We also strongly oppose the companies 
+                those are violating open source licenses!
+                """
+        Label(self, text=texts, font=(None, 12)).grid(row=3, column=0, padx=5, pady=5)
 
     @staticmethod
     def crash():
