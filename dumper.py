@@ -95,11 +95,8 @@ class Dumper:
             futures = {executor.submit(self.dump_part, part): part for part in partitions}
             for future in as_completed(futures):
                 partition_name = futures[future]['partition'].partition_name
-                try:
-                    future.result()
-                    print(f"{partition_name} Done!")
-                except Exception as exc:
-                    print(f"{partition_name} - processing generated an exception: {exc}")
+                future.result()
+                print(f"{partition_name} Done!")
 
     def validate_magic(self):
         magic = self.payloadfile.read(4)
