@@ -594,13 +594,10 @@ class Tool(Tk):
                 a = Debugger()
                 a.lift()
                 a.focus_force()
-            color1 = randrange(16, 256)
-            color2 = randrange(16, 256)
-            color3 = randrange(16, 256)
-            color1 = hex(color1)
-            color2 = hex(color2)
-            color3 = hex(color3)
-            ans = "#" + color1[2:] + color2[2:] + color3[2:]
+            color1 = hex(randrange(16, 256))[2:]
+            color2 = hex(randrange(16, 256))[2:]
+            color3 = hex(randrange(16, 256))[2:]
+            ans = "#" + color1 + color2 + color3
             return ans
 
         def update_angle():
