@@ -570,10 +570,22 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
+
         global kemiaojiang
-        kemiaojiang = PhotoImage(open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb')).resize((280, 540)))
-        Label(self.tab, image=kemiaojiang).pack(side='left')
-        Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠\nWelcome To MIO-KITCHEN", justify='left').pack(side='left', padx=5)
+        global kemiaojiang_img
+        global kemiaojiang_label
+        kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
+        kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
+        kemiaojiang_label = Label(self.tab, image=kemiaojiang)
+        kemiaojiang_label.pack(side='left', padx=0, expand=True)
+        about_ = Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠\nWelcome To MIO-KITCHEN", justify='left',
+                       foreground='#87CEFA', font=(None, 12))
+        about_.pack(side='top', padx=5, pady=120, expand=True)
+
+        def change_size(event):
+            pass
+
+        self.tab.bind('<Configure>', change_size)
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
