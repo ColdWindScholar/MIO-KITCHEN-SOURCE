@@ -30,6 +30,7 @@ class Extractor:
         self.context = []
         self.fs_config = []
         self.space = []
+        self.error_times = 0
 
     @staticmethod
     def __out_name(file_path, out=1):
@@ -97,6 +98,12 @@ class Extractor:
     def scan_dir(self, root_inode, root_path=""):
         for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
             if entry_name in ['.', '..'] or entry_name.endswith(' (2)'):
+                continue
+            if self.error_times >= 3:
+                print("Some thing wrong,Stop!")
+                break
+            if not entry_name:
+                self.error_times += 1
                 continue
             entry_inode = root_inode.volume.get_inode(entry_inode_idx, entry_type)
             entry_inode_path = root_path + '/' + entry_name
