@@ -3393,9 +3393,9 @@ def unpack(chose, form: str = '') -> bool:
         splituapp.extract(work + "UPDATE.APP", work, chose)
         return True
     for i in chose:
-        if os.access(work + i + ".zstd", os.F_OK):
-            print(lang.text79 + i + ".zstd")
-            call('zstd --rm -d ' + work + i + '.zstd')
+        if os.access(work + i + ".zst", os.F_OK):
+            print(lang.text79 + i + ".zst")
+            call('zstd --rm -d ' + work + i + '.zst')
             return True
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
