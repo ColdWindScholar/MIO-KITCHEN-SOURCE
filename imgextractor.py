@@ -99,13 +99,14 @@ class Extractor:
         for entry_name, entry_inode_idx, entry_type in root_inode.open_dir():
             if entry_name in ['.', '..'] or entry_name.endswith(' (2)'):
                 continue
-            if self.error_times >= 3:
+            if self.error_times >= 200:
                 print("Some thing wrong,Stop!")
                 break
             entry_inode = root_inode.volume.get_inode(entry_inode_idx, entry_type)
             entry_inode_path = root_path + '/' + entry_name
             if entry_inode_path[-1:] == '/' and not entry_inode.is_dir:
                 self.error_times += 1
+                print(entry_inode)
                 continue
 
             mode = self.__get_perm(entry_inode.mode_str)
