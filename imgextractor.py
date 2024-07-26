@@ -106,7 +106,6 @@ class Extractor:
             entry_inode_path = root_path + '/' + entry_name
             if entry_inode_path[-1:] == '/' and not entry_inode.is_dir:
                 self.error_times += 1
-                print(entry_inode)
                 continue
 
             mode = self.__get_perm(entry_inode.mode_str)
