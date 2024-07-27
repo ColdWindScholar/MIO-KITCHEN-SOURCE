@@ -684,13 +684,8 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            values=[str(i.rsplit('.', 1)[0]) for i in
                                    os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
-        ai = StringVar(value=settings.ai_engine)
-        treff = StringVar(value=settings.treff)
-        auto_rm_pay = StringVar(value=settings.rm_pay)
         context = StringVar(value=settings.contextpatch)
         New_Project_Structure = StringVar(value=settings.nps)
-        ai.trace("w", lambda *x: settings.set_value('ai_engine', ai.get()))
-        treff.trace("w", lambda *x: settings.set_value('treff', treff.get()))
         ttk.Button(sf4, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
@@ -707,14 +702,9 @@ class Tool(Tk):
 
         context.trace("w", lambda *x: enable_contextpatch())
         New_Project_Structure.trace("w", lambda *x: settings.set_value('nps', New_Project_Structure.get()))
-        auto_rm_pay.trace("w", lambda *x: settings.set_value('rm_pay', auto_rm_pay.get()))
-        ttk.Checkbutton(sf4, text=lang.ai_engine, variable=ai, onvalue='1',
-                        offvalue='0',
-                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        get_setting_button('ai_engine', sf4, lang.ai_engine)
         if os.name == 'nt':
-            ttk.Checkbutton(sf4, text='Transparent effect', variable=treff, onvalue='1',
-                            offvalue='0',
-                            style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+            get_setting_button('treff', sf4, 'Transparent effect')
         # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
         #             offvalue='0',
         #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
@@ -722,9 +712,7 @@ class Tool(Tk):
                                     offvalue='0',
                                     style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)
-        ttk.Checkbutton(sf4, text=lang.t9.format("payload.bin"), variable=auto_rm_pay, onvalue='1',
-                        offvalue='0',
-                        style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        get_setting_button('rm_pay', sf4, lang.t9.format("payload.bin"))
         get_setting_button('auto_unpack', sf4, '自动解包')
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
