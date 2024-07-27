@@ -654,16 +654,22 @@ class Tool(Tk):
             fill=X, side='bottom')
 
     def setting_tab(self):
+        def get_setting_button(item, master, text, on_v='1', off_v='0'):
+            a = StringVar(value=getattr(settings, item))
+            a.trace("w", lambda *x: settings.set_value(item, a.get()))
+            ttk.Checkbutton(master, text=text, variable=a, onvalue=on_v,
+                            offvalue=off_v,
+                            style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+
         self.show_local = StringVar()
         self.show_local.set(settings.path)
         Setting_Frame = ScrollFrame(self.tab3)
         Setting_Frame.gui()
         Setting_Frame.pack(fill=BOTH, expand=True)
-
-        sf1 = ttk.Frame(Setting_Frame)
-        sf2 = ttk.Frame(Setting_Frame)
-        sf3 = ttk.Frame(Setting_Frame)
-        sf4 = ttk.Frame(Setting_Frame, width=20)
+        sf1 = ttk.Frame(Setting_Frame.label_frame)
+        sf2 = ttk.Frame(Setting_Frame.label_frame)
+        sf3 = ttk.Frame(Setting_Frame.label_frame)
+        sf4 = ttk.Frame(Setting_Frame.label_frame, width=20)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
@@ -719,6 +725,7 @@ class Tool(Tk):
         ttk.Checkbutton(sf4, text=lang.t9.format("payload.bin"), variable=auto_rm_pay, onvalue='1',
                         offvalue='0',
                         style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        get_setting_button('auto_unpack', sf4, '自动解包')
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
@@ -1096,6 +1103,7 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini: str = None):
+        self.auto_unpack = '0'
         self.treff = '0'
         if set_ini:
             self.set_file = set_ini

@@ -106,7 +106,8 @@ class ScrollFrame(Frame):
     def gui(self):
         scrollbar = Scrollbar(self, orient='vertical')
         scrollbar.pack(side='right', fill='y', padx=10)
-        self.canvas = Canvas(self, yscrollcommand=scrollbar.set, height=1)
+        self.canvas = Canvas(self, yscrollcommand=scrollbar.set, height=450)
+        self.canvas.pack_propagate(False)
         self.canvas.pack(fill='both')
         scrollbar.config(command=self.canvas.yview)
         self.label_frame = Frame(self.canvas)
