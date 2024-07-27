@@ -84,6 +84,42 @@ class ListBox(Frame):
         self.update_ui()
 
 
+class ScrollFrame(Frame):
+    def __init__(self, master):
+        super().__init__(master=master)
+        self.var = None
+        self.set_all = None
+        self.label_frame = None
+        self.canvas = None
+        self.controls = []
+
+    def __on_mouse(self, event):
+        self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
+
+    def clear(self):
+        for i in self.controls:
+            try:
+                i.destroy()
+            except (TclError, AttributeError, ValueError):
+                pass
+
+    def gui(self):
+        scrollbar = Scrollbar(self, orient='vertical')
+        scrollbar.pack(side='right', fill='y', padx=10)
+        self.canvas = Canvas(self, yscrollcommand=scrollbar.set, height=1)
+        self.canvas.pack(fill='both')
+        scrollbar.config(command=self.canvas.yview)
+        self.label_frame = Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        self.canvas.bind_all("<MouseWheel>",
+                             lambda event: self.__on_mouse(event))
+        self.update_ui()
+
+    def update_ui(self):
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+
 if __name__ == '__main__':
     a = Tk()
     b = ListBox(a)

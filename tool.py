@@ -89,7 +89,7 @@ import utils
 from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
-from controls import ListBox
+from controls import ListBox, ScrollFrame
 from undz import DZFileTools
 from selinux_audit_allow import main as selinux_audit_allow
 
@@ -656,10 +656,14 @@ class Tool(Tk):
     def setting_tab(self):
         self.show_local = StringVar()
         self.show_local.set(settings.path)
-        sf1 = ttk.Frame(self.tab3)
-        sf2 = ttk.Frame(self.tab3)
-        sf3 = ttk.Frame(self.tab3)
-        sf4 = ttk.Frame(self.tab3, width=20)
+        Setting_Frame = ScrollFrame(self.tab3)
+        Setting_Frame.gui()
+        Setting_Frame.pack(fill=BOTH, expand=True)
+
+        sf1 = ttk.Frame(Setting_Frame)
+        sf2 = ttk.Frame(Setting_Frame)
+        sf3 = ttk.Frame(Setting_Frame)
+        sf4 = ttk.Frame(Setting_Frame, width=20)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
@@ -721,6 +725,7 @@ class Tool(Tk):
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
         sf4.pack(padx=10, pady=10, fill='both')
+        Setting_Frame.update_ui()
         ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
 
 
