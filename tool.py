@@ -686,7 +686,6 @@ class Tool(Tk):
                                    os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
         context = StringVar(value=settings.contextpatch)
         New_Project_Structure = StringVar(value=settings.nps)
-        ttk.Button(sf4, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
 
         def enable_contextpatch():
             if context.get() == '1':
@@ -713,7 +712,7 @@ class Tool(Tk):
                                     style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)
         get_setting_button('rm_pay', sf4, lang.t9.format("payload.bin"))
-        get_setting_button('auto_unpack', sf4, '自动解包')
+        get_setting_button('auto_unpack', sf4, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         sf1.pack(padx=10, pady=10, fill='both')
@@ -721,6 +720,7 @@ class Tool(Tk):
         sf3.pack(padx=10, pady=10, fill='both')
         sf4.pack(padx=10, pady=10, fill='both')
         Setting_Frame.update_ui()
+        ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
         ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
 
 

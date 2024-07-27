@@ -12,6 +12,7 @@
   "toolbox": "工具箱",
   "lang": "语言：",
   "settings": "设置",
+  "auto_unpack": "自动解包",
   "warn1": "请选择一个项目",
   "warn2": "请选择一个插件",
   "warn3": "未发现 {}",
