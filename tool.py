@@ -3332,6 +3332,10 @@ def unpackrom(ifile) -> None:
         script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
         unpackg.refs()
         fz.close()
+        if settings.auto_unpack == '1':
+            chose = [i.split('.')[0] for i in os.listdir(rwork())]
+
+            unpack(chose)
         return
     elif ftype != 'unknown':
         folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
@@ -3347,6 +3351,10 @@ def unpackrom(ifile) -> None:
         copy(ifile, str(folder))
         project_menu.listdir()
         dn.set(os.path.basename(folder))
+        if settings.auto_unpack == '1':
+            chose = [i.split('.')[0] for i in os.listdir(rwork())]
+
+            unpack(chose)
     else:
         print(lang.text82 % ftype)
     unpackg.refs()
