@@ -24,6 +24,7 @@
   "lang": "Idioma:",
   "ai_engine": "Motor IA",
   "settings": "Configurações",
+  "auto_unpack": "Desempacotar automaticamente",
   "audit_allow": "Permitir auditoria do SELinux",
   "warn1": "Por favor, selecione um projeto.",
   "warn2": "Por favor, selecione um plugin.",
