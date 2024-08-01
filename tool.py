@@ -3732,7 +3732,7 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     if call(
-            f"mke2fs -O ^has_journal -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
+            f"mke2fs -O ^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
