@@ -81,16 +81,13 @@ class Dumper:
             )
 
         self.payloadfile.close()
-        self.multiprocess_partitions(partitions_with_ops)
-        return True
-
-    def multiprocess_partitions(self, partitions):
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
-            futures = {executor.submit(self.dump_part, part): part for part in partitions}
+            futures = {executor.submit(self.dump_part, part): part for part in partitions_with_ops}
             for future in as_completed(futures):
                 partition_name = futures[future]['partition'].partition_name
                 future.result()
                 print(f"{partition_name} Done!")
+        return True
 
     def validate_magic(self):
         magic = self.payloadfile.read(4)
