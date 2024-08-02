@@ -10,7 +10,7 @@ from multiprocessing import cpu_count
 import zstandard
 
 import update_metadata_pb2 as um
-from update_metadata_reader import Type
+from update_metadata_reader import Type, Metadata
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
@@ -105,8 +105,9 @@ class Dumper:
         self.metadata_signature = self.payloadfile.read(metadata_signature_size)
         self.data_offset = self.payloadfile.tell()
         self.dam = um.DeltaArchiveManifest()
+        self.dam2 = Metadata(manifest)
         self.dam.ParseFromString(manifest)
-        self.block_size = self.dam.block_size
+        self.block_size = self.dam2.block_size
 
     def data_for_op(self, operation, out_file, old_file):
         payloadfile = self.tls.payloadfile
