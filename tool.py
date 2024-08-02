@@ -4001,8 +4001,8 @@ class UnpackGui(ttk.LabelFrame):
             if os.path.exists(work + "payload.bin"):
                 with open(work + "payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
-                        self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}",
-                                        i.partition_name)
+                        self.lsg.insert(f"{i.get('1')}{hum_convert(int(i.get('7').get('1'))):>10}",
+                                        i.get('1'))
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
                 if gettype(work + "super.img") == 'sparse':

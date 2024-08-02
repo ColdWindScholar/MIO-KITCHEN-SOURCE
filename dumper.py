@@ -173,9 +173,13 @@ class Dumper:
             else:
                 dst_extents = op.get('6')
             out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
-            for ext in op.src_extents:
-                old_file.seek(ext.start_block * self.block_size)
-                data_length = ext.num_blocks * self.block_size
+            if isinstance(op.get('4'), dict):
+                src_extents = [op.get('4')]
+            else:
+                src_extents = op.get('4')
+            for ext in src_extents:
+                old_file.seek(int(ext.get('1')) * self.block_size)
+                data_length = int(ext.get('2')) * self.block_size
                 while processed_len < data_length:
                     data = old_file.read(buffsize)
                     processed_len += len(data)
