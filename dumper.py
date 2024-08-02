@@ -43,6 +43,8 @@ class Dumper:
         return open(self.payloadpath, 'rb')
 
     def run(self) -> bool:
+        print(self.dam.partitions[0])
+        print(self.dam2.partitions[0])
         if self.images == "":
             partitions = self.dam.partitions
         else:
@@ -66,25 +68,15 @@ class Dumper:
             operations = []
             for operation in partition.operations:
                 self.payloadfile.seek(self.data_offset + operation.data_offset)
-                operations.append(
-                    {
-                        "data_offset": self.payloadfile.tell(),
-                        "operation": operation,
-                        "data_length": operation.data_length,
-                    }
-                )
-            partitions_with_ops.append(
-                {
-                    "partition": partition.partition_name,
-                    "operations": operations,
-                }
-            )
+                operations.append({"data_offset": self.payloadfile.tell(), "operation": operation,
+                                   "data_length": operation.data_length})
+            partitions_with_ops.append({"name": partition.partition_name, "operations": operations, })
 
         self.payloadfile.close()
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = {executor.submit(self.dump_part, part): part for part in partitions_with_ops}
             for future in as_completed(futures):
-                partition_name = futures[future]['partition']
+                partition_name = futures[future]['name']
                 future.result()
                 print(f"{partition_name} Done!")
         return True
@@ -189,7 +181,7 @@ class Dumper:
 
     def dump_part(self, part):
         print(part)
-        name = part["partition"]
+        name = part["name"]
         out_file = open(f"{self.out}/{name}.img", "wb")
         old_file = open(f"{self.old}/{name}.img", "rb") if self.diff else None
         with self.open_payloadfile() as payloadfile:
