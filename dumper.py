@@ -123,11 +123,12 @@ class Dumper:
         op = operation["operation"]
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
-        if op.type == op.REPLACE_ZSTD and payloadfile.read(4) != b'\x28\xb5\x2f\xfd':
-            op_type = op.REPLACE
-        else:
-            op_type = op.type
-        payloadfile.seek(payloadfile.tell() - 4)
+        op_type = op.type
+        print(op.type)
+        if op.type == op.REPLACE_ZSTD:
+            if payloadfile.read(4) != b'(\xb5/\xfd':
+                op_type = op.REPLACE
+            payloadfile.seek(payloadfile.tell() - 4)
         if op_type == op.REPLACE_ZSTD:
             dec = zstandard.ZstdDecompressor().decompressobj()
             while processed_len < data_length:
