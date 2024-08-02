@@ -10,7 +10,7 @@ from multiprocessing import cpu_count
 import zstandard
 
 import update_metadata_pb2 as um
-
+from update_metadata_reader import Type
 flatten = lambda l: [item for sublist in l for item in sublist]
 
 
@@ -41,7 +41,7 @@ class Dumper:
     def open_payloadfile(self):
         return open(self.payloadpath, 'rb')
 
-    def run(self, slow=False) -> bool:
+    def run(self) -> bool:
         if self.images == "":
             partitions = self.dam.partitions
         else:
@@ -80,15 +80,10 @@ class Dumper:
             )
 
         self.payloadfile.close()
-        if slow:
-            self.extract_slow(partitions_with_ops)
-        else:
-            self.multiprocess_partitions(partitions_with_ops)
+        self.multiprocess_partitions(partitions_with_ops)
         return True
 
-    def extract_slow(self, partitions):
-        for part in partitions:
-            self.dump_part(part)
+
 
     def multiprocess_partitions(self, partitions):
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
@@ -124,11 +119,11 @@ class Dumper:
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
         op_type = op.type
-        if op.type == op.REPLACE_ZSTD:
+        if op.type == Type.REPLACE_ZSTD:
             if payloadfile.read(4) != b'(\xb5/\xfd':
-                op_type = op.REPLACE
+                op_type = Type.REPLACE
             payloadfile.seek(payloadfile.tell() - 4)
-        if op_type == op.REPLACE_ZSTD:
+        if op_type == Type.REPLACE_ZSTD:
             dec = zstandard.ZstdDecompressor().decompressobj()
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
@@ -136,7 +131,7 @@ class Dumper:
                 data = dec.decompress(data)
                 out_file.write(data)
                 out_file.write(dec.flush())
-        elif op_type == op.REPLACE_XZ:
+        elif op_type == Type.REPLACE_XZ:
             dec = lzma.LZMADecompressor()
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
@@ -148,7 +143,7 @@ class Dumper:
                     if dec.needs_input or dec.eof:
                         break
                     data = b''
-        elif op_type == op.REPLACE_BZ:
+        elif op_type == Type.REPLACE_BZ:
             dec = bz2.BZ2Decompressor()
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
@@ -160,7 +155,7 @@ class Dumper:
                     if dec.needs_input or dec.eof:
                         break
                     data = b''
-        elif op_type == op.REPLACE:
+        elif op_type == Type.REPLACE:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             payloadfile.seek(payloadfile.tell() - 4)
             while processed_len < data_length:
@@ -168,7 +163,7 @@ class Dumper:
                 processed_len += len(data)
                 out_file.write(data)
 
-        elif op_type == op.SOURCE_COPY:
+        elif op_type == Type.SOURCE_COPY:
             if not self.diff:
                 print("SOURCE_COPY supported only for differential OTA")
                 sys.exit(-2)
@@ -181,7 +176,7 @@ class Dumper:
                     processed_len += len(data)
                     out_file.write(data)
                 processed_len = 0
-        elif op_type == op.ZERO:
+        elif op_type == Type.ZERO:
             for ext in op.dst_extents:
                 out_file.seek(ext.start_block * self.block_size)
                 data_length = ext.num_blocks * self.block_size
@@ -196,6 +191,7 @@ class Dumper:
         del data
 
     def dump_part(self, part):
+        print(part)
         name = part["partition"].partition_name
         out_file = open(f"{self.out}/{name}.img", "wb")
 
