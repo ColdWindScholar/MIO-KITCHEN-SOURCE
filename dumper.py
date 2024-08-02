@@ -75,7 +75,7 @@ class Dumper:
                 )
             partitions_with_ops.append(
                 {
-                    "partition": partition,
+                    "partition": partition.partition_name,
                     "operations": operations,
                 }
             )
@@ -84,7 +84,7 @@ class Dumper:
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = {executor.submit(self.dump_part, part): part for part in partitions_with_ops}
             for future in as_completed(futures):
-                partition_name = futures[future]['partition'].partition_name
+                partition_name = futures[future]['partition']
                 future.result()
                 print(f"{partition_name} Done!")
         return True
@@ -189,7 +189,7 @@ class Dumper:
 
     def dump_part(self, part):
         print(part)
-        name = part["partition"].partition_name
+        name = part["partition"]
         out_file = open(f"{self.out}/{name}.img", "wb")
 
         if self.diff:
