@@ -1016,6 +1016,7 @@ class Welcome(ttk.Frame):
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
+        jzxs(win)
         self.wait_window()
         states.in_oobe = False
 
@@ -1023,6 +1024,7 @@ class Welcome(ttk.Frame):
         if self.frame:
             self.frame.destroy()
         self.frame = ttk.Frame(self)
+        jzxs(win)
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
