@@ -1007,7 +1007,8 @@ class Welcome(ttk.Frame):
             1: self.main,
             2: self.license,
             3: self.private,
-            4: self.done
+            4: self.support,
+            5: self.done
         }
         if frames.get(oobe):
             frames.get(oobe, self.main)()
@@ -1078,10 +1079,21 @@ class Welcome(ttk.Frame):
             (te := Text(self.frame)).insert('insert', f.read())
         te.pack(fill=BOTH)
         ttk.Label(self.frame, text=lang.t3).pack()
+        ttk.Button(self.frame, text=lang.text138, command=self.support).pack(fill=BOTH, side='bottom')
+
+    def support(self):
+        settings.set_value("oobe", 4)
+        self.reframe()
+        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
+                                                                  expand=True)
+        ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        self.photo = PhotoImage(data=images.wechat_byte)
+        Label(self.frame, image=self.photo).pack(padx=5, pady=5)
+        ttk.Label(self.frame, text=lang.text109).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
 
     def done(self):
-        settings.set_value("oobe", 4)
+        settings.set_value("oobe", 5)
         self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
                                                                   expand=True)
@@ -4190,7 +4202,7 @@ unpackg: UnpackGui
 def init():
     if settings.updating in ['1', '2']:
         Updater()
-    if int(settings.oobe) < 4:
+    if int(settings.oobe) < 5:
         Welcome()
     if not os.path.exists(tool_bin):
         error(1, 'Sorry,Not support your device yet.')
