@@ -191,12 +191,7 @@ class Dumper:
         print(part)
         name = part["partition"]
         out_file = open(f"{self.out}/{name}.img", "wb")
-
-        if self.diff:
-            old_file = open(f"{self.old}/{name}.img", "rb")
-        else:
-            old_file = None
-
+        old_file = open(f"{self.old}/{name}.img", "rb") if self.diff else None
         with self.open_payloadfile() as payloadfile:
             self.tls.payloadfile = payloadfile
             for op in part["operations"]:
