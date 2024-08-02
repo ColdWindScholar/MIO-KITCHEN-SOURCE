@@ -203,7 +203,6 @@ class Dumper:
         del data
 
     def dump_part(self, part):
-        print(part)
         name = part["name"]
         out_file = open(f"{self.out}/{name}.img", "wb")
         old_file = open(f"{self.old}/{name}.img", "rb") if self.diff else None
