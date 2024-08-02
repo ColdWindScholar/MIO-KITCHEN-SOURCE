@@ -164,9 +164,9 @@ class Dumper:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             payloadfile.seek(payloadfile.tell() - 4)
             while processed_len < data_length:
-                    data = payloadfile.read(buffsize)
-                    processed_len += len(data)
-                    out_file.write(data)
+                data = payloadfile.read(buffsize)
+                processed_len += len(data)
+                out_file.write(data)
 
         elif op_type == op.SOURCE_COPY:
             if not self.diff:
