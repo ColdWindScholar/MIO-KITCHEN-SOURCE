@@ -123,9 +123,7 @@ class Dumper:
         op = operation["operation"]
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
-        if op.type == op.REPLACE_ZSTD and payloadfile.read(4) == b'\x28\xb5\x2f\xfd':
-            op_type = op.REPLACE_ZSTD
-        elif op.type == op.REPLACE_ZSTD:
+        if op.type == op.REPLACE_ZSTD and payloadfile.read(4) != b'\x28\xb5\x2f\xfd':
             op_type = op.REPLACE
         else:
             op_type = op.type
