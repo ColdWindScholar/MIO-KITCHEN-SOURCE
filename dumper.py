@@ -11,6 +11,7 @@ import zstandard
 
 import update_metadata_pb2 as um
 from update_metadata_reader import Type
+
 flatten = lambda l: [item for sublist in l for item in sublist]
 
 
@@ -82,8 +83,6 @@ class Dumper:
         self.payloadfile.close()
         self.multiprocess_partitions(partitions_with_ops)
         return True
-
-
 
     def multiprocess_partitions(self, partitions):
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
