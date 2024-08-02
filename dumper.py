@@ -42,7 +42,6 @@ class Dumper:
         return open(self.payloadpath, 'rb')
 
     def run(self) -> bool:
-        print(self.dam2.partitions[0])
         if self.images == "":
             partitions = self.dam2.partitions
         else:
