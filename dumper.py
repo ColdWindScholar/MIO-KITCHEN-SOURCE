@@ -9,7 +9,6 @@ from multiprocessing import cpu_count
 
 import zstandard
 
-import update_metadata_pb2 as um
 from update_metadata_reader import Type, Metadata
 
 flatten = lambda l: [item for sublist in l for item in sublist]
@@ -43,16 +42,15 @@ class Dumper:
         return open(self.payloadpath, 'rb')
 
     def run(self) -> bool:
-        print(self.dam.partitions[0])
         print(self.dam2.partitions[0])
         if self.images == "":
-            partitions = self.dam.partitions
+            partitions = self.dam2.partitions
         else:
             partitions = []
             for image in self.images:
                 found = False
-                for dam_part in self.dam.partitions:
-                    if dam_part.partition_name == image:
+                for dam_part in self.dam2.partitions:
+                    if dam_part.get('1') == image:
                         partitions.append(dam_part)
                         found = True
                         break
@@ -66,11 +64,15 @@ class Dumper:
         partitions_with_ops = []
         for partition in partitions:
             operations = []
-            for operation in partition.operations:
-                self.payloadfile.seek(self.data_offset + operation.data_offset)
+            if isinstance(partition.get('8'), dict):
+                operations_ = [partition.get('8')]
+            else:
+                operations_ = partition.get('8')
+            for operation in operations_:
+                self.payloadfile.seek(self.data_offset + int(operation.get("2")))
                 operations.append({"data_offset": self.payloadfile.tell(), "operation": operation,
-                                   "data_length": operation.data_length})
-            partitions_with_ops.append({"name": partition.partition_name, "operations": operations, })
+                                   "data_length": int(operation.get("3"))})
+            partitions_with_ops.append({"name": partition.get('1'), "operations": operations})
 
         self.payloadfile.close()
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
@@ -93,9 +95,7 @@ class Dumper:
         manifest = self.payloadfile.read(manifest_size)
         self.metadata_signature = self.payloadfile.read(metadata_signature_size)
         self.data_offset = self.payloadfile.tell()
-        self.dam = um.DeltaArchiveManifest()
         self.dam2 = Metadata(manifest)
-        self.dam.ParseFromString(manifest)
         self.block_size = self.dam2.block_size
 
     def data_for_op(self, operation, out_file, old_file):
@@ -107,8 +107,8 @@ class Dumper:
         op = operation["operation"]
 
         # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
-        op_type = op.type
-        if op.type == Type.REPLACE_ZSTD:
+        op_type = int(op.get('1'))
+        if op_type == Type.REPLACE_ZSTD:
             if payloadfile.read(4) != b'(\xb5/\xfd':
                 op_type = Type.REPLACE
             payloadfile.seek(payloadfile.tell() - 4)
@@ -122,7 +122,11 @@ class Dumper:
                 out_file.write(dec.flush())
         elif op_type == Type.REPLACE_XZ:
             dec = lzma.LZMADecompressor()
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
+            if isinstance(op.get('6'), dict):
+                dst_extents = [op.get('6')]
+            else:
+                dst_extents = op.get('6')
+            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
                 processed_len += len(data)
@@ -134,7 +138,11 @@ class Dumper:
                     data = b''
         elif op_type == Type.REPLACE_BZ:
             dec = bz2.BZ2Decompressor()
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
+            if isinstance(op.get('6'), dict):
+                dst_extents = [op.get('6')]
+            else:
+                dst_extents = op.get('6')
+            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
                 processed_len += len(data)
@@ -145,7 +153,11 @@ class Dumper:
                         break
                     data = b''
         elif op_type == Type.REPLACE:
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
+            if isinstance(op.get('6'), dict):
+                dst_extents = [op.get('6')]
+            else:
+                dst_extents = op.get('6')
+            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
             payloadfile.seek(payloadfile.tell() - 4)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
@@ -156,7 +168,11 @@ class Dumper:
             if not self.diff:
                 print("SOURCE_COPY supported only for differential OTA")
                 sys.exit(-2)
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
+            if isinstance(op.get('6'), dict):
+                dst_extents = [op.get('6')]
+            else:
+                dst_extents = op.get('6')
+            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
             for ext in op.src_extents:
                 old_file.seek(ext.start_block * self.block_size)
                 data_length = ext.num_blocks * self.block_size
@@ -166,16 +182,20 @@ class Dumper:
                     out_file.write(data)
                 processed_len = 0
         elif op_type == Type.ZERO:
-            for ext in op.dst_extents:
-                out_file.seek(ext.start_block * self.block_size)
-                data_length = ext.num_blocks * self.block_size
+            if isinstance(op.get('6'), dict):
+                dst_extents = [op.get('6')]
+            else:
+                dst_extents = op.get('6')
+            for ext in dst_extents:
+                out_file.seek(int(ext.get('1')) * self.block_size)
+                data_length = int(ext.get('2')) * self.block_size
                 while processed_len < data_length:
                     data = bytes(min(data_length - processed_len, buffsize))
                     out_file.write(data)
                     processed_len += len(data)
                 processed_len = 0
         else:
-            print(f"Unsupported type = {op.type:d}")
+            print(f"Unsupported type = {op_type:d}")
             sys.exit(-1)
         del data
 
