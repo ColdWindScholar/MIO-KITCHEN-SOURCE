@@ -68,7 +68,7 @@ class Dumper:
             else:
                 operations_ = partition.get('8')
             for operation in operations_:
-                self.payloadfile.seek(self.data_offset + int(operation.get("2")))
+                self.payloadfile.seek(self.data_offset + int(operation.get("2", 0)))
                 operations.append({"data_offset": self.payloadfile.tell(), "operation": operation,
                                    "data_length": int(operation.get("3"))})
             partitions_with_ops.append({"name": partition.get('1'), "operations": operations})
