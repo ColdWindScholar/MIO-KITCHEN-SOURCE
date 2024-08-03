@@ -1,9 +1,8 @@
 import blackboxprotobuf
-import enum
 from json import loads
 
 
-class Type(enum.EnumType):
+class Type(int):
     REPLACE = 0
     REPLACE_BZ = 1
     MOVE = 2
