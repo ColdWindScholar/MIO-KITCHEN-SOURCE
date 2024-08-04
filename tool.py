@@ -1633,7 +1633,7 @@ class ModuleManager:
         extra_envs = {}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
-                         "run": lambda cmd: call(exe=str(cmd), kz='N', shstate=True),
+                         "run": lambda cmd: call(exe=str(cmd), extra=False),
                          'gettype': lambda file_: gettype(file_),
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
 
@@ -2528,7 +2528,7 @@ class Dbkxyt:
                 utils.simg2img(path)
             try:
                 print(f"[Compress] {os.path.basename(path)}...")
-                call(f"zstd -5 --rm {path} -o {path}.zst")
+                call(['zstd', '-5', '--rm', path,'-o', f'{path}.zst'])
             except Exception as e:
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
@@ -2738,16 +2738,19 @@ class StdoutRedirector:
             error(1, self.error_info)
 
 
-def call(exe, kz='Y', out=0, shstate=False, sp=0):
-    cmd = f'{tool_bin}{exe}' if kz == "Y" else exe
+def call(exe, extra=True, out=0):
+    if isinstance(exe, list):
+        cmd = exe
+        if extra:
+            cmd[0] = f"{tool_bin}{exe[0]}"
+    else:
+        cmd = f'{tool_bin}{exe}' if extra else exe
     if os.name != 'posix':
         conf = subprocess.CREATE_NO_WINDOW
     else:
-        if sp == 0:
-            cmd = shlex.split(cmd)
         conf = 0
     try:
-        ret = subprocess.Popen(cmd, shell=shstate, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, creationflags=conf)
         pid = ret.pid
         states.open_pids.append(pid)
@@ -2888,8 +2891,7 @@ def dboot(nm: str = 'boot'):
 
     if os.path.isdir(work + nm + os.sep + "ramdisk"):
         os.chdir(work + nm + os.sep + "ramdisk")
-        call(exe=f"busybox ash -c \"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio\"", sp=1,
-             shstate=True)
+        call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
         os.chdir(work + nm + os.sep)
         with open(work + nm + os.sep + "comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
