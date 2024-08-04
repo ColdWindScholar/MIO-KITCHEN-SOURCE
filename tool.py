@@ -1427,8 +1427,7 @@ class ModuleManager:
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
                 shell = 'ash' if os.name == 'posix' else 'bash'
-                call(
-                    f"busybox {shell} {file} {(script_path + 'main.sh').replace(os.sep, '/')}")
+                call(['busybox', shell, file, (script_path + 'main.sh').replace(os.sep, '/')])
                 try:
                     os.remove(file)
                 except (Exception, BaseException) as e:
@@ -3143,8 +3142,7 @@ class Packxx(Toplevel):
                 if os.name == 'nt':
                     try:
                         if folder := findfolder(work, "com.google.android.apps.nbu."):
-                            call(
-                                f"mv {folder} {folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')}")
+                            call(['mv', folder, folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception as e:
                         print(e)
                 fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
@@ -3688,7 +3686,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text87 % name)
     else:
         print(lang.text88 % (name, 'br'))
-        call(f"brotli -q {brl} -j -w 24 {work + name}.new.dat -o {work + name}.new.dat.br")
+        call(['brotli', '-q', str(brl), '-j', '-w', '24', f"{work + name}.new.dat", '-o', f"{work + name}.new.dat.br"])
         if os.access(work + name + ".new.dat", os.F_OK):
             try:
                 os.remove(work + name + ".new.dat")
@@ -4123,7 +4121,7 @@ class FormatConversion(ttk.LabelFrame):
                     if hget == 'br':
                         if os.access(work + i, os.F_OK):
                             print(lang.text79 + i)
-                            call("brotli -dj " + work + i)
+                            call(['brotli', '-dj', work + i])
                     if hget == 'dat':
                         if os.access(work + i, os.F_OK):
                             print(lang.text79 + work + i)
@@ -4150,7 +4148,7 @@ class FormatConversion(ttk.LabelFrame):
                     if hget == 'br':
                         if os.access(work + i, os.F_OK):
                             print(lang.text79 + i)
-                            call(f"brotli -dj {work + i}")
+                            call(['brotli', '-dj', work + i])
                     if hget in ['dat', 'br']:
                         if os.path.exists(work):
                             if hget == 'br':
@@ -4178,7 +4176,7 @@ class FormatConversion(ttk.LabelFrame):
                         datbr(work, os.path.basename(i).split('.')[0], "dat")
                     if hget == 'br':
                         print(lang.text79 + i)
-                        call(f"brotli -dj {work + i}")
+                        call(['brotli', '-dj', work + i])
 
                 elif f_get == 'br':
                     if hget == 'raw':
@@ -4186,8 +4184,8 @@ class FormatConversion(ttk.LabelFrame):
                     if hget in ['raw', 'sparse']:
                         datbr(work, os.path.basename(i).split('.')[0], 0)
                     if hget == 'dat':
-                        print(lang.text88 % os.path.basename(i).split('.')[0])
-                        call(f"brotli -q 0 -j -w 24 {work + i} -o {work + i}.br")
+                        print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
+                        call(['brotli', '-q', '0',  '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
                         if os.access(work + i + '.br', os.F_OK):
                             try:
                                 os.remove(work + i)
