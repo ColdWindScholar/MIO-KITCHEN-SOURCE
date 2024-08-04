@@ -1033,12 +1033,12 @@ class Welcome(ttk.Frame):
         for i in self.winfo_children():
             i.destroy()
         self.reframe()
-        ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+        ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             values=[i.rsplit('.', 1)[0] for i in
                                     os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
-        lb3_.pack(padx=10, pady=10, side='top')
+        lb3_.pack(padx=10, pady=10, side='top', fill=BOTH)
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
 
@@ -1058,12 +1058,11 @@ class Welcome(ttk.Frame):
                                   i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
-        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                       expand=True)
+        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb.pack(padx=10, pady=10, side='top', fill=X)
         te = Text(self.frame)
-        te.pack(fill=BOTH, side='top')
+        te.pack(fill=BOTH, side='top', expand=True)
         load_license()
         ttk.Label(self.frame, text=lang.t1).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
@@ -1071,21 +1070,20 @@ class Welcome(ttk.Frame):
     def private(self):
         settings.set_value("oobe", 3)
         self.reframe()
-        ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                  expand=True)
+        ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         with open(os.path.join(cwd_path, "bin", "licenses", "private.txt"), 'r',
                   encoding='UTF-8') as f:
             (te := Text(self.frame)).insert('insert', f.read())
-        te.pack(fill=BOTH)
+        te.pack(fill=BOTH, expand=True)
         ttk.Label(self.frame, text=lang.t3).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.support).pack(fill=BOTH, side='bottom')
 
     def support(self):
         settings.set_value("oobe", 4)
         self.reframe()
-        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                      expand=True)
+        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH
+                                                                      )
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(self.frame, image=self.photo).pack(padx=5, pady=5)
@@ -1095,11 +1093,10 @@ class Welcome(ttk.Frame):
     def done(self):
         settings.set_value("oobe", 5)
         self.reframe()
-        ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                  expand=True)
+        ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
-            side='top', fill=BOTH, padx=10, pady=10)
+            side='top', fill=BOTH, padx=10, pady=10, expand=True)
         ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
 
