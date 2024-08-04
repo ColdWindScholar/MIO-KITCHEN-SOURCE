@@ -70,7 +70,7 @@ class Dumper:
             for operation in operations_:
                 self.payloadfile.seek(self.data_offset + int(operation.get("2", 0)))
                 operations.append({"data_offset": self.payloadfile.tell(), "operation": operation,
-                                   "data_length": int(operation.get("3"))})
+                                   "data_length": int(operation.get("3", 0))})
             partitions_with_ops.append({"name": partition.get('1'), "operations": operations})
 
         self.payloadfile.close()
