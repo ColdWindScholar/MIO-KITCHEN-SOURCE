@@ -27,8 +27,7 @@ class Dumper:
             self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), buffsize=8192
     ):
         self.payloadpath = payloadfile
-        payloadfile = self.open_payloadfile()
-        self.payloadfile = payloadfile
+        self.payloadfile = self.open_payloadfile()
         self.tls = threading.local()
         self.out = out
         self.diff = diff
