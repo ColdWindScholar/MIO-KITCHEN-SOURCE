@@ -3698,7 +3698,7 @@ def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
-    other_ = '-E legacy-compress' if old_kernel else []
+    other_ = '-E legacy-compress' if old_kernel else ''
     cmd = ['mkfs.erofs', *other_.split(), f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
      f'--product-out={work}',
      f'--fs-config-file={work}config{os.sep}{name}_fs_config',
