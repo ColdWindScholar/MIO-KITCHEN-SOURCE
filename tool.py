@@ -3845,8 +3845,6 @@ class ProjectMenuUtils(ttk.LabelFrame):
     @staticmethod
     def select_print():
         print(lang.text96 + dn.get())
-        if ' ' in dn.get() or not dn.get().isprintable():
-            print(lang.t29 + dn.get())
 
     def gui(self):
         self.combobox = ttk.Combobox(self, textvariable=dn, state='readonly')
@@ -4205,8 +4203,6 @@ unpackg: UnpackGui
 def init_verify():
     if not os.path.exists(tool_bin):
         error(1, 'Sorry,Not support your device yet.')
-    if ' ' in settings.path:
-        ask_win2(lang.warn16 % lang.space)
     if not settings.path.isprintable():
         ask_win2(lang.warn16 % lang.special_words)
 
