@@ -192,9 +192,8 @@ class Dumper:
                 out_file.seek(int(ext.get('1', 0)) * self.block_size)
                 data_length = int(ext.get('2', 0)) * self.block_size
                 while processed_len < data_length:
-                    data = bytes(min(data_length - processed_len, buffsize))
-                    out_file.write(data)
-                    processed_len += len(data)
+                    out_file.write(bytes(min(data_length - processed_len, buffsize)))
+                    processed_len += len(min(data_length - processed_len, buffsize))
                 processed_len = 0
         else:
             print(f"Unsupported type = {op_type:d}")
