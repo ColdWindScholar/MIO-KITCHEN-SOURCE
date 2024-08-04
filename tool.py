@@ -4203,9 +4203,9 @@ def init_verify():
     if not os.path.exists(tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if ' ' in settings.path:
-        error(1, f'The path contain space.')
+        ask_win2(lang.warn16 % lang.space)
     if not settings.path.isprintable():
-        error(1, 'The path contain special words.')
+        ask_win2(lang.warn16 % lang.special_words)
 
 
 def init():
