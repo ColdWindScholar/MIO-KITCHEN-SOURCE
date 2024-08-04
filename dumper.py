@@ -4,6 +4,7 @@ import lzma
 import struct
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
@@ -71,6 +72,7 @@ class Dumper:
                 self.payloadfile.seek(self.data_offset + int(operation.get("2", 0)))
                 operations.append({"data_offset": self.payloadfile.tell(), "operation": operation,
                                    "data_length": int(operation.get("3", 0))})
+
             partitions_with_ops.append({"name": partition.get('1'), "operations": operations})
 
         self.payloadfile.close()
@@ -125,7 +127,7 @@ class Dumper:
                 dst_extents = [op.get('6')]
             else:
                 dst_extents = op.get('6')
-            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
+            out_file.seek(int(dst_extents[0].get('1', 0)) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
                 processed_len += len(data)
@@ -141,7 +143,7 @@ class Dumper:
                 dst_extents = [op.get('6')]
             else:
                 dst_extents = op.get('6')
-            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
+            out_file.seek(int(dst_extents[0].get('1', 0)) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
                 processed_len += len(data)
@@ -156,7 +158,7 @@ class Dumper:
                 dst_extents = [op.get('6')]
             else:
                 dst_extents = op.get('6')
-            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
+            out_file.seek(int(dst_extents[0].get('1', 0)) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
                 processed_len += len(data)
@@ -170,14 +172,14 @@ class Dumper:
                 dst_extents = [op.get('6')]
             else:
                 dst_extents = op.get('6')
-            out_file.seek(int(dst_extents[0].get('1')) * self.block_size)
+            out_file.seek(int(dst_extents[0].get('1', 0)) * self.block_size)
             if isinstance(op.get('4'), dict):
                 src_extents = [op.get('4')]
             else:
                 src_extents = op.get('4')
             for ext in src_extents:
-                old_file.seek(int(ext.get('1')) * self.block_size)
-                data_length = int(ext.get('2')) * self.block_size
+                old_file.seek(int(ext.get('1', 0)) * self.block_size)
+                data_length = int(ext.get('2', 0)) * self.block_size
                 while processed_len < data_length:
                     data = old_file.read(buffsize)
                     processed_len += len(data)
@@ -189,8 +191,8 @@ class Dumper:
             else:
                 dst_extents = op.get('6')
             for ext in dst_extents:
-                out_file.seek(int(ext.get('1')) * self.block_size)
-                data_length = int(ext.get('2')) * self.block_size
+                out_file.seek(int(ext.get('1', 0)) * self.block_size)
+                data_length = int(ext.get('2', 0)) * self.block_size
                 while processed_len < data_length:
                     data = bytes(min(data_length - processed_len, buffsize))
                     out_file.write(data)
