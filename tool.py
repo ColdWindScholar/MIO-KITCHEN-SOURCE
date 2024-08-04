@@ -1085,7 +1085,7 @@ class Welcome(ttk.Frame):
         settings.set_value("oobe", 4)
         self.reframe()
         ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH,
-                                                                  expand=True)
+                                                                      expand=True)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(self.frame, image=self.photo).pack(padx=5, pady=5)
@@ -4199,13 +4199,21 @@ project_menu: ProjectMenuUtils
 unpackg: UnpackGui
 
 
+def init_verify():
+    if not os.path.exists(tool_bin):
+        error(1, 'Sorry,Not support your device yet.')
+    if ' ' in settings.path:
+        error(1, 'The path contain space')
+    if not settings.path.isprintable():
+        error(1, 'The path contain special words.')
+
+
 def init():
     if settings.updating in ['1', '2']:
         Updater()
     if int(settings.oobe) < 5:
         Welcome()
-    if not os.path.exists(tool_bin):
-        error(1, 'Sorry,Not support your device yet.')
+    init_verify()
     try:
         win.winfo_exists()
     except TclError:
