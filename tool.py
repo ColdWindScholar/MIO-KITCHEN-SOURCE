@@ -2742,6 +2742,7 @@ def call(exe, extra=True, out=0):
         cmd = exe
         if extra:
             cmd[0] = f"{tool_bin}{exe[0]}"
+        cmd = [i for i in cmd if i]
     else:
         cmd = f'{tool_bin}{exe}' if extra else exe
     if os.name != 'posix':
@@ -2849,7 +2850,7 @@ def jboot(bn: str = 'boot'):
             return
     re_folder(work + bn)
     os.chdir(work + bn)
-    if call(f"magiskboot unpack -h {boot}") != 0:
+    if call(['magiskboot', 'unpack', '-h', f'{boot}']) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cwd_path)
         rmtree(work + bn)
@@ -2862,14 +2863,14 @@ def jboot(bn: str = 'boot'):
         if comp != "unknown":
             os.rename(work + bn + os.sep + "ramdisk.cpio",
                       work + bn + os.sep + "ramdisk.cpio.comp")
-            if call(f"magiskboot decompress {work + bn + os.sep + 'ramdisk.cpio.comp'} {work + bn + os.sep + 'ramdisk.cpio'}") != 0:
+            if call(["magiskboot", "decompress", work + bn + os.sep + 'ramdisk.cpio.comp', work + bn + os.sep + 'ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
         if not os.path.exists(work + bn + os.sep + "ramdisk"):
             os.mkdir(work + bn + os.sep + "ramdisk")
         os.chdir(work + bn + os.sep)
         print("Unpacking Ramdisk...")
-        call('cpio -i -d -F ramdisk.cpio -D ramdisk')
+        call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
         os.chdir(cwd_path)
     else:
         print("Unpack Done!")
@@ -2896,7 +2897,7 @@ def dboot(nm: str = 'boot'):
             comp = compf.read()
         print(f"Compressing:{comp}")
         if comp != "unknown":
-            if call(f"magiskboot compress={comp} ramdisk-new.cpio") != 0:
+            if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
                 print("Failed to pack Ramdisk...")
                 os.remove("ramdisk-new.cpio")
             else:
@@ -2913,7 +2914,7 @@ def dboot(nm: str = 'boot'):
         if comp == "unknown":
             flag = "-n"
     os.chdir(work + nm + os.sep)
-    if call(f"magiskboot repack {flag} {boot}") != 0:
+    if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
     else:
         os.remove(work + f"{nm}.img")
@@ -3713,8 +3714,7 @@ def make_ext4fs(name, work, sparse, size=0, UTC=None):
     if not size:
         size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
-    return call(
-        f"make_ext4fs -J -T {UTC} {sparse} -S {work}config{os.sep}{name}_file_contexts -l {size} -C {work}config{os.sep}{name}_fs_config -L {name} -a {name} {work + name}.img {work + name}")
+    return call(['make_ext4fs', '-J', '-T', f'{UTC}', f'{sparse}', '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}', '-C', f'{work}config{os.sep}{name}_fs_config', '-L', f'{name}', '-a', name, f"{work + name}.img", work + name])
 
 
 @animation
@@ -3728,14 +3728,14 @@ def make_f2fs(name, work, UTC=None):
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(f'mkfs.f2fs {work + name}.img -O extra_attr -O inode_checksum -O sb_checksum -O compression -f') != 0:
+    if call(['mkfs.f2fs', f"{work + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O', 'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
     with open(f'{work}config{os.sep}{name}_file_contexts', 'a+', encoding='utf-8') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
-        f'sload.f2fs -f {work + name} -C {work}config{os.sep}{name}_fs_config -T {UTC} -s {work}config{os.sep}{name}_file_contexts -t /{name} -c {work + name}.img')
+        ['sload.f2fs', '-f', work+name, '-C', f'{work}config{os.sep}{name}_fs_config', '-T', f'{UTC}', '-s', f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work+name}.img'])
 
 
 def mke2fs(name, work, sparse, size=0, UTC=None):
@@ -4043,7 +4043,7 @@ class UnpackGui(ttk.LabelFrame):
 
 
 def img2simg(path):
-    call(f'img2simg {path} {path}s')
+    call(['img2simg', path, f'{path}s'])
     if os.path.exists(path + 's'):
         try:
             os.remove(path)
