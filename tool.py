@@ -1231,7 +1231,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
-                exe=f"dtc -@ -I dtb -O dts {work + bn + os.sep + 'dtbo' + os.sep + dtbo} -o {os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])}",
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + os.sep + 'dtbo' + os.sep + dtbo, '-o', os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
                 out=1)
     print(lang.text5)
     try:
@@ -1252,7 +1252,7 @@ def pack_dtbo() -> bool:
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
             call(
-                exe=f"dtc -@ -I dts -O dtb {os.path.join(work, 'dtbo', 'dts', dts)} -o {os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])}",
+                exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', f"{os.path.join(work,'dtbo','dts',dts)}", '-o', os.path.join(work,'dtbo','dtbo','dtbo.'+os.path.basename(dts).rsplit('.', 1)[1])],
                 out=1)
     print(f"{lang.text7}:dtbo.img")
     list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
@@ -3431,11 +3431,11 @@ def unpack(chose, form: str = '') -> bool:
     for i in chose:
         if os.access(work + i + ".zst", os.F_OK):
             print(lang.text79 + i + ".zst")
-            call('zstd --rm -d ' + work + i + '.zst')
+            call(['zstd', '--rm', '-d', work + i + '.zst'])
             return True
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
-            call("brotli -dj " + work + i + ".new.dat.br")
+            call(['brotli', '-dj', work + i + ".new.dat.br"])
         if os.access(work + i + ".new.dat.1", os.F_OK):
             with open(work + i + ".new.dat", 'ab') as ofd:
                 for n in range(100):
@@ -3523,7 +3523,7 @@ def unpack(chose, form: str = '') -> bool:
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
-                if call(exe=f"extract.erofs -i '{os.path.join(settings.path, dn.get(), i + '.img')}' -o '{work}' -x",
+                if call(exe=['extract.erofs', '-i', os.path.join(settings.path, dn.get(), i + '.img'), '-o', work, '-x'],
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
@@ -3533,7 +3533,7 @@ def unpack(chose, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                if call(exe=f"extract.f2fs -o '{work}' '{os.path.join(settings.path, dn.get(), i + '.img')}'",
+                if call(exe=['extract.f2fs', '-o', work, os.path.join(settings.path, dn.get(), i + '.img')],
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
@@ -3701,8 +3701,12 @@ def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
-    other_ = '-E legacy-compress' if old_kernel else ''
-    cmd = f"mkfs.erofs {other_} -z{extra_} -T {UTC} --mount-point=/{name} --product-out={work} --fs-config-file={work}config{os.sep}{name}_fs_config --file-contexts={work}config{os.sep}{name}_file_contexts {work + name}.img {work + name + os.sep}"
+    other_ = '-E legacy-compress' if old_kernel else []
+    cmd = ['mkfs.erofs', *other_.split(), f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
+     f'--product-out={work}',
+     f'--fs-config-file={work}config{os.sep}{name}_fs_config',
+     f'--file-contexts={work}config{os.sep}{name}_file_contexts',
+     f'{work + name}.img', work + name + os.sep]
     return call(cmd, out=1)
 
 
@@ -3745,18 +3749,18 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     if call(
-            f"mke2fs -O ^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize -L {name} -I 256 -M /{name} -m 0 -t ext4 -b 4096 {work + name}_new.img {int(size)}") != 0:
+            ['mke2fs', '-O', '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L', name, '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work+name}_new.img', f'{int(size)}']) != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     ret = call(
-        f"e2fsdroid -e -T {UTC} -S {work}config{os.sep}{name}_file_contexts -C {work}config{os.sep}{name}_fs_config -a /{name} -f {work + name} {work + name}_new.img")
+        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C', f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work+name}', f'{work+name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     if sparse == "y":
-        call(f"img2simg {work + name}_new.img {work + name}.img")
+        call(['img2simg', f'{work+name}_new.img', f'{work+name}.img'])
         try:
             os.remove(work + name + "_new.img")
         except (Exception, BaseException):
@@ -3781,7 +3785,7 @@ def rmdir(path):
             try:
                 rmtree(path)
             except (Exception, BaseException):
-                call(f'busybox rm -rf "{path}"')
+                call(['busybox', 'rm', '-rf', path])
         except (Exception, BaseException):
             print(lang.warn11.format(path))
         win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
