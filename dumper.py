@@ -24,7 +24,7 @@ def u64(x):
 
 class Dumper:
     def __init__(
-            self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), buffsize=8192
+            self, payloadfile, out, diff=None, old=None, images=[], workers=cpu_count(), buffsize=8192
     ):
         self.payloadpath = payloadfile
         self.payloadfile = self.open_payloadfile()
@@ -41,7 +41,7 @@ class Dumper:
         return open(self.payloadpath, 'rb')
 
     def run(self) -> bool:
-        if self.images == "":
+        if not self.images:
             partitions = self.dam2.partitions
         else:
             partitions = []
@@ -55,7 +55,7 @@ class Dumper:
                 if not found:
                     print(f"Partition {image} not found in image")
 
-        if len(partitions) == 0:
+        if not partitions:
             print("Not operating on any partitions")
             return False
 
