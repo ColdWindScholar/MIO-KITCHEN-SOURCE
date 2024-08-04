@@ -4,7 +4,6 @@ import lzma
 import struct
 import sys
 import threading
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
