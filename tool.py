@@ -1228,7 +1228,8 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
-                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + os.sep + 'dtbo' + os.sep + dtbo, '-o', os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + os.sep + 'dtbo' + os.sep + dtbo, '-o',
+                     os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
                 out=1)
     print(lang.text5)
     try:
@@ -1249,7 +1250,8 @@ def pack_dtbo() -> bool:
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
             call(
-                exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', f"{os.path.join(work,'dtbo','dts',dts)}", '-o', os.path.join(work,'dtbo','dtbo','dtbo.'+os.path.basename(dts).rsplit('.', 1)[1])],
+                exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', f"{os.path.join(work, 'dtbo', 'dts', dts)}", '-o',
+                     os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
                 out=1)
     print(f"{lang.text7}:dtbo.img")
     list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
@@ -2524,7 +2526,7 @@ class Dbkxyt:
                 utils.simg2img(path)
             try:
                 print(f"[Compress] {os.path.basename(path)}...")
-                call(['zstd', '-5', '--rm', path,'-o', f'{path}.zst'])
+                call(['zstd', '-5', '--rm', path, '-o', f'{path}.zst'])
             except Exception as e:
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
@@ -2860,7 +2862,8 @@ def jboot(bn: str = 'boot'):
         if comp != "unknown":
             os.rename(work + bn + os.sep + "ramdisk.cpio",
                       work + bn + os.sep + "ramdisk.cpio.comp")
-            if call(["magiskboot", "decompress", work + bn + os.sep + 'ramdisk.cpio.comp', work + bn + os.sep + 'ramdisk.cpio']) != 0:
+            if call(["magiskboot", "decompress", work + bn + os.sep + 'ramdisk.cpio.comp',
+                     work + bn + os.sep + 'ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
         if not os.path.exists(work + bn + os.sep + "ramdisk"):
@@ -3140,7 +3143,8 @@ class Packxx(Toplevel):
                 if os.name == 'nt':
                     try:
                         if folder := findfolder(work, "com.google.android.apps.nbu."):
-                            call(['mv', folder, folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
+                            call(['mv', folder,
+                                  folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception as e:
                         print(e)
                 fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
@@ -3520,7 +3524,8 @@ def unpack(chose, form: str = '') -> bool:
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
-                if call(exe=['extract.erofs', '-i', os.path.join(settings.path, dn.get(), i + '.img'), '-o', work, '-x'],
+                if call(exe=['extract.erofs', '-i', os.path.join(settings.path, dn.get(), i + '.img'), '-o', work,
+                             '-x'],
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
@@ -3584,7 +3589,8 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     ttk.Label(frame_inner, text=text, font=(None, 20)).pack(side=TOP)
     frame_button = ttk.Frame(frame_inner)
 
-    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(padx=5, pady=5, fill=X, side='left', expand=True)
+    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(padx=5, pady=5, fill=X, side='left',
+                                                                             expand=True)
     ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(padx=5,
                                                                                                  pady=5,
                                                                                                  fill=X, side='left',
@@ -3693,33 +3699,35 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % (name, 'br'))
 
 
-def mkerofs(name, format_, work, level, old_kernel=0, UTC=None):
+def mkerofs(name: str, format_, work, level, old_kernel=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
     other_ = '-E legacy-compress' if old_kernel else ''
     cmd = ['mkfs.erofs', *other_.split(), f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
-     f'--product-out={work}',
-     f'--fs-config-file={work}config{os.sep}{name}_fs_config',
-     f'--file-contexts={work}config{os.sep}{name}_file_contexts',
-     f'{work + name}.img', work + name + os.sep]
+           f'--product-out={work}',
+           f'--fs-config-file={work}config{os.sep}{name}_fs_config',
+           f'--file-contexts={work}config{os.sep}{name}_file_contexts',
+           f'{work + name}.img', work + name + os.sep]
     return call(cmd, out=1)
 
 
 @animation
-def make_ext4fs(name, work, sparse, size=0, UTC=None):
+def make_ext4fs(name: str, work: str, sparse, size=0, UTC=None):
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
     if not size:
         size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
-    return call(['make_ext4fs', '-J', '-T', f'{UTC}', f'{sparse}', '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}', '-C', f'{work}config{os.sep}{name}_fs_config', '-L', f'{name}', '-a', name, f"{work + name}.img", work + name])
+    return call(
+        ['make_ext4fs', '-J', '-T', f'{UTC}', f'{sparse}', '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
+         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', f'{name}', '-a', name, f"{work + name}.img", work + name])
 
 
 @animation
-def make_f2fs(name, work, UTC=None):
+def make_f2fs(name: str, work: str, UTC=None):
     print(lang.text91 % name)
     size = Dirsize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
@@ -3729,14 +3737,16 @@ def make_f2fs(name, work, UTC=None):
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(['mkfs.f2fs', f"{work + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O', 'compression', '-f']) != 0:
+    if call(['mkfs.f2fs', f"{work + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O',
+             'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
     with open(f'{work}config{os.sep}{name}_file_contexts', 'a+', encoding='utf-8') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
-        ['sload.f2fs', '-f', work+name, '-C', f'{work}config{os.sep}{name}_fs_config', '-T', f'{UTC}', '-s', f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work+name}.img'])
+        ['sload.f2fs', '-f', work + name, '-C', f'{work}config{os.sep}{name}_fs_config', '-T', f'{UTC}', '-s',
+         f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work + name}.img'])
 
 
 def mke2fs(name, work, sparse, size=0, UTC=None):
@@ -3746,18 +3756,22 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     if call(
-            ['mke2fs', '-O', '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L', name, '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work+name}_new.img', f'{int(size)}']) != 0:
+            ['mke2fs', '-O',
+             '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L', name,
+             '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work + name}_new.img',
+             f'{int(size)}']) != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     ret = call(
-        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C', f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work+name}', f'{work+name}_new.img'])
+        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C',
+         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}', f'{work + name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     if sparse == "y":
-        call(['img2simg', f'{work+name}_new.img', f'{work+name}.img'])
+        call(['img2simg', f'{work + name}_new.img', f'{work + name}.img'])
         try:
             os.remove(work + name + "_new.img")
         except (Exception, BaseException):
@@ -4184,7 +4198,7 @@ class FormatConversion(ttk.LabelFrame):
                         datbr(work, os.path.basename(i).split('.')[0], 0)
                     if hget == 'dat':
                         print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
-                        call(['brotli', '-q', '0',  '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
+                        call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
                         if os.access(work + i + '.br', os.F_OK):
                             try:
                                 os.remove(work + i)
