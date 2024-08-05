@@ -2744,6 +2744,8 @@ def call(exe, extra=True, out=0):
         cmd = [i for i in cmd if i]
     else:
         cmd = f'{tool_bin}{exe}' if extra else exe
+        if os.name == 'posix':
+            cmd = cmd.split()
     if os.name != 'posix':
         conf = subprocess.CREATE_NO_WINDOW
     else:
