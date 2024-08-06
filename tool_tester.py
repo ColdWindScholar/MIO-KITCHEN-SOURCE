@@ -9,6 +9,7 @@ else:
     prog_path = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0])))
 
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
+from utils import *
 
 
 class Test(unittest.TestCase):
@@ -39,6 +40,9 @@ class Test(unittest.TestCase):
         for i in file_list:
             if not os.path.exists(os.path.join(tool_bin, i)):
                 raise FileNotFoundError(f'{i} is missing!')
+
+    def test_v_code(self):
+        self.assertNotEqual(v_code(), v_code())
 
     def tearDown(self):
         print('Test Done!')
