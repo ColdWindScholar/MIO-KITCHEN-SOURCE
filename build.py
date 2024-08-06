@@ -18,7 +18,11 @@ import platform
 import shutil
 import zipfile
 from platform import system
+
 from pip._internal.cli.main import main as _main
+
+from tool_tester import test_main, Test
+
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
         print(f"Installing {i}")
@@ -34,6 +38,8 @@ elif ostype == 'Darwin':
         print("Tkinter IS not exist!\nThe Build may not Work!")
 else:
     name = 'MIO-KITCHEN-win.zip'
+if Test:
+    test_main()
 
 
 def zip_folder(folder_path):
@@ -64,6 +70,7 @@ def zip_folder(folder_path):
 local = os.getcwd()
 print("Building...")
 import PyInstaller.__main__
+
 if ostype == 'Darwin':
     PyInstaller.__main__.run([
         'tool.py',
@@ -121,7 +128,8 @@ elif os.name == 'nt':
     ])
 if not os.path.exists('dist/bin'):
     os.makedirs('dist/bin', exist_ok=True)
-pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype, 'kemiaojiang.png', 'License_kemiaojiang.txt']
+pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype,
+          'kemiaojiang.png', 'License_kemiaojiang.txt']
 for i in os.listdir(local + os.sep + "bin"):
     if i in pclist:
         if os.path.isdir(f"{local}/bin/{i}"):
@@ -129,7 +137,7 @@ for i in os.listdir(local + os.sep + "bin"):
         else:
             shutil.copy(f"{local}/bin/{i}", f"{local}/dist/bin/{i}")
 if not os.path.exists('dist/LICENSE'):
-    shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep+'LICENSE')
+    shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep + 'LICENSE')
 if os.name == 'posix':
     if platform.machine() == 'x86_64' and os.path.exists(f'{local}/dist/bin/Linux/aarch64'):
         try:
