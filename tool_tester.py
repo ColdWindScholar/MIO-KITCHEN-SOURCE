@@ -49,6 +49,7 @@ class Test(unittest.TestCase):
         config = ConfigParser()
         config.read(set_file)
         self.assertIsNot(config.items('setting'), (None, None), 'The Setting Config Format Is Wrong!')
+        self.assertIs(gettype(os.path.join(prog_path, 'bin', 'extra_flash.zip')), 'zip', 'The Extra Flash Tools Missing!')
 
     def tearDown(self):
         print('Test Done!')
