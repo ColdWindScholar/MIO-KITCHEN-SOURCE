@@ -355,7 +355,7 @@ class ToolBox(ttk.Frame):
                 return size
             try:
                 origin_size = float(size)
-            except ValueError as e:
+            except ValueError:
                 return "0"
 
             units = {
