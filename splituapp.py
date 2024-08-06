@@ -7,7 +7,7 @@
 # Based on the app_structure file in split_up_data.pl by McSpoon
 
 
-from os import makedirs, sep
+from os import makedirs, sep, path
 from string import printable
 from struct import unpack
 
@@ -20,7 +20,9 @@ def extract(source, out_dir: str, flist: list):
         makedirs(out_dir, exist_ok=True)
     finally:
         ...
-
+    if not path.exists(source):
+        print('The File Not Exist!')
+        return 
     with open(source, 'rb') as f:
         while True:
             i = f.read(byte_num)
