@@ -13,9 +13,7 @@ tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine())
 
 class Test(unittest.TestCase):
     def setUp(self):
-        print(
-            'Starting Test.'
-        )
+        print('Starting Test.')
 
     def test_import(self):
         pys = [i[:-3] for i in os.listdir(prog_path) if i.endswith('.py') and i != 'build.py']
