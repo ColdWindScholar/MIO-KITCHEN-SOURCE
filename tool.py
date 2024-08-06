@@ -2853,7 +2853,7 @@ def jboot(bn: str = 'boot'):
             return
     re_folder(work + bn)
     os.chdir(work + bn)
-    if call(['magiskboot', 'unpack', '-h', f'{boot}']) != 0:
+    if call(['magiskboot', 'unpack', '-h', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cwd_path)
         rmtree(work + bn)
@@ -3718,7 +3718,7 @@ def mkerofs(name: str, format_, work, level, old_kernel=0, UTC=None):
 
 
 @animation
-def make_ext4fs(name: str, work: str, sparse, size=0, UTC=None):
+def make_ext4fs(name: str, work: str, sparse='', size=0, UTC=None):
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
@@ -3726,7 +3726,7 @@ def make_ext4fs(name: str, work: str, sparse, size=0, UTC=None):
         size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
-        ['make_ext4fs', '-J', '-T', f'{UTC}', f'{sparse}', '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
+        ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
          '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work + name}.img", work + name])
 
 
@@ -4047,7 +4047,7 @@ class UnpackGui(ttk.LabelFrame):
         parts_dict = JsonEdit(work + "config" + os.sep + "parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
-                self.lsg.insert(f"{folder:>10} [{parts_dict.get(folder, 'Unknown')}]", folder)
+                self.lsg.insert(f"{folder} [{parts_dict.get(folder, 'Unknown')}]", folder)
 
     def close_(self):
         lbs = self.lsg.selected.copy()
