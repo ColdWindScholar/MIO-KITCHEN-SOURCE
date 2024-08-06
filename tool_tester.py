@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
             print(f'Importing {i}')
             __import__(i)
 
-    @unittest.skipIf(platform.system() == 'Darwin', "Skip Macos")
+    @unittest.skipIf(platform.system() == 'Darwin', "Macos Is Not Support Complete!")
     def test_binaries(self):
         file_list = ['brotli', 'busybox', 'cpio', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
                      'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd']
