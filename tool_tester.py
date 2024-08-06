@@ -17,6 +17,7 @@ class Test(unittest.TestCase):
 
     def test_import(self):
         pys = [i[:-3] for i in os.listdir(prog_path) if i.endswith('.py') and i != 'build.py']
+        pys.remove(os.path.basename(__file__).split('.')[0])
         pys.append('tkinter')
         pys.remove('tool')
         sys.path.append(prog_path)
