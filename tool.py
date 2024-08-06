@@ -234,7 +234,6 @@ def warn_win(text='', color='orange', title="Warn"):
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
-    #########
     ask.after(1500, ask.destroy)
 
 
