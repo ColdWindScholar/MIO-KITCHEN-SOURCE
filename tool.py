@@ -1762,7 +1762,6 @@ class ModuleManager:
                     print(lang.text133 + str(e))
                     self.destroy()
                 self.title(data['main']['info']['title'])
-                # 设置窗口大小和位置
                 height = data['main']['info']['height']
                 width = data['main']['info']['weight']
                 if height != 'none' and width != 'none':
@@ -2515,7 +2514,7 @@ class PackSuper(Toplevel):
                                                                                              pady=10)
         ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
-        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz, values=("qti_dynamic_partitions", "main"))).pack(
+        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz, values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
             side='left',
             padx=10,
             pady=10,
