@@ -2774,13 +2774,13 @@ def download_api(url, path=None, int_=True, size_=0):
 
 
 def download_file():
-    var1 = IntVar(value=0)
+    var1 = BooleanVar(value=False)
     down = win.get_frame(lang.text61 + os.path.basename(url := input_(title=lang.text60)))
     win.message_pop(lang.text62, "green")
     progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
     ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
-    c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=1, offvalue=0)
+    c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=True, offvalue=False)
     c1.pack(padx=10, pady=10)
     start_time = time.time()
     try:
@@ -2791,7 +2791,7 @@ def download_file():
         elapsed = time.time() - start_time
         print(lang.text65.format(os.path.basename(url), str(elapsed)))
         down.destroy()
-        if var1.get() == 1:
+        if var1.get():
             unpackrom(settings.path + os.sep + os.path.basename(url))
             os.remove(settings.path + os.sep + os.path.basename(url))
     except Exception as e:
@@ -3109,10 +3109,9 @@ class Packxx(Toplevel):
             if self.spatchvb.get() == 1:
                 for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                     file = findfile(j, work)
-                    if file:
-                        if gettype(file) == 'vbmeta':
-                            print(lang.text71 % file)
-                            utils.Vbpatch(file).disavb()
+                    if gettype(file) == 'vbmeta':
+                        print(lang.text71 % file)
+                        utils.Vbpatch(file).disavb()
             if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
                 if os.name == 'nt':
                     try:
