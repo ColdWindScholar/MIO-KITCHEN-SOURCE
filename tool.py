@@ -3727,7 +3727,7 @@ def make_ext4fs(name: str, work: str, sparse, size=0, UTC=None):
     print(f"{name}:[{size}]")
     return call(
         ['make_ext4fs', '-J', '-T', f'{UTC}', f'{sparse}', '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
-         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', f'{name}', '-a', name, f"{work + name}.img", work + name])
+         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work + name}.img", work + name])
 
 
 @animation
