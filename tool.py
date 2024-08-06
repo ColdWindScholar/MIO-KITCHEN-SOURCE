@@ -1354,6 +1354,13 @@ class ModuleManager:
         self.new.module_dir = self.module_dir
         self.uninstall_gui.module_dir = self.module_dir
         self.MshParse.module_dir = self.module_dir
+        self.errorcodes = self.ErrorCodes()
+
+    class ErrorCodes(int):
+        Normal = 0
+        PlatformNotSupport = 1
+        DependsMissing = 2
+        IsBroken = 3
 
     def get_name(self, id_) -> str:
         name = self.get_info(id_, 'name')
@@ -1454,26 +1461,23 @@ class ModuleManager:
 
     def install(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
-            print(lang.warn2)
-            return
+            return self.errorcodes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
             if 'info' not in f.namelist():
-                print(lang.warn2)
-                return
+                return self.errorcodes.IsBroken, ''
         mconf = ConfigParser()
         with zipfile.ZipFile(mpk) as f:
             with f.open('info') as info_file:
                 mconf.read_string(info_file.read().decode('utf-8'))
         try:
             supports = mconf.get('module', 'supports').split()
-            if sys.platform not in supports:
-                return 0
+            if platform.system() not in supports:
+                return self.errorcodes.PlatformNotSupport, ''
         except (Exception, BaseException):
             ...
         for dep in mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                print(lang.text36 % (mconf.get('module', 'name'), dep, dep))
-                return 0
+                return self.errorcodes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
             rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
@@ -1507,8 +1511,8 @@ class ModuleManager:
                     with mpk_f.open('icon') as i:
                         f.write(i.read())
 
-        print(mconf.get('module', 'name'), lang.text39)
         list_pls_plugin()
+        return self.errorcodes.Normal, ''
 
     @animation
     def export(self, id_: str):
@@ -2024,7 +2028,7 @@ class InstallMpk(Toplevel):
         f.pack(side=LEFT)
         self.text = Text(self, width=50, height=20)
         self.text.pack(padx=10, pady=10)
-        self.prog = ttk.Progressbar(self, length=200, mode='determinate', orient=HORIZONTAL, maximum=100, value=0)
+        self.prog = ttk.Progressbar(self, length=200, mode='indeterminate', orient=HORIZONTAL, maximum=100, value=0)
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=(None, 12))
         self.state.pack(padx=10, pady=10)
@@ -2038,58 +2042,27 @@ class InstallMpk(Toplevel):
     def install(self):
         if self.installb.cget('text') == lang.text34:
             self.destroy()
-            return 1
+            return 0
+        self.prog.start()
         self.installb.config(state=DISABLED)
-        try:
-            supports = self.mconf.get('module', 'supports').split()
-            if sys.platform not in supports:
-                self.state['text'] = lang.warn15.format(sys.platform)
-                return 0
-        except (Exception, BaseException):
-            ...
-        for dep in self.mconf.get('module', 'depend').split():
-            if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), dep, dep)
-                self.installb['text'] = lang.text37
-                self.installb.config(state='normal')
-                return 0
-        if os.path.exists(os.path.join(cwd_path, "bin", "module", self.mconf.get('module', 'identifier'))):
-            rmtree(os.path.join(cwd_path, "bin", "module", self.mconf.get('module', 'identifier')))
-        install_dir = self.mconf.get('module', 'identifier')
-        with zipfile.ZipFile(self.mpk, 'r') as myfile:
-            with myfile.open(self.mconf.get('module', 'resource'), 'r') as inner_file:
-                fz = zipfile.ZipFile(inner_file, 'r')
-                uncompress_size = sum((file.file_size for file in fz.infolist()))
-                extracted_size = 0
-                for file in fz.namelist():
-                    try:
-                        file = str(file).encode('cp437').decode('gbk')
-                    except (Exception, BaseException):
-                        file = str(file).encode('utf-8').decode('utf-8')
-                    info = fz.getinfo(file)
-                    extracted_size += info.file_size
-                    self.state['text'] = lang.text38.format(file)
-                    fz.extract(file, str(os.path.join(cwd_path, "bin", "module", install_dir)))
-                    self.prog['value'] = extracted_size * 100 / uncompress_size
-        try:
-            depends = self.mconf.get('module', 'depend')
-        except (Exception, BaseException):
-            depends = ''
-        minfo = {}
-        for i in self.mconf.items('module'):
-            minfo[i[0]] = i[1]
-        minfo['depend'] = depends
-        with open(os.path.join(cwd_path, "bin", "module", self.mconf.get('module', 'identifier'), "info.json"),
-                  'w', encoding='utf-8') as f:
-            json.dump(minfo, f, indent=2, ensure_ascii=False)
-        if self.icon:
-            with open(os.path.join(cwd_path, "bin", "module", self.mconf.get('module', 'identifier'), "icon"),
-                      'wb') as f:
-                f.write(self.icon)
-
-        self.state['text'] = lang.text39
-        self.installb['text'] = lang.text34
-        self.installb.config(state='normal')
+        ret, reason = ModuleManager.install(self.mpk)
+        if ret == ModuleManager.errorcodes.PlatformNotSupport:
+            self.state['text'] = lang.warn15.format(platform.system())
+        elif ret == ModuleManager.errorcodes.DependsMissing:
+            self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
+            self.installb['text'] = lang.text37
+            self.installb.config(state='normal')
+        elif ret == ModuleManager.errorcodes.IsBroken:
+            self.state['text'] = 'The Mpk Is Not Installed'
+            self.installb['text'] = lang.text37
+            self.installb.config(state='normal')
+        elif ret == ModuleManager.errorcodes.Normal:
+            self.state['text'] = lang.text39
+            self.installb['text'] = lang.text34
+            self.installb.config(state='normal')
+        self.prog.stop()
+        self.prog['mode'] = 'determinate'
+        self.prog['value'] = 100
 
     def load(self):
         if not self.mpk:
