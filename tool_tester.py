@@ -1,7 +1,8 @@
+import os.path
 import platform
 import unittest
-import os
-import sys
+from utils import *
+from config_parser import ConfigParser
 
 if os.name == 'nt':
     prog_path = os.getcwd()
@@ -9,7 +10,7 @@ else:
     prog_path = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0])))
 
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
-from utils import *
+set_file = os.path.join(prog_path, "bin", "setting.ini")
 
 
 class Test(unittest.TestCase):
@@ -41,8 +42,13 @@ class Test(unittest.TestCase):
             if not os.path.exists(os.path.join(tool_bin, i)):
                 raise FileNotFoundError(f'{i} is missing!')
 
-    def test_v_code(self):
+    def test_values_files(self):
         self.assertNotEqual(v_code(), v_code())
+        self.assertIs(os.path.exists(set_file), True, 'Settings File Not Found!')
+        self.assertIs(os.access(set_file, os.F_OK), True, 'Settings File IS Not Ok!')
+        config = ConfigParser()
+        config.read(set_file)
+        self.assertIsNot(config.items('setting'), (None, None), 'The Setting Config Format Is Wrong!')
 
     def tearDown(self):
         print('Test Done!')
