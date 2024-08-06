@@ -854,7 +854,7 @@ class Updater(Toplevel):
             package += '-macos.zip'
         for i in self.update_assets:
             if i.get('name') == package:
-                if platform.machine() in ['AMD64', 'X86_64']:
+                if platform.machine() in ['AMD64', 'X86_64', 'x86_64']:
                     self.update_download_url = i.get('browser_download_url')
                     self.update_size = i.get('size')
                     return
