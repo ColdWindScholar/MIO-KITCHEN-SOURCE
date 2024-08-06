@@ -2649,7 +2649,6 @@ class PackSuper(Toplevel):
         if os.path.exists(self.work + "dynamic_partitions_op_list"):
             try:
                 data = utils.dynamic_list_reader(self.work + "dynamic_partitions_op_list")
-                print(data)
             except (Exception, BaseException):
                 return
             if len(data) > 1:
