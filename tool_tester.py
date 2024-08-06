@@ -30,6 +30,9 @@ class Test(unittest.TestCase):
     def test_binaries(self):
         file_list = ['brotli', 'busybox', 'cpio', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
                      'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd']
+        if platform.machine() != 'x86_64':
+            file_list.remove('mkfs.f2fs')
+            file_list.remove('extract.f2fs')
         if os.name == 'nt':
             file_list.remove('mkfs.f2fs')
             file_list.remove('extract.f2fs')
