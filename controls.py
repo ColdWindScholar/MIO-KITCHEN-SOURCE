@@ -26,6 +26,7 @@ class ListBox(Frame):
         self.selected: list = []
         self.vars = []
         self.controls = []
+        self.loaded_value = []
 
     def __on_mouse(self, event):
         self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
@@ -72,8 +73,10 @@ class ListBox(Frame):
                 self.selected.remove(value)
         self.var.set(True if all(i.get() for i in self.vars) else False)
 
-    def insert(self, text: str = '', value: str = ''):
-        var = BooleanVar(value=False)
+    def insert(self, text: str = '', value: str = '', state=False):
+        if value in self.loaded_value:
+            return
+        var = BooleanVar(value=state)
         c = Checkbutton(self.label_frame, text=text, variable=var, onvalue=True, offvalue=False)
         self.vars.append(var)
         args = (var, value)

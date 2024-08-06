@@ -2538,6 +2538,7 @@ class PackSuper(Toplevel):
         self.attrib = StringVar(value='readonly')
         self.sdbfz = StringVar()
         self.scywj = IntVar()
+        self.selected = []
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
@@ -2579,6 +2580,7 @@ class PackSuper(Toplevel):
         self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(self.generate))
         self.g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
+        self.read_list()
         cz(self.refresh)
         jzxs(self)
 
@@ -2589,7 +2591,6 @@ class PackSuper(Toplevel):
                                                                                                        padx=5,
                                                                                                        pady=5, fill=X,
                                                                                                        expand=True)
-        self.read_list()
 
     def start_(self):
         try:
@@ -2632,19 +2633,23 @@ class PackSuper(Toplevel):
                                     lb=self.tl.selected.copy(), work=rwork())
         self.g_b.config(text=lang.text34)
         time.sleep(1)
-        self.g_b.config(text=lang.t27, state='normal')
+        try:
+            self.g_b.config(text=lang.t27, state='normal')
+        except TclError:
+            pass
 
     def refresh(self):
         self.tl.clear()
         for file_name in os.listdir(self.work):
             if file_name.endswith(".img"):
                 if (file_type := gettype(self.work + file_name)) in ["ext", "erofs", 'f2fs', 'sparse']:
-                    self.tl.insert(f"{file_name[:-4]} [{file_type}]", file_name[:-4])
+                    self.tl.insert(f"{file_name[:-4]} [{file_type}]", file_name[:-4], file_name[:-4] in self.selected)
 
     def read_list(self):
         if os.path.exists(self.work + "dynamic_partitions_op_list"):
             try:
                 data = utils.dynamic_list_reader(self.work + "dynamic_partitions_op_list")
+                print(data)
             except (Exception, BaseException):
                 return
             if len(data) > 1:
@@ -2653,10 +2658,13 @@ class PackSuper(Toplevel):
                     self.sdbfz.set(fir[:-2])
                     self.supersz.set(2)
                     self.supers.set(int(data[fir]['size']))
+                    self.selected = data[fir].get('parts', [])
+
             else:
                 dbfz, = data
                 self.sdbfz.set(dbfz)
                 self.supers.set(int(data[dbfz]['size']))
+                self.selected = data[dbfz].get('parts', [])
                 self.supersz.set(1)
 
 
