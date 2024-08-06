@@ -39,7 +39,7 @@ elif ostype == 'Darwin':
 else:
     name = 'MIO-KITCHEN-win.zip'
 if Test:
-    test_main()
+    test_main(exit=False)
 
 
 def zip_folder(folder_path):
