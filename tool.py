@@ -322,7 +322,7 @@ class ToolBox(ttk.Frame):
     class FileBytes(Toplevel):
         def __init__(self):
             super().__init__()
-            self.values = ("B", "GB", "KB", "MB")
+            self.values = ("B", "KB", "MB", "GB", 'TB')
             self.title(lang.t60)
             self.gui()
 
@@ -362,7 +362,8 @@ class ToolBox(ttk.Frame):
                 "B": 1,
                 "KB": 2 ** 10,
                 "MB": 2 ** 20,
-                "GB": 2 ** 30
+                "GB": 2 ** 30,
+                "TB": 2 ** 30 * 1024
             }
 
             return str(origin_size * units[origin] / units[convert])
