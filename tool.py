@@ -2605,7 +2605,8 @@ class PackSuper(Toplevel):
         for file_name in os.listdir(self.work):
             if file_name.endswith(".img"):
                 if (file_type := gettype(self.work + file_name)) in ["ext", "erofs", 'f2fs', 'sparse']:
-                    self.tl.insert(f"{file_name[:-4]} [{file_type}]", file_name[:-4], file_name[:-4] in self.selected)
+                    name = file_name[:-4]
+                    self.tl.insert(f"{name} [{file_type}]", name, name in self.selected)
 
     def read_list(self):
         if os.path.exists(self.work + "dynamic_partitions_op_list"):
