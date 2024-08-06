@@ -2053,7 +2053,7 @@ class InstallMpk(Toplevel):
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
         elif ret == ModuleManager.errorcodes.IsBroken:
-            self.state['text'] = 'The Mpk Is Not Installed'
+            self.state['text'] = lang.warn2
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
         elif ret == ModuleManager.errorcodes.Normal:
