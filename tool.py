@@ -4129,85 +4129,84 @@ class FormatConversion(ttk.LabelFrame):
         selection = self.list_b.selected.copy()
         self.destroy()
         if f_get == hget:
-            ...
-        else:
-            for i in selection:
-                print(f'[{hget}->{f_get}]{i}')
-                if f_get == 'sparse':
-                    basename = os.path.basename(i).split('.')[0]
-                    if hget == 'br':
-                        if os.access(work + i, os.F_OK):
-                            print(lang.text79 + i)
-                            call(['brotli', '-dj', work + i])
-                    if hget == 'dat':
-                        if os.access(work + i, os.F_OK):
-                            print(lang.text79 + work + i)
-                            transferfile = os.path.abspath(
-                                os.path.dirname(work)) + os.sep + basename + ".transfer.list"
-                            if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                                Sdat2img(transferfile, work + i, work + basename + ".img")
-                                if os.access(work + basename + ".img", os.F_OK):
-                                    os.remove(work + i)
-                                    os.remove(transferfile)
-                                    try:
-                                        os.remove(work + basename + '.patch.dat')
-                                    except (IOError, PermissionError, FileNotFoundError):
-                                        ...
-                            else:
-                                print("transferpath" + lang.text84)
-                        if os.path.exists(work + basename + '.img'):
-                            img2simg(work + basename + '.img')
-                    if hget == 'raw':
-                        if os.path.exists(work + basename + '.img'):
-                            img2simg(work + basename + '.img')
-                elif f_get == 'raw':
-                    basename = os.path.basename(i).split('.')[0]
-                    if hget == 'br':
-                        if os.access(work + i, os.F_OK):
-                            print(lang.text79 + i)
-                            call(['brotli', '-dj', work + i])
-                    if hget in ['dat', 'br']:
-                        if os.path.exists(work):
-                            if hget == 'br':
-                                i = i.replace('.br', '')
-                            print(lang.text79 + work + i)
-                            transferfile = os.path.abspath(
-                                os.path.dirname(work)) + os.sep + basename + ".transfer.list"
-                            if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                                Sdat2img(transferfile, work + i, work + basename + ".img")
-                                if os.access(work + basename + ".img", os.F_OK):
-                                    try:
-                                        os.remove(work + i)
-                                        os.remove(transferfile)
-                                        os.remove(work + basename + '.patch.dat')
-                                    except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
-                                        ...
-                            else:
-                                print("transferfile" + lang.text84)
-                    if hget == 'sparse':
-                        utils.simg2img(work + i)
-                elif f_get == 'dat':
-                    if hget == 'raw':
-                        img2simg(work + i)
-                    if hget in ['raw', 'sparse']:
-                        datbr(work, os.path.basename(i).split('.')[0], "dat")
-                    if hget == 'br':
+            return
+        for i in selection:
+            print(f'[{hget}->{f_get}]{i}')
+            if f_get == 'sparse':
+                basename = os.path.basename(i).split('.')[0]
+                if hget == 'br':
+                    if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
                         call(['brotli', '-dj', work + i])
-
-                elif f_get == 'br':
-                    if hget == 'raw':
-                        img2simg(work + i)
-                    if hget in ['raw', 'sparse']:
-                        datbr(work, os.path.basename(i).split('.')[0], 0)
-                    if hget == 'dat':
-                        print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
-                        call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
-                        if os.access(work + i + '.br', os.F_OK):
-                            try:
+                if hget == 'dat':
+                    if os.access(work + i, os.F_OK):
+                        print(lang.text79 + work + i)
+                        transferfile = os.path.abspath(
+                            os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
+                            Sdat2img(transferfile, work + i, work + basename + ".img")
+                            if os.access(work + basename + ".img", os.F_OK):
                                 os.remove(work + i)
-                            except Exception as e:
-                                print(e)
+                                os.remove(transferfile)
+                                try:
+                                    os.remove(work + basename + '.patch.dat')
+                                except (IOError, PermissionError, FileNotFoundError):
+                                    ...
+                        else:
+                            print("transferpath" + lang.text84)
+                    if os.path.exists(work + basename + '.img'):
+                        img2simg(work + basename + '.img')
+                if hget == 'raw':
+                    if os.path.exists(work + basename + '.img'):
+                        img2simg(work + basename + '.img')
+            elif f_get == 'raw':
+                basename = os.path.basename(i).split('.')[0]
+                if hget == 'br':
+                    if os.access(work + i, os.F_OK):
+                        print(lang.text79 + i)
+                        call(['brotli', '-dj', work + i])
+                if hget in ['dat', 'br']:
+                    if os.path.exists(work):
+                        if hget == 'br':
+                            i = i.replace('.br', '')
+                        print(lang.text79 + work + i)
+                        transferfile = os.path.abspath(
+                            os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
+                            Sdat2img(transferfile, work + i, work + basename + ".img")
+                            if os.access(work + basename + ".img", os.F_OK):
+                                try:
+                                    os.remove(work + i)
+                                    os.remove(transferfile)
+                                    os.remove(work + basename + '.patch.dat')
+                                except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
+                                    ...
+                        else:
+                            print("transferfile" + lang.text84)
+                if hget == 'sparse':
+                    utils.simg2img(work + i)
+            elif f_get == 'dat':
+                if hget == 'raw':
+                    img2simg(work + i)
+                if hget in ['raw', 'sparse']:
+                    datbr(work, os.path.basename(i).split('.')[0], "dat")
+                if hget == 'br':
+                    print(lang.text79 + i)
+                    call(['brotli', '-dj', work + i])
+
+            elif f_get == 'br':
+                if hget == 'raw':
+                    img2simg(work + i)
+                if hget in ['raw', 'sparse']:
+                    datbr(work, os.path.basename(i).split('.')[0], 0)
+                if hget == 'dat':
+                    print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
+                    call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
+                    if os.access(work + i + '.br', os.F_OK):
+                        try:
+                            os.remove(work + i)
+                        except Exception as e:
+                            print(e)
         print(lang.text8)
 
 
