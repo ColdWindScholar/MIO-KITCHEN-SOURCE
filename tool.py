@@ -2620,6 +2620,13 @@ class PackSuper(Toplevel):
                     self.supersz.set(2)
                     self.supers.set(int(data[fir]['size']))
                     self.selected = data[fir].get('parts', [])
+                    selected = []
+                    for i in self.selected:
+                        if i.endswith('_a') or i.endswith('_b'):
+                            selected.append(i[:-2])
+                        else:
+                            selected.append(i)
+                    self.selected = selected
 
             else:
                 dbfz, = data
