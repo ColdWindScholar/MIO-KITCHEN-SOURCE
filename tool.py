@@ -3826,14 +3826,10 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.combobox = None
         self.pack(padx=5, pady=5)
 
-    @staticmethod
-    def select_print():
-        print(lang.text96 + dn.get())
-
     def gui(self):
         self.combobox = ttk.Combobox(self, textvariable=dn, state='readonly')
         self.combobox.pack(side="top", padx=10, pady=10, fill=X)
-        self.combobox.bind('<<ComboboxSelected>>', lambda *x: self.select_print())
+        self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + dn.get()))
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text115, command=self.new).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove)).pack(side="left", padx=10, pady=10)
