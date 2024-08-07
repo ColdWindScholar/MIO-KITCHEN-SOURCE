@@ -172,8 +172,7 @@ class Dumper:
             out_file.seek(int(dst_extents[0].get('1', 0)) * self.block_size)
             while processed_len < data_length:
                 data = payloadfile.read(buffsize)
-                processed_len += len(data)
-                out_file.write(data)
+                processed_len += out_file.write(data)
 
         elif op_type == Type.SOURCE_COPY:
             if not self.diff:
@@ -193,8 +192,7 @@ class Dumper:
                 data_length = int(ext.get('2', 0)) * self.block_size
                 while processed_len < data_length:
                     data = old_file.read(buffsize)
-                    processed_len += len(data)
-                    out_file.write(data)
+                    processed_len += out_file.write(data)
                 processed_len = 0
         elif op_type == Type.ZERO:
             if isinstance(op.get('6'), dict):
@@ -215,9 +213,8 @@ class Dumper:
 
     def dump_part(self, part):
         name = part["name"]
-        old_file = open(f"{self.old}/{name}.img", "rb", buffering=8192) if self.diff else None
-        with open(f"{self.out}/{name}.img", "wb") as out_file:
-            with self.open_payloadfile() as payloadfile:
-                self.tls.payloadfile = payloadfile
-                for op in part["operations"]:
-                    self.data_for_op(op, out_file, old_file)
+        old_file = open(f"{self.old}/{name}.img", "rb", buffering=self.buffsize) if self.diff else None
+        with open(f"{self.out}/{name}.img", "wb") as out_file, self.open_payloadfile() as payloadfile:
+            self.tls.payloadfile = payloadfile
+            for op in part["operations"]:
+                self.data_for_op(op, out_file, old_file)
