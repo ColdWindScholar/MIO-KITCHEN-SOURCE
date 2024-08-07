@@ -214,7 +214,7 @@ class Dumper:
     def dump_part(self, part):
         name = part["name"]
         old_file = open(f"{self.old}/{name}.img", "rb", buffering=self.buffsize) if self.diff else None
-        with open(f"{self.out}/{name}.img", "wb") as out_file, self.open_payloadfile() as payloadfile:
+        with open(f"{self.out}/{name}.img", "wb", buffering=self.buffsize) as out_file, self.open_payloadfile() as payloadfile:
             self.tls.payloadfile = payloadfile
             for op in part["operations"]:
                 self.data_for_op(op, out_file, old_file)
