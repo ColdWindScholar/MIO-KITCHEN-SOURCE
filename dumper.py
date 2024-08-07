@@ -215,7 +215,7 @@ class Dumper:
 
     def dump_part(self, part):
         name = part["name"]
-        old_file = open(f"{self.old}/{name}.img", "rb") if self.diff else None
+        old_file = open(f"{self.old}/{name}.img", "rb", buffering=8192) if self.diff else None
         with open(f"{self.out}/{name}.img", "wb") as out_file:
             with self.open_payloadfile() as payloadfile:
                 self.tls.payloadfile = payloadfile
