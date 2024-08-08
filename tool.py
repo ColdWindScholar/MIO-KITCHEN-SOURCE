@@ -92,7 +92,7 @@ from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
 from controls import ListBox, ScrollFrame
 from undz import DZFileTools
 from selinux_audit_allow import main as selinux_audit_allow
-
+import logging
 try:
     import imp
 except ImportError:
@@ -163,7 +163,7 @@ class LoadAnim:
             try:
                 win.gif_label.after_cancel(i)
             except (Exception, BaseException):
-                ...
+                logging.exception('Bugs')
         win.gif_label.pack_forget()
         self.hide_gif = True
 
@@ -177,7 +177,7 @@ class LoadAnim:
                 self.frames.append(PhotoImage(gif))
                 gif.seek(len(self.frames))
         except EOFError:
-            ...
+            logging.exception('Bugs')
 
     def __call__(self, func):
         @wraps(func)
@@ -412,7 +412,7 @@ class ToolBox(ttk.Frame):
                 try:
                     i.destroy()
                 except:
-                    pass
+                    logging.exception('Bugs')
 
         def dnd(self, file_list: list):
             cz(self.__dnd, file_list)
@@ -727,6 +727,7 @@ theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(cwd_path, 'bin', platform.system(), platform.machine()) + os.sep
+tool_log = f'{cwd_path}/bin/temp/{v_code()}.log'
 states = States()
 
 # Some Functions for Upgrade
@@ -937,7 +938,7 @@ class Updater(Toplevel):
                     shutil.rmtree(os.path.join(cwd_path, "bin", "temp"))
                 os.makedirs(os.path.join(cwd_path, "bin", "temp"), exist_ok=True)
             except (IOError, IsADirectoryError, FileNotFoundError, PermissionError) as e:
-                print(e)
+                logging.exception('Bugs')
             settings.set_value('updating', '')
             settings.set_value('new_tool', '')
             subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
@@ -975,6 +976,7 @@ def error(code, desc="unknown error"):
     te.pack(padx=10, pady=10)
     te.insert('insert', desc)
     te.config(yscrollcommand=scroll.set)
+    ttk.Label(er, text=f"The Log File Is: {tool_log}", font=(None, 10)).pack(padx=10, pady=10)
     ttk.Button(er, text="Report",
                command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"),
                style="Accent.TButton").pack(side=LEFT,
@@ -1176,6 +1178,7 @@ class SetUtils:
             sv_ttk.set_theme(theme.get())
             animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
         except Exception as e:
+            logging.exception('Bugs')
             win.message_pop(lang.text101 % (theme.get(), e))
 
     def set_language(self):
@@ -1187,6 +1190,7 @@ class SetUtils:
                 if ask_win(lang.t36):
                     restart()
         except Exception as e:
+            logging.exception('Bugs')
             print(lang.t130, e)
 
     def modpath(self):
@@ -1231,7 +1235,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     try:
         os.remove(dtboimg)
     except (Exception, BaseException):
-        ...
+        logging.exception('Bugs')
     rmdir(work + "dtbo" + os.sep + "dtbo")
 
 
@@ -1433,7 +1437,7 @@ class ModuleManager:
                 try:
                     os.remove(file)
                 except (Exception, BaseException) as e:
-                    print(e)
+                    logging.exception('Bugs')
         elif os.path.exists(script_path + "main.py") and imp:
             try:
                 module = imp.load_source('module', script_path + "main.py")
@@ -1448,7 +1452,7 @@ class ModuleManager:
                     }
                     module.main(data)
             except Exception as e:
-                print(e)
+                logging.exception('Bugs')
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls_plugin()
@@ -1475,7 +1479,7 @@ class ModuleManager:
             if platform.system() not in supports:
                 return self.errorcodes.PlatformNotSupport, ''
         except (Exception, BaseException):
-            ...
+            logging.exception('Bugs')
         for dep in mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
                 return self.errorcodes.DependsMissing, dep
@@ -1536,6 +1540,7 @@ class ModuleManager:
                 try:
                     mpk.write(str(i), arcname=arch_name)
                 except Exception as e:
+                    logging.exception('Bugs')
                     print(lang.text2.format(i, e))
         with zipfile.ZipFile(os.path.join(settings.path, str(name) + ".mpk"), 'w',
                              compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
@@ -1700,7 +1705,7 @@ class ModuleManager:
                 try:
                     os.remove(file_)
                 except (Exception, BaseException):
-                    ...
+                    logging.exception('Bugs')
 
         def msh(self, cmd):
             try:
@@ -1770,7 +1775,7 @@ class ModuleManager:
                 try:
                     self.attributes('-topmost', 'true')
                 except (Exception, BaseException):
-                    ...
+                    logging.exception('Bugs')
                 self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
                 for group_name, group_data in data['main'].items():
                     if group_name != "info":
@@ -1854,7 +1859,7 @@ class ModuleManager:
             try:
                 self.attributes('-topmost', 'true')
             except (Exception, BaseException):
-                ...
+                logging.exception('Bugs')
             self.title(lang.t6)
             jzxs(self)
             ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
@@ -1903,6 +1908,7 @@ class ModuleManager:
                     try:
                         rmtree(self.module_dir + os.sep + name)
                     except PermissionError as e:
+                        logging.exception('Bugs')
                         print(e)
                 if os.path.exists(self.module_dir + os.sep + name):
                     win.message_pop(lang.warn9, 'red')
@@ -1911,7 +1917,7 @@ class ModuleManager:
                     try:
                         list_pls_plugin()
                     except (Exception, BaseException):
-                        ...
+                        logging.exception('Bugs')
             else:
                 win.message_pop(lang.warn2)
 
@@ -2082,10 +2088,11 @@ class InstallMpk(Toplevel):
                     self.icon = myfi.read()
                     try:
                         self.pyt = PhotoImage(data=self.icon)
-                    except Exception as e:
-                        print(e)
+                    except Exception:
+                        logging.exception('Bugs')
                         self.pyt = PhotoImage(data=images.none_byte)
             except (Exception, BaseException):
+                logging.exception('Bugs')
                 self.pyt = PhotoImage(data=images.none_byte)
         self.name_label.config(text=self.mconf.get('module', 'name'))
         self.logo.config(image=self.pyt)
@@ -2196,13 +2203,13 @@ class Debugger(Toplevel):
                             globals()[h.get()] = __import__(f.get().split()[1])
                             read_value()
                         except ImportError:
-                            pass
+                            logging.exception('Bugs')
                     elif f.get().split()[0] == 'global':
                         try:
                             globals()[h.get()] = globals()[f.get().split()[1]]
                             read_value()
                         except (Exception, BaseException):
-                            pass
+                            logging.exception('Bugs')
                 else:
                     globals()[h.get()] = f.get()
             else:
@@ -2344,7 +2351,7 @@ class MpkStore(Toplevel):
             try:
                 i.destroy()
             except (TclError, ValueError):
-                pass
+                logging.exception('Bugs')
 
     def modify_repo(self):
         (input_var := StringVar()).set(settings.plugin_repo)
@@ -2391,9 +2398,9 @@ class MpkStore(Toplevel):
                 try:
                     os.remove(os.path.join(cwd_path, "bin", "temp", i))
                 except (Exception, BaseException) as e:
-                    print(e)
+                    logging.exception('Bugs')
         except (ConnectTimeout, HTTPError, BaseException, Exception, TclError) as e:
-            print(e)
+            logging.exception('Bugs')
             return
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
@@ -2405,7 +2412,7 @@ class MpkStore(Toplevel):
             url = requests.get(self.repo + 'plugin.json')
             self.data = json.loads(url.text)
         except (Exception, BaseException) as e:
-            print(e)
+            logging.exception('Bugs')
             self.apps = self.data = []
         else:
             self.apps = self.data
@@ -2485,6 +2492,7 @@ class Dbkxyt:
                 print(f"[Compress] {os.path.basename(path)}...")
                 call(['zstd', '-5', '--rm', path, '-o', f'{path}.zst'])
             except Exception as e:
+                logging.exception('Bugs')
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
 
@@ -2559,6 +2567,7 @@ class PackSuper(Toplevel):
             self.supers.get()
         except (Exception, BaseException):
             self.supers.set(0)
+            logging.exception('Bugs')
         if not self.versize():
             ask_win2(lang.t10.format(self.supers.get()))
             return False
@@ -2598,7 +2607,7 @@ class PackSuper(Toplevel):
         try:
             self.g_b.config(text=lang.t27, state='normal')
         except TclError:
-            pass
+            logging.exception('Bugs')
 
     def refresh(self):
         self.tl.clear()
@@ -2613,6 +2622,7 @@ class PackSuper(Toplevel):
             try:
                 data = utils.dynamic_list_reader(self.work + "dynamic_partitions_op_list")
             except (Exception, BaseException):
+                logging.exception('Bugs')
                 return
             if len(data) > 1:
                 fir, sec = data
@@ -2654,7 +2664,7 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
             try:
                 os.rename(work + part + '_a.img', work + part + '.img')
             except:
-                pass
+                logging.exception('Bugs')
     command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
     if set_.get() == 1:
         command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
@@ -2682,8 +2692,8 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
                     if os.path.exists(work + img + ".img"):
                         try:
                             os.remove(work + img + ".img")
-                        except Exception as e:
-                            print(e)
+                        except Exception:
+                            logging.exception('Bugs')
         else:
             win.message_pop(lang.warn10)
     else:
@@ -2879,7 +2889,7 @@ def dboot(nm: str = 'boot'):
                 try:
                     os.remove("ramdisk.cpio")
                 except (Exception, BaseException):
-                    ...
+                    logging.exception('Bugs')
                 os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
         else:
             print("Successfully packed Ramdisk..")
@@ -3017,7 +3027,7 @@ class Packxx(Toplevel):
         try:
             self.destroy()
         except AttributeError:
-            pass
+            logging.exception('Bugs')
         self.packrom()
 
     def show_modify_size(self):
@@ -3118,8 +3128,8 @@ class Packxx(Toplevel):
                         if folder := findfolder(work, "com.google.android.apps.nbu."):
                             call(['mv', folder,
                                   folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
-                    except Exception as e:
-                        print(e)
+                    except Exception:
+                        logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
                 utils.qc(work + "config" + os.sep + dname + "_fs_config")
                 if settings.contextpatch == "1":
@@ -3360,7 +3370,7 @@ def unpack(chose, form: str = '') -> bool:
             try:
                 ensure_dir_case_sensitive(rwork())
             except (Exception, BaseException):
-                ...
+                logging.exception('Bugs')
     if not dn.get():
         win.message_pop(lang.warn1)
         return False
@@ -3430,7 +3440,7 @@ def unpack(chose, form: str = '') -> bool:
                         try:
                             os.remove(work + i + '.patch.dat')
                         except (Exception, BaseException):
-                            ...
+                            logging.exception('Bugs')
                     else:
                         print("transferfile" + lang.text84)
         if os.access(work + i + ".img", os.F_OK):
@@ -3448,7 +3458,7 @@ def unpack(chose, form: str = '') -> bool:
                 try:
                     utils.LogoDumper(work + i + ".img", work + i).check_img(work + i + ".img")
                 except AssertionError:
-                    pass
+                    logging.exception('Bugs')
                 else:
                     logo_dump(i)
             if gettype(work + i + ".img") == 'vbmeta':
@@ -3597,7 +3607,7 @@ class Dirsize:
                 self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
                                   not os.path.islink(os.path.join(root, name))])
             except (PermissionError, BaseException, Exception):
-                pass
+                logging.exception('Bugs')
         if self.get == 1:
             self.rsize_v = self.size
         else:
@@ -3656,8 +3666,8 @@ def datbr(work, name, brl: any, dat_ver=4):
     if os.access(work + name + ".new.dat", os.F_OK):
         try:
             os.remove(work + name + ".img")
-        except Exception as e:
-            print(e)
+        except Exception:
+            logging.exception('Bugs')
             os.remove(work + name + ".img")
     if brl == "dat":
         print(lang.text87 % name)
@@ -3667,8 +3677,8 @@ def datbr(work, name, brl: any, dat_ver=4):
         if os.access(work + name + ".new.dat", os.F_OK):
             try:
                 os.remove(work + name + ".new.dat")
-            except Exception as e:
-                print(e)
+            except Exception:
+                logging.exception('Bugs')
         print(lang.text89 % (name, 'br'))
 
 
@@ -3748,13 +3758,13 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
         try:
             os.remove(work + name + "_new.img")
         except (Exception, BaseException):
-            ...
+            logging.exception('Bugs')
     else:
         if os.path.isfile(work + name + ".img"):
             try:
                 os.remove(work + name + ".img")
             except (Exception, BaseException):
-                ...
+                logging.exception('Bugs')
         os.rename(work + name + "_new.img", work + name + ".img")
     return 0
 
@@ -4031,7 +4041,7 @@ def img2simg(path):
             os.remove(path)
             os.rename(path + 's', path)
         except Exception as e:
-            print(e)
+            logging.exception('Bugs')
 
 
 class FormatConversion(ttk.LabelFrame):
@@ -4116,7 +4126,7 @@ class FormatConversion(ttk.LabelFrame):
                                 try:
                                     os.remove(work + basename + '.patch.dat')
                                 except (IOError, PermissionError, FileNotFoundError):
-                                    ...
+                                    logging.exception('Bugs')
                         else:
                             print("transferpath" + lang.text84)
                     if os.path.exists(work + basename + '.img'):
@@ -4145,7 +4155,7 @@ class FormatConversion(ttk.LabelFrame):
                                     os.remove(transferfile)
                                     os.remove(work + basename + '.patch.dat')
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
-                                    ...
+                                    logging.exception('Bugs')
                         else:
                             print("transferfile" + lang.text84)
                 if hget == 'sparse':
@@ -4171,7 +4181,7 @@ class FormatConversion(ttk.LabelFrame):
                         try:
                             os.remove(work + i)
                         except Exception as e:
-                            print(e)
+                            logging.exception('Bugs')
         print(lang.text8)
 
 
@@ -4187,6 +4197,8 @@ def init_verify():
 
 
 def init():
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
+                        filename=tool_log, filemode='w')
     if settings.updating in ['1', '2']:
         Updater()
     if int(settings.oobe) < 5:
@@ -4195,6 +4207,7 @@ def init():
     try:
         win.winfo_exists()
     except TclError:
+        logging.exception('TclError')
         return
     if os.name == 'nt' and settings.treff == '1':
         pywinstyles.apply_style(win, 'acrylic')
@@ -4224,7 +4237,7 @@ def restart(er=None):
             if not ask_win2("Your operation will not be saved."):
                 return
     except (TclError, ValueError, AttributeError):
-        pass
+        logging.exception('Restart')
 
     def _inner():
         argv = [sys.executable]
@@ -4243,10 +4256,10 @@ def restart(er=None):
             try:
                 i.destroy()
             except (TclError, ValueError, AttributeError):
-                pass
+                logging.exception('Restart')
         win.destroy()
     except (Exception, BaseException):
-        pass
+        logging.exception('Restart')
 
     threading.Thread(target=_inner).start()
 
