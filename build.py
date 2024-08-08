@@ -21,8 +21,6 @@ from platform import system
 
 from pip._internal.cli.main import main as _main
 
-from tool_tester import test_main, Test
-
 with open('requirements.txt', 'r', encoding='utf-8') as l:
     for i in l.read().split("\n"):
         print(f"Installing {i}")
@@ -38,6 +36,8 @@ elif ostype == 'Darwin':
         print("Tkinter IS not exist!\nThe Build may not Work!")
 else:
     name = 'MIO-KITCHEN-win.zip'
+from tool_tester import test_main, Test
+
 if Test:
     test_main(exit=False)
 
