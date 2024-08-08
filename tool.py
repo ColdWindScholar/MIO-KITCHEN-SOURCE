@@ -727,7 +727,7 @@ theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 tool_bin = os.path.join(cwd_path, 'bin', platform.system(), platform.machine()) + os.sep
-tool_log = f'{cwd_path}/bin/temp/{v_code()}.log'
+tool_log = f'{cwd_path}/bin/temp/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
 
 # Some Functions for Upgrade
