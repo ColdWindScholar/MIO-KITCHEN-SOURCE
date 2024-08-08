@@ -3559,7 +3559,7 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
     ask = Toplevel()
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20)).pack(side=TOP)
+    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
     frame_button = ttk.Frame(frame_inner)
 
     ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(padx=5, pady=5, fill=X, side='left',
