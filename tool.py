@@ -1435,9 +1435,10 @@ class ModuleManager:
                     f.write(f'export language="{settings.language}"\n')
                     f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
                     f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
+                    f.write('export project_output="{}"\n'.format(ProjectManager.current_work_output_path()))
                     f.write(
                         "export project='{}'\nsource $1".format(
-                            ProjectManager.current_work_path().replace('\\', '/')))
+                            ProjectManager.current_work_path()))
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
@@ -1654,7 +1655,8 @@ class ModuleManager:
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
-                         'project': ProjectManager.current_work_path,
+                         'project': ProjectManager.current_work_path(),
+                         'project_output': ProjectManager.current_work_output_path(),
                          'moddir': self.module_dir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
             for n, v in self.extra_envs.items():
                 self.envs[n] = v
@@ -2441,11 +2443,11 @@ class Dbkxyt:
         if not ProjectManager.exist():
             win.message_pop(lang.warn1)
             return
-        if os.path.exists((dir_ := ProjectManager.current_work_path()) + "firmware-update"):
+        if os.path.exists((dir_ := ProjectManager.current_work_output_path()) + "firmware-update"):
             os.rename(dir_ + "firmware-update", dir_ + "images")
         if not os.path.exists(dir_ + "images"):
             os.makedirs(dir_ + 'images')
-        if os.path.exists(os.path.join(ProjectManager.current_work_path(), 'payload.bin')):
+        if os.path.exists(os.path.join(ProjectManager.current_work_output_path(), 'payload.bin')):
             print("Found payload.bin ,Stop!")
             return
         if os.path.exists(dir_ + 'META-INF'):
@@ -4103,7 +4105,7 @@ def img2simg(path):
         try:
             os.remove(path)
             os.rename(path + 's', path)
-        except Exception as e:
+        except Exception:
             logging.exception('Bugs')
 
 
@@ -4155,13 +4157,13 @@ class FormatConversion(ttk.LabelFrame):
 
     @staticmethod
     def refile(f):
-        for i in os.listdir(work := ProjectManager.current_work_path()):
+        for i in os.listdir(work := ProjectManager.current_work_output_path()):
             if i.endswith(f) and os.path.isfile(work + i):
                 yield i
 
     @animation
     def conversion(self):
-        work = ProjectManager.current_work_path()
+        work = ProjectManager.current_work_output_path()
         f_get = self.f.get()
         hget = self.h.get()
         selection = self.list_b.selected.copy()
