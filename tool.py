@@ -2665,7 +2665,7 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
     if not ProjectManager.exist():
         warn_win(text=lang.warn1)
         return False
-    work = ProjectManager.current_work_path()
+    work = ProjectManager.current_work_output_path()
     lb_c = []
     for part in lb:
         if part.endswith('_b') or part.endswith('_a'):
