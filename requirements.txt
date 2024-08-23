@@ -1,6 +1,7 @@
 Pillow>=10.0.1
 pycryptodome>=3.19.1
-Requests==2.31.0
+Requests>2.31.0
+protobuf>5
 sv_ttk
 windnd
 pyinstaller
@@ -10,4 +11,3 @@ pip
 Pygments
 zstandard
 pywinstyles
-blackboxprotobuf

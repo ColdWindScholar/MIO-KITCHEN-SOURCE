@@ -23,7 +23,7 @@ from threading import Thread
 
 import blockimgdiff
 import sparse_img
-import update_metadata_reader as um
+import update_metadata_pb2 as um
 from lpunpack import SparseImage
 
 DataImage = blockimgdiff.DataImage
@@ -431,7 +431,8 @@ def payload_reader(payloadfile):
     metadata_signature_size = struct.unpack('>I', payloadfile.read(4))[0] if file_format_version > 1 else 0
     manifest = payloadfile.read(manifest_size)
     payloadfile.read(metadata_signature_size)
-    dam = um.Metadata(manifest)
+    dam = um.DeltaArchiveManifest()
+    dam.ParseFromString(manifest)
     return dam
 
 
