@@ -675,8 +675,10 @@ class Tool(Tk):
         ###
         project_struct = StringVar(value=settings.project_struct)
         ttk.Label(sf5, text=lang.project_struct).pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sf5, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sf5, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sf5, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10,
+                                                                                             side='left')
+        ttk.Radiobutton(sf5, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10,
+                                                                                           side='left')
         project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
         ###
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
@@ -1755,22 +1757,6 @@ class ModuleManager:
         def __init__(self, jsons, msh=False):
             super().__init__()
 
-            def generate_sh():
-                temp = os.path.join(cwd_path, "bin", "temp")
-                if not os.path.exists(temp):
-                    os.mkdir(temp)
-                self.destroy()
-
-            def generate_msh():
-                for va in self.gavs.keys():
-                    if gva := self.gavs[va].get():
-                        ModuleManager.MshParse.extra_envs[va] = gva
-                        if gva is str and os.path.isabs(gva) and os.name == 'nt':
-                            if '\\' in gva:
-                                ModuleManager.MshParse.extra_envs[va] = gva.replace("\\", '/')
-                self.destroy()
-                self.gavs.clear()
-
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
                     data = json.load(f)
@@ -1795,27 +1781,21 @@ class ModuleManager:
                         group_frame.pack(padx=10, pady=10)
                         for con in group_data['controls']:
                             if con["type"] == "text":
-                                text_label = ttk.Label(group_frame, text=con['text'],
-                                                       font=(None, int(con['fontsize'])))
-                                text_label.pack(side=con['side'], padx=5, pady=5)
+                                ttk.Label(group_frame, text=con['text'],
+                                                       font=(None, int(con['fontsize']))).pack(side=con['side'], padx=5, pady=5)
                             elif con["type"] == "button":
-                                button_command = con['command']
-                                button = ttk.Button(group_frame, text=con['text'],
-                                                    command=lambda: print(button_command))
-                                button.pack(side='left')
+                                ttk.Button(group_frame, text=con['text'],
+                                                    command=lambda: print(con['command'])).pack(side='left')
                             elif con["type"] == "filechose":
                                 ft = ttk.Frame(group_frame)
                                 ft.pack(fill=X)
                                 file_var_name = con['set']
                                 self.gavs[file_var_name] = StringVar()
-                                file_label = ttk.Label(ft, text=con['text'])
-                                file_label.pack(side='left', padx=10, pady=10)
-                                file_entry = ttk.Entry(ft, textvariable=self.gavs[file_var_name])
-                                file_entry.pack(side='left', padx=5, pady=5)
-                                file_button = ttk.Button(ft, text=lang.text28,
-                                                         command=lambda: self.gavs[file_var_name].set(
-                                                             filedialog.askopenfilename()))
-                                file_button.pack(side='left', padx=10, pady=10)
+                                ttk.Label(ft, text=con['text']).pack(side='left', padx=10, pady=10)
+                                ttk.Entry(ft, textvariable=self.gavs[file_var_name]).pack(side='left', padx=5, pady=5)
+                                ttk.Button(ft, text=lang.text28,
+                                           command=lambda: self.gavs[file_var_name].set(
+                                               filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
                             elif con["type"] == "radio":
                                 radio_var_name = con['set']
                                 self.gavs[radio_var_name] = StringVar()
@@ -1840,17 +1820,34 @@ class ModuleManager:
                             elif con['type'] == 'checkbutton':
                                 b_var_name = con['set']
                                 self.gavs[b_var_name] = IntVar()
-                                text = 'M.K.C' if 'text' not in con else con['text']
+                                text = '' if 'text' not in con else con['text']
                                 ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
                                                 offvalue=0,
                                                 style="Switch.TCheckbutton").pack(
                                     padx=5, pady=5, fill=BOTH)
                             else:
                                 print(lang.warn14.format(con['type']))
-            ttk.Button(self, text=lang.ok, command=lambda: cz(generate_msh if msh else generate_sh)).pack(fill=X,
-                                                                                                          side='bottom')
+            ttk.Button(self, text=lang.ok, command=lambda: cz(self.generate_msh if msh else self.generate_sh)).pack(
+                fill=X,
+                side='bottom')
             jzxs(self)
             self.wait_window()
+
+        def generate_sh(self):
+            temp = os.path.join(cwd_path, "bin", "temp")
+            if not os.path.exists(temp):
+                os.mkdir(temp)
+            self.destroy()
+
+        def generate_msh(self):
+            for va in self.gavs.keys():
+                if gva := self.gavs[va].get():
+                    ModuleManager.MshParse.extra_envs[va] = gva
+                    if gva is str and os.path.isabs(gva) and os.name == 'nt':
+                        if '\\' in gva:
+                            ModuleManager.MshParse.extra_envs[va] = gva.replace("\\", '/')
+            self.destroy()
+            self.gavs.clear()
 
     class UninstallMpk(Toplevel):
 
