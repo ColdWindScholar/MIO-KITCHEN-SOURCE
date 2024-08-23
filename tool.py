@@ -674,9 +674,9 @@ class Tool(Tk):
         self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
         ###
         project_struct = StringVar(value=settings.project_struct)
-        ttk.Label(sf5, text='项目结构:').pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sf5, text='single', variable=project_struct, value='single').pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sf5, text='split', variable=project_struct, value='split').pack(padx=10, pady=10, side='left')
+        ttk.Label(sf5, text=lang.project_struct).pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sf5, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sf5, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10, side='left')
         project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
         ###
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
