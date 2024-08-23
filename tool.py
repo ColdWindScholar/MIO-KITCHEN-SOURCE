@@ -93,6 +93,7 @@ from controls import ListBox, ScrollFrame
 from undz import DZFileTools
 from selinux_audit_allow import main as selinux_audit_allow
 import logging
+
 try:
     import imp
 except ImportError:
@@ -901,7 +902,8 @@ class Updater(Toplevel):
                 'updating': '1',
                 'language': settings.language,
                 'oobe': settings.oobe,
-                'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe'))
+                'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
+                "version_old": settings.version
             }
             for i in update_dict.keys():
                 settings.set_value(i, update_dict.get(i, ''))
@@ -925,6 +927,7 @@ class Updater(Toplevel):
         else:
             self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
+            settings.set_value('version', settings.version_old)
 
     def update_process3(self):
         self.notice.configure(text=lang.t52)
@@ -947,6 +950,7 @@ class Updater(Toplevel):
         else:
             self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
+            settings.set_value('version', settings.version_old)
 
     def close(self):
         states.update_window = False
@@ -1115,6 +1119,7 @@ class SetUtils:
         self.bar_level = '0.9'
         self.ai_engine = '0'
         self.version = 'basic'
+        self.version_old = 'unknown'
         self.language = 'English'
         self.updating = ''
         self.new_tool = ''
@@ -2522,7 +2527,8 @@ class PackSuper(Toplevel):
                                                                                              pady=10)
         ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
-        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz, values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
+        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz,
+                                values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
             side='left',
             padx=10,
             pady=10,
