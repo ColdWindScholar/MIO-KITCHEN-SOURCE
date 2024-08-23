@@ -2732,6 +2732,7 @@ class StdoutRedirector:
 
 
 def call(exe, extra=True, out=0):
+    logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
         if extra:
@@ -2757,6 +2758,7 @@ def call(exe, extra=True, out=0):
                 except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
+                logging.info(out_put)
         states.open_pids.remove(pid)
     except subprocess.CalledProcessError as e:
         for i in iter(e.stdout.readline, b""):
@@ -2766,6 +2768,7 @@ def call(exe, extra=True, out=0):
                 except (Exception, BaseException):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
+                logging.info(out_put)
         return 2
     ret.wait()
     return ret.returncode
