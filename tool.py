@@ -667,10 +667,18 @@ class Tool(Tk):
         sf2 = ttk.Frame(Setting_Frame.label_frame)
         sf3 = ttk.Frame(Setting_Frame.label_frame)
         sf4 = ttk.Frame(Setting_Frame.label_frame, width=20)
+        sf5 = ttk.Frame(Setting_Frame.label_frame)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
         self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
+        ###
+        project_struct = StringVar(value=settings.project_struct)
+        ttk.Label(sf5, text='项目结构:').pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sf5, text='single', variable=project_struct, value='single').pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sf5, text='split', variable=project_struct, value='split').pack(padx=10, pady=10, side='left')
+        project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
+        ###
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.show_local, wraplength=200)
         slo.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
@@ -682,7 +690,6 @@ class Tool(Tk):
                            values=[str(i.rsplit('.', 1)[0]) for i in
                                    os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
         context = StringVar(value=settings.contextpatch)
-        New_Project_Structure = StringVar(value=settings.nps)
 
         def enable_contextpatch():
             if context.get() == '1':
@@ -697,13 +704,9 @@ class Tool(Tk):
                 settings.set_value('contextpatch', context.get())
 
         context.trace("w", lambda *x: enable_contextpatch())
-        New_Project_Structure.trace("w", lambda *x: settings.set_value('nps', New_Project_Structure.get()))
         get_setting_button('ai_engine', sf4, lang.ai_engine)
         if os.name == 'nt':
             get_setting_button('treff', sf4, 'Transparent effect')
-        # ttk.Checkbutton(sf4, text="新项目结构", variable=New_Project_Structure, onvalue='1',
-        #             offvalue='0',
-        #           style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
@@ -715,6 +718,7 @@ class Tool(Tk):
         sf1.pack(padx=10, pady=10, fill='both')
         sf2.pack(padx=10, pady=10, fill='both')
         sf3.pack(padx=10, pady=10, fill='both')
+        sf5.pack(padx=10, pady=10, fill='both')
         sf4.pack(padx=10, pady=10, fill='both')
         Setting_Frame.update_ui()
         ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
@@ -723,7 +727,7 @@ class Tool(Tk):
 
 win = Tool()
 start = dti()
-dn = utils.project_name = StringVar()
+current_project_name = utils.project_name = StringVar()
 theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
@@ -1104,13 +1108,13 @@ class Welcome(ttk.Frame):
 
 class SetUtils:
     def __init__(self, set_ini: str = None):
+        self.project_struct = 'single'
         self.auto_unpack = '0'
         self.treff = '0'
         if set_ini:
             self.set_file = set_ini
         else:
             self.set_file = os.path.join(cwd_path, "bin", "setting.ini")
-        self.nps = '0'
         self.rm_pay = '0'
         self.plugin_repo = None
         self.contextpatch = '0'
@@ -1174,7 +1178,7 @@ class SetUtils:
         self.config.set("setting", name, value)
         with open(self.set_file, 'w', encoding='utf-8') as fil:
             self.config.write(fil)
-        self.load()
+        setattr(self, name, value)
 
     def set_theme(self):
         print(lang.text100 + theme.get())
@@ -1218,7 +1222,7 @@ def re_folder(path):
 
 @animation
 def un_dtbo(bn: str = 'dtbo') -> None:
-    if not (dtboimg := findfile(f"{bn}.img", work := rwork())):
+    if not (dtboimg := findfile(f"{bn}.img", work := ProjectManager.current_work_path())):
         print(lang.warn3.format(bn))
         return
     re_folder(work + bn)
@@ -1246,7 +1250,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
 
 @animation
 def pack_dtbo() -> bool:
-    work = rwork()
+    work = ProjectManager.current_work_path()
     if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
         return False
@@ -1262,7 +1266,7 @@ def pack_dtbo() -> bool:
     list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
              f.startswith("dtbo.")]
     list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
-    mkdtboimg.create_dtbo(work + "dtbo.img", list_, 4096)
+    mkdtboimg.create_dtbo(ProjectManager.current_work_output_path() + "dtbo.img", list_, 4096)
     rmdir(work + "dtbo")
     print(lang.text8)
     return True
@@ -1270,7 +1274,7 @@ def pack_dtbo() -> bool:
 
 @animation
 def logo_dump(bn: str = 'logo'):
-    if not (logo := findfile(f'{bn}.img', work := rwork())):
+    if not (logo := findfile(f'{bn}.img', work := ProjectManager.current_work_path())):
         win.message_pop(lang.warn3.format(bn))
         return False
     re_folder(work + bn)
@@ -1295,7 +1299,7 @@ def calculate_sha256_file(file_path):
 
 @animation
 def logo_pack(origin_logo=None) -> int:
-    work = rwork()
+    work = ProjectManager.current_work_path()
     if not origin_logo:
         origin_logo = findfile('logo.img', work)
     logo = work + "logo-new.img"
@@ -1389,7 +1393,7 @@ class ModuleManager:
 
     @animation
     def run(self, id_) -> int:
-        if not dn.get():
+        if not current_project_name.get():
             print(lang.warn1)
             return 1
         if id_:
@@ -1433,7 +1437,7 @@ class ModuleManager:
                     f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
                     f.write(
                         "export project='{}'\nsource $1".format(
-                            rwork().replace('\\', '/')))
+                            ProjectManager.current_work_path().replace('\\', '/')))
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
@@ -1450,7 +1454,8 @@ class ModuleManager:
                     data = {
                         "win": win,
                         'version': settings.version, "bin": script_path.replace(os.sep, "/"),
-                        "project": rwork().replace('\\', '/'), 'moddir': self.module_dir.replace('\\', '/'),
+                        "project": ProjectManager.current_work_path().replace('\\', '/'),
+                        'moddir': self.module_dir.replace('\\', '/'),
                         'tool_bin': tool_bin.replace(
                             '\\',
                             '/')
@@ -1649,7 +1654,7 @@ class ModuleManager:
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
-                         'project': (settings.path + os.sep + dn.get()).replace('\\', '/'),
+                         'project': ProjectManager.current_work_path,
                          'moddir': self.module_dir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
             for n, v in self.extra_envs.items():
                 self.envs[n] = v
@@ -2433,14 +2438,14 @@ class MpkStore(Toplevel):
 @animation
 class Dbkxyt:
     def __init__(self):
-        if not dn.get():
+        if not ProjectManager.exist():
             win.message_pop(lang.warn1)
             return
-        if os.path.exists((dir_ := rwork()) + "firmware-update"):
+        if os.path.exists((dir_ := ProjectManager.current_work_path()) + "firmware-update"):
             os.rename(dir_ + "firmware-update", dir_ + "images")
         if not os.path.exists(dir_ + "images"):
             os.makedirs(dir_ + 'images')
-        if os.path.exists(os.path.join(rwork(), 'payload.bin')):
+        if os.path.exists(os.path.join(ProjectManager.current_work_path(), 'payload.bin')):
             print("Found payload.bin ,Stop!")
             return
         if os.path.exists(dir_ + 'META-INF'):
@@ -2541,7 +2546,7 @@ class PackSuper(Toplevel):
 
         self.tl = ListBox(lf3)
         self.tl.gui()
-        self.work = rwork()
+        self.work = ProjectManager.current_work_path()
 
         self.tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
 
@@ -2607,7 +2612,7 @@ class PackSuper(Toplevel):
     def generate(self):
         self.g_b.config(text=lang.t28, state='disabled')
         utils.generate_dynamic_list(dbfz=self.sdbfz.get(), size=self.supers.get(), set_=self.supersz.get(),
-                                    lb=self.tl.selected.copy(), work=rwork())
+                                    lb=self.tl.selected.copy(), work=ProjectManager.current_work_path())
         self.g_b.config(text=lang.text34)
         time.sleep(1)
         try:
@@ -2655,10 +2660,10 @@ class PackSuper(Toplevel):
 
 @animation
 def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly'):
-    if not dn.get():
+    if not ProjectManager.exist():
         warn_win(text=lang.warn1)
         return False
-    work = rwork()
+    work = ProjectManager.current_work_path()
     lb_c = []
     for part in lb:
         if part.endswith('_b') or part.endswith('_a'):
@@ -2827,7 +2832,7 @@ def download_file():
 
 @animation
 def jboot(bn: str = 'boot'):
-    if not (boot := findfile(f"{bn}.img", (work := rwork()))):
+    if not (boot := findfile(f"{bn}.img", (work := ProjectManager.current_work_path()))):
         print(lang.warn3.format(bn))
         return
     if not os.path.exists(boot):
@@ -2869,7 +2874,7 @@ def jboot(bn: str = 'boot'):
 
 @animation
 def dboot(nm: str = 'boot'):
-    work = rwork()
+    work = ProjectManager.current_work_path()
     flag = ''
     boot = findfile(f"{nm}.img", work)
     if not os.path.exists(work + nm):
@@ -2908,7 +2913,7 @@ def dboot(nm: str = 'boot'):
         print("Failed to Pack boot...")
     else:
         os.remove(work + f"{nm}.img")
-        os.rename(work + nm + os.sep + "new-boot.img", work + os.sep + f"{nm}.img")
+        os.rename(work + nm + os.sep + "new-boot.img", ProjectManager.current_work_output_path() + os.sep + f"{nm}.img")
         os.chdir(cwd_path)
         try:
             rmdir(work + nm)
@@ -3044,7 +3049,7 @@ class Packxx(Toplevel):
                 side='left', padx=5, pady=5)
 
     def verify(self):
-        parts_dict = JsonEdit(rwork() + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit(ProjectManager.current_work_path() + "config" + os.sep + "parts_info").read()
         for i in self.lg:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
@@ -3053,7 +3058,7 @@ class Packxx(Toplevel):
         return False
 
     def modify_custom_size(self):
-        work = rwork()
+        work = ProjectManager.current_work_path()
 
         def save():
             if f.get().isdigit():
@@ -3111,13 +3116,10 @@ class Packxx(Toplevel):
 
     @animation
     def packrom(self) -> bool:
-        if not dn.get():
-            win.message_pop(lang.warn1)
-            return False
-        elif not os.path.exists(settings.path + os.sep + dn.get()):
+        if not ProjectManager.exist():
             win.message_pop(lang.warn1, "red")
             return False
-        parts_dict = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit((work := ProjectManager.current_work_path()) + "config" + os.sep + "parts_info").read()
         for i in self.lg:
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
@@ -3145,7 +3147,7 @@ class Packxx(Toplevel):
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
-                    if mkerofs(dname, str(self.edbgs.get()), work, level=int(self.scale_erofs.get()),
+                    if mkerofs(dname, str(self.edbgs.get()), work=work, work_output=ProjectManager.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
@@ -3153,26 +3155,26 @@ class Packxx(Toplevel):
                             rdi(work, dname)
                         print(lang.text3.format(dname))
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
-                            img2simg(work + dname + ".img")
+                            img2simg(ProjectManager.current_work_output_path() + dname + ".img")
                             if self.dbgs.get() == 'dat':
-                                datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', 4)))
                             elif self.dbgs.get() == 'br':
-                                datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print(lang.text3.format(dname))
                 elif parts_dict[dname] == 'f2fs':
-                    if make_f2fs(dname, work, UTC=self.UTC.get()) != 0:
+                    if make_f2fs(dname, work=work, work_output=ProjectManager.current_work_output_path(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
                         if self.delywj.get() == 1:
                             rdi(work, dname)
                         print(lang.text3.format(dname))
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
-                            img2simg(work + dname + ".img")
+                            img2simg(ProjectManager.current_work_output_path() + dname + ".img")
                             if self.dbgs.get() == 'dat':
-                                datbr(work, dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', 4)))
                             elif self.dbgs.get() == 'br':
-                                datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print(lang.text3.format(dname))
 
@@ -3196,24 +3198,24 @@ class Packxx(Toplevel):
                                 except ValueError:
                                     ext4_size_value = 0
 
-                    if make_ext4fs(dname, work, "-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                   ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
-                        dname,
-                        work,
-                        "y" if self.dbgs.get() in [
+                    if make_ext4fs(name=dname, work=work, work_output=ProjectManager.current_work_output_path(), sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
+                                   size=ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                        name=dname,work=work,
+                        work_output=ProjectManager.current_work_output_path(),
+                        sparse="y" if self.dbgs.get() in [
                             "dat",
                             "br",
                             "sparse"] else 'n',
-                        ext4_size_value,
+                        size=ext4_size_value,
                         UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                         continue
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
-                        datbr(work, dname, "dat", int(parts_dict.get('dat_ver', '4')))
+                        datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', '4')))
                     elif self.dbgs.get() == "br":
-                        datbr(work, dname, self.scale.get(), int(parts_dict.get('dat_ver', '4')))
+                        datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', '4')))
                     else:
                         print(lang.text3.format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
@@ -3286,33 +3288,36 @@ def unpackrom(ifile) -> None:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif ftype == 'kdz':
-        project_dir = settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0]
-        project_dir = os.path.normpath(project_dir)
-        if not os.path.exists(project_dir):
-            re_folder(project_dir)
-        KDZFileTools(ifile, project_dir, extract_all=True)
-        for i in os.listdir(project_dir):
-            if not os.path.isfile(project_dir + os.sep + i):
+        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
+        if not ProjectManager.exist():
+            re_folder(ProjectManager.current_work_path())
+        KDZFileTools(ifile, ProjectManager.current_work_path(), extract_all=True)
+        for i in os.listdir(ProjectManager.current_work_path()):
+            if not os.path.isfile(ProjectManager.current_work_path() + os.sep + i):
                 continue
-            if i.endswith('.dz') and gettype(project_dir + os.sep + i) == 'dz':
-                DZFileTools(project_dir + os.sep + i, project_dir, extract_all=True)
+            if i.endswith('.dz') and gettype(ProjectManager.current_work_path() + os.sep + i) == 'dz':
+                DZFileTools(ProjectManager.current_work_path() + os.sep + i, ProjectManager.current_work_path(),
+                            extract_all=True)
         return
     elif os.path.splitext(ifile)[1] == '.ofp':
+        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
         if ask_win(lang.t12) == 1:
-            ofp_mtk_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+            ofp_mtk_decrypt.main(ifile, ProjectManager.current_work_path())
         else:
-            ofp_qc_decrypt.main(ifile, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
-            script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+            ofp_qc_decrypt.main(ifile, ProjectManager.current_work_path())
+            script2fs(ProjectManager.current_work_path())
         unpackg.refs()
         return
     elif os.path.splitext(ifile)[1] == '.ops':
+        current_project_name.set(os.path.basename(ifile).split('.')[0])
         args = {'decrypt': True,
                 "<filename>": ifile,
-                'outdir': os.path.join(settings.path, os.path.basename(ifile).split('.')[0])}
+                'outdir': os.path.join(settings.path, ProjectManager.current_work_path())}
         opscrypto.main(args)
         unpackg.refs()
         return
     if gettype(zip_src) == 'zip':
+        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
         fz = zipfile.ZipFile(zip_src, 'r')
         for fi in fz.namelist():
             try:
@@ -3324,21 +3329,21 @@ def unpackrom(ifile) -> None:
                     file_ = fi
             print(lang.text79 + file_)
             try:
-                fz.extract(fi, settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+                fz.extract(fi, ProjectManager.current_work_path())
                 if fi != file_:
-                    os.rename(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], fi),
-                              os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0], file_))
+                    os.rename(os.path.join(ProjectManager.current_work_path(), fi),
+                              os.path.join(ProjectManager.current_work_path(), file_))
             except Exception as e:
                 print(lang.text80 % (file_, e))
                 win.message_pop(lang.warn4.format(file_))
         print(lang.text81)
-        if os.path.isdir(os.path.join(settings.path, os.path.splitext(os.path.basename(zip_src))[0])):
+        if os.path.isdir(ProjectManager.current_work_path()):
             project_menu.set_project(os.path.splitext(os.path.basename(zip_src))[0])
-        script2fs(settings.path + os.sep + os.path.splitext(os.path.basename(zip_src))[0])
+        script2fs(ProjectManager.current_work_path())
         unpackg.refs()
         fz.close()
         if settings.auto_unpack == '1':
-            chose = [i.split('.')[0] for i in os.listdir(rwork())]
+            chose = [i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())]
 
             unpack(chose)
         return
@@ -3353,11 +3358,11 @@ def unpackrom(ifile) -> None:
             os.mkdir(folder)
         except Exception as e:
             win.message_pop(str(e))
-        copy(ifile, str(folder))
+        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + os.sep + 'Source'))
         project_menu.listdir()
-        dn.set(os.path.basename(folder))
+        current_project_name.set(os.path.basename(folder))
         if settings.auto_unpack == '1':
-            chose = [i.split('.')[0] for i in os.listdir(rwork())]
+            chose = [i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())]
 
             unpack(chose)
     else:
@@ -3365,8 +3370,41 @@ def unpackrom(ifile) -> None:
     unpackg.refs()
 
 
-def rwork() -> str:
-    return os.path.join(settings.path, dn.get()) + os.sep
+class ProjectManager:
+    def __init__(self):
+        ...
+
+    @staticmethod
+    def get_work_path(name):
+        path = str(os.path.join(settings.path, name) + os.sep)
+        return path if os.name != 'nt' else path.replace('\\', '/')
+
+    def current_work_path(self):
+        if settings.project_struct == 'single':
+            path = self.get_work_path(current_project_name.get())
+        else:
+            path = os.path.join(self.get_work_path(current_project_name.get()), 'Source') + os.sep
+            if not os.path.exists(path) and current_project_name.get():
+                os.makedirs(path, exist_ok=True)
+        return path if os.name != 'nt' else path.replace('\\', '/')
+
+    def current_work_output_path(self):
+        if settings.project_struct == 'single':
+            path = self.get_work_path(current_project_name.get())
+        else:
+            path = os.path.join(self.get_work_path(current_project_name.get()), 'Output') + os.sep
+            if not os.path.exists(path) and current_project_name.get():
+                os.makedirs(path, exist_ok=True)
+        return path if os.name != 'nt' else path.replace('\\', '/')
+
+    def exist(self, name=None):
+        if not name:
+            return os.path.exists(self.current_work_path())
+        else:
+            return os.path.exists(self.get_work_path(current_project_name.get()))
+
+
+ProjectManager = ProjectManager()
 
 
 @animation
@@ -3374,16 +3412,16 @@ def unpack(chose, form: str = '') -> bool:
     if os.name == 'nt':
         if windll.shell32.IsUserAnAdmin():
             try:
-                ensure_dir_case_sensitive(rwork())
+                ensure_dir_case_sensitive(ProjectManager.current_work_path())
             except (Exception, BaseException):
                 logging.exception('Bugs')
-    if not dn.get():
+    if not ProjectManager.exist():
         win.message_pop(lang.warn1)
         return False
-    elif not os.path.exists(settings.path + os.sep + dn.get()):
+    elif not os.path.exists(ProjectManager.current_work_path()):
         win.message_pop(lang.warn1, "red")
         return False
-    json_ = JsonEdit((work := rwork()) + "config" + os.sep + "parts_info")
+    json_ = JsonEdit((work := ProjectManager.current_work_path()) + "config" + os.sep + "parts_info")
     parts = json_.read()
     if not chose:
         return False
@@ -3506,14 +3544,15 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                imgextractor.Extractor().main(work + i + ".img", work + i, work)
+                imgextractor.Extractor().main(ProjectManager.current_work_path() + i + ".img", work + i, work)
                 if os.path.exists(work + i):
                     try:
                         os.remove(work + i + ".img")
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == "erofs":
-                if call(exe=['extract.erofs', '-i', os.path.join(settings.path, dn.get(), i + '.img'), '-o', work,
+                if call(exe=['extract.erofs', '-i', os.path.join(ProjectManager.current_work_path(), i + '.img'), '-o',
+                             work,
                              '-x'],
                         out=1) != 0:
                     print('Unpack failed...')
@@ -3524,7 +3563,7 @@ def unpack(chose, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                if call(exe=['extract.f2fs', '-o', work, os.path.join(settings.path, dn.get(), i + '.img')],
+                if call(exe=['extract.f2fs', '-o', work, os.path.join(ProjectManager.current_work_path(), i + '.img')],
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
@@ -3688,7 +3727,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % (name, 'br'))
 
 
-def mkerofs(name: str, format_, work, level, old_kernel=0, UTC=None):
+def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
@@ -3698,12 +3737,12 @@ def mkerofs(name: str, format_, work, level, old_kernel=0, UTC=None):
            f'--product-out={work}',
            f'--fs-config-file={work}config{os.sep}{name}_fs_config',
            f'--file-contexts={work}config{os.sep}{name}_file_contexts',
-           f'{work + name}.img', work + name + os.sep]
+           f'{work_output + name}.img', work + name + os.sep]
     return call(cmd, out=1)
 
 
 @animation
-def make_ext4fs(name: str, work: str, sparse='', size=0, UTC=None):
+def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
@@ -3712,11 +3751,11 @@ def make_ext4fs(name: str, work: str, sparse='', size=0, UTC=None):
     print(f"{name}:[{size}]")
     return call(
         ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
-         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work + name}.img", work + name])
+         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work_output + name}.img", work + name])
 
 
 @animation
-def make_f2fs(name: str, work: str, UTC=None):
+def make_f2fs(name: str, work: str,work_output,  UTC=None):
     print(lang.text91 % name)
     size = Dirsize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
@@ -3726,7 +3765,7 @@ def make_f2fs(name: str, work: str, UTC=None):
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(['mkfs.f2fs', f"{work + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O',
+    if call(['mkfs.f2fs', f"{work_output + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O',
              'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
@@ -3735,10 +3774,10 @@ def make_f2fs(name: str, work: str, UTC=None):
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
         ['sload.f2fs', '-f', work + name, '-C', f'{work}config{os.sep}{name}_fs_config', '-T', f'{UTC}', '-s',
-         f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work + name}.img'])
+         f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output + name}.img'])
 
 
-def mke2fs(name, work, sparse, size=0, UTC=None):
+def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
     print(lang.text91 % name)
     size = Dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
@@ -3747,31 +3786,31 @@ def mke2fs(name, work, sparse, size=0, UTC=None):
     if call(
             ['mke2fs', '-O',
              '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L', name,
-             '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work + name}_new.img',
+             '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output + name}_new.img',
              f'{int(size)}']) != 0:
-        rmdir(f'{work + name}_new.img')
+        rmdir(f'{work_output + name}_new.img')
         print(lang.text75 % name)
         return 1
     ret = call(
         ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C',
-         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}', f'{work + name}_new.img'])
+         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}', f'{work_output + name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     if sparse == "y":
-        call(['img2simg', f'{work + name}_new.img', f'{work + name}.img'])
+        call(['img2simg', f'{work_output + name}_new.img', f'{work_output + name}.img'])
         try:
-            os.remove(work + name + "_new.img")
+            os.remove(work_output + name + "_new.img")
         except (Exception, BaseException):
             logging.exception('Bugs')
     else:
-        if os.path.isfile(work + name + ".img"):
+        if os.path.isfile(work_output + name + ".img"):
             try:
-                os.remove(work + name + ".img")
+                os.remove(work_output + name + ".img")
             except (Exception, BaseException):
                 logging.exception('Bugs')
-        os.rename(work + name + "_new.img", work + name + ".img")
+        os.rename(work_output + name + "_new.img", work_output + name + ".img")
     return 0
 
 
@@ -3801,17 +3840,17 @@ def get_all_file_paths(directory):
 def pack_zip():
     if ask_win(lang.t53) != 1:
         return
-    if not dn.get():
+    if not ProjectManager.exist():
         win.message_pop(lang.warn1)
     else:
-        print(lang.text91 % dn.get())
+        print(lang.text91 % current_project_name.get())
         if ask_win(lang.t25) == 1:
             Dbkxyt()
-        with zipfile.ZipFile(relpath := settings.path + os.sep + dn.get() + ".zip", 'w',
+        with zipfile.ZipFile(relpath := settings.path + os.sep + current_project_name.get() + ".zip", 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
-            for file in get_all_file_paths(settings.path + os.sep + dn.get()):
+            for file in get_all_file_paths(ProjectManager.current_work_output_path()):
                 file = str(file)
-                arch_name = file.replace(settings.path + os.sep + dn.get(), '')
+                arch_name = file.replace(ProjectManager.current_work_output_path(), '')
                 print(f"{lang.text1}:{arch_name}")
                 try:
                     zip_.write(file, arcname=arch_name)
@@ -3843,9 +3882,9 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
-        self.combobox = ttk.Combobox(self, textvariable=dn, state='readonly')
+        self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
         self.combobox.pack(side="top", padx=10, pady=10, fill=X)
-        self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + dn.get()))
+        self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
         ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text115, command=self.new).pack(side="left", padx=10, pady=10)
         ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove)).pack(side="left", padx=10, pady=10)
@@ -3855,7 +3894,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         if not os.path.isdir(os.path.join(settings.path, name)):
             return
         self.listdir()
-        dn.set(name)
+        current_project_name.set(name)
 
     def listdir(self):
         array = []
@@ -3864,27 +3903,29 @@ class ProjectMenuUtils(ttk.LabelFrame):
                 array.append(f)
         self.combobox["value"] = array
         if not array:
-            dn.set('')
+            current_project_name.set('')
             self.combobox.current()
         else:
             self.combobox.current(0)
 
     def rename(self) -> bool:
-        if not dn.get():
+        if not ProjectManager.exist():
             print(lang.warn1)
             return False
-        if os.path.exists(settings.path + os.sep + (inputvar := input_(lang.text102 + dn.get(), dn.get()))):
+        if os.path.exists(settings.path + os.sep + (
+        inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
             print(lang.text103)
             return False
-        if inputvar != dn.get():
-            os.rename(settings.path + os.sep + dn.get(), settings.path + os.sep + inputvar)
+        if inputvar != current_project_name.get():
+            os.rename(settings.path + os.sep + current_project_name.get(), settings.path + os.sep + inputvar)
             self.listdir()
         else:
             print(lang.text104)
         return True
 
     def remove(self):
-        win.message_pop(lang.warn1) if not dn.get() else rmdir(settings.path + os.sep + dn.get())
+        win.message_pop(lang.warn1) if not ProjectManager.exist() else rmdir(
+            ProjectManager.get_work_path(current_project_name.get()))
         self.listdir()
 
     def new(self):
@@ -3958,7 +3999,7 @@ class UnpackGui(ttk.LabelFrame):
         if not self.lsg.selected:
             ck_.destroy()
             return
-        f_path = os.path.join(rwork(), self.lsg.selected[0] + ".img")
+        f_path = os.path.join(ProjectManager.current_work_path(), self.lsg.selected[0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
             return
@@ -3991,7 +4032,7 @@ class UnpackGui(ttk.LabelFrame):
 
     def refs(self):
         self.lsg.clear()
-        if not os.path.exists(work := rwork()):
+        if not os.path.exists(work := ProjectManager.current_work_path()):
             win.message_pop(lang.warn1)
             return False
         if self.fm.get() == 'payload':
@@ -4022,7 +4063,7 @@ class UnpackGui(ttk.LabelFrame):
 
     def refs2(self):
         self.lsg.clear()
-        if not os.path.exists(work := rwork()):
+        if not os.path.exists(work := ProjectManager.current_work_path()):
             win.message_pop(lang.warn1)
             return False
         parts_dict = JsonEdit(work + "config" + os.sep + "parts_info").read()
@@ -4078,7 +4119,7 @@ class FormatConversion(ttk.LabelFrame):
         t.pack(side=BOTTOM, fill=BOTH)
 
     def relist(self):
-        work = rwork()
+        work = ProjectManager.current_work_path()
         self.list_b.clear()
         if self.h.get() == "br":
             for i in self.refile(".new.dat.br"):
@@ -4098,13 +4139,13 @@ class FormatConversion(ttk.LabelFrame):
 
     @staticmethod
     def refile(f):
-        for i in os.listdir(work := rwork()):
+        for i in os.listdir(work := ProjectManager.current_work_path()):
             if i.endswith(f) and os.path.isfile(work + i):
                 yield i
 
     @animation
     def conversion(self):
-        work = rwork()
+        work = ProjectManager.current_work_path()
         f_get = self.f.get()
         hget = self.h.get()
         selection = self.list_b.selected.copy()
