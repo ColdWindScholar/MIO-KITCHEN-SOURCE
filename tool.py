@@ -672,7 +672,7 @@ class Tool(Tk):
         self.list2.pack(padx=10, pady=10, side='left')
         self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
-        slo = ttk.Label(sf3, textvariable=self.show_local)
+        slo = ttk.Label(sf3, textvariable=self.show_local, wraplength=200)
         slo.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
