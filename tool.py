@@ -3147,7 +3147,8 @@ class Packxx(Toplevel):
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
-                    if mkerofs(dname, str(self.edbgs.get()), work=work, work_output=ProjectManager.current_work_output_path(), level=int(self.scale_erofs.get()),
+                    if mkerofs(dname, str(self.edbgs.get()), work=work,
+                               work_output=ProjectManager.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
@@ -3157,13 +3158,16 @@ class Packxx(Toplevel):
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
                             img2simg(ProjectManager.current_work_output_path() + dname + ".img")
                             if self.dbgs.get() == 'dat':
-                                datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, "dat",
+                                      int(parts_dict.get('dat_ver', 4)))
                             elif self.dbgs.get() == 'br':
-                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(),
+                                      int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print(lang.text3.format(dname))
                 elif parts_dict[dname] == 'f2fs':
-                    if make_f2fs(dname, work=work, work_output=ProjectManager.current_work_output_path(), UTC=self.UTC.get()) != 0:
+                    if make_f2fs(dname, work=work, work_output=ProjectManager.current_work_output_path(),
+                                 UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
                         if self.delywj.get() == 1:
@@ -3172,9 +3176,11 @@ class Packxx(Toplevel):
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
                             img2simg(ProjectManager.current_work_output_path() + dname + ".img")
                             if self.dbgs.get() == 'dat':
-                                datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, "dat",
+                                      int(parts_dict.get('dat_ver', 4)))
                             elif self.dbgs.get() == 'br':
-                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', 4)))
+                                datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(),
+                                      int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print(lang.text3.format(dname))
 
@@ -3198,9 +3204,11 @@ class Packxx(Toplevel):
                                 except ValueError:
                                     ext4_size_value = 0
 
-                    if make_ext4fs(name=dname, work=work, work_output=ProjectManager.current_work_output_path(), sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                   size=ext4_size_value, UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
-                        name=dname,work=work,
+                    if make_ext4fs(name=dname, work=work, work_output=ProjectManager.current_work_output_path(),
+                                   sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
+                                   size=ext4_size_value,
+                                   UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                        name=dname, work=work,
                         work_output=ProjectManager.current_work_output_path(),
                         sparse="y" if self.dbgs.get() in [
                             "dat",
@@ -3213,9 +3221,11 @@ class Packxx(Toplevel):
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
-                        datbr(ProjectManager.current_work_output_path(), dname, "dat", int(parts_dict.get('dat_ver', '4')))
+                        datbr(ProjectManager.current_work_output_path(), dname, "dat",
+                              int(parts_dict.get('dat_ver', '4')))
                     elif self.dbgs.get() == "br":
-                        datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(), int(parts_dict.get('dat_ver', '4')))
+                        datbr(ProjectManager.current_work_output_path(), dname, self.scale.get(),
+                              int(parts_dict.get('dat_ver', '4')))
                     else:
                         print(lang.text3.format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
@@ -3398,7 +3408,9 @@ class ProjectManager:
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def exist(self, name=None):
-        if not name:
+        if not current_project_name.get():
+            return False
+        if name is None:
             return os.path.exists(self.current_work_path())
         else:
             return os.path.exists(self.get_work_path(current_project_name.get()))
@@ -3751,11 +3763,12 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
     print(f"{name}:[{size}]")
     return call(
         ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
-         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work_output + name}.img", work + name])
+         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work_output + name}.img",
+         work + name])
 
 
 @animation
-def make_f2fs(name: str, work: str,work_output,  UTC=None):
+def make_f2fs(name: str, work: str, work_output, UTC=None):
     print(lang.text91 % name)
     size = Dirsize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
@@ -3765,7 +3778,8 @@ def make_f2fs(name: str, work: str,work_output,  UTC=None):
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(['mkfs.f2fs', f"{work_output + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum', '-O',
+    if call(['mkfs.f2fs', f"{work_output + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum',
+             '-O',
              'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
@@ -3793,7 +3807,8 @@ def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
         return 1
     ret = call(
         ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C',
-         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}', f'{work_output + name}_new.img'])
+         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}',
+         f'{work_output + name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
@@ -3913,7 +3928,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
             print(lang.warn1)
             return False
         if os.path.exists(settings.path + os.sep + (
-        inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
+                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
             print(lang.text103)
             return False
         if inputvar != current_project_name.get():
@@ -4032,7 +4047,8 @@ class UnpackGui(ttk.LabelFrame):
 
     def refs(self):
         self.lsg.clear()
-        if not os.path.exists(work := ProjectManager.current_work_path()):
+        work = ProjectManager.current_work_path()
+        if not ProjectManager.exist():
             win.message_pop(lang.warn1)
             return False
         if self.fm.get() == 'payload':
@@ -4264,9 +4280,9 @@ def init():
     global project_menu
     project_menu = ProjectMenuUtils()
     project_menu.gui()
+    project_menu.listdir()
     unpackg.gui()
     Frame3().gui()
-    project_menu.listdir()
     animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
     animation.init()
     print(lang.text108)
