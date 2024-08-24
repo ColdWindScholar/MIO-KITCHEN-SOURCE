@@ -2981,7 +2981,7 @@ class Packxx(Toplevel):
                                                                                                                 side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
-                     values=("lz4", "lz4hc", "lzma", "deflate")).pack(side='left', padx=5, pady=5)
+                     values=("lz4", "lz4hc", "lzma", "deflate", "zstd")).pack(side='left', padx=5, pady=5)
         ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
