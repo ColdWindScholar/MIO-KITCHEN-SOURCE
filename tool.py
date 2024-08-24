@@ -568,7 +568,7 @@ class Tool(Tk):
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
-            ask_win(lang.warn16)
+            cz(ask_win, lang.warn16)
             call(['su'], extra=False)
 
     def tab_content(self):
@@ -2769,7 +2769,7 @@ def call(exe, extra=True, out=0):
                 print(out_put)
                 logging.info(out_put)
         states.open_pids.remove(pid)
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+    except subprocess.CalledProcessError as e:
         for i in iter(e.stdout.readline, b""):
             if out == 0:
                 try:
@@ -2778,6 +2778,9 @@ def call(exe, extra=True, out=0):
                     out_put = i.decode("gbk").strip()
                 print(out_put)
                 logging.info(out_put)
+        return 2
+    except FileNotFoundError:
+        logging.exception('Bugs')
         return 2
     ret.wait()
     return ret.returncode
