@@ -1181,7 +1181,7 @@ class SetUtils:
         with open(self.set_file, 'w', encoding='utf-8') as fil:
             self.config.write(fil)
         setattr(self, name, value)
-        if name in ['treff', 'barlevel']:
+        if name in ['treff', 'barlevel', 'theme']:
             self.load()
 
     def set_theme(self):
