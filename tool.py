@@ -4281,6 +4281,8 @@ def init():
                         filename=tool_log, filemode='w')
     if settings.updating in ['1', '2']:
         Updater()
+    if settings.custom_system == 'Android':
+        win.attributes("-fullscreen", True)
     if int(settings.oobe) < 5:
         Welcome()
     init_verify()
