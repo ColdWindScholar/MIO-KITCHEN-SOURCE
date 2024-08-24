@@ -3882,7 +3882,7 @@ def dndfile(files):
         try:
             fi = fi.decode('gbk')
         except (Exception, BaseException):
-            ...
+            logging.exception('fI')
         if os.path.exists(fi):
             if fi.endswith(".mpk"):
                 InstallMpk(fi)
