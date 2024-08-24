@@ -733,7 +733,6 @@ current_project_name = utils.project_name = StringVar()
 theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
-tool_bin = os.path.join(cwd_path, 'bin', platform.system(), platform.machine()) + os.sep
 tool_log = f'{cwd_path}/bin/temp/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
 
@@ -1139,6 +1138,12 @@ class SetUtils:
             sv_ttk.set_theme("dark")
             error(1,
                   'Some necessary files were lost, please reinstall this software to fix the problem!')
+        if hasattr(self, 'custom_system'):
+            if not self.custom_system.strip():
+                self.custom_system = platform.system()
+        else:
+            self.custom_system = platform.system()
+        self.tool_bin = os.path.join(cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
 
     def load(self):
         self.config.read(self.set_file)
@@ -1432,7 +1437,7 @@ class ModuleManager:
                                 f.write(f"export {va}='{gva}'\n")
                         values.gavs.clear()
                     f.write('export tool_bin="{}"\n'.format(
-                        tool_bin.replace(
+                        settings.tool_bin.replace(
                             '\\',
                             '/')))
                     f.write(f'export version="{settings.version}"\n')
@@ -1461,7 +1466,7 @@ class ModuleManager:
                         'version': settings.version, "bin": script_path.replace(os.sep, "/"),
                         "project": ProjectManager.current_work_path().replace('\\', '/'),
                         'moddir': self.module_dir.replace('\\', '/'),
-                        'tool_bin': tool_bin.replace(
+                        'tool_bin': settings.tool_bin.replace(
                             '\\',
                             '/')
                     }
@@ -1658,7 +1663,7 @@ class ModuleManager:
         def __init__(self, sh):
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
-            self.envs = {'version': settings.version, 'tool_bin': tool_bin.replace('\\', '/'),
+            self.envs = {'version': settings.version, 'tool_bin': settings.tool_bin.replace('\\', '/'),
                          'project': ProjectManager.current_work_path(),
                          'project_output': ProjectManager.current_work_output_path(),
                          'moddir': self.module_dir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
@@ -2735,10 +2740,10 @@ def call(exe, extra=True, out=0):
     if isinstance(exe, list):
         cmd = exe
         if extra:
-            cmd[0] = f"{tool_bin}{exe[0]}"
+            cmd[0] = f"{settings.tool_bin}{exe[0]}"
         cmd = [i for i in cmd if i]
     else:
-        cmd = f'{tool_bin}{exe}' if extra else exe
+        cmd = f'{settings.tool_bin}{exe}' if extra else exe
         if os.name == 'posix':
             cmd = cmd.split()
     if os.name != 'posix':
@@ -2885,7 +2890,7 @@ def dboot(nm: str = 'boot'):
         print(f"Cannot Find {nm}...")
         return
     cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                    tool_bin).replace(
+                    settings.tool_bin).replace(
         '\\', "/")
 
     if os.path.isdir(work + nm + os.sep + "ramdisk"):
@@ -4257,7 +4262,7 @@ unpackg: UnpackGui
 
 
 def init_verify():
-    if not os.path.exists(tool_bin):
+    if not os.path.exists(settings.tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():
         ask_win2(lang.warn16 % lang.special_words)
