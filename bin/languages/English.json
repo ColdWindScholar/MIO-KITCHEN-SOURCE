@@ -45,7 +45,7 @@
   "warn13": "[W]: The tool was started with normal user privileges, unpack / pack functions may not work correctly in this case (please run with Sudo/ROOT)",
   "warn14": "Unknown Widget: {}",
   "warn15": "Unsupported OS {}",
-  "warn16": "The Working Path contain %s.\nThe program may not run currently.\nPlease Modify The Working Path!",
+  "warn16": "We need Root permission to support the normal operation of this tool. Please click Allow in the pop-up authorization window",
   "text1": "Writing:",
   "text2": "Error writing {} : {}",
   "text3": "Packed successfully : {}!",

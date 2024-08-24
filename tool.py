@@ -25,6 +25,8 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
+from google.api_core.retry import if_transient_error
+
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
@@ -565,6 +567,9 @@ class Tool(Tk):
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
+        if settings.custom_system == 'Android' and os.geteuid() != 0:
+            ask_win(lang.warn16)
+            call(['su'], extra=False)
 
     def tab_content(self):
 
@@ -2764,7 +2769,7 @@ def call(exe, extra=True, out=0):
                 print(out_put)
                 logging.info(out_put)
         states.open_pids.remove(pid)
-    except subprocess.CalledProcessError as e:
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
         for i in iter(e.stdout.readline, b""):
             if out == 0:
                 try:
