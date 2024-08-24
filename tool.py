@@ -569,7 +569,9 @@ class Tool(Tk):
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
             cz(ask_win, lang.warn16)
-            call(['su'], extra=False)
+            if call(['su'], extra=False) != 0:
+                ask_win(lang.warn17)
+
 
     def tab_content(self):
 

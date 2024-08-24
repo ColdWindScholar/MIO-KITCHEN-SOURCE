@@ -46,6 +46,7 @@
   "warn14": "Unknown Widget: {}",
   "warn15": "Unsupported OS {}",
   "warn16": "We need Root permission to support the normal operation of this tool. Please click Allow in the pop-up authorization window",
+  "waarn17": "Root permission not obtained",
   "text1": "Writing:",
   "text2": "Error writing {} : {}",
   "text3": "Packed successfully : {}!",
