@@ -987,7 +987,7 @@ def error(code, desc="unknown error"):
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er, height=20, width=60)
     scroll.config(command=te.yview)
-    te.pack(padx=10, pady=10)
+    te.pack(padx=10, pady=10, fill=BOTH)
     te.insert('insert', desc)
     te.config(yscrollcommand=scroll.set)
     ttk.Label(er, text=f"The Log File Is: {tool_log}", font=(None, 10)).pack(padx=10, pady=10)
