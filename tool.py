@@ -67,7 +67,7 @@ else:
     import mkc_filedialog as filedialog
 
 if sys.version_info.major == 3:
-    if sys.version_info.minor < 8 or sys.version_info.minor > 12:
+    if sys.version_info.minor < 8:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
