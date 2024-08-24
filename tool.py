@@ -2447,7 +2447,7 @@ class MpkStore(Toplevel):
 
 
 @animation
-class Dbkxyt:
+class PackHybridRom:
     def __init__(self):
         if not ProjectManager.exist():
             win.message_pop(lang.warn1)
@@ -2466,7 +2466,7 @@ class Dbkxyt:
         with open(dir_ + "bin" + os.sep + "right_device", 'w', encoding='gbk') as rd:
             rd.write(right_device + "\n")
         with open(
-                dir_ + 'META-INF' + os.sep + "com" + os.sep + "google" + os.sep + "android" + os.sep + "update-binary",
+                dir_ + 'META-INF/com/google/android/update-binary',
                 'r+', encoding='utf-8', newline='\n') as script:
             lines = script.readlines()
             lines.insert(45, f'right_device="{right_device}"\n')
@@ -3877,7 +3877,7 @@ def pack_zip():
     else:
         print(lang.text91 % current_project_name.get())
         if ask_win(lang.t25) == 1:
-            Dbkxyt()
+            PackHybridRom()
         with zipfile.ZipFile(relpath := settings.path + os.sep + current_project_name.get() + ".zip", 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
             for file in get_all_file_paths(ProjectManager.current_work_output_path()):
