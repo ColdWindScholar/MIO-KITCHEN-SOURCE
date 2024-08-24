@@ -25,8 +25,6 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from google.api_core.retry import if_transient_error
-
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
