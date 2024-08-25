@@ -47,6 +47,7 @@
   "warn15": "Unsupported OS {}",
   "warn16": "We need Root permission to support the normal operation of this tool. Please click Allow in the pop-up authorization window",
   "waarn17": "Root permission not obtained",
+  "warn18": "Are you sure enable it? This feature may cause the rom cannot boot!",
   "text1": "Writing:",
   "text2": "Error writing {} : {}",
   "text3": "Packed successfully : {}!",
@@ -245,5 +246,6 @@
   "t57": "List of partition(s)",
   "t58": "Modify plugin repository",
   "t59": "Get File Info",
-  "t60": "Byte Calculator"
+  "t60": "Byte Calculator",
+  "t61": "Transparent effect"
 }

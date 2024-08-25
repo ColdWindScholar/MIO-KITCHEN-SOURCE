@@ -700,7 +700,7 @@ class Tool(Tk):
         def enable_contextpatch():
             if context.get() == '1':
                 if ask_win2(
-                        "Are you sure enable it? This feature may cause cannot boot rom!"):
+                        lang.warn18):
                     settings.set_value('contextpatch', context.get())
                 else:
                     context.set('0')
