@@ -566,8 +566,8 @@ class Tool(Tk):
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
-            ask_win(lang.warn16)
-            if call(['su'], extra=False) != 0:
+            ask_win(lang.warn16, wait=False)
+            if call(['su', '-c', 'echo ok'], extra=False) != 0:
                 ask_win(lang.warn17)
         if settings.custom_system == 'Android' and os.geteuid() == 0:
             os.makedirs('/data/local/MIO', exist_ok=True)
@@ -3610,7 +3610,7 @@ def unpack(chose, form: str = '') -> bool:
     return True
 
 
-def ask_win(text='', ok=None, cancel=None) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
     if not ok:
         ok = lang.ok
     if not cancel:
@@ -3634,8 +3634,8 @@ def ask_win(text='', ok=None, cancel=None) -> int:
     def close_ask(value_=1):
         value.set(value_)
         ask.destroy()
-
-    ask.wait_window()
+    if wait:
+        ask.wait_window()
     return value.get()
 
 
