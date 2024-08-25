@@ -569,6 +569,8 @@ class Tool(Tk):
             cz(ask_win, lang.warn16)
             if call(['su'], extra=False) != 0:
                 ask_win(lang.warn17)
+            if os.geteuid() == 0:
+                os.makedirs('/data/local/MIO', exist_ok=True)
 
 
     def tab_content(self):
