@@ -785,7 +785,7 @@ class Updater(Toplevel):
         self.notice = ttk.Label(f2, text=lang.t42)
         self.notice.pack(padx=5, pady=5)
         if states.run_source:
-            ttk.Label(self, text='You are running the source code\nPlease Use "git pull" To Update', foreground='gray',
+            ttk.Label(self, text=lang.t64, foreground='gray',
                       justify='center').pack(fill=X, pady=10,
                                              padx=10, anchor='center')
             jzxs(self)
