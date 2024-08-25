@@ -611,8 +611,7 @@ class Tool(Tk):
             color1 = hex(randrange(16, 256))[2:]
             color2 = hex(randrange(16, 256))[2:]
             color3 = hex(randrange(16, 256))[2:]
-            ans = "#" + color1 + color2 + color3
-            return ans
+            return f"#{color1}{color2}{color3}"
 
         def update_angle():
             self.rotate_angle -= 10
