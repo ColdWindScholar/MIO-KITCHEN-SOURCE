@@ -566,7 +566,7 @@ class Tool(Tk):
         self.gif_label.pack(padx=10, pady=10)
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
-            cz(ask_win, lang.warn16)
+            ask_win(lang.warn16)
             if call(['su'], extra=False) != 0:
                 ask_win(lang.warn17)
             if os.geteuid() == 0:
