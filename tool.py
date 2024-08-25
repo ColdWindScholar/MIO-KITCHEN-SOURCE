@@ -632,7 +632,7 @@ class Tool(Tk):
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
         Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
-        ttk.Label(self.tab4, text="Open Source, Free, Faster", style="Link.TLabel").pack()
+        ttk.Label(self.tab4, text=lang.t63, style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
@@ -645,7 +645,7 @@ class Tool(Tk):
         tab = ttk.LabelFrame(text=lang.text16)
         tab.place(relx=0.5, rely=0.5, anchor="center")
         Label(tab,
-              text="Wechat Pay",
+              text=lang.t62,
               font=(None, 20), fg='#008000').pack(padx=10, pady=10)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(tab, image=self.photo).pack(padx=5, pady=5)
@@ -712,7 +712,7 @@ class Tool(Tk):
         context.trace("w", lambda *x: enable_contextpatch())
         get_setting_button('ai_engine', sf4, lang.ai_engine)
         if os.name == 'nt':
-            get_setting_button('treff', sf4, 'Transparent effect')
+            get_setting_button('treff', sf4, lang.t61)
         enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
