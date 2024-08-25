@@ -4305,7 +4305,11 @@ def init():
     animation.init()
     print(lang.text108)
     win.update()
-    jzxs(win)
+    if settings.custom_system == 'Android':
+        global jzxs
+        jzxs = lambda *x:bool(x)
+    else:
+        jzxs(win)
     win.get_time()
     print(lang.text134 % (dti() - start))
     do_override_sv_ttk_fonts()
