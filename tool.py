@@ -2183,6 +2183,8 @@ class Debugger(Toplevel):
                                                                                                                  sticky='nw')
         ttk.Label(ck, text=f'Uname: {platform.uname()}', foreground='gray').grid(row=5, column=0, padx=5, pady=5,
                                                                                  sticky='nw')
+        ttk.Label(ck, text=f"Log File: {tool_log}", foreground='gray').grid(row=6, column=0, padx=5, pady=5,
+                                                                                 sticky='nw')
         jzxs(ck)
 
     @staticmethod
