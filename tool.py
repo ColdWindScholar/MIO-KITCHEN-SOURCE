@@ -567,7 +567,7 @@ class Tool(Tk):
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
             ask_win(lang.warn16, wait=False)
-            if call(['su', '-c', 'echo ok'], extra=False) != 0:
+            if call(['su', '-c', 'echo ok'], extra_path=False) != 0:
                 ask_win(lang.warn17)
         if settings.custom_system == 'Android' and os.geteuid() == 0:
             os.makedirs('/data/local/MIO', exist_ok=True)
@@ -951,7 +951,7 @@ class Updater(Toplevel):
                 if os.path.exists(os.path.join(cwd_path, "bin", "temp")):
                     shutil.rmtree(os.path.join(cwd_path, "bin", "temp"))
                 os.makedirs(os.path.join(cwd_path, "bin", "temp"), exist_ok=True)
-            except (IOError, IsADirectoryError, FileNotFoundError, PermissionError) as e:
+            except (IOError, IsADirectoryError, FileNotFoundError, PermissionError):
                 logging.exception('Bugs')
             settings.set_value('updating', '')
             settings.set_value('new_tool', '')
@@ -1461,7 +1461,7 @@ class ModuleManager:
                 call(['busybox', shell, file, (script_path + 'main.sh').replace(os.sep, '/')])
                 try:
                     os.remove(file)
-                except (Exception, BaseException) as e:
+                except (Exception, BaseException):
                     logging.exception('Bugs')
         elif os.path.exists(script_path + "main.py") and imp:
             try:
@@ -1477,7 +1477,7 @@ class ModuleManager:
                             '/')
                     }
                     module.main(data)
-            except Exception as e:
+            except Exception:
                 logging.exception('Bugs')
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
@@ -1662,7 +1662,7 @@ class ModuleManager:
         extra_envs = {}
         grammar_words = {"echo": lambda strings: print(strings),
                          "rmdir": lambda path: rmdir(path.strip()),
-                         "run": lambda cmd: call(exe=str(cmd), extra=False),
+                         "run": lambda cmd: call(exe=str(cmd), extra_path=False),
                          'gettype': lambda file_: gettype(file_),
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
 
@@ -2419,9 +2419,9 @@ class MpkStore(Toplevel):
                 cz(ModuleManager.install, os.path.join(cwd_path, "bin", "temp", i), join=True)
                 try:
                     os.remove(os.path.join(cwd_path, "bin", "temp", i))
-                except (Exception, BaseException) as e:
+                except (Exception, BaseException):
                     logging.exception('Bugs')
-        except (ConnectTimeout, HTTPError, BaseException, Exception, TclError) as e:
+        except (ConnectTimeout, HTTPError, BaseException, Exception, TclError):
             logging.exception('Bugs')
             return
         control.config(state='normal', text=lang.text21)
@@ -2433,7 +2433,7 @@ class MpkStore(Toplevel):
         try:
             url = requests.get(self.repo + 'plugin.json')
             self.data = json.loads(url.text)
-        except (Exception, BaseException) as e:
+        except (Exception, BaseException):
             logging.exception('Bugs')
             self.apps = self.data = []
         else:
@@ -2741,15 +2741,15 @@ class StdoutRedirector:
             error(1, self.error_info)
 
 
-def call(exe, extra=True, out=0):
+def call(exe, extra_path=True, out=0):
     logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
-        if extra:
+        if extra_path:
             cmd[0] = f"{settings.tool_bin}{exe[0]}"
         cmd = [i for i in cmd if i]
     else:
-        cmd = f'{settings.tool_bin}{exe}' if extra else exe
+        cmd = f'{settings.tool_bin}{exe}' if extra_path else exe
         if os.name == 'posix':
             cmd = cmd.split()
     if os.name != 'posix':
@@ -4261,7 +4261,7 @@ class FormatConversion(ttk.LabelFrame):
                     if os.access(work + i + '.br', os.F_OK):
                         try:
                             os.remove(work + i)
-                        except Exception as e:
+                        except Exception:
                             logging.exception('Bugs')
         print(lang.text8)
 
