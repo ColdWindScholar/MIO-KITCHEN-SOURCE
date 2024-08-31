@@ -739,7 +739,7 @@ current_project_name = utils.project_name = StringVar()
 theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
-tool_log = f'{cwd_path}/bin/temp/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
+tool_log = f'{cwd_path.replace(os.sep, "/")}/bin/temp/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
 
 # Some Functions for Upgrade
