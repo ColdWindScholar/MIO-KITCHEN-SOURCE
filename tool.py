@@ -576,8 +576,6 @@ class Tool(Tk):
     def tab_content(self):
 
         global kemiaojiang
-        global kemiaojiang_img
-        global kemiaojiang_label
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
         kemiaojiang_label = Label(self.tab, image=kemiaojiang)
@@ -1002,7 +1000,7 @@ def error(code, desc="unknown error"):
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10, expand=True, fill=BOTH)
-    ttk.Button(er, text="Exit", command=lambda: win.destroy()).pack(side=LEFT, padx=10, pady=10, expand=True, fill=BOTH)
+    ttk.Button(er, text="Exit", command= win.destroy).pack(side=LEFT, padx=10, pady=10, expand=True, fill=BOTH)
     jzxs(er)
     er.wait_window()
     sys.exit()
