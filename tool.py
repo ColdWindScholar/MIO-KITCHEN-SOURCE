@@ -4311,6 +4311,9 @@ def init():
     win.get_time()
     print(lang.text134 % (dti() - start))
     do_override_sv_ttk_fonts()
+    if os.name == 'nt':
+        if sys.getwindowsversion().major <= 6:
+            ask_win('Support for Windows 7 and older operating systems will be removed after version 4.0.0')
     win.mainloop()
 
 
