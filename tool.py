@@ -3904,7 +3904,8 @@ def pack_zip():
 def dndfile(files):
     for fi in files:
         try:
-            fi = fi.decode('gbk')
+            if hasattr(fi, 'decode'):
+                fi = fi.decode('gbk')
         except (Exception, BaseException):
             logging.exception('fI')
         if os.path.exists(fi):
