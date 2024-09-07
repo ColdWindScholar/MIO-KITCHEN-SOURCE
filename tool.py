@@ -3316,7 +3316,7 @@ def unpackrom(ifile) -> None:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
     elif ftype == 'tar':
-        print(lang.text78 + ifile)
+        print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
         if not ProjectManager.exist():
             re_folder(ProjectManager.current_work_path())
