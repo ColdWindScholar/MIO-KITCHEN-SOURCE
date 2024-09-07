@@ -2681,7 +2681,8 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
     for part in lb:
         if part.endswith('_b') or part.endswith('_a'):
             part = part.replace('_a', '').replace('_b', '')
-        lb_c.append(part)
+        if part not in lb_c:
+            lb_c.append(part)
     lb = lb_c
     for part in lb:
         if not os.path.exists(work + part + '.img') and os.path.exists(work + part + '_a.img'):
