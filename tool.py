@@ -4325,6 +4325,8 @@ def init():
     if os.name == 'nt':
         if sys.getwindowsversion().major <= 6:
             ask_win('Support for Windows 7 and older operating systems will be removed after version 4.0.0')
+    if len(sys.argv) > 1:
+        dndfile(sys.argv[1:])
     win.mainloop()
 
 
