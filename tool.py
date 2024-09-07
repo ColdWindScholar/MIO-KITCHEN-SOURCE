@@ -351,7 +351,8 @@ class ToolBox(ttk.Frame):
             self.result_size.delete(0, tk.END)
             self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
 
-        def __calc(self, origin: str, convert: str, size) -> str:
+        @staticmethod
+        def __calc(origin: str, convert: str, size) -> str:
             if origin == convert:
                 return size
             try:
