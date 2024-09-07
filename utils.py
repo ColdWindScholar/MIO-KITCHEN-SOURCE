@@ -20,7 +20,7 @@ from os import getcwd
 from os.path import exists
 from random import randint, choice
 from threading import Thread
-
+import tarfile
 import blockimgdiff
 import sparse_img
 import update_metadata_pb2 as um
@@ -212,6 +212,8 @@ def gettype(file) -> str:
         elif len(f_) == 3:
             if compare(f_[0], f_[2]):
                 return f_[1]
+    if tarfile.is_tarfile(file):
+        return 'tar'
     try:
         if LogoDumper(file, str(None)).check_img(file):
             return 'logo'

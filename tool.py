@@ -24,7 +24,7 @@ from collections import deque
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-
+import tarfile
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
@@ -3315,6 +3315,14 @@ def unpackrom(ifile) -> None:
         except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
+    elif ftype == 'tar':
+        print(lang.text78 + ifile)
+        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
+        if not ProjectManager.exist():
+            re_folder(ProjectManager.current_work_path())
+        with tarfile.TarFile(ifile) as f:
+            f.extractall(ProjectManager.current_work_path(), filter='tar')
+        return
     elif ftype == 'kdz':
         current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
         if not ProjectManager.exist():
