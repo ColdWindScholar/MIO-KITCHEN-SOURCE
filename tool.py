@@ -2688,23 +2688,23 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
                 os.rename(work + part + '_a.img', work + part + '.img')
             except:
                 logging.exception('Bugs')
-    command = "lpmake --metadata-size 65536 -super-name super -metadata-slots "
+    command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
     if set_.get() == 1:
-        command += f"2 -device super:{size.get()} --group {dbfz.get()}:{size.get()} "
+        command += ['2', '-device', f'super:{size.get()}', "--group", f"{dbfz.get()}:{size.get()}"]
         for part in lb:
-            command += f"--partition {part}:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()} --image {part}={work + part}.img "
+            command+=['--partition', f"{part}:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}", '--image', f'{part}={work + part}.img']
     else:
-        command += f"3 -device super:{size.get()} --group {dbfz.get()}_a:{size.get()} "
+        command += ["3", '-device', f'super:{size.get()}', '--group', f"{dbfz.get()}_a:{size.get()}"]
         for part in lb:
-            command += f"--partition {part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a --image {part}_a={work + part}.img "
-        command += f"--group {dbfz.get()}_b:{size.get()} "
+            command += ['--partition', f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a", '--image', f'{part}_a={work + part}.img']
+        command += ["--group", f"{dbfz.get()}_b:{size.get()}"]
         for part in lb:
-            command += f"--partition {part}_b:{attrib}:0:{dbfz.get()}_b "
+            command += ['--partition', f"{part}_b:{attrib}:0:{dbfz.get()}_b"]
         if set_.get() == 2:
-            command += "--virtual-ab "
+            command+=["--virtual-ab"]
     if sparse.get() == 1:
-        command += "--sparse "
-    command += f" --out {work + 'super.img'}"
+        command+=["--sparse"]
+    command+=['--out', work + 'super.img']
     if return_cmd == 1:
         return command
     if call(command) == 0:
