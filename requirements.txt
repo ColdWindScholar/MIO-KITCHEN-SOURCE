@@ -11,3 +11,4 @@ pip
 Pygments
 zstandard
 pywinstyles
+tarsafe
