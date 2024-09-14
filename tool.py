@@ -3308,8 +3308,8 @@ def script2fs(path):
 
 @animation
 def unpackrom(ifile) -> None:
-    print(lang.text77 + (zip_src := ifile), f'Type:[{gettype(ifile)}]')
-    if (ftype := gettype(ifile)) == "ozip":
+    print(lang.text77 + (zip_src := ifile), f'Type:[{(ftype := gettype(ifile))}]')
+    if ftype == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
         try:
@@ -3317,7 +3317,7 @@ def unpackrom(ifile) -> None:
         except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
         zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
-    elif ftype == 'tar':
+    elif ftype == 'tar'  or ifile.endswith(".tar.gz"):
         print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
         if not ProjectManager.exist():
