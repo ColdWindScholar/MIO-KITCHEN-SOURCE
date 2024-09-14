@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import ctypes
+import gzip
 import hashlib
 import json
 import platform
@@ -25,6 +26,8 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 import tarsafe
+from indic_transliteration.sanscript_cli.help_text import output_file
+
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
@@ -3308,25 +3311,45 @@ def script2fs(path):
 
 @animation
 def unpackrom(ifile) -> None:
-    print(lang.text77 + (zip_src := ifile), f'Type:[{(ftype := gettype(ifile))}]')
-    if ftype == "ozip":
+    print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
+    if ftype == 'gzip':
+        print(lang.text79 + ifile)
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+        if not ProjectManager.exist():
+            re_folder(ProjectManager.current_work_path())
+        if os.path.basename(ifile).endswith(".gz"):
+            output_file_name = os.path.basename(ifile)[:-3]
+        else:
+            output_file_name = os.path.basename(ifile)
+        output_file_ = os.path.join(ProjectManager.current_work_path(), output_file_name)
+        with open(output_file_, "wb") as output, gzip.open(ifile, "rb") as input_file:
+            data = input_file.read(8192)
+            while len(data) == 8192:
+                output.write(data)
+                data = input_file.read(8192)
+            else:
+                if len(data) > 0:
+                    output.write(data)
+        unpackrom(output_file_)
+        return
+    elif ftype == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
         try:
             os.remove(ifile)
         except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
-        zip_src = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
-    elif ftype == 'tar'  or ifile.endswith(".tar.gz"):
+        unpackrom(os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip")
+    elif ftype == 'tar':
         print(lang.text79 + ifile)
-        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if not ProjectManager.exist():
             re_folder(ProjectManager.current_work_path())
         with tarsafe.TarSafe(ifile) as f:
             f.extractall(ProjectManager.current_work_path())
         return
     elif ftype == 'kdz':
-        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if not ProjectManager.exist():
             re_folder(ProjectManager.current_work_path())
         KDZFileTools(ifile, ProjectManager.current_work_path(), extract_all=True)
@@ -3338,7 +3361,7 @@ def unpackrom(ifile) -> None:
                             extract_all=True)
         return
     elif os.path.splitext(ifile)[1] == '.ofp':
-        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if ask_win(lang.t12) == 1:
             ofp_mtk_decrypt.main(ifile, ProjectManager.current_work_path())
         else:
@@ -3354,9 +3377,9 @@ def unpackrom(ifile) -> None:
         opscrypto.main(args)
         unpackg.refs()
         return
-    if gettype(zip_src) == 'zip':
-        current_project_name.set(os.path.splitext(os.path.basename(zip_src))[0])
-        fz = zipfile.ZipFile(zip_src, 'r')
+    if gettype(ifile) == 'zip':
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+        fz = zipfile.ZipFile(ifile, 'r')
         for fi in fz.namelist():
             try:
                 file_ = fi.encode('cp437').decode('gbk')
@@ -3376,7 +3399,7 @@ def unpackrom(ifile) -> None:
                 win.message_pop(lang.warn4.format(file_))
         print(lang.text81)
         if os.path.isdir(ProjectManager.current_work_path()):
-            project_menu.set_project(os.path.splitext(os.path.basename(zip_src))[0])
+            project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
         script2fs(ProjectManager.current_work_path())
         unpackg.refs()
         fz.close()
