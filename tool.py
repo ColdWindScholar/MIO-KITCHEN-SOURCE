@@ -3330,7 +3330,12 @@ def unpackrom(ifile) -> None:
             else:
                 if len(data) > 0:
                     output.write(data)
+        old_project_name = os.path.splitext(os.path.basename(ifile))[0]
         unpackrom(output_file_)
+        if old_project_name != (new_project_name := current_project_name.get()):
+            current_project_name.set(old_project_name)
+            project_menu.remove()
+        current_project_name.set(new_project_name)
         return
     elif ftype == "ozip":
         print(lang.text78 + ifile)
