@@ -25,8 +25,11 @@ from collections import deque
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
+
+from jinja2.nodes import args_as_const
+
+from pyaxmlparser import APK
 import tarsafe
-from indic_transliteration.sanscript_cli.help_text import output_file
 
 from unkdz import KDZFileTools
 
@@ -4010,6 +4013,106 @@ class ProjectMenuUtils(ttk.LabelFrame):
             print(lang.text99 % inputvar)
             os.mkdir(settings.path + os.sep + inputvar)
         self.listdir()
+class CustomTable(ttk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.create_widgets()
+        self.choices = []
+        self.images = {}
+        self.index = 0
+
+    def create_widgets(self):
+        self.canvas = Canvas(self, width=600, height=400)
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = ttk.Frame(self.canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
+            )
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        self.scrollbar.pack(side=RIGHT, fill=Y)
+        header = ttk.Frame(self.scrollable_frame)
+        header.pack(fill=X)
+        tk.Label(header, text="选择\t图标\t名称\t包名\t文件名\t版本\t大小\t分区\t状态").pack(side=LEFT, padx=5)
+
+        self.update_ui()
+    def __set_value(self, var, value):
+        if var.get():
+            if value not in self.choices:
+                self.choices.append(value)
+        else:
+            if value in self.choices:
+                self.choices.remove(value)
+        print(var.get(), value)
+
+    def add_item(self, value='',icon_data:bytes=b'',state=False, *args):
+        frame = ttk.Frame(self.scrollable_frame)
+        frame.pack(fill=X)
+
+        var = BooleanVar(value=state)
+        checkbutton = ttk.Checkbutton(frame, variable=var)
+        checkbutton.pack(side=LEFT)
+        if state:
+            self.choices.append(value)
+        var.trace('w',
+                  lambda *x, arg=(var, value): self.__set_value(*arg))
+        self.index += 1
+        try:
+            img = PhotoImage(open_img(BytesIO(icon_data)).resize((50, 50)))
+        except:
+            img = PhotoImage(data=images.none_byte)
+        self.images[self.index] = img
+
+        label_widget = ttk.Label(frame, image=self.images[self.index])
+        label_widget.pack(side=LEFT, padx=5)
+        args_n = []
+        for i in args:
+            if i:
+                args_n.append(i)
+            else:
+                args_n.append('Unknown')
+        args = args_n
+        del args_n
+        tk.Label(frame, text="   ".join([i for i in args if i])).pack(side=LEFT ,padx=10)
+
+
+    def update_ui(self):
+        self.scrollable_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+class ApkManager(Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.content = CustomTable(self)
+        self.content.pack(fill=BOTH)
+        cz(self.scan_apks)
+
+    def scan_apks(self):
+        if not ProjectManager.exist():
+            warn_win(lang.warn1)
+        work = ProjectManager.current_work_path()
+        for root, _, files in os.walk(ProjectManager.current_work_path(), topdown=True):
+            for file in files:
+                apk_file = os.path.join(root, file)
+                if not apk_file.endswith(".apk"):
+                    continue
+                apk = APK(apk_file)
+                partition = root.replace(os.sep, '/')
+                partition = partition.replace(work.replace(os.sep, '/'), '').split("/")[0]
+                self.content.add_item(apk_file, apk.icon_data(images.none_byte), False, apk.get_app_name(), apk.packagename, file, apk.version_code, hum_convert(os.path.getsize(apk_file)),
+                                      partition, "建议删除")
+        self.content.update_idletasks()
+
 
 
 class Frame3(ttk.LabelFrame):
@@ -4023,6 +4126,7 @@ class Frame3(ttk.LabelFrame):
         ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5,
                                                                                               pady=5)
         ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
+        ttk.Button(self, text="APK 管理", command=lambda: cz(ApkManager)).grid(row=1, column=0, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):
