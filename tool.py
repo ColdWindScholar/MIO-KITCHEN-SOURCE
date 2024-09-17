@@ -94,7 +94,7 @@ from config_parser import ConfigParser
 import utils
 from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img
+from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img, Unxz
 from controls import ListBox, ScrollFrame
 from undz import DZFileTools
 from selinux_audit_allow import main as selinux_audit_allow
@@ -3532,6 +3532,9 @@ def unpack(chose, form: str = '') -> bool:
             print(lang.text79 + i + ".zst")
             call(['zstd', '--rm', '-d', work + i + '.zst'])
             return True
+        if os.access(work + i + ".new.dat.xz", os.F_OK):
+            print(lang.text79 + i + ".new.dat.xz")
+            Unxz(work + i + ".new.dat.xz")
         if os.access(work + i + ".new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
             call(['brotli', '-dj', work + i + ".new.dat.br"])
@@ -4141,7 +4144,7 @@ class UnpackGui(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
         self.ch.set(True)
         self.fm = ttk.Combobox(self, state="readonly",
-                               values=('new.dat.br', "new.dat", 'img', 'zst', 'payload', 'super', 'update.app'))
+                               values=('new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super', 'update.app'))
         self.lsg = ListBox(self)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
         self.menu.add_command(label=lang.attribute, command=self.info)
@@ -4274,7 +4277,7 @@ class FormatConversion(ttk.LabelFrame):
         self.place(relx=0.5, rely=0.5, anchor="center")
         self.f = Frame(self)
         self.f.pack(pady=5, padx=5, fill=X)
-        self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br'), state='readonly')
+        self.h = ttk.Combobox(self.f, values=("raw", "sparse", 'dat', 'br', 'xz'), state='readonly')
         self.h.current(0)
         self.h.bind("<<ComboboxSelected>>", lambda *x: self.relist())
         self.h.pack(side='left', padx=5)
@@ -4300,6 +4303,9 @@ class FormatConversion(ttk.LabelFrame):
         self.list_b.clear()
         if self.h.get() == "br":
             for i in self.refile(".new.dat.br"):
+                self.list_b.insert(i, i)
+        elif self.h.get() == 'xz':
+            for i in self.refile(".new.dat.xz"):
                 self.list_b.insert(i, i)
         elif self.h.get() == 'dat':
             for i in self.refile(".new.dat"):
@@ -4337,6 +4343,10 @@ class FormatConversion(ttk.LabelFrame):
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
                         call(['brotli', '-dj', work + i])
+                if hget == 'xz':
+                    if os.access(work + i, os.F_OK):
+                        print(lang.text79 + i)
+                        Unxz(work + i)
                 if hget == 'dat':
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + work + i)
@@ -4364,10 +4374,16 @@ class FormatConversion(ttk.LabelFrame):
                     if os.access(work + i, os.F_OK):
                         print(lang.text79 + i)
                         call(['brotli', '-dj', work + i])
-                if hget in ['dat', 'br']:
+                if hget == 'xz':
+                    if os.access(work + i, os.F_OK):
+                        print(lang.text79 + i)
+                        Unxz(work + i)
+                if hget in ['dat', 'br', 'xz']:
                     if os.path.exists(work):
                         if hget == 'br':
                             i = i.replace('.br', '')
+                        if hget == 'xz':
+                            i = i.replace('.xz', '')
                         print(lang.text79 + work + i)
                         transferfile = os.path.abspath(
                             os.path.dirname(work)) + os.sep + basename + ".transfer.list"
@@ -4392,13 +4408,21 @@ class FormatConversion(ttk.LabelFrame):
                 if hget == 'br':
                     print(lang.text79 + i)
                     call(['brotli', '-dj', work + i])
+                if hget == 'xz':
+                    print(lang.text79 + i)
+                    Unxz(work + i)
 
             elif f_get == 'br':
                 if hget == 'raw':
                     img2simg(work + i)
                 if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], 0)
-                if hget == 'dat':
+                if hget in ['dat', 'xz']:
+                    if hget == 'xz':
+                        print(lang.text79 + i)
+                        Unxz(work + i)
+                        i = i.rsplit('.xz', 1)[0]
+
                     print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
                     call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
                     if os.access(work + i + '.br', os.F_OK):
