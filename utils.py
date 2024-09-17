@@ -204,7 +204,10 @@ class Sdat2img:
                         print(f'Command "{cmd}" is not valid.')
                         return
 
-
+def get_all_file_paths(directory):
+    for root, _, files in os.walk(directory):
+        for filename in files:
+            yield os.path.join(root, filename)
 def gettype(file) -> str:
     """
     Return File Type:str

@@ -26,11 +26,9 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from jinja2.nodes import args_as_const
-
-from pyaxmlparser import APK
 import tarsafe
 
+from pyaxmlparser import APK
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
@@ -1564,7 +1562,7 @@ class ModuleManager:
             (info_ := ConfigParser())['module'] = data
             info_.write(buffer2 := StringIO())
         with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-            for i in get_all_file_paths(self.module_dir + os.sep + value):
+            for i in utils.get_all_file_paths(self.module_dir + os.sep + value):
                 arch_name = str(i).replace(self.module_dir + os.sep + value, '')
                 if os.path.basename(i) in ['info.json', 'icon']:
                     continue
@@ -3908,10 +3906,7 @@ def rmdir(path):
         win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
 
 
-def get_all_file_paths(directory):
-    for root, _, files in os.walk(directory):
-        for filename in files:
-            yield os.path.join(root, filename)
+
 
 
 @animation
@@ -3926,7 +3921,7 @@ def pack_zip():
             PackHybridRom()
         with zipfile.ZipFile(relpath := settings.path + os.sep + current_project_name.get() + ".zip", 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
-            for file in get_all_file_paths(ProjectManager.current_work_output_path()):
+            for file in utils.get_all_file_paths(ProjectManager.current_work_output_path()):
                 file = str(file)
                 arch_name = file.replace(ProjectManager.current_work_output_path(), '')
                 print(f"{lang.text1}:{arch_name}")
