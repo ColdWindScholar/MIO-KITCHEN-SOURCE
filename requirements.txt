@@ -12,3 +12,4 @@ Pygments
 zstandard
 pywinstyles
 tarsafe
+asn1crypto
