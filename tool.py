@@ -27,8 +27,10 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
-
-from pyaxmlparser import APK
+try:
+    from pyaxmlparser import APK
+except:
+    APK = print
 from unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
