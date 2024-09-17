@@ -120,6 +120,7 @@ class States:
     open_pids = []
     run_source = True if gettype(sys.argv[0]) == "unknown" else False
     in_oobe = False
+    development = False
 
 
 class JsonEdit:
@@ -4129,7 +4130,8 @@ class Frame3(ttk.LabelFrame):
         ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5,
                                                                                               pady=5)
         ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
-        ttk.Button(self, text="APK 管理", command=lambda: cz(ApkManager)).grid(row=1, column=0, padx=5, pady=5)
+        if states.development:
+            ttk.Button(self, text="APK 管理", command=lambda: cz(ApkManager)).grid(row=1, column=0, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):
