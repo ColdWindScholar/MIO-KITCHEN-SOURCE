@@ -13,3 +13,4 @@ zstandard
 pywinstyles
 tarsafe
 asn1crypto
+lxml
