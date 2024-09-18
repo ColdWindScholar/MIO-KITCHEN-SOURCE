@@ -14,4 +14,4 @@ pywinstyles
 tarsafe
 asn1crypto
 lxml
-python-magic
+magic
