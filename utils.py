@@ -17,12 +17,12 @@ import struct
 import sys
 import tempfile
 import traceback
+import magic
 from os import getcwd
 from os.path import exists
 from random import randint, choice
 from threading import Thread
 from lzma import LZMADecompressor
-import tarfile
 import blockimgdiff
 import sparse_img
 import update_metadata_pb2 as um
@@ -226,22 +226,6 @@ def gettype(file) -> str:
 
     def is_super(fil) -> any:
         with open(fil, 'rb') as file_:
-            buf = bytearray(file_.read(4))
-            if len(buf) < 4:
-                return False
-            file_.seek(0, 0)
-
-            while buf[0] == 0x00:
-                buf = bytearray(file_.read(1))
-            try:
-                file_.seek(-1, 1)
-            except (BaseException, Exception):
-                return False
-            buf += bytearray(file_.read(4))
-        return buf[1:] == b'\x67\x44\x6c\x61'
-
-    def is_super2(fil) -> any:
-        with open(fil, 'rb') as file_:
             try:
                 file_.seek(4096, 0)
             except EOFError:
@@ -250,7 +234,7 @@ def gettype(file) -> str:
         return buf == b'\x67\x44\x6c\x61'
 
     try:
-        if is_super(file) or is_super2(file):
+        if is_super(file):
             return 'super'
     except IndexError:
         ...
@@ -261,7 +245,7 @@ def gettype(file) -> str:
         elif len(f_) == 3:
             if compare(f_[0], f_[2]):
                 return f_[1]
-    if tarfile.is_tarfile(file):
+    if magic.from_file(file, mime=True) == 'application/x-tar':
         return 'tar'
     try:
         if LogoDumper(file, str(None)).check_img(file):
