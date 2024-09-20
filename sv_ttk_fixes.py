@@ -1,3 +1,6 @@
+# Workaround ugly font fallbacks on Windows.
+# Only for Windows!!
+#
 # Copyright (C) 2024 The MIO-KITCHEN-SOURCE Project
 #
 # Licensed under theGNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");

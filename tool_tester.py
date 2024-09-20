@@ -35,6 +35,9 @@ class Test(unittest.TestCase):
         pys.remove(os.path.basename(__file__).split('.')[0])
         pys.append('tkinter')
         pys.remove('tool')
+        if os.name != 'nt':
+            pys.remove('sv_ttk_fixes')
+            pys.remove('pycase')
         sys.path.append(prog_path)
         for i in pys:
             print(f'Importing {i}')

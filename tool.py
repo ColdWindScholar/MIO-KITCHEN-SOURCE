@@ -49,6 +49,7 @@ import time
 from platform import machine
 from webbrowser import open as openurl
 import tkinter as tk
+from tkinter import ttk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
@@ -92,7 +93,8 @@ import AI_engine
 import ext4
 from config_parser import ConfigParser
 import utils
-from sv_ttk_fixes import *
+if os.name == 'nt':
+    from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
 from utils import cz, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from controls import ListBox, ScrollFrame
@@ -454,7 +456,8 @@ class Tool(Tk):
         super().__init__()
         self.tab6 = None
         self.rotate_angle = 0
-        do_set_window_deffont(self)
+        if os.name == 'nt':
+            do_set_window_deffont(self)
         self.show = None
         self.scroll = None
         self.frame_bg = None
@@ -4478,9 +4481,8 @@ def init():
     jzxs(win)
     win.get_time()
     print(lang.text134 % (dti() - start))
-    if settings.custom_system != 'Android':
-        do_override_sv_ttk_fonts()
     if os.name == 'nt':
+        do_override_sv_ttk_fonts()
         if sys.getwindowsversion().major <= 6:
             ask_win('Support for Windows 7 and older operating systems will be removed after version 4.0.0')
     if len(sys.argv) > 1:
