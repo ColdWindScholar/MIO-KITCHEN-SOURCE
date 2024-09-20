@@ -94,7 +94,7 @@ from config_parser import ConfigParser
 import utils
 from sv_ttk_fixes import *
 from extra import fspatch, re, contextpatch
-from utils import cz, jzxs, v_code, gettype, findfile, findfolder, Sdat2img, Unxz
+from utils import cz, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from controls import ListBox, ScrollFrame
 from undz import DZFileTools
 from selinux_audit_allow import main as selinux_audit_allow
@@ -3647,6 +3647,8 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(work + i + ".img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
+            if is_empty_img(work + i + ".img"):
+                print(lang.text141)
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
     json_.write(parts)

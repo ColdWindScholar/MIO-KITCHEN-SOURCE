@@ -208,9 +208,21 @@ def get_all_file_paths(directory):
     for root, _, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
-def zero_start(file: str, c: int) -> bool:
+def zero_start(file: str, c: int, buff_size: int = 8192) -> bool:
     with open(file, 'rb') as f:
-        return all(b == 0 for b in f.read(c))
+        zeros_ = bytearray(buff_size)
+        while c:
+            buf = f.read(min(c, buff_size))
+            n = len(buf)
+            if n != len(zeros_):
+                # short read?
+                zeros_ = bytearray(n)
+            if buf != zeros_:
+                return False
+            c -= n
+    return True
+def is_empty_img(file: str) -> bool:
+    return zero_start(file, os.path.getsize(file))
 def gettype(file) -> str:
     """
     Return File Type:str
