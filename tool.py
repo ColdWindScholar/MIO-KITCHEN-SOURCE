@@ -3647,7 +3647,7 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(work + i + ".img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
-            if is_empty_img(work + i + ".img"):
+            if file_type == 'unknown' and is_empty_img(work + i + ".img"):
                 print(lang.text141)
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
