@@ -458,6 +458,7 @@ class ToolBox(ttk.Frame):
             super().__init__()
             self.title(lang.trim_image)
             self.gui()
+            jzxs(self)
 
         def gui(self):
             ttk.Label(self, text=lang.help_trim_image).pack(padx=5, pady=5)
