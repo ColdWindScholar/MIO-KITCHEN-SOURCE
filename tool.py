@@ -53,7 +53,8 @@ from tkinter import ttk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
-from tkinter import (Tk, BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+from tkinterdnd2 import Tk, DND_FILES
+from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
 import pygments.lexers
@@ -66,7 +67,6 @@ from dumper import Dumper
 from utils import lang
 
 if os.name == 'nt':
-    import windnd
     from ctypes import windll
     from tkinter import filedialog
     import pywinstyles
@@ -397,8 +397,8 @@ class ToolBox(ttk.Frame):
             (tl := ttk.Label(a, text=lang.text132_e)).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
-            if os.name == 'nt':
-                windnd.hook_dropfiles(a, self.dnd)
+            a.drop_target_register(DND_FILES)
+            a.dnd_bind('<<Drop>>', lambda x: self.dnd([x.data]))
             self.b = ttk.LabelFrame(self, text='INFO')
             self.b.pack(fill=BOTH, side=TOP)
 
@@ -626,11 +626,10 @@ class Tool(Tk):
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
         sys.stdout = StdoutRedirector(self.show)
         sys.stderr = StdoutRedirector(self.show, error_=True)
-        if os.name == 'nt':
-            windnd.hook_dropfiles(tr, func=dndfile)
-            windnd.hook_dropfiles(tr2, func=dndfile)
-        else:
-            print(f'{platform.system()} Dont Support Drop File.\nReason: I am Lazy.')
+        tr.drop_target_register(DND_FILES)
+        tr.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
+        tr2.drop_target_register(DND_FILES)
+        tr2.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)

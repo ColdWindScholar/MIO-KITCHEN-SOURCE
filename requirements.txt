@@ -3,7 +3,6 @@ pycryptodome>=3.19.1
 Requests>2.31.0
 protobuf>5
 sv_ttk
-windnd
 pyinstaller
 chlorophyll
 future
@@ -14,3 +13,4 @@ pywinstyles
 tarsafe
 asn1crypto
 lxml
+tkinterdnd2
