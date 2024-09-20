@@ -72,6 +72,10 @@ print("Building...")
 import PyInstaller.__main__
 
 if ostype == 'Darwin':
+    if platform.machine() == 'x86_64':
+        dndplat = 'osx-x64'
+    elif platform.machine() == 'arm64':
+        dndplat = 'osx-arm64'
     PyInstaller.__main__.run([
         'tool.py',
         '-Fw',
@@ -83,6 +87,8 @@ if ostype == 'Darwin':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
+        '--collect-all',
+        'tkinterdnd2.tkdnd.' + dndplat,
         '--hidden-import',
         'tkinter',
         '--hidden-import',
@@ -91,6 +97,11 @@ if ostype == 'Darwin':
         'PIL._tkinter_finder'
     ])
 elif os.name == 'posix':
+    if ostype == 'Linux':
+        if platform.machine() == 'x86_64':
+            dndplat = 'linux-x64'
+        elif platform.machine() == 'aarch64':
+            dndplat = 'linux-arm64'
     PyInstaller.__main__.run([
         'tool.py',
         '-Fw',
@@ -102,6 +113,8 @@ elif os.name == 'posix':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
+        '--collect-all',
+        'tkinterdnd2.tkdnd.' + dndplat,
         '--hidden-import',
         'tkinter',
         '--hidden-import',
@@ -112,6 +125,12 @@ elif os.name == 'posix':
         'splash.png'
     ])
 elif os.name == 'nt':
+    if platform.machine() == 'x86':
+        dndplat = 'win-x86'
+    elif platform.machine() == 'AMD64':
+        dndplat = 'win-x64'
+    elif platform.machine() == 'ARM64':
+        dndplat = 'win-arm64'
     PyInstaller.__main__.run([
         'tool.py',
         '-Fw',
@@ -123,6 +142,8 @@ elif os.name == 'nt':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
+        '--collect-all',
+        'tkinterdnd2.tkdnd.' + dndplat,
         '--splash',
         'splash.png'
     ])
