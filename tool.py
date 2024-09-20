@@ -1032,10 +1032,10 @@ class Welcome(ttk.Frame):
         if frames.get(oobe):
             frames.get(oobe, self.main)()
         else:
-            ttk.Label(self, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=BOTH, expand=True)
+            ttk.Label(self, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-            ttk.Button(self, text=lang.text136, command=self.main).pack(fill=BOTH)
+            ttk.Button(self, text=lang.text136, command=self.main).pack(fill=X)
         jzxs(win)
         self.wait_window()
         states.in_oobe = False
@@ -1052,7 +1052,7 @@ class Welcome(ttk.Frame):
         for i in self.winfo_children():
             i.destroy()
         self.reframe()
-        ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
+        ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             values=[i.rsplit('.', 1)[0] for i in
@@ -1077,10 +1077,10 @@ class Welcome(ttk.Frame):
                                   i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
-        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
+        ttk.Label(self.frame, text=lang.text139, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb.pack(padx=10, pady=10, side='top', fill=X)
-        te = Text(self.frame)
+        te = Text(self.frame, height=10)
         te.pack(fill=BOTH, side='top', expand=True)
         load_license()
         ttk.Label(self.frame, text=lang.t1).pack()
@@ -1089,11 +1089,11 @@ class Welcome(ttk.Frame):
     def private(self):
         settings.set_value("oobe", 3)
         self.reframe()
-        ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
+        ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         with open(os.path.join(cwd_path, "bin", "licenses", "private.txt"), 'r',
                   encoding='UTF-8') as f:
-            (te := Text(self.frame)).insert('insert', f.read())
+            (te := Text(self.frame, height=10)).insert('insert', f.read())
         te.pack(fill=BOTH, expand=True)
         ttk.Label(self.frame, text=lang.t3).pack()
         ttk.Button(self.frame, text=lang.text138, command=self.support).pack(fill=BOTH, side='bottom')
@@ -1101,7 +1101,7 @@ class Welcome(ttk.Frame):
     def support(self):
         settings.set_value("oobe", 4)
         self.reframe()
-        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH
+        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X
                                                                       )
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.photo = PhotoImage(data=images.wechat_byte)
@@ -1112,7 +1112,7 @@ class Welcome(ttk.Frame):
     def done(self):
         settings.set_value("oobe", 5)
         self.reframe()
-        ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=BOTH)
+        ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10, expand=True)
