@@ -208,6 +208,9 @@ def get_all_file_paths(directory):
     for root, _, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
+def zero_start(file: str, c: int) -> bool:
+    with open(file, 'rb') as f:
+        return all(b == 0 for b in f.read(c))
 def gettype(file) -> str:
     """
     Return File Type:str
@@ -226,22 +229,6 @@ def gettype(file) -> str:
 
     def is_super(fil) -> any:
         with open(fil, 'rb') as file_:
-            buf = bytearray(file_.read(4))
-            if len(buf) < 4:
-                return False
-            file_.seek(0, 0)
-
-            while buf[0] == 0x00:
-                buf = bytearray(file_.read(1))
-            try:
-                file_.seek(-1, 1)
-            except (BaseException, Exception):
-                return False
-            buf += bytearray(file_.read(4))
-        return buf[1:] == b'\x67\x44\x6c\x61'
-
-    def is_super2(fil) -> any:
-        with open(fil, 'rb') as file_:
             try:
                 file_.seek(4096, 0)
             except EOFError:
@@ -250,7 +237,7 @@ def gettype(file) -> str:
         return buf == b'\x67\x44\x6c\x61'
 
     try:
-        if is_super(file) or is_super2(file):
+        if is_super(file):
             return 'super'
     except IndexError:
         ...
@@ -261,7 +248,7 @@ def gettype(file) -> str:
         elif len(f_) == 3:
             if compare(f_[0], f_[2]):
                 return f_[1]
-    if tarfile.is_tarfile(file):
+    if not zero_start(file, 512) and tarfile.is_tarfile(file):
         return 'tar'
     try:
         if LogoDumper(file, str(None)).check_img(file):
