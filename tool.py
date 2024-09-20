@@ -282,6 +282,8 @@ class ToolBox(ttk.Frame):
                                                                                                               column=0,
                                                                                                               padx=5,
                                                                                                               pady=5)
+        ttk.Button(self.label_frame, text=lang.trim_image, command=self.TrimImage, width=width).grid(row=1, column=1,
+                                                                                                     padx=5, pady=5)
         """"""
         self.update_ui()
 
@@ -450,6 +452,69 @@ class ToolBox(ttk.Frame):
             self.put_info(lang.time, time.ctime(os.path.getctime(file)))
             self.put_info("MD5", calculate_md5_file(file))
             self.put_info("SHA256", calculate_sha256_file(file))
+
+    class TrimImage(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title(lang.trim_image)
+            self.gui()
+
+        def gui(self):
+            ttk.Label(self, text=lang.help_trim_image).pack(padx=5, pady=5)
+            f = Frame(self)
+            self.choose_file = StringVar(value='')
+            ttk.Label(f, text=lang.text77).pack(side=LEFT, fill=X, padx=5, pady=5)
+            self.path_edit = ttk.Entry(f, textvariable=self.choose_file)
+            self.path_edit.pack(side=LEFT, fill=X, padx=5, pady=5)
+            self.choose_button = ttk.Button(f, text=lang.choose, command=lambda: self.choose_file.set(
+                                            filedialog.askopenfilename(title=lang.text25)) == self.lift())
+            self.choose_button.pack(side=LEFT, fill=X, padx=5, pady=5)
+            f.pack(padx=5, pady=5, anchor='nw', fill=X)
+            self.button = ttk.Button(self, text=lang.text22, command=self.run, style='Accent.TButton')
+            self.button.pack(padx=5, pady=5, fill=X)
+
+        def do_trim(self, buff_size: int = 8192):
+            orig_size = file_size = os.path.getsize(self.choose_file.get())
+            zeros_ = bytearray(buff_size)
+            with open(self.choose_file.get(), 'rb') as f:
+                self.button.configure(text=lang.running + ' - 0%')
+                update_ui = 3000
+                while file_size:
+                    n = min(file_size, buff_size)
+                    file_size_ = file_size - n
+                    f.seek(file_size_)
+                    buf = f.read(n)
+                    assert len(buf) == n
+                    if n != len(zeros_):
+                        zeros_ = bytearray(n)
+                    if buf != zeros_:
+                        for i, b in enumerate(reversed(buf)):
+                            if b != 0: break
+                        file_size -= i
+                        break
+                    file_size = file_size_
+
+                    update_ui -= 1
+                    if update_ui == 0:
+                        update_ui = 3000
+                        percentage = 100 - file_size * 100 // orig_size
+                        self.button.configure(text=lang.running + f' - {percentage}%')
+                        self.update_idletasks()
+            os.truncate(self.choose_file.get(), file_size)
+            c = orig_size - file_size
+            info_win(lang.trim_image_summary % (c, hum_convert(c)))
+
+        def run(self):
+            if self.button.cget('text') == lang.done:
+                self.destroy()
+                return
+            if not os.path.isfile(self.choose_file.get()):
+                return
+            self.button.configure(text=lang.running, state='disabled')
+            self.path_edit.configure(state='disabled')
+            self.choose_button.configure(state='disabled')
+            self.do_trim()
+            self.button.configure(text=lang.done, state='normal', style='')
 
 
 class Tool(Tk):
@@ -3714,6 +3779,18 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
 
     ask.wait_window()
     return value.get()
+
+
+def info_win(text: str, ok: str = lang.ok):
+    ask = Toplevel()
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
+    ttk.Button(frame_inner, text=ok, command=ask.destroy, style="Accent.TButton").pack(padx=5, pady=5,
+                                                                                       fill=X, side='left',
+                                                                                       expand=True)
+    jzxs(ask)
+    ask.wait_window()
 
 
 class Dirsize:

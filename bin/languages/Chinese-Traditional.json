@@ -13,6 +13,8 @@
   "lang": "語言：",
   "settings": "設置",
   "auto_unpack": "自動解包",
+  "trim_image": "RAW 映像瘦身",
+  "trim_image_summary": "總共從文件末尾截去了 %d 個零字節（約 %s）",
   "warn1": "請選擇一個項目",
   "warn2": "請選擇一個插件",
   "warn3": "未發現 {}",
