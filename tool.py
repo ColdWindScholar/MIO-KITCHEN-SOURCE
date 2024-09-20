@@ -325,9 +325,10 @@ class ToolBox(ttk.Frame):
         def run(self):
             if self.button.cget('text') == lang.done:
                 self.destroy()
-            self.button.configure(text=lang.running, state='disabled')
-            cz(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
-            self.button.configure(text=lang.done, state='normal', style='')
+            else:
+                self.button.configure(text=lang.running, state='disabled')
+                cz(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
+                self.button.configure(text=lang.done, state='normal', style='')
 
     class FileBytes(Toplevel):
         def __init__(self):
