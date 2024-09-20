@@ -467,7 +467,7 @@ class ToolBox(ttk.Frame):
             self.choose_file = StringVar(value='')
             ttk.Label(f, text=lang.text77).pack(side=LEFT, fill=X, padx=5, pady=5)
             self.path_edit = ttk.Entry(f, textvariable=self.choose_file)
-            self.path_edit.pack(side=LEFT, fill=X, padx=5, pady=5)
+            self.path_edit.pack(side=LEFT, fill=X, padx=5, pady=5, expand=True)
             self.choose_button = ttk.Button(f, text=lang.choose, command=lambda: self.choose_file.set(
                                             filedialog.askopenfilename(title=lang.text25)) == self.lift())
             self.choose_button.pack(side=LEFT, fill=X, padx=5, pady=5)
