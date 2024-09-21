@@ -18,6 +18,7 @@ import gzip
 import hashlib
 import json
 import platform
+import platform_machine_fixes
 import shutil
 import subprocess
 import threading

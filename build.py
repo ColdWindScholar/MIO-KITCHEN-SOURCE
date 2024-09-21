@@ -15,6 +15,7 @@
 # limitations under the License.
 import os
 import platform
+import platform_machine_fixes
 import shutil
 import zipfile
 from platform import system
