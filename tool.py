@@ -941,7 +941,10 @@ class Updater(Toplevel):
         elif platform.system() == 'Linux':
             package += '-linux.zip'
         elif platform.system() == 'Darwin':
-            package += '-macos.zip'
+            if platform.machine() == 'x86_64':
+                package += '-macos-intel.zip'
+            else:
+                package += '-macos.zip'
         for i in self.update_assets:
             if i.get('name') == package:
                 if platform.machine() in ['AMD64', 'X86_64', 'x86_64']:

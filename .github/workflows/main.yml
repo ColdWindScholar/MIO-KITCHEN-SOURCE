@@ -44,6 +44,9 @@ jobs:
           cd MIO-KITCHEN-macos
           move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
           cd ..
+          cd MIO-KITCHEN-macos-intel
+          move ./MIO-KITCHEN-macos-intel.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos-intel.zip
+          cd ..
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
@@ -100,7 +103,10 @@ jobs:
           name: MIO-KITCHEN-linux
           path: './MIO-KITCHEN-linux.zip'
   build-macos:
-    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [macos-latest, macos-13]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -114,9 +120,15 @@ jobs:
           python3 -m pip install -U --force-reinstall pip
       - name: Pack Tool
         run: python3 build.py
-      - name: Upload Macos Build
-        if: success()
+      - name: Upload Arm64 Macos Build
+        if: success() && matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: MIO-KITCHEN-macos
           path: './MIO-KITCHEN-macos.zip'
+      - name: Upload x86_64 Macos Build
+        if: success() && matrix.os == 'macos-13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIO-KITCHEN-macos-intel
+          path: './MIO-KITCHEN-macos-intel.zip'

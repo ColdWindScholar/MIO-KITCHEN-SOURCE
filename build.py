@@ -30,7 +30,10 @@ ostype = system()
 if ostype == 'Linux':
     name = 'MIO-KITCHEN-linux.zip'
 elif ostype == 'Darwin':
-    name = 'MIO-KITCHEN-macos.zip'
+    if platform.machine() == 'x86_64':
+        name = 'MIO-KITCHEN-macos-intel.zip'
+    else:
+        name = 'MIO-KITCHEN-macos.zip'
     try:
         from tkinter import END
     except:
