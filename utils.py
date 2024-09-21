@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+import os.path
+import platform
 import struct
 import sys
 import tempfile
@@ -48,6 +50,11 @@ if os.name == 'nt':
     prog_path = getcwd()
 else:
     prog_path = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0])))
+    if platform.system() == 'Darwin':
+        path_frags = prog_path.split(os.path.sep)
+        if path_frags[-3:] == ['tool.app', 'Contents', 'MacOS']:
+            path_frags = path_frags[:-3]
+            prog_path = os.path.sep.join(path_frags)
 project_name = None
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
