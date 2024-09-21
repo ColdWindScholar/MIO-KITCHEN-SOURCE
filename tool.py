@@ -1236,7 +1236,7 @@ class SetUtils:
             if not self.path:
                 self.path = os.getcwd()
         else:
-            self.path = os.getcwd()
+            self.path = utils.prog_path
         language.set(self.language)
         self.load_language(language.get())
         theme.set(self.theme)
