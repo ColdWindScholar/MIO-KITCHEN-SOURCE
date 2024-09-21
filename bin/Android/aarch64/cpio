@@ -1,3 +1,3 @@
-#/sbin/sh
+#/system/bin/sh
 # A cpio for Andoid
 cpio $@
