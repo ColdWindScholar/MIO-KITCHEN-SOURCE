@@ -2945,7 +2945,7 @@ def jboot(bn: str = 'boot'):
             return
     re_folder(work + bn)
     os.chdir(work + bn)
-    if call(['magiskboot', 'unpack', '-h', boot]) != 0:
+    if call(['magiskboot', 'unpack', '-h', '-n', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cwd_path)
         rmtree(work + bn)
@@ -3002,11 +3002,14 @@ def dboot(nm: str = 'boot'):
                     os.remove("ramdisk.cpio")
                 except (Exception, BaseException):
                     logging.exception('Bugs')
+                if comp == 'gzip':
+                    comp = 'gz'
                 os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
         else:
             print("Successfully packed Ramdisk..")
             os.remove("ramdisk.cpio")
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+        print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
             flag = "-n"
     os.chdir(work + nm + os.sep)
