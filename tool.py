@@ -29,7 +29,7 @@ from tkinter.ttk import Scrollbar
 import tarsafe
 
 from Magisk import Magisk_patch
-from tool_tester import tool_bin
+
 
 try:
     from pyaxmlparser import APK
@@ -321,7 +321,7 @@ class ToolBox(ttk.Frame):
         def patch(self):
             local_path = str(os.path.join(cwd_path, "bin", "temp", v_code()))
             re_folder(local_path)
-            magiskboot = tool_bin + os.sep + "magiskboot"
+            magiskboot = settings.tool_bin + os.sep + "magiskboot"
             with Magisk_patch(self.boot_file.get(), None, magiskboot, local_path, self.IS64BIT.get(), self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
                 self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
                               ) as m:
