@@ -18,6 +18,9 @@ import gzip
 import hashlib
 import json
 import platform
+
+from Cython.Compiler.Naming import self_cname
+
 import platform_machine_fixes
 import shutil
 import subprocess
@@ -28,6 +31,10 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
+
+from Magisk import Magisk_patch
+from tool_tester import tool_bin
+
 try:
     from pyaxmlparser import APK
 except:
@@ -285,13 +292,99 @@ class ToolBox(ttk.Frame):
                                                                                                               pady=5)
         ttk.Button(self.label_frame, text=lang.trim_image, command=self.TrimImage, width=width).grid(row=1, column=1,
                                                                                                      padx=5, pady=5)
+        ttk.Button(self.label_frame, text=lang.magisk_patch, command=self.MagiskPatcher, width=width).grid(row=1, column=2,
+                                                                                                     padx=5, pady=5)
         """"""
         self.update_ui()
 
     def update_ui(self):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+    class MagiskPatcher(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.magisk_apk = None
+            self.boot_file = None
+            self.title(lang.magisk_patch)
+            self.gui()
+            jzxs(self)
+        def get_arch(self, apk=None) -> list:
+            if not apk:
+                apk = self.magisk_apk.get()
+            if not apk or not os.path.exists(apk):
+                return ["arm64-v8a"]
+            with Magisk_patch(None, None, None, None, MAGISAPK=apk) as m:
+                return m.get_arch()
+        def chose_file_refresh(self):
+            file = filedialog.askopenfilename()
+            self.magisk_apk.set(
+                file)
+            self.archs.configure(value=self.get_arch(file))
+            self.lift()
+            self.focus_force()
+        def patch(self):
+            local_path = str(os.path.join(cwd_path, "bin", "temp", v_code()))
+            re_folder(local_path)
+            magiskboot = tool_bin + os.sep + "magiskboot"
+            with Magisk_patch(self.boot_file.get(), None, magiskboot, local_path, self.IS64BIT.get(), self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
+                self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
+                              ) as m:
+                m.auto_patch()
+                if m.output:
+                    output_file = os.path.join(cwd_path,
+                                                os.path.basename(self.boot_file.get()[:-4]) + "_magisk_patched.img")
+                    if os.path.exists(output_file):
+                        output_file = os.path.join(cwd_path,
+                                                    os.path.basename(self.boot_file.get()[:-4]) + v_code() +"_magisk_patched.img")
+                    os.rename(m.output, output_file)
+                print(f"Done!Patched Boot:{output_file}")
+                info_win(f"Patched Boot:\n{output_file}")
+        def gui(self):
+            ttk.Label(self, text=lang.magisk_patch).pack()
+            ft = ttk.Frame(self)
+            ft.pack(fill=X)
 
+            self.boot_file = StringVar()
+            ttk.Label(ft, text=lang.boot_file).pack(side='left', padx=10, pady=10)
+            ttk.Entry(ft, textvariable=self.boot_file).pack(side='left', padx=5, pady=5)
+            ttk.Button(ft, text=lang.text28,
+                       command=lambda: self.boot_file.set(
+                           filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+
+            ft = ttk.Frame(self)
+            ft.pack(fill=BOTH)
+
+            self.magisk_apk = StringVar()
+            ttk.Label(ft, text=lang.magisk_apk).pack(side='left', padx=10, pady=10)
+            ttk.Entry(ft, textvariable=self.magisk_apk).pack(side='left', padx=5, pady=5)
+            ttk.Button(ft, text=lang.text28,
+                       command=lambda: self.chose_file_refresh()).pack(side='left', padx=10, pady=10)
+            ft = ttk.Frame(self)
+            ft.pack(fill=X)
+
+            self.magisk_arch = StringVar(value='arm64-v8a')
+            ttk.Label(ft, text=lang.arch).pack(side='left', padx=10, pady=10)
+            self.archs = ttk.Combobox(ft, state='readonly', textvariable=self.magisk_arch,
+                         values=["arm64-v8a"])
+            self.archs.pack(side='left', padx=5, pady=5)
+            ttk.Button(ft, text=lang.text23,
+                       command=lambda: self.archs.configure(value=self.get_arch())).pack(side='left', padx=10, pady=10)
+            # Options
+            # IS64BIT=True, KEEPVERITY=False, KEEPFORCEENCRYPT=False, RECOVERYMODE=False
+            self.IS64BIT = BooleanVar(value=True)
+            self.KEEPVERITY = BooleanVar(value=False)
+            self.KEEPFORCEENCRYPT = BooleanVar(value=False)
+            self.RECOVERYMODE = BooleanVar(value=False)
+            ft = ttk.Frame(self)
+            ft.pack(fill=X)
+            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='IS64BIT', variable=self.IS64BIT).pack(fill=X, padx=5, pady=5, side=LEFT)
+            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='KEEPVERITY', variable=self.KEEPVERITY).pack(fill=X, padx=5, pady=5, side=LEFT)
+            ft = ttk.Frame(self)
+            ft.pack(fill=X)
+            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='KEEPFORCEENCRYPT', variable=self.KEEPFORCEENCRYPT).pack(fill=X, padx=5, pady=5, side=LEFT)
+            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='RECOVERYMODE', variable=self.RECOVERYMODE).pack(fill=X, padx=5, pady=5, side=LEFT)
+            self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton', command=lambda:cz(self.patch))
+            self.patch_bu.pack(fill=X, padx=5, pady=5)
     class SelinuxAuditAllow(Toplevel):
         def __init__(self):
             super().__init__()
