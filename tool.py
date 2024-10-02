@@ -18,10 +18,6 @@ import gzip
 import hashlib
 import json
 import platform
-
-from Cython.Compiler.Naming import self_cname
-
-import platform_machine_fixes
 import shutil
 import subprocess
 import threading
