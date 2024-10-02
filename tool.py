@@ -337,8 +337,8 @@ class ToolBox(ttk.Frame):
                         output_file = os.path.join(cwd_path,
                                                     os.path.basename(self.boot_file.get()[:-4]) + v_code() +"_magisk_patched.img")
                     os.rename(m.output, output_file)
-                print(f"Done!Patched Boot:{output_file}")
-                info_win(f"Patched Boot:\n{output_file}")
+                    print(f"Done!Patched Boot:{output_file}")
+                    info_win(f"Patched Boot:\n{output_file}")
         def gui(self):
             ttk.Label(self, text=lang.magisk_patch).pack()
             ft = ttk.Frame(self)
