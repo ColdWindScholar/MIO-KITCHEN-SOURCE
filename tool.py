@@ -209,7 +209,7 @@ class LoadAnim:
             task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
-                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[1]}...\n")
+                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
                 return
             else:
                 self.tasks[task_num] = info
