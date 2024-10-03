@@ -194,12 +194,12 @@ class LoadAnim:
         self.stop()
 
     def load_gif(self, gif):
-        try:
-            while True:
-                self.frames.append(PhotoImage(gif))
+        while True:
+            self.frames.append(PhotoImage(gif))
+            try:
                 gif.seek(len(self.frames))
-        except EOFError:
-            logging.exception('Bugs')
+            except EOFError:
+                break
 
     def __call__(self, func):
         @wraps(func)
