@@ -74,7 +74,7 @@ def zip_folder(folder_path):
 local = os.getcwd()
 print("Building...")
 import PyInstaller.__main__
-
+dndplat = None
 if ostype == 'Darwin':
     if platform.machine() == 'x86_64':
         dndplat = 'osx-x64'
@@ -91,8 +91,6 @@ if ostype == 'Darwin':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
-        '--collect-all',
-        'tkinterdnd2.tkdnd.' + dndplat,
         '--hidden-import',
         'tkinter',
         '--hidden-import',
@@ -117,8 +115,6 @@ elif os.name == 'posix':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
-        '--collect-all',
-        'tkinterdnd2.tkdnd.' + dndplat,
         '--hidden-import',
         'tkinter',
         '--hidden-import',
@@ -146,15 +142,13 @@ elif os.name == 'nt':
         'sv_ttk',
         '--collect-data',
         'chlorophyll',
-        '--collect-all',
-        'tkinterdnd2.tkdnd.' + dndplat,
         '--splash',
         'splash.png'
     ])
 if not os.path.exists('dist/bin'):
     os.makedirs('dist/bin', exist_ok=True)
 pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype,
-          'kemiaojiang.png', 'License_kemiaojiang.txt']
+          'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd"]
 for i in os.listdir(local + os.sep + "bin"):
     if i in pclist:
         if os.path.isdir(f"{local}/bin/{i}"):
@@ -163,6 +157,12 @@ for i in os.listdir(local + os.sep + "bin"):
             shutil.copy(f"{local}/bin/{i}", f"{local}/dist/bin/{i}")
 if not os.path.exists('dist/LICENSE'):
     shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep + 'LICENSE')
+if dndplat:
+    for i in os.listdir(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd'):
+        if i == dndplat:
+            continue
+        if os.path.isdir(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i):
+            shutil.rmtree(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i, ignore_errors=True)
 if os.name == 'posix':
     if platform.machine() == 'x86_64' and os.path.exists(f'{local}/dist/bin/Linux/aarch64'):
         try:
