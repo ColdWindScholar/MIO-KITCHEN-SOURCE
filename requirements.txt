@@ -13,4 +13,4 @@ pywinstyles
 tarsafe
 asn1crypto
 lxml
-tkinterdnd2
+tkinterdnd2>=0.4.2
