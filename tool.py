@@ -829,6 +829,24 @@ class Tool(Tk):
             ttk.Checkbutton(master, text=text, variable=a, onvalue=on_v,
                             offvalue=off_v,
                             style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+        def get_cache_size():
+            temp = os.path.join(cwd_path, "bin", "temp")
+            size = 0
+            for root, _, files in os.walk(temp):
+                try:
+                    size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
+                                      not os.path.islink(os.path.join(root, name))])
+                except:
+                    logging.exception("Bugs")
+            return size
+
+        def clean_cache():
+            temp = os.path.join(cwd_path, "bin", "temp")
+            try:
+                re_folder(temp, quiet=True)
+            except:
+                logging.exception("Bugs")
+            slo2.configure(text=hum_convert(get_cache_size()))
 
         self.show_local = StringVar()
         self.show_local.set(settings.path)
@@ -840,6 +858,7 @@ class Tool(Tk):
         sf3 = ttk.Frame(Setting_Frame.label_frame)
         sf4 = ttk.Frame(Setting_Frame.label_frame, width=20)
         sf5 = ttk.Frame(Setting_Frame.label_frame)
+        sf6 = ttk.Frame(Setting_Frame.label_frame)
         ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
@@ -863,6 +882,12 @@ class Tool(Tk):
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            values=[str(i.rsplit('.', 1)[0]) for i in
                                    os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
+        ###
+        ttk.Label(sf6, text=lang.cache_size).pack(side='left', padx=10, pady=10)
+        slo2 = ttk.Label(sf6, text=hum_convert(get_cache_size()), wraplength=200)
+        slo2.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
+        slo2.pack(padx=10, pady=10, side='left')
+        ttk.Button(sf6, text=lang.clean, command=lambda:cz(clean_cache)).pack(side="left", padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
 
         def enable_contextpatch():
@@ -889,11 +914,12 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sf4, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        sf1.pack(padx=10, pady=10, fill='both')
-        sf2.pack(padx=10, pady=10, fill='both')
-        sf3.pack(padx=10, pady=10, fill='both')
-        sf5.pack(padx=10, pady=10, fill='both')
-        sf4.pack(padx=10, pady=10, fill='both')
+        sf1.pack(padx=10, pady=7, fill='both')
+        sf2.pack(padx=10, pady=7, fill='both')
+        sf3.pack(padx=10, pady=7, fill='both')
+        sf5.pack(padx=10, pady=7, fill='both')
+        sf6.pack(padx=10, pady=7, fill='both')
+        sf4.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
         ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
@@ -1398,9 +1424,9 @@ settings = SetUtils()
 settings.load()
 
 
-def re_folder(path):
+def re_folder(path, quiet=False):
     if os.path.exists(path):
-        rmdir(path)
+        rmdir(path, quiet)
     os.mkdir(path)
 
 
@@ -4073,21 +4099,22 @@ def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
 
 
 @animation
-def rmdir(path):
+def rmdir(path,  quiet=False):
     if not path:
-        win.message_pop(lang.warn1)
+        if not quiet:
+            win.message_pop(lang.warn1)
     else:
-        print(lang.text97 + os.path.basename(path))
+        if not quiet:
+            print(lang.text97 + os.path.basename(path))
         try:
             try:
                 rmtree(path)
             except (Exception, BaseException):
-                call(['busybox', 'rm', '-rf', path])
+                call(['busybox', 'rm', '-rf', path], out=1 if quiet else 0)
         except (Exception, BaseException):
             print(lang.warn11.format(path))
-        win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
-
-
+        if not quiet:
+            win.message_pop(lang.warn11.format(path)) if os.path.exists(path) else print(lang.text98 + path)
 
 
 

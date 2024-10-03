@@ -31,6 +31,8 @@
   "log_file": "日志文件:",
   "scopied":"已复制",
   "lang": "语言：",
+  "clean": "清理",
+  "cache_size": "缓存大小:",
   "settings": "设置",
   "auto_unpack": "自动解包",
   "audit_allow": "Selinux 审核允许",

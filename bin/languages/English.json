@@ -30,6 +30,8 @@
   "log_file": "Log File:",
   "scopied":"Copied",
   "lang": "Language:",
+  "clean": "Clean",
+  "cache_size": "Cache Size:",
   "ai_engine": "AI ENGINE",
   "settings": "Settings",
   "auto_unpack": "Auto Unpack",
