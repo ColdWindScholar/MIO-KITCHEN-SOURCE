@@ -1427,7 +1427,7 @@ settings.load()
 def re_folder(path, quiet=False):
     if os.path.exists(path):
         rmdir(path, quiet)
-    os.mkdir(path)
+    os.makedirs(path, exist_ok=True)
 
 
 @animation
