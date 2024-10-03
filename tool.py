@@ -155,7 +155,8 @@ class JsonEdit:
 class LoadAnim:
     gifs = []
 
-    def __init__(self):
+    def __init__(self, master):
+        self.master = master
         self.frames = []
         self.hide_gif = False
         self.frame = None
@@ -166,13 +167,13 @@ class LoadAnim:
     def run(self, ind: int = 0):
         self.hide_gif = False
         if not self.hide_gif:
-            win.gif_label.pack(padx=10, pady=10)
+            self.master.gif_label.pack(padx=10, pady=10)
         self.frame = self.frames[ind]
         ind += 1
         if ind == len(self.frames):
             ind = 0
-        win.gif_label.configure(image=self.frame)
-        self.gifs.append(win.gif_label.after(30, self.run, ind))
+        self.master.gif_label.configure(image=self.frame)
+        self.gifs.append(self.master.gif_label.after(30, self.run, ind))
     def get_task_num(self):
         if self.task_num_index > self.task_num_max:
             self.task_num_index = 0
@@ -183,10 +184,10 @@ class LoadAnim:
     def stop(self):
         for i in self.gifs:
             try:
-                win.gif_label.after_cancel(i)
+                self.master.gif_label.after_cancel(i)
             except (Exception, BaseException):
                 logging.exception('Bugs')
-        win.gif_label.pack_forget()
+        self.master.gif_label.pack_forget()
         self.hide_gif = True
 
     def init(self):
@@ -224,7 +225,7 @@ class LoadAnim:
         return call_func
 
 
-animation = LoadAnim()
+
 
 
 class DevNull:
@@ -924,6 +925,7 @@ class Tool(Tk):
 
 
 win = Tool()
+animation = LoadAnim(win)
 start = dti()
 current_project_name = utils.project_name = StringVar()
 theme = StringVar()
