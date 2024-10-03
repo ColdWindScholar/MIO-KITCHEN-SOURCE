@@ -317,6 +317,7 @@ class ToolBox(ttk.Frame):
             self.lift()
             self.focus_force()
         def patch(self):
+            self.patch_bu.configure(state="disabled", text=lang.running)
             local_path = str(os.path.join(cwd_path, "bin", "temp", v_code()))
             re_folder(local_path)
             magiskboot = settings.tool_bin + os.sep + "magiskboot"
@@ -333,6 +334,7 @@ class ToolBox(ttk.Frame):
                     os.rename(m.output, output_file)
                     print(f"Done!Patched Boot:{output_file}")
                     info_win(f"Patched Boot:\n{output_file}")
+            self.patch_bu.configure(state="normal", text=lang.patch)
         def gui(self):
             ttk.Label(self, text=lang.magisk_patch).pack()
             ft = ttk.Frame(self)
