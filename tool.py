@@ -124,7 +124,7 @@ class States:
     donate_window = False
     mpk_store = False
     open_pids = []
-    run_source = True if gettype(sys.argv[0]) == "unknown" else False
+    run_source = gettype(sys.argv[0]) == "unknown"
     in_oobe = False
     development = False
 
