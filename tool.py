@@ -216,12 +216,7 @@ class LoadAnim:
             task_real.start()
             task_real.join()
             if task_num in self.tasks:
-                if len(self.tasks.get(task_num)) - 1 >= 0:
-                    del self.tasks[task_num][self.tasks[task_num].index(info)]
-                else:
-                    del self.tasks[task_num]
-                if not self.tasks[task_num]:
-                    del self.tasks[task_num]
+                del self.tasks[task_num]
             del info, task_num
             if not self.tasks:
                 self.stop()
