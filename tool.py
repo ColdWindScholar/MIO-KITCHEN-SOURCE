@@ -1791,13 +1791,14 @@ class ModuleManager:
             jzxs(self)
 
         @staticmethod
-        def label_entry(master, text, side):
+        def label_entry(master, text, side, value:str=''):
             frame = Frame(master)
             ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
-            entry = ttk.Entry(frame)
+            entry_value = tk.StringVar(value=value)
+            entry = ttk.Entry(frame, textvariable=entry_value)
             entry.pack(padx=5, pady=5, side=LEFT)
             frame.pack(padx=5, pady=5, fill=X, side=side)
-            return entry
+            return entry_value
 
         def editor_(self, id_=None):
             if not id_:
@@ -1819,11 +1820,11 @@ class ModuleManager:
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             f_b = ttk.Frame(self)
             f = ttk.Frame(f_b)
-            self.name = self.label_entry(f, lang.t20, TOP)
-            self.aou = self.label_entry(f, lang.t21, TOP)
-            self.ver = self.label_entry(f, lang.t22, TOP)
-            self.dep = self.label_entry(f, lang.t23, TOP)
-            self.identifier = self.label_entry(f, 'identifier', TOP)
+            self.name = self.label_entry(f, lang.t20, TOP, "example")
+            self.aou = self.label_entry(f, lang.t21, TOP, "MIO-KITCHEN")
+            self.ver = self.label_entry(f, lang.t22, TOP, "1.0")
+            self.dep = self.label_entry(f, lang.t23, TOP, '')
+            self.identifier = self.label_entry(f, lang.identifier, TOP, 'example.mio_kitchen.plugin')
             f.pack(padx=5, pady=5, side=LEFT)
             f = ttk.Frame(f_b)
             ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
@@ -1836,6 +1837,9 @@ class ModuleManager:
 
         def create(self):
             if not self.identifier.get():
+                return
+            if ModuleManager.get_installed(self.identifier.get()):
+                info_win(lang.warn19 % self.identifier.get())
                 return
             data = {
                 "name": self.name.get(),
@@ -1850,7 +1854,7 @@ class ModuleManager:
                 os.makedirs(self.module_dir + os.sep + iden)
             with open(self.module_dir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8',
                       newline='\n') as js:
-                js.write(json.dumps(data))
+                json.dump(data, js, ensure_ascii=False, indent=4)
             list_pls_plugin()
             self.editor_(iden)
 
