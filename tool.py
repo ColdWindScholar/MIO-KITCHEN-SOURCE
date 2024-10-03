@@ -160,6 +160,8 @@ class LoadAnim:
         self.hide_gif = False
         self.frame = None
         self.tasks = {}
+        self.task_num_index = 0
+        self.task_num_max = 100
 
     def run(self, ind: int = 0):
         self.hide_gif = False
@@ -171,6 +173,12 @@ class LoadAnim:
             ind = 0
         win.gif_label.configure(image=self.frame)
         self.gifs.append(win.gif_label.after(30, self.run, ind))
+    def get_task_num(self):
+        if self.task_num_index > self.task_num_max:
+            self.task_num_index = 0
+        while self.task_num_index in self.tasks:
+            self.task_num_index += 1
+        return self.task_num_index
 
     def stop(self):
         for i in self.gifs:
@@ -197,9 +205,9 @@ class LoadAnim:
         @wraps(func)
         def call_func(*args, **kwargs):
             cz(self.run())
-            task_num = func.__name__
+            task_num = self.get_task_num()
             task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
-            info = [hash(func), args, task_real]
+            info = [func.__name__, args, task_real]
             if task_num in self.tasks:
                 try:
                     self.tasks[task_num].index(info)
