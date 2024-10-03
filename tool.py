@@ -209,15 +209,10 @@ class LoadAnim:
             task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
-                try:
-                    self.tasks[task_num].index(info)
-                except ValueError:
-                    self.tasks[task_num].append(info)
-                else:
-                    print(f"Please Wait for task_{task_real.native_id} with args {info[1]}...\n")
-                    return
+                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[1]}...\n")
+                return
             else:
-                self.tasks[task_num] = [info]
+                self.tasks[task_num] = info
             task_real.start()
             task_real.join()
             if task_num in self.tasks:
