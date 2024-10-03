@@ -32,7 +32,9 @@ def _require(tkroot):
     try:
         import os.path
         import platform
-
+        mach_ = platform.machine()
+        if platform.architecture()[0] == '32bit' and mach_ == 'AMD64': mach_ = 'x86'
+        platform.machine = lambda: mach_
         if platform.system()=="Darwin" and platform.machine()=="arm64":
             tkdnd_platform_rep = "osx-arm64"
         elif platform.system()=="Darwin" and platform.machine()=="x86_64":
