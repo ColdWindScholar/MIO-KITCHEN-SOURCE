@@ -163,6 +163,9 @@ if dndplat:
             continue
         if os.path.isdir(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i):
             shutil.rmtree(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i, ignore_errors=True)
+else:
+    print("Cannot Build!!!TkinterDnd2 Missing!!!!!!!!!!")
+    exit(-1)
 if os.name == 'posix':
     if platform.machine() == 'x86_64' and os.path.exists(f'{local}/dist/bin/Linux/aarch64'):
         try:
