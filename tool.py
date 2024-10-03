@@ -1115,6 +1115,7 @@ class Updater(Toplevel):
             subprocess.Popen(
                 [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            cz(sys.exit, 1)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text=lang.t41, foreground='red')
@@ -1122,6 +1123,7 @@ class Updater(Toplevel):
 
     def update_process2(self):
         self.notice.configure(text=lang.t51)
+        time.sleep(2)
         if os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe'))))
