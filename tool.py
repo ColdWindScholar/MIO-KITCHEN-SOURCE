@@ -57,7 +57,7 @@ from tkinter import ttk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
-from tkinterdnd2 import Tk, DND_FILES
+from tkinterdnd2_build_in import Tk, DND_FILES
 from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
