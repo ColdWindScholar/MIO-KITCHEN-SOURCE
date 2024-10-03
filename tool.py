@@ -318,7 +318,7 @@ class ToolBox(ttk.Frame):
             self.focus_force()
         def patch(self):
             self.patch_bu.configure(state="disabled", text=lang.running)
-            local_path = str(os.path.join(cwd_path, "bin", "temp", v_code()))
+            local_path = str(os.path.join(temp, v_code()))
             re_folder(local_path)
             magiskboot = settings.tool_bin + os.sep + "magiskboot"
             with Magisk_patch(self.boot_file.get(), None, magiskboot, local_path, self.IS64BIT.get(), self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
@@ -830,7 +830,6 @@ class Tool(Tk):
                             offvalue=off_v,
                             style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
         def get_cache_size():
-            temp = os.path.join(cwd_path, "bin", "temp")
             size = 0
             for root, _, files in os.walk(temp):
                 try:
@@ -841,7 +840,6 @@ class Tool(Tk):
             return size
 
         def clean_cache():
-            temp = os.path.join(cwd_path, "bin", "temp")
             try:
                 re_folder(temp, quiet=True)
             except:
@@ -931,7 +929,8 @@ current_project_name = utils.project_name = StringVar()
 theme = StringVar()
 language = StringVar()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
-tool_log = f'{cwd_path.replace(os.sep, "/")}/bin/temp/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
+temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
+tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
 
 # Some Functions for Upgrade
@@ -1071,14 +1070,14 @@ class Updater(Toplevel):
         self.notice.configure(text=lang.t50, foreground='red')
 
     def download(self):
-        if not os.path.exists(os.path.join(cwd_path, "bin", "temp")):
-            os.makedirs(os.path.join(cwd_path, "bin", "temp"))
+        if not os.path.exists(temp):
+            os.makedirs(temp)
         mode = True
         self.progressbar.configure(mode='indeterminate')
         self.progressbar.start()
         self.update_zip = os.path.normpath(
-            os.path.join(cwd_path, "bin", "temp", os.path.basename(self.update_download_url)))
-        for percentage, _, _, _, _ in download_api(self.update_download_url, os.path.join(cwd_path, "bin", "temp"),
+            os.path.join(temp, os.path.basename(self.update_download_url)))
+        for percentage, _, _, _, _ in download_api(self.update_download_url, temp,
                                                    size_=self.update_size):
             if not states.update_window:
                 return
@@ -1143,9 +1142,9 @@ class Updater(Toplevel):
                     os.remove(settings.new_tool)
                 if os.path.isfile(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))):
                     os.remove(os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-                if os.path.exists(os.path.join(cwd_path, "bin", "temp")):
-                    shutil.rmtree(os.path.join(cwd_path, "bin", "temp"))
-                os.makedirs(os.path.join(cwd_path, "bin", "temp"), exist_ok=True)
+                if os.path.exists(temp):
+                    shutil.rmtree(temp)
+                os.makedirs(temp, exist_ok=True)
             except (IOError, IsADirectoryError, FileNotFoundError, PermissionError):
                 logging.exception('Bugs')
             settings.set_value('updating', '')
@@ -1624,7 +1623,7 @@ class ModuleManager:
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             values = self.Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
                 script_path + "main.json") else None
-            if not os.path.exists(temp := os.path.join(cwd_path, "bin", "temp") + os.sep):
+            if not os.path.exists(temp):
                 re_folder(temp)
             if not file:
                 file = temp + v_code()
@@ -1915,7 +1914,7 @@ class ModuleManager:
                 self.runline(do.replace(f'@{vn}@', v))
 
         def sh(self, cmd):
-            with open(file_ := (os.path.join(cwd_path, "bin", "temp", v_code())), "w",
+            with open(file_ := (os.path.join(temp, v_code())), "w",
                       encoding='UTF-8',
                       newline="\n") as f:
                 for i in self.envs:
@@ -2042,7 +2041,6 @@ class ModuleManager:
             self.wait_window()
 
         def generate_sh(self):
-            temp = os.path.join(cwd_path, "bin", "temp")
             if not os.path.exists(temp):
                 os.mkdir(temp)
             self.destroy()
@@ -2604,18 +2602,15 @@ class MpkStore(Toplevel):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
         try:
             for i in files:
-                for percentage, _, _, _, _ in download_api(self.repo + i,
-                                                           os.path.join(cwd_path, "bin",
-                                                                        "temp"),
-                                                           size_=size):
+                for percentage, _, _, _, _ in download_api(self.repo + i,temp,size_=size):
                     if control and states.mpk_store:
                         control.config(text=f"{percentage} %")
                     else:
                         return False
 
-                cz(ModuleManager.install, os.path.join(cwd_path, "bin", "temp", i), join=True)
+                cz(ModuleManager.install, os.path.join(temp, i), join=True)
                 try:
-                    os.remove(os.path.join(cwd_path, "bin", "temp", i))
+                    os.remove(os.path.join(temp, i))
                 except (Exception, BaseException):
                     logging.exception('Bugs')
         except (ConnectTimeout, HTTPError, BaseException, Exception, TclError):
