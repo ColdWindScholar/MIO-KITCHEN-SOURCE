@@ -19,6 +19,8 @@ if os.name == 'nt':
 
 
 def symlink(link_target, target):
+    if not os.path.exists(os.path.dirname(target)):
+        os.makedirs(os.path.dirname(target) ,exist_ok=True)
     if os.name == 'posix':
         os.symlink(link_target, target)
     elif os.name == 'nt':
