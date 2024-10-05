@@ -23,13 +23,7 @@
 * Android 8以下のROMのインストールをサポート、IMGとしてのパッケージング
 * LinuxでMKCファイル選択のAPIを使用
 ***
-## * macOSに関するお知らせ
-``` shell
-# [brotli]を使用する場合はそれが必要になります:
-# システム内に入っているかもしれないので確認をしてください
-# 
-brew install gettext
-```
+
 ## 使用開始
 ### 必要となる準備
 <details><summary>macOS</summary>

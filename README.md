@@ -33,13 +33,7 @@
 | Windows | x86_64 x86 amd64 arm64(by sewzj) |
 | Macos   | Arm64  X86                  |
 
-## * macOS Notice
-``` shell
-# If you want to use [brotli], you need:
-# You system may had it already, so check first.
-# 
-brew install gettext
-```
+
 ## Start To Use
 > [!NOTE]
 > Currently Only Support Python 3.8 and Newer!

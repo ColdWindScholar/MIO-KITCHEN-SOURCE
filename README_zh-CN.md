@@ -24,13 +24,7 @@
 * 支持安卓8以下ROM打IMG
 * 在LINUX上使用MKC_文件选择，更易用
 ***
-## * macOS 注意！
-``` shell
-# 如果你想使用 [brotli],你需要:
-# 可能系统自带, 请先检查
-# 
-brew install gettext
-```
+
 ## 开始使用
 ### 必要准备
 <details><summary>macOS</summary>

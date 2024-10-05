@@ -33,13 +33,7 @@
 | Windows | x86_64 x86 amd64 arm64 |
 | Macos   | Arm64  X86             |
 
-## * Aviso macOS
-``` shell
-# Se quiser usar [brotli], você precisa:
-# Seu sistema já pode ter isso, então verifique primeiro
-#
-brew install gettext
-```
+
 ## Comece a usar
 > [!NOTE]
 > Atualmente suporta apenas Python 3.8 e mais recente

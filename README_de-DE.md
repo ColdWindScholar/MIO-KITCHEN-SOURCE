@@ -23,13 +23,7 @@
 * Unterstützt die Installation von ROMs unter Android 8 und Paketierung als IMG
 * Verwenden Sie die mkc-Datei, wählen Sie die API unter Linux, verwenden Sie sie einfach
 ***
-## * macOS-Hinweis
-``` shell
-# Wenn Sie [Brotli] verwenden möchten, benötigen Sie:
-# Ihr System hatte es möglicherweise bereits, also überprüfen Sie es zuerst
-# 
-brew install gettext
-```
+
 ## Beginnen Sie mit der Verwendung
 ### Notwendige Vorbereitung
 <details><summary>macOS</summary>
