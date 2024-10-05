@@ -62,7 +62,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.8.10
+      - name: Set up Python 3.12.6
         uses: actions/setup-python@v5
         with:
           # Semantic version range syntax or exact version of a Python version
