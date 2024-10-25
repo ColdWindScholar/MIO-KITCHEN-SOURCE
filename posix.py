@@ -17,7 +17,7 @@ if os.name == 'nt':
     from stat import FILE_ATTRIBUTE_SYSTEM
     from ctypes import windll
 
-
+from logging import exception
 def symlink(link_target, target):
     if not os.path.exists(os.path.dirname(target)):
         os.makedirs(os.path.dirname(target) ,exist_ok=True)
@@ -29,8 +29,8 @@ def symlink(link_target, target):
             try:
                 windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
                                                    DWORD(FILE_ATTRIBUTE_SYSTEM))
-            except Exception as e:
-                print(str(e))
+            except Exception:
+                exception("Posix")
 
 
 def readlink(path):
