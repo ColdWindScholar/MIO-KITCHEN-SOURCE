@@ -243,7 +243,8 @@ class AXMLPrinter:
             value = self.__replacement.sub('_', value)
         return value
 
-    def _print_namespace(self, uri):
+    @staticmethod
+    def _print_namespace(uri):
         if uri != "":
             uri = "{{{}}}".format(uri)
         return uri

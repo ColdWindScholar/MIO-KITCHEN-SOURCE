@@ -650,6 +650,10 @@ def create_dtbo_image(fout, list, page_size=2048, dt_type='dtb',  flags='0'):
     Args:
         fout: Output file handle to write to.
         argv: list of command line arguments.
+        :param list:
+        :param page_size:
+        :param dt_type:
+        :param flags:
     """
 
     assert list, 'List of dt_images to add to DTBO not provided'
@@ -672,6 +676,8 @@ def dump_dtbo_image(fin, dtfilename, decompress=False):
     Args:
         fin: Input DTBO image files.
         argv: list of command line arguments.
+        :param dtfilename:
+        :param decompress:
     """
     dtbo = Dtbo(fin)
     if dtfilename:

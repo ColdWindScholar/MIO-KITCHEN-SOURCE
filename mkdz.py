@@ -293,7 +293,8 @@ class MKDZFileTools:
 
         self.dz_file.writeFile(file, os.path.basename(name))
 
-    def parseArgs(self):
+    @staticmethod
+    def parseArgs():
         # Parse arguments
         parser = argparse.ArgumentParser(description='LG Compressed DZ File Creator by Elliott Mitchell')
         parser.add_argument('-f', '--file', help='DZ File to create', action='store', required=True, dest='dzfile')

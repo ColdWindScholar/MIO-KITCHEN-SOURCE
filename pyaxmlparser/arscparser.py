@@ -225,10 +225,12 @@ class ARSCParser(object):
                         nb += 3 + nb_i - 1  # -1 to account for the nb+=1 on the next line
                 nb += 1
 
-    def get_resource_string(self, ate):
+    @staticmethod
+    def get_resource_string(ate):
         return [ate.get_value(), ate.get_key_data()]
 
-    def get_resource_id(self, ate):
+    @staticmethod
+    def get_resource_id(ate):
         x = [ate.get_value()]
         if ate.key.get_data() == 0:
             x.append("false")
@@ -236,7 +238,8 @@ class ARSCParser(object):
             x.append("true")
         return x
 
-    def get_resource_bool(self, ate):
+    @staticmethod
+    def get_resource_bool(ate):
         x = [ate.get_value()]
         if ate.key.get_data() == 0:
             x.append("false")
@@ -244,10 +247,12 @@ class ARSCParser(object):
             x.append("true")
         return x
 
-    def get_resource_integer(self, ate):
+    @staticmethod
+    def get_resource_integer(ate):
         return [ate.get_value(), ate.key.get_data()]
 
-    def get_resource_color(self, ate):
+    @staticmethod
+    def get_resource_color(ate):
         entry_data = ate.key.get_data()
         return [
             ate.get_value(),
@@ -258,7 +263,8 @@ class ARSCParser(object):
                 (entry_data & 0xFF))
         ]
 
-    def get_resource_dimen(self, ate):
+    @staticmethod
+    def get_resource_dimen(ate):
         try:
             return [
                 ate.get_value(), "%s%s" % (
@@ -272,7 +278,8 @@ class ARSCParser(object):
             return [ate.get_value(), ate.key.get_data()]
 
     # FIXME
-    def get_resource_style(self, ate):
+    @staticmethod
+    def get_resource_style(ate):
         return ["", ""]
 
     def get_packages_names(self):
@@ -752,13 +759,10 @@ class ARSCParser(object):
                 return None
             return "@{}/{}".format(resource, name)
         else:
-            for p in self.get_packages_names():
-                r, n, i_id = self.get_id(p, r_id)
+            for package_ in self.get_packages_names():
+                resource, name, i_id = self.get_id(package_, r_id)
                 if i_id:
                     # found the resource in this package
-                    package = p
-                    resource = r
-                    name = n
                     break
             if not package:
                 return None

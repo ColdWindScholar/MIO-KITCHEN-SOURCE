@@ -43,11 +43,11 @@ class askopenfilenames(Toplevel):
         self.type.pack(fill=X, padx=5, pady=5)
         self.path = StringVar()
         self.paths = Entry(self, textvariable=self.path)
-        self.paths.bind("<Return>", self.p_bind)
+        self.paths.bind("<Return>", lambda x:self.p_bind())
         self.path.set(os.path.abspath("/"))
         self.paths.pack(fill=X, padx=5, pady=5)
         self.show = Listbox(self, activestyle='dotbox', highlightthickness=0)
-        self.show.bind("<Double-Button-1>", self.p_bind)
+        self.show.bind("<Double-Button-1>", lambda x:self.p_bind())
         self.show.pack(fill=BOTH, padx=5, pady=5)
         ff = Frame(self)
         Button(ff, text=lang.t56, command=self.return_var).pack(fill=X, side=LEFT, padx=5, pady=5)
@@ -58,7 +58,7 @@ class askopenfilenames(Toplevel):
         jzxs(self)
         self.wait_window()
 
-    def p_bind(self, event):
+    def p_bind(self):
         try:
             file = self.show.get(self.show.curselection())
         except:

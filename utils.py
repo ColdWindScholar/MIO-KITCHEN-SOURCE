@@ -110,7 +110,7 @@ class Unxz:
     def do_unxz(self):
         dec = LZMADecompressor()
         with open(self.file_path, 'rb') as in_fd, open(self.out_file, 'wb') as out_fd:
-            while (raw := in_fd.read(self.buff_size)):
+            while raw := in_fd.read(self.buff_size):
                 while True:
                     raw = dec.decompress(raw, max_length=self.buff_size)
                     out_fd.write(raw)

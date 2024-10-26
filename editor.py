@@ -40,14 +40,14 @@ class PythonEditor(tk.Frame):
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         self.show = tk.Listbox(self, activestyle='dotbox', highlightthickness=0)
-        self.show.bind("<Double-Button-1>", self.p_bind)
+        self.show.bind("<Double-Button-1>", lambda x:self.p_bind())
         self.show.pack(fill=tk.BOTH, padx=5, pady=5)
         ff = ttk.Frame(self)
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
         self.refs()
 
-    def p_bind(self, event):
+    def p_bind(self):
         try:
             file = self.show.get(self.show.curselection())
         except:

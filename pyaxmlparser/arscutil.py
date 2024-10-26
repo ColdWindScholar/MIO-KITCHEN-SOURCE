@@ -314,7 +314,8 @@ class ARSCResTableConfig(object):
 
             self.exceedingSize = 0
 
-    def _unpack_language_or_region(self, char_in, char_base):
+    @staticmethod
+    def _unpack_language_or_region(char_in, char_base):
         char_out = ""
         if char_in[0] & 0x80:
             first = char_in[1] & 0x1f
@@ -440,7 +441,7 @@ class ARSCResTableConfig(object):
             elif density == const.DENSITY_ANY:
                 res.append("anydpi")
             else:
-                res.append("%ddpi" % (density))
+                res.append("%ddpi" % density)
 
         touchscreen = (self.screenType & 0xff00) >> 8
         if touchscreen != const.TOUCHSCREEN_ANY:

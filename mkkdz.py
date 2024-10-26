@@ -128,7 +128,8 @@ class KDZFileTools(kdz.KDZFile):
     def cmdList(self):
         pass
 
-    def parseArgs(self):
+    @staticmethod
+    def parseArgs():
         # Parse arguments
         parser = argparse.ArgumentParser(description='LG KDZ File creator by Elliott Mitchell')
         parser.add_argument('-f', '--file', help='KDZ File to read', action='store', required=True, dest='kdzfile')

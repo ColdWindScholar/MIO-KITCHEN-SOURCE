@@ -1,4 +1,4 @@
-'''Python wrapper for the tkdnd tk extension.
+"""Python wrapper for the tkdnd tk extension.
 
 The tkdnd extension provides an interface to native, platform specific
 drag and drop mechanisms. Under Unix the drag & drop protocol in use is
@@ -20,14 +20,14 @@ Drag and drop for the application can then be enabled by using one of the
 classes TkinterDnD.Tk() as application main window instead of a regular
 tkinter.Tk() window. This will add the drag-and-drop specific methods to the
 Tk window and all its descendants.
-'''
+"""
 
 import tkinter
 from utils import prog_path
 TkdndVersion = None
 
 def _require(tkroot):
-    '''Internal function.'''
+    """Internal function."""
     global TkdndVersion
     try:
         import os.path
@@ -87,7 +87,7 @@ class DnDEvent:
     pass
 
 class DnDWrapper:
-    '''Internal class.'''
+    """Internal class."""
     # some of the percent substitutions need to be enclosed in braces
     # so we can use splitlist() to convert them into tuples
     _subst_format_dnd = ('%A', '%a', '%b', '%C', '%c', '{%CST}',
@@ -165,7 +165,7 @@ class DnDWrapper:
     tkinter.BaseWidget._dnd_bind = _dnd_bind
 
     def dnd_bind(self, sequence=None, func=None, add=None):
-        '''Bind to this widget at drag and drop event SEQUENCE a call
+        """Bind to this widget at drag and drop event SEQUENCE a call
         to function FUNC.
         SEQUENCE may be one of the following:
         <<DropEnter>>, <<DropPosition>>, <<DropLeave>>, <<Drop>>,
@@ -177,12 +177,12 @@ class DnDWrapper:
         containing three elements: the drop action(s) supported by the
         drag source, the format type(s) that the data can be dropped as and
         finally the data that shall be dropped. Each of these three elements
-        may be a tuple of strings or a single string.'''
+        may be a tuple of strings or a single string."""
         return self._dnd_bind(('bind', self._w), sequence, func, add)
     tkinter.BaseWidget.dnd_bind = dnd_bind
 
     def drag_source_register(self, button=None, *dndtypes):
-        '''This command will register SELF as a drag source.
+        """This command will register SELF as a drag source.
         A drag source is a widget than can start a drag action. This command
         can be executed multiple times on a widget.
         When SELF is registered as a drag source, optional DNDTYPES can be
@@ -195,7 +195,7 @@ class DnDWrapper:
         different type list. Finally, button is the mouse button that will be
         used for starting the drag action. It can have any of the values 1
         (left mouse button), 2 (middle mouse button - wheel) and 3
-        (right mouse button). If button is not specified, it defaults to 1.'''
+        (right mouse button). If button is not specified, it defaults to 1."""
         # hack to fix a design bug from the first version
         if button is None:
             button = 1
@@ -212,15 +212,15 @@ class DnDWrapper:
     tkinter.BaseWidget.drag_source_register = drag_source_register
 
     def drag_source_unregister(self):
-        '''This command will stop SELF from being a drag source. Thus, window
+        """This command will stop SELF from being a drag source. Thus, window
         will stop receiving events related to drag operations. It is an error
         to use this command for a window that has not been registered as a
-        drag source with drag_source_register().'''
+        drag source with drag_source_register()."""
         self.tk.call('tkdnd::drag_source', 'unregister', self._w)
     tkinter.BaseWidget.drag_source_unregister = drag_source_unregister
 
     def drop_target_register(self, *dndtypes):
-        '''This command will register SELF as a drop target. A drop target is
+        """This command will register SELF as a drop target. A drop target is
         a widget than can accept a drop action. This command can be executed
         multiple times on a widget. When SELF is registered as a drop target,
         optional DNDTYPES can be provided. These types list can contain one or
@@ -228,51 +228,51 @@ class DnDWrapper:
         contain platform independent or platform specific types. Platform
         independent are DND_Text for dropping text portions and DND_Files for
         dropping a list of files (which can contain one or multiple files) on
-        SELF.'''
+        SELF."""
         self.tk.call('tkdnd::drop_target', 'register', self._w, dndtypes)
     tkinter.BaseWidget.drop_target_register = drop_target_register
 
     def drop_target_unregister(self):
-        '''This command will stop SELF from being a drop target. Thus, SELF
+        """This command will stop SELF from being a drop target. Thus, SELF
         will stop receiving events related to drop operations. It is an error
         to use this command for a window that has not been registered as a
-        drop target with drop_target_register().'''
+        drop target with drop_target_register()."""
         self.tk.call('tkdnd::drop_target', 'unregister', self._w)
     tkinter.BaseWidget.drop_target_unregister = drop_target_unregister
 
     def platform_independent_types(self, *dndtypes):
-        '''This command will accept a list of types that can contain platform
+        """This command will accept a list of types that can contain platform
         independnent or platform specific types. A new list will be returned,
         where each platform specific type in DNDTYPES will be substituted by
         one or more platform independent types. Thus, the returned list may
-        have more elements than DNDTYPES.'''
+        have more elements than DNDTYPES."""
         return self.tk.split(self.tk.call(
                             'tkdnd::platform_independent_types', dndtypes))
     tkinter.BaseWidget.platform_independent_types = platform_independent_types
 
     def platform_specific_types(self, *dndtypes):
-        '''This command will accept a list of types that can contain platform
+        """This command will accept a list of types that can contain platform
         independnent or platform specific types. A new list will be returned,
         where each platform independent type in DNDTYPES will be substituted
         by one or more platform specific types. Thus, the returned list may
-        have more elements than DNDTYPES.'''
+        have more elements than DNDTYPES."""
         return self.tk.split(self.tk.call(
                             'tkdnd::platform_specific_types', dndtypes))
     tkinter.BaseWidget.platform_specific_types = platform_specific_types
 
     def get_dropfile_tempdir(self):
-        '''This command will return the temporary directory used by TkDND for
+        """This command will return the temporary directory used by TkDND for
         storing temporary files. When the package is loaded, this temporary
         directory will be initialised to a proper directory according to the
         operating system. This default initial value can be changed to be the
         value of the following environmental variables:
-        TKDND_TEMP_DIR, TEMP, TMP.'''
+        TKDND_TEMP_DIR, TEMP, TMP."""
         return self.tk.call('tkdnd::GetDropFileTempDirectory')
     tkinter.BaseWidget.get_dropfile_tempdir = get_dropfile_tempdir
 
     def set_dropfile_tempdir(self, tempdir):
-        '''This command will change the temporary directory used by TkDND for
-        storing temporary files to TEMPDIR.'''
+        """This command will change the temporary directory used by TkDND for
+        storing temporary files to TEMPDIR."""
         self.tk.call('tkdnd::SetDropFileTempDirectory', tempdir)
     tkinter.BaseWidget.set_dropfile_tempdir = set_dropfile_tempdir
 
@@ -282,8 +282,8 @@ class DnDWrapper:
 #######################################################################
 
 class Tk(tkinter.Tk, DnDWrapper):
-    '''Creates a new instance of a tkinter.Tk() window; all methods of the
-    DnDWrapper class apply to this window and all its descendants.'''
+    """Creates a new instance of a tkinter.Tk() window; all methods of the
+    DnDWrapper class apply to this window and all its descendants."""
     def __init__(self, *args, **kw):
         tkinter.Tk.__init__(self, *args, **kw)
         self.TkdndVersion = _require(self)

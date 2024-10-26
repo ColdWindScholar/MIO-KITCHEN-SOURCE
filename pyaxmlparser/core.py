@@ -155,6 +155,8 @@ class APKV3SignedData(APKV2SignedData):
         base_str = super().__str__()
 
         # maxSDK is set to a negative value if there is no upper bound on the sdk targeted
+        if self.maxSDK is None or self.minSDK is None:
+            return "None"
         max_sdk_str = "%d" % self.maxSDK
         if self.maxSDK >= 0x7fffffff:
             max_sdk_str = "0x%x" % self.maxSDK
@@ -310,14 +312,14 @@ class APK:
             self._apk_analysis()
 
     def __repr__(self):
-        repr = """
+        return """
         filename: {self.filename}
         package: {self.package}
         valid apk: {self.valid_apk}
         """
-        return repr
 
-    def _ns(self, name):
+    @staticmethod
+    def _ns(name):
         """
         return the name including the Android namespace
         """
@@ -647,7 +649,7 @@ class APK:
         :return: str of filetype
         """
         default = "Unknown"
-        ftype = None
+
 
         try:
             # Magic is optional
@@ -675,7 +677,7 @@ class APK:
 
         try:
             ftype = magic.from_buffer(buffer[:1024])
-        except magic.MagicError as e:
+        except magic.MagicError:
             log.exception("Error getting the magic type!")
             return default
 
@@ -711,7 +713,8 @@ class APK:
 
         return self._files
 
-    def _patch_magic(self, buffer, orig):
+    @staticmethod
+    def _patch_magic(buffer, orig):
         """
         Overwrite some probably wrong detections by mime libraries
 
@@ -820,6 +823,7 @@ class APK:
         """
         Deprecated: use `get_all_attribute_value()` instead
         Return elements in xml files which match with the tag name and the specific attribute
+        :param with_namespace:
         :param tag_name: a string which specify the tag name
         :param attribute: a string which specify the attribute
         """
@@ -973,8 +977,7 @@ class APK:
     def find_tags(self, tag_name, **attribute_filter):
         """
         Return a list of all the matched tags in all available xml
-        :param tag: specify the tag name
-        :type tag: string
+        :param tag_name:
         """
         all_tags = [
             self.find_tags_from_xml(
@@ -1404,7 +1407,7 @@ class APK:
             name="android.hardware.touchscreen"
         ) == "android.hardware.touchscreen"
 
-    def new_zip(self, filename, deleted_files=None, new_files={}):
+    def new_zip(self, filename, deleted_files=None, new_files=None):
         """
             Create a new zip file
 
@@ -1416,34 +1419,35 @@ class APK:
             :type deleted_files: None or a string
             :type new_files: a dictionnary (key:filename, value:content of the file)
         """
-        zout = zipfile.ZipFile(filename, 'w')
-
-        for item in self.zip.infolist():
-            # Block one: deleted_files, or deleted_files and new_files
-            if deleted_files is not None:
-                if re.match(deleted_files, item.filename) is None:
-                    # if the regex of deleted_files doesn't match the filename
-                    if new_files is not False:
-                        if item.filename in new_files:
-                            # and if the filename is in new_files
-                            zout.writestr(item, new_files[item.filename])
-                            continue
-                    # Otherwise, write the original file.
-                    buffer = self.zip.read(item.filename)
-                    zout.writestr(item, buffer)
-            # Block two: deleted_files is None, new_files is not empty
-            elif new_files is not False:
-                if item.filename in new_files:
-                    zout.writestr(item, new_files[item.filename])
+        if new_files is None:
+            new_files = {}
+        with zipfile.ZipFile(filename, 'w') as zout:
+            for item in self.zip.infolist():
+                # Block one: deleted_files, or deleted_files and new_files
+                if deleted_files is not None:
+                    if re.match(deleted_files, item.filename) is None:
+                        # if the regex of deleted_files doesn't match the filename
+                        if new_files is not False:
+                            if item.filename in new_files:
+                                # and if the filename is in new_files
+                                zout.writestr(item, new_files[item.filename])
+                                continue
+                        # Otherwise, write the original file.
+                        buffer = self.zip.read(item.filename)
+                        zout.writestr(item, buffer)
+                # Block two: deleted_files is None, new_files is not empty
+                elif new_files is not False:
+                    if item.filename in new_files:
+                        zout.writestr(item, new_files[item.filename])
+                    else:
+                        buffer = self.zip.read(item.filename)
+                        zout.writestr(item, buffer)
+                # Block three: deleted_files is None, new_files is empty.
+                # Just write out the default zip
                 else:
                     buffer = self.zip.read(item.filename)
                     zout.writestr(item, buffer)
-            # Block three: deleted_files is None, new_files is empty.
-            # Just write out the default zip
-            else:
-                buffer = self.zip.read(item.filename)
-                zout.writestr(item, buffer)
-        zout.close()
+
 
     def get_android_manifest_axml(self):
         """
@@ -1549,7 +1553,8 @@ class APK:
 
         return self._is_signed_v3
 
-    def read_uint32_le(self, io_stream):
+    @staticmethod
+    def read_uint32_le(io_stream):
         value, = unpack('<I', io_stream.read(4))
         return value
 
@@ -1587,7 +1592,6 @@ class APK:
         # * IDs with an unknown value should be ignored.
         f = io.BytesIO(self.get_raw())
 
-        size_central = None
         offset_central = None
 
         # Go to the end
