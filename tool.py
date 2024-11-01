@@ -645,13 +645,6 @@ class Tool(Tk):
                                data=images.icon_byte))
         sys.stdout = DevNull()
 
-    def put_log(self):
-        log_ = settings.path + os.sep + v_code() + '.txt'
-        with open(log_, 'w', encoding='utf-8', newline='\n') as f:
-            f.write(self.show.get(1.0, tk.END))
-            self.show.delete(1.0, tk.END)
-        print(lang.text95 + log_)
-
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
         self.after(1000, self.get_time)
@@ -728,8 +721,6 @@ class Tool(Tk):
                                                                                                     padx=10,
                                                                                                     pady=5,
                                                                                                     expand=True)
-        ttk.Button(self.rzf, text=lang.text106, command=lambda: self.put_log()).pack(side='bottom', padx=10, pady=5,
-                                                                                     expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
@@ -2935,6 +2926,7 @@ class StdoutRedirector:
             self.error_info += string
             return
         self.text_space.insert(tk.END, string)
+        logging.debug(string)
         self.text_space.see('end')
 
     def flush(self):
