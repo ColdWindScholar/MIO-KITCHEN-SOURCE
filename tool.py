@@ -2924,6 +2924,7 @@ class StdoutRedirector:
     def write(self, string):
         if self.error:
             self.error_info += string
+            logging.error(string)
             return
         self.text_space.insert(tk.END, string)
         logging.debug(string)
