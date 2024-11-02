@@ -4,6 +4,7 @@
 # MIO-KITCHEN-SOURCE #
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
 #### A Rom Tool Written in Python
+##### The Best Free And Open Source Rom Tool For You
 > [!CAUTION]
 > Unauthorized commercial use prohibited
 ***
@@ -27,13 +28,31 @@
 ***
 ## Supported Os
 
-| Os      | Arch                        |
-|---------|-----------------------------|
-| Linux   | x86_64 arm64                |
+|   Os    | Arch                             |
+|:-------:|----------------------------------|
+|  Linux  | x86_64 arm64                     |
 | Windows | x86_64 x86 amd64 arm64(by sewzj) |
-| Macos   | Arm64  X86                  |
-
-
+|  Macos  | Arm64  X86                       |
+## Supported Image Types
+| Supported Image Types                |
+|--------------------------------------|
+| Android Boot Image |
+| Android Recovery Image |
+| Android Vendor_boot Image |
+| Erofs  |
+| Ext4  |
+| F2fs(Linux Version)  |
+| Romfs  |
+## Supported File Types
+| Supported File Types |
+|----------------------|
+| Zip                  |
+| ops                  |
+| Ozip                 |
+| tar.md5              |
+| kdz/dz               |
+| ofp                  |
+| tar.gz               |
 ## Start To Use
 > [!NOTE]
 > Currently Only Support Python 3.8 and Newer!
