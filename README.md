@@ -34,15 +34,16 @@
 | Windows | x86_64 x86 amd64 arm64(by sewzj) |
 |  Macos  | Arm64  X86                       |
 ## Supported Image Types
-| Supported Image Types                |
-|--------------------------------------|
-| Android Boot Image |
-| Android Recovery Image |
+| Supported Image Types     |
+|---------------------------|
+| Android Boot Image        |
+| Android Recovery Image    |
 | Android Vendor_boot Image |
-| Erofs  |
-| Ext4  |
-| F2fs(Linux Version)  |
-| Romfs  |
+| Erofs                     |
+| Ext4                      |
+| F2fs(Linux Version)       |
+| Romfs                     |
+| Payload                   |
 ## Supported File Types
 | Supported File Types |
 |----------------------|
