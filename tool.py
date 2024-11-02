@@ -27,7 +27,7 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
-
+from romfs_parse import RomfsParse
 from Magisk import Magisk_patch
 
 
@@ -3796,7 +3796,6 @@ def unpack(chose, form: str = '') -> bool:
                     if wjm.endswith('_b.img'):
                         if os.path.getsize(work + wjm) == 0:
                             os.remove(work + wjm)
-
             if (file_type := gettype(work + i + ".img")) == "ext":
                 with open(work + i + ".img", 'rb+') as e:
                     mount = ext4.Volume(e).get_mount_point
@@ -3813,6 +3812,9 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(work + i + ".img")
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
+            if file_type == 'romfs':
+                fs = RomfsParse(ProjectManager.current_work_path() + i + ".img")
+                fs.extract(work)
             if file_type == "erofs":
                 if call(exe=['extract.erofs', '-i', os.path.join(ProjectManager.current_work_path(), i + '.img'), '-o',
                              work,
