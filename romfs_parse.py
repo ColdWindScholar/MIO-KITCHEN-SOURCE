@@ -175,8 +175,3 @@ class RomfsParse:
     def __repr__(self):
         return f"(Romfs, volume_name = {self.volume_name}, size = {self.size}, nodes_number = {self.nodes})"
 
-
-fs = RomfsParse(r"app.bin")
-fs.extract()
-print(fs)
-
