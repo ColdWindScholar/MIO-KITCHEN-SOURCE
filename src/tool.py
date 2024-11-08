@@ -4163,7 +4163,7 @@ def dndfile(files):
 class ProjectMenuUtils(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
-        self.combobox = None
+        self.combobox: ttk.Combobox = None
         self.pack(padx=5, pady=5)
 
     def gui(self):
@@ -4421,7 +4421,6 @@ class UnpackGui(ttk.LabelFrame):
         self.lsg.clear()
         work = ProjectManager.current_work_path()
         if not ProjectManager.exist():
-            win.message_pop(lang.warn1)
             return False
         if self.fm.get() == 'payload':
             if os.path.exists(work + "payload.bin"):
