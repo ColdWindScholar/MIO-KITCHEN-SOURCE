@@ -2908,9 +2908,9 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
             print(lang.text59 % (work + "super.img"))
             if del_ == 1:
                 for img in lb:
-                    if os.path.exists(work + img + ".img"):
+                    if os.path.exists(f"{work}{img}.img"):
                         try:
-                            os.remove(work + img + ".img")
+                            os.remove(f"{work}{img}.img")
                         except Exception:
                             logging.exception('Bugs')
         else:
