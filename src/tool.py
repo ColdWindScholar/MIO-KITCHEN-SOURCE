@@ -111,7 +111,7 @@ try:
 except ImportError:
     imp = None
 try:
-    from pycase import ensure_dir_case_sensitive
+    from .pycase import ensure_dir_case_sensitive
 except ImportError:
     def ensure_dir_case_sensitive(*x):
         print(f'Cannot sensitive {x}, Not Supported')
