@@ -15,7 +15,6 @@
 # limitations under the License.
 import os
 import platform
-import platform_machine_fixes
 import shutil
 import zipfile
 from platform import system
@@ -40,7 +39,7 @@ elif ostype == 'Darwin':
         print("Tkinter IS not exist!\nThe Build may not Work!")
 else:
     name = 'MIO-KITCHEN-win.zip'
-from tool_tester import test_main, Test
+from src.tool_tester import test_main, Test
 
 if Test:
     test_main(exit=False)
