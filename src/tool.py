@@ -4184,7 +4184,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
     def listdir(self):
         array = []
         for f in os.listdir(settings.path + os.sep + "."):
-            if os.path.isdir(settings.path + os.sep + f) and f not in  ['bin', 'pyaxmlparser'] and not f.startswith('.'):
+            if os.path.isdir(settings.path + os.sep + f) and f not in  ['bin', 'pyaxmlparser', 'src'] and not f.startswith('.'):
                 array.append(f)
         self.combobox["value"] = array
         if not array:
