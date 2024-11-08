@@ -2891,7 +2891,11 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
             command += ['--partition', f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a", '--image', f'{part}_a={work + part}.img']
         command += ["--group", f"{dbfz.get()}_b:{size.get()}"]
         for part in lb:
-            command += ['--partition', f"{part}_b:{attrib}:0:{dbfz.get()}_b"]
+            if not os.path.exists(f"{work + part}_b.img"):
+                command += ['--partition', f"{part}_b:{attrib}:0:{dbfz.get()}_b"]
+            else:
+                command += ['--partition', f"{part}_b:{attrib}:{os.path.getsize(work + part + '_b.img')}:{dbfz.get()}_b",
+                            '--image', f'{part}_b={work + part}_b.img']
         if set_.get() == 2:
             command+=["--virtual-ab"]
     if sparse.get() == 1:
