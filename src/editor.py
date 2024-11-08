@@ -20,7 +20,7 @@ from tkinter.ttk import Button
 
 import pygments.lexers
 from chlorophyll import CodeView
-from utils import cz, gettype, lang
+from .utils import cz, gettype, lang
 
 
 class PythonEditor(tk.Frame):

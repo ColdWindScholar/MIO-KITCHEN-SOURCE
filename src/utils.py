@@ -25,10 +25,10 @@ from random import randint, choice
 from threading import Thread
 from lzma import LZMADecompressor
 import tarfile
-import blockimgdiff
-import sparse_img
-import update_metadata_pb2 as um
-from lpunpack import SparseImage
+from . import blockimgdiff
+from . import sparse_img
+from . import update_metadata_pb2 as um
+from .lpunpack import SparseImage
 
 DataImage = blockimgdiff.DataImage
 

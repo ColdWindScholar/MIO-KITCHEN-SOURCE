@@ -26,7 +26,7 @@ from tempfile import mkstemp
 from threading import Lock, Thread
 from collections import deque, OrderedDict
 from hashlib import sha1
-from rangelib import RangeSet
+from .rangelib import RangeSet
 
 __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
 

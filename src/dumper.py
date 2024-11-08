@@ -9,7 +9,7 @@ from multiprocessing import cpu_count
 
 import zstandard
 
-import update_metadata_pb2 as um
+from . import update_metadata_pb2 as um
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 

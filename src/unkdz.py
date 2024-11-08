@@ -22,8 +22,7 @@ from __future__ import print_function
 
 import os
 from binascii import b2a_hex
-
-import kdz
+from . import kdz
 
 
 # our tools are in "libexec"

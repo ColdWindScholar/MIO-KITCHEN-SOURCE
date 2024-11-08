@@ -27,15 +27,15 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
-from romfs_parse import RomfsParse
-from Magisk import Magisk_patch
+from .romfs_parse import RomfsParse
+from .Magisk import Magisk_patch
 
 
 try:
     from pyaxmlparser import APK
 except:
     APK = print
-from unkdz import KDZFileTools
+from .unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
     try:
@@ -57,7 +57,7 @@ from tkinter import ttk
 from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
-from tkinterdnd2_build_in import Tk, DND_FILES
+from .tkinterdnd2_build_in import Tk, DND_FILES
 from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
@@ -67,8 +67,8 @@ from requests import ConnectTimeout, HTTPError
 import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
-from dumper import Dumper
-from utils import lang
+from .dumper import Dumper
+from .utils import lang
 
 if os.name == 'nt':
     from ctypes import windll
@@ -82,28 +82,28 @@ if sys.version_info.major == 3:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
-import imgextractor
-import lpunpack
-import mkdtboimg
-import ozipdecrypt
-import splituapp
-import ofp_qc_decrypt
-import ofp_mtk_decrypt
-import editor
-import opscrypto
-import images
-import extra
-import AI_engine
-import ext4
-from config_parser import ConfigParser
-import utils
+from . import imgextractor
+from . import lpunpack
+from . import mkdtboimg
+from . import ozipdecrypt
+from . import splituapp
+from . import ofp_qc_decrypt
+from . import ofp_mtk_decrypt
+from . import editor
+from . import opscrypto
+from . import images
+from . import extra
+from . import AI_engine
+from . import ext4
+from .config_parser import ConfigParser
+from . import utils
 if os.name == 'nt':
-    from sv_ttk_fixes import *
-from extra import fspatch, re, contextpatch
-from utils import cz, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
-from controls import ListBox, ScrollFrame
-from undz import DZFileTools
-from selinux_audit_allow import main as selinux_audit_allow
+    from .sv_ttk_fixes import *
+from .extra import fspatch, re, contextpatch
+from .utils import cz, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from .controls import ListBox, ScrollFrame
+from .undz import DZFileTools
+from .selinux_audit_allow import main as selinux_audit_allow
 import logging
 
 try:

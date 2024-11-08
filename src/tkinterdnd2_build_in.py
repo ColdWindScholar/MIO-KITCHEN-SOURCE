@@ -18,7 +18,7 @@ CF_HDROP = 'CF_HDROP'
 FileGroupDescriptor = 'FileGroupDescriptor - FileContents'# ??
 FileGroupDescriptorW = 'FileGroupDescriptorW - FileContents'# ??
 
-import TkinterDnD
-from TkinterDnD import Tk
+from . import TkinterDnD
+from .TkinterDnD import Tk
 
 

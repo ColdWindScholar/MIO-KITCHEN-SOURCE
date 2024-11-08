@@ -17,7 +17,7 @@ import struct
 import sys
 from bisect import bisect_right
 
-import rangelib
+from . import rangelib
 
 
 class SparseImage:

@@ -13,8 +13,8 @@
 # limitations under the License.
 from difflib import SequenceMatcher
 from tkinter import Toplevel, ttk
-from utils import jzxs
-from Document_Library import library
+from .utils import jzxs
+from .Document_Library import library
 
 
 def suggest(string: str = '', language='cn', ok='ok'):

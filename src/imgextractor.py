@@ -15,10 +15,10 @@
 import os
 import re
 import struct
-from posix import symlink
+from .posix import symlink
 from timeit import default_timer as dti
-import ext4
-from utils import simg2img
+from . import ext4
+from .utils import simg2img
 
 
 class Extractor:

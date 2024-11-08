@@ -13,9 +13,9 @@
 # limitations under the License.
 import os
 import re
-from posix import symlink
-import contextpatch
-import fspatch
+from .posix import symlink
+from . import contextpatch
+from . import fspatch
 
 
 class updaterutil:

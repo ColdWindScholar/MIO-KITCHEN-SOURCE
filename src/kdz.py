@@ -21,7 +21,7 @@ Copyright (C) 2013 IOMonster (thecubed on XDA)
 
 from collections import OrderedDict
 
-import dz
+from . import dz
 
 
 class KDZFile(dz.DZStruct):

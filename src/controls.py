@@ -13,7 +13,7 @@
 # limitations under the License.
 from tkinter.ttk import Frame, Scrollbar, Checkbutton, Separator
 from tkinter import Canvas, Tk, X, BooleanVar, HORIZONTAL, TclError
-from utils import lang
+from .utils import lang
 
 
 class ListBox(Frame):

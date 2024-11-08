@@ -23,7 +23,7 @@ Tk window and all its descendants.
 """
 
 import tkinter
-from utils import prog_path
+from .utils import prog_path
 TkdndVersion = None
 
 def _require(tkroot):
