@@ -3911,7 +3911,7 @@ def info_win(text: str, ok: str = lang.ok):
     ask.wait_window()
 
 
-class Dirsize:
+class GetFolderSize:
     # get-command
     # 1 - return True value of dir size
     # 2 - return Rsize value of dir size
@@ -4023,7 +4023,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     if not size:
-        size = Dirsize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
+        size = GetFolderSize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
         ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
@@ -4034,7 +4034,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
 @animation
 def make_f2fs(name: str, work: str, work_output, UTC=None):
     print(lang.text91 % name)
-    size = Dirsize(work + name, 1, 1).rsize_v
+    size = GetFolderSize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
     size_f2fs = (54 * 1024 * 1024) + size
     size_f2fs = int(size_f2fs * 1.15) + 1
@@ -4057,7 +4057,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
 
 def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
     print(lang.text91 % name)
-    size = Dirsize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
+    size = GetFolderSize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
     if not UTC:
         UTC = int(time.time())
@@ -4631,10 +4631,6 @@ class FormatConversion(ttk.LabelFrame):
                         except Exception:
                             logging.exception('Bugs')
         print(lang.text8)
-
-
-project_menu: ProjectMenuUtils
-unpackg: UnpackGui
 
 
 def init_verify():
