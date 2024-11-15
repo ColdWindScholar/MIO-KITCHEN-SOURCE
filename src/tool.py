@@ -768,10 +768,7 @@ class Tool(Tk):
                 a = Debugger()
                 a.lift()
                 a.focus_force()
-            color1 = hex(randrange(16, 256))[2:]
-            color2 = hex(randrange(16, 256))[2:]
-            color3 = hex(randrange(16, 256))[2:]
-            return f"#{color1}{color2}{color3}"
+            return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
 
         def update_angle():
             self.rotate_angle -= 10
@@ -1469,8 +1466,7 @@ def pack_dtbo() -> bool:
     print(f"{lang.text7}:dtbo.img")
     list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
              f.startswith("dtbo.")]
-    list_ = sorted(list_, key=lambda x: int(x.rsplit('.')[1]))
-    mkdtboimg.create_dtbo(ProjectManager.current_work_output_path() + "dtbo.img", list_, 4096)
+    mkdtboimg.create_dtbo(ProjectManager.current_work_output_path() + "dtbo.img", sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
     rmdir(work + "dtbo")
     print(lang.text8)
     return True
@@ -1484,22 +1480,18 @@ def logo_dump(bn: str = 'logo'):
     re_folder(work + bn)
     utils.LogoDumper(logo, work + bn).unpack()
 
-
-def calculate_md5_file(file_path):
-    md5 = hashlib.md5()
+def hashlib_calculate(file_path, method:str):
+    if not hasattr(hashlib, method):
+        print(f"Warn, The algorithm {method} not exist in hashlib!")
+        return 1
+    algorithm = getattr(hashlib, method)()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
-            md5.update(chunk)
-    return md5.hexdigest()
+            algorithm.update(chunk)
+    return algorithm.hexdigest()
 
-
-def calculate_sha256_file(file_path):
-    sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            sha256.update(chunk)
-    return sha256.hexdigest()
-
+calculate_sha256_file = lambda file_path: hashlib_calculate(file_path, 'sha256')
+calculate_md5_file = lambda file_path: hashlib_calculate(file_path, 'md5')
 
 @animation
 def logo_pack(origin_logo=None) -> int:
