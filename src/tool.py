@@ -68,7 +68,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from .dumper import Dumper
-from .utils import lang
+from .utils import lang, LogoDumper
 
 if os.name == 'nt':
     from ctypes import windll
@@ -1471,14 +1471,15 @@ def pack_dtbo() -> bool:
     print(lang.text8)
     return True
 
-
 @animation
-def logo_dump(bn: str = 'logo'):
-    if not (logo := findfile(f'{bn}.img', work := ProjectManager.current_work_path())):
-        win.message_pop(lang.warn3.format(bn))
+def logo_dump(file_path, output:str = None, output_name:str  ="logo"):
+    if output is None:
+        output = ProjectManager.current_work_path()
+    if not os.path.exists(file_path):
+        win.message_pop(lang.warn3.format(output_name))
         return False
-    re_folder(work + bn)
-    utils.LogoDumper(logo, work + bn).unpack()
+    re_folder(output + output_name)
+    LogoDumper(file_path, output + output_name).unpack()
 
 def hashlib_calculate(file_path, method:str):
     if not hasattr(hashlib, method):
@@ -3763,7 +3764,7 @@ def unpack(chose, form: str = '') -> bool:
                 except AssertionError:
                     logging.exception('Bugs')
                 else:
-                    logo_dump(i)
+                    logo_dump(work + i + ".img", output_name=i)
             if gettype(work + i + ".img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{i}")
                 utils.Vbpatch(work + i + ".img").disavb()
