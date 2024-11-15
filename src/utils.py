@@ -469,10 +469,7 @@ class LangUtils:
 
 lang = LangUtils()
 
-
-def u64(x):
-    return struct.unpack('>Q', x)[0]
-
+u64 = lambda x:struct.unpack('>Q', x)[0]
 
 def payload_reader(payloadfile):
     """

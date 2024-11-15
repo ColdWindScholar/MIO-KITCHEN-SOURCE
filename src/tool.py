@@ -1546,7 +1546,7 @@ class IconGrid(tk.Frame):
         try:
             self.apps.get(id_).destroy()
         except (TclError, Exception):
-            pass
+            logging.exception("Bugs")
 
     def on_frame_configure(self):
         self.scrollable_frame.update_idletasks()
