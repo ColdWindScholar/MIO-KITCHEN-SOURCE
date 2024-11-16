@@ -824,7 +824,7 @@ class Tool(Tk):
         ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
         lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
                            values=[str(i.rsplit('.', 1)[0]) for i in
-                                   os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
+                                   os.listdir(f"{cwd_path}/bin/languages")])
         ###
         ttk.Label(sf6, text=lang.cache_size).pack(side='left', padx=10, pady=10)
         slo2 = ttk.Label(sf6, text=hum_convert(get_cache_size()), wraplength=200)
@@ -1192,7 +1192,7 @@ class Welcome(ttk.Frame):
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
                             values=[i.rsplit('.', 1)[0] for i in
-                                    os.listdir(cwd_path + os.sep + "bin" + os.sep + "languages")])
+                                    os.listdir(f"{cwd_path}/bin/languages")])
         lb3_.pack(padx=10, pady=10, side='top', fill=BOTH)
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
@@ -1203,13 +1203,13 @@ class Welcome(ttk.Frame):
 
         def load_license():
             te.delete(1.0, tk.END)
-            with open(os.path.join(cwd_path, "bin", "licenses", lce.get() + ".txt"), 'r',
+            with open(f"{cwd_path}/bin/licenses/{lce.get()}.txt", 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
 
         self.reframe()
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
-                          values=[i.rsplit('.')[0] for i in os.listdir(cwd_path + "/bin/licenses") if
+                          values=[i.rsplit('.')[0] for i in os.listdir(f"{cwd_path}/bin/licenses") if
                                   i != 'private.txt'])
         lb.bind('<<ComboboxSelected>>', lambda *x: load_license())
         lb.current(0)
@@ -1383,10 +1383,10 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         print(lang.warn3.format(bn))
         return
     re_folder(work + bn)
-    re_folder(work + bn + os.sep + "dtbo")
-    re_folder(work + bn + os.sep + "dts")
+    re_folder(f"{work}{bn}/dtbo")
+    re_folder(work + bn + "/dts")
     try:
-        mkdtboimg.dump_dtbo(dtboimg, work + bn + os.sep + "dtbo" + os.sep + "dtbo")
+        mkdtboimg.dump_dtbo(dtboimg, work + bn + "/dtbo/dtbo")
     except Exception as e:
         print(lang.warn4.format(e))
         return
@@ -1394,7 +1394,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
-                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + os.sep + 'dtbo' + os.sep + dtbo, '-o',
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + '/dtbo/' +  dtbo, '-o',
                      os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
                 out=1)
     print(lang.text5)
@@ -1402,17 +1402,17 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         os.remove(dtboimg)
     except (Exception, BaseException):
         logging.exception('Bugs')
-    rmdir(work + "dtbo" + os.sep + "dtbo")
+    rmdir(work + "dtbo/dtbo")
 
 
 @animation
 def pack_dtbo() -> bool:
     work = ProjectManager.current_work_path()
-    if not os.path.exists(work + "dtbo" + os.sep + "dts") or not os.path.exists(work + "dtbo"):
+    if not os.path.exists(work + "dtbo/dts") or not os.path.exists(work + "dtbo"):
         print(lang.warn5)
         return False
-    re_folder(work + "dtbo" + os.sep + "dtbo")
-    for dts in os.listdir(work + "dtbo" + os.sep + "dts"):
+    re_folder(work + "dtbo/dtbo")
+    for dts in os.listdir(work + "dtbo/dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
             call(
@@ -1420,7 +1420,7 @@ def pack_dtbo() -> bool:
                      os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
                 out=1)
     print(f"{lang.text7}:dtbo.img")
-    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo" + os.sep + "dtbo") if
+    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo/dtbo") if
              f.startswith("dtbo.")]
     mkdtboimg.create_dtbo(ProjectManager.current_work_output_path() + "dtbo.img", sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
     rmdir(work + "dtbo")
@@ -1537,7 +1537,7 @@ class ModuleManager:
             return id_
 
     def get_info(self, id_: str, item: str) -> str:
-        info_file = self.module_dir + os.sep + id_ + os.sep + 'info.json'
+        info_file = self.module_dir + f'/{id_}/info.json'
         if not os.path.exists(info_file):
             return ''
         with open(info_file, 'r', encoding='UTF-8') as f:
@@ -1788,7 +1788,7 @@ class ModuleManager:
             self.destroy()
             if not os.path.exists(self.module_dir + os.sep + iden):
                 os.makedirs(self.module_dir + os.sep + iden)
-            with open(self.module_dir + os.sep + iden + os.sep + "info.json", 'w+', encoding='utf-8',
+            with open(self.module_dir + f"/{iden}/info.json", 'w+', encoding='utf-8',
                       newline='\n') as js:
                 json.dump(data, js, ensure_ascii=False, indent=4)
             list_pls_plugin()
@@ -2589,9 +2589,9 @@ class PackHybridRom:
             return
         if os.path.exists(dir_ + 'META-INF'):
             rmdir(dir_ + 'META-INF')
-        zipfile.ZipFile(cwd_path + os.sep + "bin" + os.sep + "extra_flash.zip").extractall(dir_)
+        zipfile.ZipFile(f"{cwd_path}/bin/extra_flash.zip").extractall(dir_)
         right_device = input_(lang.t26, 'olive')
-        with open(dir_ + "bin" + os.sep + "right_device", 'w', encoding='gbk') as rd:
+        with open(dir_ + "bin/right_device", 'w', encoding='gbk') as rd:
             rd.write(right_device + "\n")
         with open(
                 dir_ + 'META-INF/com/google/android/update-binary',
@@ -3001,21 +3001,21 @@ def jboot(bn: str = 'boot'):
         os.chdir(cwd_path)
         rmtree(work + bn)
         return
-    if os.access(work + bn + os.sep + "ramdisk.cpio", os.F_OK):
-        comp = gettype(work + bn + os.sep + "ramdisk.cpio")
+    if os.access(work + bn + "/ramdisk.cpio", os.F_OK):
+        comp = gettype(work + bn + "/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
-        with open(work + bn + os.sep + "comp", "w", encoding='utf-8') as f:
+        with open(work + bn + "/comp", "w", encoding='utf-8') as f:
             f.write(comp)
         if comp != "unknown":
-            os.rename(work + bn + os.sep + "ramdisk.cpio",
-                      work + bn + os.sep + "ramdisk.cpio.comp")
-            if call(["magiskboot", "decompress", work + bn + os.sep + 'ramdisk.cpio.comp',
-                     work + bn + os.sep + 'ramdisk.cpio']) != 0:
+            os.rename(work + bn + "/ramdisk.cpio",
+                      work + bn + "/ramdisk.cpio.comp")
+            if call(["magiskboot", "decompress", work + bn + '/ramdisk.cpio.comp',
+                     work + bn + '/ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
-        if not os.path.exists(work + bn + os.sep + "ramdisk"):
-            os.mkdir(work + bn + os.sep + "ramdisk")
-        os.chdir(work + bn + os.sep)
+        if not os.path.exists(work + bn +  "/ramdisk"):
+            os.mkdir(work + bn +  "/ramdisk")
+        os.chdir(work + bn)
         print("Unpacking Ramdisk...")
         call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
         os.chdir(cwd_path)
@@ -3036,11 +3036,11 @@ def dboot(nm: str = 'boot'):
                     settings.tool_bin).replace(
         '\\', "/")
 
-    if os.path.isdir(work + nm + os.sep + "ramdisk"):
-        os.chdir(work + nm + os.sep + "ramdisk")
+    if os.path.isdir(work + nm + "/ramdisk"):
+        os.chdir(work + nm + "/ramdisk")
         call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
-        os.chdir(work + nm + os.sep)
-        with open(work + nm + os.sep + "comp", "r", encoding='utf-8') as compf:
+        os.chdir(work + nm)
+        with open(work + nm +  "/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
         if comp != "unknown":
@@ -3063,12 +3063,12 @@ def dboot(nm: str = 'boot'):
         print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
             flag = "-n"
-    os.chdir(work + nm + os.sep)
+    os.chdir(work + nm)
     if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
     else:
         os.remove(work + f"{nm}.img")
-        os.rename(work + nm + os.sep + "new-boot.img", ProjectManager.current_work_output_path() + os.sep + f"{nm}.img")
+        os.rename(work + nm + "/new-boot.img", ProjectManager.current_work_output_path() + f"/{nm}.img")
         os.chdir(cwd_path)
         try:
             rmdir(work + nm)
@@ -3204,7 +3204,7 @@ class Packxx(Toplevel):
                 side='left', padx=5, pady=5)
 
     def verify(self):
-        parts_dict = JsonEdit(ProjectManager.current_work_path() + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit(ProjectManager.current_work_path() + "config/parts_info").read()
         for i in self.lg:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
@@ -3243,8 +3243,8 @@ class Packxx(Toplevel):
                                     continue
                                 if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
                                     ext4_size_value = max(ext4_size_value, int(_i[2]))
-                    elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
-                        with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as size_f:
+                    elif os.path.exists(work + f"config/{dname}_size.txt"):
+                        with open(work + f"config/{dname}_size.txt", encoding='utf-8') as size_f:
                             try:
                                 ext4_size_value = int(size_f.read().strip())
                             except ValueError:
@@ -3274,7 +3274,7 @@ class Packxx(Toplevel):
         if not ProjectManager.exist():
             win.message_pop(lang.warn1, "red")
             return False
-        parts_dict = JsonEdit((work := ProjectManager.current_work_path()) + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit((work := ProjectManager.current_work_path()) + "config/parts_info").read()
         for i in self.lg:
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
@@ -3294,10 +3294,10 @@ class Packxx(Toplevel):
                     except Exception:
                         logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
-                utils.qc(work + "config" + os.sep + dname + "_fs_config")
+                utils.qc(work + f"config/{dname}_fs_config")
                 if settings.contextpatch == "1":
-                    contextpatch.main(work + dname, work + "config" + os.sep + dname + "_file_contexts")
-                utils.qc(work + "config" + os.sep + dname + "_file_contexts")
+                    contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
+                utils.qc(work + f"config/{dname}_file_contexts")
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
@@ -3352,8 +3352,8 @@ class Packxx(Toplevel):
                                         continue
                                     if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
                                         ext4_size_value = max(ext4_size_value, int(_i[2]))
-                        elif os.path.exists(work + "config" + os.sep + dname + "_size.txt"):
-                            with open(work + "config" + os.sep + dname + "_size.txt", encoding='utf-8') as f:
+                        elif os.path.exists(work + f"config/{dname}_size.txt"):
+                            with open(work + f"config/{dname}_size.txt", encoding='utf-8') as f:
                                 try:
                                     ext4_size_value = int(f.read().strip())
                                 except ValueError:
@@ -3429,13 +3429,13 @@ def input_(title: str = lang.text76, text: str = "") -> str:
 
 def script2fs(path):
     if os.path.exists(os.path.join(path, "system", "app")):
-        if not os.path.exists(path + os.sep + "config"):
-            os.makedirs(path + os.sep + "config")
-        extra.script2fs_context(findfile("updater-script", path + os.sep + "META-INF"), path + os.sep + "config", path)
+        if not os.path.exists(path + "/config"):
+            os.makedirs(path + "/config")
+        extra.script2fs_context(findfile("updater-script", path + "/META-INF"), path + "/config", path)
         json_ = JsonEdit(os.path.join(path, "config", "parts_info"))
         parts = json_.read()
         for v in os.listdir(path):
-            if os.path.exists(path + os.sep + "config" + os.sep + v + "_fs_config"):
+            if os.path.exists(path + f"/config/{v}_fs_config"):
                 if v not in parts.keys():
                     parts[v] = 'ext'
         json_.write(parts)
@@ -3556,7 +3556,7 @@ def unpackrom(ifile) -> None:
             os.mkdir(folder)
         except Exception as e:
             win.message_pop(str(e))
-        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + os.sep + 'Source'))
+        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source'))
         project_menu.listdir()
         current_project_name.set(os.path.basename(folder))
         if settings.auto_unpack == '1':
@@ -3621,7 +3621,7 @@ def unpack(chose, form: str = '') -> bool:
     elif not os.path.exists(ProjectManager.current_work_path()):
         win.message_pop(lang.warn1, "red")
         return False
-    json_ = JsonEdit((work := ProjectManager.current_work_path()) + "config" + os.sep + "parts_info")
+    json_ = JsonEdit((work := ProjectManager.current_work_path()) + "config/parts_info")
     parts = json_.read()
     if not chose:
         return False
@@ -4119,7 +4119,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
     def listdir(self):
         array = []
-        for f in os.listdir(settings.path + os.sep + "."):
+        for f in os.listdir(settings.path):
             if os.path.isdir(settings.path + os.sep + f) and f not in  ['bin', 'pyaxmlparser', 'src'] and not f.startswith('.'):
                 array.append(f)
         self.combobox["value"] = array
@@ -4282,7 +4282,7 @@ class UnpackGui(ttk.LabelFrame):
         if not os.path.exists(work := ProjectManager.current_work_path()):
             win.message_pop(lang.warn1)
             return False
-        parts_dict = JsonEdit(work + "config" + os.sep + "parts_info").read()
+        parts_dict = JsonEdit(work + "config/parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(f"{folder} [{parts_dict.get(folder, 'Unknown')}]", folder)
