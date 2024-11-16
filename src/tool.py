@@ -734,7 +734,6 @@ class Tool(Tk):
         Label(self.tab4,
               text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
               font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
-        # Label(self.tab4,text=lang.text127,font=('楷书', 12), fg='#ff8800').pack(padx=10, pady=10)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
         Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
@@ -1135,7 +1134,6 @@ def error(code, desc="unknown error"):
 class Welcome(ttk.Frame):
     def __init__(self):
         super().__init__(master=win)
-        # self.config(text=lang.text135)
         self.pack(fill=BOTH, expand=True)
         self.frame = None
         oobe = int(settings.oobe)
@@ -1354,8 +1352,7 @@ settings.load()
 
 
 def re_folder(path, quiet=False):
-    if os.path.exists(path):
-        rmdir(path, quiet)
+    if os.path.exists(path): rmdir(path, quiet)
     os.makedirs(path, exist_ok=True)
 
 
@@ -1370,13 +1367,14 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     try:
         mkdtboimg.dump_dtbo(dtboimg, work + bn + "/dtbo/dtbo")
     except Exception as e:
+        logging.exception("Bugs")
         print(lang.warn4.format(e))
         return
     for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
-                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', work + bn + '/dtbo/' +  dtbo, '-o',
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', f'{work}{bn}/dtbo/{dtbo}', '-o',
                      os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
                 out=1)
     print(lang.text5)
@@ -1398,7 +1396,7 @@ def pack_dtbo() -> bool:
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
             call(
-                exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', f"{os.path.join(work, 'dtbo', 'dts', dts)}", '-o',
+                exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', os.path.join(work, 'dtbo', 'dts', dts), '-o',
                      os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
                 out=1)
     print(f"{lang.text7}:dtbo.img")
@@ -1509,8 +1507,9 @@ class ModuleManager:
         DependsMissing = 2
         IsBroken = 3
 
+
     def get_info(self, id_: str, item: str) -> str:
-        info_file = self.module_dir + f'/{id_}/info.json'
+        info_file = f'{self.module_dir}/{id_}/info.json'
         if not os.path.exists(info_file):
             return ''
         with open(info_file, 'r', encoding='UTF-8') as f:
@@ -1598,12 +1597,18 @@ class ModuleManager:
             print(lang.warn8)
         return 0
 
-    def install(self, mpk):
+    def check_mpk(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return self.errorcodes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
             if 'info' not in f.namelist():
                 return self.errorcodes.IsBroken, ''
+        return self.errorcodes.Normal, ''
+
+    def install(self, mpk):
+        check_mpk_result = self.check_mpk(mpk)
+        if check_mpk_result[0] != self.errorcodes.Normal:
+            return check_mpk_result
         mconf = ConfigParser()
         with zipfile.ZipFile(mpk) as f:
             with f.open('info') as info_file:
