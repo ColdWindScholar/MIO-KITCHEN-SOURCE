@@ -106,6 +106,9 @@ except ImportError:
     def ensure_dir_case_sensitive(*x):
         print(f'Cannot sensitive {x}, Not Supported')
 
+if os.name == 'nt':
+    os.putenv = lambda name, value: ctypes.windll.kernel32.SetEnvironmentVariableW(name, value)
+    os.environ.__setitem__ = lambda name, value: ctypes.windll.kernel32.SetEnvironmentVariableW(name, value)
 cwd_path = utils.prog_path
 
 
