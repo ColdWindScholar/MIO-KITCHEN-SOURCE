@@ -1529,7 +1529,6 @@ class ModuleManager:
 
         name = self.get_name(id_)
         script_path = self.module_dir + os.sep + value + os.sep
-        file = ''
         with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
             data = json.load(f)
             for n in data['depend'].split():
@@ -1541,38 +1540,24 @@ class ModuleManager:
                 script_path + "main.json") else None
             if not os.path.exists(temp):
                 re_folder(temp)
-            if not file:
-                file = temp + v_code()
-                while os.path.exists(file):
-                    file = temp + v_code()
             if os.path.exists(script_path + "main.sh"):
-                with open(file, "w", encoding='UTF-8', newline="\n") as f:
                     if values:
                         for va in values.gavs.keys():
                             if gva := values.gavs[va].get():
-                                f.write(f"export {va}='{gva}'\n")
+                                os.environ[va] = gva
                         values.gavs.clear()
-                    f.write('export tool_bin="{}"\n'.format(
-                        settings.tool_bin.replace(
-                            '\\',
-                            '/')))
-                    f.write(f'export version="{settings.version}"\n')
-                    f.write(f'export language="{settings.language}"\n')
-                    f.write(f'export bin="{script_path.replace(os.sep, "/")}"\n')
-                    f.write('export moddir="{}"\n'.format(self.module_dir.replace('\\', '/')))
-                    f.write('export project_output="{}"\n'.format(ProjectManager.current_work_output_path()))
-                    f.write(
-                        "export project='{}'\nsource $1".format(
-                            ProjectManager.current_work_path()))
+                    os.environ['tool_bin'] = settings.tool_bin.replace('\\', '/')
+                    os.environ['version'] = settings.version
+                    os.environ['language'] = settings.language
+                    os.environ['bin'] = script_path.replace(os.sep, "/")
+                    os.environ['moddir'] = self.module_dir.replace('\\', '/')
+                    os.environ['project_output'] = ProjectManager.current_work_output_path()
+                    os.environ['project'] = ProjectManager.current_work_path()
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
-            if os.path.exists(file) and os.path.exists(script_path + "main.sh"):
+            if os.path.exists(script_path + "main.sh"):
                 shell = 'ash' if os.name == 'posix' else 'bash'
-                call(['busybox', shell, file, (script_path + 'main.sh').replace(os.sep, '/')])
-                try:
-                    os.remove(file)
-                except (Exception, BaseException):
-                    logging.exception('Bugs')
+                call(['busybox', shell, os.path. join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/'), (script_path + 'main.sh').replace(os.sep, '/')])
         elif os.path.exists(script_path + "main.py") and imp:
             try:
                 module = imp.load_source('module', script_path + "main.py")
