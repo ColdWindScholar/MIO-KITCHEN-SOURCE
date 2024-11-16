@@ -676,10 +676,10 @@ class Tool(Tk):
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(pady=10, fill=Y, expand=True, side="bottom")
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(padx=10, pady=10)
         MpkMan().gui()
         if settings.custom_system == 'Android' and os.geteuid() != 0:
             ask_win(lang.warn16, wait=False)
