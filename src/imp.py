@@ -31,62 +31,11 @@ PKG_DIRECTORY = 5
 C_BUILTIN = 6
 PY_FROZEN = 7
 
-
-def new_module(name):
-    """**DEPRECATED**
-
-    Create a new module.
-
-    The module is not entered into sys.modules.
-
-    """
-    return types.ModuleType(name)
-
-
-def get_magic():
-    """**DEPRECATED**
-
-    Return the magic number for .pyc files.
-    """
-    return util.MAGIC_NUMBER
-
-
-def get_tag():
-    """Return the magic tag for .pyc files."""
-    return sys.implementation.cache_tag
-
-
-def cache_from_source(path, debug_override=None):
-    """**DEPRECATED**
-
-    Given the path to a .py file, return the path to its .pyc file.
-
-    The .py file does not need to exist; this simply returns the path to the
-    .pyc file calculated as if the .py file were imported.
-
-    If debug_override is not None, then it must be a boolean and is used in
-    place of sys.flags.optimize.
-
-    If sys.implementation.cache_tag is None then NotImplementedError is raised.
-
-    """
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        return util.cache_from_source(path, debug_override)
-
-
-def source_from_cache(path):
-    """**DEPRECATED**
-
-    Given the path to a .pyc. file, return the path to its .py file.
-
-    The .pyc file does not need to exist; this simply returns the path to
-    the .py file calculated to correspond to the .pyc file.  If path does
-    not conform to PEP 3147 format, ValueError will be raised. If
-    sys.implementation.cache_tag is None then NotImplementedError is raised.
-
-    """
-    return util.source_from_cache(path)
+new_module = lambda name:types.ModuleType(name)
+get_magic  = lambda : util.MAGIC_NUMBER
+get_tag = lambda : sys.implementation.cache_tag
+cache_from_source = lambda path, debug_override=None:util.cache_from_source(path, debug_override)
+source_from_cache = lambda path: util.source_from_cache(path)
 
 
 def get_suffixes():
@@ -286,17 +235,7 @@ def find_module(name, path=None):
     file = open(file_path, mode, encoding=encoding)
     return file, file_path, (suffix, mode, type_)
 
-
-def reload(module):
-    """**DEPRECATED**
-
-    Reload the module and return it.
-
-    The module must have been successfully imported before.
-
-    """
-    return importlib.reload(module)
-
+reload = lambda module:importlib.reload(module)
 
 def init_builtin(name):
     """**DEPRECATED**

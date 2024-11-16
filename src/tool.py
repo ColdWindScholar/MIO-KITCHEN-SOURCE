@@ -214,8 +214,6 @@ class LoadAnim:
 
         return call_func
 
-
-
 class DevNull:
     # Yes, As You Saw, It's a empty class.
     def __init__(self):...
@@ -678,10 +676,7 @@ class Tool(Tk):
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(side='bottom',
-                                                                                                    padx=10,
-                                                                                                    pady=5,
-                                                                                                    expand=True)
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(pady=10, fill=Y, expand=True)
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
@@ -857,12 +852,7 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sf4, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        sf1.pack(padx=10, pady=7, fill='both')
-        sf2.pack(padx=10, pady=7, fill='both')
-        sf3.pack(padx=10, pady=7, fill='both')
-        sf5.pack(padx=10, pady=7, fill='both')
-        sf6.pack(padx=10, pady=7, fill='both')
-        sf4.pack(padx=10, pady=7, fill='both')
+        for i in [sf1, sf2, sf3, sf5, sf6, sf4]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
         ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
