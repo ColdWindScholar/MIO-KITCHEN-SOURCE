@@ -693,11 +693,9 @@ class Tool(Tk):
         global kemiaojiang
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
-        kemiaojiang_label = Label(self.tab, image=kemiaojiang)
-        kemiaojiang_label.pack(side='left', padx=0, expand=True)
-        about_ = Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠\nWelcome To MIO-KITCHEN", justify='left',
-                       foreground='#87CEFA', font=(None, 12))
-        about_.pack(side='top', padx=5, pady=120, expand=True)
+        Label(self.tab, image=kemiaojiang).pack(side='left', padx=0, expand=True)
+        Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠\nWelcome To MIO-KITCHEN", justify='left',
+                       foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
 
 
     def tab6_content(self):
@@ -897,10 +895,7 @@ class Updater(Toplevel):
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         states.update_window = True
-        if settings.update_url:
-            self.update_url = settings.update_url
-        else:
-            self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+        self.update_url = settings.update_url if settings.update_url else 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.package_head = ''
         self.update_download_url = ''
         self.update_size = 0
@@ -991,10 +986,7 @@ class Updater(Toplevel):
         elif platform.system() == 'Linux':
             package += '-linux.zip'
         elif platform.system() == 'Darwin':
-            if platform.machine() == 'x86_64':
-                package += '-macos-intel.zip'
-            else:
-                package += '-macos.zip'
+            package += '-macos-intel.zip' if platform.machine() == 'x86_64' else '-macos.zip'
         for i in self.update_assets:
             if i.get('name') == package:
                 if platform.machine() in ['AMD64', 'X86_64', 'x86_64']:
@@ -1470,7 +1462,7 @@ class IconGrid(tk.Frame):
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.scrollable_frame.bind("<Configure>", lambda *x: self.on_frame_configure())
         # Bind mouse wheel event to scrollbar
-        self.master.bind_all("<MouseWheel>", self.on_mousewheel)
+        self.master.bind_all("<MouseWheel>", lambda event : self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units"))
 
     def add_icon(self, icon, id_, num=4):
         self.icons.append(icon)
@@ -1498,10 +1490,6 @@ class IconGrid(tk.Frame):
         self.scrollable_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
-    def on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-        # self.on_frame_configure()
-
 
 class ModuleManager:
     def __init__(self):
@@ -1512,19 +1500,14 @@ class ModuleManager:
         self.uninstall_gui.module_dir = self.module_dir
         self.MshParse.module_dir = self.module_dir
         self.errorcodes = self.ErrorCodes()
+        self.get_name = lambda id_:name if (name := self.get_info(id_, 'name')) else id_
+        self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
 
     class ErrorCodes(int):
         Normal = 0
         PlatformNotSupport = 1
         DependsMissing = 2
         IsBroken = 3
-
-    def get_name(self, id_) -> str:
-        name = self.get_info(id_, 'name')
-        if name:
-            return name
-        else:
-            return id_
 
     def get_info(self, id_: str, item: str) -> str:
         info_file = self.module_dir + f'/{id_}/info.json'
@@ -1614,9 +1597,6 @@ class ModuleManager:
         else:
             print(lang.warn8)
         return 0
-
-    def get_installed(self, id_) -> bool:
-        return os.path.exists(os.path.join(self.module_dir, id_))
 
     def install(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
@@ -2097,10 +2077,7 @@ class MpkMan(ttk.Frame):
                 finally:
                     continue
             if os.path.isdir(self.moduledir + os.sep + i):
-                if os.path.exists(os.path.join(self.moduledir, i, 'icon')):
-                    self.images_[i] = PhotoImage(open_img(os.path.join(self.moduledir, i, 'icon')).resize((70, 70)))
-                else:
-                    self.images_[i] = PhotoImage(data=images.none_byte)
+                self.images_[i] = PhotoImage(open_img(os.path.join(self.moduledir, i, 'icon')).resize((70, 70))) if os.path.exists(os.path.join(self.moduledir, i, 'icon')) else PhotoImage(data=images.none_byte)
                 data = JsonEdit(os.path.join(self.moduledir, i, "info.json")).read()
                 icon = tk.Label(self.pls.scrollable_frame,
                                 image=self.images_[i],
@@ -2307,12 +2284,7 @@ class Debugger(Toplevel):
 
     @staticmethod
     def settings():
-        def save():
-            if f.get():
-                settings.set_value(h.get(), f.get())
-            else:
-                read_value()
-
+        save = lambda : settings.set_value(h.get(), f.get()) if f.get() else read_value()
         def read_value():
             f.delete(0, tk.END)
             f.insert(0, getattr(settings, h.get()))
@@ -2445,10 +2417,7 @@ class MpkStore(Toplevel):
 
     def search_apps(self):
         for i in self.data:
-            if self.search.get() not in i.get('name'):
-                self.app_infos.get(i.get('id')).pack_forget()
-            else:
-                self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
+            self.app_infos.get(i.get('id')).pack_forget() if self.search.get() not in i.get('name') else self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
         self.canvas.yview_moveto(0.0)
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
@@ -2725,13 +2694,13 @@ class PackSuper(Toplevel):
                 if not i:
                     continue
                 i = i - 0.25
-                t = 1024 * 1024 * 1024 * i - size
+                t = (1024 ** 3) * i - size
                 if t < 0:
                     continue
                 if t < diff_size:
                     diff_size = t
                 else:
-                    size = i * 1024 * 1024 * 1024
+                    size = i * (1024 ** 3)
                     break
             self.supers.set(int(size))
             return False
@@ -2773,10 +2742,7 @@ class PackSuper(Toplevel):
                     self.selected = data[fir].get('parts', [])
                     selected = []
                     for i in self.selected:
-                        if i.endswith('_a') or i.endswith('_b'):
-                            selected.append(i[:-2])
-                        else:
-                            selected.append(i)
+                        selected.append(i[:-2]) if i.endswith('_a') or i.endswith('_b') else selected.append(i)
                     self.selected = selected
 
             else:
@@ -2876,10 +2842,7 @@ def call(exe, extra_path=True, out=0):
         cmd = f'{settings.tool_bin}{exe}' if extra_path else exe
         if os.name == 'posix':
             cmd = cmd.split()
-    if os.name != 'posix':
-        conf = subprocess.CREATE_NO_WINDOW
-    else:
-        conf = 0
+    conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
     try:
         ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, creationflags=conf)
@@ -2926,13 +2889,7 @@ def download_api(url, path=None, int_=True, size_=0):
             bytes_downloaded += len(data)
             elapsed = time.time() - start_time
             speed = bytes_downloaded / (1024 * elapsed)
-            if file_size != 0:
-                if int_:
-                    percentage = int((bytes_downloaded / file_size) * 100)
-                else:
-                    percentage = (bytes_downloaded / file_size) * 100
-            else:
-                percentage = 'None'
+            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
 
@@ -3187,11 +3144,7 @@ class Packxx(Toplevel):
         self.packrom()
 
     def show_modify_size(self):
-        if self.ext4_method.get() == lang.t32:
-            self.xgdx.pack_forget()
-        else:
-            self.xgdx.pack(
-                side='left', padx=5, pady=5)
+        self.xgdx.pack_forget() if self.ext4_method.get() == lang.t32 else self.xgdx.pack(side='left', padx=5, pady=5)
 
     def verify(self):
         parts_dict = JsonEdit(ProjectManager.current_work_path() + "config/parts_info").read()
@@ -3283,7 +3236,7 @@ class Packxx(Toplevel):
                                   folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception:
                         logging.exception('Bugs')
-                fspatch.main(work + dname, os.path.join(work + "config", dname + "_fs_config"))
+                fspatch.main(work + dname, os.path.join(work + "config", f"{dname}_fs_config"))
                 utils.qc(work + f"config/{dname}_fs_config")
                 if settings.contextpatch == "1":
                     contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
@@ -3398,8 +3351,8 @@ def rdi(work, part_name) -> bool:
                 path_ = os.path.join(work, "config", i_ % part_name)
                 if os.access(path_, os.F_OK):
                     os.remove(path_)
-        except Exception as e:
-            print(lang.text73 % (part_name, e))
+        except Exception:
+            logging.exception(lang.text73 % (part_name, 'E'))
         print(lang.text3.format(part_name))
     else:
         win.message_pop(lang.text75 % part_name, "red")
@@ -3531,9 +3484,7 @@ def unpackrom(ifile) -> None:
         unpackg.refs()
         fz.close()
         if settings.auto_unpack == '1':
-            chose = [i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())]
-
-            unpack(chose)
+            unpack([i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())])
         return
     elif ftype != 'unknown':
         folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
@@ -3550,9 +3501,7 @@ def unpackrom(ifile) -> None:
         project_menu.listdir()
         current_project_name.set(os.path.basename(folder))
         if settings.auto_unpack == '1':
-            chose = [i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())]
-
-            unpack(chose)
+            unpack([i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())])
     else:
         print(lang.text82 % ftype)
     unpackg.refs()
@@ -3588,10 +3537,7 @@ class ProjectManager:
     def exist(self, name=None):
         if not current_project_name.get():
             return False
-        if name is None:
-            return os.path.exists(self.current_work_path())
-        else:
-            return os.path.exists(self.get_work_path(current_project_name.get()))
+        return os.path.exists(self.current_work_path()) if name is None else os.path.exists(self.get_work_path(current_project_name.get()))
 
 
 ProjectManager = ProjectManager()
@@ -4526,8 +4472,7 @@ def restart(er=None):
         p.wait()
         sys.exit(p.returncode)
 
-    if er:
-        er.destroy()
+    if er: er.destroy()
     try:
         for i in win.winfo_children():
             try:
