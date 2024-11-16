@@ -606,30 +606,9 @@ class ToolBox(ttk.Frame):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
-        self.tab6 = None
         self.rotate_angle = 0
         if os.name == 'nt':
             do_set_window_deffont(self)
-        self.show = None
-        self.scroll = None
-        self.frame_bg = None
-        self.canvas1 = None
-        self.scrollbar = None
-        self.tab7 = None
-        self.tab5 = None
-        self.tab4 = None
-        self.tab3 = None
-        self.tab2 = None
-        self.tab = None
-        self.sub_win3 = None
-        self.sub_win2 = None
-        self.rzf = None
-        self.tsk = None
-        self.gif_label = None
-        self.photo = None
-        self.show_local = None
-        self.list2 = None
-        self.notepad = None
         self.message_pop = warn_win
         self.title('MIO-KITCHEN')
         if os.name != "posix":
@@ -1758,12 +1737,6 @@ class ModuleManager:
         def __init__(self):
             super().__init__()
             self.title(lang.text115)
-            self.identifier = None
-            self.dep = None
-            self.intro = None
-            self.ver = None
-            self.aou = None
-            self.name = None
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             self.gui()
@@ -2130,8 +2103,6 @@ list_pls_plugin = print
 class MpkMan(ttk.Frame):
     def __init__(self):
         super().__init__(master=win.tab7)
-        self.rmenu2 = None
-        self.pls = None
         self.pack(padx=10, pady=10, fill=BOTH)
         self.chosen = tk.StringVar(value='')
         self.moduledir = ModuleManager.module_dir
@@ -2215,12 +2186,10 @@ class MpkMan(ttk.Frame):
 class InstallMpk(Toplevel):
     def __init__(self, mpk=None):
         super().__init__()
-        self.pyt = None
         self.mconf = ConfigParser()
         self.installable = True
         self.mpk = mpk
         self.title(lang.text31)
-        self.icon = None
         self.resizable(False, False)
         f = Frame(self)
         self.logo = Label(f)
@@ -4329,9 +4298,6 @@ class Frame3(ttk.LabelFrame):
 class UnpackGui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
-        self.fm = None
-        self.lsg = None
-        self.menu = None
         self.ch = BooleanVar()
 
     def gui(self):
