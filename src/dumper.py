@@ -13,13 +13,8 @@ from . import update_metadata_pb2 as um
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
-
-def u32(x):
-    return struct.unpack(">I", x)[0]
-
-
-def u64(x):
-    return struct.unpack(">Q", x)[0]
+u32 = lambda x:struct.unpack(">I", x)[0]
+u64 = lambda x:struct.unpack(">Q", x)[0]
 
 
 class Dumper:

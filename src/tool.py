@@ -77,11 +77,6 @@ if os.name == 'nt':
 else:
     import mkc_filedialog as filedialog
 
-if sys.version_info.major == 3:
-    if sys.version_info.minor < 8:
-        input(
-            f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
-        sys.exit(1)
 from . import imgextractor
 from . import lpunpack
 from . import mkdtboimg
@@ -253,9 +248,7 @@ def warn_win(text='', color='orange', title="Warn"):
 class ToolBox(ttk.Frame):
     def __init__(self, master):
         super().__init__(master=master)
-
-    def __on_mouse(self, event):
-        self.canvas.yview_scroll(-1 * int(event.delta / 120), "units")
+        self.__on_mouse = lambda event:self.canvas.yview_scroll(-1 * int(event.delta / 120), "units")
 
     def pack_basic(self):
         scrollbar = Scrollbar(self, orient='vertical')

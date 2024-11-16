@@ -23,10 +23,7 @@ _SV_TTK_FONT_NAMES = ['SunValleyCaptionFont', 'SunValleyBodyFont',
                       'SunValleySubtitleFont', 'SunValleyTitleFont',
                       'SunValleyTitleLargeFont', 'SunValleyDisplayFont']
 
-
-def _tk_get_font(family: str = 'TkDefaultFont'):
-    return tkinter.font.nametofont(family)
-
+_tk_get_font = lambda family = 'TkDefaultFont':tkinter.font.nametofont(family)
 
 def _tk_get_font_family(font_=None) -> str:
     if font_ is None:
@@ -47,10 +44,7 @@ def _do_hook_label_init():
     orig_init = ttk.Label.__init__
     ttk.Label.__init__ = lambda *args, **kwargs: _label_init_wrapper(orig_init, *args, **kwargs)
 
-
-def do_set_window_deffont(root):
-    root.option_add("*Font", _tk_get_font())
-
+do_set_window_deffont = lambda root:root.option_add("*Font", _tk_get_font())
 
 def do_override_sv_ttk_fonts():
     for _sv_ttk_font_name in _SV_TTK_FONT_NAMES:
