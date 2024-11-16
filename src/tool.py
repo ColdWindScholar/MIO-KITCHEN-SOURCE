@@ -676,7 +676,7 @@ class Tool(Tk):
         self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(pady=10, fill=Y, expand=True)
+        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(pady=10, fill=Y, expand=True, side="bottom")
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
         self.gif_label = Label(self.rzf)
         self.gif_label.pack(padx=10, pady=10)
@@ -810,7 +810,7 @@ class Tool(Tk):
         ###
         ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
         slo = ttk.Label(sf3, textvariable=self.show_local, wraplength=200)
-        slo.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
+        slo.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None, 1) if os.name == 'nt' else ...)
         slo.pack(padx=10, pady=10, side='left')
         ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
@@ -821,7 +821,7 @@ class Tool(Tk):
         ###
         ttk.Label(sf6, text=lang.cache_size).pack(side='left', padx=10, pady=10)
         slo2 = ttk.Label(sf6, text=hum_convert(get_cache_size()), wraplength=200)
-        slo2.bind('<Button-1>', lambda *x: os.startfile(self.show_local.get()) if os.name == 'nt' else ...)
+        slo2.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None, 1) if os.name == 'nt' else ...)
         slo2.pack(padx=10, pady=10, side='left')
         ttk.Button(sf6, text=lang.clean, command=lambda:cz(clean_cache)).pack(side="left", padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
@@ -3072,6 +3072,7 @@ class Packxx(Toplevel):
         self.xgdx = ttk.Button(lf1, text=lang.t37, command=self.modify_custom_size)
         self.xgdx.pack(
             side='left', padx=5, pady=5)
+        self.show_modify_size = lambda : self.xgdx.pack_forget() if self.ext4_method.get() == lang.t32 else self.xgdx.pack(side='left', padx=5, pady=5)
         self.ext4_method.trace('w', lambda *x: self.show_modify_size())
         cz(self.show_modify_size)
         #
@@ -3142,9 +3143,6 @@ class Packxx(Toplevel):
         except AttributeError:
             logging.exception('Bugs')
         self.packrom()
-
-    def show_modify_size(self):
-        self.xgdx.pack_forget() if self.ext4_method.get() == lang.t32 else self.xgdx.pack(side='left', padx=5, pady=5)
 
     def verify(self):
         parts_dict = JsonEdit(ProjectManager.current_work_path() + "config/parts_info").read()
@@ -4035,7 +4033,7 @@ def dndfile(files):
 class ProjectMenuUtils(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.text12)
-        self.combobox: ttk.Combobox = None
+        self.combobox: ttk.Combobox
         self.pack(padx=5, pady=5)
 
     def gui(self):
