@@ -217,12 +217,6 @@ class LoadAnim:
 
         return call_func
 
-class DevNull:
-    # Yes, As You Saw, It's a empty class.
-    def __init__(self):...
-    def write(self, string):...
-    @staticmethod
-    def flush():...
 
 
 def warn_win(text='', color='orange', title="Warn"):
@@ -605,7 +599,7 @@ class Tool(Tk):
             self.iconphoto(True,
                            PhotoImage(
                                data=images.icon_byte))
-        sys.stdout = DevNull()
+        sys.stdout.write = logging.info
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
