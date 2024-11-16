@@ -16,7 +16,7 @@ import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import Button, Entry, Frame, Combobox
 
-from utils import lang, cz, jzxs
+from .utils import lang, cz, jzxs
 
 
 def askopenfilename(title="Choose File", filetypes=(("*", "*.*"),)):
