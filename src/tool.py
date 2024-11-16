@@ -1557,7 +1557,7 @@ class ModuleManager:
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(script_path + "main.sh"):
                 shell = 'ash' if os.name == 'posix' else 'bash'
-                call(['busybox', shell, os.path. join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/'), (script_path + 'main.sh').replace(os.sep, '/')])
+                call(['busybox', shell, os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/'), (script_path + 'main.sh').replace(os.sep, '/')])
         elif os.path.exists(script_path + "main.py") and imp:
             try:
                 module = imp.load_source('module', script_path + "main.py")
@@ -1813,19 +1813,11 @@ class ModuleManager:
                         self.envs['result'] = ""
 
         def sh(self, cmd):
-            with open(file_ := (os.path.join(temp, v_code())), "w",
-                      encoding='UTF-8',
-                      newline="\n") as f:
-                for i in self.envs:
-                    f.write(f'export {i}="{self.envs.get(i, "")}"\n')
-                f.write("source $1")
-            if os.path.exists(file_):
-                sh = "ash" if os.name == 'posix' else "bash"
-                call(f"busybox {sh} {file_} {cmd.replace(os.sep, '/')}")
-                try:
-                    os.remove(file_)
-                except (Exception, BaseException):
-                    logging.exception('Bugs')
+            for i in self.envs:
+                os.environ[i] = self.envs.get(i, "")
+            sh = "ash" if os.name == 'posix' else "bash"
+            execer = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
+            call(f"busybox {sh} {execer} {cmd.replace(os.sep, '/')}")
 
         def msh(self, cmd):
             try:
