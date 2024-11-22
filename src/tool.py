@@ -4390,6 +4390,8 @@ def init_verify():
 
 
 def init():
+    if not os.path.exists(tool_log):
+        open(tool_log, 'w', encoding="utf-8", newline="\n").close()
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     if settings.updating in ['1', '2']:
