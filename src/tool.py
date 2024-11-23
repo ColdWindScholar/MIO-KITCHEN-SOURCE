@@ -2215,13 +2215,15 @@ class Debugger(Toplevel):
         jzxs(self)
 
     def gui(self):
-        ttk.Button(self, text='Globals', command=self.loaded_module).grid(row=2, column=0, padx=5, pady=5)
-        ttk.Button(self, text='Settings', command=self.settings).grid(row=2, column=1, padx=5, pady=5)
-        ttk.Button(self, text='Info', command=self.show_info).grid(row=2, column=2, padx=5, pady=5)
-        ttk.Button(self, text='Crash it!', command=self.crash).grid(row=2, column=3, padx=5, pady=5)
-        ttk.Button(self, text='Hacker panel',
-                   command=lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')).grid(
-            row=2, column=4, padx=5, pady=5)
+        functions = [
+            ('Globals', self.loaded_module),
+            ('Settings', self.settings),
+            ('Info', self.show_info),
+            ('Crash it!', self.crash),
+            ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
+        ]
+        for index, (text, func) in enumerate(functions):
+            ttk.Button(self, text=text, command=func).grid(row=2, column=index, padx=5, pady=5)
 
     @staticmethod
     def crash():
