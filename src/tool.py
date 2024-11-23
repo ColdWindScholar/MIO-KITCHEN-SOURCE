@@ -122,8 +122,8 @@ class States:
 
 
 class JsonEdit:
-    def __init__(self, j_f):
-        self.file = j_f
+    def __init__(self, file_path):
+        self.file = file_path
 
     def read(self):
         if not os.path.exists(self.file):
