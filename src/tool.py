@@ -219,14 +219,14 @@ class LoadAnim:
 
 
 
-def warn_win(text='', color='orange', title="Warn"):
+def warn_win(text:str='', color:str='orange', title:str="Warn", wait:int=1500):
     ask = ttk.LabelFrame(win)
     ask.configure(text=title)
     ask.place(relx=0.5, rely=0.5, anchor="nw")
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
-    ask.after(1500, ask.destroy)
+    ask.after(wait, ask.destroy)
 
 
 class ToolBox(ttk.Frame):
@@ -445,7 +445,7 @@ class ToolBox(ttk.Frame):
                 "KB": 2 ** 10,
                 "MB": 2 ** 20,
                 "GB": 2 ** 30,
-                "TB": 2 ** 30 * 1024
+                "TB": 2 ** 40
             }
 
             return str(origin_size * units[origin] / units[convert])
