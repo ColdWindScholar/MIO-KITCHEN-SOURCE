@@ -187,6 +187,7 @@ class LoadAnim:
         self.stop()
 
     def load_gif(self, gif):
+        self.frames.clear()
         while True:
             self.frames.append(PhotoImage(gif))
             try:
