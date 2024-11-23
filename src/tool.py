@@ -4079,11 +4079,14 @@ class Frame3(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
-        ttk.Button(self, text=lang.text122, command=lambda: cz(pack_zip)).grid(row=0, column=0, padx=5, pady=5)
-        ttk.Button(self, text=lang.text123, command=lambda: cz(PackSuper)).grid(row=0, column=1, padx=5, pady=5)
-        ttk.Button(self, text=lang.text19, command=lambda: win.notepad.select(win.tab7)).grid(row=0, column=2, padx=5,
-                                                                                              pady=5)
-        ttk.Button(self, text=lang.t13, command=lambda: cz(FormatConversion)).grid(row=0, column=3, padx=5, pady=5)
+        functions = [
+            (lang.text122, lambda: cz(pack_zip)),
+            (lang.text123, lambda: cz(PackSuper)),
+            (lang.text19, lambda: win.notepad.select(win.tab7)),
+            (lang.t13, lambda: cz(FormatConversion))
+        ]
+        for index, (text, func)  in enumerate(functions):
+            ttk.Button(self, text=text, command=func).grid(row=0, column=index, padx=5, pady=5)
 
 class UnpackGui(ttk.LabelFrame):
     def __init__(self):
@@ -4180,7 +4183,6 @@ class UnpackGui(ttk.LabelFrame):
             if os.path.exists(work + "UPDATE.APP"):
                 for i in splituapp.get_parts(work + "UPDATE.APP"):
                     self.lsg.insert(i, i)
-
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(self.fm.get()):
