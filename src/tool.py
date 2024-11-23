@@ -4019,10 +4019,14 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
         self.combobox.pack(side="top", padx=10, pady=10, fill=X)
         self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
-        ttk.Button(self, text=lang.text23, command=self.listdir).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text115, command=self.new).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text116, command=lambda: cz(self.remove)).pack(side="left", padx=10, pady=10)
-        ttk.Button(self, text=lang.text117, command=lambda: cz(self.rename)).pack(side="left", padx=10, pady=10)
+        functions = [
+            (lang.text23, self.listdir),
+            (lang.text115, self.new),
+            (lang.text116, lambda: cz(self.remove)),
+            (lang.text117, lambda: cz(self.rename)),
+        ]
+        for text, func in functions:
+            ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
 
     def set_project(self, name):
         if not os.path.isdir(os.path.join(settings.path, name)):
