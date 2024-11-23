@@ -103,8 +103,7 @@ except ImportError:
 try:
     from .pycase import ensure_dir_case_sensitive
 except ImportError:
-    def ensure_dir_case_sensitive(*x):
-        print(f'Cannot sensitive {x}, Not Supported')
+    ensure_dir_case_sensitive = lambda *x : print(f'Cannot sensitive {x}, Not Supported')
 
 if os.name == 'nt':
     os.putenv = lambda name, value: ctypes.windll.kernel32.SetEnvironmentVariableW(name, value)
