@@ -248,25 +248,25 @@ class ToolBox(ttk.Frame):
 
     def gui(self):
         self.pack_basic()
-        """"""
-        width = 17
-        ttk.Button(self.label_frame, text=lang.text114, command=lambda: cz(download_file), width=width).grid(row=0,
-                                                                                                             column=0,
-                                                                                                             padx=5,
-                                                                                                             pady=5)
-        ttk.Button(self.label_frame, text=lang.t59, command=self.GetFileInfo, width=width).grid(row=0, column=1, padx=5,
-                                                                                                pady=5)
-        ttk.Button(self.label_frame, text=lang.t60, command=self.FileBytes, width=width).grid(row=0, column=2, padx=5,
-                                                                                              pady=5)
-        ttk.Button(self.label_frame, text=lang.audit_allow, command=self.SelinuxAuditAllow, width=width).grid(row=1,
-                                                                                                              column=0,
-                                                                                                              padx=5,
-                                                                                                              pady=5)
-        ttk.Button(self.label_frame, text=lang.trim_image, command=self.TrimImage, width=width).grid(row=1, column=1,
-                                                                                                     padx=5, pady=5)
-        ttk.Button(self.label_frame, text=lang.magisk_patch, command=self.MagiskPatcher, width=width).grid(row=1, column=2,
-                                                                                                     padx=5, pady=5)
-        """"""
+        functions = [
+            (lang.text114, lambda: cz(download_file)),
+            (lang.t59, self.GetFileInfo),
+            (lang.t60, self.FileBytes),
+            (lang.audit_allow, self.SelinuxAuditAllow),
+            (lang.trim_image, self.TrimImage),
+            (lang.magisk_patch, self.MagiskPatcher),
+        ]
+        width_controls = 3
+        #
+        index_row = 0
+        index_column = 0
+        for text, func in functions:
+            ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row,column=index_column,padx=5,pady=5)
+            if index_column < (width_controls - 1):
+                index_column += 1
+            else:
+                index_column = 0
+                index_row += 1
         self.update_ui()
 
     def update_ui(self):
