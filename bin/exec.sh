@@ -7,7 +7,7 @@ if [[ $(uname) == "Windows_NT" ]]; then
   for i in $(set)
   do
     if [[ "$i" == "*=*" ]]; then
-      if [[ "$i" == "*\n*" ]] || [[ "$i" == "*\r*" ]] || [[ "$i" == "'" ]] || [[ "$i" == '"' ]] || [[ "$i" == '$*' ]];then
+      if [[ "$i" == "*\n*" || "$i" == "*\r*" || "$i" == "'" || "$i" == '"' ||   "$i" == '$*' ]];then
         continue
       fi
       value_name=$(echo ${i%=*} | tr A-Z a-z)
