@@ -3,12 +3,20 @@
 # Yes!
 tool_author="ColdWindSolar"
 if [[ $(uname) == "Windows_NT" ]]; then
-  tool_bin=$TOOL_BIN
-  version=$VERSION
-  project=$PROJECT
-  language=$LANGUAGE
-  bin=$BIN
-  moddir=$MODDIR
-  project_output=$PROJECT_OUTPUT
+  echo "[Nt]Preparing Environment Variables..."
+  for i in $(set)
+  do
+    if [[ "$i" == "*=*" ]]; then
+      if [[ "$i" == "*\n*" ]] || [[ "$i" == "*\r*" ]] || [[ "$i" == "'" ]] || [[ "$i" == '"' ]] || [[ "$i" == '$*' ]];then
+        continue
+      fi
+      value_name=$(echo ${i%=*} | tr A-Z a-z)
+      if [[ "${value_name}" == 'ifs' ]] || [[ "${value_name}" == 'ps*' ]]; then
+        continue
+      fi
+      eval "${value_name}=${i#*=}"
+    fi
+  done
+  echo "[Nt]Executing Script..."
 fi
 source $1
