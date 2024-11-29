@@ -1,21 +1,19 @@
 #!/bin/bash
 # The MIO-KITCHEN-PROJECT
 # Yes!
-tool_author="ColdWindSolar"
 if [[ $(uname) == "Windows_NT" ]]; then
   echo "[Nt]Preparing Environment Variables..."
   for i in $(set)
   do
-    if [[ "$i" == "*=*" ]]; then
-      if [[ "$i" == "*\n*" || "$i" == "*\r*" || "$i" == "'" || "$i" == '"' ||   "$i" == '$*' ]];then
+      if [[ "$i" != "*=*" ||  "$i" == "*\n*" || "$i" == "*\r*" || "$i" == "'" || "$i" == '"' ||   "$i" == '$*' ]]; then
         continue
       fi
-      value_name=$(echo ${i%=*} | tr A-Z a-z)
-      if [[ "${value_name}" == 'ifs' ]] || [[ "${value_name}" == 'ps*' ]]; then
+      value_name=${i%=*}
+      if [[ "${value_name}" == 'IFS' || "${value_name}" == 'PS*'  ]]; then
         continue
       fi
+      value_name=$(echo ${value_name} | tr A-Z a-z)
       eval "${value_name}=${i#*=}"
-    fi
   done
   echo "[Nt]Executing Script..."
 fi
