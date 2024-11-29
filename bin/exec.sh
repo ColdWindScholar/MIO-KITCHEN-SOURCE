@@ -1,6 +1,6 @@
 #!/bin/bash
 # The MIO-KITCHEN-PROJECT
-# I know Its Too Slowly On Windows,But I have not a better solutions.
+# I know Its Too Slowly On Windows,But I have not any better solutions.
 if [[ $(uname) == "Windows_NT" ]]; then
   echo "[Nt]Preparing Environment Variables..."
   for i in $(set)
