@@ -105,9 +105,6 @@ try:
 except ImportError:
     ensure_dir_case_sensitive = lambda *x : print(f'Cannot sensitive {x}, Not Supported')
 
-if os.name == 'nt':
-    os.putenv = lambda name, value: ctypes.windll.kernel32.SetEnvironmentVariableW(name, value)
-    os.environ.__setitem__ = lambda name, value: ctypes.windll.kernel32.SetEnvironmentVariableW(name, value)
 cwd_path = utils.prog_path
 
 
@@ -862,7 +859,7 @@ tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
-
+module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 # Some Functions for Upgrade
 if os.name == 'nt':
     kernel32 = ctypes.windll.kernel32
@@ -1537,24 +1534,21 @@ class ModuleManager:
                 script_path + "main.json") else None
             if not os.path.exists(temp):
                 re_folder(temp)
+            exports = ''
             if os.path.exists(script_path + "main.sh"):
-                    if values:
-                        for va in values.gavs.keys():
-                            if gva := values.gavs[va].get():
-                                os.environ[va] = gva
-                        values.gavs.clear()
-                    os.environ['tool_bin'] = settings.tool_bin.replace('\\', '/')
-                    os.environ['version'] = settings.version
-                    os.environ['language'] = settings.language
-                    os.environ['bin'] = script_path.replace(os.sep, "/")
-                    os.environ['moddir'] = self.module_dir.replace('\\', '/')
-                    os.environ['project_output'] = ProjectManager.current_work_output_path()
-                    os.environ['project'] = ProjectManager.current_work_path()
+                if values:
+                    for va in values.gavs.keys():
+                        if gva := values.gavs[va].get():
+                            exports += f"export {va}='{gva}';"
+                    values.gavs.clear()
+                exports += f"export tool_bin='{settings.tool_bin.replace(os.sep, '/')}';export version='{settings.version}';export language='{settings.language}';export bin='{script_path.replace(os.sep, '/')}';"
+                exports += f"export moddir='{self.module_dir.replace(os.sep, '/')}';export project_output='{ProjectManager.current_work_output_path()}';export project='{ProjectManager.current_work_path()}';"
             if os.path.exists(script_path + "main.msh"):
                 self.MshParse(script_path + "main.msh")
             if os.path.exists(script_path + "main.sh"):
                 shell = 'ash' if os.name == 'posix' else 'bash'
-                call(['busybox', shell, os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/'), (script_path + 'main.sh').replace(os.sep, '/')])
+                call(['busybox', shell, '-c', f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
+            del exports
         elif os.path.exists(script_path + "main.py") and imp:
             try:
                 module = imp.load_source('module', script_path + "main.py")
@@ -1810,11 +1804,12 @@ class ModuleManager:
                         self.envs['result'] = ""
 
         def sh(self, cmd):
-            for i in self.envs:
-                os.environ[i] = self.envs.get(i, "")
+            exports = ''
             sh = "ash" if os.name == 'posix' else "bash"
-            execer = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
-            call(f"busybox {sh} {execer} {cmd.replace(os.sep, '/')}")
+            for i in self.envs:
+                exports += f"export {i}='{self.envs.get(i, '')}';"
+            call(['busybox', sh, '-c', f"{exports}exec {module_exec} {cmd.replace(os.sep, '/')}"])
+            del exports
 
         def msh(self, cmd):
             try:
