@@ -2948,22 +2948,25 @@ def jboot(bn: str = 'boot'):
 
 
 @animation
-def dboot(nm: str = 'boot'):
+def dboot(name: str = 'boot', source:str=None, boot:str=None):
     work = ProjectManager.current_work_path()
     flag = ''
-    boot = findfile(f"{nm}.img", work)
-    if not os.path.exists(work + nm):
-        print(f"Cannot Find {nm}...")
+    if boot is None:
+        boot = findfile(f"{name}.img", work)
+    if source is None:
+        source = work + name
+    if not os.path.exists(source):
+        print(f"Cannot Find {name}...")
         return
     cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                     settings.tool_bin).replace(
         '\\', "/")
 
-    if os.path.isdir(work + nm + "/ramdisk"):
-        os.chdir(work + nm + "/ramdisk")
+    if os.path.isdir(f"{source}/ramdisk"):
+        os.chdir(f"{source}/ramdisk")
         call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
-        os.chdir(work + nm)
-        with open(work + nm +  "/comp", "r", encoding='utf-8') as compf:
+        os.chdir(source)
+        with open(f"{source}/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
         if comp != "unknown":
@@ -2986,17 +2989,17 @@ def dboot(nm: str = 'boot'):
         print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
             flag = "-n"
-    os.chdir(work + nm)
+    os.chdir(source)
     if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
     else:
-        os.remove(work + f"{nm}.img")
-        os.rename(work + nm + "/new-boot.img", ProjectManager.current_work_output_path() + f"/{nm}.img")
+        os.remove(boot)
+        os.rename(source + "/new-boot.img", ProjectManager.current_work_output_path() + f"/{name}.img")
         os.chdir(cwd_path)
         try:
-            rmdir(work + nm)
+            rmdir(source)
         except (Exception, BaseException):
-            print(lang.warn11.format(nm))
+            print(lang.warn11.format(name))
         print("Successfully packed Boot...")
 
 
