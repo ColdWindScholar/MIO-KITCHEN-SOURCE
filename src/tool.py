@@ -2974,7 +2974,6 @@ def dboot(name: str = 'boot', source:str=None, boot:str=None):
                 print("Failed to pack Ramdisk...")
                 os.remove("ramdisk-new.cpio")
             else:
-                print("Successfully packed Ramdisk..")
                 try:
                     os.remove("ramdisk.cpio")
                 except (Exception, BaseException):
@@ -2983,12 +2982,12 @@ def dboot(name: str = 'boot', source:str=None, boot:str=None):
                     comp = 'gz'
                 os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
         else:
-            print("Successfully packed Ramdisk..")
             os.remove("ramdisk.cpio")
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
             flag = "-n"
+        print("Successfully packed Ramdisk..")
     os.chdir(source)
     if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
