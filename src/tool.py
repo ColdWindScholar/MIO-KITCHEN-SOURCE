@@ -1531,8 +1531,7 @@ class ModuleManager:
         if not os.path.exists(info_file):
             return ''
         with open(info_file, 'r', encoding='UTF-8') as f:
-            data = json.load(f)
-            return data.get(item, '')
+            return json.load(f).get(item, '')
 
     @animation
     def run(self, id_) -> int:
@@ -2825,6 +2824,7 @@ class StdoutRedirector:
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
+        self.flush = lambda : error(1, self.error_info) if self.error_info else ...
 
     def write(self, string):
         if self.error:
@@ -2834,10 +2834,6 @@ class StdoutRedirector:
         self.text_space.insert(tk.END, string)
         logging.debug(string)
         self.text_space.see('end')
-
-    def flush(self):
-        if self.error_info:
-            error(1, self.error_info)
 
 
 def call(exe, extra_path=True, out=0):

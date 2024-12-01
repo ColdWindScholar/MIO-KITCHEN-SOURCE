@@ -95,9 +95,7 @@ class ScrollFrame(Frame):
         self.label_frame = None
         self.canvas = None
         self.controls = []
-
-    def __on_mouse(self, event):
-        self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
+        self.__on_mouse = lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
 
     def clear(self):
         for i in self.controls:
