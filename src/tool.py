@@ -856,7 +856,6 @@ class Tool(Tk):
                                     offvalue='0',
                                     style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)
-        get_setting_button('rm_pay', sf4, lang.t9.format("payload.bin"))
         get_setting_button('auto_unpack', sf4, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
@@ -1255,7 +1254,6 @@ class SetUtils:
             self.set_file = set_ini
         else:
             self.set_file = os.path.join(cwd_path, "bin", "setting.ini")
-        self.rm_pay = '0'
         self.plugin_repo = None
         self.contextpatch = '0'
         self.oobe = '0'
@@ -3567,12 +3565,6 @@ def unpack(chose, form: str = '') -> bool:
     if form == 'payload':
         print(lang.text79 + "payload")
         Dumper(work + "payload.bin", work, diff=False, old='old', images=chose).run()
-        if settings.rm_pay == '1':
-            try:
-                os.remove(work + "payload.bin")
-            except Exception as e:
-                print(lang.text72 + f" payload.bin:{e}")
-                os.remove(work + "payload.bin")
         return True
     elif form == 'super':
         print(lang.text79 + "Super")
