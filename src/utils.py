@@ -230,8 +230,7 @@ def zero_start(file: str, c: int, buff_size: int = 8192) -> bool:
                 return False
             c -= n
     return True
-def is_empty_img(file: str) -> bool:
-    return zero_start(file, os.path.getsize(file))
+is_empty_img = lambda file: zero_start(file, os.path.getsize(file))
 def gettype(file) -> str:
     """
     Return File Type:str
@@ -368,8 +367,7 @@ def qc(file_) -> None:
         f.writelines(data)
     del data
 
-
-def cz(func, *args, join=False):
+def create_thread(func, *args, join=False):
     """
     Multithreaded running tasks
     :param func: Function

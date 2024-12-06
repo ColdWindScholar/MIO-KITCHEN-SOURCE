@@ -16,7 +16,7 @@ import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import Button, Entry, Frame, Combobox
 
-from .utils import lang, cz, jzxs
+from .utils import lang, create_thread, jzxs
 
 
 def askopenfilename(title="Choose File", filetypes=(("*", "*.*"),)):
@@ -54,7 +54,7 @@ class askopenfilenames(Toplevel):
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text=lang.cancel, command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
-        cz(self.refs)
+        create_thread(self.refs)
         jzxs(self)
         self.wait_window()
 
@@ -66,7 +66,7 @@ class askopenfilenames(Toplevel):
         var = os.path.abspath(os.path.join(self.path.get(), file))
         if os.path.isdir(var):
             self.path.set(var)
-            cz(self.refs)
+            create_thread(self.refs)
         elif os.path.isfile(var):
             self.return_var()
 
@@ -113,7 +113,7 @@ class askdirectorys(Toplevel):
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5)
         Button(ff, text=lang.cancel, command=self.cancel).pack(fill=X, side=LEFT, padx=5, pady=5)
         ff.pack(padx=5, pady=5, fill=X)
-        cz(self.refs)
+        create_thread(self.refs)
         jzxs(self)
         self.wait_window()
 
@@ -125,7 +125,7 @@ class askdirectorys(Toplevel):
         var = os.path.abspath(os.path.join(self.path.get(), file))
         if os.path.isdir(var):
             self.path.set(var)
-            cz(self.refs)
+            create_thread(self.refs)
         elif os.path.isfile(var):
             self.return_var()
 

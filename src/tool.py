@@ -91,7 +91,7 @@ from . import utils
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from .extra import fspatch, re, contextpatch
-from .utils import cz, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from .utils import create_thread, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from .controls import ListBox, ScrollFrame
 from .undz import DZFileTools
 from .selinux_audit_allow import main as selinux_audit_allow
@@ -197,7 +197,7 @@ class LoadAnim:
     def __call__(self, func):
         @wraps(func)
         def call_func(*args, **kwargs):
-            cz(self.run())
+            create_thread(self.run())
             task_num = self.get_task_num()
             task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
             info = [func.__name__, args, task_real]
@@ -247,7 +247,7 @@ class ToolBox(ttk.Frame):
     def gui(self):
         self.pack_basic()
         functions = [
-            (lang.text114, lambda: cz(download_file)),
+            (lang.text114, lambda: create_thread(download_file)),
             (lang.t59, self.GetFileInfo),
             (lang.t60, self.FileBytes),
             (lang.audit_allow, self.SelinuxAuditAllow),
@@ -371,7 +371,7 @@ class ToolBox(ttk.Frame):
                             variable=self.KEEPFORCEENCRYPT).pack(fill=X, padx=5, pady=5, side=LEFT)
             ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='RECOVERYMODE', variable=self.RECOVERYMODE).pack(
                 fill=X, padx=5, pady=5, side=LEFT)
-            self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton', command=lambda: cz(self.patch))
+            self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton', command=lambda: create_thread(self.patch))
             self.patch_bu.pack(fill=X, padx=5, pady=5)
 
     class SelinuxAuditAllow(Toplevel):
@@ -412,7 +412,7 @@ class ToolBox(ttk.Frame):
                 self.destroy()
             else:
                 self.button.configure(text=lang.running, state='disabled')
-                cz(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
+                create_thread(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
                 self.button.configure(text=lang.done, state='normal', style='')
 
     class FileBytes(Toplevel):
@@ -473,6 +473,7 @@ class ToolBox(ttk.Frame):
             self.gui()
             self.geometry("400x450")
             self.resizable(False, False)
+            self.dnd = lambda file_list:create_thread(self.__dnd, file_list)
             jzxs(self)
 
         def gui(self):
@@ -510,9 +511,6 @@ class ToolBox(ttk.Frame):
                     i.destroy()
                 except:
                     logging.exception('Bugs')
-
-        def dnd(self, file_list: list):
-            cz(self.__dnd, file_list)
 
         def __dnd(self, file_list: list):
             self.clear()
@@ -835,7 +833,7 @@ class Tool(Tk):
         slo2.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
                                                                         1) if os.name == 'nt' else ...)
         slo2.pack(padx=10, pady=10, side='left')
-        ttk.Button(sf6, text=lang.clean, command=lambda: cz(clean_cache)).pack(side="left", padx=10, pady=10)
+        ttk.Button(sf6, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left", padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
 
         def enable_contextpatch():
@@ -934,7 +932,7 @@ class Updater(Toplevel):
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
         self.update_button = ttk.Button(f3, text=lang.t38, style='Accent.TButton',
-                                        command=lambda: cz(self.get_update))
+                                        command=lambda: create_thread(self.get_update))
         ttk.Button(f3, text=lang.cancel, command=self.close).pack(fill=X, expand=True, side=LEFT,
                                                                   pady=10,
                                                                   padx=10)
@@ -947,7 +945,7 @@ class Updater(Toplevel):
         elif 'tool' in os.path.basename(tool_self) and settings.updating == '2':
             self.update_process3()
         else:
-            cz(self.get_update)
+            create_thread(self.get_update)
         self.resizable(width=False, height=False)
         jzxs(self)
 
@@ -1055,7 +1053,7 @@ class Updater(Toplevel):
             subprocess.Popen(
                 [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            cz(sys.exit, 1)
+            create_thread(sys.exit, 1)
             terminate_process(os.getpid())
         else:
             self.notice.configure(text=lang.t41, foreground='red')
@@ -1942,7 +1940,7 @@ class ModuleManager:
                                     padx=5, pady=5, fill=BOTH)
                             else:
                                 print(lang.warn14.format(con['type']))
-            ttk.Button(self, text=lang.ok, command=lambda: cz(self.generate_msh if msh else self.generate_sh)).pack(
+            ttk.Button(self, text=lang.ok, command=lambda: create_thread(self.generate_msh if msh else self.generate_sh)).pack(
                 fill=X,
                 side='bottom')
             jzxs(self)
@@ -2047,8 +2045,6 @@ class ModuleManager:
 
 ModuleManager = ModuleManager()
 
-list_pls_plugin = print
-
 
 class MpkMan(ttk.Frame):
     def __init__(self):
@@ -2087,7 +2083,7 @@ class MpkMan(ttk.Frame):
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', lambda event, ar=i: cz(ModuleManager.run, ar))
+                icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(ModuleManager.run, ar))
                 icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
                 self.pls.add_icon(icon, i)
 
@@ -2105,7 +2101,7 @@ class MpkMan(ttk.Frame):
         list_pls_plugin = self.list_pls
 
         ttk.Label(self, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, side=LEFT)
-        ttk.Button(self, text='Mpk Store', command=lambda: cz(MpkStore)).pack(side="right", padx=10, pady=10)
+        ttk.Button(self, text='Mpk Store', command=lambda: create_thread(MpkStore)).pack(side="right", padx=10, pady=10)
         ttk.Separator(win.tab7, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         a = Label(win.tab7, text=lang.text24)
         a.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
@@ -2118,16 +2114,16 @@ class MpkMan(ttk.Frame):
         rmenu = Menu(self.pls, tearoff=False, borderwidth=0)
         rmenu.add_command(label=lang.text21, command=lambda: InstallMpk(
             filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
-        rmenu.add_command(label=lang.text23, command=lambda: cz(self.refresh))
-        rmenu.add_command(label=lang.text115, command=lambda: cz(ModuleManager.new))
+        rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh))
+        rmenu.add_command(label=lang.text115, command=lambda: create_thread(ModuleManager.new))
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
         self.rmenu2.add_command(label=lang.text20,
-                                command=lambda: cz(ModuleManager.uninstall_gui, self.chosen.get()))
+                                command=lambda: create_thread(ModuleManager.uninstall_gui, self.chosen.get()))
         self.rmenu2.add_command(label=lang.text22,
-                                command=lambda: cz(ModuleManager.run, self.chosen.get()))
-        self.rmenu2.add_command(label=lang.t14, command=lambda: cz(ModuleManager.export, self.chosen.get()))
+                                command=lambda: create_thread(ModuleManager.run, self.chosen.get()))
+        self.rmenu2.add_command(label=lang.t14, command=lambda: create_thread(ModuleManager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
-                                command=lambda: cz(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
+                                command=lambda: create_thread(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
         self.list_pls()
         lf1.pack(padx=10, pady=10)
 
@@ -2156,12 +2152,12 @@ class InstallMpk(Toplevel):
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=(None, 12))
         self.state.pack(padx=10, pady=10)
-        self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: cz(self.install))
+        self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: create_thread(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         self.load()
         jzxs(self)
         self.wait_window()
-        cz(list_pls_plugin)
+        create_thread(list_pls_plugin)
 
     def install(self):
         if self.installb.cget('text') == lang.text34:
@@ -2383,7 +2379,7 @@ class MpkStore(Toplevel):
         ff = ttk.Frame(self)
         ttk.Label(ff, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
         ttk.Button(ff, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
-        ttk.Button(ff, text=lang.text23, command=lambda: cz(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
+        ttk.Button(ff, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
         ff.pack(padx=10, pady=10, fill=BOTH)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.search = ttk.Entry(self)
@@ -2403,7 +2399,7 @@ class MpkStore(Toplevel):
         scrollbar.config(command=self.canvas.yview)
         self.label_frame = ttk.Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
-        cz(self.get_db)
+        create_thread(self.get_db)
         self.label_frame.update_idletasks()
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
@@ -2453,7 +2449,7 @@ class MpkStore(Toplevel):
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
             bu = ttk.Button(f, text=lang.text21,
-                            command=lambda a=args: cz(self.download, *a))
+                            command=lambda a=args: create_thread(self.download, *a))
             if not ModuleManager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
@@ -2482,7 +2478,7 @@ class MpkStore(Toplevel):
         a.wait_window()
         if settings.plugin_repo != self.repo:
             self.init_repo()
-            cz(self.get_db)
+            create_thread(self.get_db)
 
     def download(self, files, size, id_, depends):
         if id_ not in self.tasks:
@@ -2507,7 +2503,7 @@ class MpkStore(Toplevel):
                     else:
                         return False
 
-                cz(ModuleManager.install, os.path.join(temp, i), join=True)
+                create_thread(ModuleManager.install, os.path.join(temp, i), join=True)
                 try:
                     os.remove(os.path.join(temp, i))
                 except (Exception, BaseException):
@@ -2661,20 +2657,20 @@ class PackSuper(Toplevel):
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
         ttk.Button(t_frame, text=lang.text23, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
-        self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: cz(self.generate))
+        self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: create_thread(self.generate))
         self.g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
         self.read_list()
-        cz(self.refresh)
+        create_thread(self.refresh)
         jzxs(self)
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                       fill=X,
                                                                       expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
-                                                                                                       padx=5,
-                                                                                                       pady=5, fill=X,
-                                                                                                       expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(side='left',
+                                                                                                                  padx=5,
+                                                                                                                  pady=5, fill=X,
+                                                                                                                  expand=True)
 
     def start_(self):
         try:
@@ -2894,8 +2890,7 @@ def download_api(url, path=None, int_=True, size_=0):
             bytes_downloaded += len(data)
             elapsed = time.time() - start_time
             speed = bytes_downloaded / (1024 * elapsed)
-            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
-                                                                                             bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
+            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
 
@@ -3083,7 +3078,7 @@ class Packxx(Toplevel):
         self.show_modify_size = lambda: self.xgdx.pack_forget() if self.ext4_method.get() == lang.t32 else self.xgdx.pack(
             side='left', padx=5, pady=5)
         self.ext4_method.trace('w', lambda *x: self.show_modify_size())
-        cz(self.show_modify_size)
+        create_thread(self.show_modify_size)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5,
@@ -3140,10 +3135,10 @@ class Packxx(Toplevel):
                                                                       pady=2,
                                                                       fill=X,
                                                                       expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: cz(self.start_), style="Accent.TButton").pack(side='left',
-                                                                                                       padx=2, pady=2,
-                                                                                                       fill=X,
-                                                                                                       expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(side='left',
+                                                                                                                  padx=2, pady=2,
+                                                                                                                  fill=X,
+                                                                                                                  expand=True)
         jzxs(self)
 
     def start_(self):
@@ -4001,7 +3996,11 @@ def rmdir(path, quiet=False):
 
 
 @animation
-def pack_zip():
+def pack_zip(input_dir=None,output_zip=None):
+    if input_dir is None:
+        input_dir = ProjectManager.current_work_output_path()
+    if output_zip is None:
+        output_zip = settings.path + os.sep + current_project_name.get() + ".zip"
     if ask_win(lang.t53) != 1:
         return
     if not ProjectManager.exist():
@@ -4010,18 +4009,18 @@ def pack_zip():
         print(lang.text91 % current_project_name.get())
         if ask_win(lang.t25) == 1:
             PackHybridRom()
-        with zipfile.ZipFile(relpath := settings.path + os.sep + current_project_name.get() + ".zip", 'w',
+        with zipfile.ZipFile(output_zip, 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
-            for file in utils.get_all_file_paths(ProjectManager.current_work_output_path()):
+            for file in utils.get_all_file_paths(input_dir):
                 file = str(file)
-                arch_name = file.replace(ProjectManager.current_work_output_path(), '')
+                arch_name = file.replace(input_dir, '')
                 print(f"{lang.text1}:{arch_name}")
                 try:
                     zip_.write(file, arcname=arch_name)
                 except Exception as e:
                     print(lang.text2.format(file, e))
-        if os.path.exists(relpath):
-            print(lang.text3.format(relpath))
+        if os.path.exists(output_zip):
+            print(lang.text3.format(output_zip))
 
 
 def dndfile(files):
@@ -4035,7 +4034,7 @@ def dndfile(files):
             if fi.endswith(".mpk"):
                 InstallMpk(fi)
             else:
-                cz(unpackrom, fi)
+                create_thread(unpackrom, fi)
         else:
             print(fi + lang.text84)
 
@@ -4053,8 +4052,8 @@ class ProjectMenuUtils(ttk.LabelFrame):
         functions = [
             (lang.text23, self.listdir),
             (lang.text115, self.new),
-            (lang.text116, lambda: cz(self.remove)),
-            (lang.text117, lambda: cz(self.rename)),
+            (lang.text116, lambda: create_thread(self.remove)),
+            (lang.text117, lambda: create_thread(self.rename)),
         ]
         for text, func in functions:
             ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
@@ -4117,10 +4116,10 @@ class Frame3(ttk.LabelFrame):
 
     def gui(self):
         functions = [
-            (lang.text122, lambda: cz(pack_zip)),
-            (lang.text123, lambda: cz(PackSuper)),
+            (lang.text122, lambda: create_thread(pack_zip)),
+            (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
-            (lang.t13, lambda: cz(FormatConversion))
+            (lang.t13, lambda: create_thread(FormatConversion))
         ]
         for index, (text, func) in enumerate(functions):
             ttk.Button(self, text=text, command=func).grid(row=0, column=index, padx=5, pady=5)
@@ -4155,7 +4154,7 @@ class UnpackGui(ttk.LabelFrame):
         ff1.pack(padx=5, pady=5, fill=X)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
         self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(self, text=lang.run, command=lambda: cz(self.close_)).pack(padx=5, pady=5, side='left')
+        ttk.Button(self, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
         self.refs()
         self.ch.trace("w", lambda *x: self.hd())
 
@@ -4223,7 +4222,7 @@ class UnpackGui(ttk.LabelFrame):
         elif self.fm.get() == 'super':
             if os.path.exists(work + "super.img"):
                 if gettype(work + "super.img") == 'sparse':
-                    cz(utils.simg2img, work + "super.img", join=True)
+                    create_thread(utils.simg2img, work + "super.img", join=True)
                 for i in lpunpack.get_parts(work + "super.img"):
                     self.lsg.insert(i, i)
         elif self.fm.get() == 'update.app':
@@ -4286,14 +4285,14 @@ class FormatConversion(ttk.LabelFrame):
         self.list_b = ListBox(self)
         self.list_b.gui()
         self.list_b.pack(padx=5, pady=5, fill=BOTH)
-        cz(self.relist)
+        create_thread(self.relist)
         t = Frame(self)
         ttk.Button(t, text=lang.cancel, command=self.destroy).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                    expand=True)
-        ttk.Button(t, text=lang.ok, command=lambda: cz(self.conversion), style='Accent.TButton').pack(side='left',
-                                                                                                      padx=5, pady=5,
-                                                                                                      fill=BOTH,
-                                                                                                      expand=True)
+        ttk.Button(t, text=lang.ok, command=lambda: create_thread(self.conversion), style='Accent.TButton').pack(side='left',
+                                                                                                                 padx=5, pady=5,
+                                                                                                                 fill=BOTH,
+                                                                                                                 expand=True)
         t.pack(side=BOTTOM, fill=BOTH)
 
     def relist(self):

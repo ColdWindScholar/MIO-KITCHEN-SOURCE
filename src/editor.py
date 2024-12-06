@@ -20,7 +20,7 @@ from tkinter.ttk import Button
 
 import pygments.lexers
 from chlorophyll import CodeView
-from .utils import cz, gettype, lang
+from .utils import create_thread, gettype, lang
 
 
 class PythonEditor(tk.Frame):
@@ -36,7 +36,7 @@ class PythonEditor(tk.Frame):
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text=lang.text17, command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                               expand=1)
-        self.save_b = ttk.Button(f1, text=lang.t54, command=lambda: cz(self.save), style="Accent.TButton")
+        self.save_b = ttk.Button(f1, text=lang.t54, command=lambda: create_thread(self.save), style="Accent.TButton")
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         self.show = tk.Listbox(self, activestyle='dotbox', highlightthickness=0)
