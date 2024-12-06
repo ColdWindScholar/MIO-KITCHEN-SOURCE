@@ -852,7 +852,7 @@ class Tool(Tk):
         get_setting_button('ai_engine', sf4, lang.ai_engine)
         if os.name == 'nt':
             get_setting_button('treff', sf4, lang.t61)
-        enable_cp = ttk.Checkbutton(sf4, text="Context_Patch", variable=context, onvalue='1',
+        enable_cp = ttk.Checkbutton(sf4, text=lang.context_patch, variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)

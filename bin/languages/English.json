@@ -19,6 +19,7 @@
   "scopy":"Copy",
   "size": "Size",
   "time": "Time",
+  "context_patch": "Selinux Context Patch",
   "running": "Running",
   "patch": "Patch",
   "identifier":"Identifier:",

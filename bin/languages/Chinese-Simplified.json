@@ -20,6 +20,7 @@
   "scopy":"复制",
   "size": "大小",
   "time": "时间",
+  "context_patch": "Selinux 上下文修补",
   "running": "正在运行",
   "patch": "修补",
   "identifier":"标识符:",
