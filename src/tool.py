@@ -976,7 +976,14 @@ class Updater(Toplevel):
         except (Exception, BaseException):
             self.notice.configure(text=lang.t47, foreground='red')
             return
-        if not (new_version := json_.get('name')).endswith(settings.version):
+        new_version = json_.get('name')
+
+        if new_version is None:
+            self.notice.configure(text=lang.t46, foreground='red')
+            self.update_button.configure(state='normal', text=lang.text37)
+            return
+
+        if not new_version.endswith(settings.version):
             self.package_head = new_version
             self.notice.configure(text=lang.t48 % new_version, foreground='orange')
             self.change_log.insert('insert', json_.get('body'))
