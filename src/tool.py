@@ -612,7 +612,6 @@ class Tool(Tk):
             self.iconphoto(True,
                            PhotoImage(
                                data=images.icon_byte))
-        sys.stdout.write = logging.info
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))

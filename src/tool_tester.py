@@ -37,7 +37,6 @@ class Test(unittest.TestCase):
         except ValueError:
             ...
         pys.append('tkinter')
-        pys.append('tkinterdnd2')
         pys.remove('tool')
         if os.name != 'nt':
             pys.remove('sv_ttk_fixes')
