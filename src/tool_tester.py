@@ -32,7 +32,10 @@ class Test(unittest.TestCase):
 
     def test_import(self):
         pys = [i[:-3] for i in os.listdir(prog_path) if i.endswith('.py') and i != 'build.py']
-        pys.remove(os.path.basename(__file__).split('.')[0])
+        try:
+            pys.remove(os.path.basename(__file__).split('.')[0])
+        except ValueError:
+            ...
         pys.append('tkinter')
         pys.append('tkinterdnd2')
         pys.remove('tool')

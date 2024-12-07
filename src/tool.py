@@ -91,7 +91,7 @@ from . import utils
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from .extra import fspatch, re, contextpatch
-from .utils import create_thread, jzxs, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from .utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from .controls import ListBox, ScrollFrame
 from .undz import DZFileTools
 from .selinux_audit_allow import main as selinux_audit_allow
@@ -279,7 +279,7 @@ class ToolBox(ttk.Frame):
             self.boot_file = None
             self.title(lang.magisk_patch)
             self.gui()
-            jzxs(self)
+            move_center(self)
 
         def get_arch(self, apk=None) -> list:
             if not apk:
@@ -379,7 +379,7 @@ class ToolBox(ttk.Frame):
             super().__init__()
             self.title(lang.audit_allow)
             self.gui()
-            jzxs(self)
+            move_center(self)
 
         def gui(self):
             f = Frame(self)
@@ -440,7 +440,7 @@ class ToolBox(ttk.Frame):
             self.f_.bind("<<ComboboxSelected>>", lambda *x: self.calc())
             self.f_.pack(side='left', padx=5)
             ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, padx=5, pady=5)
-            jzxs(self)
+            move_center(self)
 
         def calc(self):
             self.result_size.delete(0, tk.END)
@@ -474,7 +474,7 @@ class ToolBox(ttk.Frame):
             self.geometry("400x450")
             self.resizable(False, False)
             self.dnd = lambda file_list:create_thread(self.__dnd, file_list)
-            jzxs(self)
+            move_center(self)
 
         def gui(self):
             a = ttk.LabelFrame(self, text='Drop')
@@ -539,7 +539,7 @@ class ToolBox(ttk.Frame):
             super().__init__()
             self.title(lang.trim_image)
             self.gui()
-            jzxs(self)
+            move_center(self)
             self.resizable(False, False)
 
         def gui(self):
@@ -921,7 +921,7 @@ class Updater(Toplevel):
             ttk.Label(self, text=lang.t64, foreground='gray',
                       justify='center').pack(fill=X, pady=10,
                                              padx=10, anchor='center')
-            jzxs(self)
+            move_center(self)
             return
         self.change_log = Text(f2, width=50, height=15)
         self.change_log.pack(padx=5, pady=5)
@@ -946,7 +946,7 @@ class Updater(Toplevel):
         else:
             create_thread(self.get_update)
         self.resizable(width=False, height=False)
-        jzxs(self)
+        move_center(self)
 
     def get_update(self):
         if self.update_button.cget('text') == lang.t40:
@@ -1136,7 +1136,7 @@ def error(code, desc="unknown error"):
                                             padx=10,
                                             pady=10, expand=True, fill=BOTH)
     ttk.Button(er, text="Exit", command=win.destroy).pack(side=LEFT, padx=10, pady=10, expand=True, fill=BOTH)
-    jzxs(er)
+    move_center(er)
     er.wait_window()
     sys.exit()
 
@@ -1162,7 +1162,7 @@ class Welcome(ttk.Frame):
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
             ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
             ttk.Button(self, text=lang.text136, command=self.main).pack(fill=X)
-        jzxs(win)
+        move_center(win)
         self.wait_window()
         states.in_oobe = False
 
@@ -1170,7 +1170,7 @@ class Welcome(ttk.Frame):
         if self.frame:
             self.frame.destroy()
         self.frame = ttk.Frame(self)
-        jzxs(win)
+        move_center(win)
         self.frame.pack(expand=1, fill=BOTH)
 
     def main(self):
@@ -1695,7 +1695,7 @@ class ModuleManager:
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             self.gui()
-            jzxs(self)
+            move_center(self)
 
         @staticmethod
         def label_entry(master, text, side, value: str = ''):
@@ -1941,7 +1941,7 @@ class ModuleManager:
             ttk.Button(self, text=lang.ok, command=lambda: create_thread(self.generate_msh if msh else self.generate_sh)).pack(
                 fill=X,
                 side='bottom')
-            jzxs(self)
+            move_center(self)
             self.wait_window()
 
         def generate_sh(self):
@@ -1980,7 +1980,7 @@ class ModuleManager:
             except (Exception, BaseException):
                 logging.exception('Bugs')
             self.title(lang.t6)
-            jzxs(self)
+            move_center(self)
             ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                               expand=True)
             if self.arr:
@@ -2153,7 +2153,7 @@ class InstallMpk(Toplevel):
         self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: create_thread(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         self.load()
-        jzxs(self)
+        move_center(self)
         self.wait_window()
         create_thread(list_pls_plugin)
 
@@ -2228,7 +2228,7 @@ class Debugger(Toplevel):
         super().__init__()
         self.title("MIO-KITCHEN Debugger")
         self.gui()
-        jzxs(self)
+        move_center(self)
 
     def gui(self):
         functions = [
@@ -2277,7 +2277,7 @@ class Debugger(Toplevel):
                                                                                  sticky='nw')
         ttk.Label(ck, text=f"Log File: {tool_log}", foreground='gray').grid(row=6, column=0, padx=5, pady=5,
                                                                             sticky='nw')
-        jzxs(ck)
+        move_center(ck)
 
     @staticmethod
     def settings():
@@ -2302,7 +2302,7 @@ class Debugger(Toplevel):
         f.pack(padx=5, fill=BOTH)
         read_value()
         ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
-        jzxs(ck)
+        move_center(ck)
         ck.wait_window()
 
     @staticmethod
@@ -2345,7 +2345,7 @@ class Debugger(Toplevel):
         f.pack(padx=5, fill=BOTH)
         read_value()
         ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
-        jzxs(ck)
+        move_center(ck)
         ck.wait_window()
 
 
@@ -2402,7 +2402,7 @@ class MpkStore(Toplevel):
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
-        jzxs(self)
+        move_center(self)
 
     def init_repo(self):
         if not hasattr(settings, 'plugin_repo'):
@@ -2472,7 +2472,7 @@ class MpkStore(Toplevel):
                    command=lambda: settings.set_value('plugin_repo', input_var.get()) == a.destroy()).pack(pady=5,
                                                                                                            padx=5,
                                                                                                            fill=BOTH)
-        jzxs(a)
+        move_center(a)
         a.wait_window()
         if settings.plugin_repo != self.repo:
             self.init_repo()
@@ -2660,7 +2660,7 @@ class PackSuper(Toplevel):
         t_frame.pack(fill=X)
         self.read_list()
         create_thread(self.refresh)
-        jzxs(self)
+        move_center(self)
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                       fill=X,
@@ -3137,7 +3137,7 @@ class Packxx(Toplevel):
                                                                                                                   padx=2, pady=2,
                                                                                                                   fill=X,
                                                                                                                   expand=True)
-        jzxs(self)
+        move_center(self)
 
     def start_(self):
         try:
@@ -3209,7 +3209,7 @@ class Packxx(Toplevel):
         f.pack(side='left', padx=5)
         read_value()
         ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
-        jzxs(ck)
+        move_center(ck)
         ck.wait_window()
 
     @animation
@@ -3768,7 +3768,7 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
         value.set(value_)
         ask.destroy()
 
-    jzxs(ask)
+    move_center(ask)
 
     ask.wait_window()
     return value.get()
@@ -3782,7 +3782,7 @@ def info_win(text: str, ok: str = lang.ok):
     ttk.Button(frame_inner, text=ok, command=ask.destroy, style="Accent.TButton").pack(padx=5, pady=5,
                                                                                        fill=X, side='left',
                                                                                        expand=True)
-    jzxs(ask)
+    move_center(ask)
     ask.wait_window()
 
 
@@ -4156,7 +4156,7 @@ class UnpackGui(ttk.LabelFrame):
 
     def info(self):
         ck_ = Toplevel()
-        jzxs(ck_)
+        move_center(ck_)
         ck_.title(lang.attribute)
         if not self.lsg.selected:
             ck_.destroy()
@@ -4461,7 +4461,7 @@ def init():
     win.update()
     if settings.custom_system == 'Android':
         win.attributes('-fullscreen', True)
-    jzxs(win)
+    move_center(win)
     win.get_time()
     print(lang.text134 % (dti() - start))
     if os.name == 'nt':

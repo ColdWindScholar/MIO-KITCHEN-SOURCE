@@ -13,7 +13,7 @@
 # limitations under the License.
 from difflib import SequenceMatcher
 from tkinter import Toplevel, ttk
-from .utils import jzxs
+from .utils import move_center
 from .Document_Library import library
 
 
@@ -49,4 +49,4 @@ def suggest(string: str = '', language='cn', ok='ok'):
                     break
     ttk.Label(window, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
     ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10)
-    jzxs(window)
+    move_center(window)

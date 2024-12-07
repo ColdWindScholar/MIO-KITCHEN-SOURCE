@@ -442,7 +442,7 @@ def findfolder(dir__, folder_name):
     return None
 
 
-def jzxs(master):
+def move_center(master):
     """
     Replace Toplevel or Tk to Center
     :param master: Window
