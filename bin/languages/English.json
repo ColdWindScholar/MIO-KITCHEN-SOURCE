@@ -20,6 +20,8 @@
   "size": "Size",
   "time": "Time",
   "context_patch": "Selinux Context Patch",
+  "detail": "Detail",
+  "solution": "Solution",
   "running": "Running",
   "patch": "Patch",
   "identifier":"Identifier:",

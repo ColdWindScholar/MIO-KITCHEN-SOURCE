@@ -2829,8 +2829,7 @@ class StdoutRedirector:
         logging.debug(string)
         self.text_space.see('end')
         if settings.ai_engine == '1':
-            AI_engine.suggest(string, language='cn' if "Chinese" in settings.language else 'en',
-                              ok=lang.ok)
+            AI_engine.suggest(string, language=settings.language, ok=lang.ok)
 
 
 def call(exe, extra_path=True, out=0):

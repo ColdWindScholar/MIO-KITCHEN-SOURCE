@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os.path
 from difflib import SequenceMatcher
 from tkinter import Toplevel, ttk, BOTH
-from .utils import move_center
-from .Document_Library import library
+from .utils import move_center, prog_path, lang
+from json import load
+with open(os.path.join(prog_path, 'bin', 'help_document.json'), 'r', encoding='utf-8') as f:
+    library = load(f)
 
-
-def suggest(string: str = '', language='cn', ok='ok'):
+def suggest(string: str = '', language='English', ok='ok'):
     catch_error = [i for i in string.split("\n") if 'error' in i]
     if not catch_error:
         catch_error = [i for i in string.split("\n") if 'failed' in i]
@@ -34,8 +36,16 @@ def suggest(string: str = '', language='cn', ok='ok'):
     window.resizable(False, False)
     window.title("AI ENGINE")
     text = f"No idea about:\n\t{string}\nPlease Report It To us."
+    detail = 'Unknown'
     if string:
         for i in library.keys():
+            if not language in library[i]:
+                language = 'English'
+            if 'detail' in library[i]:
+                try:
+                    detail = library[i]['detail'][language]
+                except ValueError:
+                    detail = 'Unknown'
             similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
             if similarity_ >= 0.8:
                 text = library[i][language]
@@ -48,6 +58,12 @@ def suggest(string: str = '', language='cn', ok='ok'):
                 else:
                     text = library[i][language]
                     break
-    ttk.Label(window, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
+    f1 = ttk.LabelFrame(window, text=lang.detail)
+    ttk.Label(f1, text=detail, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
+    f1.pack(padx=10, pady=10)
+    f2 = ttk.LabelFrame(window, text="解决方法")
+    ttk.Label(f2, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
+    f2.pack(padx=10, pady=10)
+
     ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10, fill=BOTH)
     move_center(window)
