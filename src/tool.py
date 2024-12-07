@@ -2231,6 +2231,9 @@ class Debugger(Toplevel):
         move_center(self)
 
     def gui(self):
+        row = 0
+        num = 3
+        num_c = 0
         functions = [
             ('Globals', self.loaded_module),
             ('Settings', self.settings),
@@ -2240,7 +2243,11 @@ class Debugger(Toplevel):
             ('Generate Bug Report', lambda: create_thread(self.Generate_Bug_Report)),
         ]
         for index, (text, func) in enumerate(functions):
-            ttk.Button(self, text=text, command=func).grid(row=2, column=index, padx=5, pady=5)
+            ttk.Button(self, text=text, command=func).grid(row=row, column=num_c, padx=5, pady=5)
+            num_c += 1
+            if num_c >= num:
+                row += 1
+                num_c = 0
 
     @staticmethod
     def Generate_Bug_Report():
@@ -2265,7 +2272,7 @@ class Debugger(Toplevel):
             f.write(f'Uname: {platform.uname()}\n')
         pack_zip(inner, bugreport:=os.path.join(output, f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"), slient=True)
         re_folder(inner,quiet=True)
-        print(f"The Bug Report Was Saved:{bugreport}")
+        print(f"\tThe Bug Report Was Saved:{bugreport}")
 
     @staticmethod
     def crash():
