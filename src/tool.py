@@ -957,6 +957,7 @@ class Updater(Toplevel):
                 self.notice.configure(text=lang.t44, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
                 self.progressbar.stop()
+                logging.exception("Upgrade")
                 return
             return
         self.notice.configure(text=lang.t45, foreground='')
@@ -1037,33 +1038,29 @@ class Updater(Toplevel):
 
     def update_process(self):
         [terminate_process(i) for i in states.open_pids]
-        if os.path.exists(tool_self):
-            shutil.copy(tool_self,
-                        os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-            self.notice.configure(text=lang.t51)
-            with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
-                for file in zip_ref.namelist():
-                    if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
-                        zip_ref.extract(file, cwd_path)
-                    else:
-                        zip_ref.extract(file, os.path.join(cwd_path, "bin"))
-            update_dict = {
-                'updating': '1',
-                'language': settings.language,
-                'oobe': settings.oobe,
-                'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
-                "version_old": settings.version
-            }
-            for i in update_dict.keys():
-                settings.set_value(i, update_dict.get(i, ''))
-            subprocess.Popen(
-                [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            create_thread(sys.exit, 1)
-            terminate_process(os.getpid())
-        else:
-            self.notice.configure(text=lang.t41, foreground='red')
-            self.update_button.configure(state='normal', text=lang.text37)
+        self.notice.configure(text=lang.t51)
+        with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
+            for file in zip_ref.namelist():
+                if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
+                    zip_ref.extract(file, cwd_path)
+                else:
+                    zip_ref.extract(file, os.path.join(cwd_path, "bin"))
+        update_dict = {
+            'updating': '1',
+            'language': settings.language,
+            'oobe': settings.oobe,
+            'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
+            "version_old": settings.version
+        }
+        for i in update_dict.keys():
+            settings.set_value(i, update_dict.get(i, ''))
+        shutil.copy(os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
+                    os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
+        subprocess.Popen(
+            [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        terminate_process(os.getpid())
+
 
     def update_process2(self):
         self.notice.configure(text=lang.t51)
