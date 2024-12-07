@@ -2237,9 +2237,35 @@ class Debugger(Toplevel):
             ('Info', self.show_info),
             ('Crash it!', self.crash),
             ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
+            ('Generate Bug Report', lambda: create_thread(self.Generate_Bug_Report)),
         ]
         for index, (text, func) in enumerate(functions):
             ttk.Button(self, text=text, command=func).grid(row=2, column=index, padx=5, pady=5)
+
+    @staticmethod
+    def Generate_Bug_Report():
+        if os.name == 'nt':
+            output = filedialog.askdirectory(title="Path To Save Bug Report")
+        else:
+            output = cwd_path
+        output = str(output)
+        if not output:
+            return
+        if not os.path.isdir(output) or not os.path.exists(output):
+            return
+        re_folder(inner := os.path.join(temp, v_code()))
+        shutil.copyfile(tool_log, os.path.join(inner, os.path.basename(tool_log)))
+        with open(os.path.join(inner, 'detail.txt'), 'w+', encoding='utf-8', newline='\n') as f:
+            f.write(f'Python: {sys.version}\n')
+            f.write(f'Platform: {sys.platform}\n')
+            f.write(f'Exec Command: {sys.argv}\n')
+            f.write(f'Tool Version: {settings.version}\n')
+            f.write(f'Source code running: {states.run_source}\n')
+            f.write(f'python Implementation: {platform.python_implementation()}\n')
+            f.write(f'Uname: {platform.uname()}\n')
+        pack_zip(inner, bugreport:=os.path.join(output, f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"), slient=True)
+        re_folder(inner,quiet=True)
+        print(f"The Bug Report Was Saved:{bugreport}")
 
     @staticmethod
     def crash():
@@ -3988,25 +4014,28 @@ def rmdir(path, quiet=False):
 
 
 @animation
-def pack_zip(input_dir=None,output_zip=None):
+def pack_zip(input_dir=None,output_zip=None, slient=False):
     if input_dir is None:
         input_dir = ProjectManager.current_work_output_path()
     if output_zip is None:
         output_zip = settings.path + os.sep + current_project_name.get() + ".zip"
-    if ask_win(lang.t53) != 1:
-        return
+    if not slient:
+        if ask_win(lang.t53) != 1:
+            return
     if not ProjectManager.exist():
         win.message_pop(lang.warn1)
     else:
         print(lang.text91 % current_project_name.get())
-        if ask_win(lang.t25) == 1:
-            PackHybridRom()
+        if not slient:
+            if ask_win(lang.t25) == 1:
+                PackHybridRom()
         with zipfile.ZipFile(output_zip, 'w',
                              compression=zipfile.ZIP_DEFLATED) as zip_:
             for file in utils.get_all_file_paths(input_dir):
                 file = str(file)
                 arch_name = file.replace(input_dir, '')
-                print(f"{lang.text1}:{arch_name}")
+                if not slient:
+                    print(f"{lang.text1}:{arch_name}")
                 try:
                     zip_.write(file, arcname=arch_name)
                 except Exception as e:
