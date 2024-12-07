@@ -981,6 +981,7 @@ class Updater(Toplevel):
         if new_version is None:
             self.notice.configure(text=lang.t46, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
+            self.change_log.insert('insert', url.text)
             return
 
         if not new_version.endswith(settings.version):
