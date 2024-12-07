@@ -147,7 +147,7 @@ elif os.name == 'nt':
 if not os.path.exists('dist/bin'):
     os.makedirs('dist/bin', exist_ok=True)
 pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash.zip', 'setting.ini', ostype,
-          'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd"]
+          'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json']
 for i in os.listdir(local + os.sep + "bin"):
     if i in pclist:
         if os.path.isdir(f"{local}/bin/{i}"):
