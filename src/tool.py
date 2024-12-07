@@ -1094,6 +1094,7 @@ class Updater(Toplevel):
 
     def update_process3(self):
         self.notice.configure(text=lang.t52)
+        time.sleep(2)
         if os.path.exists(settings.new_tool):
             try:
                 if os.path.isfile(settings.new_tool):
