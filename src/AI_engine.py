@@ -44,7 +44,7 @@ def suggest(string: str = '', language='English', ok='ok'):
             if 'detail' in library[i]:
                 try:
                     detail = library[i]['detail'][language]
-                except ValueError:
+                except (ValueError, KeyError):
                     detail = 'Unknown'
             similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
             if similarity_ >= 0.8:
