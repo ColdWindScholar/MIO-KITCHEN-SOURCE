@@ -32,7 +32,7 @@ def suggest(string: str = '', language='cn', ok='ok'):
     similarity = 0
     window = Toplevel()
     window.resizable(False, False)
-    window.title("AI ENGINE:<Based on bug feedback>")
+    window.title("AI ENGINE")
     text = f"No idea about:\n\t{string}\nPlease Report It To us."
     if string:
         for i in library.keys():
