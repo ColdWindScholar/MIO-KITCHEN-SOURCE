@@ -59,11 +59,12 @@ def suggest(string: str = '', language='English', ok='ok'):
                     text = library[i][language]
                     break
     f1 = ttk.LabelFrame(window, text=lang.detail)
-    ttk.Label(f1, text=detail, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
+    ttk.Label(f1, text=string, font=(None, 12), foreground="orange", wraplength=400).pack(padx=10, pady=5)
+    ttk.Label(f1, text=detail, font=(None, 15),foreground="grey", wraplength=400).pack(padx=10, pady=10)
     f1.pack(padx=10, pady=10)
     f2 = ttk.LabelFrame(window, text=lang.solution)
-    ttk.Label(f2, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
+    ttk.Label(f2, text=text, font=(None, 15),foreground="green", wraplength=400).pack(padx=10, pady=10)
     f2.pack(padx=10, pady=10)
 
-    ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10, fill=BOTH)
+    ttk.Button(window, text=ok, command=window.destroy, style="Accent.TButton").pack(padx=10, pady=10, fill=BOTH)
     move_center(window)
