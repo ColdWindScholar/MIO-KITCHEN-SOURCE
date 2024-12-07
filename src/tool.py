@@ -1120,6 +1120,7 @@ def error(code, desc="unknown error"):
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er, height=20, width=60)
+    sys.stdout = StdoutRedirector(te)
     scroll.config(command=te.yview)
     te.pack(padx=10, pady=10, fill=BOTH)
     te.insert('insert', desc)
@@ -1127,6 +1128,11 @@ def error(code, desc="unknown error"):
     ttk.Label(er, text=f"The Log File Is: {tool_log}", font=(None, 10)).pack(padx=10, pady=10)
     ttk.Button(er, text="Report",
                command=lambda: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/issues"),
+               style="Accent.TButton").pack(side=LEFT,
+                                            padx=10,
+                                            pady=10, expand=True, fill=BOTH)
+    ttk.Button(er, text="Generate Bug Report",
+               command=lambda: create_thread(Generate_Bug_Report),
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10, expand=True, fill=BOTH)
@@ -2222,35 +2228,7 @@ class InstallMpk(Toplevel):
         self.state.config()
         self.installb.config(state=DISABLED)
 
-
-class Debugger(Toplevel):
-    def __init__(self):
-        super().__init__()
-        self.title("MIO-KITCHEN Debugger")
-        self.gui()
-        move_center(self)
-
-    def gui(self):
-        row = 0
-        num = 3
-        num_c = 0
-        functions = [
-            ('Globals', self.loaded_module),
-            ('Settings', self.settings),
-            ('Info', self.show_info),
-            ('Crash it!', self.crash),
-            ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
-            ('Generate Bug Report', lambda: create_thread(self.Generate_Bug_Report)),
-        ]
-        for index, (text, func) in enumerate(functions):
-            ttk.Button(self, text=text, command=func).grid(row=row, column=num_c, padx=5, pady=5)
-            num_c += 1
-            if num_c >= num:
-                row += 1
-                num_c = 0
-
-    @staticmethod
-    def Generate_Bug_Report():
+def Generate_Bug_Report():
         if os.name == 'nt':
             output = filedialog.askdirectory(title="Path To Save Bug Report")
         else:
@@ -2273,6 +2251,32 @@ class Debugger(Toplevel):
         pack_zip(inner, bugreport:=os.path.join(output, f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"), slient=True)
         re_folder(inner,quiet=True)
         print(f"\tThe Bug Report Was Saved:{bugreport}")
+
+class Debugger(Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.title("MIO-KITCHEN Debugger")
+        self.gui()
+        move_center(self)
+
+    def gui(self):
+        row = 0
+        num = 3
+        num_c = 0
+        functions = [
+            ('Globals', self.loaded_module),
+            ('Settings', self.settings),
+            ('Info', self.show_info),
+            ('Crash it!', self.crash),
+            ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
+            ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
+        ]
+        for index, (text, func) in enumerate(functions):
+            ttk.Button(self, text=text, command=func).grid(row=row, column=num_c, padx=5, pady=5)
+            num_c += 1
+            if num_c >= num:
+                row += 1
+                num_c = 0
 
     @staticmethod
     def crash():
