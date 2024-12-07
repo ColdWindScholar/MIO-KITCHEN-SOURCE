@@ -50,9 +50,8 @@ def _require(tkroot):
             tkdnd_platform_rep = "win-x86"
         else:
             raise RuntimeError('Plaform not supported.')
-        
-        module_path = os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)
-        tkroot.tk.call('lappend', 'auto_path', module_path)
+
+        tkroot.tk.call('lappend', 'auto_path', os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep))
         TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
     except tkinter.TclError:
         raise RuntimeError('Unable to load tkdnd library.')

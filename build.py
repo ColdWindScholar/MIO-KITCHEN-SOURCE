@@ -124,6 +124,8 @@ elif os.name == 'posix':
         'splash.png'
     ])
 elif os.name == 'nt':
+    mach_ = platform.machine()
+    platform.machine = lambda: 'x86' if platform.architecture()[0] == '32bit' and mach_ == 'AMD64' else mach_
     if platform.machine() == 'x86':
         dndplat = 'win-x86'
     elif platform.machine() == 'AMD64':
