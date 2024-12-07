@@ -61,7 +61,7 @@ def suggest(string: str = '', language='English', ok='ok'):
     f1 = ttk.LabelFrame(window, text=lang.detail)
     ttk.Label(f1, text=detail, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
     f1.pack(padx=10, pady=10)
-    f2 = ttk.LabelFrame(window, text="解决方法")
+    f2 = ttk.LabelFrame(window, text=lang.solution)
     ttk.Label(f2, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
     f2.pack(padx=10, pady=10)
 
