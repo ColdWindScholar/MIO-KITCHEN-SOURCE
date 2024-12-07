@@ -1039,10 +1039,15 @@ class Updater(Toplevel):
     def update_process(self):
         [terminate_process(i) for i in states.open_pids]
         self.notice.configure(text=lang.t51)
+        update_files = []
         with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
             for file in zip_ref.namelist():
                 if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
-                    zip_ref.extract(file, cwd_path)
+                    try:
+                        zip_ref.extract(file, cwd_path)
+                    except PermissionError:
+                        zip_ref.extract(file, temp)
+                        update_files.append([os.path.join(temp, file), file])
                 else:
                     zip_ref.extract(file, os.path.join(cwd_path, "bin"))
         update_dict = {
@@ -1050,7 +1055,8 @@ class Updater(Toplevel):
             'language': settings.language,
             'oobe': settings.oobe,
             'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
-            "version_old": settings.version
+            "version_old": settings.version,
+            "update_files": update_files
         }
         for i in update_dict.keys():
             settings.set_value(i, update_dict.get(i, ''))
@@ -1065,6 +1071,15 @@ class Updater(Toplevel):
     def update_process2(self):
         self.notice.configure(text=lang.t51)
         time.sleep(2)
+        if hasattr(settings, 'update_files'):
+            for path, real in settings.update_files:
+                if calculate_md5_file(path) == calculate_md5_file(os.path.join(cwd_path, real)):
+                    continue
+                if os.path.exists(path):
+                    os.rename(path, os.path.join(cwd_path, real))
+                else:
+                    logging.warning(path)
+
         if os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe'))))
@@ -1442,6 +1457,9 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):
         print(f"Warn, The algorithm {method} not exist in hashlib!")
+        return 1
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        print(f"Warn, The file {file_path} not exist!")
         return 1
     algorithm = getattr(hashlib, method)()
     with open(file_path, "rb") as f:
