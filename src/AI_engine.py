@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from difflib import SequenceMatcher
-from tkinter import Toplevel, ttk
+from tkinter import Toplevel, ttk, BOTH
 from .utils import move_center
 from .Document_Library import library
 
@@ -31,8 +31,9 @@ def suggest(string: str = '', language='cn', ok='ok'):
         return
     similarity = 0
     window = Toplevel()
+    window.resizable(False, False)
     window.title("AI ENGINE:<Based on bug feedback>")
-    text = 'SORRY, No Suggestion For This Problem'
+    text = f"No idea about:\n\t{string}\nPlease Report It To us."
     if string:
         for i in library.keys():
             similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
@@ -48,5 +49,5 @@ def suggest(string: str = '', language='cn', ok='ok'):
                     text = library[i][language]
                     break
     ttk.Label(window, text=text, font=(None, 15), wraplength=400).pack(padx=10, pady=10)
-    ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10)
+    ttk.Button(window, text=ok, command=window.destroy).pack(padx=10, pady=10, fill=BOTH)
     move_center(window)

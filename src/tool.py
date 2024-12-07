@@ -2828,6 +2828,9 @@ class StdoutRedirector:
         self.text_space.insert(tk.END, string)
         logging.debug(string)
         self.text_space.see('end')
+        if settings.ai_engine == '1':
+            AI_engine.suggest(string, language='cn' if "Chinese" in settings.language else 'en',
+                              ok=lang.ok)
 
 
 def call(exe, extra_path=True, out=0):
@@ -3334,9 +3337,7 @@ class Packxx(Toplevel):
                 logo_pack()
             else:
                 print(f"Unsupported {i}:{parts_dict[i]}")
-        if settings.ai_engine == '1':
-            AI_engine.suggest(win.show.get(1.0, tk.END), language='cn' if "Chinese" in settings.language else 'en',
-                              ok=lang.ok)
+
 
 
 def rdi(work, part_name) -> bool:
