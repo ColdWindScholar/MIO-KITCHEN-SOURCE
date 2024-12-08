@@ -1,0 +1,112 @@
+#!/sbin/sh
+OUTFD=/proc/self/fd/$2
+ZIPF="$3"
+ui_print() {
+	echo -e "ui_print $1\nui_print" >>$OUTFD
+}
+package_extract_file() {
+  ui_print "- 正在刷写分区 $(basename $2) "
+  ui_print "- Flashing partition $(basename $2) "
+  if [ -e $2$(getprop ro.boot.slot_suffix) ] && [ "$(getprop ro.boot.slot_suffix)" != "" ] ;then
+  unzip -p "$ZIPF" $1 >${2}_a
+  unzip -p "$ZIPF" $1 >${2}_b
+  else
+  unzip -p "$ZIPF" $1 >$2
+  fi
+}
+package_extract_zstd() {
+  ui_print "- 正在刷写分区 $(basename $2) "
+  ui_print "- Flashing partition $(basename $2) "
+  if [ -e ${2}_a ] ;then
+  unzip -p "$ZIPF" $1 | /tmp/bin/zstd -c -d >${2}_a
+  else
+  unzip -p "$ZIPF" $1 | /tmp/bin/zstd -c -d >$2
+  fi
+}
+getVolumeKey() {
+	ui_print "- 监听音量键 按[+]是Y 按[-]是N"
+	ui_print "- Listening for volume keys, press [+] for Yes, press [-] for No."
+	key=$(getevent -qlc 1)
+	Up=$(echo $key |grep KEY_VOLUMEUP)
+	Down=$(echo $key |grep KEY_VOLUMEDOWN)
+	[ "$Up" != "" ] && return 0
+	[ "$Down" != "" ] && return 1
+}
+remap() {
+	for part in $(ls /dev/block/mapper/)
+	do
+	[ "$part" == "by-uuid" ] && continue
+	ui_print "正在重新挂载$part"
+	ui_print "Re-mounting$part"
+	lptools unmap $part
+	lptools map $part
+	done
+}
+[ -d /tmp ] && rm -rf /tmp
+mkdir -p /tmp
+unzip "$ZIPF" bin/zstd -d /tmp
+chmod -R 0755 /tmp
+device=$(getprop ro.product.device)
+ui_print "M.K.C Recovery Flash Script"
+ui_print "Made By MIO-KITCHEN"
+if [ "$device" != "$right_device" ] ;then
+ui_print "机型效验不通过！"
+ui_print "此包仅可供 $right_device 刷入，而你的设备是 $device"
+ui_print " - 强制刷入吗？"
+ui_print "Device verification failed！"
+ui_print "This ROM is only available for $right_device to flash, and your device is $device."
+ui_print " - Do you want to force the flash?"
+if getVolumeKey;then
+ui_print "正在强制刷入！此操作可能导致设备损坏！"
+ui_print "Forcing the flash now! This operation may cause device damage!"
+else
+ui_print "终止！"
+ui_print "Aborted!"
+exit 1
+fi
+fi
+# 禁用模块
+ui_print "- 是否禁用模块？"
+ui_print "- Do you want to disable the module?"
+if getVolumeKey;then
+	ui_print "- 禁用模块"
+	ui_print "- Disable the module"
+	for module in $(ls -d /data/adb/modules/*); do
+		moduleName=$(basename $module)
+		ui_print "- 正在禁用 $moduleName"
+		ui_print "- Disabling $moduleName"
+		touch $module/disable
+	done
+fi
+ui_print "- 开始刷机"
+ui_print "- Starting the flashing process."
+# unzip preloader
+unzip -o "$ZIPF" "images/preloader*.img" -d /tmp
+#Other images
+# UFS
+if [ -e /dev/block/sda ] && [ -f tmp/images/preloader_ufs.img ] ;then
+	package_extract_file "images/preloader_ufs.img" "/dev/block/by-name/sda"
+fi
+#EMMC
+if [ -e /dev/block/mmcblk0boot0 ] && [ -f tmp/images/preloader_emmc.img ] ;then
+	package_extract_file "images/preloader_emmc.img" "/dev/block/by-name/mmcblk0boot0"
+fi
+if [ -e /dev/block/mmcblk0boot1 ] && [ -f tmp/images/preloader_emmc.img ] ;then
+	package_extract_file "images/preloader_emmc.img" "/dev/block/by-name/mmcblk0boot1"
+fi
+if [ -f tmp/images/preloader_raw.img ] ;then
+	for preloaderPartition in $(ls /dev/block/by-name |grep preloader);do
+		package_extract_file "images/preloader_raw.img" "/dev/block/by-name/$preloaderPartition"
+	done
+fi
+#super image
+ui_print "- 清除缓存"
+ui_print "- Clearing cache"
+rm -rf /data/dalvik-cache/arm/*
+rm -rf /data/dalvik-cache/arm64/*
+rm -rf /data/system/package_cache/*
+#remap
+[ -e /dev/block/by-name/super ] && remap
+ui_print "- 刷机完毕"
+ui_print "- Flashing complete."
+exit 0
