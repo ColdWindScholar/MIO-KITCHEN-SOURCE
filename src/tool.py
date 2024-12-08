@@ -117,6 +117,7 @@ class States:
     run_source = gettype(sys.argv[0]) == "unknown"
     in_oobe = False
     development = False
+    inited = False
 
 
 class JsonEdit:
@@ -1546,7 +1547,7 @@ class ModuleManager:
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.startlist = os.path.join(self.module_dir, 'start.list')
         self.start_list_lock = False
-        self.exec_start_list()
+        create_thread(self.exec_start_list)
 
     class ErrorCodes(int):
         Normal = 0
@@ -1564,7 +1565,8 @@ class ModuleManager:
         data = s_list.read()
         if data is not list:
             data = list(data)
-        data.append(id)
+        if not id in data:
+            data.append(id)
         s_list.write(data)
         del data
         self.start_list_lock = False
@@ -1575,8 +1577,11 @@ class ModuleManager:
             while self.start_list_lock:
                 time.sleep(1)
         self.start_list_lock = True
+        while not states.inited:
+            time.sleep(1)
         for i in JsonEdit(self.startlist).read():
-            logging.info(f"Exec {i}")
+            if not self.get_installed(i):
+                continue
             create_thread(self.run, i)
         self.start_list_lock = False
 
@@ -4561,6 +4566,7 @@ def init():
             ask_win('Support for Windows 7 and older operating systems will be removed after version 4.0.0')
     if len(sys.argv) > 1:
         dndfile(sys.argv[1:])
+    states.inited = True
     win.mainloop()
 
 
