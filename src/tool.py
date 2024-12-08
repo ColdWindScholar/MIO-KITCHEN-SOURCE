@@ -2607,7 +2607,7 @@ class PackHybridRom:
             return
         if os.path.exists(dir_ + 'META-INF'):
             rmdir(dir_ + 'META-INF')
-        zipfile.ZipFile(f"{cwd_path}/bin/extra_flash.zip").extractall(dir_)
+        shutil.copytree(f"{cwd_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
         right_device = input_(lang.t26, 'olive')
         with open(dir_ + "bin/right_device", 'w', encoding='gbk') as rd:
             rd.write(right_device + "\n")
