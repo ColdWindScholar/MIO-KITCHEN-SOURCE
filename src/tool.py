@@ -1555,7 +1555,7 @@ class ModuleManager:
         DependsMissing = 2
         IsBroken = 3
 
-    def write_start_list(self, id):
+    def write_start_list(self, id, remove=False):
         if self.start_list_lock:
             print("Waiting For Lock...")
             while self.start_list_lock:
@@ -1567,6 +1567,8 @@ class ModuleManager:
             data = list(data)
         if not id in data:
             data.append(id)
+        if remove and id in data:
+            data.remove(id)
         s_list.write(data)
         del data
         self.start_list_lock = False
@@ -2080,6 +2082,7 @@ class ModuleManager:
             self.remove(self.value, self.value2)
 
         def remove(self, name=None, show_name='') -> None:
+            ModuleManager.write_start_list(name, remove=True)
             if name:
                 print(lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(self.module_dir + os.sep + name):
