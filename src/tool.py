@@ -2681,10 +2681,11 @@ class PackSuper(Toplevel):
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
         (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
         self.supersz.set(1)
-        # 自动设置
-        ttk.Radiobutton(lf1, text="A-only", variable=self.supersz, value=1).pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1, text="Virtual-ab", variable=self.supersz, value=2).pack(side='left', padx=10, pady=10)
-        ttk.Radiobutton(lf1, text="A/B", variable=self.supersz, value=3).pack(side='left', padx=10, pady=10)
+
+        radios = [("A-only", 1), ("Virtual-ab", 2), ("Virtual-ab", 3)]
+        for text, value in radios:
+            ttk.Radiobutton(lf1, text=text, variable=self.supersz, value=value).pack(side='left', padx=10, pady=10)
+
         ttk.Radiobutton(lf1_r, text="Readonly", variable=self.attrib, value='readonly').pack(side='left', padx=10,
                                                                                              pady=10)
         ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
