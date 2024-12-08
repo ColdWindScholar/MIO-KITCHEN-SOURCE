@@ -1544,12 +1544,42 @@ class ModuleManager:
         self.errorcodes = self.ErrorCodes()
         self.get_name = lambda id_: name if (name := self.get_info(id_, 'name')) else id_
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
+        self.startlist = os.path.join(self.module_dir, 'start.list')
+        self.start_list_lock = False
+        self.exec_start_list()
 
     class ErrorCodes(int):
         Normal = 0
         PlatformNotSupport = 1
         DependsMissing = 2
         IsBroken = 3
+
+    def write_start_list(self, id):
+        if self.start_list_lock:
+            print("Waiting For Lock...")
+            while self.start_list_lock:
+                time.sleep(1)
+        self.start_list_lock = True
+        s_list = JsonEdit(self.startlist)
+        data = s_list.read()
+        if data is not list:
+            data = list(data)
+        data.append(id)
+        s_list.write(data)
+        del data
+        self.start_list_lock = False
+
+    def exec_start_list(self):
+        if self.start_list_lock:
+            print("Waiting For Lock...")
+            while self.start_list_lock:
+                time.sleep(1)
+        self.start_list_lock = True
+        for i in JsonEdit(self.startlist).read():
+            logging.info(f"Exec {i}")
+            create_thread(self.run, i)
+        self.start_list_lock = False
+
 
     def get_info(self, id_: str, item: str) -> str:
         info_file = f'{self.module_dir}/{id_}/info.json'
@@ -1651,6 +1681,12 @@ class ModuleManager:
                     info = fz.getinfo(file)
                     extracted_size += info.file_size
                     fz.extract(file, str(os.path.join(cwd_path, "bin", "module", install_dir)))
+        try:
+            start_auto = mconf.get('module', 'start_auto')
+        except:
+            start_auto = 'False'
+        if start_auto in ['True', 'true', '1']:
+            self.write_start_list(mconf.get('module', 'identifier'))
         try:
             depends = mconf.get('module', 'depend')
         except (Exception, BaseException):
