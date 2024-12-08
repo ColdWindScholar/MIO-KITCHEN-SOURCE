@@ -98,7 +98,7 @@ from .selinux_audit_allow import main as selinux_audit_allow
 import logging
 
 try:
-    import imp
+    from . import imp
 except ImportError:
     imp = None
 try:
@@ -1570,7 +1570,7 @@ class ModuleManager:
             return 1
 
         name = self.get_name(id_)
-        script_path = self.module_dir + os.sep + value + os.sep
+        script_path = self.module_dir + f"/{value}/"
         with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
             data = json.load(f)
             for n in data['depend'].split():
@@ -1600,18 +1600,7 @@ class ModuleManager:
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
             try:
-                module = imp.load_source('module', script_path + "main.py")
-                if hasattr(module, 'main'):
-                    data = {
-                        "win": win,
-                        'version': settings.version, "bin": script_path.replace(os.sep, "/"),
-                        "project": ProjectManager.current_work_path().replace('\\', '/'),
-                        'moddir': self.module_dir.replace('\\', '/'),
-                        'tool_bin': settings.tool_bin.replace(
-                            '\\',
-                            '/')
-                    }
-                    module.main(data)
+                imp.load_source('__mkc_module__', script_path + "main.py")
             except Exception:
                 logging.exception('Bugs')
         elif not os.path.exists(self.module_dir + os.sep + value):
