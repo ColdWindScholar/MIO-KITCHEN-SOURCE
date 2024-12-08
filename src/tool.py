@@ -1073,7 +1073,11 @@ class Updater(Toplevel):
         self.notice.configure(text=lang.t51)
         time.sleep(2)
         if hasattr(settings, 'update_files'):
-            for path, real in settings.update_files:
+            for i in settings.update_files:
+                try:
+                    path, real = i
+                except (KeyError, ValueError):
+                    continue
                 if calculate_md5_file(path) == calculate_md5_file(os.path.join(cwd_path, real)):
                     continue
                 if os.path.exists(path):
