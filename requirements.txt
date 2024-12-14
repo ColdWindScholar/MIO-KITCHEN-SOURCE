@@ -13,3 +13,4 @@ pywinstyles
 tarsafe
 asn1crypto
 lxml
+wmi

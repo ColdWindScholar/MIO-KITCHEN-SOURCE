@@ -87,7 +87,6 @@ from . import AI_engine
 from . import ext4
 from .config_parser import ConfigParser
 from . import utils
-
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from .extra import fspatch, re, contextpatch
@@ -96,6 +95,14 @@ from .controls import ListBox, ScrollFrame
 from .undz import DZFileTools
 from .selinux_audit_allow import main as selinux_audit_allow
 import logging
+is_pro = False
+try:
+    from src.pro.sn import v as verify
+    is_pro = True
+except ImportError:
+    is_pro = False
+if is_pro:
+    from src.pro.active_ui import Active
 
 try:
     from . import imp
@@ -1326,6 +1333,10 @@ class SetUtils:
         self.load_language(language.get())
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
+        if is_pro:
+            if 'active_code' not in self.__dir__():
+                self.active_code = 'None'
+            verify.verify(self.active_code)
         if os.name != 'nt':
             win.attributes("-alpha", self.bar_level)
         else:
@@ -4561,6 +4572,9 @@ def init():
     animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
     animation.init()
     print(lang.text108)
+    if is_pro:
+        if not verify.state:
+            Active(verify, settings, win, images, lang).gui()
     win.update()
     if settings.custom_system == 'Android':
         win.attributes('-fullscreen', True)
