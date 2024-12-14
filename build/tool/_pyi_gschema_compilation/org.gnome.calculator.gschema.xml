@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <enum id="org.gnome.calculator.NumberFormat">
+    <value value="0" nick="automatic"/>
+    <value value="1" nick="fixed"/>
+    <value value="2" nick="scientific"/>
+    <value value="3" nick="engineering"/>
+  </enum>
+  <enum id="org.gnome.calculator.ButtonMode">
+    <value value="0" nick="basic"/>
+    <value value="1" nick="advanced"/>
+    <value value="2" nick="financial"/>
+    <value value="3" nick="programming"/>
+    <value value="4" nick="keyboard"/>
+  </enum>
+  <enum id="org.gnome.calculator.AngleUnit">
+    <value value="0" nick="radians"/>
+    <value value="1" nick="degrees"/>
+    <value value="2" nick="gradians"/>
+  </enum>
+
+  <schema path="/org/gnome/calculator/" id="org.gnome.calculator" gettext-domain="gnome-calculator">
+    <key type="i" name="accuracy">
+      <default>9</default>
+      <summary>Accuracy value</summary>
+      <description>The number of digits displayed after the numeric point</description>
+    </key>
+    <key type="i" name="word-size">
+      <default>64</default>
+      <range min="8" max="64"/>
+      <summary>Word size</summary>
+      <description>The size of the words used in bitwise operations</description>
+    </key>
+    <key type="i" name="base">
+      <default>10</default>
+      <range min="2" max="16"/>
+      <summary>Numeric Base</summary>
+      <description>The numeric base</description>
+    </key>
+    <key type="b" name="show-thousands">
+      <default>false</default>
+      <summary>Show Thousands Separators</summary>
+      <description>Indicates whether thousands separators are shown in large numbers.</description>
+    </key>
+    <key type="b" name="show-zeroes">
+      <default>false</default>
+      <summary>Show Trailing Zeroes</summary>
+      <description>Indicates whether any trailing zeroes after the  numeric point should be shown in the display value.</description>
+    </key>
+    <key name="number-format" enum="org.gnome.calculator.NumberFormat">
+      <default>'automatic'</default>
+      <summary>Number format</summary>
+      <description>The format to display numbers in</description>
+    </key>
+    <key name="angle-units" enum="org.gnome.calculator.AngleUnit">
+      <default>'degrees'</default>
+      <summary>Angle units</summary>
+      <description>The angle units to use</description>
+    </key>
+    <key name="refresh-interval" type="i">
+      <default>604800</default>
+      <summary>Currency update interval</summary>
+      <description>How often the currency exchange rates should be updated. A value of 0 means the currency exchange rates won't be fetched from the network at all.</description>
+    </key>
+    <key name="button-mode" enum="org.gnome.calculator.ButtonMode">
+      <default>'basic'</default>
+      <summary>Button mode</summary>
+      <description>The button mode</description>
+    </key>
+    <key type="s" name="source-currency">
+      <default>''</default>
+      <summary>Source currency</summary>
+      <description>Currency of the current calculation</description>
+    </key>
+    <key type="s" name="target-currency">
+      <default>''</default>
+      <summary>Target currency</summary>
+      <description>Currency to convert the current calculation into</description>
+    </key>
+    <key type="s" name="source-units">
+      <default>'degree'</default>
+      <summary>Source units</summary>
+      <description>Units of the current calculation</description>
+    </key>
+    <key type="s" name="target-units">
+      <default>'radian'</default>
+      <summary>Target units</summary>
+      <description>Units to convert the current calculation into</description>
+    </key>
+    <key type="i" name="precision">
+      <default>2000</default>
+      <summary>Internal precision</summary>
+      <description>The internal precision used with the MPFR library</description>
+    </key>
+    <key type="(ii)" name="window-position">
+      <default>(-1, -1)</default>
+      <summary>Window position</summary>
+      <description>Window position (x and y) of the last closed window.</description>
+    </key>
+  </schema>
+</schemalist>

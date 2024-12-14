@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gsettings-desktop-schemas">
+  <schema id="org.gnome.desktop.a11y.interface" path="/org/gnome/desktop/a11y/interface/">
+    <key name="high-contrast" type="b">
+      <default>false</default>
+      <summary>High contrast</summary>
+      <description>
+        Whether to use the high contrast style.
+      </description>
+    </key>
+  </schema>
+</schemalist>

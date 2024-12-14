@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/mail-notification/" id="org.gnome.evolution.plugin.mail-notification" gettext-domain="evolution">
+    <key type="b" name="notify-only-inbox">
+      <default>true</default>
+      <summary>Notify new messages for Inbox only.</summary>
+      <description>Whether to notify new messages in Inbox folder only.</description>
+    </key>
+    <key type="b" name="notify-dbus-enabled">
+      <default>true</default>
+      <summary>Enable D-Bus messages.</summary>
+      <description>Generates a D-Bus message when new mail messages arrive.</description>
+    </key>
+    <key type="b" name="notify-status-enabled">
+      <default>true</default>
+      <summary>Enable icon in notification area.</summary>
+      <description>Show new mail icon in notification area when new messages arrive.</description>
+    </key>
+    <key type="b" name="notify-status-notification">
+      <default>true</default>
+      <summary>Popup message together with the icon.</summary>
+      <description>Whether show message over the icon when new messages arrive.</description>
+    </key>
+    <key type="b" name="notify-sound-enabled">
+      <default>true</default>
+      <summary>Enable audible notifications when new messages arrive.</summary>
+      <description>Whether to make a sound of any kind when new messages arrive. If “false”, the “notify-sound-beep”, “notify-sound-file”, “notify-sound-play-file” and “notify-sound-use-theme” keys are disregarded.</description>
+    </key>
+    <key type="b" name="notify-sound-beep">
+      <default>false</default>
+      <summary>Whether to emit a beep.</summary>
+      <description>Whether to emit a beep when new messages arrive.</description>
+    </key>
+    <key type="s" name="notify-sound-file">
+      <default>''</default>
+      <summary>Sound filename to be played.</summary>
+      <description>Sound file to be played when new messages arrive, if “notify-sound-play-file” is “true”.</description>
+    </key>
+    <key type="b" name="notify-sound-play-file">
+      <default>false</default>
+      <summary>Whether to play a sound file.</summary>
+      <description>Whether to play a sound file when new messages arrive. The name of the sound file is given by the “notify-sound-file” key.</description>
+    </key>
+    <key type="b" name="notify-sound-use-theme">
+      <default>true</default>
+      <summary>Use sound theme</summary>
+      <description>Play themed sound when new messages arrive, if not in beep mode.</description>
+    </key>
+    <key type="as" name="notify-not-accounts">
+      <default>['']</default>
+      <summary>Do not notify for these accounts</summary>
+      <description>Contains UIDs of accounts for which the notifications should be avoided.</description>
+    </key>
+  </schema>
+</schemalist>

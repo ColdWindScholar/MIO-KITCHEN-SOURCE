@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/attachment-reminder/" id="org.gnome.evolution.plugin.attachment-reminder" gettext-domain="evolution">
+     <key type="as" name="attachment-reminder-clues">
+
+      <default l10n='messages'>['attachment','attaching','attached','enclosed']</default>
+      <summary>List of clues for the attachment reminder plugin to look for in a message body</summary>
+      <description>List of clues for the attachment reminder plugin to look for in a message body.</description>
+    </key>
+  </schema>
+</schemalist>

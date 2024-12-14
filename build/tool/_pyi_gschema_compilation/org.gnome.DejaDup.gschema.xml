@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- -*- Mode: XML; indent-tabs-mode: nil; tab-width: 2 -*- -->
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+SPDX-FileCopyrightText: Michael Terry
+-->
+
+<schemalist gettext-domain="deja-dup">
+
+  <schema id="org.gnome.DejaDup" path="/org/gnome/deja-dup/">
+    <key name="include-list" type="as">
+      <default>[ '$HOME' ]</default>
+      <summary>Folders to save</summary>
+      <description>This list of directories will be backed up.  Reserved values $HOME, $DESKTOP, $DOCUMENTS, $DOWNLOAD, $MUSIC, $PICTURES, $PUBLIC_SHARE, $TEMPLATES, $TRASH, and $VIDEOS are recognized as the user’s special directories and can be at the start of a longer path ($HOME/subdir).  Reserved value $USER is replaced by the user’s username and can be anywhere in the path.  Relative entries are relative to the user’s home directory.</description>
+    </key>
+    <key name="exclude-list" type="as">
+      <default>[ '$TRASH', '$DOWNLOAD' ]</default>
+      <summary>Folders to ignore</summary>
+      <description>This list of directories will not be backed up.  Reserved values $HOME, $DESKTOP, $DOCUMENTS, $DOWNLOAD, $MUSIC, $PICTURES, $PUBLIC_SHARE, $TEMPLATES, $TRASH, and $VIDEOS are recognized as the user’s special directories and can be at the start of a longer path ($HOME/subdir).  Reserved value $USER is replaced by the user’s username and can be anywhere in the path.  Relative entries are relative to the user’s home directory.</description>
+    </key>
+    <key name="last-run" type="s">
+      <default>''</default>
+      <summary>The last time Déjà Dup was run</summary>
+      <description>The last time Déjà Dup was successfully run.  This time should be in ISO 8601 format.</description>
+    </key>
+    <key name="last-backup" type="s">
+      <default>''</default>
+      <summary>The last time Déjà Dup backed up</summary>
+      <description>The last time Déjà Dup successfully completed a backup.  This time should be in ISO 8601 format.</description>
+    </key>
+    <key name="last-restore" type="s">
+      <default>''</default>
+      <summary>The last time Déjà Dup restored</summary>
+      <description>The last time Déjà Dup successfully completed a restore.  This time should be in ISO 8601 format.</description>
+    </key>
+    <key name="periodic" type="b">
+      <default>false</default>
+      <summary>Whether to periodically back up</summary>
+      <description>Whether to automatically back up on a regular schedule.</description>
+    </key>
+    <key name="periodic-period" type="i">
+      <default>7</default>
+      <summary>How often to periodically back up</summary>
+      <description>The number of days between backups.</description>
+    </key>
+    <key name="prompt-check" type="s">
+      <default>''</default>
+      <summary>The last time Déjà Dup checked whether it should prompt about backing up</summary>
+      <description>When a user logs in, the Déjà Dup monitor checks whether it should prompt about backing up.  This is used to increase discoverability for users that don’t know about backups.  This time should be either ‘disabled’ to turn off this check or in ISO 8601 format.</description>
+    </key>
+    <key name="nag-check" type="s">
+      <default>''</default>
+      <summary>The last time Déjà Dup checked whether it should prompt about your password</summary>
+      <description>In order to prevent you from forgetting your passwords, Déjà Dup will occasionally notify you to confirm the password.  This time should be either ‘disabled’ to turn off this check or in ISO 8601 format.</description>
+    </key>
+    <key name="delete-after" type="i">
+      <default>0</default>
+      <summary>How long to keep backup files</summary>
+      <description>The number of days to keep backup files on the backup location.  A value of 0 means forever.  This is a minimum number of days; the files may be kept longer.</description>
+    </key>
+    <key name="full-backup-period" type="i">
+      <default>90</default>
+      <summary>How long to wait between full backups</summary>
+      <description>Déjà Dup needs to occasionally make fresh full backups.  This is the number of days to wait between full backups.</description>
+    </key>
+    <key name="allow-metered" type="b">
+      <default>false</default>
+      <summary>Whether to use metered networks</summary>
+      <description>If false, Déjà Dup will refuse to run scheduled backups over metered network connections (like 4G).</description>
+    </key>
+    <key name="backend" type="s">
+      <choices>
+        <choice value='auto'/>
+        <choice value='remote'/>
+        <choice value='local'/>
+        <choice value='drive'/>
+        <choice value='google'/>
+        <!-- deprecated -->
+        <choice value='file'/>
+        <choice value='gcs'/>
+        <choice value='goa'/>
+        <choice value='openstack'/>
+        <choice value='rackspace'/>
+        <choice value='s3'/>
+        <choice value='u1'/>
+      </choices>
+      <default>'auto'</default>
+      <summary>Type of location to store backup</summary>
+      <description>The type of backup location.  If ‘auto’, a default will be chosen based on what is available.</description>
+    </key>
+    <child name='google' schema="org.gnome.DejaDup.Google"/>
+    <child name='remote' schema="org.gnome.DejaDup.Remote"/>
+    <child name='local' schema="org.gnome.DejaDup.Local"/>
+    <child name='drive' schema="org.gnome.DejaDup.Drive"/>
+  </schema>
+
+  <schema id="org.gnome.DejaDup.Local" path="/org/gnome/deja-dup/local/">
+    <key name="folder" type="s">
+      <default>'$HOSTNAME'</default>
+      <summary>The folder where backups are stored</summary>
+      <description>The folder hierarchy where backups are stored. Paths can be absolute or relative to your home directory.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.DejaDup.Drive" path="/org/gnome/deja-dup/drive/">
+    <key name="uuid" type="s">
+      <default>''</default>
+      <summary>UUID</summary>
+      <description>The unique filesystem identifier for the drive, used to recognize the drive when it is plugged in.</description>
+    </key>
+    <key name="name" type="s">
+      <default>''</default>
+      <summary>Name</summary>
+      <description>The name of the external drive.</description>
+    </key>
+    <key name="icon" type="s">
+      <default>''</default>
+      <summary>Icon</summary>
+      <description>The icon of the external drive, as a serialized GIcon.</description>
+    </key>
+    <key name="folder" type="s">
+      <default>'$HOSTNAME'</default>
+      <summary>The folder where backups are stored</summary>
+      <description>The folder hierarchy where backups are stored. Paths are relative to the drive.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.DejaDup.Remote" path="/org/gnome/deja-dup/remote/">
+    <key name="uri" type="s">
+      <default>''</default>
+      <summary>The server address</summary>
+      <description>The URI of the remote server location.</description>
+    </key>
+    <key name="folder" type="s">
+      <default>'$HOSTNAME'</default>
+      <summary>The folder where backups are stored</summary>
+      <description>The folder hierarchy where backups are stored. Paths can be absolute or relative to the host.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.DejaDup.Google" path="/org/gnome/deja-dup/google/">
+    <key name="folder" type="s">
+      <default>'$HOSTNAME'</default>
+      <summary>The folder where backups are stored</summary>
+      <description>The folder path where backups are stored. Paths can be absolute or relative to the host.</description>
+    </key>
+  </schema>
+
+</schemalist>

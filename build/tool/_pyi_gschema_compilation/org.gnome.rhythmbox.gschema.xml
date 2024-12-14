@@ -1,0 +1,437 @@
+<schemalist>
+
+  <schema id="org.gnome.rhythmbox.source">
+    <key name="sorting" type="(sb)">
+      <default>('Artist',true)</default>
+      <summary>The sorting column and order</summary>
+      <description>The title of the column to sort on, and the order to sort in (true for ascending, false for descending)</description>
+    </key>
+    <key name="show-browser" type="b">
+      <default>true</default>
+      <summary>Show browser in library</summary>
+      <description>Show the artist and album browser in the library.</description>
+    </key>
+    <key name="paned-position" type="i">
+      <default>180</default>
+      <summary>Position of browser pane (if it exists)</summary>
+      <description>Position of browser pane.</description>
+    </key>
+    <key name="search-type" type="s">
+      <default>'search-match'</default>
+      <summary>Selected search type</summary>
+      <description>The currently selected search type for the source.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.encoding-settings">
+    <key name="media-type" type="s">
+      <default>'audio/x-vorbis'</default>
+      <summary>Preferred media type for encoding audio</summary>
+      <description>Preferred media type for encoding audio. 'audio/x-vorbis' for Ogg Vorbis, or 'audio/mpeg' for MP3, for example. This is not a MIME type.</description>
+    </key>
+    <key name="media-type-presets" type="a{ss}">
+      <default>[]</default>
+      <summary>Maps media types to audio encoder preset names.</summary>
+      <description>Maps media types to audio encoder preset names. If there is no mapping for a media type, the default encoder settings will be used.</description>
+    </key>
+    <key name="transcode-lossless" type="b">
+      <default>false</default>
+      <summary>Whether to transcode files from lossless encodings to the preferred format</summary>
+      <description>When a lossless file is transferred to a target with this set to true, it will be transcoded to the preferred format even if the lossless format is supported by the target.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox" path="/org/gnome/rhythmbox/">
+    <key name="maximized" type="b">
+      <default>false</default>
+      <summary>Whether the window is maximized</summary>
+      <description>
+        True if the window is maximized. Otherwise, the size and position are determined
+        by the size and position keys.
+      </description>
+    </key>
+    <key name="size" type="(ii)">
+      <default>(790,560)</default>
+      <summary>The size of the main window</summary>
+      <description>The size of the main window, if not maximized. (0,0) indicates no specific size.</description>
+    </key>
+    <key name="position" type="(ii)">
+      <default>(-1,-1)</default>
+      <summary>Main window position</summary>
+      <description>The position of the window, if not maximized. (-1, -1) indicates no specific position.</description>
+    </key>
+    <key name="display-page-tree-visible" type="b">
+      <default>true</default>
+      <summary>Display page tree visibility</summary>
+      <description>If true, the display page tree is visible.</description>
+    </key>
+    <key name="display-page-tree-height" type="i">
+      <default>300</default>
+      <summary>Display page tree height</summary>
+      <description>Height of the display page tree when the play queue is shown as a sidebar.</description>
+    </key>
+    <key name="paned-position" type="i">
+      <default>160</default>
+      <summary>Position of main window pane</summary>
+      <description>Position of main window pane.</description>
+    </key>
+    <key name="right-paned-position" type="i">
+      <default>400</default>
+      <summary>Position of the right pane</summary>
+      <description>Position of the right pane</description>
+    </key>
+    <key name="queue-as-sidebar" type="b">
+      <default>false</default>
+      <summary>Queue display type</summary>
+      <description>If true, the play queue is displayed as a sidebar. If false, the play queue is displayed as a source in the source list.</description>
+    </key>
+    <key name="show-song-position-slider" type="b">
+      <default>true</default>
+      <summary>Song position slider visibility</summary>
+      <description>If true, the song position slider is shown.</description>
+    </key>
+    <key name="show-album-art" type="b">
+      <default>true</default>
+      <summary>Album art display visibility</summary>
+      <description>If true, the album art display is shown.</description>
+    </key>
+    <key name="time-display" type="b">
+      <default>true</default>
+      <summary>Whether to show elapsed or remaining time</summary>
+      <description>If true, the elapsed time will be shown in song duration displays. Otherwise the remaining time will be shown.</description>
+    </key>
+    <key name="follow-playing" type="b">
+      <default>true</default>
+      <summary>Whether to follow the playing track in the track list</summary>
+      <description>If true, as the playing track changes, the track list will scroll to show the new track</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.rhythmdb" path="/org/gnome/rhythmbox/rhythmdb/">
+    <key name="locations" type="as">
+      <default>[]</default>
+      <summary>Directories that Rhythmbox should monitor</summary>
+      <description>A list of directory URIs that Rhythmbox should monitor for changes and new tracks.</description>
+    </key>
+    <key name="grace-period" type="i">
+      <default>45</default>
+      <summary>Number of days before removing a stale entry from the database</summary>
+      <description>When the database contains a file that is no longer available, it will keep the database entry for the number of days defined by this key. Setting it to a negative number makes Rhythmbox keep the songs forever.</description>
+    </key>
+    <key name="monitor-library" type="b">
+      <default>false</default>
+      <summary>Whether the library location are monitored</summary>
+      <description>If true, the configured library locations are monitored for new files</description>
+    </key>
+  </schema>
+
+  <enum id="org.gnome.rhythmbox.sources.browser-view-types">
+    <value nick="artists-albums" value="0"/>
+    <value nick="genres-artists" value="1"/>
+    <value nick="genres-artists-albums" value="2"/>
+  </enum>
+  <schema id="org.gnome.rhythmbox.sources" path="/org/gnome/rhythmbox/sources/">
+    <key name="browser-views" enum="org.gnome.rhythmbox.sources.browser-view-types">
+      <default>'artists-albums'</default>
+      <summary>Views to show in the library browser.</summary>
+      <description>Views to show in the library browser.</description>
+    </key>
+    <key name="visible-columns" type="as">
+      <default>['track-number','artist','album','genre','duration','post-time']</default>
+      <summary>List of visible columns.</summary>
+      <description>The list of columns that will be shown. If a given source doesn't support a particular column, it won't be displayed.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.rhythmbox.library" path="/org/gnome/rhythmbox/library/">
+    <key name="layout-path" type="s">
+      <default>'%aa/%at'</default>
+      <summary>Directory hierarchy of library</summary>
+      <description>The path used to store track in, under the chosen library. Various substitutions are done</description>
+    </key>
+    <key name="layout-filename" type="s">
+      <default>'%tN - %tt'</default>
+      <summary>File name of tracks</summary>
+      <description>The path used to store track in, under the chosen library. Various substitutions are done</description>
+    </key>
+    <key name="strip-chars" type="b">
+      <default>false</default>
+      <summary>Strip special characters</summary>
+      <description>Whether to replace punctuation and spaces in filenames with underscores when transferring to the library</description>
+    </key>
+    <key name="add-dir" type="s">
+      <default>''</default>
+      <summary>Previous location chosen when adding new tracks to the library</summary>
+      <description>Previous location chosen when adding new tracks to the library</description>
+    </key>
+
+    <child name='encoding' schema='org.gnome.rhythmbox.encoding-settings'/>
+    <child name='source' schema='org.gnome.rhythmbox.source'/>
+  </schema>
+  <enum id="org.gnome.rhythmbox.podcast-interval">
+    <value nick="hourly" value="0"/>
+    <value nick="daily" value="1"/>
+    <value nick="weekly" value="2"/>
+    <value nick="manual" value="3"/>
+  </enum>
+  <schema id="org.gnome.rhythmbox.podcast-source" extends="org.gnome.rhythmbox.source">
+    <override name="sorting">('Feed',true)</override>
+    <override name="paned-position">180</override>
+    <override name="show-browser">true</override>
+    <override name="search-type">'search-match'</override>
+  </schema>
+  <schema id="org.gnome.rhythmbox.podcast" path="/org/gnome/rhythmbox/podcast/">
+
+    <key name="download-interval" enum='org.gnome.rhythmbox.podcast-interval'>
+      <default>'hourly'</default>
+      <summary>How frequently to check for new podcast episodes</summary>
+      <description>How frequently to check for new podcast episodes. Can be hourly, daily, weekly, or manual.</description>
+    </key>
+    <key name="download-location" type="s">
+      <default>''</default>
+      <summary>URI of a directory to download podcast episodes to</summary>
+      <description>URI of a directory to download podcast episodes to</description>
+    </key>
+
+    <child name='source' schema='org.gnome.rhythmbox.podcast-source'/>
+  </schema>
+  <schema id="org.gnome.rhythmbox.sharing" path="/org/gnome/rhythmbox/sharing/">
+    <key name="enable-browsing" type="b">
+      <default>true</default>
+      <summary>Enables browsing your network for computers with shared music</summary>
+      <description>When enabled, Rhythmbox will search for shared music on your local network</description>
+    </key>
+    <key name="enable-sharing" type="b">
+      <default>false</default>
+      <summary>Enables sharing your music with computers on your network</summary>
+      <description>When enabled, Rhythmbox will share your music with other computers</description>
+    </key>
+    <key name="require-password" type="b">
+      <default>false</default>
+      <summary>Require a password to access your music over the network</summary>
+      <description>When enabled, Rhythmbox will require a password for others to access your music over the network.</description>
+    </key>
+    <key name="share-name" type="s">
+      <default>''</default>
+      <summary>Name for your shared music</summary>
+      <description>Name other computers will see your music shared as</description>
+    </key>
+    <key name="share-password" type="s">
+      <default>''</default>
+      <summary>Password for your shared music</summary>
+      <description>Password that is required for accessing your shared music.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.rhythmbox.player" path="/org/gnome/rhythmbox/player/">
+    <key name="use-xfade-backend" type="b">
+      <default>false</default>
+      <summary>Whether to use the crossfading player backend</summary>
+      <description>Whether to use the crossfading player backend. Changes to this setting only take effect after a restart.</description>
+    </key>
+    <key name="transition-time" type="d">
+      <default>0.0</default>
+      <summary>Duration of a track transition in seconds</summary>
+      <description>Duration of a track transition in seconds</description>
+    </key>
+    <key name="play-order" type="s">
+      <default>'linear'</default>
+      <summary>Order to play songs in</summary>
+      <description>Value identifies the order songs are played in. Legal values are: "linear", "shuffle", "random-equal-weights", "random-by-age", "random-by-rating".</description>
+    </key>
+    <key name="volume" type="d">
+      <default>1.0</default>
+      <summary>Volume level</summary>
+      <description>Volume level.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.rhythmbox.plugins" path="/org/gnome/rhythmbox/plugins/">
+    <key name="no-user-plugins" type="b">
+      <default>false</default>
+      <summary>Disable per-user plugins.</summary>
+      <description>When set prevents loading of plugins from the user's home directory</description>
+    </key>
+    <key name="active-plugins" type="as">
+      <default>[]</default>
+      <summary>List of active plugin names.</summary>
+      <description>List of active plugin names. These plugins will be loaded on startup if available.</description>
+    </key>
+    <key name="seen-plugins" type="as">
+      <default>[]</default>
+      <summary>List of plugins that have previously been seen.</summary>
+      <description>List of plugins that have previously been seen.  Previously unseen plugins may be automatically enabled.</description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.audiocd" path="/org/gnome/rhythmbox/plugins/audiocd/">
+    <child name='source' schema='org.gnome.rhythmbox.source'/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.audioscrobbler.service">
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Whether the service is enabled</summary>
+      <description>
+	If true, the service will be displayed in the UI and will be available for streaming
+	and track submission.
+      </description>
+    </key>
+    <key name="scrobbling-enabled" type="b">
+      <default>true</default>
+      <summary>Whether scrobbling is enabled</summary>
+      <description>
+	If true, tracks you listen to will be submitted to all enabled scrobbling services.
+      </description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.daap.dacp">
+    <key name="enable-remote" type="b">
+      <default>false</default>
+      <summary>Whether to enable iTunes Remote devices</summary>
+      <description>Whether to enable iTunes Remote devices</description>
+    </key>
+
+    <key name="known-remotes" type="as">
+      <default>[]</default>
+      <summary>A list of remotes that the user has paired with</summary>
+      <description>A list of remotes that the user has paired with.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.rhythmbox.plugins.daap" path="/org/gnome/rhythmbox/plugins/daap/">
+    <child name='dacp' schema='org.gnome.rhythmbox.plugins.daap.dacp'/>
+    <child name='source' schema='org.gnome.rhythmbox.source'/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.android" path="/org/gnome/rhythmbox/plugins/android/">
+    <child name='source' schema='org.gnome.rhythmbox.source'/>
+    <child name="encoding" schema="org.gnome.rhythmbox.encoding-settings"/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.generic-player" path="/org/gnome/rhythmbox/plugins/generic-player/">
+    <child name='source' schema='org.gnome.rhythmbox.source'/>
+    <child name="encoding" schema="org.gnome.rhythmbox.encoding-settings"/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.ipod" path="/org/gnome/rhythmbox/plugins/ipod/">
+    <child name="source" schema="org.gnome.rhythmbox.source"/>
+    <child name="encoding" schema="org.gnome.rhythmbox.encoding-settings"/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.iradio.source" extends="org.gnome.rhythmbox.source">
+    <override name="sorting">('Title',true)</override>
+    <override name="paned-position">200</override>
+    <override name="show-browser">true</override>
+  </schema>
+  <schema id="org.gnome.rhythmbox.plugins.iradio" path="/org/gnome/rhythmbox/plugins/iradio/">
+    <key name="initial-stations-loaded" type="b">
+      <default>false</default>
+      <summary>Whether the initial station list has been loaded</summary>
+      <description>Whether the initial station list has been loaded</description>
+    </key>
+
+    <child name='source' schema='org.gnome.rhythmbox.plugins.iradio.source'/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.listenbrainz" path="/org/gnome/rhythmbox/plugins/listenbrainz/">
+      <key type="s" name="user-token">
+          <default>""</default>
+          <summary>ListenBrainz user token</summary>
+          <description></description>
+      </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.lyrics" path="/org/gnome/rhythmbox/plugins/lyrics/">
+    <key name="sites" type="as">
+      <default>['lyrc.com.ar']</default>	<!-- do we have any that work? -->
+      <summary>The list of sites to search for lyrics</summary>
+      <description>The list of sites to search for lyrics</description>
+    </key>
+    <!-- don't like this at all -->
+    <key name="folder" type="s">
+      <default>''</default>
+      <summary>Song lyrics cache location</summary>
+      <description>The location of a folder to store downloaded song lyrics</description>
+    </key>
+  </schema>
+
+
+  <!-- pygobject's gsettings overrides can't do enums yet
+  <enum id="org.gnome.rhythmbox.plugins.magnatune.audio-format">
+    <value nick="ogg" value="0"/>
+    <value nick="flac" value="1"/>
+    <value nick="wav" value="2"/>
+    <value nick="mp3-vbr" value="3"/>
+    <value nick="mp3-cbr" value="4"/>
+  </enum>
+  <enum id="org.gnome.rhythmbox.plugins.magnatune.account-type">
+    <value nick="none" value="0"/>
+    <value nick="stream" value="1"/>
+    <value nick="download" value="2"/>
+  </enum>
+  -->
+  <schema id="org.gnome.rhythmbox.plugins.magnatune" path="/org/gnome/rhythmbox/plugins/magnatune/">
+    <key name="format" type="s"> <!-- enum="org.gnome.rhythmbox.plugins.magnatune.audio-format" -->
+      <default>'ogg'</default>
+      <summary>Audio format to use for Magnatune downloads</summary>
+      <description>Audio format to use for Magnatune downloads</description>
+    </key>
+    <key name="account-type" type="s"> <!-- enum="org.gnome.rhythmbox.plugins.magnatune.account-type"> -->
+      <default>'none'</default>
+      <summary>Magnatune account type</summary>
+      <description>Magnatune account type</description>
+    </key>
+
+    <child name="source" schema="org.gnome.rhythmbox.source"/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.mtpdevice" path="/org/gnome/rhythmbox/plugins/mtpdevice/">
+    <child name="source" schema="org.gnome.rhythmbox.source"/>
+    <child name="encoding" schema="org.gnome.rhythmbox.encoding-settings"/>
+  </schema>
+
+  <enum id="org.gnome.rhythmbox.plugins.replaygain.mode">
+    <value nick="radio" value="0"/>
+    <value nick="album" value="1"/>
+  </enum>
+  <schema id="org.gnome.rhythmbox.plugins.replaygain" path="/org/gnome/rhythmbox/plugins/replaygain/">
+    <key name="limiter" type="b">
+      <default>true</default>
+      <summary>Whether to apply compression to prevent clipping</summary>
+      <description>
+      If set, audio compression will be applied to prevent the output
+      signal from clipping.
+      </description>
+    </key>
+    <key name="preamp" type="d">
+      <default>0.0</default>
+      <summary>Pre-amplification level</summary>
+      <description>
+	The amount of gain to apply to the signal before ReplayGain adjustment
+      </description>
+    </key>
+    <key name="mode" enum="org.gnome.rhythmbox.plugins.replaygain.mode">
+      <default>'radio'</default>
+      <summary>The active ReplayGain adjustment mode</summary>
+      <description>
+        Either 'radio' for equal loudness for all tracks or 'album' for ideal
+	loudness for all tracks.
+      </description>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.grilo" path="/org/gnome/rhythmbox/plugins/grilo/">
+    <child name="source" schema="org.gnome.rhythmbox.source"/>
+  </schema>
+
+  <schema id="org.gnome.rhythmbox.plugins.webremote" path="/org/gnome/rhythmbox/plugins/webremote/">
+    <key name="listen-port" type="q">
+      <default>0</default>
+      <summary>Listening port to use for the web remote control service</summary>
+      <description>Listening port to use for the web remote control service</description>
+    </key>
+    <key name="access-key" type="s">
+      <default>''</default>
+      <summary>Access key for the web remote control interface</summary>
+      <description>Access key for the web remote control interface</description>
+    </key>
+  </schema>
+</schemalist>

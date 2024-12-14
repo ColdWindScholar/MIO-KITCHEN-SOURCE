@@ -1,0 +1,14 @@
+<schemalist>
+	<schema id="org.gnome.seahorse.window" gettext-domain="seahorse">
+		<key name="width" type="i">
+			<default>-1</default>
+			<summary>Width of the window</summary>
+			<description>Width (in pixels) of the window.</description>
+		</key>
+		<key name="height" type="i">
+			<default>-1</default>
+			<summary>Height of the window</summary>
+			<description>Height (in pixels) of the window.</description>
+		</key>
+	</schema>
+</schemalist>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.color" path="/org/gnome/settings-daemon/plugins/color/">
+    <key name="recalibrate-display-threshold" type="u">
+      <default>0</default>
+      <summary>The duration a display profile is valid</summary>
+      <description>This is the number of days after which the display color profile is considered invalid.</description>
+    </key>
+    <key name="recalibrate-printer-threshold" type="u">
+      <default>0</default>
+      <summary>The duration a printer profile is valid</summary>
+      <description>This is the number of days after which the printer color profile is considered invalid.</description>
+    </key>
+    <key name="night-light-enabled" type="b">
+      <default>false</default>
+      <summary>If the night light mode is enabled</summary>
+      <description>Night light mode changes the color temperature of your display when the sun has gone down or at preset times.</description>
+    </key>
+    <key name="night-light-temperature" type="u">
+      <default>2700</default>
+      <summary>Temperature of the display when enabled</summary>
+      <description>This temperature in Kelvin is used to modify the screen tones when night light mode is enabled. Higher values are bluer, lower redder.</description>
+    </key>
+    <key name="night-light-schedule-automatic" type="b">
+      <default>true</default>
+      <summary>Use the sunrise and sunset</summary>
+      <description>Calculate the sunrise and sunset times automatically, from the current location.</description>
+    </key>
+    <key name="night-light-schedule-from" type="d">
+      <default>20.00</default>
+      <summary>The start time</summary>
+      <description>When “night-light-schedule-automatic” is disabled, use this start time in hours from midnight.</description>
+    </key>
+    <key name="night-light-schedule-to" type="d">
+      <default>6.00</default>
+      <summary>The end time</summary>
+      <description>When “night-light-schedule-automatic” is disabled, use this end time in hours from midnight.</description>
+    </key>
+    <key name="night-light-last-coordinates" type="(dd)">
+      <default>(91,181)</default>
+      <summary>The last detected position</summary>
+      <description>When location services are available this represents the last detected location. The default value is an invalid value to ensure it is always updated at startup.</description>
+    </key>
+  </schema>
+</schemalist>

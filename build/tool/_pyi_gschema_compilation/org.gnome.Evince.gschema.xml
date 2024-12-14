@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  <enum id="org.gnome.Evince.SizingMode">
+    <value nick="fit-page" value="0"/>
+    <value nick="fit-width" value="1"/>
+    <value nick="free" value="2"/>
+    <value nick="automatic" value="3"/>
+  </enum>
+
+  <schema id="org.gnome.Evince" path="/org/gnome/evince/" gettext-domain="evince">
+    <key name="override-restrictions" type="b">
+      <default>true</default>
+      <summary>Override document restrictions</summary>
+      <description>Override document restrictions, like restriction to copy or to print.</description>
+    </key>
+    <key name="auto-reload" type="b">
+      <default>true</default>
+      <summary>Automatically reload the document</summary>
+      <description>The document is automatically reloaded on file change.</description>
+    </key>
+    <key name="document-directory" type="ms">
+      <default>nothing</default>
+      <summary>The URI of the directory last used to open or save a document</summary>
+    </key>
+    <key name="pictures-directory" type="ms">
+      <default>nothing</default>
+      <summary>The URI of the directory last used to save a picture</summary>
+    </key>
+    <key name="page-cache-size" type="u">
+      <default>50</default>
+      <summary>Page cache size in MiB</summary>
+      <description>The maximum size that will be used to cache rendered pages, limits maximum zoom level.</description>
+    </key>
+    <key name="show-caret-navigation-message" type="b">
+      <default>true</default>
+      <summary>Show a dialog to confirm that the user wants to activate the caret navigation.</summary>
+    </key>
+    <key type="b" name="allow-links-change-zoom">
+      <default>true</default>
+      <summary>Allow links to change the zoom level.</summary>
+    </key>
+    <child name="default" schema="org.gnome.Evince.Default"/>
+  </schema>
+
+  <schema id="org.gnome.Evince.Default" path="/org/gnome/evince/default/" gettext-domain="evince">
+    <key name="enable-spellchecking" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-toolbar" type="b">
+      <default>true</default>
+    </key>
+    <key name="show-sidebar" type="b">
+      <default>true</default>
+    </key>
+    <key name="window-ratio" type="(dd)">
+      <default>(0., 0.)</default>
+    </key>
+    <key name="sizing-mode" enum="org.gnome.Evince.SizingMode">
+      <default>'automatic'</default>
+    </key>
+    <key name="zoom" type="d">
+      <default>1.</default>
+    </key>
+    <key name="inverted-colors" type="b">
+      <default>false</default>
+    </key>
+    <key name="continuous" type="b">
+      <default>true</default>
+    </key>
+    <key name="dual-page" type="b">
+      <default>false</default>
+    </key>
+    <key name="dual-page-odd-left" type="b">
+      <default>false</default>
+    </key>
+    <key name="fullscreen" type="b">
+      <default>false</default>
+    </key>
+    <key name="sidebar-page" type="s">
+      <default>'links'</default>
+    </key>
+    <key name="sidebar-size" type="i">
+      <default>132</default>
+    </key>
+  </schema>
+
+</schemalist>

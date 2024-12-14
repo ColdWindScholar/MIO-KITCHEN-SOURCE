@@ -1,0 +1,110 @@
+##################################
+# zorin-desktop-session settings #
+##################################
+
+[org.gnome.shell:zorin]
+always-show-log-out = true
+enabled-extensions = ['drive-menu@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'x11gestures@joseexposito.github.io', 'zorin-appindicator@zorinos.com', 'zorin-desktop-icons@zorinos.com', 'zorin-menu@zorinos.com', 'zorin-printers@zorinos.com', 'zorin-taskbar@zorinos.com']
+
+[org.gnome.desktop.interface:zorin]
+gtk-theme = 'ZorinBlue-Light'
+icon-theme= 'ZorinBlue-Light'
+cursor-theme = 'Adwaita'
+font-name = 'Inter 10'
+document-font-name = 'Sans 10'
+monospace-font-name = 'JetBrains Mono 10'
+enable-hot-corners = false
+
+[org.gnome.desktop.app-folders.folders.Utilities:zorin]
+apps = ['nm-connection-editor.desktop', 'org.gnome.baobab.desktop', 'org.gnome.DejaDup.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.eog.desktop', 'org.gnome.Evince.desktop', 'org.gnome.FileRoller.desktop', 'org.gnome.seahorse.Application.desktop', 'org.gnome.Logs.desktop', 'org.gnome.Characters.desktop', 'org.gnome.font-viewer.desktop', 'software-properties-gtk.desktop', 'gnome-session-properties.desktop', 'gnome-language-selector.desktop', 'alacarte.desktop', 'org.gnome.PowerStats.desktop', 'gufw.desktop', 'gnome-system-monitor.desktop', 'org.gnome.Terminal.desktop']
+
+[org.gnome.desktop.background:zorin]
+show-desktop-icons = true
+
+[org.gnome.desktop.sound:zorin]
+theme-name = 'zorin'
+event-sounds = true
+input-feedback-sounds = true
+
+[org.gtk.Settings.FileChooser:zorin]
+sort-directories-first = true
+startup-mode = 'cwd'
+
+[org.gnome.desktop.wm.keybindings:zorin]
+show-desktop = ['<Primary><Super>d','<Primary><Alt>d','<Super>d']
+switch-applications = ['<Super>Tab']
+switch-windows = ['<Alt>Tab']
+switch-applications-backward = ['<Shift><Super>Tab']
+switch-windows-backward = ['<Shift><Alt>Tab']
+
+[org.gnome.desktop.wm.preferences:zorin]
+resize-with-right-button = true
+button-layout = 'appmenu:minimize,maximize,close'
+titlebar-font = 'Inter Bold 10'
+titlebar-uses-system-font = true
+
+[org.gnome.eog.ui:zorin]
+sidebar = false
+
+[org.gnome.nautilus.icon-view:zorin]
+default-zoom-level = 'standard'
+
+[org.gnome.nautilus.preferences:zorin]
+open-folder-on-dnd-hover = true
+show-create-link = true
+
+[org.gnome.mutter:zorin]
+attach-modal-dialogs = true
+edge-tiling = true
+dynamic-workspaces = true
+workspaces-only-on-primary = true
+focus-change-on-pointer-rest = true
+
+[org.gnome.mutter.keybindings:zorin]
+toggle-tiled-left = ['<Primary><Super>Left','<Super>Left']
+toggle-tiled-right = ['<Primary><Super>Right','<Super>Right']
+
+[org.gnome.settings-daemon.plugins.media-keys:zorin]
+home = ['<Super>e']
+rotate-video-lock-static = ['XF86RotationLockToggle']
+
+[org.gnome.settings-daemon.plugins.power:zorin]
+power-button-action = 'suspend'
+sleep-inactive-ac-timeout = 0
+
+[org.gnome.shell.extensions.user-theme:zorin]
+name = 'ZorinBlue-Light'
+
+[org.gnome.shell.extensions.zorin-desktop-icons:zorin]
+add-volumes-opposite = false
+show-home = false
+show-trash = false
+show-volumes = false
+
+[org.gnome.shell.extensions.zorin-menu:zorin]
+layout = 'ALL'
+
+[org.gnome.shell.extensions.zorin-taskbar:zorin]
+panel-positions = '{"0":"BOTTOM"}'
+panel-sizes = '{"0":48,"1":48,"2":48}'
+
+[org.gnome.shell.overrides:zorin]
+attach-modal-dialogs = true
+edge-tiling = true
+dynamic-workspaces = true
+workspaces-only-on-primary = true
+focus-change-on-pointer-rest = true
+
+[org.gnome.desktop.peripherals.mouse:zorin]
+natural-scroll = false
+
+[org.gnome.desktop.peripherals.touchpad:zorin]
+tap-to-click = true
+natural-scroll = true
+click-method = 'fingers'
+
+[org.gnome.rhythmbox.plugins:zorin]
+active-plugins = ['alternative-toolbar', 'artsearch', 'audiocd','audioscrobbler','cd-recorder','daap','dbus-media-server','generic-player','ipod','iradio','mmkeys','mpris','mtpdevice','power-manager']
+
+[org.gnome.rhythmbox.plugins.alternative_toolbar:zorin]
+display-type = 1

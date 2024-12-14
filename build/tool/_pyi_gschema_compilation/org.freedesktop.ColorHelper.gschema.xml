@@ -1,0 +1,31 @@
+<schemalist>
+  <schema id="org.freedesktop.ColorHelper" path="/org/freedesktop/color-helper/">
+    <key name="display-gamma" type="d">
+      <default>2.4</default>
+      <summary>Default gamma for the display</summary>
+      <description>
+        The default target gamma value for the display.
+        Common values are 1.8, 2.2 and 2.4.
+      </description>
+    </key>
+    <key name="display-whitepoint" type="i">
+      <default>6500</default>
+      <summary>Default display target whitepoint</summary>
+      <description>
+        The default target whitepoint in Kelvin for display calibration,
+        with 0 meaning display native.
+        Common values are 6500 for D65 and 5000 for D50.
+      </description>
+    </key>
+    <key name="sample-delay" type="i">
+      <default>400</default>
+      <summary>Delay between sample intervals</summary>
+      <description>
+        This is the delay between setting the sample color and asking the
+        measuring instrument to take a sample.
+        It is required because both the graphics driver and the display itself
+        introduce latency.
+      </description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,75 @@
+<schemalist>
+  <schema gettext-domain="evolution-data-server" id="org.gnome.evolution.shell.network-config" path="/org/gnome/evolution/shell/network-config/">
+
+    <!-- This entire schema is deprecated.  Network proxy settings are
+         integrated into the ESource framework and are written to disk
+         as plain text key files.
+    -->
+
+    <key name="proxy-type" type="i">
+      <default>0</default>
+      <summary>(Deprecated) Proxy type to use</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="use-http-proxy" type="b">
+      <default>false</default>
+      <summary>(Deprecated) Whether to use http-proxy</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="use-authentication" type="b">
+      <default>false</default>
+      <summary>(Deprecated) Whether proxy server requires authentication</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="http-host" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Host name for HTTP requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="http-port" type="i">
+      <default>0</default>
+      <summary>(Deprecated) Port number for HTTP requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="authentication-user" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Proxy authentication user name</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="authentication-password" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Proxy authentication password</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="ignore-hosts" type="as">
+      <default>[]</default>
+      <summary>(Deprecated) List of hosts to connect to without proxy</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="secure-host" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Host name for HTTPS requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="secure-port" type="i">
+      <default>0</default>
+      <summary>(Deprecated) Port number for HTTPS requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="socks-host" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Host name for SOCKS requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="socks-port" type="i">
+      <default>0</default>
+      <summary>(Deprecated) Port number for SOCKS requests</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+    <key name="autoconfig-url" type="s">
+      <default>''</default>
+      <summary>(Deprecated) Automatic proxy configuration URL</summary>
+      <description>This key was deprecated in version 3.12 and should no longer be used.  Proxy settings are now integrated into Evolution-Data-Server’s account system.  See the ESourceProxy API documentation for details.</description>
+    </key>
+  </schema>
+</schemalist>

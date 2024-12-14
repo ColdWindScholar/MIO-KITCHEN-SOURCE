@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.peripherals" path="/org/gnome/settings-daemon/peripherals/">
+    <child name="smartcard" schema="org.gnome.settings-daemon.peripherals.smartcard"/>
+    <child name="keyboard" schema="org.gnome.settings-daemon.peripherals.keyboard"/>
+    <child name="touchscreen" schema="org.gnome.settings-daemon.peripherals.touchscreen"/>
+  </schema>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.peripherals.smartcard" path="/org/gnome/settings-daemon/peripherals/smartcard/">
+    <key name="removal-action" enum="org.gnome.settings-daemon.GsdSmartcardRemovalAction">
+      <default>'none'</default>
+      <summary>Smartcard removal action</summary>
+      <description>Set this to one of “none”, “lock-screen”, or “force-logout”. The action will get performed when the smartcard used for log in is removed.</description>
+    </key>
+  </schema>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.peripherals.keyboard" path="/org/gnome/settings-daemon/peripherals/keyboard/">
+    <key name="click" type="b">
+      <default>true</default>
+    </key>
+    <key name="click-volume" type="i">
+      <default>0</default>
+    </key>
+    <key name="bell-mode" enum="org.gnome.settings-daemon.GsdBellMode">
+      <default>'on'</default>
+      <description>Possible values are “on”, “off”, and “custom”.</description>
+    </key>
+    <key name="bell-pitch" type="i">
+      <default>400</default>
+    </key>
+    <key name="bell-duration" type="i">
+      <default>100</default>
+    </key>
+    <key name="bell-custom-file" type="s">
+      <default>''</default>
+      <summary>Keyboard Bell Custom Filename</summary>
+      <description>File name of the bell sound to be played.</description>
+    </key>
+  </schema>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.peripherals.touchscreen" path="/org/gnome/settings-daemon/peripherals/touchscreen/">
+    <key name="orientation-lock" type="b">
+      <default>false</default>
+      <summary>Whether the tablet’s orientation is locked, or rotated automatically.</summary>
+    </key>
+  </schema>
+
+  <!-- Deprecated schemas/keys -->
+  <schema id="org.gnome.settings-daemon.peripherals.mouse.deprecated">
+    <key name="left-handed" type="b">
+      <default>false</default>
+      <summary>Mouse button orientation</summary>
+      <description>Swap left and right mouse buttons for left-handed mice.</description>
+    </key>
+    <key name="motion-acceleration" type="d">
+      <default>-1</default>
+      <summary>Single Click</summary>
+      <description>Acceleration multiplier for mouse motion. A value of -1 is the system default.</description>
+    </key>
+    <key name="motion-threshold" type="i">
+      <default>-1</default>
+      <summary>Motion Threshold</summary>
+      <description>Distance in pixels the pointer must move before accelerated mouse motion is activated. A value of -1 is the system default.</description>
+    </key>
+    <key name="middle-button-enabled" type="b">
+      <default>false</default>
+      <summary>Middle button emulation</summary>
+      <description>Enables middle mouse button emulation through simultaneous left and right button click.</description>
+    </key>
+    <key name="double-click" type="i">
+      <default>400</default>
+      <summary>Double click time</summary>
+      <description> Length of a double click in milliseconds.</description>
+    </key>
+    <key name="drag-threshold" type="i">
+      <default>8</default>
+      <summary>Drag threshold</summary>
+      <description>Distance before a drag is started.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.keyboard.deprecated">
+    <key name="repeat" type="b">
+      <default>true</default>
+    </key>
+    <key name="repeat-interval" type="u">
+      <default>30</default>
+      <summary>Key Repeat Interval</summary>
+      <description>Delay between repeats in milliseconds.</description>
+    </key>
+    <key name="delay" type="u">
+      <default>500</default>
+      <summary>Initial Key Repeat Delay</summary>
+      <description>Initial key repeat delay in milliseconds.</description>
+    </key>
+    <key name="remember-numlock-state" type="b">
+      <default>true</default>
+      <summary>Remember NumLock state</summary>
+      <description>When set to true, GNOME will remember the state of the NumLock LED between sessions.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.touchpad.deprecated">
+    <key name="disable-while-typing" type="b">
+      <default>false</default>
+      <summary>Disable touchpad while typing</summary>
+      <description>Set this to TRUE if you have problems with accidentally hitting the touchpad while typing.</description>
+    </key>
+    <key name="horiz-scroll-enabled" type="b">
+      <default>true</default>
+      <summary>Enable horizontal scrolling</summary>
+      <description>Set this to TRUE to allow horizontal scrolling by the same method selected with the scroll_method key.</description>
+    </key>
+    <key name="scroll-method" enum="org.gnome.settings-daemon.GsdTouchpadScrollMethod">
+      <default>'two-finger-scrolling'</default>
+      <summary>Select the touchpad scroll method</summary>
+      <description>Select the touchpad scroll method. Supported values are: “disabled”, “edge-scrolling”, “two-finger-scrolling”.</description>
+    </key>
+    <key name="tap-to-click" type="b">
+      <default>false</default>
+      <summary>Enable mouse clicks with touchpad</summary>
+      <description>Set this to TRUE to be able to send mouse clicks by tapping on the touchpad.</description>
+    </key>
+    <key name="touchpad-enabled" type="b">
+      <default>true</default>
+      <summary>Enable touchpad</summary>
+      <description>Set this to TRUE to enable all touchpads.</description>
+    </key>
+    <key name="left-handed" enum="org.gnome.settings-daemon.GsdTouchpadHandedness">
+      <default>'mouse'</default>
+      <summary>Touchpad button orientation</summary>
+      <description>Swap left and right mouse buttons for left-handed mice with “left”, “right” for right-handed, “mouse” to follow the mouse setting.</description>
+    </key>
+    <key name="motion-acceleration" type="d">
+      <default>-1</default>
+      <summary>Single Click</summary>
+      <description>Acceleration multiplier for mouse motion. A value of -1 is the system default.</description>
+    </key>
+    <key name="motion-threshold" type="i">
+      <default>-1</default>
+      <summary>Motion Threshold</summary>
+      <description>Distance in pixels the pointer must move before accelerated mouse motion is activated. A value of -1 is the system default.</description>
+    </key>
+    <key name="natural-scroll" type="b">
+      <default>false</default>
+      <summary>Natural scrolling</summary>
+      <description>Set this to TRUE to enable natural (reverse) scrolling for touchpads.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.trackball.deprecated">
+    <key name="scroll-wheel-emulation-button" type="i">
+      <default>0</default>
+      <range min="0" max="24"/>
+      <summary>Mouse wheel emulation button. 0 to disable the feature.</summary>
+    </key>
+  </schema>
+</schemalist>

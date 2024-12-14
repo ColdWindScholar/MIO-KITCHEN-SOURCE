@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.zorin.desktop.appearance" path="/com/zorin/desktop/appearance/">
+    <key name="show-more-layouts-message" type="b">
+      <default>true</default>
+      <summary>Show more desktop layouts message</summary>
+      <description>Show a message that explains how to get more desktop layouts.</description>
+    </key>
+  </schema>
+</schemalist>

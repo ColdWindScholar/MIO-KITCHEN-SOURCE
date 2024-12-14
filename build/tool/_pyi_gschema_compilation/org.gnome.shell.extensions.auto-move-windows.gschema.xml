@@ -1,0 +1,10 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.auto-move-windows" path="/org/gnome/shell/extensions/auto-move-windows/">
+    <key name="application-list" type="as">
+      <!-- FIXME: should be a(su), when JS supports more of GVariant -->
+      <default>[ ]</default>
+      <summary>Application and workspace list</summary>
+      <description>A list of strings, each containing an application id (desktop file name), followed by a colon and the workspace number</description>
+    </key>
+  </schema>
+</schemalist>

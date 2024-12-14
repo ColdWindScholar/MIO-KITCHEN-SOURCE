@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/bogofilter/" id="org.gnome.evolution.bogofilter" gettext-domain="evolution">
+    <key type="b" name="utf8-for-spam-filter">
+      <default>true</default>
+      <summary>Convert mail messages to Unicode</summary>
+      <description>Convert message text to Unicode UTF-8 to unify spam/ham tokens coming from different character sets.</description>
+    </key>
+
+    <key type="s" name="command">
+      <default>''</default>
+      <summary>Full path command to run Bogofilter</summary>
+      <description>Full path to a Bogofilter command. If not set, then a compile-time path is used, usually /usr/bin/bogofilter. The command should not contain any other arguments.</description>
+    </key>
+  </schema>
+</schemalist>

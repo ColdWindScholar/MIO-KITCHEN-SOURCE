@@ -1,0 +1,93 @@
+<schemalist>
+
+  <enum id='org.gnome.evolution-data-server.calendar.Duration'>
+    <value nick='minutes' value='0'/>
+    <value nick='hours' value='1'/>
+    <value nick='days' value='2'/>
+  </enum>
+
+  <schema gettext-domain="evolution-data-server" id="org.gnome.evolution-data-server.calendar" path="/org/gnome/evolution-data-server/calendar/">
+
+    <key name="contacts-reminder-enabled" type="b">
+      <default>false</default>
+      <summary>Birthday and anniversary reminder</summary>
+      <description>Whether to set a reminder for birthdays and anniversaries</description>
+    </key>
+    <key name="contacts-reminder-interval" type="i">
+      <default>15</default>
+      <summary>Birthday and anniversary reminder value</summary>
+      <description>Number of units for determining a birthday or anniversary reminder</description>
+    </key>
+    <key name="contacts-reminder-units" enum='org.gnome.evolution-data-server.calendar.Duration'>
+      <default>'minutes'</default>
+      <summary>Birthday and anniversary reminder units</summary>
+      <description>Units for a birthday or anniversary reminder, “minutes”, “hours” or “days”</description>
+    </key>
+
+    <key name="reminders-past" type="as">
+      <default>['']</default>
+      <summary>Past reminders for EReminderWatcher</summary>
+    </key>
+    <key name="reminders-snoozed" type="as">
+      <default>['']</default>
+      <summary>Snoozed reminders for EReminderWatcher</summary>
+    </key>
+
+    <key name="notify-programs" type="as">
+      <default>[]</default>
+      <summary>Reminder programs</summary>
+      <description>Programs that are allowed to be run by reminders</description>
+    </key>
+    <key name="notify-enable-audio" type="b">
+      <default>true</default>
+      <summary>Enable audio notifications</summary>
+      <description>When set to true, the audio reminders will be played, otherwise audio reminders will be silently ignored</description>
+    </key>
+    <key name="notify-with-tray" type="b">
+      <default>true</default>
+      <summary>Show reminders in notification tray only</summary>
+      <description>When set to true, the reminders are shown only in the notification tray, otherwise the reminders dialog is shown immediately</description>
+    </key>
+    <key name="notify-window-on-top" type="b">
+      <default>true</default>
+      <summary>Show reminder notification dialog always on top</summary>
+      <description>Whether or not to show reminder notification dialog always on top. Note this works only as a hint for the window manager, which may or may not obey it.</description>
+    </key>
+    <key name="notify-window-x" type="i">
+      <default>-1</default>
+      <summary>X position of the reminder notification dialog</summary>
+    </key>
+    <key name="notify-window-y" type="i">
+      <default>-1</default>
+      <summary>Y position of the reminder notification dialog</summary>
+    </key>
+    <key name="notify-window-width" type="i">
+      <default>-1</default>
+      <summary>Width of the reminder notification dialog</summary>
+    </key>
+    <key name="notify-window-height" type="i">
+      <default>-1</default>
+      <summary>Height of the reminder notification dialog</summary>
+    </key>
+    <key name="notify-window-paned-position" type="i">
+      <default>-1</default>
+      <summary>Size in pixels of the event list in the reminder notification dialog</summary>
+    </key>
+    <key name="notify-completed-tasks" type="b">
+      <default>true</default>
+      <summary>Show reminder notification for completed tasks</summary>
+    </key>
+    <key name="notify-past-events" type="b">
+      <default>false</default>
+      <summary>Show reminder notification for past events</summary>
+    </key>
+    <key name="notify-last-snooze-minutes" type="i">
+      <default>5</default>
+      <summary>The last used snooze time, in minutes</summary>
+    </key>
+    <key name="notify-custom-snooze-minutes" type="ai">
+      <default>[]</default>
+      <summary>User-defined snooze times, in minutes</summary>
+    </key>
+  </schema>
+</schemalist>

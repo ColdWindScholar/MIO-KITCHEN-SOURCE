@@ -1,0 +1,118 @@
+('/home/enrico/sources/MIO-KITCHEN-SOURCE/splash.png',
+ '/home/enrico/sources/MIO-KITCHEN-SOURCE/build/tool/Splash-00.res',
+ '/home/enrico/sources/MIO-KITCHEN-SOURCE/build/tool/Splash-00_script.tcl',
+ None,
+ 12,
+ 'TkDefaultFont',
+ 'black',
+ 'Initializing',
+ True,
+ False,
+ True,
+ (760, 480),
+ True,
+ 'proc _ipc_server {channel clientaddr clientport} {\n'
+ 'set client_name [format <%s:%d> $clientaddr $clientport]\n'
+ 'chan configure $channel \\\n'
+ '-buffering none \\\n'
+ '-encoding utf-8 \\\n'
+ '-eofchar \\x04 \\\n'
+ '-translation cr\n'
+ 'chan event $channel readable [list _ipc_caller $channel $client_name]\n'
+ '}\n'
+ 'proc _ipc_caller {channel client_name} {\n'
+ 'chan gets $channel cmd\n'
+ 'if {[chan eof $channel]} {\n'
+ 'chan close $channel\n'
+ 'exit\n'
+ '} elseif {![chan blocked $channel]} {\n'
+ 'if {[string match "update_text*" $cmd]} {\n'
+ 'global status_text\n'
+ 'set first [expr {[string first "(" $cmd] + 1}]\n'
+ 'set last [expr {[string last ")" $cmd] - 1}]\n'
+ 'set status_text [string range $cmd $first $last]\n'
+ '}\n'
+ '}\n'
+ '}\n'
+ 'set server_socket [socket -server _ipc_server -myaddr localhost 0]\n'
+ 'set server_port [fconfigure $server_socket -sockname]\n'
+ 'set env(_PYI_SPLASH_IPC) [lindex $server_port 2]\n'
+ 'image create photo splash_image\n'
+ 'splash_image put $_image_data\n'
+ 'unset _image_data\n'
+ 'proc canvas_text_update {canvas tag _var - -} {\n'
+ 'upvar $_var var\n'
+ '$canvas itemconfigure $tag -text $var\n'
+ '}\n'
+ 'package require Tk\n'
+ 'set image_width [image width splash_image]\n'
+ 'set image_height [image height splash_image]\n'
+ 'set display_width [winfo screenwidth .]\n'
+ 'set display_height [winfo screenheight .]\n'
+ 'set x_position [expr {int(0.5*($display_width - $image_width))}]\n'
+ 'set y_position [expr {int(0.5*($display_height - $image_height))}]\n'
+ 'frame .root\n'
+ 'canvas .root.canvas \\\n'
+ '-width $image_width \\\n'
+ '-height $image_height \\\n'
+ '-borderwidth 0 \\\n'
+ '-highlightthickness 0\n'
+ '.root.canvas create image \\\n'
+ '[expr {$image_width / 2}] \\\n'
+ '[expr {$image_height / 2}] \\\n'
+ '-image splash_image\n'
+ 'pack .root\n'
+ 'grid .root.canvas -column 0 -row 0 -columnspan 1 -rowspan 2\n'
+ 'wm overrideredirect . 1\n'
+ 'wm geometry . +${x_position}+${y_position}\n'
+ 'wm attributes . -topmost 1\n'
+ 'raise .',
+ '/lib/x86_64-linux-gnu/libtcl8.6.so',
+ '/lib/x86_64-linux-gnu/libtk8.6.so',
+ {'_tk_data/text.tcl',
+  '_tk_data/tk.tcl',
+  '_tk_data/ttk/cursors.tcl',
+  '_tk_data/ttk/fonts.tcl',
+  '_tk_data/ttk/ttk.tcl',
+  '_tk_data/ttk/utils.tcl',
+  'libX11.so.6',
+  'libXau.so.6',
+  'libXdmcp.so.6',
+  'libXext.so.6',
+  'libXft.so.2',
+  'libXrender.so.1',
+  'libXss.so.1',
+  'libbrotlicommon.so.1',
+  'libbrotlidec.so.1',
+  'libbsd.so.0',
+  'libexpat.so.1',
+  'libfontconfig.so.1',
+  'libfreetype.so.6',
+  'libmd.so.0',
+  'libpng16.so.16',
+  'libtcl8.6.so',
+  'libtk8.6.so',
+  'libuuid.so.1',
+  'libz.so.1'},
+ [('libtcl8.6.so', '/lib/x86_64-linux-gnu/libtcl8.6.so', 'BINARY'),
+  ('libtk8.6.so', '/lib/x86_64-linux-gnu/libtk8.6.so', 'BINARY'),
+  ('libz.so.1', '/lib/x86_64-linux-gnu/libz.so.1', 'BINARY'),
+  ('libbrotlidec.so.1', '/lib/x86_64-linux-gnu/libbrotlidec.so.1', 'BINARY'),
+  ('libXext.so.6', '/lib/x86_64-linux-gnu/libXext.so.6', 'BINARY'),
+  ('libX11.so.6', '/lib/x86_64-linux-gnu/libX11.so.6', 'BINARY'),
+  ('libXrender.so.1', '/lib/x86_64-linux-gnu/libXrender.so.1', 'BINARY'),
+  ('libexpat.so.1', '/lib/x86_64-linux-gnu/libexpat.so.1', 'BINARY'),
+  ('libmd.so.0', '/lib/x86_64-linux-gnu/libmd.so.0', 'BINARY'),
+  ('libbrotlicommon.so.1',
+   '/lib/x86_64-linux-gnu/libbrotlicommon.so.1',
+   'BINARY'),
+  ('libbsd.so.0', '/lib/x86_64-linux-gnu/libbsd.so.0', 'BINARY'),
+  ('libXss.so.1', '/lib/x86_64-linux-gnu/libXss.so.1', 'BINARY'),
+  ('libfreetype.so.6', '/lib/x86_64-linux-gnu/libfreetype.so.6', 'BINARY'),
+  ('libXdmcp.so.6', '/lib/x86_64-linux-gnu/libXdmcp.so.6', 'BINARY'),
+  ('libXau.so.6', '/lib/x86_64-linux-gnu/libXau.so.6', 'BINARY'),
+  ('libuuid.so.1', '/lib/x86_64-linux-gnu/libuuid.so.1', 'BINARY'),
+  ('libfontconfig.so.1', '/lib/x86_64-linux-gnu/libfontconfig.so.1', 'BINARY'),
+  ('libpng16.so.16', '/lib/x86_64-linux-gnu/libpng16.so.16', 'BINARY'),
+  ('libXft.so.2', '/lib/x86_64-linux-gnu/libXft.so.2', 'BINARY')],
+ '/usr/lib/python3.10/lib-dynload/_tkinter.cpython-310-x86_64-linux-gnu.so')

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <!-- This is a partial copy of org.gnome.evolution.shell, with just the start-offline key, refering
+       to the same path, so that this state can be shared without having to depend on the schemas
+       from the full evolution.
+       This will be removed in later releases of e-d-s -->
+  <schema path="/org/gnome/evolution/shell/" id="org.gnome.evolution.eds-shell">
+    <key type="b" name="start-offline">
+      <default>false</default>
+      <summary>Start in offline mode</summary>
+      <description>Whether Evolution will start up in offline mode instead of online mode.</description>
+    </key>
+  </schema>
+</schemalist>

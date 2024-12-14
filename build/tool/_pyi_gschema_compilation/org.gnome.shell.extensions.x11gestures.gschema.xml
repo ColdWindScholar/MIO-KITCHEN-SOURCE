@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.x11gestures" path="/org/gnome/shell/extensions/x11gestures/">
+    <key name="swipe-fingers" type="i">
+      <default>3</default>
+    </key>
+  </schema>
+</schemalist>
+

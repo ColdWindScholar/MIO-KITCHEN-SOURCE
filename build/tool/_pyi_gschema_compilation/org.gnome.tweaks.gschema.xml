@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema path="/org/gnome/tweaks/" id="org.gnome.tweaks" gettext-domain="org.gnome.tweaks">
+        <key type="b" name="show-extensions-notice">
+            <default>true</default>
+            <summary>Show Extensions Notice</summary>
+            <description>When first installed the user should be notified that extensions support has moved to a dedicated app, Extensions.</description>
+        </key>
+    </schema>
+</schemalist>

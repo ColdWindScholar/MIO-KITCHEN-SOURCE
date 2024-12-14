@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/sender-validation/" id="org.gnome.evolution.plugin.sender-validation" gettext-domain="evolution">
+     <key type="as" name="assignments">
+      <default>[]</default>
+      <summary>List of assignments for recipient and the address to be used with it</summary>
+      <description>The list is of format 'recipient&lt;tab&gt;sender', where the recipient can be part of the address only and the sender is a full email address, which should match the From address precisely.</description>
+    </key>
+  </schema>
+</schemalist>

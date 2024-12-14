@@ -1,0 +1,205 @@
+<schemalist>
+
+  <flags id="org.gnome.mutter.MetaExperimentalFeature">
+    <value nick="scale-monitor-framebuffer" value="1"/>
+    <value nick="kms-modifiers" value="2"/>
+    <value nick="rt-scheduler" value="4"/>
+    <value nick="autoclose-xwayland" value="8"/>
+  </flags>
+
+  <schema id="org.gnome.mutter" path="/org/gnome/mutter/"
+          gettext-domain="mutter">
+
+    <key name="overlay-key" type="s">
+      <default>'Super_L'</default>
+      <summary>Modifier to use for extended window management operations</summary>
+      <description>
+        This key will initiate the “overlay”, which is a combination window
+        overview and application launching system.  The default is intended
+        to be the “Windows key” on PC hardware.
+
+        It’s expected that this binding either the default or set to
+        the empty string.
+      </description>
+    </key>
+
+    <key name="attach-modal-dialogs" type="b">
+      <default>false</default>
+      <summary>Attach modal dialogs</summary>
+      <description>
+        When true, instead of having independent titlebars, modal dialogs
+        appear attached to the titlebar of the parent window and are moved
+        together with the parent window.
+      </description>
+    </key>
+
+    <key name="edge-tiling" type="b">
+      <default>false</default>
+      <summary>Enable edge tiling when dropping windows on screen edges</summary>
+      <description>
+        If enabled, dropping windows on vertical screen edges maximizes them
+        vertically and resizes them horizontally to cover half of the available
+        area. Dropping windows on the top screen edge maximizes them completely.
+      </description>
+    </key>
+
+    <key name="dynamic-workspaces" type="b">
+      <default>false</default>
+      <summary>Workspaces are managed dynamically</summary>
+      <description>
+        Determines whether workspaces are managed dynamically or
+        whether there’s a static number of workspaces (determined
+        by the num-workspaces key in org.gnome.desktop.wm.preferences).
+      </description>
+    </key>
+
+    <key name="workspaces-only-on-primary" type="b">
+      <default>false</default>
+      <summary>Workspaces only on primary</summary>
+      <description>
+        Determines whether workspace switching should happen for windows
+        on all monitors or only for windows on the primary monitor.
+      </description>
+    </key>
+
+    <key name="no-tab-popup" type="b">
+      <default>false</default>
+      <summary>No tab popup</summary>
+      <description>
+        Determines whether the use of popup and highlight frame should
+        be disabled for window cycling.
+      </description>
+    </key>
+
+    <key name="focus-change-on-pointer-rest" type="b">
+      <default>false</default>
+      <summary>Delay focus changes until the pointer stops moving</summary>
+      <description>
+        If set to true, and the focus mode is either “sloppy” or “mouse”
+        then the focus will not be changed immediately when entering a
+        window, but only after the pointer stops moving.
+      </description>
+    </key>
+
+    <key name="draggable-border-width" type="i">
+      <default>10</default>
+      <range min="0" max="64"/>
+      <summary>Draggable border width</summary>
+      <description>
+          The amount of total draggable borders. If the theme’s visible
+          borders are not enough, invisible borders will be added to meet
+          this value.
+      </description>
+    </key>
+
+    <key name="auto-maximize" type="b">
+      <default>true</default>
+      <summary>Auto maximize nearly monitor sized windows</summary>
+      <description>
+        If enabled, new windows that are initially the size of the monitor
+        automatically get maximized.
+      </description>
+    </key>
+
+    <key name="center-new-windows" type="b">
+      <default>false</default>
+      <summary>Place new windows in the center</summary>
+      <description>
+        When true, the new windows will always be put in the center of the
+        active screen of the monitor.
+      </description>
+    </key>
+
+    <key name="experimental-features" type="as">
+      <default>[]</default>
+      <summary>Enable experimental features</summary>
+      <description>
+        To enable experimental features, add the feature keyword to the list.
+        Whether the feature requires restarting the compositor depends on the
+        given feature. Any experimental feature is not required to still be
+        available, or configurable. Don’t expect adding anything in this
+        setting to be future proof.
+
+        Currently possible keywords:
+
+        • “scale-monitor-framebuffer” — makes mutter default to layout logical
+                                        monitors in a logical pixel coordinate
+                                        space, while scaling monitor
+                                        framebuffers instead of window content,
+                                        to manage HiDPI monitors. Does not
+                                        require a restart.
+
+        • “kms-modifiers”             — makes mutter always allocate scanout
+                                        buffers with explicit modifiers, if
+                                        supported by the driver. Requires a
+                                        restart.
+
+        • “rt-scheduler”              — makes mutter request a low priority
+                                        real-time scheduling. Requires a restart.
+
+        • “autoclose-xwayland”        — automatically terminates Xwayland if all
+                                        relevant X11 clients are gone.
+                                        Requires a restart.
+
+        • “x11-randr-fractional-scaling” — enable fractional scaling under X11
+                                           using xrandr scaling. It might reduce
+                                           performances.
+                                           Does not require a restart.
+      </description>
+    </key>
+
+    <key name="locate-pointer-key" type="s">
+      <default>'Control_L'</default>
+      <summary>Modifier to use to locate the pointer</summary>
+      <description>
+        This key will initiate the “locate pointer” action.
+      </description>
+    </key>
+
+    <key name="check-alive-timeout" type="u">
+      <default>5000</default>
+      <summary>Timeout for check-alive ping</summary>
+      <description>
+        Number of milliseconds a client has to respond to a ping request in
+        order to not be detected as frozen. Using 0 will disable the alive check
+        completely.
+      </description>
+    </key>
+
+    <child name="keybindings" schema="org.gnome.mutter.keybindings"/>
+
+  </schema>
+  <schema id="org.gnome.mutter.keybindings" path="/org/gnome/mutter/keybindings/">
+
+    <key name="toggle-tiled-left" type="as">
+      <default><![CDATA[['<Super>Left']]]></default>
+      <summary>View split on left</summary>
+    </key>
+
+    <key name="toggle-tiled-right" type="as">
+      <default><![CDATA[['<Super>Right']]]></default>
+      <summary>View split on right</summary>
+    </key>
+
+    <key name="tab-popup-select" type="as">
+      <default>[]</default>
+      <summary>Select window from tab popup</summary>
+    </key>
+
+    <key name="tab-popup-cancel" type="as">
+      <default>[]</default>
+      <summary>Cancel tab popup</summary>
+    </key>
+
+    <key name="switch-monitor" type="as">
+      <default><![CDATA[['<Super>p','XF86Display']]]></default>
+      <summary>Switch monitor configurations</summary>
+    </key>
+
+    <key name="rotate-monitor" type="as">
+      <default><![CDATA[['XF86RotateWindows']]]></default>
+      <summary>Rotates the built-in monitor configuration</summary>
+    </key>
+
+  </schema>
+</schemalist>

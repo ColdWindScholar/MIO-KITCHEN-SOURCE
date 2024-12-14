@@ -1,0 +1,130 @@
+<schemalist>
+
+  <flags id="org.gnome.mutter.MetaXwaylandDisableExtension">
+    <value nick="Security" value="1"/>
+    <value nick="Xtest" value="2"/>
+  </flags>
+
+  <schema id="org.gnome.mutter.wayland.keybindings" path="/org/gnome/mutter/wayland/keybindings/"
+	  gettext-domain="mutter">
+    <key name="switch-to-session-1" type="as">
+      <default><![CDATA[['<Primary><Alt>F1']]]></default>
+      <summary>Switch to VT 1</summary>
+    </key>
+    <key name="switch-to-session-2" type="as">
+      <default><![CDATA[['<Primary><Alt>F2']]]></default>
+      <summary>Switch to VT 2</summary>
+    </key>
+    <key name="switch-to-session-3" type="as">
+      <default><![CDATA[['<Primary><Alt>F3']]]></default>
+      <summary>Switch to VT 3</summary>
+    </key>
+    <key name="switch-to-session-4" type="as">
+      <default><![CDATA[['<Primary><Alt>F4']]]></default>
+      <summary>Switch to VT 4</summary>
+    </key>
+    <key name="switch-to-session-5" type="as">
+      <default><![CDATA[['<Primary><Alt>F5']]]></default>
+      <summary>Switch to VT 5</summary>
+    </key>
+    <key name="switch-to-session-6" type="as">
+      <default><![CDATA[['<Primary><Alt>F6']]]></default>
+      <summary>Switch to VT 6</summary>
+    </key>
+    <key name="switch-to-session-7" type="as">
+      <default><![CDATA[['<Primary><Alt>F7']]]></default>
+      <summary>Switch to VT 7</summary>
+    </key>
+    <key name="switch-to-session-8" type="as">
+      <default><![CDATA[['<Primary><Alt>F8']]]></default>
+      <summary>Switch to VT 8</summary>
+    </key>
+    <key name="switch-to-session-9" type="as">
+      <default><![CDATA[['<Primary><Alt>F9']]]></default>
+      <summary>Switch to VT 9</summary>
+    </key>
+    <key name="switch-to-session-10" type="as">
+      <default><![CDATA[['<Primary><Alt>F10']]]></default>
+      <summary>Switch to VT 10</summary>
+    </key>
+    <key name="switch-to-session-11" type="as">
+      <default><![CDATA[['<Primary><Alt>F11']]]></default>
+      <summary>Switch to VT 11</summary>
+    </key>
+    <key name="switch-to-session-12" type="as">
+      <default><![CDATA[['<Primary><Alt>F12']]]></default>
+      <summary>Switch to VT 12</summary>
+    </key>
+    <key name="restore-shortcuts" type="as">
+      <default><![CDATA[['<Super>Escape']]]></default>
+      <summary>Re-enable shortcuts</summary>
+    </key>
+  </schema>
+
+
+  <schema id="org.gnome.mutter.wayland" path="/org/gnome/mutter/wayland/"
+          gettext-domain="mutter">
+
+    <key name="xwayland-allow-grabs" type="b">
+      <default>false</default>
+      <summary>Allow X11 grabs to lock keyboard focus with Xwayland</summary>
+      <description>
+        Allow all keyboard events to be routed to X11 “override redirect”
+        windows with a grab when running in Xwayland.
+
+        This option is to support X11 clients which map an “override redirect”
+        window (which do not receive keyboard focus) and issue a keyboard
+        grab to force all keyboard events to that window.
+
+        This option is seldom used and has no effect on regular X11 windows
+        which can receive keyboard focus under normal circumstances.
+
+        For a X11 grab to be taken into account under Wayland, the client must
+        also either send a specific X11 ClientMessage to the root window or be
+        among the applications allowed in key “xwayland-grab-access-rules”.
+      </description>
+    </key>
+
+    <key name="xwayland-grab-access-rules" type="as">
+      <default>[]</default>
+      <summary>Xwayland applications allowed to issue keyboard grabs</summary>
+      <description>
+        List the resource names or resource class of X11 windows either
+        allowed or not allowed to issue X11 keyboard grabs under Xwayland.
+
+        The resource name or resource class of a given X11 window can be
+        obtained using the command “xprop WM_CLASS”.
+
+        Wildcards “*” and jokers “?” in the values are supported.
+
+        Values starting with “!” are denied, which has precedence over
+        the list of values allowed, to revoke applications from the default
+	system list.
+
+        The default system list includes the following applications:
+
+        “gnome-boxes,remote-viewer,virt-viewer,virt-manager,vinagre,vncviewer,Xephyr”
+
+        Users can break an existing grab by using the specific keyboard
+        shortcut defined by the keybinding key “restore-shortcuts”.
+      </description>
+    </key>
+
+    <key name="xwayland-disable-extension"
+        flags='org.gnome.mutter.MetaXwaylandDisableExtension'>
+      <default>[]</default>
+      <summary>Disable selected X extensions in Xwayland</summary>
+      <description>
+        This option disables the selected X extensions in Xwayland if
+        Xwayland was built with support for those X extensions.
+
+        This option has no effect if Xwayland was built without support
+        for the selected extensions.
+
+        Xwayland needs to be restarted for this setting to take effect.
+      </description>
+    </key>
+
+  </schema>
+
+</schemalist>

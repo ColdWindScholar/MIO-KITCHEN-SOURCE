@@ -1,0 +1,18 @@
+<schemalist gettext-domain="org.gnome.Characters">
+  <schema id="org.gnome.Characters" path="/org/gnome/Characters/">
+    <key name="font" type="s">
+      <default>'Cantarell 50'</default>
+      <summary>Font to display characters</summary>
+      <description>
+	Use the font to render characters on the character list.
+      </description>
+    </key>
+    <key name="recent-characters" type="as">
+      <default>[]</default>
+    </key>
+    <key name="max-recent-characters" type="u">
+      <default>100</default>
+      <summary>Maximum recent characters</summary>
+    </key>
+  </schema>
+</schemalist>

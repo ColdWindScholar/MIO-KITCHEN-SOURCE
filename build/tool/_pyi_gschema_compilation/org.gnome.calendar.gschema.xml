@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-calendar">
+    <schema id="org.gnome.calendar" path="/org/gnome/calendar/">
+        <key name="window-maximized" type="b">
+            <default>true</default>
+            <summary>Window maximized</summary>
+            <description>Window maximized state</description>
+        </key>
+        <key name="window-size" type="(ii)">
+            <default>(768, 600)</default>
+            <summary>Window size</summary>
+            <description>Window size (width and height).</description>
+        </key>
+        <key name="window-position" type="(ii)">
+            <default>(-1, -1)</default>
+            <summary>Window position</summary>
+            <description>Window position (x and y).</description>
+        </key>
+        <key name="active-view" enum="org.gnome.calendar.GcalWindowView">
+            <default>'month'</default>
+            <summary>Type of the active view</summary>
+            <description>Type of the active window view, default value is: monthly view</description>
+        </key>
+        <key name="weather-settings" type="(bbsmv)">
+            <default>(true, true, '', nothing)</default>
+            <summary>Weather Service Configuration</summary>
+            <description>Whether weather reports are shown, automatic locations are used and a location-name</description>
+        </key>
+        <key name="follow-night-light" type="b">
+            <default>false</default>
+            <summary>Follow system night light</summary>
+            <description>Use GNOME night light setting to activate night-mode.</description>
+        </key>
+    </schema>
+</schemalist>

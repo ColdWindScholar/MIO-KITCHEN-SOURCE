@@ -1,0 +1,34 @@
+<schemalist gettext-domain="baobab">
+  <schema id="org.gnome.baobab" path="/org/gnome/baobab/">
+    <child name="preferences" schema="org.gnome.baobab.preferences"/>
+    <child name="ui" schema="org.gnome.baobab.ui"/>
+  </schema>
+  <schema id="org.gnome.baobab.preferences" path="/org/gnome/baobab/preferences/">
+    <key name="excluded-uris" type="as">
+      <default>[]</default>
+      <summary>Excluded locations URIs</summary>
+      <description>A list of URIs for locations to be excluded from scanning.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.baobab.ui" path="/org/gnome/baobab/ui/">
+    <key name="active-chart" type="s">
+      <choices>
+        <choice value='rings'/>
+        <choice value='treemap'/>
+      </choices>
+      <default>'rings'</default>
+      <summary>Active Chart</summary>
+      <description>Which type of chart should be displayed.</description>
+    </key>
+    <key name="window-size" type="(ii)">
+      <default>(960, 600)</default>
+      <summary>Window size</summary>
+      <description>The initial size of the window</description>
+    </key>
+    <key name="window-state" type="i">
+      <default>0</default>
+      <summary>Window state</summary>
+      <description>The GdkWindowState of the window</description>
+    </key>
+  </schema>
+</schemalist>

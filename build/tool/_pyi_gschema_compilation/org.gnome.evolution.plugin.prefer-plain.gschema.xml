@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/prefer-plain/" id="org.gnome.evolution.plugin.prefer-plain" gettext-domain="evolution">
+    <key type="s" name="mode">
+      <default>'normal'</default>
+      <summary>Mode to use when displaying mails</summary>
+      <description>The mode to use for displaying mails. “normal” makes Evolution choose the best part to show, “prefer_plain” makes it use the text part, if present, “prefer_source” makes it use the text part, if present, otherwise shows HTML source, and “only_plain” forces Evolution to only show plain text</description>
+    </key>
+    <key type="b" name="show-suppressed">
+      <default>true</default>
+      <summary>Whether to show suppressed HTML output</summary>
+      <description>Whether to show suppressed HTML output</description>
+    </key>
+  </schema>
+</schemalist>

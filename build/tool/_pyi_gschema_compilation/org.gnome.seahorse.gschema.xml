@@ -1,0 +1,29 @@
+<schemalist>
+	<schema id="org.gnome.seahorse" path="/apps/seahorse/" gettext-domain="seahorse">
+		<key name="server-auto-retrieve" type="b">
+			<default>false</default>
+			<summary>Auto retrieve keys</summary>
+			<description>Whether or not keys should be automatically retrieved from key servers.</description>
+		</key>
+		<key name="server-auto-publish" type="b">
+			<default>false</default>
+			<summary>Auto publish keys</summary>
+			<description>Whether or not modified keys should be automatically published.</description>
+		</key>
+		<key name="server-publish-to" type="s">
+			<default>''</default>
+			<summary>Publish keys to this key server</summary>
+			<description>The key server to publish PGP keys to. Or empty to suppress publishing of PGP keys.</description>
+		</key>
+		<key name="last-search-text" type="s">
+			<default>''</default>
+			<summary>Last key server search pattern</summary>
+			<description>The last search pattern searched for against a key server.</description>
+		</key>
+		<key name="last-search-servers" type="as">
+			<default>[]</default>
+			<summary>Last key servers used</summary>
+			<description>The last key server a search was performed against or empty for all key servers.</description>
+		</key>
+	</schema>
+</schemalist>

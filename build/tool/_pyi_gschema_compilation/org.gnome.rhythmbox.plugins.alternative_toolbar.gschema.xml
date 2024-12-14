@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema path="/org/gnome/rhythmbox/plugins/alternative_toolbar/"
+            id="org.gnome.rhythmbox.plugins.alternative_toolbar">
+        <key type="i" name="display-type">
+            <default>0</default>
+            <summary>Type of display</summary>
+            <description>Type of display</description>
+        </key>
+        <key type="b" name="start-hidden">
+            <default>false</default>
+            <summary>Start toolbar in hidden state</summary>
+            <description>Start toolbar in hidden state</description>
+        </key>
+        <key type="b" name="show-compact">
+            <default>true</default>
+            <summary>Show compact toolbar</summary>
+            <description>Show compact toolbar</description>
+        </key>
+        <key type="i" name="compact-pos">
+            <default>0</default>
+            <summary>Compact toolbar position</summary>
+            <description>Compact toolbar TOP or BOTTOM</description>
+        </key>
+        <key type="b" name="playing-label">
+            <default>false</default>
+            <summary>Show album/genre/year for playing label</summary>
+            <description>Show album/genre/year for playing label</description>
+        </key>
+        <key type="b" name="volume-control">
+            <default>false</default>
+            <summary>volume-control</summary>
+            <description>volume-control</description>
+        </key>
+        <key type="b" name="inline-label">
+            <default>true</default>
+            <summary>inline album label</summary>
+            <description>display album label before progress bar instead of above it</description>
+        </key>
+        <key type="b" name="compact-progressbar">
+            <default>false</default>
+            <summary>compact progressbar</summary>
+            <description>Use the compact progressbar instead of the stock progress bar</description>
+        </key>
+        <key type="b" name="enhanced-sidebar">
+            <default>false</default>
+            <summary>use the enhanced sidebar</summary>
+            <description>Use the enhanced sidebar rather than the stock sidebar</description>
+        </key>
+        <key type="s" name="expanders">
+            <default>'{1:True}'</default>
+            <summary>expanders status</summary>
+            <description>expanders open or close status</description>
+        </key>
+        <key type="b" name="show-tooltips">
+            <default>true</default>
+            <summary>show tooltips</summary>
+            <description>Show or hide tooltips used in the plugin</description>
+        </key>
+        <key type="b" name="enhanced-plugins">
+            <default>true</default>
+            <summary>show enhanced plugins dialog</summary>
+            <description>Use the enhanced plugins dialog</description>
+        </key>
+        <key type="i" name="repeat-type">
+            <default>2</default>
+            <summary>Repeat Button Type</summary>
+            <description>Icon and functionality for the repeat toggle-button</description>
+        </key>
+        <key type="b" name="show-source-toolbar">
+            <default>true</default>
+            <summary>show source toolbar</summary>
+            <description>Show or hide source toolbar</description>
+        </key>
+        <key type="i" name="horiz-categories">
+            <default>0</default>
+            <summary>show categories in a horizontal position</summary>
+            <description>show categories in a horizontal position</description>
+        </key>
+        <key type="b" name="app-menu-display">
+            <default>false</default>
+            <summary>display application menu button</summary>
+            <description>force the app-menu button to be
+                displayed
+            </description>
+        </key>
+        <key type="b" name="dark-theme">
+            <default>false</default>
+            <summary>prefer dark theme</summary>
+            <description>prefer to use a dark-theme rather than the current theme
+            </description>
+        </key>
+    </schema>
+</schemalist>

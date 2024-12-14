@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema gettext-domain="libgnomekbd" id="org.gnome.libgnomekbd" path="/org/gnome/libgnomekbd/">
+    <child name="preview" schema="org.gnome.libgnomekbd.preview"/>
+    <child name="indicator" schema="org.gnome.libgnomekbd.indicator"/>
+  </schema>
+  <schema gettext-domain="libgnomekbd" id="org.gnome.libgnomekbd.preview" path="/org/gnome/libgnomekbd/preview/">
+    <key name="x" type="i">
+      <range min="-1" max="65535"/>
+      <default>-1</default>
+      <summary>The Keyboard Preview, X offset</summary>
+      <description>The Keyboard Preview, X offset</description>
+    </key>
+    <key name="y" type="i">
+      <range min="-1" max="65535"/>
+      <default>-1</default>
+      <summary>The Keyboard Preview, Y offset</summary>
+      <description>The Keyboard Preview, Y offset</description>
+    </key>
+    <key name="width" type="i">
+      <range min="-1" max="65535"/>
+      <default>-1</default>
+      <summary>The Keyboard Preview, width</summary>
+      <description>The Keyboard Preview, width</description>
+    </key>
+    <key name="height" type="i">
+      <range min="-1" max="65535"/>
+      <default>-1</default>
+      <summary>The Keyboard Preview, height</summary>
+      <description>The Keyboard Preview, height</description>
+    </key>
+  </schema>
+  <schema gettext-domain="libgnomekbd" id="org.gnome.libgnomekbd.indicator" path="/org/gnome/libgnomekbd/indicator/">
+    <key name="secondary" type="i">
+      <range min="0" max="15"/>
+      <default>0</default>
+      <summary>Secondary groups</summary>
+      <description>Secondary groups</description>
+    </key>
+    <key name="show-flags" type="b">
+      <default>false</default>
+      <summary>Show flags in the applet</summary>
+      <description>Show flags in the applet to indicate the current layout</description>
+    </key>
+    <key name="font-family" type="s">
+      <default>''</default>
+      <summary>The font family</summary>
+      <description>The font family for the layout indicator</description>
+    </key>
+    <key name="font-size" type="i">
+      <range min="1" max="65535"/>
+      <default>10</default>
+      <summary>The font size</summary>
+      <description>The font size for the layout indicator</description>
+    </key>
+    <key name="foreground-color" type="s">
+      <default>''</default>
+      <summary>The foreground color</summary>
+      <description>The foreground color for the layout indicator</description>
+    </key>
+    <key name="background-color" type="s">
+      <default>''</default>
+      <summary>The background color</summary>
+      <description>The background color for the layout indicator</description>
+    </key>
+  </schema>
+</schemalist>

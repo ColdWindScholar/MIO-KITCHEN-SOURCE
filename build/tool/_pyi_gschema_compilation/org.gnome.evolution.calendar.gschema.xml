@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  
+  <enum id="org.gnome.evolution.calendar.Duration">
+    <value value='0' nick='minutes'/>
+    <value value='1' nick='hours'/>
+    <value value='2' nick='days'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.calendar.Weekday">
+    <value value='1' nick='monday'/>
+    <value value='2' nick='tuesday'/>
+    <value value='3' nick='wednesday'/>
+    <value value='4' nick='thursday'/>
+    <value value='5' nick='friday'/>
+    <value value='6' nick='saturday'/>
+    <value value='7' nick='sunday'/>
+  </enum>
+
+  <schema path="/org/gnome/evolution/calendar/" id="org.gnome.evolution.calendar" gettext-domain="evolution">
+    <key type="s" name="audio-dir">
+      <default>''</default>
+      <summary>Save directory for reminder audio</summary>
+      <description>Directory for saving reminder audio files</description>
+    </key>
+    <key type="i" name="ba-reminder-interval">
+      <default>15</default>
+      <summary>Birthday and anniversary reminder value</summary>
+      <description>Number of units for determining a birthday or anniversary reminder</description>
+    </key>
+    <key name="ba-reminder-units" enum="org.gnome.evolution.calendar.Duration">
+      <default>'minutes'</default>
+      <summary>Birthday and anniversary reminder units</summary>
+      <description>Units for a birthday or anniversary reminder, “minutes”, “hours” or “days”</description>
+    </key>
+    <key type="b" name="compress-weekend">
+      <default>true</default>
+      <summary>Compress weekends in month view</summary>
+      <description>Whether to compress weekends in the month view, which puts Saturday and Sunday in the space of one weekday</description>
+    </key>
+    <key type="b" name="confirm-delete">
+      <default>true</default>
+      <summary>Ask for confirmation when deleting items</summary>
+      <description>Whether to ask for confirmation when deleting an appointment or task</description>
+    </key>
+    <key type="b" name="confirm-purge">
+      <default>true</default>
+      <summary>Confirm expunge</summary>
+      <description>Whether to ask for confirmation when expunging appointments and tasks</description>
+    </key>
+    <key type="i" name="date-navigator-pane-position">
+      <default>150</default>
+      <summary>Month view vertical pane position</summary>
+      <description>Position of the vertical pane, between the calendar lists and the date navigator calendar</description>
+    </key>
+    <key type="i" name="date-navigator-pane-position-sub">
+      <default>150</default>
+      <summary>Month view vertical pane position</summary>
+      <description>Position of the vertical pane, between the calendar lists and the date navigator calendar</description>
+    </key>
+    <key type="i" name="day-end-hour">
+      <default>17</default>
+      <summary>Workday end hour</summary>
+      <description>Hour the workday ends on, in twenty four hour format, 0 to 23</description>
+    </key>
+    <key type="i" name="day-end-minute">
+      <default>0</default>
+      <summary>Workday end minute</summary>
+      <description>Minute the workday ends on, 0 to 59.</description>
+    </key>
+    <key type="i" name="day-start-hour">
+      <default>9</default>
+      <summary>Workday start hour</summary>
+      <description>Hour the workday starts on, in twenty four hour format, 0 to 23.</description>
+    </key>
+    <key type="i" name="day-start-minute">
+      <default>0</default>
+      <summary>Workday start minute</summary>
+      <description>Minute the workday starts on, 0 to 59.</description>
+    </key>
+    <key type="i" name="day-start-mon">
+      <default>-1</default>
+      <summary>Workday start time for Monday</summary>
+      <description>Time the workday starts on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-mon">
+      <default>-1</default>
+      <summary>Workday end time for Monday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-tue">
+      <default>-1</default>
+      <summary>Workday start time for Tuesday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-tue">
+      <default>-1</default>
+      <summary>Workday end time for Tuesday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-wed">
+      <default>-1</default>
+      <summary>Workday start time for Wednesday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-wed">
+      <default>-1</default>
+      <summary>Workday end time for Wednesday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-thu">
+      <default>-1</default>
+      <summary>Workday start time for Thursday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-thu">
+      <default>-1</default>
+      <summary>Workday end time for Thursday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-fri">
+      <default>-1</default>
+      <summary>Workday start time for Friday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-fri">
+      <default>-1</default>
+      <summary>Workday end time for Friday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-sat">
+      <default>-1</default>
+      <summary>Workday start time for Saturday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-sat">
+      <default>-1</default>
+      <summary>Workday end time for Saturday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="i" name="day-start-sun">
+      <default>-1</default>
+      <summary>Workday start time for Sunday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-start-hour and day-start-minute</description>
+    </key>
+    <key type="i" name="day-end-sun">
+      <default>-1</default>
+      <summary>Workday end time for Sunday</summary>
+      <description>Time the workday ends on, in twenty four hour format HHMM, 0000 to 2359, or -1 to use day-end-hour and day-end-minute</description>
+    </key>
+    <key type="s" name="day-second-zone">
+      <default>''</default>
+      <summary>The second timezone for a Day View</summary>
+      <description>Shows the second time zone in a Day View, if set. Value is similar to one used in a “timezone” key</description>
+    </key>
+    <key type="as" name="day-second-zones">
+      <default>[]</default>
+      <summary>Recently used second time zones in a Day View</summary>
+      <description>List of recently used second time zones in a Day View</description>
+    </key>
+    <key type="i" name="day-second-zones-max">
+      <default>5</default>
+      <summary>Maximum number of recently used timezones to remember</summary>
+      <description>Maximum number of recently used timezones to remember in a “day-second-zones” list</description>
+    </key>
+    <key type="i" name="default-reminder-interval">
+      <default>15</default>
+      <summary>Default reminder value</summary>
+      <description>Number of units for determining a default reminder</description>
+    </key>
+    <key name="default-reminder-units" enum="org.gnome.evolution.calendar.Duration">
+      <default>'minutes'</default>
+      <summary>Default reminder units</summary>
+      <description>Units for a default reminder, “minutes”, “hours” or “days”</description>
+    </key>
+    <key type="b" name="editor-show-categories">
+      <default>false</default>
+      <summary>Show categories field in the event/meeting/task editor</summary>
+      <description>Whether to show categories field in the event/meeting editor</description>
+    </key>
+    <key type="b" name="editor-show-role">
+      <default>true</default>
+      <summary>Show Role field in the event/task/meeting editor</summary>
+      <description>Whether to show role field in the event/task/meeting editor</description>
+    </key>
+    <key type="b" name="editor-show-rsvp">
+      <default>false</default>
+      <summary>Show RSVP field in the event/task/meeting editor</summary>
+      <description>Whether to show RSVP field in the event/task/meeting editor</description>
+    </key>
+    <key type="b" name="editor-show-status">
+      <default>true</default>
+      <summary>Show status field in the event/task/meeting editor</summary>
+      <description>Whether to show status field in the event/task/meeting editor</description>
+    </key>
+    <key type="b" name="editor-show-timezone">
+      <default>false</default>
+      <summary>Show timezone field in the event/meeting editor</summary>
+      <description>Whether to show timezone field in the event/meeting editor</description>
+    </key>
+    <key type="b" name="editor-show-type">
+      <default>false</default>
+      <summary>Show type field in the event/task/meeting editor</summary>
+      <description>Whether to show type field in the event/task/meeting editor</description>
+    </key>
+    <key type="b" name="hide-completed-tasks">
+      <default>false</default>
+      <summary>Hide completed tasks</summary>
+      <description>Whether to hide completed tasks in the tasks view</description>
+    </key>
+    <key name="hide-completed-tasks-units" enum="org.gnome.evolution.calendar.Duration">
+      <default>'days'</default>
+      <summary>Hide task units</summary>
+      <description>Units for determining when to hide tasks, “minutes”, “hours” or “days”</description>
+    </key>
+    <key type="i" name="hide-completed-tasks-value">
+      <default>1</default>
+      <summary>Hide task value</summary>
+      <description>Number of units for determining when to hide tasks</description>
+    </key>
+    <key type="b" name="hide-cancelled-events">
+      <default>false</default>
+      <summary>Hide cancelled events</summary>
+      <description>Whether to hide cancelled events in the calendar view</description>
+    </key>
+    <key type="b" name="hide-cancelled-tasks">
+      <default>false</default>
+      <summary>Hide cancelled tasks</summary>
+      <description>Whether to hide cancelled tasks in the tasks view</description>
+    </key>
+    <key type="i" name="hpane-position">
+      <default>400</default>
+      <summary>Horizontal pane position</summary>
+      <description>Position of the horizontal pane, between the date navigator calendar and the task list when not in the month view, in pixels</description>
+    </key>
+    <key type="i" name="last-notification-time">
+      <default>1</default>
+      <summary>Last reminder time</summary>
+      <description>Time the last reminder ran, in time_t</description>
+    </key>
+    <key type="s" name="marcus-bains-color-dayview">
+      <default>'#ff0000'</default>
+      <summary>Marcus Bains Line Color — Day View</summary>
+      <description>Color to draw the Marcus Bains line in the Day View</description>
+    </key>
+    <key type="s" name="marcus-bains-color-timebar">
+      <default>'#ff0000'</default>
+      <summary>Marcus Bains Line Color — Time bar</summary>
+      <description>Color to draw the Marcus Bains Line in the Time bar (empty for default)</description>
+    </key>
+    <key type="b" name="marcus-bains-line">
+      <default>true</default>
+      <summary>Marcus Bains Line</summary>
+      <description>Whether to draw the Marcus Bains Line (line at current time) in the calendar</description>
+    </key>
+    <key type="i" name="memo-hpane-position">
+      <default>200</default>
+      <summary>Memo preview pane position (horizontal)</summary>
+      <description>Position of the task preview pane when oriented horizontally</description>
+    </key>
+    <key type="i" name="memo-layout">
+      <default>0</default>
+      <summary>Memo layout style</summary>
+      <description>The layout style determines where to place the preview pane in relation to the memo list. “0” (Classic View) places the preview pane below the memo list. “1” (Vertical View) places the preview pane next to the memo list</description>
+    </key>
+    <key type="i" name="memo-vpane-position">
+      <default>400</default>
+      <summary>Memo preview pane position (vertical)</summary>
+      <description>Position of the memo preview pane when oriented vertically</description>
+    </key>
+    <key type="i" name="month-hpane-position">
+      <default>400</default>
+      <summary>Month view horizontal pane position</summary>
+      <description>Position of the horizontal pane, between the view and the date navigator calendar and task list in the month view, in pixels</description>
+    </key>
+    <key type="b" name="month-scroll-by-week">
+      <default>true</default>
+      <summary>Scroll Month View by a week, not by a month</summary>
+      <description>Whether to scroll a Month View by a week, not by a month</description>
+    </key>
+    <key type="b" name="month-start-with-current-week">
+      <default>false</default>
+      <summary>Let the Month View start with the current week</summary>
+      <description>Whether the month view should show weeks starting with the current week instead of the first week of the month.</description>
+    </key>
+    <key type="s" name="prefer-new-item">
+      <default>''</default>
+      <summary>Preferred New button item</summary>
+      <description>Name of the preferred New toolbar button item</description>
+    </key>
+    <key type="s" name="primary-calendar">
+      <default>''</default>
+      <summary>Primary calendar</summary>
+      <description>The UID of the selected (or “primary”) calendar in the sidebar of the “Calendar” view</description>
+    </key>
+    <key type="s" name="primary-memos">
+      <default>''</default>
+      <summary>Primary memo list</summary>
+      <description>The UID of the selected (or “primary”) memo list in the sidebar of the “Memos” view</description>
+    </key>
+    <key type="s" name="primary-tasks">
+      <default>''</default>
+      <summary>Primary task list</summary>
+      <description>The UID of the selected (or “primary”) task list in the sidebar of the “Tasks” view</description>
+    </key>
+    <key type="s" name="publish-template">
+      <default>''</default>
+      <summary>Free/busy template URL</summary>
+      <description>The URL template to use as a free/busy data fallback, %u is replaced by the user part of the mail address and %d is replaced by the domain</description>
+    </key>
+    <key type="b" name="recur-events-italic">
+      <default>false</default>
+      <summary>Recurrent Events in Italic</summary>
+      <description>Show days with recurrent events in italic font in bottom left calendar</description>
+    </key>
+    <key type="i" name="search-range-years">
+      <default>10</default>
+      <summary>Search range for time-based searching in years</summary>
+      <description>How many years can the time-based search go forward or backward from currently selected day when searching for another occurrence; default is ten years</description>
+    </key>
+    <key type="b" name="show-event-end">
+      <default>true</default>
+      <summary>Show appointment end times in week and month views</summary>
+      <description>Whether to display the end time of events in the week and month views</description>
+    </key>
+    <key type="b" name="show-icons-month-view">
+      <default>false</default>
+      <summary>Show appointment icons in the month view</summary>
+      <description>Whether to show icons of events in the month view</description>
+    </key>
+    <key type="b" name="show-memo-preview">
+      <default>true</default>
+      <summary>Show the memo preview pane</summary>
+      <description>If “true”, show the memo preview pane in the main window</description>
+    </key>
+    <key type="b" name="show-task-preview">
+      <default>true</default>
+      <summary>Show the task preview pane</summary>
+      <description>If “true”, show the task preview pane in the main window</description>
+    </key>
+    <key type="b" name="show-week-numbers">
+      <default>false</default>
+      <summary>Show week numbers in Day View, Work Week View, and Date Navigator</summary>
+      <description>Whether to show week numbers in various places in the Calendar</description>
+    </key>
+    <key type="d" name="tag-vpane-position">
+      <default>0</default>
+      <summary>Vertical position for the tag pane</summary>
+      <description>Vertical position for the tag pane</description>
+    </key>
+    <key type="b" name="show-tag-vpane">
+      <default>true</default>
+      <summary>Show Tasks and Memos pane in the Calendar view</summary>
+      <description>Whether to show Tasks and Memos pane in the Calendar view</description>
+    </key>
+    <key type="b" name="task-due-today-highlight">
+      <default>true</default>
+      <summary>Highlight tasks due today</summary>
+      <description>Whether highlight tasks due today with a special color (task-due-today-color)</description>
+    </key>
+    <key type="s" name="task-due-today-color">
+      <default>'#1e90ff'</default>
+      <summary>Tasks due today color</summary>
+      <description>Background color of tasks that are due today, in “#rrggbb” format. Used together with task-due-today-highlight</description>
+    </key>
+    <key type="i" name="task-hpane-position">
+      <default>200</default>
+      <summary>Task preview pane position (horizontal)</summary>
+      <description>Position of the task preview pane when oriented horizontally</description>
+    </key>
+    <key type="i" name="task-layout">
+      <default>0</default>
+      <summary>Task layout style</summary>
+      <description>The layout style determines where to place the preview pane in relation to the task list. “0” (Classic View) places the preview pane below the task list. “1” (Vertical View) places the preview pane next to the task list</description>
+    </key>
+    <key type="i" name="task-vpane-position">
+      <default>400</default>
+      <summary>Task preview pane position (vertical)</summary>
+      <description>Position of the task preview pane when oriented vertically</description>
+    </key>
+    <key type="b" name="task-overdue-highlight">
+      <default>true</default>
+      <summary>Highlight overdue tasks</summary>
+      <description>Whether highlight overdue tasks with a special color (task-overdue-color)</description>
+    </key>
+    <key type="s" name="task-overdue-color">
+      <default>'#ff0000'</default>
+      <summary>Overdue tasks color</summary>
+      <description>Background color of tasks that are overdue, in “#rrggbb” format. Used together with task-overdue-highlight.</description>
+    </key>
+    <key type="i" name="time-divisions">
+      <default>30</default>
+      <summary>Time divisions</summary>
+      <description>Intervals shown in Day and Work Week views, in minutes</description>
+    </key>
+    <key type="s" name="timezone">
+      <default>'UTC'</default>
+      <summary>Timezone</summary>
+      <description>The default timezone to use for dates and times in the calendar, as an untranslated Olson timezone database location like “America/New York”</description>
+    </key>
+    <key type="b" name="use-24hour-format">
+      <default>false</default>
+      <summary>Twenty four hour time format</summary>
+      <description>Whether to show times in twenty four hour format instead of using am/pm</description>
+    </key>
+    <key type="b" name="use-ba-reminder">
+      <default>false</default>
+      <summary>Birthday and anniversary reminder</summary>
+      <description>Whether to set a reminder for birthdays and anniversaries</description>
+    </key>
+    <key type="b" name="use-default-reminder">
+      <default>false</default>
+      <summary>Default appointment reminder</summary>
+      <description>Whether to set a default reminder for appointments</description>
+    </key>
+    <key type="b" name="use-system-timezone">
+      <default>true</default>
+      <summary>Use system timezone</summary>
+      <description>Use the system timezone instead of the timezone selected in Evolution</description>
+    </key>
+    <key name="week-start-day-name" enum="org.gnome.evolution.calendar.Weekday">
+      <default>'monday'</default>
+      <summary>First day of the week</summary>
+    </key>
+    <key type="b" name="work-day-monday">
+      <default>true</default>
+      <summary>Monday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-tuesday">
+      <default>true</default>
+      <summary>Tuesday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-wednesday">
+      <default>true</default>
+      <summary>Wednesday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-thursday">
+      <default>true</default>
+      <summary>Thursday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-friday">
+      <default>true</default>
+      <summary>Friday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-saturday">
+      <default>false</default>
+      <summary>Saturday is a work day</summary>
+    </key>
+    <key type="b" name="work-day-sunday">
+      <default>false</default>
+      <summary>Sunday is a work day</summary>
+    </key>
+    <key type="b" name="classify-private">
+      <default>false</default>
+      <summary>Create events, memos and tasks as Private by default</summary>
+    </key>
+    <key type="b" name="draw-flat-events">
+      <default>true</default>
+      <summary>Draw events as flat, not shaded.</summary>
+    </key>
+    <key type="b" name="week-view-days-left-to-right">
+      <default>false</default>
+      <summary>Whether to order days in the Week View from left to right, rather than from top to bottom.</summary>
+    </key>
+    <key type="b" name="allow-direct-summary-edit">
+      <default>false</default>
+      <summary>Allow direct edit of event Summary when clicking on it in the Day, Work Week, Week or Month view.</summary>
+    </key>
+    <key type="ai" name="custom-reminders-minutes">
+      <default>[]</default>
+      <summary>User-defined reminder times, in minutes</summary>
+    </key>
+    <key type="b" name="use-markdown-editor">
+      <default>false</default>
+      <summary>Whether to use markdown editor for the description in the component editor.</summary>
+    </key>
+
+    
+
+    <key type="i" name="week-start-day">
+      <default>1</default>
+      <summary>(Deprecated) First day of the week, from Sunday (0) to Saturday (6)</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “week-start-day-name” instead.</description>
+    </key>
+    <key type="i" name="working-days">
+      <default>62</default>
+      <summary>(Deprecated) Work days</summary>
+      <description>Days on which the start and end of work hours should be indicated. (This key was deprecated in version 3.10 and should no longer be used. Use the “work-day-monday”, “work-day-tuesday”, etc. keys instead.)</description>
+    </key>
+
+  </schema>
+
+</schemalist>

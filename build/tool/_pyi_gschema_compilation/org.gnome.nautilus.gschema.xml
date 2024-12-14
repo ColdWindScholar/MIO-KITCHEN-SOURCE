@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <enum id="org.gnome.nautilus.SpeedTradeoff">
+    <value value="0" nick="always"/>
+    <value value="1" nick="local-only"/>
+    <value value="2" nick="never"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.ClickPolicy">
+    <value value="0" nick="single"/>
+    <value value="1" nick="double"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.ActivationChoice">
+    <value value="0" nick="launch"/>
+    <value value="1" nick="display"/>
+    <value value="2" nick="ask"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.FolderView">
+    <value value="1" nick="list-view"/>
+    <value value="2" nick="icon-view"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.SortOrder">
+    <!--
+      When touching this, make sure to keep the values in sync with the
+      #NautilusFileSortType enum in the `src/nautilus-file.h` code header file.
+    -->
+    <value value="0" nick="name"/>
+    <value value="1" nick="size"/>
+    <value value="2" nick="type"/>
+    <value value="3" nick="mtime"/>
+    <value value="4" nick="atime"/>
+    <value value="5" nick="btime"/>
+    <value value="6" nick="starred"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.CanvasZoomLevel">
+    <value value="0" nick="small"/>
+    <value value="1" nick="standard"/>
+    <value value="2" nick="large"/>
+    <value value="3" nick="larger"/>
+    <value value="4" nick="largest"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.ListZoomLevel">
+    <value value="0" nick="small"/>
+    <value value="1" nick="standard"/>
+    <value value="2" nick="large"/>
+    <value value="3" nick="larger"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.TabPosition">
+    <value value="0" nick="after-current-tab"/>
+    <value value="1" nick="end"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.SearchFilterTimeType">
+    <value value="0" nick="last_modified"/>
+    <value value="1" nick="last_used"/>
+    <value value="2" nick="created"/>
+  </enum>
+
+  <enum id="org.gnome.nautilus.CompressionFormat">
+    <value value="0" nick="zip"/>
+    <value value="1" nick="tar.xz"/>
+    <value value="2" nick="7z"/>
+    <value value="3" nick="encrypted_zip"/>
+  </enum>
+
+  <schema path="/org/gnome/nautilus/" id="org.gnome.nautilus" gettext-domain="nautilus">
+    <child schema="org.gnome.nautilus.preferences" name="preferences"/>
+    <child schema="org.gnome.nautilus.compression" name="compression"/>
+    <child schema="org.gnome.nautilus.icon-view" name="icon-view"/>
+    <child schema="org.gnome.nautilus.list-view" name="list-view"/>
+    <child schema="org.gnome.nautilus.window-state" name="window-state"/>
+  </schema>
+
+  <schema path="/org/gnome/nautilus/preferences/" id="org.gnome.nautilus.preferences" gettext-domain="nautilus">
+    <key name="tabs-open-position" enum="org.gnome.nautilus.TabPosition">
+      <aliases>
+        <alias value='after_current_tab' target='after-current-tab'/>
+      </aliases>
+      <default>'after-current-tab'</default>
+      <summary>Where to position newly open tabs in browser windows</summary>
+      <description>If set to “after-current-tab”, then new tabs are inserted after the current tab. If set to “end”, then new tabs are appended to the end of the tab list.</description>
+    </key>
+    <key type="b" name="always-use-location-entry">
+      <default>false</default>
+      <summary>Always use the location entry, instead of the pathbar</summary>
+      <description>If set to true, then Nautilus browser windows will always use a textual input entry for the location toolbar, instead of the pathbar.</description>
+    </key>
+    <key name="recursive-search" enum="org.gnome.nautilus.SpeedTradeoff">
+      <default>'local-only'</default>
+      <summary>Where to perform recursive search</summary>
+      <description>In which locations Nautilus should search on subfolders. Available values are “local-only”, “always”, “never”.</description>
+    </key>
+    <key name="search-filter-time-type" enum="org.gnome.nautilus.SearchFilterTimeType">
+      <default>'last_modified'</default>
+      <summary>Filter the search dates using either last used or last modified</summary>
+      <description>Filter the search dates using either last used or last modified.</description>
+    </key>
+    <key type="b" name="show-delete-permanently">
+      <default>false</default>
+      <summary>Whether to show a context menu item to delete permanently</summary>
+      <description>If set to true, then Nautilus will show a delete permanently context menu item to bypass the Trash.</description>
+    </key>
+    <key type="b" name="show-create-link">
+      <default>false</default>
+      <summary>Whether to show context menu items to create links from copied or selected files</summary>
+      <description>If set to true, then Nautilus will show context menu items to create links from the copied or selected files.</description>
+    </key>
+    <key name="show-directory-item-counts" enum="org.gnome.nautilus.SpeedTradeoff">
+      <aliases><alias value='local_only' target='local-only'/></aliases>
+      <default>'local-only'</default>
+      <summary>When to show number of items in a folder</summary>
+      <description>Speed tradeoff for when to show the number of items in a folder. If set to “always” then always show item counts, even if the folder is on a remote server. If set to “local-only” then only show counts for local file systems. If set to “never” then never bother to compute item counts.</description>
+    </key>
+    <key name="click-policy" enum="org.gnome.nautilus.ClickPolicy">
+      <default>'double'</default>
+      <summary>Type of click used to launch/open files</summary>
+      <description>Possible values are “single” to launch files on a single click, or “double” to launch them on a double click.</description>
+    </key>
+    <key type="b" name="install-mime-activation">
+      <default>true</default>
+      <summary>Show the package installer for unknown MIME types</summary>
+      <description>Whether to show the user a package installer dialog in case an unknown MIME type is opened, in order to search for an application to handle it.</description>
+    </key>
+    <key type="b" name="mouse-use-extra-buttons">
+      <default>true</default>
+      <summary>Use extra mouse button events in Nautilus’ browser window</summary>
+      <description>For users with mice that have “Forward” and “Back” buttons, this key will determine if any action is taken inside of Nautilus when either is pressed.</description>
+    </key>
+    <key type="i" name="mouse-forward-button">
+      <default>9</default>
+      <summary>Mouse button to activate the “Forward” command in browser window</summary>
+      <description>For users with mice that have buttons for “Forward” and “Back”, this key will set which button activates the “Forward” command in a browser window. Possible values range between 6 and 14.</description>
+    </key>
+    <key type="i" name="mouse-back-button">
+      <default>8</default>
+      <summary>Mouse button to activate the “Back” command in browser window</summary>
+      <description>For users with mice that have buttons for “Forward” and “Back”, this key will set which button activates the “Back” command in a browser window. Possible values range between 6 and 14.</description>
+    </key>
+    <key name="show-image-thumbnails" enum="org.gnome.nautilus.SpeedTradeoff">
+      <aliases><alias value='local_only' target='local-only'/></aliases>
+      <default>'local-only'</default>
+      <summary>When to show thumbnails of files</summary>
+      <description>Speed trade-off for when to show a file as a thumbnail. If set to “always” then always thumbnail, even if the folder is on a remote server. If set to “local-only” then only show thumbnails for local file systems. If set to “never” then never bother to thumbnail files, just use a generic icon. Despite what the name may suggest, this applies to any previewable file type.</description>
+    </key>
+    <key type="t" name="thumbnail-limit">
+      <range max="5000"/>
+      <default>50</default>
+      <summary>Maximum image size for thumbnailing</summary>
+      <description>Images over this size (in megabytes) won’t be thumbnailed. The purpose of this setting is to avoid thumbnailing large images that may take a long time to load or use lots of memory.</description>
+    </key>
+    <key name="default-sort-order" enum="org.gnome.nautilus.SortOrder">
+      <aliases>
+        <alias value='modification_date' target='mtime'/>
+      </aliases>
+      <default>'name'</default>
+      <summary>Default sort order</summary>
+      <description>The default sort-order for items in the icon view. Possible values are “name”, “size”, “type”, “mtime”, “atime” and “starred”.</description>
+    </key>
+    <key type="b" name="default-sort-in-reverse-order">
+      <default>false</default>
+      <summary>Reverse sort order in new windows</summary>
+      <description>If true, files in new windows will be sorted in reverse order. I.e., if sorted by name, then instead of sorting the files from “a” to “z”, they will be sorted from “z” to “a”; if sorted by size, instead of being incrementally they will be sorted decrementally.</description>
+    </key>
+    <key name="default-folder-viewer" enum="org.gnome.nautilus.FolderView">
+      <aliases>
+        <alias value='icon_view' target='icon-view'/>
+        <alias value='compact_view' target='icon-view'/>
+        <alias value='compact-view' target='icon-view'/>
+        <alias value='list_view' target='list-view'/>
+      </aliases>
+      <default>'icon-view'</default>
+      <summary>Default folder viewer</summary>
+      <description>When a folder is visited this viewer is used. Possible values are “list-view”, and “icon-view”.</description>
+    </key>
+    <key type="b" name="show-hidden-files">
+      <default>false</default>
+      <summary>Whether to show hidden files</summary>
+      <description>This key is deprecated and ignored. The “show-hidden” key from “org.gtk.Settings.FileChooser” is now used instead.</description>
+    </key>
+    <key name="search-view" enum="org.gnome.nautilus.FolderView">
+      <default>'list-view'</default>
+      <summary>What viewer should be used when searching</summary>
+      <description>When searching Nautilus will switch to the type of view in this setting.</description>
+    </key>
+    <key type="b" name="open-folder-on-dnd-hover">
+      <default>true</default>
+      <summary>Whether to open the hovered folder after a timeout when drag and drop operation</summary>
+      <description>If this is set to true, when performing a drag and drop operation the hovered folder will open automatically after a timeout.</description>
+    </key>
+    <key type="b" name="use-experimental-views">
+      <default>false</default>
+      <summary>Enable new experimental views</summary>
+      <description>Whether to use the new experimental views using the latest GTK+ widgets to help giving feedback and shaping their future.</description>
+    </key>
+    <key type="b" name="fts-enabled">
+      <default>true</default>
+      <summary>Whether to have full text search enabled by default when opening a new window/tab</summary>
+      <description>If set to true, then Nautilus will also match the file contents besides the name. This toggles the default active state, which can still be overridden in the search popover</description>
+    </key>
+  </schema>
+
+  <schema path="/org/gnome/nautilus/compression/" id="org.gnome.nautilus.compression" gettext-domain="nautilus">
+    <key name="default-compression-format" enum="org.gnome.nautilus.CompressionFormat">
+      <default>'zip'</default>
+      <summary>Default format for compressing files</summary>
+      <description>The format that will be selected when compressing files.</description>
+    </key>
+  </schema>
+
+  <schema path="/org/gnome/nautilus/icon-view/" id="org.gnome.nautilus.icon-view" gettext-domain="nautilus">
+    <key type="as" name="captions">
+      <default>[ 'none', 'none', 'none' ]</default>
+      <summary>List of possible captions on icons</summary>
+      <description>A list of captions below an icon in the icon view. The actual number of captions shown depends on the zoom level. Some possible values are: “size”, “type”, “date_modified”, “owner”, “group”, “permissions”, and “mime_type”.</description>
+    </key>
+    <key name="default-zoom-level" enum="org.gnome.nautilus.CanvasZoomLevel">
+      <default>'large'</default>
+      <summary>Default icon view zoom level</summary>
+    </key>
+    <key type="as" name="text-ellipsis-limit">
+      <default>[ '3' ]</default>
+      <summary>Text Ellipsis Limit</summary>
+      <description>A string specifying how parts of overlong file names should be replaced by ellipses, depending on the zoom level. Each of the list entries is of the form “Zoom Level:Integer”. For each specified zoom level, if the given integer is larger than 0, the file name will not exceed the given number of lines. If the integer is 0 or smaller, no limit is imposed on the specified zoom level. A default entry of the form “Integer” without any specified zoom level is also allowed. It defines the maximum number of lines for all other zoom levels. Examples: 0 — always display overlong file names; 3 — shorten file names if they exceed three lines; smallest:5,smaller:4,0 — shorten file names if they exceed five lines for zoom level “smallest”. Shorten file names if they exceed four lines for zoom level “smaller”. Do not shorten file names for other zoom levels. Available zoom levels: small, standard, large.</description>
+    </key>
+  </schema>
+
+  <schema path="/org/gnome/nautilus/list-view/" id="org.gnome.nautilus.list-view" gettext-domain="nautilus">
+    <key name="default-zoom-level" enum="org.gnome.nautilus.ListZoomLevel">
+      <default>'standard'</default>
+      <summary>Default list view zoom level</summary>
+    </key>
+    <key type="as" name="default-visible-columns">
+      <default>[ 'name', 'size', 'date_modified', 'starred' ]</default>
+      <summary>Columns visible in list view</summary>
+    </key>
+    <key type="as" name="default-column-order">
+      <default>[ 'name', 'size', 'type', 'owner', 'group', 'permissions', 'mime_type', 'where', 'date_modified', 'date_modified_with_time', 'date_accessed', 'date_created', 'recency', 'starred' ]</default>
+      <summary>Column order in list view</summary>
+    </key>
+    <key type="b" name="use-tree-view">
+      <default>false</default>
+      <summary>Use tree view</summary>
+      <description>Whether a tree should be used for list view navigation instead of a flat list.</description>
+    </key>
+  </schema>
+
+  <schema path="/org/gnome/nautilus/window-state/" id="org.gnome.nautilus.window-state" gettext-domain="nautilus">
+    <key type="(ii)" name="initial-size">
+      <default>(890, 550)</default>
+      <summary>Initial size of the window</summary>
+      <description>A tuple containing the initial width and height of the application window.</description>
+    </key>
+    <key type="b" name="maximized">
+      <default>false</default>
+      <summary>Whether the navigation window should be maximized</summary>
+      <description>Whether the navigation window should be maximized by default.</description>
+    </key>
+    <key type="i" name="sidebar-width">
+      <default>188</default>
+      <summary>Width of the side pane</summary>
+      <description>The default width of the side pane in new windows.</description>
+    </key>
+    <key type="b" name="start-with-location-bar">
+      <default>true</default>
+      <summary>Show location bar in new windows</summary>
+      <description>If set to true, newly opened windows will have the location bar visible.</description>
+    </key>
+    <key type="b" name="start-with-sidebar">
+      <default>true</default>
+      <summary>Show side pane in new windows</summary>
+      <description>If set to true, newly opened windows will have the side pane visible.</description>
+    </key>
+  </schema>
+</schemalist>

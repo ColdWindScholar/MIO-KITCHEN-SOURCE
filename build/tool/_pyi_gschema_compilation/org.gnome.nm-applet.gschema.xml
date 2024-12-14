@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.nm-applet" path="/org/gnome/nm-applet/" gettext-domain="libnma">
+    <key name="disable-connected-notifications" type="b">
+      <default>false</default>
+      <summary>Disable connected notifications</summary>
+      <description>Set this to true to disable notifications when connecting to a network.</description>
+    </key>
+    <key name="disable-disconnected-notifications" type="b">
+      <default>false</default>
+      <summary>Disable disconnected notifications</summary>
+      <description>Set this to true to disable notifications when disconnecting from a network.</description>
+    </key>
+    <key name="disable-vpn-notifications" type="b">
+      <default>false</default>
+      <summary>Disable VPN notifications</summary>
+      <description>Set this to true to disable notifications when connecting to or disconnecting from a VPN.</description>
+    </key>
+    <key name="suppress-wireless-networks-available" type="b">
+      <default>false</default>
+      <summary>Suppress networks available notifications</summary>
+      <description>Set this to true to disable notifications when Wi-Fi networks are available.</description>
+    </key>
+    <key name="stamp" type="i">
+      <default>0</default>
+      <summary>Stamp</summary>
+      <description>Used to determine whether settings should be migrated to a new version.</description>
+    </key>
+    <key name="disable-wifi-create" type="b">
+      <default>false</default>
+      <summary>Disable WiFi Create</summary>
+      <description>Set to true to disable creation of adhoc networks when using the applet.</description>
+    </key>
+    <key name="show-applet" type="b">
+      <default>true</default>
+      <summary>Show the applet in notification area</summary>
+      <description>Set to FALSE to disable displaying the applet in the notification area.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.nm-applet.eap">
+    <key name="ignore-ca-cert" type="b">
+      <default>false</default>
+      <summary>Ignore CA certificate</summary>
+      <description>Set this to true to disable warnings about CA certificates in EAP authentication.</description>
+    </key>
+    <key name="ignore-phase2-ca-cert" type="b">
+      <default>false</default>
+      <summary>Ignore CA certificate</summary>
+      <description>Set this to true to disable warnings about CA certificates in phase 2 of EAP authentication.</description>
+    </key>
+  </schema>
+</schemalist>

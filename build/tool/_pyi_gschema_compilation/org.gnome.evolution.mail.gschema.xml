@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  
+  <enum id="org.gnome.evolution.mail.AutomaticActionPolicy">
+    <value value='0' nick='ask'/>
+    <value value='1' nick='always'/>
+    <value value='2' nick='never'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.ForwardStyle">
+    <value value='0' nick='attached'/>
+    <value value='1' nick='inline'/>
+    <value value='2' nick='quoted'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.ReplyStyle">
+    <value value='-1' nick='unknown'/>
+    <value value='0' nick='quoted'/>
+    <value value='1' nick='do-not-quote'/>
+    <value value='2' nick='attach'/>
+    <value value='3' nick='outlook'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.ImageLoadingPolicy">
+    <value value='0' nick='never'/>
+    <value value='1' nick='sometimes'/>
+    <value value='2' nick='always'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.ThreeState">
+    <value value='0' nick='off'/>
+    <value value='1' nick='on'/>
+    <value value='2' nick='inconsistent'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.MailRecipientCertificateLookup">
+    <value value='0' nick='off'/>
+    <value value='1' nick='autocompleted'/>
+    <value value='2' nick='books'/>
+  </enum>
+
+  
+  <enum id="org.gnome.evolution.mail.ContentEditorMode">
+    <value value='-1' nick='unknown'/>
+    <value value='0' nick='plain-text'/>
+    <value value='1' nick='html'/>
+    <value value='2' nick='markdown'/>
+    <value value='3' nick='markdown-plain-text'/>
+    <value value='4' nick='markdown-html'/>
+  </enum>
+
+  <schema path="/org/gnome/evolution/mail/" id="org.gnome.evolution.mail" gettext-domain="evolution">
+    <key type="b" name="prompt-check-if-default-mailer">
+      <default>true</default>
+      <summary>Check whether Evolution is the default mailer</summary>
+      <description>Every time Evolution starts, check whether or not it is the default mailer.</description>
+    </key>
+    <key type="s" name="composer-charset">
+      <default>''</default>
+      <summary>Default charset in which to compose messages</summary>
+      <description>Default charset in which to compose messages. Uses UTF-8, if not set.</description>
+    </key>
+    <key type="s" name="composer-editor">
+      <default>''</default>
+      <summary>Comma-separated names of the editor to prefer in the message composer</summary>
+      <description>If the name doesn’t correspond to any known editor, then the built-in WebKit editor is used. The mode is optional, in which case the editor is used for all the modes it supports. Modes are “plain”, “html”, "markdown-plain", "markdown-html" and "markdown". Example values: “webkit” (to use WebKit for plain and html), “plain:first-editor,html:second-editor” (to use “first-editor” for the “plain” and “second-editor” for “html”)</description>
+    </key>
+    <key type="s" name="composer-gallery-path">
+      <default>''</default>
+      <summary>Path where picture gallery should search for its content</summary>
+      <description>This value can be an empty string, which means it’ll use the system Picture folder, usually set to ~/Pictures. This folder will be also used when the set path is not pointing to the existent folder</description>
+    </key>
+    <key type="b" name="composer-inline-spelling">
+      <default>true</default>
+      <summary>Spell check inline</summary>
+      <description>Draw spelling error indicators on words as you type.</description>
+    </key>
+    <key type="b" name="composer-magic-links">
+      <default>true</default>
+      <summary>Automatic link recognition</summary>
+      <description>Recognize links in text and replace them.</description>
+    </key>
+    <key type="b" name="composer-magic-smileys">
+      <default>false</default>
+      <summary>Automatic emoticon recognition</summary>
+      <description>Recognize emoticons in text and replace them with images or Unicode characters.</description>
+    </key>
+    <key type="b" name="composer-unicode-smileys">
+      <default>false</default>
+      <summary>Unicode emoticons</summary>
+      <description>Use Unicode characters for emoticons.</description>
+    </key>
+    <key type="s" name="composer-message-attribution">
+      <default>''</default>
+      <summary>Attribute message</summary>
+      <description>The text that is inserted when replying to a message, attributing the message to the original author</description>
+    </key>
+    <key type="s" name="composer-message-forward">
+      <default>''</default>
+      <summary>Forward message</summary>
+      <description>The text that is inserted when forwarding a message, saying that the forwarded message follows</description>
+    </key>
+    <key type="s" name="composer-message-original">
+      <default>''</default>
+      <summary>Original message</summary>
+      <description>The text that is inserted when replying to a message (top posting), saying that the original message follows</description>
+    </key>
+    <key type="b" name="composer-group-reply-to-list">
+      <default>false</default>
+      <summary>Group Reply replies to list</summary>
+      <description>Instead of the normal “Reply to All” behaviour, this option will make the “Group Reply” toolbar button try to reply only to the mailing list through which you happened to receive the copy of the message to which you’re replying.</description>
+    </key>
+    <key type="b" name="composer-reply-start-bottom">
+      <default>false</default>
+      <summary>Put the cursor at the bottom of replies</summary>
+      <description>Users get all up in arms over where the cursor should go when replying to a message. This determines whether the cursor is placed at the top of the message or the bottom.</description>
+    </key>
+    <key type="b" name="composer-request-receipt">
+      <default>false</default>
+      <summary>Always request read receipt</summary>
+      <description>Whether a read receipt request gets added to every message by default.</description>
+    </key>
+    <key name="composer-mode" enum="org.gnome.evolution.mail.ContentEditorMode">
+      <default>'plain-text'</default>
+      <summary>What mode open the composer with</summary>
+    </key>
+    <key type="as" name="composer-spell-languages">
+      <default>[]</default>
+      <summary>Spell checking languages</summary>
+      <description>List of dictionary language codes used for spell checking.</description>
+    </key>
+    <key type="as" name="composer-spell-languages-recently-used">
+      <default>[]</default>
+      <summary>List of recently used spell checking languages</summary>
+      <description>List of dictionary language codes used for spell checking, which had been used recently.</description>
+    </key>
+    <key type="i" name="composer-spell-languages-max-recently-used">
+      <default>5</default>
+      <summary>How many recently used spell checking languages to remember</summary>
+    </key>
+    <key type="b" name="composer-show-bcc">
+      <default>false</default>
+      <summary>Show “Bcc” field when sending a mail message</summary>
+      <description>Show the “Bcc” field when sending a mail message. This is controlled from the View menu when a mail account is chosen.</description>
+    </key>
+    <key type="b" name="composer-show-cc">
+      <default>true</default>
+      <summary>Show “Cc” field when sending a mail message</summary>
+      <description>Show the “Cc” field when sending a mail message. This is controlled from the View menu when a mail account is chosen.</description>
+    </key>
+    <key type="b" name="composer-show-from-override">
+      <default>false</default>
+      <summary>Show “From” override field when sending a mail message</summary>
+      <description>Show the “From” override field when sending a mail message. This is controlled from the View menu when a mail account is chosen.</description>
+    </key>
+    <key type="b" name="composer-show-reply-to">
+      <default>false</default>
+      <summary>Show “Reply To” field when sending a mail message</summary>
+      <description>Show the “Reply To” field when sending a mail message. This is controlled from the View menu when a mail account is chosen.</description>
+    </key>
+    <key type="b" name="composer-show-post-from">
+      <default>true</default>
+      <summary>Show “From” field when posting to a newsgroup</summary>
+      <description>Show the “From” field when posting to a newsgroup. This is controlled from the View menu when a news account is chosen.</description>
+    </key>
+    <key type="b" name="composer-show-post-reply-to">
+      <default>false</default>
+      <summary>Show “Reply To” field when posting to a newsgroup</summary>
+      <description>Show the “Reply To” field when posting to a newsgroup. This is controlled from the View menu when a news account is chosen.</description>
+    </key>
+    <key type="b" name="composer-sign-reply-if-signed">
+      <default>false</default>
+      <summary>Digitally sign replies when the original message is signed</summary>
+      <description>Automatically enable PGP or S/MIME signatures when replying to a message which is also PGP or S/MIME signed.</description>
+    </key>
+    <key type="b" name="composer-outlook-filenames">
+      <default>false</default>
+      <summary>Encode filenames in an Outlook/GMail way</summary>
+      <description>Encode filenames in the mail headers same as Outlook or GMail do, to let them display correctly filenames with UTF-8 letters sent by Evolution, because they do not follow the RFC 2231, but use the incorrect RFC 2047 standard.</description>
+    </key>
+    <key type="b" name="composer-use-outbox">
+      <default>false</default>
+      <summary>Send messages through Outbox folder</summary>
+      <description>Always save messages to Outbox folder when sending, to let a user choose when the messages should be sent.</description>
+    </key>
+    <key type="i" name="composer-delay-outbox-flush">
+      <default>-1</default>
+      <summary>How long to delay Outbox flush when sending messages through Outbox folder</summary>
+      <description>A delay, in minutes, to wait for the Outbox folder flush. Less than 0 means never flush, 0 means immediately, the rest is the delay interval in minutes.</description>
+    </key>
+    <key type="b" name="composer-signature-in-new-only">
+      <default>false</default>
+      <summary>Include signature in new messages only</summary>
+      <description>Include selected signature only for new messages, but have no signature added for Replies or Forwards.</description>
+    </key>
+    <key type="b" name="composer-top-signature">
+      <default>false</default>
+      <summary>Put personalized signatures at the top of replies</summary>
+      <description>Users get all up in arms over where their signature should go when replying to a message. This determines whether the signature is placed at the top of the message or the bottom.</description>
+    </key>
+    <key type="b" name="composer-no-signature-delim">
+      <default>false</default>
+      <summary>Do not add signature delimiter</summary>
+      <description>Set to TRUE in case you do not want to add signature delimiter before your signature when composing a mail.</description>
+    </key>
+    <key type="b" name="composer-reply-keep-signature">
+      <default>false</default>
+      <summary>Keep original message signature in replies</summary>
+      <description>When set to TRUE, keep original message signature in replies, otherwise strip the signature and everything below it when replying to the message.</description>
+    </key>
+    <key type="b" name="composer-ignore-list-reply-to">
+      <default>false</default>
+      <summary>Ignore list Reply-To:</summary>
+      <description>Some mailing lists set a Reply-To: header to trick users into sending replies to the list, even when they ask Evolution to make a private reply. Setting this option to TRUE will attempt to ignore such Reply-To: headers, so that Evolution will do as you ask it. If you use the private reply action, it will reply privately, while if you use the “Reply to List” action it will do that. It works by comparing the Reply-To: header with a List-Post: header, if there is one.</description>
+    </key>
+    <key type="s" name="composer-localized-re">
+      <default>''</default>
+      <summary>List of localized “Re”</summary>
+      <description>Comma-separated list of localized “Re” abbreviations to skip in a subject text when replying to a message, as an addition to the standard “Re” prefix. An example is “SV,AV”.</description>
+    </key>
+    <key type="as" name="composer-localized-re-separators">
+      <default>['']</default>
+      <summary>List of localized “Re” separators</summary>
+      <description>A list of localized “Re” separators, used to skip in a subject text when replying to a message, as an addition to the standard “:” and the Unicode “︰” separators.</description>
+    </key>
+    <key type="b" name="composer-use-localized-fwd-re">
+      <default>false</default>
+      <summary>Use localized “Fwd”/“Re” in message Subject</summary>
+      <description>When set to true, uses localized “Fwd”/“Re” in message Subject on reply and forward as provided by current locale translation, otherwise uses unlocalized version.</description>
+    </key>
+    <key type="i" name="composer-word-wrap-length">
+      <default>71</default>
+      <summary>Number of characters for wrapping</summary>
+      <description>Will autowrap lines after given number of characters.</description>
+    </key>
+    <key type="i" name="composer-many-to-cc-recips-num">
+      <default>10</default>
+      <summary>Number of To and CC recipients to ask “prompt-on-many-to-cc-recips” from</summary>
+      <description>When to ask, when the number of To and CC recipients reaches this value.</description>
+    </key>
+    <key type="b" name="composer-toolbar-show-sign-encrypt">
+      <default>false</default>
+      <summary>Whether to always show Sign and Encrypt buttons on the toolbar</summary>
+      <description>If set to “true”, the Sign and Encrypt buttons for either PGP or S/MIME are always shown in the composer’s toolbar. Otherwise they are shown only when being used.</description>
+    </key>
+    <key type="b" name="composer-wrap-quoted-text-in-replies">
+      <default>true</default>
+      <summary>Wrap quoted text in replies</summary>
+      <description>If set to “true” quoted text in replies will be wrapped.</description>
+    </key>
+    <key type="b" name="composer-paste-plain-prefer-pre">
+      <default>false</default>
+      <summary>Paste plain text as preformatted</summary>
+      <description>When set, paste a plain text into the composer body as Preformatted paragraph. When not set, paste it as Normal paragraph.</description>
+    </key>
+    <key type="b" name="composer-reply-credits-utc-to-localtime">
+      <default>false</default>
+      <summary>Convert UTC time in reply credits to local time</summary>
+      <description>Whether the time in reply credits should be converted to local time when it’s in UTC in the message.</description>
+    </key>
+    <key type="b" name="composer-mark-read-on-reply">
+      <default>true</default>
+      <summary>Mark replied to messages as read</summary>
+      <description>When replying to a message and marking it as being replied to, then whether also mark it as read.</description>
+    </key>
+    <key type="b" name="composer-plain-text-starts-preformatted">
+      <default>false</default>
+      <summary>Whether start Plain Text composer with Preformatted paragraph mode</summary>
+      <description>When set to true, new Plain Text messages will have preselected Preformatted paragraph mode. The Normal paragraph mode will be used when set to false.</description>
+    </key>
+    <key type="b" name="display-content-disposition-inline">
+      <default>true</default>
+      <summary>Whether to obey Content-Disposition:inline message header hint</summary>
+      <description>Set to “false” to block automatic display of attachments with Content-Disposition: inline.</description>
+    </key>
+    <key type="s" name="drag-and-drop-save-file-format">
+      <default>'mbox'</default>
+      <summary>Save file format for drag-and-drop operation</summary>
+      <description>Can be either “mbox” or “pdf”.</description>
+    </key>
+    <key type="b" name="show-animated-images">
+      <default>false</default>
+      <summary>Show image animations</summary>
+      <description>Enable animated images in HTML mail. Many users find animated images annoying and prefer to see a static image instead.</description>
+    </key>
+    <key type="b" name="side-bar-search">
+      <default>true</default>
+      <summary>Enable or disable type ahead search feature</summary>
+      <description>Enable the side bar search feature to allow interactive searching of folder names.</description>
+    </key>
+    <key type="b" name="magic-spacebar">
+      <default>true</default>
+      <summary>Enable or disable magic space bar</summary>
+      <description>Enable this to use Space bar key to scroll in message preview, message list and folders.</description>
+    </key>
+    <key type="b" name="global-view-setting">
+      <default>true</default>
+      <summary>Enable to use a similar message list view settings for all folders</summary>
+      <description>Enable to use a similar message list view settings for all folders.</description>
+    </key>
+    <key type="b" name="global-view-search">
+      <default>true</default>
+      <summary>Enable to use the same search settings for all folders</summary>
+      <description>This is considered only in combination with the 'global-view-setting'.</description>
+    </key>
+    <key type="b" name="mark-citations">
+      <default>true</default>
+      <summary>Mark citations in the message “Preview”</summary>
+      <description>Mark citations in the message “Preview”.</description>
+    </key>
+    <key type="s" name="citation-color">
+      <default>'#737373'</default>
+      <summary>Citation highlight color</summary>
+      <description>Citation highlight color.</description>
+    </key>
+    <key type="b" name="caret-mode">
+      <default>false</default>
+      <summary>Enable/disable caret mode</summary>
+      <description>Enable caret mode, so that you can see a cursor when reading mail.</description>
+    </key>
+    <key type="s" name="charset">
+      <default>''</default>
+      <summary>Default charset in which to display messages</summary>
+      <description>Default charset in which to display messages.</description>
+    </key>
+    <key name="image-loading-policy" enum="org.gnome.evolution.mail.ImageLoadingPolicy">
+      <default>'never'</default>
+      <summary>Automatically load images for HTML messages over HTTP</summary>
+    </key>
+    <key type="b" name="notify-remote-content">
+      <default>true</default>
+      <summary>Show notification about missing remote content</summary>
+      <description>When the message preview shows a message which requires to download remote content, while the download is not allowed for the user or the site, then show a notification about it on top of the preview panel.</description>
+    </key>
+    <key type="b" name="animate-images">
+      <default>true</default>
+      <summary>Show Animations</summary>
+      <description>Show animated images as animations.</description>
+    </key>
+    <key type="b" name="show-all-headers">
+      <default>false</default>
+      <summary>Show all message headers</summary>
+      <description>Show all the headers when viewing a messages.</description>
+    </key>
+    <key type="a(sb)" name="show-headers">
+      <default>[('From', true), ('Reply-To', true), ('To', true), ('Cc', true), ('Bcc', true), ('Subject', true), ('Date', true), ('Newsgroups', true), ('Face', true), ('x-evolution-mailer', false)]</default>
+      <summary>List of headers to show when viewing a message.</summary>
+      <description>Each header is represented as a pair: the header name, and a boolean indicating whether the header is enabled. Disabled headers are not shown when viewing a message, but are still listed in Preferences.</description>
+    </key>
+    <key type="b" name="show-sender-photo">
+      <default>false</default>
+      <summary>Show photo of the sender</summary>
+      <description>Show the photo of the sender in the message reading pane.</description>
+    </key>
+    <key type="b" name="search-gravatar-for-photo">
+      <default>false</default>
+      <summary>Search libravatar.org for photo of the sender</summary>
+      <description>Allow searching also at libravatar.org for photo of the sender.</description>
+    </key>
+    <key type="b" name="mark-seen">
+      <default>true</default>
+      <summary>Mark as Seen after specified timeout</summary>
+      <description>Mark as Seen after specified timeout.</description>
+    </key>
+    <key type="b" name="mark-seen-always">
+      <default>false</default>
+      <summary>Mark as Seen always after specified timeout</summary>
+      <description>If set to true, the selected message will be set as unread after the timeout also after the folder change.</description>
+    </key>
+    <key type="i" name="mark-seen-timeout">
+      <default>1500</default>
+      <summary>Timeout for marking messages as seen</summary>
+      <description>Timeout in milliseconds for marking messages as seen.</description>
+    </key>
+    <key type="b" name="show-attachment-bar">
+      <default>true</default>
+      <summary>Show Attachment Bar</summary>
+      <description>Show Attachment Bar below the message preview pane when the message has attachments.</description>
+    </key>
+    <key type="b" name="show-email">
+      <default>false</default>
+      <summary>Sender email-address column in the message list</summary>
+      <description>Show the email-address of the sender in a separate column in the message list.</description>
+    </key>
+    <key type="b" name="show-deleted">
+      <default>false</default>
+      <summary>Show deleted messages in the message-list</summary>
+      <description>Show deleted messages (with a strike-through) in the message-list.</description>
+    </key>
+    <key type="b" name="show-junk">
+      <default>false</default>
+      <summary>Show junk messages in the message-list</summary>
+      <description>Show junk messages (with a red strike-through) in the message-list.</description>
+    </key>
+    <key type="b" name="enable-unmatched">
+      <default>true</default>
+      <summary>Enable Unmatched search folder</summary>
+      <description>Enable Unmatched search folder within Search Folders. It does nothing if Search Folders are disabled.</description>
+    </key>
+    <key type="b" name="safe-list">
+      <default>false</default>
+      <summary>Hides the per-folder preview and removes the selection</summary>
+      <description>This key is read only once and reset to “false” after read. This unselects the mail in the list and removes the preview for that folder.</description>
+    </key>
+    <key type="i" name="paned-size">
+      <default>144</default>
+      <summary>Height of the message-list pane</summary>
+      <description>Height of the message-list pane.</description>
+    </key>
+    <key type="i" name="paned-size-sub">
+      <default>144</default>
+      <summary>Height of the message-list pane</summary>
+      <description>Height of the message-list pane.</description>
+    </key>
+    <key type="b" name="headers-collapsed">
+      <default>false</default>
+      <summary>Whether message headers are collapsed in the user interface</summary>
+    </key>
+    <key type="i" name="hpaned-size">
+      <default>450</default>
+      <summary>Width of the message-list pane</summary>
+      <description>Width of the message-list pane.</description>
+    </key>
+    <key type="i" name="hpaned-size-sub">
+      <default>450</default>
+      <summary>Width of the message-list pane</summary>
+      <description>Width of the message-list pane.</description>
+    </key>
+    <key type="i" name="layout">
+      <default>0</default>
+      <summary>Layout style</summary>
+      <description>The layout style determines where to place the preview pane in relation to the message list. “0” (Classic View) places the preview pane below the message list. “1” (Vertical View) places the preview pane next to the message list.</description>
+    </key>
+    <key type="s" name="variable-width-font">
+      <default>'Sans 12'</default>
+      <summary>Variable width font</summary>
+      <description>The variable width font for mail display.</description>
+    </key>
+    <key type="s" name="monospace-font">
+      <default>'Monospace 12'</default>
+      <summary>Terminal font</summary>
+      <description>The terminal font for mail display.</description>
+    </key>
+    <key type="b" name="use-custom-font">
+      <default>false</default>
+      <summary>Use custom fonts</summary>
+      <description>Use custom fonts for displaying mail.</description>
+    </key>
+    <key type="b" name="address-compress">
+      <default>true</default>
+      <summary>Compress display of addresses in TO/CC/BCC</summary>
+      <description>Compress display of addresses in TO/CC/BCC to the number specified in address_count.</description>
+    </key>
+    <key type="i" name="address-count">
+      <default>5</default>
+      <summary>Number of addresses to display in TO/CC/BCC</summary>
+      <description>This sets the number of addresses to show in default message list view, beyond which a “...” is shown.</description>
+    </key>
+    <key type="b" name="show-mails-in-preview">
+      <default>true</default>
+      <summary>Show mails in headers part of the message preview when name is available</summary>
+      <description>When set to false, the mail addresses which contain both the name and the email parts in headers like To/Cc/Bcc will be shown only with the name part, without the actual email, with the name made clickable.</description>
+    </key>
+    <key type="b" name="thread-subject">
+      <default>false</default>
+      <summary>Thread the message-list based on Subject</summary>
+      <description>Whether or not to fall back on threading by subjects when the messages do not contain In-Reply-To or References headers.</description>
+    </key>
+    <key type="b" name="thread-expand">
+      <default>true</default>
+      <summary>Default value for thread expand state</summary>
+      <description>This setting specifies whether the threads should be in expanded or collapsed state by default. Evolution requires a restart.</description>
+    </key>
+    <key type="b" name="thread-latest">
+      <default>true</default>
+      <summary>Whether sort threads based on latest message in that thread</summary>
+      <description>This setting specifies whether the threads should be sorted based on latest message in each thread, rather than by message’s date. Evolution requires a restart.</description>
+    </key>
+    <key type="b" name="thread-children-ascending">
+      <default>true</default>
+      <summary>Whether sort thread children always ascending</summary>
+      <description>This setting specifies whether the thread children should be sorted always ascending, rather than using the same sort order as in the thread root level.</description>
+    </key>
+    <key type="b" name="thread-compress">
+      <default>true</default>
+      <summary>Whether to compress thread level</summary>
+      <description>Set to true to compress thread levels for flat conversations, to make the level not so deep.</description>
+    </key>
+    <key type="b" name="sort-accounts-alpha">
+      <default>true</default>
+      <summary>Sort accounts alphabetically in a folder tree</summary>
+      <description>Tells how to sort accounts in a folder tree used in a Mail view. When set to true accounts are sorted alphabetically, with an exception of On This Computer and Search folders, otherwise accounts are sorted based on an order given by a user</description>
+    </key>
+    <key type="b" name="filters-log-actions">
+      <default>false</default>
+      <summary>Log filter actions</summary>
+      <description>Log filter actions to the specified log file.</description>
+    </key>
+    <key type="s" name="filters-log-file">
+      <default>''</default>
+      <summary>Logfile to log filter actions</summary>
+      <description>If not set, or being “stdout”, then the logging is done to stdout, instead to a file.</description>
+    </key>
+    <key type="b" name="flush-outbox">
+      <default>true</default>
+      <summary>Flush Outbox after filtering</summary>
+      <description>Whether to flush Outbox after filtering is done. Outbox flush will happen only when there was used any “Forward to” filter action and approximately one minute after the last action invocation.</description>
+    </key>
+    <key name="forward-style-name" enum="org.gnome.evolution.mail.ForwardStyle">
+      <default>'attached'</default>
+      <summary>Default forward style</summary>
+    </key>
+    <key name="reply-style-name" enum="org.gnome.evolution.mail.ReplyStyle">
+      <default>'quoted'</default>
+      <summary>Default reply style</summary>
+    </key>
+    <key type="s" name="composer-attribution-language">
+      <default>''</default>
+      <summary>Forward and reply attribution language tag, like en_US. Empty string means to use the same language as the user interface.</summary>
+    </key>
+    <key type="b" name="prompt-on-accel-send">
+      <default>true</default>
+      <summary>Prompt on send when using key accelerator (Ctrl+Enter)</summary>
+      <description>Prompt the user when he or she tries to send a message with a key accelerator.</description>
+    </key>
+    <key type="b" name="prompt-on-empty-subject">
+      <default>true</default>
+      <summary>Prompt on empty subject</summary>
+      <description>Prompt the user when he or she tries to send a message without a Subject.</description>
+    </key>
+    <key type="b" name="prompt-on-empty-trash">
+      <default>true</default>
+      <summary>Prompt when emptying the trash</summary>
+      <description>Prompt the user when he or she tries to empty the trash.</description>
+    </key>
+    <key type="b" name="prompt-on-expunge">
+      <default>true</default>
+      <summary>Prompt when user expunges</summary>
+      <description>Prompt the user when he or she tries to expunge a folder.</description>
+    </key>
+    <key type="b" name="prompt-on-empty-junk">
+      <default>true</default>
+      <summary>Prompt when user calls Empty Junk</summary>
+      <description>Prompt the user when he or she tries to Empty a Junk folder.</description>
+    </key>
+    <key type="b" name="prompt-on-invalid-recip">
+      <default>true</default>
+      <summary>Prompt before sending to recipients not entered as mail addresses</summary>
+      <description>It disables/enables the repeated prompts to warn that you are trying to send a message to recipients not entered as mail addresses</description>
+    </key>
+    <key type="b" name="prompt-on-only-bcc">
+      <default>true</default>
+      <summary>Prompt when user only fills Bcc</summary>
+      <description>Prompt when user tries to send a message with no To or Cc recipients.</description>
+    </key>
+    <key type="b" name="prompt-on-unwanted-html">
+      <default>true</default>
+      <summary>Prompt when user tries to send unwanted HTML</summary>
+      <description>Prompt when user tries to send HTML mail to recipients that may not want to receive HTML mail.</description>
+    </key>
+    <key type="b" name="prompt-on-open-many">
+      <default>true</default>
+      <summary>Prompt when user tries to open 10 or more messages at once</summary>
+      <description>If a user tries to open 10 or more messages at one time, ask the user if they really want to do it.</description>
+    </key>
+    <key type="b" name="prompt-on-mark-all-read">
+      <default>true</default>
+      <summary>Prompt while marking multiple messages</summary>
+      <description>Enable or disable the prompt whilst marking multiple messages.</description>
+    </key>
+    <key type="b" name="prompt-on-delete-in-vfolder">
+      <default>false</default>
+      <summary>Prompt when deleting messages in search folder</summary>
+      <description>It disables/enables the repeated prompts to warn that deleting messages from a search folder permanently deletes the message, not simply removing it from the search results.</description>
+    </key>
+    <key type="s" name="prompt-on-folder-drop-copy">
+      <default>'ask'</default>
+      <summary>Asks whether to copy a folder by drag &amp; drop in the folder tree</summary>
+      <description>Possible values are: “never” — do not allow copy with drag &amp; drop of folders in folder tree, “always” — allow copy with drag &amp; drop of folders in folder tree without asking, or “ask” — (or any other value) will ask user.</description>
+    </key>
+    <key type="s" name="prompt-on-folder-drop-move">
+      <default>'ask'</default>
+      <summary>Asks whether to move a folder by drag &amp; drop in the folder tree</summary>
+      <description>Possible values are: “never” — do not allow move with drag &amp; drop of folders in folder tree, “always” — allow move with drag &amp; drop of folders in folder tree without asking, or “ask” — (or any other value) will ask user.</description>
+    </key>
+    <key type="b" name="prompt-on-private-list-reply">
+      <default>true</default>
+      <summary>Prompt when replying privately to list messages</summary>
+      <description>It disables/enables the repeated prompts to warn that you are sending a private reply to a message which arrived via a mailing list.</description>
+    </key>
+    <key type="b" name="prompt-on-list-reply-to">
+      <default>true</default>
+      <summary>Prompt when mailing list hijacks private replies</summary>
+      <description>It disables/enables the repeated prompts to warn that you are trying sending a private reply to a message which arrived via a mailing list, but the list sets a Reply-To: header which redirects your reply back to the list</description>
+    </key>
+    <key type="b" name="prompt-on-reply-many-recips">
+      <default>true</default>
+      <summary>Prompt when replying to many recipients</summary>
+      <description>It disables/enables the repeated prompts to warn that you are sending a reply to many people.</description>
+    </key>
+    <key type="b" name="prompt-on-composer-mode-switch">
+      <default>true</default>
+      <summary>Prompt when switching composer format and the content needs to lose its formatting</summary>
+      <description>It disables/enables the repeated prompts to warn that you are switching composer format and the content needs to lose its formatting.</description>
+    </key>
+    <key type="b" name="prompt-on-many-to-cc-recips">
+      <default>true</default>
+      <summary>Prompt when sending to many To and CC recipients</summary>
+      <description>Enable or disable the prompt when sending to many To and CC recipients. The “composer-many-to-cc-recips-num” defines the threshold.</description>
+    </key>
+    <key name="browser-close-on-reply-policy" enum="org.gnome.evolution.mail.AutomaticActionPolicy">
+      <default>'ask'</default>
+      <summary>Policy for automatically closing the message browser window when forwarding or replying to the displayed message.</summary>
+    </key>
+    <key type="b" name="trash-empty-on-exit">
+      <default>false</default>
+      <summary>Empty Trash folders on exit</summary>
+      <description>Empty all Trash folders when exiting Evolution.</description>
+    </key>
+    <key type="i" name="trash-empty-on-exit-days">
+      <default>0</default>
+      <summary>Minimum days between emptying the trash on exit</summary>
+      <description>Minimum time between emptying the trash on exit, in days.</description>
+    </key>
+    <key type="i" name="trash-empty-date">
+      <default>0</default>
+      <summary>Last time Empty Trash was run</summary>
+      <description>The last time Empty Trash was run, in days since January 1st, 1970 (Epoch).</description>
+    </key>
+    <key type="i" name="error-timeout">
+      <default>60</default>
+      <summary>Amount of time in seconds the error should be shown on the status bar.</summary>
+      <description>Amount of time in seconds the error should be shown on the status bar.</description>
+    </key>
+    <key type="i" name="error-level">
+      <default>0</default>
+      <summary>Level beyond which the message should be logged.</summary>
+      <description>This can have three possible values. “0” for errors. “1” for warnings. “2” for debug messages.</description>
+    </key>
+    <key type="b" name="show-real-date">
+      <default>true</default>
+      <summary>Show original “Date” header value.</summary>
+      <description>Show the original “Date” header (with a local time only if the time zone differs). Otherwise always show “Date” header value in a user preferred format and local time zone.</description>
+    </key>
+    <key type="as" name="labels">
+      <default>['I_mportant:#EF2929','_Work:#F57900','_Personal:#4E9A06','_To Do:#3465A4','_Later:#75507B']</default>
+      <summary>List of Labels and their associated colors</summary>
+      <description>List of labels known to the mail component of Evolution. The list contains strings containing name:color where color uses the HTML hex encoding.</description>
+    </key>
+    <key type="b" name="junk-check-incoming">
+      <default>true</default>
+      <summary>Check incoming mail being junk</summary>
+      <description>Run junk test on incoming mail.</description>
+    </key>
+    <key type="b" name="junk-empty-on-exit">
+      <default>false</default>
+      <summary>Empty Junk folders on exit</summary>
+      <description>Empty all Junk folders when exiting Evolution.</description>
+    </key>
+    <key type="i" name="junk-empty-on-exit-days">
+      <default>0</default>
+      <summary>Minimum days between emptying the junk on exit</summary>
+      <description>Minimum time between emptying the junk on exit, in days.</description>
+    </key>
+    <key type="i" name="junk-empty-date">
+      <default>0</default>
+      <summary>Last time Empty Junk was run</summary>
+      <description>The last time Empty Junk was run, in days since January 1st, 1970 (Epoch).</description>
+    </key>
+    <key type="s" name="junk-default-plugin">
+      <default>'Bogofilter'</default>
+      <summary>The default plugin for Junk hook</summary>
+      <description>This is the default junk plugin, even though there are multiple plugins enabled. If the default listed plugin is disabled, then it won’t fall back to the other available plugins.</description>
+    </key>
+    <key type="b" name="junk-lookup-addressbook">
+      <default>false</default>
+      <summary>Determines whether to lookup in address book for sender email</summary>
+      <description>Determines whether to lookup the sender email in address book. If found, it shouldn’t be a spam. It looks up in the books marked for autocompletion. It can be slow, if remote address books (like LDAP) are marked for autocompletion.</description>
+    </key>
+    <key type="b" name="junk-lookup-addressbook-local-only">
+      <default>false</default>
+      <summary>Determines whether to look up addresses for junk filtering in local address book only</summary>
+      <description>This option is related to the key lookup_addressbook and is used to determine whether to look up addresses in local address book only to exclude mail sent by known contacts from junk filtering.</description>
+    </key>
+    <key type="b" name="junk-check-custom-header">
+      <default>true</default>
+      <summary>Determines whether to use custom headers to check for junk</summary>
+      <description>Determines whether to use custom headers to check for junk. If this option is enabled and the headers are mentioned, it will be improve the junk checking speed.</description>
+    </key>
+    <key type="as" name="junk-custom-header">
+      <default>['X-Spam-Flag=YES','X-Spam-Level=*****']</default>
+      <summary>Custom headers to use while checking for junk.</summary>
+      <description>Custom headers to use while checking for junk. The list elements are string in the format “headername=value”.</description>
+    </key>
+    <key type="s" name="default-account">
+      <default>''</default>
+      <summary>UID string of the default account.</summary>
+      <description>UID string of the default account.</description>
+    </key>
+    <key type="s" name="save-dir">
+      <default>''</default>
+      <summary>Save directory</summary>
+      <description>Directory for saving mail component files.</description>
+    </key>
+    <key type="s" name="composer-current-folder">
+      <default>''</default>
+      <summary>Composer load/attach directory</summary>
+      <description>Directory for loading/attaching files to composer.</description>
+    </key>
+    <key type="b" name="send-recv-on-start">
+      <default>true</default>
+      <summary>Check for new messages on start</summary>
+      <description>Whether to check for new messages when Evolution is started. This includes also sending messages from Outbox.</description>
+    </key>
+    <key type="b" name="send-recv-all-on-start">
+      <default>false</default>
+      <summary>Check for new messages in all active accounts</summary>
+      <description>Whether to check for new messages in all active accounts regardless of the account “Check for new messages every X minutes” option when Evolution is started. This option is used only together with “send_recv_on_start” option.</description>
+    </key>
+    <key type="i" name="sync-interval">
+      <default>600</default>
+      <summary>Server synchronization interval</summary>
+      <description>Controls how frequently local changes are synchronized with the remote mail server. The interval must be at least 30 seconds.</description>
+    </key>
+    <key type="b" name="vfolder-allow-expunge">
+      <default>false</default>
+      <summary>Allow expunge in virtual folders</summary>
+      <description>Enables Expunge in virtual folders, which means that the Folder→Expunge will be callable in virtual folders, while the expunge itself will be done in all folders for all deleted messages within the virtual folder, not only for deleted messages belonging to the virtual folder.</description>
+    </key>
+    <key type="b" name="composer-inherit-theme-colors">
+      <default>false</default>
+      <summary>Inherit theme colors in HTML format</summary>
+      <description>When enabled the theme colors for background, text and links are sent in resulting HTML formatted message.</description>
+    </key>
+    <child schema="org.gnome.evolution.window" name="browser-window"/>
+    <child schema="org.gnome.evolution.window" name="composer-window"/>
+    <child schema="org.gnome.evolution.window" name="filter-window"/>
+    <child schema="org.gnome.evolution.window" name="send-recv-window"/>
+    <child schema="org.gnome.evolution.window" name="subscription-window"/>
+    <child schema="org.gnome.evolution.window" name="vfolder-window"/>
+
+    <key type="s" name="local-archive-folder">
+      <default>''</default>
+      <summary>An Archive folder for On This Computer folders.</summary>
+      <description>An Archive folder to use for Messages|Archive... feature when in an On This Computer folder.</description>
+    </key>
+
+    <key type="b" name="show-to-do-bar">
+      <default>true</default>
+      <summary>Whether the To Do bar is visible in the main window</summary>
+      <description>Stores whether the To Do bar is visible in the main window.</description>
+    </key>
+    <key type="i" name="to-do-bar-width">
+      <default>9999</default>
+      <summary>Width of the To Do bar in the main window</summary>
+      <description>Holds the width of the To Do bar for the main window.</description>
+    </key>
+    <key type="b" name="show-to-do-bar-sub">
+      <default>true</default>
+      <summary>Whether the To Do bar is visible in a sub-window</summary>
+      <description>Stores whether the To Do bar is visible in a sub-window.</description>
+    </key>
+    <key type="i" name="to-do-bar-width-sub">
+      <default>9999</default>
+      <summary>Width of the To Do bar in a sub-window</summary>
+      <description>Holds the width of the To Do bar for a sub-window.</description>
+    </key>
+    <key type="b" name="to-do-bar-show-completed-tasks">
+      <default>false</default>
+      <summary>Whether the To Do bar should show also completed tasks</summary>
+      <description>Stores whether the To Do bar should show also completed tasks.</description>
+    </key>
+    <key type="b" name="to-do-bar-show-no-duedate-tasks">
+      <default>false</default>
+      <summary>Whether the To Do bar should show also tasks without Due date</summary>
+      <description>Stores whether the To Do bar should show also tasks without Due date.</description>
+    </key>
+    <key type="u" name="to-do-bar-show-n-days">
+      <default>8</default>
+      <summary>How many days to show in the To Do bar</summary>
+      <description>Values out of range are clamped to the boundary.</description>
+    </key>
+    <key type="b" name="show-startup-wizard">
+      <default>true</default>
+      <summary>Show start up wizard</summary>
+      <description>Whether show start up wizard when there is no mail account configured.</description>
+    </key>
+    <key type="b" name="delete-selects-previous">
+      <default>false</default>
+      <summary>Whether go to the previous message after message deletion</summary>
+      <description>If set to true, goes to the previous message when the selected is deleted; or to the next message, when it’s set to false.</description>
+    </key>
+    <key type="b" name="show-subject-above-sender">
+      <default>false</default>
+      <summary>Show Subject above Sender in Messages column</summary>
+      <description>Whether to show Subject above Sender (From/To) in the Messages column, usually shown in the Vertical/Wide view of the message list</description>
+    </key>
+    <key type="b" name="composer-visually-wrap-long-lines">
+      <default>false</default>
+      <summary>Visually wrap long lines in composer</summary>
+      <description>Whether to visually wrap long lines of text to avoid horizontal scrolling</description>
+    </key>
+    <key name="alt-reply-style" enum="org.gnome.evolution.mail.ReplyStyle">
+      <default>'quoted'</default>
+      <summary>Alternative reply style</summary>
+    </key>
+    <key name="alt-reply-format-mode" enum="org.gnome.evolution.mail.ContentEditorMode">
+      <default>'unknown'</default>
+      <summary>Composer mode to use.</summary>
+    </key>
+    <key name="alt-reply-start-bottom" enum="org.gnome.evolution.mail.ThreeState">
+      <default>'inconsistent'</default>
+      <summary>Put the cursor at the bottom of alternative replies</summary>
+      <description>This determines whether the cursor is placed at the top of the message or the bottom when using Alternative Reply.</description>
+    </key>
+    <key name="alt-reply-top-signature" enum="org.gnome.evolution.mail.ThreeState">
+      <default>'inconsistent'</default>
+      <summary>Put the signature at the top of the message</summary>
+      <description>This determines whether the signature is placed at the top of the message or the bottom when using Alternative Reply.</description>
+    </key>
+    <key type="b" name="alt-reply-template-apply">
+      <default>false</default>
+      <summary>Apply chosen template when using Alternative Reply</summary>
+    </key>
+    <key type="s" name="alt-reply-template-folder-uri">
+      <default>''</default>
+      <summary>Last chosen template’s folder URI for Alternative Reply</summary>
+    </key>
+    <key type="s" name="alt-reply-template-message-uid">
+      <default>''</default>
+      <summary>Last chosen template’s message UID for Alternative Reply</summary>
+    </key>
+    <key type="b" name="alt-reply-template-preserve-subject">
+      <default>false</default>
+      <summary>Whether preserve original message subject when applying template for Alternative Reply</summary>
+    </key>
+    <key type="b" name="composer-mailto-body-in-pre">
+      <default>false</default>
+      <summary>Whether set “body” in mailto: URI as Preformatted paragraph style. If set to “false”, then Normal paragraph style will be used.</summary>
+    </key>
+    <key type="b" name="browser-close-on-delete-or-junk">
+      <default>false</default>
+      <summary>Close the message browser window when the selected message is deleted or marked as Junk.</summary>
+    </key>
+    <key type="b" name="collapse-archive-folders-in-selectors">
+      <default>false</default>
+      <summary>Collapse archive folders in Move/Copy message to Folder and Go to Folder selectors.</summary>
+    </key>
+    <key name="lookup-recipient-certificates" enum="org.gnome.evolution.mail.MailRecipientCertificateLookup">
+      <default>'books'</default>
+      <summary>Where to lookup recipient S/MIME certificates or PGP keys when encrypting messages.</summary>
+      <description>The “off” value completely disables certificate lookup; the “autocompleted” value provides certificates only for auto-completed contacts; the “books” value uses certificates from auto-completed contacts and searches in books marked for auto-completion.</description>
+    </key>
+    <key type="b" name="send-receive-downloads-for-offline">
+      <default>false</default>
+      <summary>Whether Send/Receive should also download of messages for offline.</summary>
+      <description>If enabled, whenever Send/Receive is run it also runs synchronization of messages for offline use. The option is disabled by default.</description>
+    </key>
+    <key type="b" name="display-delivery-notification-inline">
+      <default>false</default>
+      <summary>Whether display delivery notification parts inline.</summary>
+      <description>If enabled, the message/delivery-status and message/disposition-notification parts are shown automatically inline.</description>
+    </key>
+    <key type="b" name="preview-unset-html-colors">
+      <default>false</default>
+      <summary>Whether unset colors provided in HTML mails.</summary>
+      <description>If enabled, unset colors in HTML messages, forcing use of desktop theme colors instead.</description>
+    </key>
+    <key type="b" name="copy-move-to-folder-preserve-expand">
+      <default>false</default>
+      <summary>Whether to preserve expand state of the folders when calling Copy/Move to Folder.</summary>
+      <description>If enabled, the Copy/Move to Folder dialog will preserve the expand state of the folders in the dialog, otherwise all the folders will be expanded.</description>
+    </key>
+    <key type="i" name="preview-text-size-limit">
+      <default>512</default>
+      <summary>Size limit for text attachments to show</summary>
+      <description>Defines the size in KB, the limit to show text attachments in the message preview. Anything above this limit will not be possible to show inline.</description>
+    </key>
+
+    
+
+    <key type="i" name="forward-style">
+      <default>0</default>
+      <summary>(Deprecated) Default forward style</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “forward-style-name” instead.</description>
+    </key>
+    <key type="i" name="reply-style">
+      <default>0</default>
+      <summary>(Deprecated) Default reply style</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “reply-style-name” instead.</description>
+    </key>
+    <key type="as" name="headers">
+      <default>[]</default>
+      <summary>(Deprecated) List of custom headers and whether they are enabled.</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “show-headers” instead.</description>
+    </key>
+    <key type="i" name="load-http-images">
+      <default>0</default>
+      <summary>(Deprecated) Load images for HTML messages over HTTP</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “image-loading-policy” instead.</description>
+    </key>
+    <key type="s" name="prompt-on-reply-close-browser">
+      <default>'ask'</default>
+      <summary>(Deprecated) Asks whether to close the message window when the user forwards or replies to the message shown in the window</summary>
+      <description>This key was deprecated in version 3.10 and should no longer be used. Use “browser-close-on-reply-policy” instead.</description>
+    </key>
+
+  </schema>
+
+</schemalist>

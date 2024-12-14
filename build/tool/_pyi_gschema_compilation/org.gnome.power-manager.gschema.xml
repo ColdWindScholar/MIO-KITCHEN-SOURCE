@@ -1,0 +1,49 @@
+<schemalist>
+  <schema id="org.gnome.power-manager" path="/org/gnome/power-manager/" gettext-domain="gnome-power-manager">
+    <key name="info-history-graph-points" type="b">
+      <default>true</default>
+      <summary>Whether we should show the history data points</summary>
+      <description>Whether we should show the history data points in the statistics window.</description>
+    </key>
+    <key name="info-history-graph-smooth" type="b">
+      <default>true</default>
+      <summary>Whether we should smooth the history data</summary>
+      <description>Whether we should smooth the history data in the graph.</description>
+    </key>
+    <key name="info-history-type" type="s">
+      <default>'power'</default>
+      <summary>The default graph type to show for history</summary>
+      <description>The default graph type to show in the history window.</description>
+    </key>
+    <key name="info-history-time" type="i">
+      <default>21600</default>
+      <summary>The maximum time displayed for history</summary>
+      <description>The maximum duration of time displayed on the x-axis of the history graph.</description>
+    </key>
+    <key name="info-stats-graph-points" type="b">
+      <default>true</default>
+      <summary>Whether we should show the stats data points</summary>
+      <description>Whether we should show the stats data points in the statistics window.</description>
+    </key>
+    <key name="info-stats-graph-smooth" type="b">
+      <default>true</default>
+      <summary>Whether we should smooth the stats data</summary>
+      <description>Whether we should smooth the stats data in the graph.</description>
+    </key>
+    <key name="info-stats-type" type="s">
+      <default>'power'</default>
+      <summary>The default graph type to show for stats</summary>
+      <description>The default graph type to show in the stats window.</description>
+    </key>
+    <key name="info-page-number" type="i">
+      <default>0</default>
+      <summary>The index of the page number to show by default</summary>
+      <description>The index of the page number to show by default which is used to return focus to the correct page.</description>
+    </key>
+    <key name="info-last-device" type="s">
+      <default>''</default>
+      <summary>The ID of the last device selected</summary>
+      <description>The identifier of the last device which is used to return focus to the correct device.</description>
+    </key>
+  </schema>
+</schemalist>

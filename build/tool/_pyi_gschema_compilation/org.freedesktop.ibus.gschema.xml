@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.freedesktop.ibus" path="/desktop/ibus/">
+    <child name="general" schema="org.freedesktop.ibus.general"/>
+    <child name="panel" schema="org.freedesktop.ibus.panel"/>
+  </schema>
+  <schema id="org.freedesktop.ibus.general" path="/desktop/ibus/general/">
+    <key name="preload-engines" type="as">
+      <default>[]</default>
+      <!-- Translators: Here “Preload” is a verb -->
+      <summary>Preload engines</summary>
+      <!-- Translators: Tooltip for the button “Preload Engines” -->
+      <description>Preload engines during ibus starts up</description>
+    </key>
+    <key name="engines-order" type="as">
+      <default>[]</default>
+      <summary>Engines order</summary>
+      <description>Saved engines order in input method list</description>
+    </key>
+    <key name="switcher-delay-time" type="i">
+      <default>400</default>
+      <summary>Popup delay milliseconds for IME switcher window</summary>
+      <description>Set popup delay milliseconds to show IME switcher window. The default is 400. 0 = Show the window immediately. 0 &lt; Delay milliseconds. 0 &gt; Do not show the window and switch prev/next engines.</description>
+    </key>
+    <key name="version" type="s">
+      <default>''</default>
+      <summary>Saved version number</summary>
+      <description>The saved version number will be used to check the difference between the version of the previous installed ibus and one of the current ibus.</description>
+    </key>
+    <key name="xkb-latin-layouts" type="as">
+      <default>[ 'ara', 'bg', 'cz', 'dev', 'gr', 'gur', 'in', 'jp(kana)', 'mal', 'mkd', 'ru', 'ua' ]</default>
+      <summary>Latin layouts which have no ASCII</summary>
+      <description>US layout is appended to the Latin layouts. variant can be omitted.</description>
+    </key>
+    <key name="use-xmodmap" type="b">
+      <default>true</default>
+      <summary>Use xmodmap</summary>
+      <description>Run xmodmap if .xmodmap or .Xmodmap exists when ibus engines are switched.</description>
+    </key>
+    <key name="use-system-keyboard-layout" type="b">
+      <default>false</default>
+      <summary>Use system keyboard layout</summary>
+      <description>Use system keyboard (XKB) layout</description>
+    </key>
+    <key name="embed-preedit-text" type="b">
+      <default>true</default>
+      <summary>Embed Preedit Text</summary>
+      <description>Embed Preedit Text in Application Window</description>
+    </key>
+    <key name="use-global-engine" type="b">
+      <default>true</default>
+      <summary>Use global input method</summary>
+      <description>Share the same input method among all applications</description>
+    </key>
+    <key name="enable-by-default" type="b">
+      <default>false</default>
+      <summary>Enable input method by default</summary>
+      <description>Enable input method by default when the application gets input focus</description>
+    </key>
+    <key name="dconf-preserve-name-prefixes" type="as">
+      <default>[ '/desktop/ibus/engine/pinyin', '/desktop/ibus/engine/bopomofo', '/desktop/ibus/engine/hangul' ]</default>
+      <summary>DConf preserve name prefixes</summary>
+      <description>Prefixes of DConf keys to stop name conversion</description>
+    </key>
+    <child name="hotkey" schema="org.freedesktop.ibus.general.hotkey"/>
+  </schema>
+  <schema id="org.freedesktop.ibus.general.hotkey" path="/desktop/ibus/general/hotkey/">
+    <key name="trigger" type="as">
+      <default>[ 'Control+space', 'Zenkaku_Hankaku', 'Alt+Kanji', 'Alt+grave', 'Hangul', 'Alt+Release+Alt_R' ]</default>
+      <summary>Trigger shortcut keys</summary>
+      <description>The shortcut keys for turning input method on or off</description>
+    </key>
+    <key name="triggers" type="as">
+      <default>[ '&lt;Super&gt;space' ]</default>
+      <summary>Trigger shortcut keys for gtk_accelerator_parse</summary>
+      <description>The shortcut keys for turning input method on or off</description>
+    </key>
+    <key name="enable-unconditional" type="as">
+      <default>[]</default>
+      <summary>Enable shortcut keys</summary>
+      <description>The shortcut keys for turning input method on</description>
+    </key>
+    <key name="disable-unconditional" type="as">
+      <default>[]</default>
+      <summary>Disable shortcut keys</summary>
+      <description>The shortcut keys for turning input method off</description>
+    </key>
+    <key name="next-engine" type="as">
+      <default>[ 'Alt+Shift_L' ]</default>
+      <summary>Next engine shortcut keys</summary>
+      <description>The shortcut keys for switching to the next input method in the list</description>
+    </key>
+    <key name="next-engine-in-menu" type="as">
+      <default>[ 'Alt+Shift_L' ]</default>
+      <summary>Next engine shortcut keys</summary>
+      <description>The shortcut keys for switching to the next input method in the list</description>
+    </key>
+    <key name="prev-engine" type="as">
+      <default>[]</default>
+      <summary>Prev engine shortcut keys</summary>
+      <description>The shortcut keys for switching to the previous input method</description>
+    </key>
+    <key name="previous-engine" type="as">
+      <default>[]</default>
+      <summary>Prev engine shortcut keys</summary>
+      <description>The shortcut keys for switching to the previous input method</description>
+    </key>
+  </schema>
+  <schema id="org.freedesktop.ibus.panel" path="/desktop/ibus/panel/">
+    <key name="show" type="i">
+      <default>0</default>
+      <summary>Auto hide</summary>
+      <description>The behavior of property panel. 0 = Do not show, 1 = Auto hide, 2 = Always show</description>
+    </key>
+    <key name="x" type="i">
+      <default>-1</default>
+      <summary>Language panel position</summary>
+    </key>
+    <key name="y" type="i">
+      <default>-1</default>
+      <summary>Language panel position</summary>
+    </key>
+    <key name="follow-input-cursor-when-always-shown" type="b">
+      <default>false</default>
+      <summary>Follow the input cursor in case the panel is always shown</summary>
+      <description>If true, the panel follows the input cursor in case the panel is always shown. If false, the panel is shown at a fixed location.</description>
+    </key>
+    <key name="auto-hide-timeout" type="i">
+      <default>10000</default>
+      <summary>The milliseconds to show property panel</summary>
+      <description>The milliseconds to show property panel after focus-in or properties are changed.</description>
+    </key>
+    <key name="lookup-table-orientation" type="i">
+      <default>1</default>
+      <summary>Orientation of lookup table</summary>
+      <description>Orientation of lookup table. 0 = Horizontal, 1 = Vertical</description>
+    </key>
+    <key name="show-icon-on-systray" type="b">
+      <default>true</default>
+      <summary>Show icon on system tray</summary>
+      <description>Show icon on system tray</description>
+    </key>
+    <key name="show-im-name" type="b">
+      <default>false</default>
+      <summary>Show input method name</summary>
+      <description>Show input method name on language bar</description>
+    </key>
+    <key name="xkb-icon-rgba" type="s">
+      <default>'#51a2da'</default>
+      <summary>RGBA value of XKB icon</summary>
+      <description>XKB icon shows the layout string and the string is rendered with the RGBA value. The RGBA value can be 1. a color name from X11, 2. a hex value in form '#rrggbb' where 'r', 'g' and 'b' are hex digits of the red, green, and blue, 3. a RGB color in form 'rgb(r,g,b)' or 4. a RGBA color in form 'rgba(r,g,b,a)' where 'r', 'g', and 'b' are either integers in the range 0 to 255 or percentage values in the range 0% to 100%, and 'a' is a floating point value in the range 0 to 1 of the alpha.</description>
+    </key>
+    <key name="property-icon-delay-time" type="i">
+      <default>500</default>
+      <summary>The milliseconds to show the panel icon for a property</summary>
+      <description>The milliseconds to show the panel icon from the engine icon to a property icon whenever engines are switched if the property is specified by the value of icon-prop-key in IBusEngineDesc. If the value is 0, no delay time and the property icon is shown immediately.</description>
+    </key>
+    <key name="use-custom-font" type="b">
+      <default>false</default>
+      <summary>Use custom font</summary>
+      <description>Use custom font name for language panel</description>
+    </key>
+    <key name="custom-font" type="s">
+      <default>'Sans 10'</default>
+      <summary>Custom font</summary>
+      <description>Custom font name for language panel</description>
+    </key>
+    <key name="use-glyph-from-engine-lang" type="b">
+      <default>true</default>
+      <summary>Choose glyphs with input method's language on candidate window</summary>
+      <description>Some code points have the different glyphs and Pango
+                   determines the glyphs from the language attribute.
+                   Pango chooses glyphs from the IBus engine's language
+                   if the value is true and choose them from the desktop
+                   locale if the value is false.</description>
+    </key>
+    <child name="emoji" schema="org.freedesktop.ibus.panel.emoji"/>
+  </schema>
+  <schema id="org.freedesktop.ibus.panel.emoji" path="/desktop/ibus/panel/emoji/">
+    <key name="unicode-hotkey" type="as">
+      <default>[ '&lt;Control&gt;&lt;Shift&gt;u' ]</default>
+      <summary>Unicode shortcut keys for gtk_accelerator_parse</summary>
+      <description>The shortcut keys for turning Unicode typing on or off</description>
+    </key>
+    <key name="hotkey" type="as">
+      <default>[ '&lt;Control&gt;period', '&lt;Control&gt;semicolon' ]</default>
+      <summary>Emoji shortcut keys for gtk_accelerator_parse</summary>
+      <description>The shortcut keys for turning emoji typing on or off</description>
+    </key>
+    <key name="font" type="s">
+      <default>'Monospace 16'</default>
+      <summary>Custom font</summary>
+      <description>Custom font name for emoji characters on emoji dialog</description>
+    </key>
+    <key name="lang" type="s">
+      <default>'en'</default>
+      <summary>Default language for emoji dictionary</summary>
+      <description>Choose a default language of emoji dictionaries on the emoji dialog. The value $lang is applied to /usr/share/ibus/dicts/emoji-$lang.dict .</description>
+    </key>
+    <key name="favorites" type="as">
+      <default>[]</default>
+      <summary>favorite emoji list on emoji dialog</summary>
+      <description>You can show the favorite emojis on emoji list if this list has any characters.</description>
+    </key>
+    <key name="favorite-annotations" type="as">
+      <default>[]</default>
+      <summary>favorite emoji annotation list on emoji dialog</summary>
+      <description>You can assign an annotation for a favorite emoji in this list.</description>
+    </key>
+    <key name="has-partial-match" type="b">
+      <default>false</default>
+      <summary>Whether emoji annotations can be match partially or not</summary>
+      <description>Whether emoji annotations can be matched with a partial string instead of the exact match or not.</description>
+    </key>
+    <key name="partial-match-length" type="i">
+      <default>3</default>
+      <summary>Match emoji annotations with the specified length</summary>
+      <description>Match emoji annotations partially with more than the specified number of characters instead of the exact match.</description>
+    </key>
+    <key name="partial-match-condition" type="i">
+      <default>0</default>
+      <summary>Choose a condition to match emoji annotations partially</summary>
+      <description>Choose one of the following conditions to match emoji annotations partially: 0 == Prefix match, 1 == Suffix match, 2 == Containing match</description>
+    </key>
+    <key name="load-emoji-at-startup" type="b">
+      <default>true</default>
+      <summary>Load the emoji data at the time of startup</summary>
+      <description>Load the emoji data at the time of startup if true. About 10MB memory is needed to load the data. Load the emoji data when open the emoji dialog at the beginning if false.</description>
+    </key>
+    <key name="load-unicode-at-startup" type="b">
+      <default>false</default>
+      <summary>Load the Unicode data at the time of startup</summary>
+      <description>Load the Unicode data at the time of startup if true. About 15MB memory is needed to load the data. Load the Unicode data when open the emoji dialog at the beginning if false. The Unicode data is always loaded after the emoji data is loaded even if true.</description>
+    </key>
+  </schema>
+</schemalist>

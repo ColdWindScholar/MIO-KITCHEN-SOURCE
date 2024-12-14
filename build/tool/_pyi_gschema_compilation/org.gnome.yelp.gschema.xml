@@ -1,0 +1,30 @@
+<schemalist>
+<schema id="org.gnome.yelp" path="/org/gnome/yelp/">
+  <key name="show-cursor" type="b">
+    <default>false</default>
+  </key>
+  <key name="font-adjustment" type="i">
+    <default>0</default>
+    <!--
+        I'm supposed to be able to do this, but gschema-compile doesn't allow it.
+        https://bugzilla.gnome.org/show_bug.cgi?id=616432
+        https://bugzilla.gnome.org/show_bug.cgi?id=616102
+    <range>
+      <min>-3</min>
+      <max>10</max>
+    </range>
+    -->
+  </key>
+</schema>
+<schema id="org.gnome.yelp.documents">
+  <key name="geometry" type="(ii)">
+    <default>(960,630)</default>
+  </key>
+  <key name="bookmarks" type="a(sss)">
+    <default>[]</default>
+  </key>
+  <key name="readlater" type="a(ss)">
+    <default>[]</default>
+  </key>
+</schema>
+</schemalist>

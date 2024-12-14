@@ -1,0 +1,53 @@
+<schemalist>
+	<schema id="org.gnome.seahorse.manager" path="/apps/seahorse/listing/" gettext-domain="seahorse">
+		<key name="sidebar-visible" type="b">
+			<default>true</default>
+			<summary>Show keyrings sidebar</summary>
+			<description>Show keyrings sidebar in Seahorse.</description>
+		</key>
+		<key name="item-filter" type="s">
+			<default>"personal"</default>
+			<summary>Which items to show</summary>
+			<description>Filter which items to show. If empty, show all items, if
+			“personal” show personal keys, if “trusted” show trusted.</description>
+		</key>
+		<key name="sidebar-width" type="i">
+			<default>148</default>
+			<summary>Width of the side pane</summary>
+			<description>The default width of the side pane.</description>
+		</key>
+		<key name="keyrings-selected" type="as">
+			<default>["secret-service://login"]</default>
+			<summary>The keyrings chosen</summary>
+			<description>The URIs of the keyrings chosen in the sidebar.</description>
+		</key>
+
+		<!-- Unused, remove once stable -->
+
+		<key name="sort-by" type="s">
+			<default>'name'</default>
+			<summary>The column to sort the Seahorse keys by</summary>
+			<description>Specify the column to sort the Seahorse key manager main window by. Columns are: “name”, “id”, “validity”, “expires”, “trust”, and “type”. Put a “-” in front of the column name to sort in descending order.</description>
+		</key>
+		<key name="show-validity" type="b">
+			<default>false</default>
+			<summary>Show validity column</summary>
+			<description>No longer in use.</description>
+		</key>
+		<key name="show-expiry" type="b">
+			<default>false</default>
+			<summary>Show expiry column</summary>
+			<description>No longer in use.</description>
+		</key>
+		<key name="show-trust" type="b">
+			<default>false</default>
+			<summary>Show trust column</summary>
+			<description>No longer in use.</description>
+		</key>
+		<key name="show-type" type="b">
+			<default>false</default>
+			<summary>Show type column</summary>
+			<description>No longer in use.</description>
+		</key>
+	</schema>
+</schemalist>

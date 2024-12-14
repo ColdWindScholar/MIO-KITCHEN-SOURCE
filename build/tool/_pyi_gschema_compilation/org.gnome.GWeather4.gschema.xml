@@ -1,0 +1,56 @@
+<schemalist gettext-domain="libgweather-4.0">
+  <schema id="org.gnome.GWeather4" path="/org/gnome/GWeather4/">
+    <key name="temperature-unit" enum="org.gnome.GWeather4.GWeatherTemperatureUnit">
+      <default>'default'</default>
+      <summary>Temperature unit</summary>
+      <description>
+	The unit of temperature used for showing weather. Valid values are “kelvin”,
+	“centigrade” and “fahrenheit”.
+      </description>
+    </key>
+    <key name="distance-unit" enum="org.gnome.GWeather4.GWeatherDistanceUnit">
+      <default>'default'</default>
+      <summary>Distance unit</summary>
+      <description>
+	The unit of distance used for showing weather (for example for visibility or for
+	distance of important events). Valid values are “meters”, “km” and “miles”.
+      </description>
+    </key>
+    <key name="speed-unit" enum="org.gnome.GWeather4.GWeatherSpeedUnit">
+      <default>'default'</default>
+      <summary>Speed unit</summary>
+      <description>
+	The unit of speed used for showing weather (for example for wind speed). Valid
+	values are “ms” (meters per second), “kph” (kilometers per hour), “mph” (miles
+	per hour), “knots” and “bft” (Beaufort scale).
+      </description>
+    </key>
+    <key name="pressure-unit" enum="org.gnome.GWeather4.GWeatherPressureUnit">
+      <default>'default'</default>
+      <summary>Pressure unit</summary>
+      <description>
+	The unit of pressure used for showing weather. Valid values are “kpa” (kilopascal),
+	“hpa” (hectopascal), “mb” (millibar, mathematically equivalent to 1 hPa but shown
+	differently), “mm-hg” (millimeters of mercury), “inch-hg” (inches of mercury), “atm”
+	(atmospheres).
+      </description>
+    </key>
+    <key name="default-location" type="(ssm(dd))">
+      <!-- TRANSLATORS: pick a default location to use in the weather applet. This should
+      usually be the largest city or the capital of your country. If you're not picking
+      a <location> in the database, don't forget to set name and coordinates.
+      Do NOT change or localize the quotation marks! -->
+      <default l10n="messages">('', 'KNYC', nothing)</default>
+      <summary>Default location</summary>
+      <description>
+	The default location for the weather applet. The first field is the name that will
+	be shown. If empty, it will be taken from the locations database.
+	The second field is the METAR code for the default weather station. It must not be
+	empty and must correspond to a &lt;code&gt; tag in the Locations.xml file.
+	The third field is a tuple of (latitude, longitude), to override the value taken
+	from the database. This is only used for sunrise and moon phase calculations, not
+	for weather forecast.
+      </description>
+    </key>
+  </schema>
+</schemalist>

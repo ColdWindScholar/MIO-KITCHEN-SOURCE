@@ -1,0 +1,71 @@
+###################
+# global settings #
+###################
+
+[org.gnome.shell]
+favorite-apps = ['org.mozilla.firefox.desktop', 'firefox.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Software.desktop']
+welcome-dialog-last-shown-version = '43.9'
+
+[org.gnome.desktop.background]
+show-desktop-icons = true
+picture-uri = 'file:///usr/share/backgrounds/Zorin.jpg'
+picture-uri-dark = 'file:///usr/share/backgrounds/Zorin-Dark.jpg'
+
+[org.gnome.desktop.interface]
+color-scheme = 'default'
+
+[org.gnome.desktop.session]
+session-name = 'zorin'
+
+[org.gnome.desktop.sound]
+theme-name = 'zorin'
+input-feedback-sounds = true
+
+[org.gnome.gedit.preferences.editor]
+highlight-current-line = false
+
+[org.gnome.login-screen]
+logo = '/usr/share/plymouth/zorin-logo.svg'
+
+[org.gnome.settings-daemon.plugins.power]
+sleep-inactive-ac-type = 'nothing'
+
+[org.gnome.software]
+download-updates-notify = false
+packaging-format-preference = ['flatpak:flathub', 'flatpak', 'deb', 'snap']
+show-ratings = false
+
+##########################
+# initial-setup settings #
+##########################
+
+[org.gnome.desktop.interface:GNOME-Greeter]
+gtk-theme = 'ZorinBlue-Light'
+icon-theme= 'ZorinBlue-Light'
+cursor-theme = 'Adwaita'
+font-name = 'Inter 10'
+monospace-font-name = 'JetBrains Mono 10'
+
+[org.gnome.desktop.wm.preferences:GNOME-Greeter]
+theme = 'ZorinBlue-Light'
+titlebar-font = 'Inter Bold 10'
+
+[org.gnome.desktop.peripherals.mouse:GNOME-Greeter]
+natural-scroll = false
+
+[org.gnome.desktop.peripherals.touchpad:GNOME-Greeter]
+tap-to-click = true
+natural-scroll = true
+click-method = 'fingers'
+
+################
+# app settings #
+################
+
+[org.gnome.evolution.shell]
+buttons-style = 'icons'
+folder-bar-width = 227
+statusbar-visible = false
+
+[org.gnome.evolution-data-server.calendar]
+notify-with-tray = true

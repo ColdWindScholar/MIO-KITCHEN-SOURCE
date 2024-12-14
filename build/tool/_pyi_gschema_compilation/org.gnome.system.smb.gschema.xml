@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="org.gnome.system.smb" path="/org/gnome/system/smb/">
+    <key name="workgroup" type="s">
+      <default>''</default>
+      <summary>SMB workgroup</summary>
+      <description>The Windows networking workgroup or domain that the user is part of. In order for a new workgroup to fully take effect the user may need to log out and log back in.</description>
+    </key>
+  </schema>
+</schemalist>

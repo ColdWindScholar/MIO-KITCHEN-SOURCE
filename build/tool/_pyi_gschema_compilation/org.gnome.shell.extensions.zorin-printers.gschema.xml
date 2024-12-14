@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions-zorin-printers">
+  <enum id="org.gnome.shell.extensions.zorin-printers.connect-to">
+	<value value="0" nick="Gnome Control Center"/>
+	<value value="1" nick="system-config-printer"/>
+  </enum>
+  <enum id="org.gnome.shell.extensions.zorin-printers.show-icon">
+	<value value="0" nick="Always"/>
+	<value value="1" nick="When printers exist"/>
+	<value value="2" nick="When printing"/>
+  </enum>
+  <schema path="/org/gnome/shell/extensions/zorin-printers/" id="org.gnome.shell.extensions.zorin-printers">
+    <key name="connect-to" enum= "org.gnome.shell.extensions.zorin-printers.connect-to">
+        <default>"Gnome Control Center"</default>
+        <summary>Interface</summary>
+        <description>Used interface</description>
+    </key>
+    <key name="show-icon" enum= "org.gnome.shell.extensions.zorin-printers.show-icon">
+        <default>"When printing"</default>
+        <summary>Show icon</summary>
+        <description>When to show the icon</description>
+    </key>
+    <key type="b" name="show-error">
+        <default>true</default>
+        <summary>Printer errors</summary>
+        <description>Show printer error icon</description>
+    </key>
+    <key type="b" name="show-jobs">
+        <default>true</default>
+        <summary>Documents count</summary>
+        <description>Show documents count</description>
+    </key>
+    <key type="b" name="job-number">
+        <default>false</default>
+        <summary>Document number</summary>
+        <description>Show each document number on print list</description>
+    </key>
+    <key type="b" name="send-to-front">
+        <default>false</default>
+        <summary>Send to front</summary>
+        <description>Documents can be sent to front</description>
+    </key>
+  </schema>
+</schemalist>

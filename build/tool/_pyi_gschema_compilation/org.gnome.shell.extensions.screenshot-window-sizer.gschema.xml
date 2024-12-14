@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.screenshot-window-sizer"
+          path="/org/gnome/shell/extensions/screenshot-window-sizer/">
+    <key type="as" name="cycle-screenshot-sizes">
+      <default><![CDATA[['<Alt><Control>s']]]></default>
+      <summary>Cycle Screenshot Sizes</summary>
+    </key>
+    <key type="as" name="cycle-screenshot-sizes-backward">
+      <default><![CDATA[['<Shift><Alt><Control>s']]]></default>
+      <summary>Cycle Screenshot Sizes Backward</summary>
+    </key>
+  </schema>
+</schemalist>

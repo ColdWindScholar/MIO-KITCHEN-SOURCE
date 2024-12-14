@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.zorin.desktop.auto-theme" path="/com/zorin/desktop/auto-theme/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>If the Zorin Auto Theme daemon is enabled</summary>
+      <description>Zorin Auto Theme changes the desktop theme throughout the day.</description>
+    </key>
+    <key name="schedule-automatic" type="b">
+      <default>false</default>
+      <summary>Use the sunrise and sunset</summary>
+      <description>Calculate the sunrise and sunset times automatically, from the current location.</description>
+    </key>
+    <key name="schedule-from" type="d">
+      <default>20.00</default>
+      <summary>The start time</summary>
+      <description>When “schedule-automatic” is disabled, use this start time in hours from midnight.</description>
+    </key>
+    <key name="schedule-to" type="d">
+      <default>6.00</default>
+      <summary>The end time</summary>
+      <description>When “schedule-automatic” is disabled, use this end time in hours from midnight.</description>
+    </key>
+    <key name="last-coordinates" type="(dd)">
+      <default>(91,181)</default>
+      <summary>The last detected position</summary>
+      <description>When location services are available this represents the last detected location. The default value is an invalid value to ensure it is always updated at startup.</description>
+    </key>
+    <key name="day-theme" type="s">
+      <default>"ZorinBlue-Light"</default>
+      <summary>Day theme</summary>
+      <description>The desktop theme to use during daytime.</description>
+    </key>
+    <key name="night-theme" type="s">
+      <default>"ZorinBlue-Dark"</default>
+      <summary>Night theme</summary>
+      <description>The desktop theme to use during nighttime.</description>
+    </key>
+  </schema>
+</schemalist>

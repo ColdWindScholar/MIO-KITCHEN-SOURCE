@@ -1,0 +1,35 @@
+Metadata-Version: 2.1
+Name: tarsafe
+Version: 0.0.5
+Summary: A safe subclass of the TarFile class for interacting with tar files. Can be used as a direct drop-in replacement for safe usage of extractall()
+Home-page: https://github.com/beatsbears/tarsafe
+Author: Andrew Scott
+License: MIT License
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/plain
+
+# Tarsafe
+![Unit Tests](https://github.com/beatsbears/tarsafe/workflows/Unit%20Tests/badge.svg)
+
+Tarsafe is a drop-in replacement for the tarfile module from the standard library to safely handle the vulnerable `extractall()` method. Inspired by a [6 year old security bug](https://bugs.python.org/issue21109).
+
+## Installation
+```
+$ pip install tarsafe
+```
+
+## Usage
+```
+from tarsafe import TarSafe
+
+tar = TarSafe.open("example.tar", "r")
+tar.extractall()
+tar.close()
+
+# OR
+
+with TarSafe.open("example.tar", "r") as tar:
+    tar.extractall()
+```
+

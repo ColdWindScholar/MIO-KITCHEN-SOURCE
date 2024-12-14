@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gdm">
+  <schema id="org.gnome.login-screen" path="/org/gnome/login-screen/">
+    <key name="enable-fingerprint-authentication" type="b">
+      <default>true</default>
+      <summary>
+        Whether or not to allow fingerprint readers for login
+      </summary>
+      <description>
+        The login screen can optionally allow users who have enrolled
+        their fingerprints to log in using those prints.
+      </description>
+    </key>
+    <key name="enable-smartcard-authentication" type="b">
+      <default>true</default>
+      <summary>
+        Whether or not to allow smartcard readers for login
+      </summary>
+      <description>
+        The login screen can optionally allow users who have smartcards
+        to log in using those smartcards.
+      </description>
+    </key>
+    <key name="enable-password-authentication" type="b">
+      <default>true</default>
+      <summary>
+        Whether or not to allow passwords for login
+      </summary>
+      <description>
+        The login screen can be configured to disallow password authentication,
+        forcing the user to use smartcard or fingerprint authentication.
+      </description>
+    </key>
+    <key name="logo" type="s">
+      <default>''</default>
+      <summary>
+        Path to small image at top of user list
+      </summary>
+      <description>
+        The login screen can optionally show a small image to provide site
+        administrators and distributions a way to display branding.
+      </description>
+    </key>
+    <key name="fallback-logo" type="s">
+      <default>''</default>
+      <summary>
+        Path to small image at top of user list
+      </summary>
+      <description>
+        The fallback login screen can optionally show a small image to provide
+        site administrators and distributions a way to display branding.
+      </description>
+    </key>
+    <key name="disable-user-list" type="b">
+      <default>false</default>
+      <summary>
+        Avoid showing user list
+      </summary>
+      <description>
+        The login screen normally shows a list of available users to log in
+        as. This setting can be toggled to disable showing the user list.
+      </description>
+    </key>
+    <key name="banner-message-enable" type="b">
+      <default>false</default>
+      <summary>
+        Enable showing the banner message
+      </summary>
+      <description>
+        Set to true to show the banner message text.
+      </description>
+    </key>
+    <key name="banner-message-text" type="s">
+      <default>''</default>
+      <summary>
+        Banner message text
+      </summary>
+      <description>
+        Text banner message to show in the login window.
+      </description>
+    </key>
+    <key name="disable-restart-buttons" type="b">
+      <default>false</default>
+      <summary>
+        Disable showing the restart buttons
+      </summary>
+      <description>
+        Set to true to disable showing the restart buttons in the login window.
+      </description>
+    </key>
+    <key name="allowed-failures" type="i">
+      <default>3</default>
+      <summary>
+        Number of allowed authentication failures
+      </summary>
+      <description>
+        The number of times a user is allowed to attempt authentication, before
+        giving up and going back to user selection.
+      </description>
+    </key>
+  </schema>
+</schemalist>

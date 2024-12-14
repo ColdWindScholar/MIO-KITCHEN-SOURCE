@@ -1,0 +1,79 @@
+[editor]
+bg = "#0a0e14"
+fg = "#b3b1ad"
+select_bg = "#1b2733"
+inactive_select_bg = "#1b2733"
+caret = "#b3b1ad"
+caret_width = 1
+border_width = 0
+focus_border_width = 0
+
+[general]
+comment = "#626a73"
+error = "#ff3333"
+escape = "#b3b1ad"
+keyword = "#ff7700"
+name = "#ff8f40"
+string = "#95e6cb"
+punctuation = "#b3b1ad"
+
+[keyword]
+constant = "#ff7700"
+declaration = "#ff7700"
+namespace = "#ff7700"
+pseudo = "#ff7700"
+reserved = "#ff7700"
+type = "#ff7700"
+
+[name]
+attr = "#ff8f40"
+builtin = "#e6b450"
+builtin_pseudo = "#e6b450"
+class = "#ff8f40"
+class_variable = "#ff8f40"
+constant = "#ffee99"
+decorator = "#e6b673"
+entity = "#ff8f40"
+exception = "#ff8f40"
+function = "#ffb454"
+global_variable = "#ff8f40"
+instance_variable = "#ff8f40"
+label = "#ff8f40"
+magic_function = "#ff8f40"
+magic_variable = "#ff8f40"
+namespace = "#b3b1ad"
+tag = "#ff8f40"
+variable = "#ff8f40"
+
+[operator]
+symbol = "#f29668"
+word = "#f29668"
+
+[string]
+affix = "#c2d94c"
+char = "#95e6cb"
+delimeter = "#c2d94c"
+doc = "#c2d94c"
+double = "#c2d94c"
+escape = "#c2d94c"
+heredoc = "#c2d94c"
+interpol = "#c2d94c"
+regex = "#95e6cb"
+single = "#c2d94c"
+symbol = "#c2d94c"
+
+[number]
+binary = "#e6b450"
+float = "#e6b450"
+hex = "#e6b450"
+integer = "#e6b450"
+long = "#e6b450"
+octal = "#e6b450"
+
+[comment]
+hashbang = "#626a73"
+multiline = "#626a73"
+preproc = "#ff7700"
+preprocfile = "#c2d94c"
+single = "#626a73"
+special = "#626a73"

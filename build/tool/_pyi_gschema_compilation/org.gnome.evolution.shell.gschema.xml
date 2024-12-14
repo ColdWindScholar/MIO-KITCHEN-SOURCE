@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/shell/" id="org.gnome.evolution.shell" gettext-domain="evolution">
+    <key type="b" name="skip-warning-dialog">
+      <default>false</default>
+      <summary>Skip development warning dialog</summary>
+      <description>Whether the warning dialog in development versions of Evolution is skipped.</description>
+    </key>
+    <key type="i" name="attachment-view">
+      <default>0</default>
+      <summary>Initial attachment view</summary>
+      <description>Initial view for attachment bar widgets. “0” is Icon View, “1” is List View.</description>
+    </key>
+    <key type="s" name="file-chooser-folder">
+      <default>''</default>
+      <summary>Initial file chooser folder</summary>
+      <description>Initial folder for GtkFileChooser dialogs.</description>
+    </key>
+    <key type="s" name="autoar-format">
+      <default>''</default>
+      <summary>Compression format used by autoar</summary>
+      <description>Compression format used when compressing attached directories with autoar.</description>
+    </key>
+    <key type="s" name="autoar-filter">
+      <default>''</default>
+      <summary>Compression filter used by autoar</summary>
+      <description>Compression filter used when compressing attached directories with autoar.</description>
+    </key>
+    <key type="b" name="start-offline">
+      <default>false</default>
+      <summary>Start in offline mode</summary>
+      <description>Whether Evolution will start up in offline mode instead of online mode.</description>
+    </key>
+    <key type="as" name="folder-paths">
+      <default>[]</default>
+      <summary>Offline folder paths</summary>
+      <description>List of paths for the folders to be synchronized to disk for offline usage.</description>
+    </key>
+    <key type="b" name="express-mode">
+      <default>false</default>
+      <summary>Enable express mode</summary>
+      <description>Flag that enables a much simplified user interface.</description>
+    </key>
+    <key type="as" name="buttons-hide">
+      <default>[]</default>
+      <summary>List of button names to hide in the window switcher</summary>
+      <description>Valid values are “mail”, “addressbook”, “calendar”, “tasks” and “memos”. Change of this requires restart of the application.</description>
+    </key>
+    <key type="b" name="buttons-visible">
+      <default>true</default>
+      <summary>Window buttons are visible</summary>
+      <description>Whether the window buttons should be visible.</description>
+    </key>
+    <key type="b" name="buttons-visible-sub">
+      <default>true</default>
+      <summary>Window buttons are visible</summary>
+      <description>Whether the window buttons should be visible.</description>
+    </key>
+    <key type="s" name="buttons-style">
+      <default>'toolbar'</default>
+      <summary>Window button style</summary>
+      <description>The style of the window buttons. Can be “text”, “icons”, “both”, “toolbar”. If “toolbar” is set, the style of the buttons is determined by the GNOME toolbar setting.</description>
+    </key>
+    <key type="b" name="menubar-visible">
+      <default>true</default>
+      <summary>Menubar is visible</summary>
+      <description>Whether the menubar should be visible.</description>
+    </key>
+    <key type="b" name="menubar-visible-sub">
+      <default>true</default>
+      <summary>Menubar is visible</summary>
+      <description>Whether the menubar should be visible.</description>
+    </key>
+    <key type="b" name="toolbar-visible">
+      <default>true</default>
+      <summary>Toolbar is visible</summary>
+      <description>Whether the toolbar should be visible.</description>
+    </key>
+    <key type="b" name="toolbar-visible-sub">
+      <default>true</default>
+      <summary>Toolbar is visible</summary>
+      <description>Whether the toolbar should be visible.</description>
+    </key>
+    <key type="b" name="sidebar-visible">
+      <default>true</default>
+      <summary>Sidebar is visible</summary>
+      <description>Whether the sidebar should be visible.</description>
+    </key>
+    <key type="b" name="sidebar-visible-sub">
+      <default>true</default>
+      <summary>Sidebar is visible</summary>
+      <description>Whether the sidebar should be visible.</description>
+    </key>
+    <key type="b" name="statusbar-visible">
+      <default>true</default>
+      <summary>Statusbar is visible</summary>
+      <description>Whether the status bar should be visible.</description>
+    </key>
+    <key type="b" name="statusbar-visible-sub">
+      <default>true</default>
+      <summary>Statusbar is visible</summary>
+      <description>Whether the status bar should be visible.</description>
+    </key>
+    <key type="s" name="default-component-id">
+      <default>'mail'</default>
+      <summary>ID or alias of the component to be shown by default at start-up.</summary>
+      <description>ID or alias of the component to be shown by default at start-up.</description>
+    </key>
+    <key type="i" name="folder-bar-width">
+      <default>200</default>
+      <summary>Default sidebar width</summary>
+      <description>The default width for the sidebar, in pixels.</description>
+    </key>
+    <key type="i" name="folder-bar-width-sub">
+      <default>200</default>
+      <summary>Default sidebar width</summary>
+      <description>The default width for the sidebar, in pixels.</description>
+    </key>
+    <key type="b" name="webkit-developer-mode">
+      <default>false</default>
+      <summary>Enable special WebKit developer features</summary>
+      <description>Any change of this option requires restart of Evolution.</description>
+    </key>
+    <key type="s" name="backup-restore-extension">
+      <default>''</default>
+      <summary>The last extension being used when backing up Evolution data.</summary>
+      <description>It can be either “.gz” or “.xz” and it influences what extension will be preselected in the file chooser.</description>
+    </key>
+    <key type="s" name="search-web-uri-prefix">
+      <default>'https://duckduckgo.com/?q='</default>
+      <summary>Prefix of the URI to use to search the web with selected text.</summary>
+      <description>The prefix of a URL to be used for searches on the web. The actual text selection is escaped and appended to this string. The URI should start with https://.</description>
+    </key>
+    <key type="i" name="webkit-minimum-font-size">
+      <default>0</default>
+      <summary>Minimum font size to be used by WebKitGTK</summary>
+      <description>The minimum font size in pixels used to display text in WebKitGTK. This setting controls the absolute smallest size. Values other than 0 can potentially break page layouts. Negative values are treated as 0.</description>
+    </key>
+    <key type="s" name="filename-illegal-chars">
+      <default>'\'&quot;&amp;`();|&lt;&gt;$%{}!'</default>
+      <summary>Set of additional illegal characters in the filename</summary>
+      <description>When generating file names from custom strings some non-printable or reserved characters are replaced with an underscore. Here's a set of additional characters to be replaced.</description>
+    </key>
+    <child schema="org.gnome.evolution.window" name="window"/>
+  </schema>
+</schemalist>

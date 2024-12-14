@@ -1,0 +1,55 @@
+DEBUG:2024-12-14 17:56:20,737:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-14 17:56:20,737:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'pHYs' 41 9
+DEBUG:2024-12-14 17:56:20,737:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'cHRM' 62 32
+DEBUG:2024-12-14 17:56:20,737:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 106 750871
+DEBUG:2024-12-14 17:56:20,863:tool.py:root:Welcome to the new Mio Kitchen
+This tool is free forever
+DEBUG:2024-12-14 17:56:20,863:tool.py:root:
+
+DEBUG:2024-12-14 17:56:20,883:tool.py:root:Startup took: 7.741057129998808 seconds
+DEBUG:2024-12-14 17:56:20,883:tool.py:root:
+
+DEBUG:2024-12-14 17:56:25,470:tool.py:root:Selected items:teste
+DEBUG:2024-12-14 17:56:25,470:tool.py:root:
+
+DEBUG:2024-12-14 17:57:07,440:tool.py:root:Selected items:teste
+DEBUG:2024-12-14 17:57:07,441:tool.py:root:
+
+ERROR:2024-12-14 17:57:12,502:tool.py:root:Exception in thread 
+ERROR:2024-12-14 17:57:12,503:tool.py:root:Thread-4 (unpack)
+ERROR:2024-12-14 17:57:12,503:tool.py:root::
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:Traceback (most recent call last):
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:    
+ERROR:2024-12-14 17:57:12,503:tool.py:root:self.run()
+ERROR:2024-12-14 17:57:12,503:tool.py:root:
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:  File "/usr/lib/python3.10/threading.py", line 953, in run
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:    
+ERROR:2024-12-14 17:57:12,503:tool.py:root:self._target(*self._args, **self._kwargs)
+ERROR:2024-12-14 17:57:12,503:tool.py:root:
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3671, in unpack
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:    
+ERROR:2024-12-14 17:57:12,503:tool.py:root:parts = json_.read()
+ERROR:2024-12-14 17:57:12,503:tool.py:root:
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 137, in read
+
+ERROR:2024-12-14 17:57:12,503:tool.py:root:    
+ERROR:2024-12-14 17:57:12,503:tool.py:root:with open(self.file, 'r+', encoding='utf-8') as pf:
+ERROR:2024-12-14 17:57:12,504:tool.py:root:
+
+ERROR:2024-12-14 17:57:12,504:tool.py:root:PermissionError
+ERROR:2024-12-14 17:57:12,504:tool.py:root:: 
+ERROR:2024-12-14 17:57:12,504:tool.py:root:[Errno 13] Permission denied: '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/config/parts_info'
+ERROR:2024-12-14 17:57:12,504:tool.py:root:
+
+DEBUG:2024-12-14 17:57:12,662:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-14 17:57:12,662:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'sRGB' 41 1
+DEBUG:2024-12-14 17:57:12,662:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 54 8192

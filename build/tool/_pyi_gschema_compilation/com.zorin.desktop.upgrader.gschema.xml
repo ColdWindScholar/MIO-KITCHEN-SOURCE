@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+<schema id="com.zorin.desktop.upgrader" path="/com/zorin/desktop/upgrader/">
+    <key name="show-test-upgrades" type="b">
+        <default>false</default>
+        <summary>Whether to show test upgrade paths</summary>
+        <description>If enabled, upgrade paths that are still in testing will appear as options under Available upgrades</description>
+    </key>
+</schema>
+
+</schemalist>

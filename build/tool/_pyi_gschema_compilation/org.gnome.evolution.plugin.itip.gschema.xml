@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/itip/" id="org.gnome.evolution.plugin.itip" gettext-domain="evolution">
+    <key type="b" name="delete-processed">
+      <default>false</default>
+      <summary>Delete processed</summary>
+      <description>Whether to delete processed iTip objects</description>
+    </key>
+    <key type="b" name="preserve-reminder">
+      <default>true</default>
+      <summary>Preserve existing reminder by default</summary>
+      <description>Whether to preset option to preserve existing reminder by default</description>
+    </key>
+    <key type="b" name="show-message-description">
+      <default>false</default>
+      <summary>Show invitation description provided by the sender</summary>
+      <description>Set to true to show invitation description as provided by the sender, if such is available</description>
+    </key>
+  </schema>
+</schemalist>

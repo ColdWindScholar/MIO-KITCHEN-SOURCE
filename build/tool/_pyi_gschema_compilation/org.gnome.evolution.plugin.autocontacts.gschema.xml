@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/autocontacts/" id="org.gnome.evolution.plugin.autocontacts" gettext-domain="evolution">
+    <key type="s" name="addressbook-source">
+      <default>''</default>
+      <summary>Address book source</summary>
+      <description>Address book to use for storing automatically synced contacts.</description>
+    </key>
+    <key type="b" name="auto-sync-gaim">
+      <default>false</default>
+      <summary>Auto sync Pidgin contacts</summary>
+      <description>Whether Pidgin contacts should be automatically synced.</description>
+    </key>
+    <key type="b" name="enable">
+      <default>false</default>
+      <summary>Enable autocontacts</summary>
+      <description>Whether contacts should be automatically added to the user’s address book.</description>
+    </key>
+    <key type="b" name="file-under-as-first-last">
+      <default>false</default>
+      <summary>Whether to set “File under” field as “First Last”</summary>
+      <description>Set File under as “First Last”, instead of “Last, First”.</description>
+    </key>
+    <key type="s" name="gaim-addressbook-source">
+      <default>''</default>
+      <summary>Pidgin address book source</summary>
+      <description>Address book to use for storing automatically synced contacts from Pidgin.</description>
+    </key>
+    <key type="i" name="gaim-check-interval">
+      <default>10</default>
+      <summary>Pidgin check interval</summary>
+      <description>Check interval for Pidgin syncing of contacts.</description>
+    </key>
+    <key type="s" name="gaim-last-sync-md5">
+      <default>''</default>
+      <summary>Pidgin last sync MD5</summary>
+      <description>Pidgin last sync MD5.</description>
+    </key>
+    <key type="s" name="gaim-last-sync-time">
+      <default>''</default>
+      <summary>Pidgin last sync time</summary>
+      <description>Pidgin last sync time.</description>
+    </key>
+  </schema>
+</schemalist>

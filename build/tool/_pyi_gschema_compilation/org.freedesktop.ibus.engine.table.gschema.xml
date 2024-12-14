@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.freedesktop.ibus.engine.table">
+    <key name="keybindings" type="a{sv}">
+      <default>
+        {
+        'cancel': &lt;['Escape']&gt;,
+        'commit': &lt;['space']&gt;,
+        'commit_to_preedit': &lt;['Control+Shift_R', 'Control+Shift_L']&gt;,
+        'commit_candidate_1': &lt;['1', 'KP_1']&gt;,
+        'commit_candidate_2': &lt;['2', 'KP_2']&gt;,
+        'commit_candidate_3': &lt;['3', 'KP_3']&gt;,
+        'commit_candidate_4': &lt;['4', 'KP_4']&gt;,
+        'commit_candidate_5': &lt;['5', 'KP_5']&gt;,
+        'commit_candidate_6': &lt;['6', 'KP_6']&gt;,
+        'commit_candidate_7': &lt;['7', 'KP_7']&gt;,
+        'commit_candidate_8': &lt;['8', 'KP_8']&gt;,
+        'commit_candidate_9': &lt;['9', 'KP_9']&gt;,
+        'commit_candidate_10': &lt;['0', 'KP_0']&gt;,
+        'commit_candidate_to_preedit_1': &lt;['Control+1', 'Control+KP_1']&gt;,
+        'commit_candidate_to_preedit_2': &lt;['Control+2', 'Control+KP_2']&gt;,
+        'commit_candidate_to_preedit_3': &lt;['Control+3', 'Control+KP_3']&gt;,
+        'commit_candidate_to_preedit_4': &lt;['Control+4', 'Control+KP_4']&gt;,
+        'commit_candidate_to_preedit_5': &lt;['Control+5', 'Control+KP_5']&gt;,
+        'commit_candidate_to_preedit_6': &lt;['Control+6', 'Control+KP_6']&gt;,
+        'commit_candidate_to_preedit_7': &lt;['Control+7', 'Control+KP_7']&gt;,
+        'commit_candidate_to_preedit_8': &lt;['Control+8', 'Control+KP_8']&gt;,
+        'commit_candidate_to_preedit_9': &lt;['Control+9', 'Control+KP_9']&gt;,
+        'commit_candidate_to_preedit_10': &lt;['Control+0', 'Control+KP_0']&gt;,
+        'lookup_table_page_down': &lt;['Page_Down', 'KP_Page_Down', 'KP_Next', 'equal']&gt;,
+        'lookup_table_page_up': &lt;['Page_Up', 'KP_Page_Up', 'KP_Prior', 'minus']&gt;,
+        'remove_candidate_1': &lt;['Mod1+1', 'Mod1+KP_1']&gt;,
+        'remove_candidate_2': &lt;['Mod1+2', 'Mod1+KP_2']&gt;,
+        'remove_candidate_3': &lt;['Mod1+3', 'Mod1+KP_3']&gt;,
+        'remove_candidate_4': &lt;['Mod1+4', 'Mod1+KP_4']&gt;,
+        'remove_candidate_5': &lt;['Mod1+5', 'Mod1+KP_5']&gt;,
+        'remove_candidate_6': &lt;['Mod1+6', 'Mod1+KP_6']&gt;,
+        'remove_candidate_7': &lt;['Mod1+7', 'Mod1+KP_7']&gt;,
+        'remove_candidate_8': &lt;['Mod1+8', 'Mod1+KP_8']&gt;,
+        'remove_candidate_9': &lt;['Mod1+9', 'Mod1+KP_9']&gt;,
+        'remove_candidate_10': &lt;['Mod1+0', 'Mod1+KP_0']&gt;,
+        'select_next_candidate_in_current_page': &lt;['Alt_L']&gt;,
+        'select_previous_candidate_in_current_page': &lt;['Control+Alt_L']&gt;,
+        'setup': &lt;['Super+Mod4+F10']&gt;,
+        'switch_to_next_chinese_mode': &lt;['Control+semicolon']&gt;,
+        'toggle_autocommit_mode': &lt;['Control+slash']&gt;,
+        'toggle_input_mode_on_off': &lt;['Shift_L']&gt;,
+        'toggle_letter_width': &lt;['Shift+space']&gt;,
+        'toggle_onechar_mode': &lt;['Control+comma']&gt;,
+        'toggle_pinyin_mode': &lt;['Shift_R']&gt;,
+        'toggle_punctuation_width': &lt;['Control+period']&gt;,
+        'toggle_suggestion_mode': &lt;['Super+Mod4+F6']&gt;
+        }
+      </default>
+      <summary>List of keybindings</summary>
+      <description>The list of configurable keybindings</description>
+    </key>
+    <key name="darktheme" type="b">
+      <default>false</default>
+    </key>
+    <key name="autoselect" type="b">
+      <default>false</default>
+    </key>
+    <key name="autocommit" type="b">
+      <default>false</default>
+    </key>
+    <key name="inputmode" type="i">
+      <default>1</default>
+    </key>
+    <key name="rememberinputmode" type="b">
+      <default>true</default>
+    </key>
+    <key name="chinesemode" type="i">
+      <default>4</default>
+    </key>
+    <key name="endeffullwidthletter" type="b">
+      <default>false</default>
+    </key>
+    <key name="endeffullwidthpunct" type="b">
+      <default>false</default>
+    </key>
+    <key name="lookuptableorientation" type="i">
+      <default>1</default>
+    </key>
+    <key name="lookuptablepagesize" type="i">
+      <default>6</default>
+    </key>
+    <key name="onechar" type="b">
+      <default>false</default>
+    </key>
+    <key name="tabdeffullwidthletter" type="b">
+      <default>false</default>
+    </key>
+    <key name="tabdeffullwidthpunct" type="b">
+      <default>false</default>
+    </key>
+    <key name="alwaysshowlookup" type="b">
+      <default>true</default>
+    </key>
+    <key name="singlewildcardchar" type="s">
+      <default>''</default>
+    </key>
+    <key name="multiwildcardchar" type="s">
+      <default>''</default>
+    </key>
+    <key name="autowildcard" type="b">
+      <default>true</default>
+    </key>
+    <key name="dynamicadjust" type="b">
+      <default>true</default>
+    </key>
+    <key name="errorsound" type="b">
+      <default>true</default>
+    </key>
+    <key name="errorsoundfile" type="s">
+      <default>'/usr/share/ibus-table/data/coin9.wav'</default>
+    </key>
+    <key name="debuglevel" type="i">
+      <default>0</default>
+      <summary>Debug level</summary>
+      <description>
+        When greater than 0, debug information may be printed to the
+        log file and debug information may also be shown graphically.
+      </description>
+    </key>
+  </schema>
+</schemalist>

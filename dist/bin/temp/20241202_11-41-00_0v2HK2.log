@@ -1,0 +1,58 @@
+INFO:2024-12-02 11:41:10,213:tool.py:root:[W]: The tool was started with normal user privileges, unpack / pack functions may not work correctly in this case (please run with sudo/root)
+INFO:2024-12-02 11:41:10,213:tool.py:root:
+
+DEBUG:2024-12-02 11:41:10,357:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-02 11:41:10,357:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'pHYs' 41 9
+DEBUG:2024-12-02 11:41:10,357:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'cHRM' 62 32
+DEBUG:2024-12-02 11:41:10,357:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 106 750871
+DEBUG:2024-12-02 11:41:10,494:tool.py:root:Welcome to the new Mio Kitchen
+This tool is free forever
+DEBUG:2024-12-02 11:41:10,494:tool.py:root:
+
+DEBUG:2024-12-02 11:41:10,518:tool.py:root:Startup took: 9.863644138000382 seconds
+DEBUG:2024-12-02 11:41:10,518:tool.py:root:
+
+DEBUG:2024-12-02 11:41:33,392:tool.py:root:New Project: teste
+DEBUG:2024-12-02 11:41:33,392:tool.py:root:
+
+DEBUG:2024-12-02 11:41:55,989:tool.py:root:Selected items:teste
+DEBUG:2024-12-02 11:41:55,989:tool.py:root:
+
+ERROR:2024-12-02 11:42:01,370:tool.py:root:Exception in thread 
+ERROR:2024-12-02 11:42:01,371:tool.py:root:Thread-3 (unpack)
+ERROR:2024-12-02 11:42:01,371:tool.py:root::
+
+ERROR:2024-12-02 11:42:01,371:tool.py:root:Traceback (most recent call last):
+
+ERROR:2024-12-02 11:42:01,371:tool.py:root:  File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:    
+ERROR:2024-12-02 11:42:01,372:tool.py:root:self.run()
+ERROR:2024-12-02 11:42:01,372:tool.py:root:
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:  File "/usr/lib/python3.10/threading.py", line 953, in run
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:    
+ERROR:2024-12-02 11:42:01,372:tool.py:root:self._target(*self._args, **self._kwargs)
+ERROR:2024-12-02 11:42:01,372:tool.py:root:
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3784, in unpack
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:    
+ERROR:2024-12-02 11:42:01,372:tool.py:root:os.makedirs(work + "config")
+ERROR:2024-12-02 11:42:01,372:tool.py:root:
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:  File "/usr/lib/python3.10/os.py", line 225, in makedirs
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:    
+ERROR:2024-12-02 11:42:01,372:tool.py:root:mkdir(name, mode)
+ERROR:2024-12-02 11:42:01,372:tool.py:root:
+
+ERROR:2024-12-02 11:42:01,372:tool.py:root:PermissionError
+ERROR:2024-12-02 11:42:01,372:tool.py:root:: 
+ERROR:2024-12-02 11:42:01,373:tool.py:root:[Errno 13] Permission denied: '/home/enrico/sources/MIO-KITCHEN-SOURCE/__pycache__/config'
+ERROR:2024-12-02 11:42:01,373:tool.py:root:
+
+DEBUG:2024-12-02 11:42:01,423:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-02 11:42:01,423:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'sRGB' 41 1
+DEBUG:2024-12-02 11:42:01,423:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 54 8192

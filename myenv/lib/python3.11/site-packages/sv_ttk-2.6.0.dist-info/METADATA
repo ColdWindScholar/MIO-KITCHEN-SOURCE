@@ -1,0 +1,77 @@
+Metadata-Version: 2.1
+Name: sv-ttk
+Version: 2.6.0
+Summary: A gorgeous theme for Tkinter, based on Windows 11's UI
+Home-page: https://github.com/rdbende/Sun-Valley-ttk-theme
+Author: rdbende
+Author-email: rdbende@proton.me
+License: MIT
+Project-URL: Source, https://github.com/rdbende/Sun-Valley-ttk-theme
+Project-URL: Documentation, https://github.com/rdbende/Sun-Valley-ttk-theme/wiki
+Project-URL: Tracker, https://github.com/rdbende/Sun-Valley-ttk-theme/issues
+Keywords: sv-ttk,tcl,tcl/tk,theme,tile,tk,ttk,tkinter,modern,fluent,dark-theme,sun-valley,windows-11,winui
+Platform: UNKNOWN
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: User Interfaces
+Classifier: Programming Language :: Python :: 3 :: Only
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Tcl
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+<div align="center">
+  
+# Sun Valley ttk theme
+Make your Tkinter application look better than ever with just two lines of code!
+
+![Screenshot of Sun Valley ttk theme](assets/screenshot.png)
+
+</div>
+
+
+## Installation [![PyPi downloads](https://static.pepy.tech/badge/sv-ttk)](https://pypi.org/project/sv-ttk)
+The theme is easily installable as a Python package
+
+```
+pip install sv-ttk
+```
+
+
+## Usage [![Documentation](https://img.shields.io/badge/-documentation-%23c368c4)](https://github.com/rdbende/Sun-Valley-ttk-theme/wiki/Usage-with-Python)
+> **Note:**
+> 
+> The theme will only be applied to themable (`tkinter.ttk`) widgets, and not with the regular Tkinter widgets, they only benefit from the colorscheme.
+
+For detailed documentation, visit the [wiki page](https://github.com/rdbende/Sun-Valley-ttk-theme/wiki/Usage-with-Python).
+
+```python
+import tkinter
+from tkinter import ttk
+
+import sv_ttk
+
+root = tkinter.Tk()
+
+button = ttk.Button(root, text="Click me!")
+button.pack()
+
+# This is where the magic happens
+sv_ttk.set_theme("dark")
+
+root.mainloop()
+```
+
+
+## Wanna see more?
+Check out my other ttk themes!
+- The [Azure ttk theme](https://github.com/rdbende/Azure-ttk-theme)
+- The [Forest ttk theme](https://github.com/rdbende/Forest-ttk-theme)
+
+

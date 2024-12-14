@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.totem" path="/org/gnome/Totem/" gettext-domain="totem">
+		<key name="brightness" type="i">
+			<default>32767</default>
+			<summary>The brightness of the video</summary>
+		</key>
+		<key name="contrast" type="i">
+			<default>32767</default>
+			<summary>The contrast of the video</summary>
+		</key>
+		<key name="hue" type="i">
+			<default>32767</default>
+			<summary>The hue of the video</summary>
+		</key>
+		<key name="saturation" type="i">
+			<default>32767</default>
+			<summary>The saturation of the video</summary>
+		</key>
+		<key name="repeat" type="b">
+			<default>false</default>
+			<summary>Repeat mode</summary>
+		</key>
+		<key name="disable-deinterlacing" type="b">
+			<default>false</default>
+			<summary>Whether to disable deinterlacing for interlaced movies</summary>
+		</key>
+		<key name="audio-output-type" enum="org.gnome.totem.BvwAudioOutputType">
+			<default>'stereo'</default>
+			<summary>Type of audio output to use</summary>
+		</key>
+		<key name="network-buffer-threshold" type="d">
+			<default>2</default>
+			<summary>Network buffering threshold</summary>
+			<description>Amount of data to buffer for network streams before starting to display the stream (in seconds).</description>
+		</key>
+		<key name="subtitle-font" type="s">
+			<default>'Sans Bold 20'</default>
+			<summary>Subtitle font</summary>
+			<description>Pango font description for subtitle rendering.</description>
+		</key>
+		<key name="subtitle-encoding" type="s">
+			<default l10n="messages" context="subtitle-encoding">
+				<!-- Translators: This is default subtitle encoding
+				     character set. You can change this to be the most common
+				     encoding for fansub subtitles in your language. File a bug
+				     against Totem, and leave UTF-8 as the default if in doubt.
+				     Don't forget to add the simple quotes ('') around the string -->
+				'UTF-8'</default>
+			<summary>Subtitle encoding</summary>
+			<description>Encoding character set for subtitle.</description>
+		</key>
+		<key name="open-uri" type="s">
+			<default>''</default>
+			<summary>Default location for the “Open…” dialogs</summary>
+			<description>Default location for the “Open…” dialogs. Default is the current directory.</description>
+		</key>
+		<key name="screenshot-save-uri" type="s">
+			<default>''</default>
+			<summary>Default location for the “Take Screenshot” dialogs</summary>
+			<description>Default location for the “Take Screenshot” dialogs. Default is the Pictures directory.</description>
+		</key>
+		<key name="disable-user-plugins" type="b">
+			<default>false</default>
+			<summary>Whether to disable the plugins in the user’s home directory</summary>
+		</key>
+		<key name="disable-keyboard-shortcuts" type="b">
+			<default>false</default>
+			<summary>Whether to disable the keyboard shortcuts</summary>
+		</key>
+		<key name="autoload-subtitles" type="b">
+			<default>true</default>
+			<summary>Whether to autoload text subtitle files when a movie is loaded</summary>
+		</key>
+		<key name="active-plugins" type="as">
+			<default>[]</default>
+			<summary>Active plugins list</summary>
+			<description>A list of the names of the plugins which are currently active (loaded and running).</description>
+		</key>
+		<key name="filesystem-paths" type="as">
+			<default>[]</default>
+			<summary>Directories to show</summary>
+			<description>Directories to show in the browse interface, none by default</description>
+		</key>
+		<key name="force-software-decoders" type="b">
+			<default>false</default>
+			<summary>Disable hardware decoders</summary>
+			<description>Disable hardware decoders and use only software decoders. For debugging purposes only.</description>
+		</key>
+	</schema>
+</schemalist>

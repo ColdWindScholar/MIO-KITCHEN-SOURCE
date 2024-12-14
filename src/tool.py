@@ -3349,8 +3349,7 @@ class Packxx(Toplevel):
                         logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(work + "config", f"{dname}_fs_config"))
                 utils.qc(work + f"config/{dname}_fs_config")
-                if settings.contextpatch == "1":
-                    contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
+                contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
                 utils.qc(work + f"config/{dname}_file_contexts")
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():

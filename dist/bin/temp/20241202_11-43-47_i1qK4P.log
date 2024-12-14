@@ -1,0 +1,691 @@
+DEBUG:2024-12-02 11:43:47,447:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-02 11:43:47,447:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'pHYs' 41 9
+DEBUG:2024-12-02 11:43:47,447:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'cHRM' 62 32
+DEBUG:2024-12-02 11:43:47,447:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 106 750871
+DEBUG:2024-12-02 11:43:47,656:tool.py:root:Welcome to the new Mio Kitchen
+This tool is free forever
+DEBUG:2024-12-02 11:43:47,657:tool.py:root:
+
+DEBUG:2024-12-02 11:43:47,686:tool.py:root:Startup took: 0.4456578190001892 seconds
+DEBUG:2024-12-02 11:43:47,686:tool.py:root:
+
+DEBUG:2024-12-02 11:43:59,200:tool.py:root:Selected items:teste
+DEBUG:2024-12-02 11:43:59,200:tool.py:root:
+
+INFO:2024-12-02 11:44:04,730:tool.py:root:['magiskboot', 'unpack', '-h', '-n', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:44:04,731:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:04,731:tool.py:root:
+
+INFO:2024-12-02 11:44:04,731:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:04,731:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:04,736:tool.py:root:
+
+INFO:2024-12-02 11:44:04,736:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:04,736:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:04,737:tool.py:root:
+
+INFO:2024-12-02 11:44:04,737:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:04,737:tool.py:root:RAMDISK_SZ      [19442883]
+DEBUG:2024-12-02 11:44:04,737:tool.py:root:
+
+INFO:2024-12-02 11:44:04,738:tool.py:root:RAMDISK_SZ      [19442883]
+DEBUG:2024-12-02 11:44:04,738:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:04,738:tool.py:root:
+
+INFO:2024-12-02 11:44:04,738:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:04,738:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:04,738:tool.py:root:
+
+INFO:2024-12-02 11:44:04,739:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:04,739:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:04,739:tool.py:root:
+
+INFO:2024-12-02 11:44:04,739:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:04,739:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:04,739:tool.py:root:
+
+INFO:2024-12-02 11:44:04,740:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:04,740:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:04,740:tool.py:root:
+
+INFO:2024-12-02 11:44:04,740:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:04,740:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:04,741:tool.py:root:
+
+INFO:2024-12-02 11:44:04,741:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:04,741:tool.py:root:Ramdisk is lz4_legacy
+DEBUG:2024-12-02 11:44:04,741:tool.py:root:
+
+INFO:2024-12-02 11:44:04,741:tool.py:root:['magiskboot', 'decompress', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio.comp', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio']
+DEBUG:2024-12-02 11:44:04,742:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:44:04,742:tool.py:root:
+
+INFO:2024-12-02 11:44:04,742:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:44:04,775:tool.py:root:Unpacking Ramdisk...
+DEBUG:2024-12-02 11:44:04,775:tool.py:root:
+
+INFO:2024-12-02 11:44:04,775:tool.py:root:['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk']
+DEBUG:2024-12-02 11:44:04,848:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:04,849:tool.py:root:
+
+INFO:2024-12-02 11:44:04,849:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:04,849:tool.py:root:Unpacking:vendor_boot.img[vendor_boot]
+DEBUG:2024-12-02 11:44:04,849:tool.py:root:
+
+DEBUG:2024-12-02 11:44:04,850:tool.py:root:Success!
+DEBUG:2024-12-02 11:44:04,850:tool.py:root:
+
+ERROR:2024-12-02 11:44:11,228:tool.py:root:Bugs
+Traceback (most recent call last):
+  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3208, in start_
+    self.destroy()
+  File "/usr/lib/python3.10/tkinter/__init__.py", line 2608, in destroy
+    for c in list(self.children.values()): c.destroy()
+AttributeError: 'Packxx' object has no attribute 'children'
+INFO:2024-12-02 11:44:11,231:tool.py:root:['busybox', 'ash', '-c', 'find | sed 1d | /home/enrico/sources/MIO-KITCHEN-SOURCE/bin/Linux/x86_64//cpio -H newc -R 0:0 -o -F ../ramdisk-new.cpio']
+DEBUG:2024-12-02 11:44:11,303:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:11,303:tool.py:root:
+
+INFO:2024-12-02 11:44:11,303:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:11,305:tool.py:root:Compressing: lz4_legacy
+DEBUG:2024-12-02 11:44:11,308:tool.py:root:
+
+INFO:2024-12-02 11:44:11,308:tool.py:root:['magiskboot', 'compress=lz4_legacy', 'ramdisk-new.cpio']
+DEBUG:2024-12-02 11:44:11,309:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:44:11,309:tool.py:root:
+
+INFO:2024-12-02 11:44:11,309:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:44:21,533:tool.py:root:Ramdisk Compression: lz4_legacy
+DEBUG:2024-12-02 11:44:21,533:tool.py:root:
+
+DEBUG:2024-12-02 11:44:21,536:tool.py:root:Successfully packed Ramdisk...
+DEBUG:2024-12-02 11:44:21,536:tool.py:root:
+
+INFO:2024-12-02 11:44:21,536:tool.py:root:['magiskboot', 'repack', '', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:44:21,537:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:21,537:tool.py:root:
+
+INFO:2024-12-02 11:44:21,537:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:21,537:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:21,538:tool.py:root:
+
+INFO:2024-12-02 11:44:21,539:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:21,539:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:21,540:tool.py:root:
+
+INFO:2024-12-02 11:44:21,541:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:21,541:tool.py:root:RAMDISK_SZ      [19442883]
+DEBUG:2024-12-02 11:44:21,542:tool.py:root:
+
+INFO:2024-12-02 11:44:21,543:tool.py:root:RAMDISK_SZ      [19442883]
+DEBUG:2024-12-02 11:44:21,543:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:21,543:tool.py:root:
+
+INFO:2024-12-02 11:44:21,544:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:21,544:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:21,544:tool.py:root:
+
+INFO:2024-12-02 11:44:21,545:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:21,545:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:21,545:tool.py:root:
+
+INFO:2024-12-02 11:44:21,546:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:21,546:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:21,546:tool.py:root:
+
+INFO:2024-12-02 11:44:21,546:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:21,546:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:21,547:tool.py:root:
+
+INFO:2024-12-02 11:44:21,547:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:21,547:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:21,548:tool.py:root:
+
+INFO:2024-12-02 11:44:21,548:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:21,548:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:44:21,550:tool.py:root:
+
+INFO:2024-12-02 11:44:21,550:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:44:21,571:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:21,571:tool.py:root:
+
+INFO:2024-12-02 11:44:21,571:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:21,572:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:21,573:tool.py:root:
+
+INFO:2024-12-02 11:44:21,574:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:21,575:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:21,575:tool.py:root:
+
+INFO:2024-12-02 11:44:21,576:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:21,576:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:21,577:tool.py:root:
+
+INFO:2024-12-02 11:44:21,577:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:21,577:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:21,578:tool.py:root:
+
+INFO:2024-12-02 11:44:21,579:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:21,580:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:21,580:tool.py:root:
+
+INFO:2024-12-02 11:44:21,581:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:21,589:tool.py:root:Successfully packed Boot...
+DEBUG:2024-12-02 11:44:21,589:tool.py:root:
+
+DEBUG:2024-12-02 11:44:21,591:tool.py:root:Deleting:vendor_boot
+DEBUG:2024-12-02 11:44:21,591:tool.py:root:
+
+DEBUG:2024-12-02 11:44:21,604:tool.py:root:Successfully deleted:/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot
+DEBUG:2024-12-02 11:44:21,604:tool.py:root:
+
+DEBUG:2024-12-02 11:44:26,656:tool.py:root:Success!
+DEBUG:2024-12-02 11:44:26,656:tool.py:root:
+
+DEBUG:2024-12-02 11:44:36,378:tool.py:root:Selected items:teste
+DEBUG:2024-12-02 11:44:36,379:tool.py:root:
+
+INFO:2024-12-02 11:44:39,850:tool.py:root:['magiskboot', 'unpack', '-h', '-n', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:44:39,851:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:39,851:tool.py:root:
+
+INFO:2024-12-02 11:44:39,851:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:39,851:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:39,851:tool.py:root:
+
+INFO:2024-12-02 11:44:39,853:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:39,853:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:39,853:tool.py:root:
+
+INFO:2024-12-02 11:44:39,854:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:39,854:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:39,855:tool.py:root:
+
+INFO:2024-12-02 11:44:39,856:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:39,856:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:39,856:tool.py:root:
+
+INFO:2024-12-02 11:44:39,858:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:39,858:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:39,858:tool.py:root:
+
+INFO:2024-12-02 11:44:39,859:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:39,859:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:39,860:tool.py:root:
+
+INFO:2024-12-02 11:44:39,860:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:39,861:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:39,861:tool.py:root:
+
+INFO:2024-12-02 11:44:39,861:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:39,861:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:39,861:tool.py:root:
+
+INFO:2024-12-02 11:44:39,862:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:39,862:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:39,863:tool.py:root:
+
+INFO:2024-12-02 11:44:39,864:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:39,866:tool.py:root:Ramdisk is lz4_legacy
+DEBUG:2024-12-02 11:44:39,866:tool.py:root:
+
+INFO:2024-12-02 11:44:39,866:tool.py:root:['magiskboot', 'decompress', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio.comp', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio']
+DEBUG:2024-12-02 11:44:39,868:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:44:39,868:tool.py:root:
+
+INFO:2024-12-02 11:44:39,868:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:44:39,900:tool.py:root:Unpacking Ramdisk...
+DEBUG:2024-12-02 11:44:39,900:tool.py:root:
+
+INFO:2024-12-02 11:44:39,900:tool.py:root:['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk']
+DEBUG:2024-12-02 11:44:39,974:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:39,975:tool.py:root:
+
+INFO:2024-12-02 11:44:39,975:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:39,975:tool.py:root:Unpacking:vendor_boot.img[vendor_boot]
+DEBUG:2024-12-02 11:44:39,976:tool.py:root:
+
+DEBUG:2024-12-02 11:44:39,978:tool.py:root:Success!
+DEBUG:2024-12-02 11:44:39,978:tool.py:root:
+
+DEBUG:2024-12-02 11:44:47,228:tool.py:root:Selected items:teste
+DEBUG:2024-12-02 11:44:47,228:tool.py:root:
+
+ERROR:2024-12-02 11:44:48,670:tool.py:root:Bugs
+Traceback (most recent call last):
+  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3208, in start_
+    self.destroy()
+  File "/usr/lib/python3.10/tkinter/__init__.py", line 2608, in destroy
+    for c in list(self.children.values()): c.destroy()
+AttributeError: 'Packxx' object has no attribute 'children'
+INFO:2024-12-02 11:44:48,670:tool.py:root:['busybox', 'ash', '-c', 'find | sed 1d | /home/enrico/sources/MIO-KITCHEN-SOURCE/bin/Linux/x86_64//cpio -H newc -R 0:0 -o -F ../ramdisk-new.cpio']
+DEBUG:2024-12-02 11:44:48,741:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:48,741:tool.py:root:
+
+INFO:2024-12-02 11:44:48,742:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:44:48,743:tool.py:root:Compressing: lz4_legacy
+DEBUG:2024-12-02 11:44:48,743:tool.py:root:
+
+INFO:2024-12-02 11:44:48,744:tool.py:root:['magiskboot', 'compress=lz4_legacy', 'ramdisk-new.cpio']
+DEBUG:2024-12-02 11:44:48,744:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:44:48,744:tool.py:root:
+
+INFO:2024-12-02 11:44:48,745:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:44:58,871:tool.py:root:Ramdisk Compression: lz4_legacy
+DEBUG:2024-12-02 11:44:58,871:tool.py:root:
+
+DEBUG:2024-12-02 11:44:58,874:tool.py:root:Successfully packed Ramdisk...
+DEBUG:2024-12-02 11:44:58,874:tool.py:root:
+
+INFO:2024-12-02 11:44:58,876:tool.py:root:['magiskboot', 'repack', '', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:44:58,877:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:58,877:tool.py:root:
+
+INFO:2024-12-02 11:44:58,877:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:44:58,878:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:58,878:tool.py:root:
+
+INFO:2024-12-02 11:44:58,879:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:44:58,879:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:58,880:tool.py:root:
+
+INFO:2024-12-02 11:44:58,881:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:58,881:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:58,884:tool.py:root:
+
+INFO:2024-12-02 11:44:58,884:tool.py:root:RAMDISK_SZ      [19442807]
+DEBUG:2024-12-02 11:44:58,885:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:58,885:tool.py:root:
+
+INFO:2024-12-02 11:44:58,885:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:58,885:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:58,886:tool.py:root:
+
+INFO:2024-12-02 11:44:58,887:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:58,887:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:58,888:tool.py:root:
+
+INFO:2024-12-02 11:44:58,889:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:58,889:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:58,889:tool.py:root:
+
+INFO:2024-12-02 11:44:58,890:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:58,890:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:58,890:tool.py:root:
+
+INFO:2024-12-02 11:44:58,891:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:44:58,891:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:58,892:tool.py:root:
+
+INFO:2024-12-02 11:44:58,893:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:44:58,893:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:44:58,893:tool.py:root:
+
+INFO:2024-12-02 11:44:58,894:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:44:58,911:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:58,911:tool.py:root:
+
+INFO:2024-12-02 11:44:58,911:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:44:58,912:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:44:58,913:tool.py:root:
+
+INFO:2024-12-02 11:44:58,913:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:44:58,914:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:58,915:tool.py:root:
+
+INFO:2024-12-02 11:44:58,915:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:44:58,918:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:58,918:tool.py:root:
+
+INFO:2024-12-02 11:44:58,919:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:44:58,920:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:58,920:tool.py:root:
+
+INFO:2024-12-02 11:44:58,920:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:44:58,921:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:58,922:tool.py:root:
+
+INFO:2024-12-02 11:44:58,923:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:44:58,931:tool.py:root:Successfully packed Boot...
+DEBUG:2024-12-02 11:44:58,931:tool.py:root:
+
+DEBUG:2024-12-02 11:44:58,935:tool.py:root:Deleting:vendor_boot
+DEBUG:2024-12-02 11:44:58,935:tool.py:root:
+
+DEBUG:2024-12-02 11:44:58,947:tool.py:root:Successfully deleted:/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot
+DEBUG:2024-12-02 11:44:58,947:tool.py:root:
+
+INFO:2024-12-02 11:45:04,008:tool.py:root:['magiskboot', 'unpack', '-h', '-n', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:45:04,008:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:45:04,009:tool.py:root:
+
+INFO:2024-12-02 11:45:04,009:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:45:04,009:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:45:04,009:tool.py:root:
+
+INFO:2024-12-02 11:45:04,010:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:45:04,010:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:04,011:tool.py:root:
+
+INFO:2024-12-02 11:45:04,012:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:04,012:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:45:04,012:tool.py:root:
+
+INFO:2024-12-02 11:45:04,014:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:45:04,014:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:04,014:tool.py:root:
+
+INFO:2024-12-02 11:45:04,016:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:04,018:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:04,019:tool.py:root:
+
+INFO:2024-12-02 11:45:04,019:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:04,020:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:04,021:tool.py:root:
+
+INFO:2024-12-02 11:45:04,021:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:04,021:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:04,022:tool.py:root:
+
+INFO:2024-12-02 11:45:04,023:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:04,023:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:45:04,024:tool.py:root:
+
+INFO:2024-12-02 11:45:04,025:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:45:04,025:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:45:04,026:tool.py:root:
+
+INFO:2024-12-02 11:45:04,026:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:45:04,027:tool.py:root:Ramdisk is lz4_legacy
+DEBUG:2024-12-02 11:45:04,027:tool.py:root:
+
+INFO:2024-12-02 11:45:04,027:tool.py:root:['magiskboot', 'decompress', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio.comp', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio']
+DEBUG:2024-12-02 11:45:04,028:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:45:04,028:tool.py:root:
+
+INFO:2024-12-02 11:45:04,029:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:45:04,061:tool.py:root:Unpacking Ramdisk...
+DEBUG:2024-12-02 11:45:04,061:tool.py:root:
+
+INFO:2024-12-02 11:45:04,062:tool.py:root:['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk']
+DEBUG:2024-12-02 11:45:04,135:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:45:04,135:tool.py:root:
+
+INFO:2024-12-02 11:45:04,135:tool.py:root:91855 blocos
+DEBUG:2024-12-02 11:45:04,136:tool.py:root:Unpacking:vendor_boot.img[vendor_boot]
+DEBUG:2024-12-02 11:45:04,137:tool.py:root:
+
+DEBUG:2024-12-02 11:45:04,138:tool.py:root:Success!
+DEBUG:2024-12-02 11:45:04,139:tool.py:root:
+
+ERROR:2024-12-02 11:45:35,668:tool.py:root:Bugs
+Traceback (most recent call last):
+  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3208, in start_
+    self.destroy()
+  File "/usr/lib/python3.10/tkinter/__init__.py", line 2608, in destroy
+    for c in list(self.children.values()): c.destroy()
+AttributeError: 'Packxx' object has no attribute 'children'
+INFO:2024-12-02 11:45:35,669:tool.py:root:['busybox', 'ash', '-c', 'find | sed 1d | /home/enrico/sources/MIO-KITCHEN-SOURCE/bin/Linux/x86_64//cpio -H newc -R 0:0 -o -F ../ramdisk-new.cpio']
+DEBUG:2024-12-02 11:45:35,740:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:45:35,741:tool.py:root:
+
+INFO:2024-12-02 11:45:35,741:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:45:35,742:tool.py:root:Compressing: lz4_legacy
+DEBUG:2024-12-02 11:45:35,742:tool.py:root:
+
+INFO:2024-12-02 11:45:35,742:tool.py:root:['magiskboot', 'compress=lz4_legacy', 'ramdisk-new.cpio']
+DEBUG:2024-12-02 11:45:35,742:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:45:35,743:tool.py:root:
+
+INFO:2024-12-02 11:45:35,743:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:45:45,721:tool.py:root:Ramdisk Compression: lz4_legacy
+DEBUG:2024-12-02 11:45:45,721:tool.py:root:
+
+DEBUG:2024-12-02 11:45:45,722:tool.py:root:Successfully packed Ramdisk...
+DEBUG:2024-12-02 11:45:45,723:tool.py:root:
+
+INFO:2024-12-02 11:45:45,723:tool.py:root:['magiskboot', 'repack', '', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:45:45,723:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:45:45,724:tool.py:root:
+
+INFO:2024-12-02 11:45:45,724:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:45:45,724:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:45:45,724:tool.py:root:
+
+INFO:2024-12-02 11:45:45,725:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:45:45,725:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:45,726:tool.py:root:
+
+INFO:2024-12-02 11:45:45,727:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:45,727:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:45:45,727:tool.py:root:
+
+INFO:2024-12-02 11:45:45,728:tool.py:root:RAMDISK_SZ      [19442852]
+DEBUG:2024-12-02 11:45:45,728:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:45,729:tool.py:root:
+
+INFO:2024-12-02 11:45:45,730:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:45,730:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:45,731:tool.py:root:
+
+INFO:2024-12-02 11:45:45,733:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:45,733:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:45,734:tool.py:root:
+
+INFO:2024-12-02 11:45:45,734:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:45,735:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:45,735:tool.py:root:
+
+INFO:2024-12-02 11:45:45,736:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:45,736:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:45:45,736:tool.py:root:
+
+INFO:2024-12-02 11:45:45,737:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:45:45,737:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:45:45,738:tool.py:root:
+
+INFO:2024-12-02 11:45:45,739:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:45:45,739:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:45:45,739:tool.py:root:
+
+INFO:2024-12-02 11:45:45,740:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:45:45,759:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:45,760:tool.py:root:
+
+INFO:2024-12-02 11:45:45,760:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:45:45,761:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:45:45,762:tool.py:root:
+
+INFO:2024-12-02 11:45:45,762:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:45:45,763:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:45,763:tool.py:root:
+
+INFO:2024-12-02 11:45:45,763:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:45:45,764:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:45,765:tool.py:root:
+
+INFO:2024-12-02 11:45:45,768:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:45:45,768:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:45,769:tool.py:root:
+
+INFO:2024-12-02 11:45:45,769:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:45:45,769:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:45,770:tool.py:root:
+
+INFO:2024-12-02 11:45:45,770:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:45:45,779:tool.py:root:Successfully packed Boot...
+DEBUG:2024-12-02 11:45:45,779:tool.py:root:
+
+DEBUG:2024-12-02 11:45:45,781:tool.py:root:Deleting:vendor_boot
+DEBUG:2024-12-02 11:45:45,781:tool.py:root:
+
+DEBUG:2024-12-02 11:45:45,794:tool.py:root:Successfully deleted:/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot
+DEBUG:2024-12-02 11:45:45,794:tool.py:root:
+
+INFO:2024-12-02 11:46:14,087:tool.py:root:['magiskboot', 'unpack', '-h', '-n', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:46:14,088:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:46:14,088:tool.py:root:
+
+INFO:2024-12-02 11:46:14,088:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:46:14,088:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:46:14,088:tool.py:root:
+
+INFO:2024-12-02 11:46:14,089:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:46:14,089:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:14,090:tool.py:root:
+
+INFO:2024-12-02 11:46:14,091:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:14,091:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:46:14,092:tool.py:root:
+
+INFO:2024-12-02 11:46:14,093:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:46:14,093:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:14,094:tool.py:root:
+
+INFO:2024-12-02 11:46:14,095:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:14,095:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:14,096:tool.py:root:
+
+INFO:2024-12-02 11:46:14,097:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:14,097:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:14,097:tool.py:root:
+
+INFO:2024-12-02 11:46:14,101:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:14,101:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:14,102:tool.py:root:
+
+INFO:2024-12-02 11:46:14,102:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:14,102:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:46:14,104:tool.py:root:
+
+INFO:2024-12-02 11:46:14,105:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:46:14,106:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:46:14,106:tool.py:root:
+
+INFO:2024-12-02 11:46:14,106:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:46:14,107:tool.py:root:Ramdisk is lz4_legacy
+DEBUG:2024-12-02 11:46:14,107:tool.py:root:
+
+INFO:2024-12-02 11:46:14,107:tool.py:root:['magiskboot', 'decompress', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio.comp', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot/ramdisk.cpio']
+DEBUG:2024-12-02 11:46:14,108:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:46:14,109:tool.py:root:
+
+INFO:2024-12-02 11:46:14,109:tool.py:root:Detected format: [lz4_legacy]
+DEBUG:2024-12-02 11:46:14,141:tool.py:root:Unpacking Ramdisk...
+DEBUG:2024-12-02 11:46:14,141:tool.py:root:
+
+INFO:2024-12-02 11:46:14,142:tool.py:root:['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk']
+DEBUG:2024-12-02 11:46:14,218:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:46:14,219:tool.py:root:
+
+INFO:2024-12-02 11:46:14,219:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:46:14,221:tool.py:root:Unpacking:vendor_boot.img[vendor_boot]
+DEBUG:2024-12-02 11:46:14,222:tool.py:root:
+
+DEBUG:2024-12-02 11:46:14,223:tool.py:root:Success!
+DEBUG:2024-12-02 11:46:14,224:tool.py:root:
+
+ERROR:2024-12-02 11:46:20,692:tool.py:root:Bugs
+Traceback (most recent call last):
+  File "/home/enrico/sources/MIO-KITCHEN-SOURCE/src/tool.py", line 3208, in start_
+    self.destroy()
+  File "/usr/lib/python3.10/tkinter/__init__.py", line 2608, in destroy
+    for c in list(self.children.values()): c.destroy()
+AttributeError: 'Packxx' object has no attribute 'children'
+INFO:2024-12-02 11:46:20,693:tool.py:root:['busybox', 'ash', '-c', 'find | sed 1d | /home/enrico/sources/MIO-KITCHEN-SOURCE/bin/Linux/x86_64//cpio -H newc -R 0:0 -o -F ../ramdisk-new.cpio']
+DEBUG:2024-12-02 11:46:20,764:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:46:20,764:tool.py:root:
+
+INFO:2024-12-02 11:46:20,765:tool.py:root:91856 blocos
+DEBUG:2024-12-02 11:46:20,767:tool.py:root:Compressing: lz4_legacy
+DEBUG:2024-12-02 11:46:20,767:tool.py:root:
+
+INFO:2024-12-02 11:46:20,768:tool.py:root:['magiskboot', 'compress=lz4_legacy', 'ramdisk-new.cpio']
+DEBUG:2024-12-02 11:46:20,768:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:46:20,768:tool.py:root:
+
+INFO:2024-12-02 11:46:20,769:tool.py:root:Compressing to [ramdisk-new.cpio.lz4]
+DEBUG:2024-12-02 11:46:30,887:tool.py:root:Ramdisk Compression: lz4_legacy
+DEBUG:2024-12-02 11:46:30,887:tool.py:root:
+
+DEBUG:2024-12-02 11:46:30,887:tool.py:root:Successfully packed Ramdisk...
+DEBUG:2024-12-02 11:46:30,887:tool.py:root:
+
+INFO:2024-12-02 11:46:30,889:tool.py:root:['magiskboot', 'repack', '', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img']
+DEBUG:2024-12-02 11:46:30,892:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:46:30,892:tool.py:root:
+
+INFO:2024-12-02 11:46:30,892:tool.py:root:Parsing boot image: [/home/enrico/sources/MIO-KITCHEN-SOURCE/teste//vendor_boot.img]
+DEBUG:2024-12-02 11:46:30,893:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:46:30,893:tool.py:root:
+
+INFO:2024-12-02 11:46:30,894:tool.py:root:VENDOR_BOOT_HDR
+DEBUG:2024-12-02 11:46:30,894:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:30,894:tool.py:root:
+
+INFO:2024-12-02 11:46:30,894:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:30,894:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:46:30,895:tool.py:root:
+
+INFO:2024-12-02 11:46:30,895:tool.py:root:RAMDISK_SZ      [19442763]
+DEBUG:2024-12-02 11:46:30,896:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:30,896:tool.py:root:
+
+INFO:2024-12-02 11:46:30,897:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:30,897:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:30,898:tool.py:root:
+
+INFO:2024-12-02 11:46:30,901:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:30,901:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:30,901:tool.py:root:
+
+INFO:2024-12-02 11:46:30,902:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:30,903:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:30,904:tool.py:root:
+
+INFO:2024-12-02 11:46:30,904:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:30,905:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:46:30,905:tool.py:root:
+
+INFO:2024-12-02 11:46:30,905:tool.py:root:RAMDISK_FMT     [raw]
+DEBUG:2024-12-02 11:46:30,906:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:46:30,906:tool.py:root:
+
+INFO:2024-12-02 11:46:30,906:tool.py:root:VBMETA
+DEBUG:2024-12-02 11:46:30,907:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:46:30,907:tool.py:root:
+
+INFO:2024-12-02 11:46:30,907:tool.py:root:Repack to boot image: [new-boot.img]
+DEBUG:2024-12-02 11:46:30,925:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:30,925:tool.py:root:
+
+INFO:2024-12-02 11:46:30,926:tool.py:root:HEADER_VER      [4]
+DEBUG:2024-12-02 11:46:30,926:tool.py:root:RAMDISK_SZ      [19442869]
+DEBUG:2024-12-02 11:46:30,926:tool.py:root:
+
+INFO:2024-12-02 11:46:30,927:tool.py:root:RAMDISK_SZ      [19442869]
+DEBUG:2024-12-02 11:46:30,928:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:30,928:tool.py:root:
+
+INFO:2024-12-02 11:46:30,928:tool.py:root:DTB_SZ          [944359]
+DEBUG:2024-12-02 11:46:30,929:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:30,929:tool.py:root:
+
+INFO:2024-12-02 11:46:30,929:tool.py:root:PAGESIZE        [4096]
+DEBUG:2024-12-02 11:46:30,929:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:30,929:tool.py:root:
+
+INFO:2024-12-02 11:46:30,930:tool.py:root:NAME            []
+DEBUG:2024-12-02 11:46:30,931:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:30,931:tool.py:root:
+
+INFO:2024-12-02 11:46:30,932:tool.py:root:CMDLINE         [video=vfb:640x400,bpp=32,memsize=3072000 swinfo.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user mtdoops.fingerprint=peridot:14/V816.0.18.0.UNPCNXM:user bootconfig]
+DEBUG:2024-12-02 11:46:30,940:tool.py:root:Successfully packed Boot...
+DEBUG:2024-12-02 11:46:30,940:tool.py:root:
+
+DEBUG:2024-12-02 11:46:30,943:tool.py:root:Deleting:vendor_boot
+DEBUG:2024-12-02 11:46:30,943:tool.py:root:
+
+DEBUG:2024-12-02 11:46:30,955:tool.py:root:Successfully deleted:/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/vendor_boot
+DEBUG:2024-12-02 11:46:30,955:tool.py:root:
+

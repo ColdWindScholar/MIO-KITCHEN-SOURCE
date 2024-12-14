@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/text-highlight/" id="org.gnome.evolution.text-highlight" gettext-domain="evolution">
+    <key type="b" name="enabled">
+      <default>true</default>
+      <summary>Whether the text-highlight module is enabled</summary>
+    </key>
+    <key type="s" name="theme">
+      <default>''</default>
+      <summary>Theme name to use, defaults to “bclear”</summary>
+      <description>Use “highlight --list-scripts=themes” to get the list of installed themes and then the value to one of them. The change requires only re-format of the message part to take into effect, like using right-click→Format As→....</description>
+    </key>
+  </schema>
+</schemalist>

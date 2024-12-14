@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schemalist>
+
+  <schema path="/org/gnome/evolution/" id="org.gnome.Evolution.DefaultSources">
+    <key name='default-address-book' type='s'>
+      <default>'system'</default>
+      <summary>The UID of the default address book</summary>
+    </key>
+    <key name='default-calendar' type='s'>
+      <default>'system'</default>
+      <summary>The UID of the default calendar</summary>
+    </key>
+    <key name='default-mail-account' type='s'>
+      <default>'system'</default>
+      <summary>The UID of the default mail account</summary>
+    </key>
+    <key name='default-mail-identity' type='s'>
+      <default>''</default>
+      <summary>The UID of the default mail identity</summary>
+    </key>
+    <key name='default-memo-list' type='s'>
+      <default>'system'</default>
+      <summary>The UID of the default memo list</summary>
+    </key>
+    <key name='default-task-list' type='s'>
+      <default>'system'</default>
+      <summary>The UID of the default task list</summary>
+    </key>
+  </schema>
+
+</schemalist>

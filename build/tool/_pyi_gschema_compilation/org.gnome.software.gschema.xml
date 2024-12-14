@@ -1,0 +1,157 @@
+<schemalist>
+  <schema id="org.gnome.software" path="/org/gnome/software/" gettext-domain="gnome-software">
+    <key name="compatible-projects" type="as">
+      <default>['GNOME', 'KDE', 'XFCE']</default>
+      <summary>A list of compatible projects</summary>
+      <description>This is a list of compatible projects we should show such as GNOME, KDE and XFCE.</description>
+    </key>
+    <key name="allow-updates" type="b">
+      <default>true</default>
+      <summary>Whether to manage updates and upgrades in GNOME Software</summary>
+      <description>If disabled, GNOME Software will hide the updates panel, not perform any automatic updates actions or prompt for upgrades.</description>
+    </key>
+    <key name="download-updates" type="b">
+      <default>true</default>
+      <summary>Automatically download and install updates</summary>
+      <description>If enabled, GNOME Software automatically downloads software updates in the background, also installing ones that do not require a reboot.</description>
+    </key>
+    <key name="download-updates-notify" type="b">
+      <default>true</default>
+      <summary>Notify the user about software updated in the background</summary>
+      <description>If enabled, GNOME Software notifies the user about updates that happened whilst the user was idle.</description>
+    </key>
+    <key name="refresh-when-metered" type="b">
+      <default>false</default>
+      <summary>Whether to automatically refresh when on a metered connection</summary>
+      <description>If enabled, GNOME Software automatically refreshes in the background even when using a metered connection (eventually downloading some metadata, checking for updates, etc., which may incur in costs for the user).</description>
+    </key>
+    <key name="first-run" type="b">
+      <default>true</default>
+      <summary>Whether it’s the very first run of GNOME Software</summary>
+    </key>
+    <key name="show-ratings" type="b">
+      <default>false</default>
+      <summary>Show star ratings next to applications</summary>
+    </key>
+    <key name="filter-default-branch" type="b">
+      <default>true</default>
+      <summary>Filter applications based on the default branch set for the remote</summary>
+    </key>
+    <key name="prompt-for-nonfree" type="b">
+      <default>true</default>
+      <summary>Non-free applications show a warning dialog before install</summary>
+      <description>When non-free applications are installed a warning dialog can be shown. This controls if that dialog is suppressed.</description>
+    </key>
+    <key name="check-timestamp" type="x">
+      <default>0</default>
+      <summary>The last update check timestamp</summary>
+    </key>
+    <key name="upgrade-notification-timestamp" type="x">
+      <default>0</default>
+      <summary>The last upgrade notification timestamp</summary>
+    </key>
+    <key name="update-notification-timestamp" type="x">
+      <default>0</default>
+      <summary>The last update notification timestamp</summary>
+    </key>
+    <key name="security-timestamp" type="x">
+      <default>0</default>
+      <summary>The timestamp of the first security update, cleared after update</summary>
+    </key>
+    <key name="install-timestamp" type="x">
+      <default>0</default>
+      <summary>The last update timestamp</summary>
+    </key>
+    <key name="screenshot-cache-age-maximum" type="u">
+      <default>2592000</default>
+      <summary>The age in seconds to verify the upstream screenshot is still valid</summary>
+      <description>
+        Choosing a larger value will mean less round-trips to the remote server
+        but updates to the screenshots may take longer to show to the user.
+        A value of 0 means to never check the server if the image already exists
+        in the cache.
+      </description>
+    </key>
+    <key name="review-server" type="s">
+      <default>'https://odrs.gnome.org/1.0/reviews/api'</default>
+      <summary>The server to use for application reviews</summary>
+    </key>
+    <key name="review-karma-required" type="i">
+      <default>0</default>
+      <summary>The minimum karma score for reviews</summary>
+      <description>Reviews with karma less than this number will not be shown.</description>
+    </key>
+    <key name="official-repos" type="as">
+      <default>[]</default>
+      <summary>A list of official repositories that should not be considered 3rd party</summary>
+    </key>
+    <key name="required-repos" type="as">
+      <default>[]</default>
+      <summary>A list of required repositories that cannot be disabled or removed</summary>
+    </key>
+    <key name="free-repos" type="as">
+      <default>[]</default>
+      <summary>A list of official repositories that should be considered free software</summary>
+    </key>
+    <key name="free-repos-url" type="s">
+      <default>''</default>
+      <summary>The licence URL to use when an application should be considered free software</summary>
+    </key>
+    <key name="install-bundles-system-wide" type="b">
+      <default>true</default>
+      <summary>Install bundled applications for all users on the system where possible</summary>
+    </key>
+    <key name="enable-repos-dialog" type="b">
+      <default>true</default>
+      <summary>Allow access to the Software Repositories dialog</summary>
+    </key>
+    <key name="show-upgrade-prerelease" type="b">
+      <default>false</default>
+      <summary>Offer upgrades for pre-releases</summary>
+    </key>
+    <key name="show-nonfree-ui" type="b">
+      <default>true</default>
+      <summary>Show some UI elements informing the user that an app is non-free</summary>
+    </key>
+    <key name="installed-page-show-size" type="b">
+      <default>true</default>
+      <summary>Show the installed size for apps in the list of installed applications</summary>
+    </key>
+    <key name="nonfree-software-uri" type="s">
+      <!-- Translators: Replace the link with a version in your language, e.g. 'https://de.wikipedia.org/wiki/Proprietäre_Software'. Remember to include ''. -->
+      <default l10n="messages">'https://en.wikipedia.org/wiki/Proprietary_software'</default>
+      <summary>The URI that explains nonfree and proprietary software</summary>
+    </key>
+    <key name="external-appstream-urls" type="as">
+      <default>[]</default>
+      <summary>A list of URLs pointing to appstream files that will be downloaded into an swcatalog folder</summary>
+    </key>
+    <key name="external-appstream-system-wide" type="b">
+      <default>false</default>
+      <summary>Install the AppStream files to a system-wide location for all users. If false, files are installed in non-standard $XDG_DATA_HOME/swcatalog/xml directory</summary>
+    </key>
+    <key name="packaging-format-preference" type="as">
+      <default>['']</default>
+      <summary>Priority order of packaging formats to prefer, with more important formats listed first. An empty array means the default order. Omitted formats are assumed to be listed last. Example packaging formats are: deb, flatpak, rpm, snap. The formats can be optionally specified with an origin name, divided by a colon, for example 'flatpak:flathub'.</summary>
+    </key>
+    <key name="flatpak-purge-timestamp" type="x">
+      <default>0</default>
+      <summary>The timestamp of the last attempt to remove unused Flatpak runtimes</summary>
+    </key>
+    <key name="show-only-free-apps" type="b">
+      <default>false</default>
+      <summary>Set to 'true' to show only freely licensed apps and hide any proprietary apps.</summary>
+    </key>
+    <key name="packagekit-historical-updates-timestamp" type="t">
+      <default>0</default>
+      <summary>The timestamp of the last received historical updates.</summary>
+    </key>
+    <child name="auth" schema="org.gnome.software.auth"/>
+  </schema>
+  <schema id="org.gnome.software.auth" gettext-domain="gnome-software">
+    <key name="account-id" type="s">
+      <default>''</default>
+      <summary>A string storing the gnome-online-account id used to login</summary>
+    </key>
+  </schema>
+</schemalist>

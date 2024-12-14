@@ -1,0 +1,776 @@
+<schemalist gettext-domain="gnome-system-monitor">
+  <schema id="org.gnome.gnome-system-monitor" path="/org/gnome/gnome-system-monitor/">
+    <key name="window-state" type="(iiii)">
+      <default>(700, 500, 50, 50)</default>
+      <summary>Main window size and position in the form (width, height, xpos, ypos)</summary>
+    </key>
+
+    <key name="maximized" type="b">
+      <default>false
+      </default>
+      <summary>Main Window should open maximized
+      </summary>
+    </key>
+
+    <key name="show-dependencies" type="b">
+      <default>false
+      </default>
+      <summary>Show process dependencies in tree form
+      </summary>
+    </key>
+
+    <key name="solaris-mode" type="b">
+      <default>true
+      </default>
+      <summary>Solaris mode for CPU percentage
+      </summary>
+      <description>If TRUE, system-monitor operates in “Solaris mode” where a task’s CPU usage is divided by the total number of CPUs. Otherwise, it operates in “Irix mode”.
+      </description>
+    </key>
+
+    <key name="process-memory-in-iec" type="b">
+      <default>false
+      </default>
+      <summary>Show memory in IEC
+      </summary>
+    </key>
+
+    <key name="smooth-refresh" type="b">
+      <default>true
+      </default>
+      <summary>Enable/Disable smooth refresh
+      </summary>
+    </key>
+
+    <key name="kill-dialog" type="b">
+      <default>true
+      </default>
+      <summary>Show warning dialog when killing processes
+      </summary>
+    </key>
+
+    <key name="update-interval" type="i">
+      <range min="1000" max="100000"/>
+      <default>3000</default>
+      <summary>Time in milliseconds between updates of the process view</summary>
+    </key>
+
+    <key name="graph-update-interval" type="i">
+      <range min="50" max="10000"/>
+      <default>100</default>
+      <summary>Time in milliseconds between updates of the graphs</summary>
+    </key>
+
+    <key name="show-all-fs" type="b">
+      <default>false
+      </default>
+      <summary>Whether information about all file systems should be displayed
+      </summary>
+      <description>Whether to display information about all file systems (including types like “autofs” and “procfs”). Useful for getting a list of all currently mounted file systems.
+      </description>
+    </key>
+
+    <key name="disks-interval" type="i">
+      <range min="1000" max="100000"/>
+      <default>5000</default>
+      <summary>Time in milliseconds between updates of the devices list</summary>
+    </key>
+
+    <key name="graph-data-points" type="i">
+      <range min="30" max="600"/>
+      <default>60</default>
+      <summary>Time amount of data points in the resource graphs</summary>
+    </key>
+
+    <key name="show-whose-processes" type="s">
+      <default>'user'</default>
+      <choices>
+        <choice value="all"/>
+        <choice value="user"/>
+        <choice value="active"/>
+      </choices>
+      <summary>Determines which processes to show.</summary>
+    </key>
+
+    <key name="current-tab" type="s">
+      <choices>
+        <choice value="processes"/>
+        <choice value="resources"/>
+        <choice value="disks"/>
+      </choices>
+      <default>'processes'</default>
+      <summary>Saves the currently viewed tab
+      </summary>
+    </key>
+
+    <key name="cpu-colors" type="a(us)">
+      <default>[
+                (0, '#e6194B'),
+                (1, '#f58231'),
+                (2, '#ffe119'),
+                (3, '#bfef45'),
+                (4, '#3cb44b'),
+                (5, '#42d4f4'),
+                (6, '#4363d8'),
+                (7, '#911eb4'),
+                (8, '#f032e6'),
+                (9, '#fabebe'),
+                (10,'#ffd8b1'),
+                (11,'#fffac8'),
+                (12,'#aaffc3'),
+                (13,'#469990'),
+                (14,'#000075'),
+                (15,'#e6beff')
+                ]</default>
+      <summary>CPU colors
+      </summary>
+      <description>Each entry is in the format (CPU#, Hexadecimal color value)
+      </description>
+    </key>
+
+    <key name="mem-color" type="s">
+      <default>'#AB1852'
+      </default>
+      <summary>Default graph memory color
+      </summary>
+    </key>
+
+    <key name="swap-color" type="s">
+      <default>'#49A835'
+      </default>
+      <summary>Default graph swap color
+      </summary>
+    </key>
+
+    <key name="net-in-color" type="s">
+      <default>'#2D7DB3'
+      </default>
+      <summary>Default graph incoming network traffic color
+      </summary>
+    </key>
+
+    <key name="net-out-color" type="s">
+      <default>'#EE1D00'
+      </default>
+      <summary>Default graph outgoing network traffic color
+      </summary>
+    </key>
+
+    <key name="network-in-bits" type="b">
+      <default>false
+      </default>
+      <summary>Show network traffic in bits
+      </summary>
+    </key>
+
+    <key name="network-total-unit" type="b">
+      <default>false
+      </default>
+      <summary>Set network totals unit separately
+      </summary>
+    </key>
+
+    <key name="network-total-in-bits" type="b">
+      <default>false
+      </default>
+      <summary>Show network totals in bits
+      </summary>
+    </key>
+
+    <key name="logarithmic-scale" type="b">
+      <default>false
+      </default>
+      <summary>Show memory in logarithmic scale
+      </summary>
+      <description>If TRUE, system-monitor shows the CPU chart as a stacked area chart instead of a line chart.
+      </description>
+    </key>
+
+    <key name="cpu-stacked-area-chart" type="b">
+      <default>false
+      </default>
+      <summary>Show CPU chart as stacked area chart
+      </summary>
+      <description>If TRUE, system-monitor shows the CPU chart as a stacked area chart instead of a line chart.
+      </description>
+    </key>
+
+    <key name="cpu-smooth-graph" type="b">
+      <default>true
+      </default>
+      <summary>Show CPU, Memory, and Network charts as smooth graphs using Bezier curves
+      </summary>
+      <description>If TRUE, system-monitor shows the CPU, Memory, and Network charts as smoothed graphs, otherwise as line charts.
+      </description>
+    </key>
+
+    <key name="resources-memory-in-iec" type="b">
+      <default>false
+      </default>
+      <summary>Show memory and swap in IEC
+      </summary>
+    </key>
+
+    <child name="proctree" schema="org.gnome.gnome-system-monitor.proctree" />
+    <child name="disktreenew" schema="org.gnome.gnome-system-monitor.disktreenew" />
+    <child name="memmapstree" schema="org.gnome.gnome-system-monitor.memmapstree" />
+    <child name="openfilestree" schema="org.gnome.gnome-system-monitor.openfilestree" />
+  </schema>
+
+  <schema id="org.gnome.gnome-system-monitor.proctree" path="/org/gnome/gnome-system-monitor/proctree/">
+    <key name="sort-col" type="i">
+      <default>0
+      </default>
+      <summary>Process view sort column
+      </summary>
+    </key>
+
+    <key name="columns-order" type="ai">
+      <default>[ 0 ]
+      </default>
+      <summary>Process view columns order
+      </summary>
+    </key>
+
+    <key name="sort-order" type="i">
+      <default>0
+      </default>
+      <summary>Process view sort order
+      </summary>
+    </key>
+
+    <key name="col-0-width" type="i">
+      <default>225
+      </default>
+      <summary>Width of process “Name” column
+      </summary>
+    </key>
+
+    <key name="col-0-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Name” column on startup
+      </summary>
+    </key>
+
+    <key name="col-1-width" type="i">
+      <default>98
+      </default>
+      <summary>Width of process “User” column
+      </summary>
+    </key>
+
+    <key name="col-1-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “User” column on startup
+      </summary>
+    </key>
+
+    <key name="col-2-width" type="i">
+      <default>37
+      </default>
+      <summary>Width of process “Status” column
+      </summary>
+    </key>
+
+    <key name="col-2-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Status” column on startup
+      </summary>
+    </key>
+
+    <key name="col-3-width" type="i">
+      <default>90
+      </default>
+      <summary>Width of process “Virtual Memory” column
+      </summary>
+    </key>
+
+    <key name="col-3-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Virtual Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-4-width" type="i">
+      <default>90
+      </default>
+      <summary>Width of process “Resident Memory” column
+      </summary>
+    </key>
+
+    <key name="col-4-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Resident Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-5-width" type="i">
+      <default>90
+      </default>
+      <summary>Width of process “Writable Memory” column
+      </summary>
+    </key>
+
+    <key name="col-5-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Writable Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-6-width" type="i">
+      <default>90
+      </default>
+      <summary>Width of process “Shared Memory” column
+      </summary>
+    </key>
+
+    <key name="col-6-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Shared Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-7-width" type="i">
+      <default>90
+      </default>
+      <summary>Width of process “X Server Memory” column
+      </summary>
+    </key>
+
+    <key name="col-7-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “X Server Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-8-width" type="i">
+      <default>71
+      </default>
+      <summary>Width of process “CPU %” column
+      </summary>
+    </key>
+
+    <key name="col-8-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “CPU %” column on startup
+      </summary>
+    </key>
+
+    <key name="col-9-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of process “CPU Time” column
+      </summary>
+    </key>
+
+    <key name="col-9-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “CPU Time” column on startup
+      </summary>
+    </key>
+
+    <key name="col-10-width" type="i">
+      <default>70
+      </default>
+      <summary>Width of process “Started” column
+      </summary>
+    </key>
+
+    <key name="col-10-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Started” column on startup
+      </summary>
+    </key>
+
+    <key name="col-11-width" type="i">
+      <default>48
+      </default>
+      <summary>Width of process “Nice” column
+      </summary>
+    </key>
+
+    <key name="col-11-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Nice” column on startup
+      </summary>
+    </key>
+
+    <key name="col-12-width" type="i">
+      <default>60
+      </default>
+      <summary>Width of process “ID” column
+      </summary>
+    </key>
+
+    <key name="col-12-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “ID” column on startup
+      </summary>
+    </key>
+
+    <key name="col-13-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of process “SELinux Security Context” column
+      </summary>
+    </key>
+    <key name="col-13-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “SELinux Security Context” column on startup
+      </summary>
+    </key>
+
+    <key name="col-14-width" type="i">
+      <default>120
+      </default>
+      <summary>Width of process “Command Line” column
+      </summary>
+    </key>
+
+    <key name="col-14-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Command Line” column on startup
+      </summary>
+    </key>
+
+    <key name="col-15-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of process “Memory” column
+      </summary>
+    </key>
+
+    <key name="col-15-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Memory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-16-width" type="i">
+      <default>48
+      </default>
+      <summary>Width of process “Waiting Channel” column
+      </summary>
+    </key>
+
+    <key name="col-16-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Waiting Channel” column on startup
+      </summary>
+    </key>
+
+    <key name="col-17-width" type="i">
+      <default>48
+      </default>
+      <summary>Width of process “Control Group” column
+      </summary>
+    </key>
+
+    <key name="col-17-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Control Group” column on startup
+      </summary>
+    </key>
+
+    <key name="col-18-width" type="i">
+      <default>70
+      </default>
+      <summary>Width of process “Unit” column
+      </summary>
+    </key>
+
+    <key name="col-18-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Unit” column on startup
+      </summary>
+    </key>
+
+    <key name="col-19-width" type="i">
+      <default>41
+      </default>
+      <summary>Width of process “Session” column
+      </summary>
+    </key>
+
+    <key name="col-19-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Session” column on startup
+      </summary>
+    </key>
+
+    <key name="col-20-width" type="i">
+      <default>59
+      </default>
+      <summary>Width of process “Seat” column
+      </summary>
+    </key>
+
+    <key name="col-20-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Seat” column on startup
+      </summary>
+    </key>
+
+    <key name="col-21-width" type="i">
+      <default>59
+      </default>
+      <summary>Width of process “Owner” column
+      </summary>
+    </key>
+
+    <key name="col-21-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show process “Owner” column on startup
+      </summary>
+    </key>
+
+    <key name="col-22-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of process “Total disk read” column
+      </summary>
+    </key>
+
+    <key name="col-22-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Total disk read” column on startup
+      </summary>
+    </key>
+
+    <key name="col-23-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of process “Total disk write” column
+      </summary>
+    </key>
+
+    <key name="col-23-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Total disk write” column on startup
+      </summary>
+    </key>
+
+    <key name="col-24-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of process “Disk read” column
+      </summary>
+    </key>
+
+    <key name="col-24-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Disk read” column on startup
+      </summary>
+    </key>
+
+    <key name="col-25-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of process “Disk write” column
+      </summary>
+    </key>
+
+    <key name="col-25-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Disk write” column on startup
+      </summary>
+    </key>
+
+    <key name="col-26-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of process “Priority” column
+      </summary>
+    </key>
+
+    <key name="col-26-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show process “Priority” column on startup
+      </summary>
+    </key>
+
+
+  </schema>
+
+  <schema id="org.gnome.gnome-system-monitor.disktreenew" path="/org/gnome/gnome-system-monitor/disktreenew/">
+    <key name="sort-col" type="i">
+      <default>1
+      </default>
+      <summary>Disk view sort column
+      </summary>
+    </key>
+
+    <key name="sort-order" type="i">
+      <default>0
+      </default>
+      <summary>Disk view sort order
+      </summary>
+    </key>
+
+    <key name="columns-order" type="ai">
+      <default>[ 0 ]
+      </default>
+      <summary>Disk view columns order
+      </summary>
+    </key>
+
+    <key name="col-0-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of disk view “Device” column
+      </summary>
+    </key>
+
+    <key name="col-0-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Device” column on startup
+      </summary>
+    </key>
+
+    <key name="col-1-width" type="i">
+      <default>100
+      </default>
+      <summary>Width of disk view “Directory” column
+      </summary>
+    </key>
+
+    <key name="col-1-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Directory” column on startup
+      </summary>
+    </key>
+
+    <key name="col-2-width" type="i">
+      <default>50
+      </default>
+      <summary>Width of disk view “Type” column
+      </summary>
+    </key>
+
+    <key name="col-2-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Type” column on startup
+      </summary>
+    </key>
+
+    <key name="col-3-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of disk view “Total” column
+      </summary>
+    </key>
+
+    <key name="col-3-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Total” column on startup
+      </summary>
+    </key>
+
+    <key name="col-4-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of disk view “Free” column
+      </summary>
+    </key>
+
+    <key name="col-4-visible" type="b">
+      <default>false
+      </default>
+      <summary>Show disk view “Free” column on startup
+      </summary>
+    </key>
+
+    <key name="col-5-width" type="i">
+      <default>80
+      </default>
+      <summary>Width of disk view “Available” column
+      </summary>
+    </key>
+
+    <key name="col-5-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Available” column on startup
+      </summary>
+    </key>
+
+    <key name="col-6-width" type="i">
+      <default>300
+      </default>
+      <summary>Width of disk view “Used” column
+      </summary>
+    </key>
+
+    <key name="col-6-visible" type="b">
+      <default>true
+      </default>
+      <summary>Show disk view “Used” column on startup
+      </summary>
+    </key>
+
+  </schema>
+
+  <schema id="org.gnome.gnome-system-monitor.memmapstree" path="/org/gnome/gnome-system-monitor/memmapstree/">
+    <key name="sort-col" type="i">
+      <default>0
+      </default>
+      <summary>Memory map sort column
+      </summary>
+    </key>
+
+    <key name="sort-order" type="i">
+      <default>0
+      </default>
+      <summary>Memory map sort order
+      </summary>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.gnome-system-monitor.openfilestree" path="/org/gnome/gnome-system-monitor/openfilestree/">
+    <key name="sort-col" type="i">
+      <default>0
+      </default>
+      <summary>Open files sort column
+      </summary>
+    </key>
+
+    <key name="sort-order" type="i">
+      <default>0
+      </default>
+      <summary>Open files sort order
+      </summary>
+    </key>
+  </schema>
+</schemalist>
+

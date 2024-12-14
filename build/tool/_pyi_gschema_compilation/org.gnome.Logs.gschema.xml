@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-logs">
+  <schema id="org.gnome.Logs" path="/org/gnome/logs/">
+    <key name="ignore-warning" type="b">
+      <summary>Ignore warning</summary>
+      <description>Whether to ignore the warning that says you don’t have sufficient permission to view logs. If ignored, the warning won’t show up again.</description>
+      <default>false</default>
+    </key>
+    <key name="sort-order" enum="org.gnome.Logs.GlSortOrder">
+      <summary>How to sort list rows in the event view list</summary>
+      <description>Sort list rows in ascending or descending order for the selected type</description>
+      <default>'descending-time'</default>
+    </key>
+  </schema>
+</schemalist>

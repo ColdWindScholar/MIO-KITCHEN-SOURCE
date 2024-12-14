@@ -1,0 +1,90 @@
+<schemalist>
+  <schema gettext-domain="evolution-data-server" id="org.gnome.evolution-data-server" path="/org/gnome/evolution-data-server/">
+    <key name="migrated" type="b">
+      <default>false</default>
+      <summary>Whether the migration of old setting was already done</summary>
+    </key>
+    <key name="camel-gpg-binary" type="s">
+      <default>''</default>
+      <summary>An absolute path where the gpg (or gpg2) binary is</summary>
+      <description>An example is “/usr/bin/gpg”; when it is left empty, or an incorrect value is set, then it will be searched for. Change requires restart of the application.</description>
+    </key>
+    <key name="camel-cipher-load-photos" type="b">
+      <default>true</default>
+      <summary>Whether to load photos of signers/encrypters</summary>
+      <description>When set to “true”, tries to load also photo of the signers/encrypters, if available in the key/certificate.</description>
+    </key>
+    <key name="camel-smtp-helo-argument" type="s">
+      <default>''</default>
+      <summary>Override SMTP HELO/EHLO argument</summary>
+      <description>When not empty, it's used as the SMTP HELO/EHLO argument, instead of the local host name/IP.</description>
+    </key>
+    <key name="camel-message-info-user-headers" type="as">
+      <default>[]</default>
+      <summary>Array of user header names</summary>
+      <description>These headers can be stored in the folder summary, possibly being visible in the GUI. The value can contain a pipe character ('|'), which delimits the display name from the header name. Example: 'Spam Score|X-Spam-Score'</description>
+    </key>
+    <key name="network-monitor-gio-name" type="s">
+      <default>''</default>
+      <summary>GIO name of the GNetworkMonitor to use for an ENetworkMonitor instance</summary>
+      <description>When set to an unknown value, then the default GNetworkMonitor is used in the background. A special value “always-online” is used for no network monitoring.</description>
+    </key>
+    <key name="autoconfig-directory" type="s">
+      <default>''</default>
+      <summary>A full path to a directory where .source files with preconfigured options can be stored</summary>
+      <description>This directory, if filled with an existing path, is checked additionally to XDG configure directories.</description>
+    </key>
+    <key name="autoconfig-variables" type="as">
+      <default>['']</default>
+      <summary>A list of variables which can be part of the autoconfig .source files</summary>
+      <description>Each item of the array is expected to be of the form: name=value. These variables are checked before environment variables, but after the predefined USER, REALNAME and HOST variables.</description>
+    </key>
+    <key name="oauth2-services-hint" type="as">
+      <default>['']</default>
+      <summary>A list of hints for OAuth2 services</summary>
+      <description>Users can extend the list of supported protocols and hostnames for defined OAuth2 services, in addition to those hard-coded.
+      Each line can be of the form:
+         servicename[-protocol]:hostname1,hostname2,...
+      where “servicename” is the actual service name;
+      the “-protocol” is optional, and if written, then the service can be used only if both “protocol” and “hostnameX” match;
+      the “hostnameX” is the actual host name to compare with, case insensitively.
+      Each line can contain multiple values, separated by comma. There can be provided multiple lines
+      for one OAuth2 service. Note that the actual URL where the token is requested and refreshed cannot
+      be changed here, the hostname is to allow other servers, where the OAuth2 service can be used.
+
+      Examples:
+         Company:mail.company.com — enables “Company” OAuth2 authentication for “mail.company.com” host
+	 Company-CalDAV:caldav.company.com — enables “Company” OAuth2 authentication for any “CalDAV” source, which reads data from “caldav.company.com” host</description>
+    </key>
+    <key name="oauth2-google-client-id" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client ID to use to connect to Google servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client ID for Google servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+    <key name="oauth2-google-client-secret" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client secret to use to connect to Google servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client secret for Google servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+    <key name="oauth2-outlook-client-id" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client ID to use to connect to Outlook servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client ID for Outlook servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+    <key name="oauth2-outlook-client-secret" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client secret to use to connect to Outlook servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client secret for Outlook servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+    <key name="oauth2-yahoo-client-id" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client ID to use to connect to Yahoo! servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client ID for Yahoo! servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+    <key name="oauth2-yahoo-client-secret" type="s">
+      <default>''</default>
+      <summary>An OAuth2 client secret to use to connect to Yahoo! servers, instead of the one provided during build time</summary>
+      <description>User-specified OAuth2 client secret for Yahoo! servers. Empty string means to use the one provided during build time. Change of this requires restart.</description>
+    </key>
+  </schema>
+</schemalist>

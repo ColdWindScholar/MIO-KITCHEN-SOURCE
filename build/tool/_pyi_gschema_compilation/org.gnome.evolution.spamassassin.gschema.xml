@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/spamassassin/" id="org.gnome.evolution.spamassassin" gettext-domain="evolution">
+    <key type="b" name="local-only">
+      <default>true</default>
+      <summary>Use only local spam tests.</summary>
+      <description>Use only the local spam tests (no DNS).</description>
+    </key>
+
+    <key type="s" name="command">
+      <default>''</default>
+      <summary>Full path command to run spamassassin</summary>
+      <description>Full path to a spamassassin command. If not set, then a compile-time path is used, usually /usr/bin/spamassassin. The command should not contain any other arguments.</description>
+    </key>
+
+    <key type="s" name="learn-command">
+      <default>''</default>
+      <summary>Full path command to run sa-learn</summary>
+      <description>Full path to a sa-learn command. If not set, then a compile-time path is used, usually /usr/bin/sa-learn. The command should not contain any other arguments.</description>
+    </key>
+  </schema>
+</schemalist>

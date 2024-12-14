@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.Contacts" path="/org/gnome/Contacts/" gettext-domain="gnome-contacts">
+    <key name="did-initial-setup" type="b">
+      <default>false</default>
+      <summary>First-time setup done.</summary>
+      <description>Set to true after the user has run the first-time setup wizard.</description>
+    </key>
+    <key name="sort-on-surname" type="b">
+      <default>false</default>
+      <summary>Sort contacts on surname.</summary>
+      <description>
+        If this is set to true, the list of contacts will be sorted on their surnames.
+        Otherwise, it will be sorted on the first names of the contacts.
+      </description>
+    </key>
+    <key name="window-height" type="i">
+      <default>600</default>
+      <summary>The default height of the contacts window.</summary>
+      <description>
+        If the window size has not been changed by the user yet this will be used as the initial value for the height of the window.
+      </description>
+    </key>
+    <key name="window-width" type="i">
+      <default>800</default>
+      <summary>The default width of the contacts window.</summary>
+      <description>
+        If the window size has not been changed by the user yet this will be used as the initial value for the width of the window.
+      </description>
+    </key>
+    <key name="window-maximized" type="b">
+      <summary>Is the window maximized?</summary>
+      <description>Stores if the window is currently maximized.</description>
+      <default>false</default>
+    </key>
+    <key name="window-fullscreen" type="b">
+      <summary>Is the window fullscreen</summary>
+      <description>Stores if the window is currently maximized.</description>
+      <default>false</default>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.power" path="/org/gnome/settings-daemon/plugins/power/">
+    <key name="idle-brightness" type="i">
+      <default>30</default>
+      <summary>The brightness of the screen when idle</summary>
+      <description>This is the laptop panel screen brightness used when the session is idle.</description>
+    </key>
+    <key name="idle-dim" type="b">
+      <default>true</default>
+      <summary>Dim the screen after a period of inactivity</summary>
+      <description>If the screen should be dimmed to save power when the computer is idle.</description>
+    </key>
+    <key name="sleep-inactive-ac-timeout" type="i">
+      <default>1200</default>
+      <summary>Sleep timeout computer when on AC</summary>
+      <description>The amount of time in seconds the computer on AC power needs to be inactive before it goes to sleep. A value of 0 means never.</description>
+    </key>
+    <key name="sleep-inactive-ac-type" enum="org.gnome.settings-daemon.GsdPowerActionType">
+      <default>'suspend'</default>
+      <summary>Whether to hibernate, suspend or do nothing when inactive</summary>
+      <description>The type of sleeping that should be performed when the computer is inactive.</description>
+    </key>
+    <key name="sleep-inactive-battery-timeout" type="i">
+      <default>1200</default>
+      <summary>Sleep timeout computer when on battery</summary>
+      <description>The amount of time in seconds the computer on battery power needs to be inactive before it goes to sleep. A value of 0 means never.</description>
+    </key>
+    <key name="sleep-inactive-battery-type" enum="org.gnome.settings-daemon.GsdPowerActionType">
+      <default>'suspend'</default>
+      <summary>Whether to hibernate, suspend or do nothing when inactive</summary>
+      <description>The type of sleeping that should be performed when the computer is inactive.</description>
+    </key>
+    <!-- See http://bugzilla.gnome.org/637473 for rationale -->
+    <key name="lid-close-battery-action" enum="org.gnome.settings-daemon.GsdPowerActionType">
+      <default>'suspend'</default>
+      <summary>Laptop lid close action on battery</summary>
+      <description>The action to take when the laptop lid is closed and the laptop is on battery power.</description>
+    </key>
+    <key name="lid-close-ac-action" enum="org.gnome.settings-daemon.GsdPowerActionType">
+      <default>'suspend'</default>
+      <summary>Laptop lid close action when on AC</summary>
+      <description>The action to take when the laptop lid is closed and the laptop is on AC power.</description>
+    </key>
+    <key name="lid-close-suspend-with-external-monitor" type="b">
+      <default>false</default>
+      <summary>Laptop lid, when closed, will suspend even if there is an external monitor plugged in</summary>
+      <description>With no external monitors plugged in, closing a laptop's lid
+	will suspend the machine (as set by the lid-close-battery-action and
+	lid-close-ac-action keys).  By default, however, closing the lid when
+	an external monitor is present will not suspend the machine, so that one can keep
+	working on that monitor (e.g. for docking stations or media viewers).  Set this
+	key to False to keep the default behavior, or to True to suspend the laptop whenever the
+	lid is closed and regardless of external monitors.</description>
+    </key>
+    <key name="ambient-enabled" type="b">
+      <default>true</default>
+      <summary>Enable the ALS sensor</summary>
+      <description>If the ambient light sensor functionality is enabled.</description>
+    </key>
+    <key name="power-button-action" enum="org.gnome.settings-daemon.GsdPowerButtonActionType">
+      <default>'suspend'</default>
+      <summary>Power button action</summary>
+      <description>The action to take when the system power button is pressed. This action is hard-coded (and the setting ignored) on virtual machines (power off) and tablets (suspend).</description>
+    </key>
+    <key name="power-saver-profile-on-low-battery" type="b">
+      <default>true</default>
+      <summary>Enable power-saver profile when battery is low</summary>
+      <description>Automatically enable the "power-saver" profile using power-profiles-daemon if the battery is low.</description>
+    </key>
+  </schema>
+</schemalist>

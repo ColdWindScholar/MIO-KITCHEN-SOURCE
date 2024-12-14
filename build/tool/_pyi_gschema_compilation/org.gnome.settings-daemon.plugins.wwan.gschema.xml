@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.wwan" path="/org/gnome/settings-daemon/plugins/wwan/">
+    <key name="unlock-sim" type="b">
+      <default>false</default>
+      <summary>Unlock sim cards</summary>
+      <description>Unlock any sim cards right away.</description>
+    </key>
+  </schema>
+</schemalist>

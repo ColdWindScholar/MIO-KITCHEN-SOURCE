@@ -1,0 +1,101 @@
+<schemalist>
+  <enum id="org.gnome.SimpleScan.PageSide">
+    <value value="0" nick="front"/>
+    <value value="1" nick="back"/>
+    <value value="2" nick="both"/>
+  </enum>
+
+  <schema id="org.gnome.SimpleScan" path="/org/gnome/simple-scan/" gettext-domain="simple-scan">
+    <key name="selected-device" type="s">
+      <default>''</default>
+      <summary>Device to scan from</summary>
+      <description>SANE device to acquire images from.</description>
+    </key>
+    <key name="document-type" type="s">
+      <default>'photo'</default>
+      <choices>
+        <choice value="text"/>
+        <choice value="photo"/>
+      </choices>
+      <summary>Type of document being scanned</summary>
+      <description>Type of document being scanned. This setting decides on the scan resolution, colors and post-processing.</description>
+    </key>
+    <key name="paper-width" type="i">
+      <default>0</default>
+      <summary>Width of paper in tenths of a mm</summary>
+      <description>The width of the paper in tenths of a mm (or 0 for automatic paper detection).</description>
+    </key>
+    <key name="paper-height" type="i">
+      <default>0</default>
+      <summary>Height of paper in tenths of a mm</summary>
+      <description>The height of the paper in tenths of a mm (or 0 for automatic paper detection).</description>
+    </key>
+    <key name="brightness" type="i">
+      <default>0</default>
+      <summary>Brightness of scan</summary>
+      <description>The brightness adjustment from -100 to 100 (0 being none).</description>
+    </key>
+    <key name="contrast" type="i">
+        <default>0</default>
+        <summary>Contrast of scan</summary>
+        <description>The contrast adjustment from -100 to 100 (0 being none).</description>
+    </key>
+    <key name="text-dpi" type="i">
+      <default>150</default>
+      <summary>Resolution for text scans</summary>
+      <description>The resolution in dots-per-inch to use when scanning text.</description>
+    </key>
+    <key name="photo-dpi" type="i">
+      <default>300</default>
+      <summary>Resolution for image scans</summary>
+      <description>The resolution in dots-per-inch to use when scanning images.</description>
+    </key>
+    <key name="page-side" enum="org.gnome.SimpleScan.PageSide">
+      <default>'both'</default>
+      <summary>Page side to scan</summary>
+      <description>The page side to scan.</description>
+    </key>
+    <key name="save-directory" type="s">
+      <default>''</default>
+      <summary>Directory to save files to</summary>
+      <description>The directory to save files to.  Defaults to the documents directory if unset.</description>
+    </key>
+    <key name="save-format" type="s">
+      <default>'application/pdf'</default>
+      <summary>File format that is used for saving image files</summary>
+      <description>MIME type that is used for saving image files. Examples of supported MIME types: image/jpeg, image/png, application/pdf</description>
+    </key>
+    <key name="jpeg-quality" type="i">
+      <range min="0" max="100"/>
+      <default>75</default>
+      <summary>Quality value to use for JPEG compression</summary>
+      <description>Quality value to use for JPEG compression.</description>
+    </key>
+    <key name="page-delay" type="i">
+      <range min="0" max="15000" />
+      <default>1000</default>
+      <summary>Delay in millisecond between pages</summary>
+      <description>Delay in millisecond between pages.</description>
+    </key>
+    <key name="postproc-enabled" type="b">
+      <default>false</default>
+      <summary>Whether or not postprocessing is enabled</summary>
+      <description>Whether or not postprocessing is enabled.</description>
+    </key>
+    <key name="postproc-script" type="s">
+      <default>''</default>
+      <summary>The path to the postprocessing script</summary>
+      <description>The path to the postprocessing script.</description>
+    </key>
+    <key name="postproc-arguments" type="s">
+      <default>''</default>
+      <summary>Additional arguments for the postprocessing script</summary>
+      <description>Additional arguments for the postprocessing script.</description>
+    </key>
+    <key name="postproc-keep-original" type="b">
+      <default>false</default>
+      <summary>Whether or not to keep the original, unprocessed file</summary>
+      <description>Whether or not to keep the original, unprocessed file. The "_orig" filename will be added to the filename immediately before the file extension. </description>
+    </key>
+  </schema>
+</schemalist>

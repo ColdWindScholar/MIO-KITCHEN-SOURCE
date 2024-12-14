@@ -1,0 +1,94 @@
+<schemalist>
+  <schema id='org.gnome.desktop.remote-desktop' path='/org/gnome/desktop/remote-desktop/'>
+  </schema>
+  <schema id='org.gnome.desktop.remote-desktop.rdp' path='/org/gnome/desktop/remote-desktop/rdp/'>
+    <key name='enable' type='b'>
+      <default>false</default>
+      <summary>Whether the RDP backend is enabled or not</summary>
+      <description>
+        If set to to 'true' the RDP backend will be initialized.
+      </description>
+    </key>
+    <key name='screen-share-mode' enum='org.gnome.desktop.remote-desktop.GrdRdpScreenShareMode'>
+      <default>'mirror-primary'</default>
+      <summary>Screenshare mode of RDP connections</summary>
+      <description>
+        The screenshare mode specifies, whether the RDP backend mirrors the
+        primary screen, or whether a virtual monitor is created.
+
+        For the initial resolution of the virtual monitor, the RDP backend uses
+        either the client core data ([MS-RDPBCGR] 2.2.1.3.2) or the client
+        monitor data ([MS-RDPBCGR] 2.2.1.3.6), depending on what is available.
+
+        When using a remote desktop session with a virtual monitor, clients can
+        resize the resolution of the virtual monitor during a session with the
+        Display Control Channel Extension ([MS-RDPEDISP]).
+
+        Allowed screenshare modes include:
+
+         * mirror-primary - Record the primary monitor of the current user
+                            session.
+
+         * extend - Create a new virtual monitor and use it for the remote
+                    desktop session.
+                    The resolution of this virtual monitor is derived from the
+                    monitor configuration, submitted by the remote desktop
+                    client.
+      </description>
+    </key>
+    <key name='tls-cert' type='s'>
+      <default>''</default>
+      <summary>Path to the certificate file</summary>
+      <description>
+        In order to be able to use RDP with TLS Security, both the private key
+        file and the certificate file need to be provided to the RDP server.
+      </description>
+    </key>
+    <key name='tls-key' type='s'>
+      <default>''</default>
+      <summary>Path to the private key file</summary>
+      <description>
+        In order to be able to use RDP with TLS Security, both the private key
+        file and the certificate file need to be provided to the RDP server.
+      </description>
+    </key>
+    <key name='view-only' type='b'>
+      <default>true</default>
+      <summary>Only allow remote connections to view the screen content</summary>
+      <description>
+        When view-only is true, remote RDP connections cannot manipulate input
+        devices (e.g. mouse and keyboard).
+      </description>
+    </key>
+  </schema>
+  <schema id='org.gnome.desktop.remote-desktop.vnc' path='/org/gnome/desktop/remote-desktop/vnc/'>
+    <key name='enable' type='b'>
+      <default>false</default>
+      <summary>Whether the VNC backend is enabled or not</summary>
+      <description>
+        If set to to 'true' the VNC backend will be initialized.
+      </description>
+    </key>
+    <key name='view-only' type='b'>
+      <default>true</default>
+      <summary>Only allow remote connections to view the screen content</summary>
+      <description>
+        When view-only is true, remote VNC connections cannot manipulate input
+        devices (e.g. mouse and keyboard).
+      </description>
+    </key>
+    <key name='auth-method' enum='org.gnome.desktop.remote-desktop.GrdVncAuthMethod'>
+      <default>'prompt'</default>
+      <summary>Method used to authenticate VNC connections</summary>
+      <description>
+        The VNC authentication method describes how a remote connection is
+        authenticated. It can currently be done in two different ways:
+
+         * prompt   - by prompting the user for each new connection, requiring a
+                      person with physical access to the workstation to
+                      explicitly approve the new connection.
+         * password - by requiring the remote client to provide a known password
+      </description>
+    </key>
+  </schema>
+</schemalist>

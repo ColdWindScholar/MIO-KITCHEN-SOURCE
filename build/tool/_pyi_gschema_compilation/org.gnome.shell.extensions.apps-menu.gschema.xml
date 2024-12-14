@@ -1,0 +1,12 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.apps-menu"
+          path="/org/gnome/shell/extensions/apps-menu/">
+    <key name="apps-menu-toggle-menu" type="as">
+      <default>["&lt;Alt&gt;F1"]</default>
+      <summary>Keybinding to open the applications menu</summary>
+      <description>
+        Keybinding to open the applications menu.
+      </description>
+    </key>
+  </schema>
+</schemalist>

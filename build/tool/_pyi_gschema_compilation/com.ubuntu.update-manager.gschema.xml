@@ -1,0 +1,59 @@
+<schemalist>
+  <schema id="com.ubuntu.update-manager" path="/apps/update-manager/">
+    <key name="show-details" type="b">
+      <default>false</default>
+      <summary>Show details of an update</summary>
+      <description>Stores the state of the expander that contains the list of changes and the description</description>
+    </key>
+    <key name="window-width" type="i">
+      <default>1</default>
+      <summary>The window width</summary>
+      <description>Stores the width of the update-manager dialog</description>
+    </key>
+    <key name="window-height" type="i">
+      <default>400</default>
+      <summary>The window height</summary>
+      <description>Stores the height of the update-manager dialog</description>
+    </key>
+    <key name="check-dist-upgrades" type="b">
+      <default>true</default>
+      <summary>*deprecated* Check for new distribution releases</summary>
+      <description>This key is deprecated in favor of the file /etc/update-manager/release-upgrades  Check automatically if a new version of the current  distribution is available and offer to upgrade (if possible).</description>
+    </key>
+    <key name="autoclose-install-window" type="b">
+      <default>true</default>
+      <summary>Auto close the install window after successful install</summary>
+      <description>If this key is set the install window will be automatically closed on successful installation.</description>
+    </key>
+    <key name="show-versions" type="b">
+      <default>false</default>
+      <summary>Show version in update list</summary>
+      <description>If this key is set the main update list window will show version information (from version to version).</description>
+    </key>
+    <key name="summary-before-name" type="b">
+      <default>true</default>
+      <summary>Show package summary before package name in update list</summary>
+      <description>If this key is set, the main update list window will show the package summary before the package name.</description>
+    </key>
+    <key name="first-run" type="b">
+      <default>true</default>
+      <summary>First run welcome message</summary>
+      <description>If this key is set a first run welcome message will be presented.</description>
+    </key>
+    <key name="check-new-release-ignore" type="s">
+      <default>''</default>
+      <summary>make check-new-release-gtk ignore a given new release</summary>
+      <description>This will permanently hide the new release prompt from  check-new-release-gtk. Note that the small button in the main update-manager UI will still be there.</description>
+    </key>
+    <key name="launch-time" type="x">
+      <default>0</default>
+      <summary>Time when update-manager got launched last</summary>
+      <description>The last time update-manager was run.</description>
+    </key>
+    <key name="launch-count" type="i">
+      <default>0</default>
+      <summary>Number of times update-manager has been launched</summary>
+      <description>Number of times update-manager has been launched.</description>
+    </key>
+  </schema>
+</schemalist>

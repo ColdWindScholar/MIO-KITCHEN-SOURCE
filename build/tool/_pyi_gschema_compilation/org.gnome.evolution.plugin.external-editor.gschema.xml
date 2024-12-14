@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/external-editor/" id="org.gnome.evolution.plugin.external-editor" gettext-domain="evolution">
+    <key type="s" name="command">
+      <default>'gedit'</default>
+      <summary>Default External Editor</summary>
+      <description>The default command that must be used as the editor.</description>
+    </key>
+    <key type="b" name="launch-on-key-press">
+      <default>false</default>
+      <summary>Automatically launch when a new mail is edited</summary>
+      <description>Automatically launch editor when key is pressed in the mail composer.</description>
+    </key>
+  </schema>
+</schemalist>

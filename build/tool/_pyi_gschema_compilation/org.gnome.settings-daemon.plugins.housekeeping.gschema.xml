@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.housekeeping" path="/org/gnome/settings-daemon/plugins/housekeeping/">
+    <key name="ignore-paths" type="as">
+      <default>[]</default>
+      <summary>Mount paths to ignore</summary>
+      <description>Specify a list of mount paths to ignore when they run low on space.</description>
+    </key>
+    <key name="free-percent-notify" type="d">
+      <default>0.05</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Free percentage notify threshold</summary>
+      <description>Percentage free space threshold for initial warning of low disk space. If the percentage free space drops below this, a warning will be shown.</description>
+    </key>
+    <key name="free-percent-notify-again" type="d">
+      <default>0.01</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Subsequent free space percentage notify threshold</summary>
+      <description>Specify the percentage that the free disk space should reduce by before issuing a subsequent warning.</description>
+    </key>
+    <key name="free-size-gb-no-notify" type="i">
+      <default>1</default>
+      <summary>Free space notify threshold</summary>
+      <description>Specify an amount in GB. If the amount of free space is more than this, no warning will be shown.</description>
+    </key>
+    <key name="min-notify-period" type="i">
+      <default>10</default>
+      <summary>Minimum notify period for repeated warnings</summary>
+      <description>Specify a time in minutes. Subsequent warnings for a volume will not appear more often than this period.</description>
+    </key>
+  </schema>
+</schemalist>

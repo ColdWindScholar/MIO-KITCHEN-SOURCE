@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-online-accounts">
+  <schema id="org.gnome.online-accounts" path="/org/gnome/online-accounts/">
+    <key name="whitelisted-providers" type="as">
+      <default>['all']</default>
+      <summary>List of providers that are allowed to be loaded</summary>
+      <description>
+        A list of strings representing the providers that are allowed to be loaded (default: 'all'). This is only evaluated on startup.
+      </description>
+    </key>
+  </schema>
+</schemalist>

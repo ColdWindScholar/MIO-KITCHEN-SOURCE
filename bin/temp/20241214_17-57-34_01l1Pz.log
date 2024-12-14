@@ -1,0 +1,122 @@
+DEBUG:2024-12-14 17:57:34,481:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-14 17:57:34,481:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'pHYs' 41 9
+DEBUG:2024-12-14 17:57:34,481:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'cHRM' 62 32
+DEBUG:2024-12-14 17:57:34,481:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 106 750871
+DEBUG:2024-12-14 17:57:34,651:tool.py:root:Welcome to the new Mio Kitchen
+This tool is free forever
+DEBUG:2024-12-14 17:57:34,651:tool.py:root:
+
+DEBUG:2024-12-14 17:57:34,688:tool.py:root:Startup took: 0.4253684590003104 seconds
+DEBUG:2024-12-14 17:57:34,688:tool.py:root:
+
+DEBUG:2024-12-14 17:57:38,316:tool.py:root:Selected items:teste
+DEBUG:2024-12-14 17:57:38,317:tool.py:root:
+
+DEBUG:2024-12-14 17:57:43,130:tool.py:root:Unpacking:system_ext.img[erofs]
+DEBUG:2024-12-14 17:57:43,130:tool.py:root:
+
+INFO:2024-12-14 17:57:43,130:tool.py:root:['extract.erofs', '-i', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/system_ext.img', '-o', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/', '-x']
+DEBUG:2024-12-14 17:57:43,673:tool.py:root:Success!
+DEBUG:2024-12-14 17:57:43,673:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,383:tool.py:root:FsPatcher: The original file has 2354 entries
+DEBUG:2024-12-14 17:58:21,385:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,387:tool.py:root:Add [system_ext['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,389:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,391:tool.py:root:Add [/lost+found['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,393:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,401:tool.py:root:Add [system_ext/app/AiAsstVision['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,403:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,405:tool.py:root:Add [system_ext/app/BasicDreams['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,407:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,409:tool.py:root:Add [system_ext/app/AiAsstVision/AiAsstVision.apk['0', '0', '0644']]
+DEBUG:2024-12-14 17:58:21,411:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,413:tool.py:root:Add [system_ext/app/BasicDreams/oat['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,415:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,417:tool.py:root:Add [system_ext/app/BasicDreams/BasicDreams.apk['0', '0', '0644']]
+DEBUG:2024-12-14 17:58:21,419:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,421:tool.py:root:Add [system_ext/app/BasicDreams/oat/arm64['0', '0', '0755']]
+DEBUG:2024-12-14 17:58:21,423:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,424:tool.py:root:Add [system_ext/app/BasicDreams/oat/arm64/BasicDreams.odex['0', '0', '0644']]
+DEBUG:2024-12-14 17:58:21,426:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,428:tool.py:root:Add [system_ext/app/BasicDreams/oat/arm64/BasicDreams.vdex['0', '0', '0644']]
+DEBUG:2024-12-14 17:58:21,430:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,433:tool.py:root:FsPatcher: Added 10 entries
+DEBUG:2024-12-14 17:58:21,435:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,482:tool.py:root:Starting to pack system_ext
+DEBUG:2024-12-14 17:58:21,484:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,498:tool.py:root:Multiple:1.0758
+DEBUG:2024-12-14 17:58:21,500:tool.py:root:
+
+DEBUG:2024-12-14 17:58:21,502:tool.py:root:system_ext:[881235299]
+DEBUG:2024-12-14 17:58:21,504:tool.py:root:
+
+INFO:2024-12-14 17:58:21,505:tool.py:root:['make_ext4fs', '-J', '-T', '1734209896', '', '-S', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/config/system_ext_file_contexts', '-l', '881235299', '-C', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/config/system_ext_fs_config', '-L', 'system_ext', '-a', 'system_ext', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/system_ext.img', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/system_ext']
+DEBUG:2024-12-14 17:58:21,557:tool.py:root:error: build_directory_structure: cannot lookup security context for /system_ext/app/AiAsstVision
+DEBUG:2024-12-14 17:58:21,559:tool.py:root:
+
+INFO:2024-12-14 17:58:21,560:tool.py:root:error: build_directory_structure: cannot lookup security context for /system_ext/app/AiAsstVision
+DEBUG:2024-12-14 17:58:21,561:tool.py:root:loaded 2362 fs_config entries
+DEBUG:2024-12-14 17:58:21,563:tool.py:root:
+
+INFO:2024-12-14 17:58:21,564:tool.py:root:loaded 2362 fs_config entries
+DEBUG:2024-12-14 17:58:21,565:tool.py:root:Creating filesystem with parameters:
+DEBUG:2024-12-14 17:58:21,567:tool.py:root:
+
+INFO:2024-12-14 17:58:21,568:tool.py:root:Creating filesystem with parameters:
+DEBUG:2024-12-14 17:58:21,570:tool.py:root:Size: 881233920
+DEBUG:2024-12-14 17:58:21,572:tool.py:root:
+
+INFO:2024-12-14 17:58:21,573:tool.py:root:Size: 881233920
+DEBUG:2024-12-14 17:58:21,574:tool.py:root:Block size: 4096
+DEBUG:2024-12-14 17:58:21,578:tool.py:root:
+
+INFO:2024-12-14 17:58:21,581:tool.py:root:Block size: 4096
+DEBUG:2024-12-14 17:58:21,585:tool.py:root:Blocks per group: 32768
+DEBUG:2024-12-14 17:58:21,592:tool.py:root:
+
+INFO:2024-12-14 17:58:21,600:tool.py:root:Blocks per group: 32768
+DEBUG:2024-12-14 17:58:21,602:tool.py:root:Inodes per group: 7696
+DEBUG:2024-12-14 17:58:21,615:tool.py:root:
+
+INFO:2024-12-14 17:58:21,624:tool.py:root:Inodes per group: 7696
+DEBUG:2024-12-14 17:58:21,627:tool.py:root:Inode size: 256
+DEBUG:2024-12-14 17:58:21,634:tool.py:root:
+
+INFO:2024-12-14 17:58:21,635:tool.py:root:Inode size: 256
+DEBUG:2024-12-14 17:58:21,642:tool.py:root:Journal blocks: 0
+DEBUG:2024-12-14 17:58:21,660:tool.py:root:
+
+INFO:2024-12-14 17:58:21,666:tool.py:root:Journal blocks: 0
+DEBUG:2024-12-14 17:58:21,672:tool.py:root:Label: system_ext
+DEBUG:2024-12-14 17:58:21,752:tool.py:root:
+
+INFO:2024-12-14 17:58:21,757:tool.py:root:Label: system_ext
+DEBUG:2024-12-14 17:58:21,818:tool.py:root:Blocks: 215145
+DEBUG:2024-12-14 17:58:22,053:tool.py:root:
+
+INFO:2024-12-14 17:58:22,073:tool.py:root:Blocks: 215145
+DEBUG:2024-12-14 17:58:22,085:tool.py:root:Block groups: 7
+DEBUG:2024-12-14 17:58:22,098:tool.py:root:
+
+INFO:2024-12-14 17:58:22,100:tool.py:root:Block groups: 7
+DEBUG:2024-12-14 17:58:22,102:tool.py:root:Reserved block group size: 55
+DEBUG:2024-12-14 17:58:22,104:tool.py:root:
+
+INFO:2024-12-14 17:58:22,105:tool.py:root:Reserved block group size: 55
+DEBUG:2024-12-14 17:58:22,110:tool.py:root:Packed successfully : system_ext!
+DEBUG:2024-12-14 17:58:22,112:tool.py:root:
+

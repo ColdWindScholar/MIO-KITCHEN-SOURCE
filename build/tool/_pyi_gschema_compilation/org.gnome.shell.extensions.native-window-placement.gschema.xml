@@ -1,0 +1,16 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema id="org.gnome.shell.extensions.native-window-placement" path="/org/gnome/shell/extensions/native-window-placement/">
+    <key name="use-more-screen" type="b">
+      <default>true</default>
+      <summary>Use more screen for windows</summary>
+      <description>Try to use more screen for placing window thumbnails by adapting to screen aspect ratio, and consolidating
+      them further to reduce the bounding box. This setting applies only with the natural placement strategy.</description>
+    </key>
+    <key name="window-captions-on-top" type="b">
+      <default>true</default>
+      <summary>Place window captions on top</summary>
+      <description>If true, place window captions on top the respective thumbnail, overriding shell default of placing it at
+      the bottom. Changing this setting requires restarting the shell to have any effect.</description>
+    </key>
+  </schema>
+</schemalist>

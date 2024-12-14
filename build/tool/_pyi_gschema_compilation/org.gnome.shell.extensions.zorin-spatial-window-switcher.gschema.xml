@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/shell/extensions/zorin-spatial-window-switcher/" id="org.gnome.shell.extensions.zorin-spatial-window-switcher">
+    <key type="b" name="hide-panel">
+        <default>false</default>
+        <summary>Hide the panel when showing window switcher</summary>
+        <description>Whether to show or hide the panel when the window switcher is active.</description>
+    </key>
+    <key type="b" name="enforce-primary-monitor">
+        <default>true</default>
+        <summary>Always show the switcher on the primary monitor</summary>
+        <description>Show the switcher on the primary monitor instead of detecting the active monitor.</description>
+    </key>
+    <key type="d" name="animation-time">
+        <range min="0.01" max="60"/>
+        <default>0.45</default>
+        <summary>The duration of animations in ms</summary>
+        <description>Define the duration of the animations.</description>
+    </key>
+    <key type="d" name="dim-factor">
+        <range min="0" max="1"/>
+        <default>0</default>
+        <summary>Dim factor for background</summary>
+        <description>Define dimming of the background. Smaller means darker. </description>
+    </key>
+    <key type="s" name="position">
+        <choices>
+            <choice value="Top"/>
+            <choice value="Bottom"/>
+        </choices>
+        <default>"Bottom"</default>
+        <summary>Position of icon and window title</summary>
+        <description>Whether the icon and window title should be placed below or above the window preview.</description>
+    </key>
+    <key type="i" name="offset">
+        <range min="-500" max="500"/>
+        <default>0</default>
+        <summary>Set a vertical offset</summary>
+        <description>Set a vertical offset. Positive values move the whole window switcher up, negative down.</description>
+    </key>
+    <key type="s" name="icon-style">
+        <choices>
+            <choice value="Classic"/>
+            <choice value="Overlay"/>
+        </choices>
+        <default>"Classic"</default>
+        <summary>Icon style</summary>
+        <description>Whether the application icon should be displayed next to the title label or as an overlay.</description>
+    </key>
+    <key type="d" name="overlay-icon-size">
+        <range min="0" max="1024"/>
+        <default>128</default>
+        <summary>The size of the overlay icon</summary>
+        <description>Define the size of the overlay icon.</description>
+    </key>
+    <key type="d" name="overlay-icon-opacity">
+        <range min="0" max="1"/>
+        <default>1</default>
+        <summary>The opacity of the overlay icon</summary>
+        <description>Define the opacity of the overlay icon.</description>
+    </key>
+    <key type="s" name="switcher-style">
+        <choices>
+            <choice value="Coverflow"/>
+            <choice value="Timeline"/>
+        </choices>
+        <default>"Coverflow"</default>
+        <summary>Switcher style</summary>
+        <description>The switcher display style.</description>
+    </key>
+    <key type="s" name="easing-function">
+        <choices>
+            <choice value="ease-linear"/>
+            <choice value="ease-in-quad"/>
+            <choice value="ease-out-quad"/>
+            <choice value="ease-in-out-quad"/>
+            <choice value="ease-in-cubic"/>
+            <choice value="ease-out-cubic"/>
+            <choice value="ease-in-out-cubic"/>
+            <choice value="ease-in-quart"/>
+            <choice value="ease-out-quart"/>
+            <choice value="ease-in-out-quart"/>
+            <choice value="ease-in-quint"/>
+            <choice value="ease-out-quint"/>
+            <choice value="ease-in-out-quint"/>
+            <choice value="ease-in-sine"/>
+            <choice value="ease-out-sine"/>
+            <choice value="ease-in-out-sine"/>
+            <choice value="ease-in-expo"/>
+            <choice value="ease-out-expo"/>
+            <choice value="ease-in-out-expo"/>
+            <choice value="ease-in-circ"/>
+            <choice value="ease-out-circ"/>
+            <choice value="ease-in-out-circ"/>
+            <choice value="ease-in-back"/>
+            <choice value="ease-out-back"/>
+            <choice value="ease-in-out-back"/>
+            <choice value="ease-in-elastic"/>
+            <choice value="ease-out-elastic"/>
+            <choice value="ease-in-out-elastic"/>
+            <choice value="ease-in-bounce"/>
+            <choice value="ease-out-bounce"/>
+            <choice value="ease-in-out-bounce"/>
+            <choice value="random"/>
+        </choices>
+        <default>"ease-out-quart"</default>
+        <summary>Easing function used in animations</summary>
+        <description>Use this easing function for animations.</description>
+    </key>
+    <key type="s" name="current-workspace-only">
+        <choices>
+            <choice value="current"/>
+            <choice value="all"/>
+            <choice value="all-currentfirst"/>
+        </choices>
+        <default>'all-currentfirst'</default>
+        <summary>Show windows from current workspace only</summary>
+        <description>Whether to show all windows or windows from current workspace only.</description>
+    </key>
+    <key type="b" name="switch-per-monitor">
+        <default>false</default>
+        <summary>Per monitor window switch</summary>
+        <description>Switch between windows on current monitor (monitor with the mouse cursor)</description>
+    </key>
+    <key type="b" name="icon-has-shadow">
+        <default>false</default>
+        <summary>Icon has shadow switch</summary>
+        <description>Whether or not the icon has a drop shadow.</description>
+    </key>
+    <key type="b" name="randomize-animation-times">
+        <default>false</default>
+        <summary>Randomize animation times switch</summary>
+        <description>Whether or not to have each animation take a different, randomized time to complete.</description>
+    </key>
+    <key type="d" name="preview-to-monitor-ratio">
+        <range min="0" max="1"/>
+        <default>0.5</default>
+        <summary>The maximum ratio of the preview dimensions with the monitor dimensions</summary>
+        <description>Define the ratio of the preview to monitor sizes.</description>
+    </key>
+    <key type="d" name="preview-scaling-factor">
+        <range min="0" max="1"/>
+        <default>0.8</default>
+        <summary>In the window switcher, scales the previews as they spread out to the sides in </summary>
+        <description>Define the scale factor successively applied each step away from the current preview.</description>
+    </key>
+    <key type="b" name="bind-to-switch-applications">
+        <default>true</default>
+        <summary>Bind to 'switch-applications' keybinding</summary>
+        <description>Whether or not to bind to the 'switch-applications' keybinding.</description>
+    </key>
+    <key type="b" name="bind-to-switch-windows">
+        <default>true</default>
+        <summary>Bind to 'switch-windows' keybinding</summary>
+        <description>Whether or not to bind to the 'switch-windows' keybinding.</description>
+    </key>
+    <key type="b" name="highlight-mouse-over">
+        <default>false</default>
+        <summary>Highlight window under mouse</summary>
+        <description>Whether or not to draw some flare on the window under the mouse so you know.</description>
+    </key>
+    <key type="b" name="raise-mouse-over">
+        <default>true</default>
+        <summary>Raise window under mouse</summary>
+        <description>Whether or not to raise the window under the mouse above others.</description>
+    </key>
+    <key type="s" name="perspective-correction-method">
+        <choices>
+            <choice value="None"/>
+            <choice value="Move Camera"/>
+            <choice value="Adjust Angles"/>
+        </choices>
+        <default>"None"</default>
+        <summary>Method to correct off-center monitor perspective</summary>
+        <description>Way to make off-center monitor switcher to look like centered.</description>
+    </key>
+    <key type="d" name="desaturate-factor">
+        <default>0.0</default>
+        <range min="0" max="1"/>
+        <summary>Amount to Desaturate the Background Application Switcher</summary>
+        <description>0 for no desaturation, 1 for total desaturation.</description>
+    </key>
+    <key type="i" name="blur-sigma">
+        <default>4</default>
+        <range min="0" max="20"/>
+        <summary>Sigma of Blur Applied to the Background Application Switcher</summary>
+        <description>The bigger, the blurrier.</description>
+    </key>
+    <key type="s" name="switcher-looping-method">
+        <choices>
+            <choice value="Flip Stack"/>
+            <choice value="Carousel"/>
+        </choices>
+        <default>"Carousel"</default>
+        <summary>How the windows cycle through the window switcher</summary>
+    </key>
+    <key type="b" name="switch-application-behaves-like-switch-windows">
+        <default>true</default>
+        <summary>The application-switcher keybinding action behaves the same as the window-switcher</summary>
+    </key>
+    <key type="b" name="use-tint">
+        <default>false</default>
+        <summary>Whether to Use a Tint Color on the Background Application Switcher</summary>
+    </key>
+    <key type="(dddd)" name="tint-color">
+        <default>(0.,0.,0.,0.)</default>
+        <summary></summary>
+    </key>
+    <key type="b" name="use-theme-color-for-tint-color">
+        <default>true</default>
+        <summary>Use gnome-shell theme switcher-list background color to tint the Application Switcher</summary>
+    </key>
+    <key type="b" name="use-glitch-effect">
+        <default>false</default>
+        <summary>Use a "glitch effect" on the background application switcher</summary>
+    </key>
+  </schema>
+</schemalist>

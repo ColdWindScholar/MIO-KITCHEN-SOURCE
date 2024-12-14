@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/com/ubuntu/update-notifier/" id="com.ubuntu.update-notifier">
+    <key type="b" name="show-apport-crashes">
+      <default>true</default>
+      <summary>Display apport crash reports automatically</summary>
+      <description>If this is disabled, the user will not be notified about pending apport crash reports.</description>
+    </key>
+    <key type="i" name="end-system-uids">
+      <default>500</default>
+      <summary>The maximum UID that is reserved for system users</summary>
+      <description>Update-notifier will not be started for system users, this specifies the upper bound of this range.</description>
+    </key>
+    <key type="i" name="regular-auto-launch-interval">
+      <default>7</default>
+      <summary>Interval (in days) when to auto launch for normal updates</summary>
+      <description>The interval (in days) when auto launching update-manager for normal updates. Please note that it will auto launch for security updates immediately. If you set it to "0" it will also launch as soon as updates become available.</description>
+    </key>
+    <key type="b" name="no-show-notifications">
+      <default>false</default>
+      <summary>Stop showing update notifications</summary>
+      <description>Do not display a notification when updates are available.</description>
+    </key>
+    <key type="u" name="release-check-time">
+      <default>0</default>
+      <summary>Time of last release check</summary>
+      <description>The last time update-notifier checked for a new release.  The format is seconds since UNIX epoch.</description>
+    </key>
+    <key type="b" name="show-livepatch-status-icon">
+      <default>true</default>
+      <summary>Show Livepatch status icon</summary>
+      <description>Enable or disable the Livepatch status icon in the systray.</description>
+    </key>
+    <key type="b" name="notify-ubuntu-advantage-available">
+      <default>false</default>
+      <summary>Notify user is able to attach to Ubuntu Advantage</summary>
+      <description>If the user should be notified that they are not connected to Ubuntu advantage. Set to False if the user has opted out of these notifications.</description>
+    </key>
+  </schema>
+</schemalist>

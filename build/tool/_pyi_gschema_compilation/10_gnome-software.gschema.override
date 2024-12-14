@@ -1,0 +1,5 @@
+[org.gnome.software]
+official-repos=['ubuntu-*', 'zorin*']
+free-repos=['ubuntu-*-main', 'ubuntu-*-universe', 'zorin-os-*']
+free-repos-url='https://www.ubuntu.com/about/about-ubuntu/licensing'
+review-server=''

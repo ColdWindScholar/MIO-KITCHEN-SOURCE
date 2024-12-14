@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="cheese">
+  <schema id='org.gnome.Cheese' path='/org/gnome/cheese/'>
+    <key type='b' name='countdown'>
+      <summary>Use a countdown</summary>
+      <description>Set to true to show a countdown before taking a photo</description>
+      <default>true</default>
+    </key>
+
+    <key type='i' name='countdown-duration'>
+      <summary>Countdown length</summary>
+      <description>The duration of the countdown before taking a photo, in seconds</description>
+      <default>3</default>
+      <range min='1' max='10'/>
+    </key>
+
+    <key type='b' name='flash'>
+      <summary>Fire flash before taking a photo</summary>
+      <description>Set to true to fire a flash before taking a photo</description>
+      <default>true</default>
+    </key>
+
+    <key type='s' name='camera'>
+      <summary>Camera device string indicator</summary>
+      <description>The path to the device node which points to the camera, for example /dev/video0</description>
+      <default>''</default>
+    </key>
+
+    <key type='s' name='selected-effect'>
+      <summary>Last selected effect</summary>
+      <description>Name of the installed effect that was selected last</description>
+      <default>'identity'</default>
+    </key>
+
+    <key type='i' name='photo-x-resolution'>
+      <summary>Photo width</summary>
+      <description>The width of the image captured from the camera, in pixels</description>
+      <default>0</default>
+      <range min='0' max='65535'/>
+    </key>
+
+    <key type='i' name='photo-y-resolution'>
+      <summary>Photo height</summary>
+      <description>The height of the image captured from the camera, in pixels</description>
+      <default>0</default>
+      <range min='0' max='65535'/>
+    </key>
+
+    <key type='i' name='video-x-resolution'>
+      <summary>Video width</summary>
+      <description>The width of the video captured from the camera, in pixels</description>
+      <default>0</default>
+      <range min='0' max='65535'/>
+    </key>
+
+    <key type='i' name='video-y-resolution'>
+      <summary>Video height</summary>
+      <description>The height of the video captured from the camera, in pixels</description>
+      <default>0</default>
+      <range min='0' max='65535'/>
+    </key>
+
+    <key type='d' name='brightness'>
+      <summary>Image brightness</summary>
+      <description>Adjusts the brightness of the image coming from the camera</description>
+      <default>0</default>
+      <range min='-1' max='1'/>
+    </key>
+
+    <key type='d' name='contrast'>
+      <summary>Image contrast</summary>
+      <description>Adjusts the contrast of the image coming from the camera</description>
+      <default>1.0</default>
+      <range min='0' max='2'/>
+    </key>
+
+    <key type='d' name='saturation'>
+      <summary>Image saturation</summary>
+      <description>Adjusts the saturation of the image coming from the camera</description>
+      <default>1</default>
+      <range min='0' max='2'/>
+    </key>
+
+    <key type='d' name='hue'>
+      <summary>Image hue</summary>
+      <description>Adjusts the hue (color tint) of the image coming from the camera</description>
+      <default>0</default>
+      <range min='-1' max='1'/>
+    </key>
+
+    <key type='s' name='video-path'>
+      <summary>Video path</summary>
+      <description>Defines the path where the videos are stored. If empty, “XDG_VIDEOS_DIR/Webcam” will be used.</description>
+      <default>''</default>
+    </key>
+
+    <key type='s' name='photo-path'>
+      <summary>Photo path</summary>
+      <description>Defines the path where the photos are stored. If empty, “XDG_PICTURES_DIR/Webcam” will be used.</description>
+      <default>''</default>
+    </key>
+
+    <key type='i' name='burst-delay'>
+      <summary>Time between photos in burst mode</summary>
+      <description>The length of time, in milliseconds, to delay between taking each photo in a burst sequence of photos. If the burst delay is less than the countdown duration, the countdown duration will be used instead.</description>
+      <default>1000</default>
+      <range min='500' max='10000'/>
+    </key>
+
+    <key type='i' name='burst-repeat'>
+      <summary>Number of photos in burst mode</summary>
+      <description>The number of photos to take in a single burst.</description>
+      <default>4</default>
+      <range min='1' max='100000'/>
+    </key>
+  </schema>
+</schemalist>

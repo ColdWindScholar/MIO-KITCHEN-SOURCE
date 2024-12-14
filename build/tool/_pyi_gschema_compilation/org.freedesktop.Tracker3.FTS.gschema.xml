@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2011, Nokia <ivan.frade@nokia.com>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the
+Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA  02110-1301, USA.
+-->
+<schemalist>
+  <schema id="org.freedesktop.Tracker3.FTS" path="/org/freedesktop/tracker/fts/" gettext-domain="tracker-miners">
+
+    <key name="enable-stemmer" type="b">
+      <summary>Enable stemmer</summary>
+      <description>Simplify the words to their root to provide more results. E.g. “shelves” and “shelf” to “shel”</description>
+      <default>false</default>
+    </key>
+
+    <key name="enable-unaccent" type="b">
+      <summary>Enable unaccent</summary>
+      <description>Translate accented characters to the equivalent unaccented. E.g. “Idéa” to “Idea” for improved matching. </description>
+      <default>true</default>
+    </key>
+
+    <key name="ignore-numbers" type="b">
+      <summary>Ignore numbers</summary>
+      <description>If enabled, numbers will not be indexed.</description>
+      <default>true</default>
+    </key>
+
+    <key name="ignore-stop-words" type="b">
+      <summary>Ignore stop words</summary>
+      <description>If enabled, the words listed in the stop-words list are ignored. E.g. common words like “the”, “yes”, “no”, etc.</description>
+      <default>true</default>
+    </key>
+
+  </schema>
+</schemalist>

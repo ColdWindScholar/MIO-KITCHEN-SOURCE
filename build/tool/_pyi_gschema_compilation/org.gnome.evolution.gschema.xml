@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/" id="org.gnome.evolution" gettext-domain="evolution">
+    <key type="s" name="version">
+      <default>''</default>
+      <summary>Previous Evolution version</summary>
+      <description>The most recently used version of Evolution, expressed as “major.minor.micro”. This is used for data and settings migration from older to newer versions.</description>
+    </key>
+    <key type="as" name="disabled-eplugins">
+      <default>[]</default>
+      <summary>List of disabled plugins</summary>
+      <description>The list of disabled plugins in Evolution</description>
+    </key>
+  </schema>
+
+  
+  <schema id="org.gnome.evolution.window" gettext-domain="evolution">
+    <key type="i" name="x">
+      <default>0</default>
+      <summary>The window’s X coordinate</summary>
+    </key>
+    <key type="i" name="y">
+      <default>0</default>
+      <summary>The window’s Y coordinate</summary>
+    </key>
+    <key type="i" name="width">
+      <default>0</default>
+      <summary>The window’s width in pixels</summary>
+    </key>
+    <key type="i" name="height">
+      <default>0</default>
+      <summary>The window’s height in pixels</summary>
+    </key>
+    <key type="b" name="maximized">
+      <default>false</default>
+      <summary>Whether the window is maximized</summary>
+    </key>
+  </schema>
+</schemalist>

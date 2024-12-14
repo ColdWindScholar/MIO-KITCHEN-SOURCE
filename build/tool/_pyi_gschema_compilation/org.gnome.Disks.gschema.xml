@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.Disks" path="/org/gnome/Disks/" gettext-domain="gnome-disk-utility">
+    <key name="image-dir-uri" type="s">
+      <default>''</default>
+      <summary>Default location for the Create/Restore disk image dialogs</summary>
+      <description>Default location for the Create/Restore disk image dialogs. If blank the ~/Documents folder is used.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.Disks.benchmark" path="/org/gnome/Disks/benchmark/" gettext-domain="gnome-disk-utility">
+    <key name="num-samples" type="i">
+     <default>100</default>
+      <summary>The number of samples the benchmark will include for the read/write test.</summary>
+    </key>
+    <key name="sample-size-mib" type="i">
+     <default>10</default>
+      <summary>The number of MiB (1048576 bytes) to read/write for each sample.</summary>
+    </key>
+    <key name="do-write" type="b">
+      <default>true</default>
+      <summary>To enable or disable the write test.</summary>
+    </key>
+    <key name="num-access-samples" type="i">
+      <default>1000</default>
+      <summary>The number of samples the benchmark will do for the access time test.</summary>
+    </key>
+  </schema>
+</schemalist>

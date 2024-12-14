@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="com.ubuntu.SoftwareProperties" path="/com/ubuntu/SoftwareProperties/">
+        <key name="goa-account-id" type="s">
+            <default>""</default>
+            <summary>Livepatch account id</summary>
+            <description>gnome-online-account account id used for livepatch authentication.</description>
+        </key>
+        <key name="ubuntu-pro-banner-visible" type="b">
+            <default>false</default>
+            <summary>Ubuntu Pro banner visibility</summary>
+            <description>True if the Ubuntu Pro banner should be shown.</description>
+        </key>
+    </schema>
+</schemalist>

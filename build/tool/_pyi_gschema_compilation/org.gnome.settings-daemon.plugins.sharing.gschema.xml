@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.sharing.service">
+    <key name="enabled-connections" type="as">
+      <default>[]</default>
+      <summary>On which connections the service is enabled</summary>
+      <description>The list of NetworkManager connections (each one represented with its UUID) on which this service is enabled and started.</description>
+    </key>
+  </schema>
+</schemalist>

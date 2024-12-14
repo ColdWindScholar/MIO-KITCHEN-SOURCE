@@ -1,0 +1,34 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <enum id="org.gnome.shell.extensions.window-list.GroupingMode">
+    <value value="0" nick="never"/>
+    <value value="1" nick="auto"/>
+    <value value="2" nick="always"/>
+  </enum>
+  <schema id="org.gnome.shell.extensions.window-list"
+          path="/org/gnome/shell/extensions/window-list/">
+    <key name="grouping-mode"
+         enum="org.gnome.shell.extensions.window-list.GroupingMode">
+      <default>'never'</default>
+      <summary>When to group windows</summary>
+      <description>
+        Decides when to group windows from the same application on the
+        window list. Possible values are “never”, “auto” and “always”.
+      </description>
+    </key>
+    <key name="display-all-workspaces" type="b">
+      <default>false</default>
+      <summary>Show windows from all workspaces</summary>
+      <description>
+        Whether to show windows from all workspaces or only the current one.
+      </description>
+    </key>
+    <key name="show-on-all-monitors" type="b">
+      <default>false</default>
+      <summary>Show the window list on all monitors</summary>
+      <description>
+        Whether to show the window list on all connected monitors or
+        only on the primary one.
+      </description>
+    </key>
+  </schema>
+</schemalist>

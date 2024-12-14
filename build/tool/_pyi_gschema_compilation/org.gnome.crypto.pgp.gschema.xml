@@ -1,0 +1,34 @@
+<schemalist>
+	<schema id="org.gnome.crypto.pgp" path="/desktop/gnome/crypto/pgp/">
+		<key name="default-key" type="s">
+			<default>''</default>
+			<summary>Default PGP Key</summary>
+			<description>This specifies the ID of the default PGP key to use for certain operations, mainly signing.</description>
+		</key>
+		<key name="ascii-armor" type="b">
+			<default>true</default>
+			<summary>ASCII Armor</summary>
+			<description>When encrypting or signing PGP files whether to use ASCII armor encoding.</description>
+		</key>
+		<key name="sort-recipients-by" type="s">
+			<default>'name'</default>
+			<summary>The column to sort the recipients</summary>
+			<description>Specify the column to sort the recipients window by. Columns are: 'name' and 'id'. Put a '-' in front of the column name to sort in descending order.</description>
+		</key>
+		<key name="encrypt-to-self" type="b">
+			<default>true</default>
+			<summary>Whether to always encrypt to default key</summary>
+			<description>If set to true, then the default key will always be added to an encryption recipients list.</description>
+		</key>
+		<key name="last-signer" type="s">
+			<default>''</default>
+			<summary>Last key used to sign a message.</summary>
+			<description>The ID of the last secret key used to sign a message.</description>
+		</key>
+		<key name="keyservers" type="as">
+			<default>['ldap://keyserver.pgp.com', 'hkps://keys.openpgp.org']</default>
+			<summary>PGP key servers</summary>
+			<description>A list of key server URIs to search for remote PGP keys. A display name can be included, by appending a space and then the name.</description>
+		</key>
+	</schema>
+</schemalist>

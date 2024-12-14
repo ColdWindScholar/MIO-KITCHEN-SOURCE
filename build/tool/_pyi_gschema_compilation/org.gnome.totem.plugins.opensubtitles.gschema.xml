@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.totem.plugins.opensubtitles" path="/org/gnome/Totem/opensubtitles/" gettext-domain="totem">
+		<key name="language" type="s">
+			<default>''</default>
+			<summary>Subtitle language</summary>
+			<description>The language to search for subtitles for movies in.</description>
+		</key>
+	</schema>
+</schemalist>

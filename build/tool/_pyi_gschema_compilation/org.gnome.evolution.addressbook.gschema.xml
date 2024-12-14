@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/addressbook/" id="org.gnome.evolution.addressbook" gettext-domain="evolution">
+    <key type="b" name="address-formatting">
+      <default>false</default>
+      <summary>Enable address formatting</summary>
+      <description>Whether addresses should be formatted according to standard in their destination country</description>
+    </key>
+    <key type="i" name="completion-minimum-query-length">
+      <default>3</default>
+      <summary>Autocomplete length</summary>
+      <description>The number of characters that must be typed before Evolution will attempt to autocomplete.</description>
+    </key>
+    <key type="b" name="completion-show-address">
+      <default>false</default>
+      <summary>Show autocompleted name with an address</summary>
+      <description>Whether force showing the mail address with the name of the autocompleted contact in the entry.</description>
+    </key>
+    <key type="s" name="select-names-last-used-uri">
+      <default>''</default>
+      <summary>URI for the folder last used in the select names dialog</summary>
+      <description>URI for the folder last used in the select names dialog.</description>
+    </key>
+    <key type="i" name="layout">
+      <default>0</default>
+      <summary>Contact layout style</summary>
+      <description>The layout style determines where to place the preview pane in relation to the contact list. “0” (Classic View) places the preview pane below the contact list. “1” (Vertical View) places the preview pane next to the contact list.</description>
+    </key>
+    <key type="i" name="hpane-position">
+      <default>200</default>
+      <summary>Contact preview pane position (horizontal)</summary>
+      <description>Position of the contact preview pane when oriented horizontally.</description>
+    </key>
+    <key type="i" name="hpane-position-sub">
+      <default>200</default>
+      <summary>Contact preview pane position (horizontal)</summary>
+      <description>Position of the contact preview pane when oriented horizontally.</description>
+    </key>
+    <key type="i" name="vpane-position">
+      <default>400</default>
+      <summary>Contact preview pane position (vertical)</summary>
+      <description>Position of the contact preview pane when oriented vertically.</description>
+    </key>
+    <key type="i" name="vpane-position-sub">
+      <default>400</default>
+      <summary>Contact preview pane position (vertical)</summary>
+      <description>Position of the contact preview pane when oriented vertically.</description>
+    </key>
+    <key type="b" name="preview-show-maps">
+      <default>false</default>
+      <summary>Show maps</summary>
+      <description>Whether to show maps in preview pane</description>
+    </key>
+    <key type="s" name="primary-addressbook">
+      <default>''</default>
+      <summary>Primary address book</summary>
+      <description>The UID of the selected (or “primary”) address book in the sidebar of the “Contacts” view</description>
+    </key>
+    <key type="b" name="show-preview">
+      <default>true</default>
+      <summary>Show preview pane</summary>
+      <description>Whether to show the preview pane.</description>
+    </key>
+    <key type="b" name="editor-show-contact-phone">
+      <default>true</default>
+      <summary>Show phone numbers</summary>
+      <description>Whether to show phone numbers in the editor</description>
+    </key>
+    <key type="b" name="editor-show-contact-sip">
+      <default>true</default>
+      <summary>Show SIP addresses</summary>
+      <description>Whether to show SIP addresses in the editor</description>
+    </key>
+    <key type="b" name="editor-show-contact-im">
+      <default>true</default>
+      <summary>Show IM addresses</summary>
+      <description>Whether to show IM addresses in the editor</description>
+    </key>
+    <key type="b" name="editor-show-mailing-home">
+      <default>true</default>
+      <summary>Show mailing Home addresses</summary>
+      <description>Whether to show mailing Home addresses in the editor</description>
+    </key>
+    <key type="b" name="editor-show-mailing-work">
+      <default>true</default>
+      <summary>Show mailing Work addresses</summary>
+      <description>Whether to show mailing addresses Work in the editor</description>
+    </key>
+    <key type="b" name="editor-show-mailing-other">
+      <default>true</default>
+      <summary>Show mailing Other addresses</summary>
+      <description>Whether to show mailing addresses Other in the editor</description>
+    </key>
+    <key type="b" name="editor-show-personal-web">
+      <default>true</default>
+      <summary>Show web addresses</summary>
+      <description>Whether to show Web Addresses in the editor</description>
+    </key>
+    <key type="b" name="editor-show-personal-job">
+      <default>true</default>
+      <summary>Show job information</summary>
+      <description>Whether to show job information in the editor</description>
+    </key>
+    <key type="b" name="editor-show-personal-misc">
+      <default>true</default>
+      <summary>Show Miscellaneous information</summary>
+      <description>Whether to show Miscellaneous information in the editor</description>
+    </key>
+    <key type="b" name="editor-show-notes">
+      <default>true</default>
+      <summary>Show notes-tab</summary>
+      <description>Whether to show notes in the editor</description>
+    </key>
+    <key type="b" name="editor-show-certs">
+      <default>true</default>
+      <summary>Show Certificates tab</summary>
+      <description>Whether to show Certificates tab in the editor</description>
+    </key>
+    <key type="s" name="open-map-target">
+      <default>'openstreetmap'</default>
+      <summary>Where to open contact locations</summary>
+      <description>Currently supported values are “openstreetmap” and “google”; if unknown set, uses “openstreetmap”</description>
+    </key>
+    <key type="b" name="preview-home-before-work">
+      <default>false</default>
+      <summary>Preview Personal before Work information</summary>
+      <description>Show the Personal information before the Work information in the contact preview</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,24 @@
+<schemalist gettext-domain="gnome-session-3.0">
+  <schema id="org.gnome.SessionManager" path="/org/gnome/gnome-session/">
+    <key name="auto-save-session" type="b">
+      <default>false</default>
+      <summary>Save sessions</summary>
+      <description>If enabled, gnome-session will save the session automatically.</description>
+    </key>
+    <key name="auto-save-session-one-shot" type="b">
+      <default>false</default>
+      <summary>Save this session</summary>
+      <description>When enabled, gnome-session will automatically save the next session at log out even if auto saving is disabled.</description>
+    </key>
+    <key name="logout-prompt" type="b">
+      <default>true</default>
+      <summary>Logout prompt</summary>
+      <description>If enabled, gnome-session will prompt the user before ending a session.</description>
+    </key>
+    <key name="show-fallback-warning" type="b">
+      <default>true</default>
+      <summary>Show the fallback warning</summary>
+      <description>If enabled, gnome-session will display a warning dialog after login if the session was automatically fallen back.</description>
+    </key>
+  </schema>
+</schemalist>

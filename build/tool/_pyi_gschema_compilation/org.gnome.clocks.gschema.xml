@@ -1,0 +1,64 @@
+<schemalist gettext-domain="gnome-clocks">
+  <schema id="org.gnome.clocks" path="/org/gnome/clocks/">
+    <key name="world-clocks" type="aa{sv}">
+      <default>[]</default>
+      <summary>Configured world clocks</summary>
+      <description>
+        List of world clocks to show.
+      </description>
+    </key>
+    <key name="alarms" type="aa{sv}">
+      <default>[]</default>
+      <summary>Configured alarms</summary>
+      <description>
+        List of alarms set.
+      </description>
+    </key>
+    <key name="timers" type="aa{sv}">
+      <default>[]</default>
+      <summary>Configured Timers</summary>
+      <description>
+      List of timers set.
+      </description>
+    </key>
+    <key name="geolocation" type="b">
+      <default>true</default>
+      <summary>Geolocation support</summary>
+      <description>
+        Turn geolocation support on and off.
+      </description>
+    </key>
+  </schema>
+  <enum id="org.gnome.clocks.panelid">
+    <value nick="world" value="0"/>
+    <value nick="alarm" value="1"/>
+    <value nick="stopwatch" value="2"/>
+    <value nick="timer" value="3"/>
+  </enum>
+  <schema id="org.gnome.clocks.state" path="/org/gnome/clocks/state/">
+    <child schema="org.gnome.clocks.state.window" name="window"/>
+  </schema>
+  <schema id="org.gnome.clocks.state.window" path="/org/gnome/clocks/state/window/">
+    <key type="i" name="state">
+      <default>0</default>
+      <summary>Window state</summary>
+      <description>
+        State of the window, e.g. maximized.
+      </description>
+    </key>
+    <key type="(ii)" name="size">
+      <default>(870, 690)</default>
+      <summary>Window width and height</summary>
+      <description>
+        Width and height of the window.
+      </description>
+    </key>
+    <key enum="org.gnome.clocks.panelid" name="panel-id">
+      <default>"world"</default>
+      <summary>Panel state</summary>
+      <description>
+        Current clock panel.
+      </description>
+    </key>
+  </schema>
+</schemalist>

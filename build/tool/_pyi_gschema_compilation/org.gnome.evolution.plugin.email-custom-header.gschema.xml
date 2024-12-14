@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema path="/org/gnome/evolution/plugin/email-custom-header/" id="org.gnome.evolution.plugin.email-custom-header" gettext-domain="evolution">
+    <key type="as" name="custom-header">
+      <default>['Security=Personal;Unclassified;Protected;InConfidence;Secret;Topsecret']</default>
+      <summary>List of Custom Headers</summary>
+      <description>The key specifies the list of custom headers that you can add to an outgoing message. The format for specifying a Header and Header value is: Name of the custom header followed by “=” and the values separated by “;”</description>
+    </key>
+  </schema>
+</schemalist>

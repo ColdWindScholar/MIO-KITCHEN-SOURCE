@@ -1,0 +1,121 @@
+DEBUG:2024-12-14 18:01:40,406:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IHDR' 16 13
+DEBUG:2024-12-14 18:01:40,406:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'pHYs' 41 9
+DEBUG:2024-12-14 18:01:40,406:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'cHRM' 62 32
+DEBUG:2024-12-14 18:01:40,406:PngImagePlugin.py:PIL.PngImagePlugin:STREAM b'IDAT' 106 750871
+DEBUG:2024-12-14 18:01:40,579:tool.py:root:Welcome to the new Mio Kitchen
+This tool is free forever
+DEBUG:2024-12-14 18:01:40,579:tool.py:root:
+
+DEBUG:2024-12-14 18:01:40,619:tool.py:root:Startup took: 0.4259760010027094 seconds
+DEBUG:2024-12-14 18:01:40,619:tool.py:root:
+
+DEBUG:2024-12-14 18:01:44,351:tool.py:root:Selected items:teste
+DEBUG:2024-12-14 18:01:44,351:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,356:tool.py:root:FsPatcher: The original file has 2362 entries
+DEBUG:2024-12-14 18:01:52,429:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,466:tool.py:root:FsPatcher: Added 0 entries
+DEBUG:2024-12-14 18:01:52,475:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,500:tool.py:root:ContextPatcher: the Original File Has 2355 entries
+DEBUG:2024-12-14 18:01:52,502:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,504:tool.py:root:ADD [/lost\+found ['u:object_r:rootfs:s0']]
+DEBUG:2024-12-14 18:01:52,506:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,517:tool.py:root:ADD [/system_ext/app/AiAsstVision ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,519:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,521:tool.py:root:ADD [/system_ext/app/BasicDreams ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,523:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,525:tool.py:root:ADD [/system_ext/app/AiAsstVision/AiAsstVision\.apk ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,527:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,530:tool.py:root:ADD [/system_ext/app/BasicDreams/oat ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,532:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,534:tool.py:root:ADD [/system_ext/app/BasicDreams/BasicDreams\.apk ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,536:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,538:tool.py:root:ADD [/system_ext/app/BasicDreams/oat/arm64 ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,540:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,542:tool.py:root:ADD [/system_ext/app/BasicDreams/oat/arm64/BasicDreams\.odex ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,544:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,546:tool.py:root:ADD [/system_ext/app/BasicDreams/oat/arm64/BasicDreams\.vdex ['u:object_r:system_file:s0']]
+DEBUG:2024-12-14 18:01:52,548:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,551:tool.py:root:ContextPatcher: Add 9 entries
+DEBUG:2024-12-14 18:01:52,553:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,583:tool.py:root:Starting to pack system_ext
+DEBUG:2024-12-14 18:01:52,585:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,600:tool.py:root:Multiple:1.0758
+DEBUG:2024-12-14 18:01:52,602:tool.py:root:
+
+DEBUG:2024-12-14 18:01:52,604:tool.py:root:system_ext:[881235299]
+DEBUG:2024-12-14 18:01:52,606:tool.py:root:
+
+INFO:2024-12-14 18:01:52,607:tool.py:root:['make_ext4fs', '-J', '-T', '1734210107', '', '-S', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/config/system_ext_file_contexts', '-l', '881235299', '-C', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/config/system_ext_fs_config', '-L', 'system_ext', '-a', 'system_ext', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/system_ext.img', '/home/enrico/sources/MIO-KITCHEN-SOURCE/teste/system_ext']
+DEBUG:2024-12-14 18:01:53,476:tool.py:root:loaded 2362 fs_config entries
+DEBUG:2024-12-14 18:01:53,624:tool.py:root:
+
+INFO:2024-12-14 18:01:53,646:tool.py:root:loaded 2362 fs_config entries
+DEBUG:2024-12-14 18:01:53,793:tool.py:root:Creating filesystem with parameters:
+DEBUG:2024-12-14 18:01:54,132:tool.py:root:
+
+INFO:2024-12-14 18:01:54,190:tool.py:root:Creating filesystem with parameters:
+DEBUG:2024-12-14 18:01:54,213:tool.py:root:Size: 881233920
+DEBUG:2024-12-14 18:01:54,230:tool.py:root:
+
+INFO:2024-12-14 18:01:54,238:tool.py:root:Size: 881233920
+DEBUG:2024-12-14 18:01:54,242:tool.py:root:Block size: 4096
+DEBUG:2024-12-14 18:01:54,246:tool.py:root:
+
+INFO:2024-12-14 18:01:54,253:tool.py:root:Block size: 4096
+DEBUG:2024-12-14 18:01:54,255:tool.py:root:Blocks per group: 32768
+DEBUG:2024-12-14 18:01:54,258:tool.py:root:
+
+INFO:2024-12-14 18:01:54,260:tool.py:root:Blocks per group: 32768
+DEBUG:2024-12-14 18:01:54,260:tool.py:root:Inodes per group: 7696
+DEBUG:2024-12-14 18:01:54,263:tool.py:root:
+
+INFO:2024-12-14 18:01:54,265:tool.py:root:Inodes per group: 7696
+DEBUG:2024-12-14 18:01:54,266:tool.py:root:Inode size: 256
+DEBUG:2024-12-14 18:01:54,267:tool.py:root:
+
+INFO:2024-12-14 18:01:54,269:tool.py:root:Inode size: 256
+DEBUG:2024-12-14 18:01:54,269:tool.py:root:Journal blocks: 0
+DEBUG:2024-12-14 18:01:54,271:tool.py:root:
+
+INFO:2024-12-14 18:01:54,273:tool.py:root:Journal blocks: 0
+DEBUG:2024-12-14 18:01:54,273:tool.py:root:Label: system_ext
+DEBUG:2024-12-14 18:01:54,275:tool.py:root:
+
+INFO:2024-12-14 18:01:54,277:tool.py:root:Label: system_ext
+DEBUG:2024-12-14 18:01:54,277:tool.py:root:Blocks: 215145
+DEBUG:2024-12-14 18:01:54,279:tool.py:root:
+
+INFO:2024-12-14 18:01:54,281:tool.py:root:Blocks: 215145
+DEBUG:2024-12-14 18:01:54,281:tool.py:root:Block groups: 7
+DEBUG:2024-12-14 18:01:54,283:tool.py:root:
+
+INFO:2024-12-14 18:01:54,284:tool.py:root:Block groups: 7
+DEBUG:2024-12-14 18:01:54,285:tool.py:root:Reserved block group size: 55
+DEBUG:2024-12-14 18:01:54,287:tool.py:root:
+
+INFO:2024-12-14 18:01:54,288:tool.py:root:Reserved block group size: 55
+DEBUG:2024-12-14 18:01:54,289:tool.py:root:Created filesystem with 2370/53872 inodes and 205132/215145 blocks
+DEBUG:2024-12-14 18:01:54,291:tool.py:root:
+
+INFO:2024-12-14 18:01:54,292:tool.py:root:Created filesystem with 2370/53872 inodes and 205132/215145 blocks
+DEBUG:2024-12-14 18:01:54,296:tool.py:root:Packed successfully : system_ext!
+DEBUG:2024-12-14 18:01:54,298:tool.py:root:
+
+DEBUG:2024-12-14 18:03:49,159:tool.py:root:The file/folder does not exist
+DEBUG:2024-12-14 18:03:49,161:tool.py:root:
+

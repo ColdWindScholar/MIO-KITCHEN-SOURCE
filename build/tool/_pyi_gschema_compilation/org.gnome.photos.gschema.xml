@@ -1,0 +1,19 @@
+<schemalist gettext-domain="gnome-photos">
+  <schema id="org.gnome.photos" path="/org/gnome/photos/">
+    <key name="window-size" type="ai">
+      <default>[960, 600]</default>
+      <summary>Window size</summary>
+      <description>Window size (width and height).</description>
+    </key>
+    <key name="window-position" type="ai">
+      <default>[]</default>
+      <summary>Window position</summary>
+      <description>Window position (x and y).</description>
+    </key>
+    <key name="window-maximized" type="b">
+      <default>true</default>
+      <summary>Window maximized</summary>
+      <description>Window maximized state</description>
+    </key>
+  </schema>
+</schemalist>

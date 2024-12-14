@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.settings-daemon.peripherals.wacom.deprecated">
+    <child name="stylus" schema="org.gnome.settings-daemon.peripherals.wacom.stylus.deprecated"/>
+    <child name="eraser" schema="org.gnome.settings-daemon.peripherals.wacom.eraser.deprecated"/>
+
+    <!-- is-absolute applies to all tools but PAD, CURSOR is hard-coded -->
+    <key name="is-absolute" type="b">
+      <default>true</default>
+      <summary>Wacom stylus absolute mode</summary>
+      <description>Enable this to set the tablet to absolute mode.</description>
+    </key>
+    <key name="area" type="ai">
+      <default>[-1, -1, -1, -1]</default>
+      <summary>Wacom tablet area</summary>
+      <description>Set this to x1, y1 and x2, y2 of the area usable by the tools.</description>
+    </key>
+    <key name="keep-aspect" type="b">
+      <default>false</default>
+      <summary>Wacom tablet aspect ratio</summary>
+      <description>Enable this to restrict the Wacom tablet area to match the aspect ratio of the output.</description>
+    </key>
+    <key name="rotation" enum="org.gnome.settings-daemon.GsdWacomRotation">
+      <default>'none'</default>
+      <summary>Wacom tablet rotation</summary>
+      <description>Set this to “none”, “cw” for 90 degree clockwise, “half” for 180 degree, and “ccw” for 90 degree counterclockwise.</description>
+    </key>
+    <key name="touch" type="b">
+      <default>true</default>
+      <summary>Wacom touch feature</summary>
+      <description>Enable this to move the cursor when the user touches the tablet.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.wacom.stylus.deprecated">
+    <key name="pressurecurve" type="ai">
+      <default>[0, 0, 100, 100]</default>
+      <summary>Wacom stylus pressure curve</summary>
+      <description>Set this to x1, y1 and x2, y2 of the pressure curve applied to the stylus.</description>
+    </key>
+    <key name="buttonmapping" type="ai">
+      <default>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</default>
+      <summary>Wacom stylus button mapping</summary>
+      <description>Set this to the logical button mapping.</description>
+    </key>
+    <key name="pressurethreshold" type="i">
+      <default>-1</default>
+      <summary>Wacom stylus pressure threshold</summary>
+      <description>Set this to the pressure value at which a stylus click event is generated.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.wacom.eraser.deprecated">
+    <key name="pressurecurve" type="ai">
+      <default>[0, 0, 100, 100]</default>
+      <summary>Wacom eraser pressure curve</summary>
+      <description>Set this to x1, y1 and x2, y2 of the pressure curve applied to the eraser.</description>
+    </key>
+    <key name="buttonmapping" type="ai">
+      <default>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</default>
+      <summary>Wacom eraser button mapping</summary>
+      <description>Set this to the logical button mapping.</description>
+    </key>
+    <key name="pressurethreshold" type="i">
+      <default>-1</default>
+      <summary>Wacom eraser pressure threshold</summary>
+      <description>Set this to the pressure value at which an eraser click event is generated.</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.peripherals.wacom.tablet-button.deprecated">
+    <key name="action-type" enum="org.gnome.settings-daemon.GsdWacomActionType">
+      <default>'none'</default>
+      <summary>Wacom button action type</summary>
+      <description>The type of action triggered by the button being pressed.</description>
+    </key>
+    <key name="custom-action" type="s">
+      <default>''</default>
+      <summary>Key combination for the custom action</summary>
+      <description>The keyboard shortcut generated when the button is pressed for custom actions.</description>
+    </key>
+    <key name="custom-elevator-action" type="as">
+      <default>['', '']</default>
+      <summary>Key combinations for a touchring or touchstrip custom action</summary>
+      <description>The keyboard shortcuts generated when a touchring or touchstrip is used for custom actions (up followed by down).</description>
+    </key>
+    <key name="oled-label" type="s">
+      <default>''</default>
+      <!-- Translators: This is the OLED display on an Intuos4 tablet:
+           http://eu.shop.wacom.eu/images/articles/d9abd9f2d4d88aa0649cda97a8077e2b_8.jpg -->
+      <summary>Button label for OLED display.</summary>
+      <description>Label will be rendered to OLED display belonging to the button</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.desktop.peripherals.tablet.deprecated">
+    <key name="display" type="as">
+      <default>["", "", ""]</default>
+    </key>
+  </schema>
+</schemalist>

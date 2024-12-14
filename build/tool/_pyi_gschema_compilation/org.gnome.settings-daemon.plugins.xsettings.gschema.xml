@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema gettext-domain="gnome-settings-daemon" id="org.gnome.settings-daemon.plugins.xsettings" path="/org/gnome/settings-daemon/plugins/xsettings/">
+    <key name="disabled-gtk-modules" type="as">
+      <default>[]</default>
+      <summary>List of explicitly disabled GTK+ modules</summary>
+      <description>A list of strings representing the GTK+ modules that will not be loaded, even if enabled by default in their configuration.</description>
+    </key>
+    <key name="enabled-gtk-modules" type="as">
+      <default>[]</default>
+      <summary>List of explicitly enabled GTK+ modules</summary>
+      <description>A list of strings representing the GTK+ modules that will be loaded, usually in addition to conditional and forcibly disabled ones.</description>
+    </key>
+    <key type="a{sv}" name="overrides">
+      <default>{}</default>
+      <summary>A dictionary of XSETTINGS to override</summary>
+      <description>This dictionary maps XSETTINGS names to overrides values. The values must be either strings, signed int32s or (in the case of colors), 4-tuples of uint16 (red, green, blue, alpha; 65535 is fully opaque).</description>
+    </key>
+  </schema>
+  <schema id="org.gnome.settings-daemon.plugins.xsettings.deprecated">
+    <key name="antialiasing" enum="org.gnome.settings-daemon.GsdFontAntialiasingMode">
+      <default>'grayscale'</default>
+      <summary>Antialiasing</summary>
+      <description>The type of antialiasing to use when rendering fonts. Possible values are: “none” for no antialiasing, “grayscale” for standard grayscale antialiasing, and “rgba” for subpixel antialiasing (LCD screens only).</description>
+    </key>
+    <key name="hinting" enum="org.gnome.settings-daemon.GsdFontHinting">
+      <default>'slight'</default>
+      <summary>Hinting</summary>
+      <description>The type of hinting to use when rendering fonts. Possible values are: “none” for no hinting and “slight” for fitting only to the Y-axis like Microsoft’s ClearType, DirectWrite and Adobe’s proprietary font rendering engine. Ignores native hinting within the font, generates hints algorithmically. Used on Ubuntu by default. Recommended. The meaning of “medium” and “full” depends on the font format (.ttf, .otf, .pfa/.pfb) and the installed version of FreeType. They usually try to fit glyphs to both the X and the Y axis (except for .otf: Y-only). This can lead to distortion and/or inconsistent rendering depending on the quality of the font, the font format and the state of FreeType’s font engines.</description>
+    </key>
+    <key name="rgba-order" enum="org.gnome.settings-daemon.GsdFontRgbaOrder">
+      <default>'rgb'</default>
+      <summary>RGBA order</summary>
+      <description>The order of subpixel elements on an LCD screen; only used when antialiasing is set to “rgba”. Possible values are: “rgb” for red on left (most common), “bgr” for blue on left, “vrgb” for red on top, “vbgr” for red on bottom.</description>
+    </key>
+  </schema>
+</schemalist>

@@ -1,0 +1,119 @@
+<schemalist>
+  <schema gettext-domain="eog" id="org.gnome.eog" path="/org/gnome/eog/">
+    <child name="view" schema="org.gnome.eog.view"/>
+    <child name="fullscreen" schema="org.gnome.eog.fullscreen"/>
+    <child name="ui" schema="org.gnome.eog.ui"/>
+    <child name="plugins" schema="org.gnome.eog.plugins"/>
+  </schema>
+  <schema gettext-domain="eog" id="org.gnome.eog.view" path="/org/gnome/eog/view/">
+    <key name="autorotate" type="b">
+      <default>true</default>
+      <summary>Automatic orientation</summary>
+      <description>Whether the image should be rotated automatically based on EXIF orientation.</description>
+    </key>
+    <key name="background-color" type="s">
+      <default>'#000000'</default>
+      <summary>Background Color</summary>
+      <description>The color that is used to fill the area behind the image. If the use-background-color key is not set, the color is determined by the active GTK+ theme instead.</description>
+    </key>
+    <key name="interpolate" type="b">
+      <default>true</default>
+      <summary>Interpolate Image</summary>
+      <description>Whether the image should be interpolated on zoom-out. This leads to better quality but is somewhat slower than non-interpolated images.</description>
+    </key>
+    <key name="extrapolate" type="b">
+      <default>true</default>
+      <summary>Extrapolate Image</summary>
+      <description>Whether the image should be extrapolated on zoom-in. This leads to blurry quality and is somewhat slower than non-extrapolated images.</description>
+    </key>
+    <key name="transparency" enum="org.gnome.eog.EogTransparencyStyle">
+      <default>'checked'</default>
+      <summary>Transparency indicator</summary>
+      <description>Determines how transparency should be indicated. Valid values are CHECK_PATTERN, COLOR and NONE. If COLOR is chosen, then the trans-color key determines the color value used.</description>
+    </key>
+    <key name="scroll-wheel-zoom" type="b">
+      <default>true</default>
+      <summary>Scroll wheel zoom</summary>
+      <description>Whether the scroll wheel should be used for zooming.</description>
+    </key>
+    <key name="zoom-multiplier" type="d">
+      <default>0.05</default>
+      <summary>Zoom multiplier</summary>
+      <description>The multiplier to be applied when using the mouse scroll wheel  for zooming. This value defines the zooming step used for each scroll  event. For example, 0.05 results in a 5% zoom increment for each  scroll event and 1.00 result in a 100% zoom increment.</description>
+    </key>
+    <key name="trans-color" type="s">
+      <default>'#000000'</default>
+      <summary>Transparency color</summary>
+      <description>If the transparency key has the value COLOR, then this  key determines the color which is used for indicating transparency.</description>
+    </key>
+    <key name="use-background-color" type="b">
+      <default>true</default>
+      <summary>Use a custom background color</summary>
+      <description>If this is active, the color set by the background-color key will be used to fill the area behind the image. If it is not set, the current GTK+ theme will determine the fill color.</description>
+    </key>
+  </schema>
+  <schema gettext-domain="eog" id="org.gnome.eog.fullscreen" path="/org/gnome/eog/fullscreen/">
+    <key name="loop" type="b">
+      <default>true</default>
+      <summary>Loop through the image sequence</summary>
+      <description>Whether the sequence of images should be shown in an endless loop.</description>
+    </key>
+    <key name="upscale" type="b">
+      <default>true</default>
+      <summary>Allow zoom greater than 100% initially</summary>
+      <description>If this is set to FALSE small images will not be stretched to fit into the screen initially.</description>
+    </key>
+    <key name="seconds" type="i">
+      <default>5</default>
+      <summary>Delay in seconds until showing the next image</summary>
+      <description>A value greater than 0 determines the seconds an image stays on screen until the next one is shown automatically. Zero  disables the automatic browsing.</description>
+    </key>
+  </schema>
+  <schema gettext-domain="eog" id="org.gnome.eog.ui" path="/org/gnome/eog/ui/">
+    <key name="statusbar" type="b">
+      <default>false</default>
+      <summary>Show/Hide the window statusbar.</summary>
+    </key>
+    <key name="image-gallery" type="b">
+      <default>false</default>
+      <summary>Show/Hide the image gallery pane.</summary>
+    </key>
+    <key name="image-gallery-position" enum="org.gnome.eog.EogWindowGalleryPos">
+      <default>'bottom'</default>
+      <summary>Image gallery pane position. Set to 0 for bottom;  1 for left; 2 for top; 3 for right.</summary>
+    </key>
+    <key name="image-gallery-resizable" type="b">
+      <default>false</default>
+      <summary>Whether the image gallery pane should be resizable.</summary>
+    </key>
+    <key name="sidebar" type="b">
+      <default>true</default>
+      <summary>Show/Hide the window side pane.</summary>
+    </key>
+    <key name="scroll-buttons" type="b">
+      <default>true</default>
+      <summary>Show/Hide the image gallery pane scroll buttons.</summary>
+    </key>
+    <key name="disable-close-confirmation" type="b">
+      <default>false</default>
+      <summary>Close main window without asking to save changes.</summary>
+    </key>
+    <key name="disable-trash-confirmation" type="b">
+      <default>false</default>
+      <summary>Trash images without asking</summary>
+      <description>If activated, Eye of GNOME won’t ask for confirmation when moving images to the trash. It will still ask if any of the files cannot be moved to the trash and would be deleted instead.</description>
+    </key>
+    <key name="filechooser-xdg-fallback" type="b">
+      <default>true</default>
+      <summary>Whether the file chooser should show the user’s pictures folder if no images are loaded.</summary>
+      <description>If activated and no image is loaded in the active window, the file chooser will display the user’s pictures folder using the XDG special user directories. If deactivated or the pictures folder has not been set up, it will show the current working directory.</description>
+    </key>
+  </schema>
+  <schema gettext-domain="eog" id="org.gnome.eog.plugins" path="/org/gnome/eog/plugins/">
+    <key name="active-plugins" type="as">
+      <default>['fullscreen']</default>
+      <summary>Active plugins</summary>
+      <description>List of active plugins. It doesn’t contain the “Location” of the active plugins.  See the .eog-plugin file for obtaining the “Location” of a given plugin.</description>
+    </key>
+  </schema>
+</schemalist>

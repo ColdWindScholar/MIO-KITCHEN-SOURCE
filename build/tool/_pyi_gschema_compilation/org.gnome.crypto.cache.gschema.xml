@@ -1,0 +1,17 @@
+<schemalist>
+	<schema id="org.gnome.crypto.cache" path="/desktop/gnome/crypto/cache/">
+		<key name="gpg-cache-method" type="s">
+			<default>'session'</default>
+			<summary>Cache Method</summary>
+			<description>The method to use for caching passphrases typed into the GPG agent.
+			Should be one of: 'always' caches permanently, 'session' caches until session end,
+			'idle' caches until the not used for gpg-cache-ttl seconds, 'timeout' caches until
+			gpg-cache-ttl seconds.</description>
+		</key>
+		<key name="gpg-cache-ttl" type="i">
+			<default>300</default>
+			<summary>Cache Time To Live</summary>
+			<description>The amount of time in seconds to cache passphrases when the 'idle' or 'timeout' gpg-cache-method are in use.</description>
+		</key>
+	</schema>
+</schemalist>
