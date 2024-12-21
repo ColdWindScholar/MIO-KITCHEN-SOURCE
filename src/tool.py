@@ -3606,7 +3606,7 @@ def unpackrom(ifile) -> None:
             os.mkdir(folder)
         except Exception as e:
             win.message_pop(str(e))
-        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source'))
+        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source/'))
         project_menu.listdir()
         current_project_name.set(os.path.basename(folder))
         if settings.auto_unpack == '1':
