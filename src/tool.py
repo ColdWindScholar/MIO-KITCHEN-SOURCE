@@ -153,7 +153,7 @@ class JsonEdit:
 class LoadAnim:
     gifs = []
 
-    def __init__(self, master):
+    def __init__(self, master=None):
         self.master = master
         self.frames = []
         self.hide_gif = False
@@ -161,6 +161,9 @@ class LoadAnim:
         self.tasks = {}
         self.task_num_index = 0
         self.task_num_max = 100
+
+    def set_master(self, master):
+        self.master = master
 
     def run(self, ind: int = 0):
         self.hide_gif = False
@@ -871,12 +874,10 @@ class Tool(Tk):
         ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
 
 
-win = Tool()
-animation = LoadAnim(win)
+# win = Tool()
+animation = LoadAnim()
 start = dti()
-current_project_name = utils.project_name = StringVar()
-theme = StringVar()
-language = StringVar()
+
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
@@ -1283,7 +1284,7 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini: str = None):
+    def __init__(self, set_ini: str = None, load=True):
         self.project_struct = 'single'
         self.auto_unpack = '0'
         self.treff = '0'
@@ -1307,7 +1308,8 @@ class SetUtils:
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.config = ConfigParser()
         if os.access(self.set_file, os.F_OK):
-            self.load()
+            if load:
+                self.load()
         else:
             sv_ttk.set_theme("dark")
             error(1,
@@ -1397,8 +1399,7 @@ class SetUtils:
         self.load()
 
 
-settings = SetUtils()
-settings.load()
+settings = SetUtils(load=False)
 
 
 def re_folder(path, quiet=False):
@@ -4547,6 +4548,14 @@ def init():
         open(tool_log, 'w', encoding="utf-8", newline="\n").close()
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
+    global win
+    win = Tool()
+    animation.set_master(win)
+    global current_project_name, theme, language
+    current_project_name = utils.project_name = StringVar()
+    theme = StringVar()
+    language = StringVar()
+    settings.load()
     if settings.updating in ['1', '2']:
         Updater()
     if int(settings.oobe) < 5:
