@@ -3603,12 +3603,14 @@ def unpackrom(ifile) -> None:
                                                                                                     os.path.basename(
                                                                                                         ifile))[0])
         try:
+            current_project_name.set(os.path.basename(folder))
             os.mkdir(folder)
+            ProjectManager.current_work_path()
+            ProjectManager.current_work_output_path()
         except Exception as e:
             win.message_pop(str(e))
         copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source/'))
         project_menu.listdir()
-        current_project_name.set(os.path.basename(folder))
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())])
     else:
