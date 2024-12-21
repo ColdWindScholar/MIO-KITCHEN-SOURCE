@@ -14,8 +14,8 @@
 import os.path
 import unittest
 
-from .config_parser import ConfigParser
-from .utils import *
+from .core.config_parser import ConfigParser
+from .core.utils import *
 
 if os.name == 'nt':
     prog_path = os.getcwd()
