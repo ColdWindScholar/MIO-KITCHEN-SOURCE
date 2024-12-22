@@ -20,9 +20,9 @@ import httpx
 
 
 class HttpFile(RawIOBase):
-    seekable = lambda : True
-    readable = lambda : True
-    writable = lambda : False
+    seekable = lambda self: True
+    readable = lambda self: True
+    writable = lambda self: False
 
     def _read_internal(self, buf: bytes) -> int:
         size = len(buf)
@@ -103,10 +103,9 @@ class HttpFile(RawIOBase):
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-"""
-Usage : 
+
 if __name__ == "__main__":
-    from . import zipfile
+    import zipfile
 
     with HttpFile(
         "https://dl.google.com/developers/android/vic/images/ota/husky_beta-ota-ap31.240322.027-3310ca50.zip"
@@ -136,4 +135,3 @@ if __name__ == "__main__":
             z2 = zipfile.ZipFile(f2)
             print(z2.namelist())
         print("total read:", f.total_bytes)
-"""
