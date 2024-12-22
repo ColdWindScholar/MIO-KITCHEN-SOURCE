@@ -13,13 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import io
+from io import RawIOBase, UnsupportedOperation
 import os
 
 import httpx
 
 
-class HttpFile(io.RawIOBase):
+class HttpFile(RawIOBase):
     seekable = lambda : True
     readable = lambda : True
     writable = lambda : False
@@ -32,7 +32,7 @@ class HttpFile(io.RawIOBase):
         n = 0
         with self.client.stream("GET", self.url, headers=headers) as r:
             if r.status_code != 206:
-                raise io.UnsupportedOperation("Remote did not return partial content!")
+                raise UnsupportedOperation("Remote did not return partial content!")
             if self.progress_reporter is not None:
                 self.progress_reporter(0, size)
             for chunk in r.iter_bytes(8192):
@@ -66,7 +66,7 @@ class HttpFile(io.RawIOBase):
         elif whence == os.SEEK_END:
             new_pos = self.size + offset
         else:
-            raise io.UnsupportedOperation(f"unsupported seek whence! {whence}")
+            raise UnsupportedOperation(f"unsupported seek whence! {whence}")
         if new_pos < 0 or new_pos > self.size:
             raise ValueError(f"invalid position to seek: {new_pos} in size {self.size}")
         # print(f'seek: pos {self.pos} -> {new_pos}')
