@@ -27,10 +27,13 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
+from PyQt5.QtWidgets import QApplication
+
 from .core.romfs_parse import RomfsParse
 from .core.Magisk import Magisk_patch
 
 from .core.unkdz import KDZFileTools
+from src.qtui import MainWindows
 
 if platform.system() != 'Darwin':
     try:
@@ -4543,7 +4546,7 @@ def init_verify():
         ask_win2(lang.warn16 % lang.special_words)
 
 
-def init():
+def __init__tk():
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
@@ -4599,6 +4602,15 @@ def init():
         dndfile(sys.argv[1:])
     states.inited = True
     win.mainloop()
+
+
+def init():
+    app = QApplication(sys.argv)
+    win_qt = MainWindows()
+    win_qt.show()
+    tool = threading.Thread(target=__init__tk)
+    tool.start()
+    sys.exit(app.exec_())
 
 
 def restart(er=None):
