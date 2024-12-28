@@ -1429,10 +1429,6 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     re_folder(output + output_name)
     LogoDumper(file_path, output + output_name).unpack()
 
-
-
-
-
 @animation
 def logo_pack(origin_logo=None) -> int:
     work = ProjectManager.current_work_path()
@@ -3824,7 +3820,6 @@ def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
         ask.destroy()
 
     move_center(ask)
-
     ask.wait_window()
     return value.get()
 
