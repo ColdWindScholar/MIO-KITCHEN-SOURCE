@@ -13,9 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import ctypes
 import gzip
-import hashlib
 import json
 import platform
 import shutil
@@ -28,11 +26,11 @@ from tkinter.ttk import Scrollbar
 
 import tarsafe
 from PyQt6.QtWidgets import QApplication
-from .qtui import MainWindow
-from .core.romfs_parse import RomfsParse
-from .core.Magisk import Magisk_patch
 
+from .core.Magisk import Magisk_patch
+from .core.romfs_parse import RomfsParse
 from .core.unkdz import KDZFileTools
+from .qtui import MainWindow
 
 if platform.system() != 'Darwin':
     try:
@@ -65,7 +63,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from .core.dumper import Dumper
-from .core.utils import lang, LogoDumper, States
+from .core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, JsonEdit
 
 if os.name == 'nt':
     from ctypes import windll
@@ -121,27 +119,7 @@ cwd_path = utils.prog_path
 
 
 
-class JsonEdit:
-    def __init__(self, file_path):
-        self.file = file_path
 
-    def read(self):
-        if not os.path.exists(self.file):
-            return {}
-        with open(self.file, 'r+', encoding='utf-8') as pf:
-            try:
-                return json.load(pf)
-            except (AttributeError, ValueError, json.decoder.JSONDecodeError):
-                return {}
-
-    def write(self, data):
-        with open(self.file, 'w+', encoding='utf-8') as pf:
-            json.dump(data, pf, indent=4)
-
-    def edit(self, name, value):
-        data = self.read()
-        data[name] = value
-        self.write(data)
 
 
 class LoadAnim:
@@ -1452,22 +1430,7 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     LogoDumper(file_path, output + output_name).unpack()
 
 
-def hashlib_calculate(file_path, method: str):
-    if not hasattr(hashlib, method):
-        print(f"Warn, The algorithm {method} not exist in hashlib!")
-        return 1
-    if not os.path.exists(file_path) or not os.path.isfile(file_path):
-        print(f"Warn, The file {file_path} not exist!")
-        return 1
-    algorithm = getattr(hashlib, method)()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(4096), b""):
-            algorithm.update(chunk)
-    return algorithm.hexdigest()
 
-
-calculate_sha256_file = lambda file_path: hashlib_calculate(file_path, 'sha256')
-calculate_md5_file = lambda file_path: hashlib_calculate(file_path, 'md5')
 
 
 @animation

@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import hashlib
+import json
 import os
 import os.path
 import platform
@@ -648,3 +650,42 @@ class States:
     in_oobe = False
     development = False
     inited = False
+
+def hashlib_calculate(file_path, method: str):
+    if not hasattr(hashlib, method):
+        print(f"Warn, The algorithm {method} not exist in hashlib!")
+        return 1
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        print(f"Warn, The file {file_path} not exist!")
+        return 1
+    algorithm = getattr(hashlib, method)()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            algorithm.update(chunk)
+    return algorithm.hexdigest()
+
+
+calculate_sha256_file = lambda file_path: hashlib_calculate(file_path, 'sha256')
+calculate_md5_file = lambda file_path: hashlib_calculate(file_path, 'md5')
+
+class JsonEdit:
+    def __init__(self, file_path):
+        self.file = file_path
+
+    def read(self):
+        if not os.path.exists(self.file):
+            return {}
+        with open(self.file, 'r+', encoding='utf-8') as pf:
+            try:
+                return json.load(pf)
+            except (AttributeError, ValueError, json.decoder.JSONDecodeError):
+                return {}
+
+    def write(self, data):
+        with open(self.file, 'w+', encoding='utf-8') as pf:
+            json.dump(data, pf, indent=4)
+
+    def edit(self, name, value):
+        data = self.read()
+        data[name] = value
+        self.write(data)
