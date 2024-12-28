@@ -65,7 +65,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from .core.dumper import Dumper
-from .core.utils import lang, LogoDumper
+from .core.utils import lang, LogoDumper, States
 
 if os.name == 'nt':
     from ctypes import windll
@@ -118,15 +118,7 @@ except ImportError:
 cwd_path = utils.prog_path
 
 
-class States:
-    update_window = False
-    donate_window = False
-    mpk_store = False
-    open_pids = []
-    run_source = gettype(sys.argv[0]) == "unknown"
-    in_oobe = False
-    development = False
-    inited = False
+
 
 
 class JsonEdit:

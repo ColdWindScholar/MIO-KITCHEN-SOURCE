@@ -303,6 +303,7 @@ def dynamic_list_reader(path):
     return data
 
 
+
 def generate_dynamic_list(dbfz, size, set_, lb, work):
     data = ['# Remove all existing dynamic partitions and groups before applying full OTA', 'remove_all_groups']
     with open(work + "dynamic_partitions_op_list", 'w', encoding='utf-8', newline='\n') as d_list:
@@ -623,3 +624,13 @@ class LogoDumper:
                 o.write(struct.pack("<I", self.cfg.imgblkoffs[i]))
                 o.write(struct.pack("<I", self.cfg.imgblkszs[i]))
             print("\tDone!")
+
+class States:
+    update_window = False
+    donate_window = False
+    mpk_store = False
+    open_pids = []
+    run_source = gettype(sys.argv[0]) == "unknown"
+    in_oobe = False
+    development = False
+    inited = False
