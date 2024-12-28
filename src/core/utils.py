@@ -76,7 +76,21 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
 
 
 # ----DEFS
+if os.name == 'nt':
+    from ctypes import windll
+    kernel32 = windll.kernel32
 
+
+    def terminate_process(pid):
+        h_process = kernel32.OpenProcess(0x0001, False, pid)
+        if h_process:
+            kernel32.TerminateProcess(h_process, 0)
+            kernel32.CloseHandle(h_process)
+        else:
+            print(f"Failed to open process with PID {pid}")
+else:
+    def terminate_process(pid):
+        os.kill(pid, 9)
 
 class Unxz:
     def __init__(self, file_path: str, remove_src: bool = True, buff_size: int = 8192):

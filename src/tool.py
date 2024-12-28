@@ -878,20 +878,7 @@ tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code
 states = States()
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 # Some Functions for Upgrade
-if os.name == 'nt':
-    kernel32 = ctypes.windll.kernel32
 
-
-    def terminate_process(pid):
-        h_process = kernel32.OpenProcess(0x0001, False, pid)
-        if h_process:
-            kernel32.TerminateProcess(h_process, 0)
-            kernel32.CloseHandle(h_process)
-        else:
-            print(f"Failed to open process with PID {pid}")
-else:
-    def terminate_process(pid):
-        os.kill(pid, 9)
 
 
 class Updater(Toplevel):
