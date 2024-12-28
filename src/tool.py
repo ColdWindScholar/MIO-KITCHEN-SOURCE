@@ -72,7 +72,7 @@ if os.name == 'nt':
     from tkinter import filedialog
     import pywinstyles
 else:
-    from . import mkc_filedialog as filedialog
+    from .core import mkc_filedialog as filedialog
 
 from .core import imgextractor
 from .core import lpunpack
