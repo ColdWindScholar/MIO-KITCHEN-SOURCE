@@ -14,5 +14,5 @@ tarsafe
 asn1crypto
 lxml
 wmi
-pyqt5
+pyqt6
 httpx

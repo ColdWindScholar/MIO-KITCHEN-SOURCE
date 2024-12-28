@@ -27,13 +27,12 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
-from PyQt5.QtWidgets import QApplication
-
+from PyQt6.QtWidgets import QApplication
+from .qtui import MainWindow
 from .core.romfs_parse import RomfsParse
 from .core.Magisk import Magisk_patch
 
 from .core.unkdz import KDZFileTools
-from src.qtui import MainWindows
 
 if platform.system() != 'Darwin':
     try:
@@ -100,19 +99,19 @@ from .core.selinux_audit_allow import main as selinux_audit_allow
 import logging
 is_pro = False
 try:
-    from src.pro.sn import v as verify
+    from .pro.sn import v as verify
     is_pro = True
 except ImportError:
     is_pro = False
 if is_pro:
-    from src.pro.active_ui import Active
+    from .pro.active_ui import Active
 
 try:
     from . import imp
 except ImportError:
     imp = None
 try:
-    from .pycase import ensure_dir_case_sensitive
+    from .core.pycase import ensure_dir_case_sensitive
 except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
@@ -4606,11 +4605,11 @@ def __init__tk():
 
 def init():
     app = QApplication(sys.argv)
-    win_qt = MainWindows()
+    win_qt = MainWindow()
     win_qt.show()
     tool = threading.Thread(target=__init__tk)
     tool.start()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 def restart(er=None):
