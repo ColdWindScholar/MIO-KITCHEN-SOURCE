@@ -3803,7 +3803,11 @@ def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
     return value.get()
 
 
-def ask_win2(text='', ok=lang.ok, cancel=lang.cancel) -> int:
+def ask_win2(text='', ok=None, cancel=None) -> int:
+    if not ok:
+        ok = lang.ok
+    if not cancel:
+        cancel = lang.cancel
     value = IntVar()
     ask = Toplevel()
     frame_inner = ttk.Frame(ask)
