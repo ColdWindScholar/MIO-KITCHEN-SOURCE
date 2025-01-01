@@ -11,10 +11,7 @@ from pathlib import Path
 from tarfile import *  # noqa: F401, F403
 
 
-__all__ = tarfile.__all__ + [
-    "TarSafe",
-    "TarSafeException",
-]
+__all__ = tarfile.__all__ + ["TarSafe", "TarSafeException",]
 
 
 class TarSafe(tarfile.TarFile):
@@ -83,7 +80,8 @@ class TarSafe(tarfile.TarFile):
                 return True
         return False
 
-    def _is_device(self, tarinfo):
+    @staticmethod
+    def _is_device(tarinfo):
         return tarinfo.ischr() or tarinfo.isblk()
 
 
