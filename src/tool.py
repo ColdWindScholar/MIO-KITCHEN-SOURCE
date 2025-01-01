@@ -3463,11 +3463,15 @@ def unpackrom(ifile) -> None:
     elif ftype == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
+        decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
+        if not os.path.exists(decrypted):
+            print(f"{ifile} decrypt Fail!!!")
+            return
+        unpackrom(decrypted)
         try:
-            os.remove(ifile)
-        except (PermissionError, IOError) as e:
-            win.message_pop(lang.warn11.format(e))
-        unpackrom(os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip")
+            os.remove(decrypted)
+        except:
+            print(f"{ifile} remove Fail!!!")
         return
     elif ftype == 'tar':
         print(lang.text79 + ifile)
