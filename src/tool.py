@@ -3468,6 +3468,7 @@ def unpackrom(ifile) -> None:
         except (PermissionError, IOError) as e:
             win.message_pop(lang.warn11.format(e))
         unpackrom(os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip")
+        return
     elif ftype == 'tar':
         print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
