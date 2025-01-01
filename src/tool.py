@@ -24,7 +24,7 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-import tarsafe
+from .core import tarsafe
 
 from .core.Magisk import Magisk_patch
 from .core.romfs_parse import RomfsParse
