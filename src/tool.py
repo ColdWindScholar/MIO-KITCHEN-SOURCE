@@ -4540,12 +4540,8 @@ def __init__tk():
 
 
 def init():
-    app = QApplication(sys.argv)
-    win_qt = MainWindow()
-    win_qt.show()
     tool = threading.Thread(target=__init__tk)
     tool.start()
-    sys.exit(app.exec())
 
 
 def restart(er=None):
