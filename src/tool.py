@@ -25,12 +25,11 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 
 import tarsafe
-from PyQt6.QtWidgets import QApplication
 
 from .core.Magisk import Magisk_patch
 from .core.romfs_parse import RomfsParse
 from .core.unkdz import KDZFileTools
-from .qtui import MainWindow
+
 
 if platform.system() != 'Darwin':
     try:
