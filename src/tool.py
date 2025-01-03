@@ -4436,14 +4436,15 @@ class FormatConversion(ttk.LabelFrame):
                             i = i.replace('.xz', '')
                         print(lang.text79 + work + i)
                         transferfile = os.path.abspath(
-                            os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                            os.path.dirname(work)) + f"/{basename}.transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
                             Sdat2img(transferfile, work + i, work + basename + ".img")
                             if os.access(work + basename + ".img", os.F_OK):
                                 try:
                                     os.remove(work + i)
                                     os.remove(transferfile)
-                                    os.remove(work + basename + '.patch.dat')
+                                    if not os.path.getsize(work + basename + '.patch.dat'):
+                                        os.remove(work + basename + '.patch.dat')
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     logging.exception('Bugs')
                         else:
