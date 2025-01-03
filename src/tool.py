@@ -4546,12 +4546,8 @@ def __init__tk():
         dndfile(sys.argv[1:])
     states.inited = True
     win.mainloop()
-
-
-def init():
-    tool = threading.Thread(target=__init__tk)
-    tool.start()
-
+# Cool Init
+init = lambda :__init__tk()
 
 def restart(er=None):
     try:
