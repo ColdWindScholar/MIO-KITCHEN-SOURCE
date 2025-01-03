@@ -27,6 +27,7 @@ from tkinter.ttk import Scrollbar
 from .core import tarsafe
 
 from .core.Magisk import Magisk_patch
+from .core.addon_register import loader, Entry
 from .core.romfs_parse import RomfsParse
 from .core.unkdz import KDZFileTools
 
@@ -104,7 +105,7 @@ if is_pro:
     from .pro.active_ui import Active
 
 try:
-    from . import imp
+    from .core import imp
 except ImportError:
     imp = None
 try:
@@ -1501,7 +1502,10 @@ class ModuleManager:
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.startlist = os.path.join(self.module_dir, 'start.list')
         self.start_list_lock = False
+        self.addon_loader = loader
+        self.addon_entries = Entry
         create_thread(self.exec_start_list)
+        create_thread(self.load_plugins)
 
     class ErrorCodes(int):
         Normal = 0
@@ -1541,6 +1545,15 @@ class ModuleManager:
             create_thread(self.run, i)
         self.start_list_lock = False
 
+    def load_plugins(self):
+        for i in os.listdir(self.module_dir):
+            if self.get_installed(i):
+                script_path = self.module_dir + f"/{i}/"
+                if os.path.exists(script_path + "main.py") and imp:
+                    try:
+                        imp.load_source('__maddon__', script_path + "main.py")
+                    except Exception:
+                        logging.exception('Bugs')
 
     def get_info(self, id_: str, item: str) -> str:
         info_file = f'{self.module_dir}/{id_}/info.json'
@@ -1590,10 +1603,7 @@ class ModuleManager:
                       f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
-            try:
-                imp.load_source('__mkc_module__', script_path + "main.py")
-            except Exception:
-                logging.exception('Bugs')
+            self.addon_loader.run(id_, Entry.main, globals())
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls_plugin()
