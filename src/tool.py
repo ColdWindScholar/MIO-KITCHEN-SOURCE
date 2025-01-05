@@ -1566,6 +1566,8 @@ class ModuleManager:
                         if hasattr(module, 'registry'):
                             for entry, func in module.registry.items():
                                 self.addon_loader.register(i, entry, func)
+                        elif hasattr(module, 'main'):
+                            self.addon_loader.register(i, self.addon_entries.main, module.main)
                     except Exception:
                         logging.exception('Bugs')
 
