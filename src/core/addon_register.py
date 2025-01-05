@@ -36,7 +36,7 @@ class PluginLoader(object):
                     "author":"",
                     "version":"",
                 }
-            self.virtual[virtual] = virtual_info
+            self.virtual[id_] = virtual_info
         if entry == Entry.boot:
             self.run(id_, entry)
 

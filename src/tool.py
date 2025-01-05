@@ -1590,17 +1590,17 @@ class ModuleManager:
         else:
             print(lang.warn2)
             return 1
+        script_path = self.module_dir + f"/{value}/"
         if id_ in self.addon_loader.virtual.keys():
             name = self.addon_loader.virtual[id_].get("name")
         else:
             name = self.get_name(id_)
-        script_path = self.module_dir + f"/{value}/"
-        with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
-            data = json.load(f)
-            for n in data['depend'].split():
-                if not os.path.exists(os.path.join(self.module_dir, n)):
-                    print(lang.text36 % (name, n, n))
-                    return 2
+            with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
+                data = json.load(f)
+                for n in data['depend'].split():
+                    if not os.path.exists(os.path.join(self.module_dir, n)):
+                        print(lang.text36 % (name, n, n))
+                        return 2
         if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
             values = self.Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
                 script_path + "main.json") else None
@@ -1623,6 +1623,8 @@ class ModuleManager:
                       f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
+            self.addon_loader.run(id_, Entry.main)
+        elif id_ in self.addon_loader.virtual.keys():
             self.addon_loader.run(id_, Entry.main)
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
