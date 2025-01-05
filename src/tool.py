@@ -3216,9 +3216,10 @@ class Packxx(Toplevel):
                                                                                                                   fill=X,
                                                                                                                   expand=True)
         move_center(self)
-        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.pack)
+        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.before_pack)
 
     def start_(self):
+        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.packing)
         try:
             self.destroy()
         except AttributeError:

@@ -6,8 +6,10 @@ except ImportError:
 class Entry(IntEnum):
     # Normal Entry
     main = 0
-    # When Pack Rom
-    pack = 1
+    # When  Pack Rom
+    before_pack = 1
+    # Packing
+    packing = 4
     # when the too close
     close = 2
     # When the tool boot
