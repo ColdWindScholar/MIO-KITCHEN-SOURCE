@@ -16,7 +16,6 @@ class Type(IntEnum):
     sh = 0
     msh = 1
     python = 3
-
 class PluginLoader(object):
     def __init__(self):
         self.plugins = {}
@@ -37,7 +36,10 @@ class PluginLoader(object):
         if not entry in self.plugins[id_].keys():
             logging.info(f"{entry} not in {id_}")
             return
-        return self.plugins[id_][entry](*args, **kwargs)
+        try:
+            return self.plugins[id_][entry](*args, **kwargs)
+        except TypeError:
+            return self.plugins[id_][entry]()
 
     def run_entry(self, entry:Entry):
         for id_ in self.plugins:

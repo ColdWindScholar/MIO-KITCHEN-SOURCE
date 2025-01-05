@@ -1562,7 +1562,10 @@ class ModuleManager:
                 script_path = self.module_dir + f"/{i}/"
                 if os.path.exists(script_path + "main.py") and imp:
                     try:
-                        imp.load_source('__maddon__', script_path + "main.py")
+                        module = imp.load_source('__maddon__', script_path + "main.py")
+                        if hasattr(module, 'registry'):
+                            for entry, func in module.registry.items():
+                                self.addon_loader.register(i, entry, func)
                     except Exception:
                         logging.exception('Bugs')
 
