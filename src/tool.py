@@ -3107,6 +3107,7 @@ class Packxx(Toplevel):
     def __init__(self, list_):
         if not list_:
             return
+        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.pack)
         self.lg = list_
         self.spatchvb = IntVar()
         self.custom_size = {}
