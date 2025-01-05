@@ -580,7 +580,15 @@ class ToolBox(ttk.Frame):
             self.choose_button.configure(state='disabled')
             self.do_trim()
             self.button.configure(text=lang.done, state='normal', style='')
-
+class DevNull:
+    def __init__(self):
+        self.data = ''
+        ...
+    def write(self, string):
+        self.data += string
+        ...
+    def flush(self):
+        ...
 
 class Tool(Tk):
     def __init__(self):
@@ -658,7 +666,9 @@ class Tool(Tk):
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
+        data:str = sys.stdout.data
         sys.stdout = StdoutRedirector(self.show)
+        sys.stdout.write(data)
         sys.stderr = StdoutRedirector(self.show, error_=True)
         tr.drop_target_register(DND_FILES)
         tr.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
@@ -1491,6 +1501,7 @@ class IconGrid(tk.Frame):
 
 class ModuleManager:
     def __init__(self):
+        sys.stdout = DevNull()
         self.module_dir = os.path.join(cwd_path, "bin", "module")
         self.uninstall_gui = self.UninstallMpk
         self.new = self.New

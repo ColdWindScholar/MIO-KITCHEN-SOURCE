@@ -39,5 +39,12 @@ class PluginLoader(object):
             return
         return self.plugins[id_][entry](*args, **kwargs)
 
+    def run_entry(self, entry:Entry):
+        for id_ in self.plugins:
+            if not entry in self.plugins[id_].keys():
+                continue
+            self.run(id_, entry)
+
+
 
 loader = PluginLoader()
