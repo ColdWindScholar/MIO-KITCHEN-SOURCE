@@ -4518,6 +4518,9 @@ def init_verify():
     if not settings.path.isprintable():
         ask_win2(lang.warn16 % lang.special_words)
 
+def exit_tool():
+    ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.close)
+    win.destroy()
 
 def __init__tk():
     if not os.path.exists(temp):
@@ -4574,6 +4577,7 @@ def __init__tk():
     if len(sys.argv) > 1:
         dndfile(sys.argv[1:])
     states.inited = True
+    win.protocol("WM_DELETE_WINDOW", exit_tool)
     win.mainloop()
 # Cool Init
 init = lambda :__init__tk()
