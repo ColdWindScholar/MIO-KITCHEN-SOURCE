@@ -1568,6 +1568,8 @@ class ModuleManager:
                                 self.addon_loader.register(i, entry, func)
                         elif hasattr(module, 'main'):
                             self.addon_loader.register(i, self.addon_entries.main, module.main)
+                        else:
+                            print(f"Can't registry Module {i} as Plugin, But We Found {[i for i in dir(module) if not i.startswith('__') and not i.endswith('__')]} in it.")
                     except Exception:
                         logging.exception('Bugs')
 
