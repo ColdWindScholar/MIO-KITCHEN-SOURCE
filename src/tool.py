@@ -2103,6 +2103,21 @@ class MpkMan(ttk.Frame):
         for i in self.pls.apps.keys():
             if not ModuleManager.get_installed(i):
                 self.pls.remove(i)
+        for i in ModuleManager.addon_loader.virtual.keys():
+            if i in self.pls.apps.keys():
+                continue
+            self.images_[i] = PhotoImage(data=images.none_byte)
+            icon = tk.Label(self.pls.scrollable_frame,
+                            image=self.images_[i],
+                            compound="center",
+                            text=ModuleManager.addon_loader.virtual[i].get('name'),
+                            bg="#4682B4",
+                            wraplength=70,
+                            justify='center')
+            icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(ModuleManager.run, ar))
+            icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
+            self.pls.add_icon(icon, i)
+
         for i in os.listdir(self.moduledir):
             if i in self.pls.apps.keys():
                 continue

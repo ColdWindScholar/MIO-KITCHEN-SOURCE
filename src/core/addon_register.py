@@ -21,13 +21,22 @@ class Type(IntEnum):
 class PluginLoader(object):
     def __init__(self):
         self.plugins = {}
+        self.virtual = {}
 
-    def register(self, id_:str="addon", entry:Entry=Entry,func:None=None):
+    def register(self, id_:str="addon", entry:Entry=Entry, func:None=None, virtual:bool = False, virtual_info:dict=None):
         if not func:
             logging.debug(f"{entry} of {id_} is {func}!")
         if id_ not in self.plugins:
             self.plugins[id_] = {}
         self.plugins[id_][entry] = func
+        if virtual:
+            if not virtual_info:
+                virtual_info = {
+                    "name":f"{id_} Extra",
+                    "author":"",
+                    "version":"",
+                }
+            self.virtual[virtual] = virtual_info
         if entry == Entry.boot:
             self.run(id_, entry)
 
