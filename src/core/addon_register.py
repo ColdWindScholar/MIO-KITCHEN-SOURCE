@@ -32,6 +32,7 @@ class PluginLoader(object):
         if virtual:
             if not virtual_info:
                 virtual_info = {
+                    "id":id_,
                     "name": id_,
                     "author":"",
                     "version":"",
