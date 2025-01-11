@@ -1982,7 +1982,7 @@ class ModuleManager:
             if id_:
                 self.value = id_
                 self.value2 = ModuleManager.get_name(id_)
-                self.lfdep()
+                self.lsdep()
                 self.ask()
             else:
                 win.message_pop(lang.warn2)
@@ -2016,7 +2016,7 @@ class ModuleManager:
                                                                                                 side=LEFT, pady=10,
                                                                                                 padx=10)
 
-        def lfdep(self, name=None):
+        def lsdep(self, name=None):
             if not name:
                 name = self.value
             for i in [i for i in os.listdir(self.module_dir) if os.path.isdir(self.module_dir + os.sep + i)]:
@@ -2027,7 +2027,7 @@ class ModuleManager:
                     for n in data['depend'].split():
                         if name == n:
                             self.arr[i] = data['name']
-                            self.lfdep(i)
+                            self.lsdep(i)
                             # 检测到依赖后立即停止
                             break
 
