@@ -1509,7 +1509,6 @@ class ModuleManager:
         self.uninstall_gui.module_dir = self.module_dir
         self.MshParse.module_dir = self.module_dir
         self.errorcodes = self.ErrorCodes()
-        self.get_name = lambda id_: name if (name := self.get_info(id_, 'name')) else id_
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.addon_loader = loader
         self.addon_entries = Entry
@@ -1520,7 +1519,13 @@ class ModuleManager:
         PlatformNotSupport = 1
         DependsMissing = 2
         IsBroken = 3
+    def is_virtual(self, id_):
+        return id_ in self.addon_loader.virtual.keys()
 
+    def get_name(self, id_):
+        if self.is_virtual(id_):
+            return self.addon_loader.virtual[id_].get("name", id_)
+        return name if (name := self.get_info(id_, 'name')) else id_
 
     def load_plugins(self):
         for i in os.listdir(self.module_dir):
@@ -1529,8 +1534,8 @@ class ModuleManager:
                 if os.path.exists(script_path + "main.py") and imp:
                     try:
                         module = imp.load_source('__maddon__', script_path + "main.py")
-                        if hasattr(module, 'registry'):
-                            for entry, func in module.registry.items():
+                        if hasattr(module, 'entrances'):
+                            for entry, func in module.entrances.items():
                                 self.addon_loader.register(i, entry, func)
                         elif hasattr(module, 'main'):
                             self.addon_loader.register(i, self.addon_entries.main, module.main)
@@ -1557,9 +1562,7 @@ class ModuleManager:
             print(lang.warn2)
             return 1
         script_path = self.module_dir + f"/{value}/"
-        if id_ in self.addon_loader.virtual.keys():
-            name = self.addon_loader.virtual[id_].get("name")
-        else:
+        if not self.is_virtual(id_):
             name = self.get_name(id_)
             with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
                 data = json.load(f)
@@ -1590,7 +1593,7 @@ class ModuleManager:
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
             self.addon_loader.run(id_, Entry.main)
-        elif id_ in self.addon_loader.virtual.keys():
+        elif self.is_virtual(id_):
             self.addon_loader.run(id_, Entry.main)
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
@@ -1664,6 +1667,9 @@ class ModuleManager:
     @animation
     def export(self, id_: str):
         name: str = self.get_name(id_)
+        if self.is_virtual(id_):
+            print(f"{name} is a virtual plugin!")
+            return
         if not id_:
             win.message_pop(lang.warn2)
             return 1
@@ -1988,8 +1994,12 @@ class ModuleManager:
                 logging.exception('Bugs')
             self.title(lang.t6)
             move_center(self)
-            ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+            if not ModuleManager.is_virtual(self.value):
+                ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                               expand=True)
+            else:
+                ttk.Label(self, text="The Plugin %s is virtual." % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+                                                                                  expand=True)
             if self.arr:
                 ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
                 ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
@@ -1998,11 +2008,11 @@ class ModuleManager:
                 for i in self.arr.keys():
                     te.insert("end", self.arr.get(i, 'None'))
                 te.pack(fill=BOTH, padx=10, pady=10)
-
             ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                           pady=10,
                                                                           padx=10)
-            ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
+            if not ModuleManager.is_virtual(self.value):
+                ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
                                                                                                 side=LEFT, pady=10,
                                                                                                 padx=10)
 
