@@ -1511,11 +1511,8 @@ class ModuleManager:
         self.errorcodes = self.ErrorCodes()
         self.get_name = lambda id_: name if (name := self.get_info(id_, 'name')) else id_
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
-        self.startlist = os.path.join(self.module_dir, 'start.list')
-        self.start_list_lock = False
         self.addon_loader = loader
         self.addon_entries = Entry
-        create_thread(self.exec_start_list)
         create_thread(self.load_plugins)
 
     class ErrorCodes(int):
@@ -1524,37 +1521,6 @@ class ModuleManager:
         DependsMissing = 2
         IsBroken = 3
 
-    def write_start_list(self, id, remove=False):
-        if self.start_list_lock:
-            print("Waiting For Lock...")
-            while self.start_list_lock:
-                time.sleep(1)
-        self.start_list_lock = True
-        s_list = JsonEdit(self.startlist)
-        data = s_list.read()
-        if data is not list:
-            data = list(data)
-        if not id in data:
-            data.append(id)
-        if remove and id in data:
-            data.remove(id)
-        s_list.write(data)
-        del data
-        self.start_list_lock = False
-
-    def exec_start_list(self):
-        if self.start_list_lock:
-            print("Waiting For Lock...")
-            while self.start_list_lock:
-                time.sleep(1)
-        self.start_list_lock = True
-        while not states.inited:
-            time.sleep(1)
-        for i in JsonEdit(self.startlist).read():
-            if not self.get_installed(i):
-                continue
-            create_thread(self.run, i)
-        self.start_list_lock = False
 
     def load_plugins(self):
         for i in os.listdir(self.module_dir):
@@ -1674,12 +1640,6 @@ class ModuleManager:
                     info = fz.getinfo(file)
                     extracted_size += info.file_size
                     fz.extract(file, str(os.path.join(cwd_path, "bin", "module", install_dir)))
-        try:
-            start_auto = mconf.get('module', 'start_auto')
-        except:
-            start_auto = 'False'
-        if start_auto in ['True', 'true', '1']:
-            self.write_start_list(mconf.get('module', 'identifier'))
         try:
             depends = mconf.get('module', 'depend')
         except (Exception, BaseException):
@@ -2068,7 +2028,6 @@ class ModuleManager:
             self.remove(self.value, self.value2)
 
         def remove(self, name=None, show_name='') -> None:
-            ModuleManager.write_start_list(name, remove=True)
             if name:
                 print(lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(self.module_dir + os.sep + name):
