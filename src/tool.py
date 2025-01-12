@@ -2255,28 +2255,37 @@ class InstallMpk(Toplevel):
         self.installb.config(state=DISABLED)
 
 def Generate_Bug_Report():
-        if os.name == 'nt':
-            output = filedialog.askdirectory(title="Path To Save Bug Report")
-        else:
-            output = cwd_path
-        output = str(output)
-        if not output:
-            return
-        if not os.path.isdir(output) or not os.path.exists(output):
-            return
-        re_folder(inner := os.path.join(temp, v_code()))
-        shutil.copyfile(tool_log, os.path.join(inner, os.path.basename(tool_log)))
-        with open(os.path.join(inner, 'detail.txt'), 'w+', encoding='utf-8', newline='\n') as f:
-            f.write(f'Python: {sys.version}\n')
-            f.write(f'Platform: {sys.platform}\n')
-            f.write(f'Exec Command: {sys.argv}\n')
-            f.write(f'Tool Version: {settings.version}\n')
-            f.write(f'Source code running: {states.run_source}\n')
-            f.write(f'python Implementation: {platform.python_implementation()}\n')
-            f.write(f'Uname: {platform.uname()}\n')
-        pack_zip(inner, bugreport:=os.path.join(output, f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"), slient=True)
-        re_folder(inner,quiet=True)
-        print(f"\tThe Bug Report Was Saved:{bugreport}")
+    n = '\n'
+    if os.name == 'nt':
+        output = filedialog.askdirectory(title="Path To Save Bug Report")
+    else:
+        output = cwd_path
+    output = str(output)
+    if not output:
+        return
+    if not os.path.isdir(output) or not os.path.exists(output):
+        return
+    re_folder(inner := os.path.join(temp, v_code()))
+    shutil.copyfile(tool_log, os.path.join(inner, os.path.basename(tool_log)))
+    with open(os.path.join(inner, 'detail.txt'), 'w+', encoding='utf-8', newline='\n') as f:
+
+        f.write(f"""
+        ----BasicInfo-----
+        Python: {sys.version}
+        Platform: {sys.platform}
+        Exec Command: {sys.argv}
+        Tool Version: {settings.version}
+        Source code running: {states.run_source}
+        python Implementation: {platform.python_implementation()}
+        Uname: {platform.uname()}
+        ----Settings-------
+        {[i + f'={getattr(settings, i)}{n}' for i in dir(settings)]}
+        """)
+    pack_zip(inner, bugreport := os.path.join(output,
+                                              f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
+             slient=True)
+    re_folder(inner, quiet=True)
+    print(f"\tThe Bug Report Was Saved:{bugreport}")
 
 class Debugger(Toplevel):
     def __init__(self):
@@ -4067,32 +4076,31 @@ def rmdir(path, quiet=False):
 def pack_zip(input_dir=None,output_zip=None, slient=False):
     if input_dir is None:
         input_dir = ProjectManager.current_work_output_path()
+        if not ProjectManager.exist():
+            win.message_pop(lang.warn1)
+            return
     if output_zip is None:
         output_zip = settings.path + os.sep + current_project_name.get() + ".zip"
     if not slient:
         if ask_win(lang.t53) != 1:
             return
-    if not ProjectManager.exist():
-        win.message_pop(lang.warn1)
-    else:
-        print(lang.text91 % current_project_name.get())
-        if not slient:
-            if ask_win(lang.t25) == 1:
-                PackHybridRom()
-        with zipfile.ZipFile(output_zip, 'w',
-                             compression=zipfile.ZIP_DEFLATED) as zip_:
-            for file in utils.get_all_file_paths(input_dir):
-                file = str(file)
-                arch_name = file.replace(input_dir, '')
-                if not slient:
-                    print(f"{lang.text1}:{arch_name}")
-                try:
-                    zip_.write(file, arcname=arch_name)
-                except Exception as e:
-                    print(lang.text2.format(file, e))
-        if os.path.exists(output_zip):
-            print(lang.text3.format(output_zip))
-
+    print(lang.text91 % current_project_name.get())
+    if not slient:
+        if ask_win(lang.t25) == 1:
+            PackHybridRom()
+    with zipfile.ZipFile(output_zip, 'w',
+                         compression=zipfile.ZIP_DEFLATED) as zip_:
+        for file in utils.get_all_file_paths(input_dir):
+            file = str(file)
+            arch_name = file.replace(input_dir, '')
+            if not slient:
+                print(f"{lang.text1}:{arch_name}")
+            try:
+                zip_.write(file, arcname=arch_name)
+            except Exception as e:
+                print(lang.text2.format(file, e))
+    if os.path.exists(output_zip):
+        print(lang.text3.format(output_zip))
 
 def dndfile(files):
     for fi in files:
