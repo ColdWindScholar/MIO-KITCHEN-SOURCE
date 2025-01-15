@@ -838,7 +838,6 @@ class LpUnpack:
 
         except LpUnpackError as e:
             print(e.message)
-            sys.exit(1)
 
         finally:
             self._fd.close()
