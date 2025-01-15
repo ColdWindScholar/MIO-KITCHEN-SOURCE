@@ -2953,6 +2953,7 @@ def download_api(url, path=None, int_=True, size_=0):
     response = requests.Session().head(url)
     file_size = int(response.headers.get("Content-Length", 0))
     response = requests.Session().get(url, stream=True, verify=False)
+    last_time = time.time()
     if file_size == 0 and size_:
         file_size = size_
     with open((settings.path if path is None else path) + os.sep + os.path.basename(url), "wb") as f:
@@ -2962,7 +2963,11 @@ def download_api(url, path=None, int_=True, size_=0):
             f.write(data)
             bytes_downloaded += len(data)
             elapsed = time.time() - start_time
-            speed = bytes_downloaded / (1024 * elapsed)
+            # old method
+            # speed = bytes_downloaded / 1024 / elapsed
+            used_time = time.time() - last_time
+            speed = chunk_size / 1024 / used_time
+            last_time = time.time()
             percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
