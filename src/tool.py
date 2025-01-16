@@ -2958,6 +2958,7 @@ def download_api(url, path=None, int_=True, size_=0):
         file_size = size_
     with open((settings.path if path is None else path) + os.sep + os.path.basename(url), "wb") as f:
         chunk_size = 2048576
+        chunk_kb = chunk_size / 1024
         bytes_downloaded = 0
         for data in response.iter_content(chunk_size=chunk_size):
             f.write(data)
@@ -2966,7 +2967,7 @@ def download_api(url, path=None, int_=True, size_=0):
             # old method
             # speed = bytes_downloaded / 1024 / elapsed
             used_time = time.time() - last_time
-            speed = chunk_size / 1024 / used_time
+            speed = chunk_kb / used_time
             last_time = time.time()
             percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
