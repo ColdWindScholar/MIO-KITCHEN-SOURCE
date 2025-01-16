@@ -610,7 +610,7 @@ class Tool(Tk):
     def get_frame(self, title):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
         frame.pack(padx=10, pady=10)
-        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne")
+        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne", padx=5, pady=5)
         self.update_frame()
         self.scrollbar.config(command=self.canvas1.yview)
         return frame
@@ -4587,6 +4587,8 @@ def __init__tk():
     win.protocol("WM_DELETE_WINDOW", exit_tool)
     win.mainloop()
 # Cool Init
+# Miside 米塔
+# Link: https://store.steampowered.com/app/2527500/
 init = lambda :__init__tk()
 
 def restart(er=None):
