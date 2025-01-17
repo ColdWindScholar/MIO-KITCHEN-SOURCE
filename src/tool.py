@@ -669,6 +669,7 @@ class Tool(Tk):
         data:str = sys.stdout.data
         sys.stdout = StdoutRedirector(self.show)
         sys.stdout.write(data)
+        del data
         sys.stderr = StdoutRedirector(self.show, error_=True)
         tr.drop_target_register(DND_FILES)
         tr.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
