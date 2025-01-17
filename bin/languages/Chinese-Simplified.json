@@ -20,6 +20,7 @@
   "scopy":"复制",
   "size": "大小",
   "time": "时间",
+  "welcome_text": "形象大使: %s\n画师: %s\n欢迎来到 %s",
   "context_patch": "Selinux 上下文修补",
   "detail": "详情",
   "solution": "解决方案",

@@ -695,7 +695,7 @@ class Tool(Tk):
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
         Label(self.tab, image=kemiaojiang).pack(side='left', padx=0, expand=True)
-        Label(self.tab, text="Ambassador: KeMiaoJiang\nPainter: HY-惠\nWelcome To MIO-KITCHEN", justify='left',
+        Label(self.tab, text=lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN"), justify='left',
               foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
 
     def tab6_content(self):

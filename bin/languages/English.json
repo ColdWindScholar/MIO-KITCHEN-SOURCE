@@ -19,6 +19,7 @@
   "scopy":"Copy",
   "size": "Size",
   "time": "Time",
+  "welcome_text": "Ambassador: %s\nPainter: %s\nWelcome To %s",
   "context_patch": "SELinux Context Patch",
   "detail": "Details",
   "solution": "Solution",
