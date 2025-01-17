@@ -3869,7 +3869,9 @@ def ask_win2(text='', ok=None, cancel=None) -> int:
     return value.get()
 
 
-def info_win(text: str, ok: str = lang.ok):
+def info_win(text: str, ok: str = None):
+    if ok is None:
+        ok = lang.ok
     ask = Toplevel()
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
