@@ -2695,7 +2695,7 @@ class PackSuper(Toplevel):
         (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
         self.supersz.set(1)
 
-        radios = [("A-only", 1), ("Virtual-ab", 2), ("Virtual-ab", 3)]
+        radios = [("A-only", 1), ("Virtual-ab", 2), ("ab", 3)]
         for text, value in radios:
             ttk.Radiobutton(lf1, text=text, variable=self.supersz, value=value).pack(side='left', padx=10, pady=10)
 
