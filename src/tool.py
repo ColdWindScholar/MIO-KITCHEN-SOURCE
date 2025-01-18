@@ -3656,7 +3656,11 @@ def unpack(chose, form: str = '') -> bool:
         return False
     if form == 'payload':
         print(lang.text79 + "payload")
-        Dumper(work + "payload.bin", work, diff=False, old='old', images=chose).run()
+        dumper = Dumper(work + "payload.bin", work, diff=False, old='old', images=chose)
+        try:
+            dumper.run()
+        except RuntimeError:
+            dumper.run(slow=True)
         return True
     elif form == 'super':
         print(lang.text79 + "Super")
