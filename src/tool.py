@@ -2614,6 +2614,8 @@ class MpkStore(Toplevel):
         if ModuleManager.get_installed(id_):
             control.config(style="")
             self.control.get(id_)[1].config(state='normal', style="Accent.TButton")
+        if id_ in self.tasks:
+            self.tasks.remove(id_)
 
     def get_db(self):
         self.clear()
