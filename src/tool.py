@@ -2305,10 +2305,11 @@ class Debugger(Toplevel):
             ('Info', self.show_info),
             ('Crash it!', self.crash),
             ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
+            ('米塔 MiSide', lambda: openurl('https://store.steampowered.com/app/2527500/')),
             ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
         ]
         for index, (text, func) in enumerate(functions):
-            ttk.Button(self, text=text, command=func).grid(row=row, column=num_c, padx=5, pady=5)
+            ttk.Button(self, text=text, command=func, width=20, style="Toggle.TButton").grid(row=row, column=num_c, padx=5, pady=5)
             num_c += 1
             if num_c >= num:
                 row += 1
@@ -2325,31 +2326,19 @@ class Debugger(Toplevel):
         ck.title('Info')
         ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
                                                                                      sticky='nw')
-        ttk.Label(ck, text='Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE V3', foreground='gray').grid(row=5,
-                                                                                                                column=0,
-                                                                                                                padx=5,
-                                                                                                                pady=5,
-                                                                                                                sticky='nw')
-        ttk.Label(ck, text=f'Python: {sys.version}', foreground='gray').grid(row=1, column=0, padx=5, pady=5,
+        text = f"""
+        Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE V3
+        Python: {sys.version}
+        Platform: {sys.platform}
+        Exec Command: {sys.argv}
+        Tool Version: {settings.version}
+        Source code running: {states.run_source}
+        python Implementation: {platform.python_implementation()}
+        Uname: {platform.uname()}
+        Log File: {tool_log}
+        """
+        ttk.Label(ck, text=text, foreground='gray').grid(row=1, column=0, padx=5, pady=5,
                                                                              sticky='nw')
-        ttk.Label(ck, text=f'Platform: {sys.platform}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
-                                                                                sticky='nw')
-        ttk.Label(ck, text=f'Exec Command: {sys.argv}', foreground='gray').grid(row=2, column=0, padx=5, pady=5,
-                                                                                sticky='nw')
-        ttk.Label(ck, text=f'Tool Version: {settings.version}', foreground='gray').grid(row=3, column=0, padx=5, pady=5,
-                                                                                        sticky='nw')
-        ttk.Label(ck, text=f'Source code running: {states.run_source}',
-                  foreground='gray').grid(row=3, column=0, padx=5, pady=5,
-                                          sticky='nw')
-        ttk.Label(ck, text=f'python Implementation: {platform.python_implementation()}', foreground='gray').grid(row=4,
-                                                                                                                 column=0,
-                                                                                                                 padx=5,
-                                                                                                                 pady=5,
-                                                                                                                 sticky='nw')
-        ttk.Label(ck, text=f'Uname: {platform.uname()}', foreground='gray').grid(row=5, column=0, padx=5, pady=5,
-                                                                                 sticky='nw')
-        ttk.Label(ck, text=f"Log File: {tool_log}", foreground='gray').grid(row=6, column=0, padx=5, pady=5,
-                                                                            sticky='nw')
         move_center(ck)
 
     @staticmethod
