@@ -1975,9 +1975,11 @@ class ModuleManager:
 
     class UninstallMpk(Toplevel):
 
-        def __init__(self, id_: str):
+        def __init__(self, id_: str, wait=False):
             super().__init__()
             self.arr = {}
+            self.uninstall_b = None
+            self.wait = wait
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             if id_ and ModuleManager.get_installed(id_):
@@ -2019,9 +2021,10 @@ class ModuleManager:
                                                                           pady=10,
                                                                           padx=10)
             if not ModuleManager.is_virtual(self.value) and self.check_pass:
-                ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
-                                                                                                side=LEFT, pady=10,
-                                                                                                padx=10)
+                self.uninstall_b = ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton")
+                self.uninstall_b.pack(fill=X, expand=True, side=LEFT, pady=10, padx=10)
+            if self.wait:
+                self.wait_window()
 
         def lsdep(self, name=None):
             if not name:
@@ -2039,14 +2042,19 @@ class ModuleManager:
                             break
 
         def uninstall(self):
-            self.destroy()
+            if not self.uninstall_b:
+                return
+            else:
+                self.uninstall_b.config(state='disabled')
             for i in self.arr.keys():
                 self.remove(i, self.arr.get(i, 'None'))
             self.remove(self.value, self.value2)
+            self.destroy()
 
         def remove(self, name=None, show_name='') -> None:
             if name:
                 print(lang.text29.format(name if not show_name else show_name))
+                self.uninstall_b.config(text=lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(self.module_dir + os.sep + name):
                     try:
                         rmtree(self.module_dir + os.sep + name)
@@ -2057,6 +2065,7 @@ class ModuleManager:
                     win.message_pop(lang.warn9, 'red')
                 else:
                     print(lang.text30)
+                    self.uninstall_b.config(text=lang.text30)
                     try:
                         list_pls_plugin()
                     except (Exception, BaseException):
@@ -2540,7 +2549,7 @@ class MpkStore(Toplevel):
 
     def uninstall(self, id_):
         bu, uninstall_button = self.control.get(id_)
-        ModuleManager.uninstall_gui(id_)
+        ModuleManager.uninstall_gui(id_, wait=True)
         if not ModuleManager.get_installed(id_):
             bu.config(style="Accent.TButton")
             uninstall_button.config(state='disabled')
