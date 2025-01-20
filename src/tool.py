@@ -1980,13 +1980,16 @@ class ModuleManager:
             self.arr = {}
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
-            if id_:
+            if id_ and ModuleManager.get_installed(id_):
+                self.check_pass = True
                 self.value = id_
                 self.value2 = ModuleManager.get_name(id_)
                 self.lsdep()
-                self.ask()
             else:
+                self.check_pass = False
+                self.value = None
                 win.message_pop(lang.warn2)
+            self.ask()
 
         def ask(self):
             try:
@@ -1995,9 +1998,12 @@ class ModuleManager:
                 logging.exception('Bugs')
             self.title(lang.t6)
             move_center(self)
-            if not ModuleManager.is_virtual(self.value):
+            if not ModuleManager.is_virtual(self.value) and self.check_pass:
                 ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                               expand=True)
+            elif not self.check_pass:
+                ttk.Label(self, text=lang.warn2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
+                                                                                  expand=True)
             else:
                 ttk.Label(self, text="The Plugin %s is virtual." % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                                   expand=True)
@@ -2012,7 +2018,7 @@ class ModuleManager:
             ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                           pady=10,
                                                                           padx=10)
-            if not ModuleManager.is_virtual(self.value):
+            if not ModuleManager.is_virtual(self.value) and self.check_pass:
                 ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton").pack(fill=X, expand=True,
                                                                                                 side=LEFT, pady=10,
                                                                                                 padx=10)
@@ -2513,15 +2519,34 @@ class MpkStore(Toplevel):
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
+
             bu = ttk.Button(f, text=lang.text21,
-                            command=lambda a=args: create_thread(self.download, *a), width=15)
+                            command=lambda a=args: create_thread(self.download, *a), width=5)
+            uninstall_button = ttk.Button(f, text=lang.text20,
+                                          command=lambda a=data.get('id'): create_thread(self.uninstall,
+                                                                                         a), width=5)
             if not ModuleManager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
-            self.control[data.get('id')] = bu
+                uninstall_button.config(state='disabled')
+            else:
+                bu.config(width=5)
+                uninstall_button.config(style="Accent.TButton")
+            self.control[data.get('id')] = bu, uninstall_button
+            uninstall_button.pack(side=RIGHT, padx=5, pady=5)
             bu.pack(side=RIGHT, padx=5, pady=5)
             f.pack(padx=5, pady=5, anchor='nw', expand=1)
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    def uninstall(self, id_):
+        bu, uninstall_button = self.control.get(id_)
+        ModuleManager.uninstall_gui(id_)
+        if not ModuleManager.get_installed(id_):
+            bu.config(style="Accent.TButton")
+            uninstall_button.config(state='disabled')
+        else:
+            bu.config(width=5)
+            uninstall_button.config(style="Accent.TButton")
 
     def clear(self):
         for i in self.deque:
@@ -2551,7 +2576,7 @@ class MpkStore(Toplevel):
         else:
             return
         if id_ in self.control.keys():
-            control = self.control.get(id_)
+            control = self.control.get(id_)[0]
             control.config(state='disabled')
         else:
             control = None
@@ -2579,6 +2604,7 @@ class MpkStore(Toplevel):
         control.config(state='normal', text=lang.text21)
         if ModuleManager.get_installed(id_):
             control.config(style="")
+            self.control.get(id_)[1].config(state='normal', style="Accent.TButton")
 
     def get_db(self):
         self.clear()
