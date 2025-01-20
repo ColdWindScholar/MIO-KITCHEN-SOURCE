@@ -2327,7 +2327,7 @@ class Debugger(Toplevel):
         ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
                                                                                      sticky='nw')
         text = f"""
-        Open Source License: GNU AFFERO GENERAL PUBLIC LICENSE V3
+        Open Source License: {states.open_source_license}
         Python: {sys.version}
         Platform: {sys.platform}
         Exec Command: {sys.argv}

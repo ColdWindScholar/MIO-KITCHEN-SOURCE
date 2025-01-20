@@ -650,6 +650,7 @@ class States:
     in_oobe = False
     development = False
     inited = False
+    open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
 
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):
