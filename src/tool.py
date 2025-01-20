@@ -2488,6 +2488,8 @@ class MpkStore(Toplevel):
         if app_dict is None:
             app_dict = []
         for data in app_dict:
+            if data.get('id') in self.app_infos:
+                continue
             f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=150)
             f.pack_propagate(False)
             self.app_infos[data.get('id')] = f
@@ -2499,12 +2501,15 @@ class MpkStore(Toplevel):
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
             o = ttk.Label(f2,
                           text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
-                               , wraplength=200)
+                               , wraplength=250)
             o.pack_propagate(False)
             o.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
-            ttk.Label(f3, text=f"{data.get('desc')}", wraplength=200).pack(padx=5, pady=5)
+            desc = data.get('desc')
+            if not desc:
+                desc = 'No Description.'
+            ttk.Label(f3, text=f"{desc}", wraplength=250).pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
