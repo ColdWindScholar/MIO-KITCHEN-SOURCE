@@ -19,7 +19,6 @@ import platform
 import shutil
 import subprocess
 import threading
-from collections import deque
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
@@ -2463,7 +2462,7 @@ class MpkStore(Toplevel):
                          lambda *x: self.search_apps())
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.logo = PhotoImage(data=images.none_byte)
-        self.deque = deque()
+        self.deque = []
         self.control = {}
         frame = tk.Frame(self)
         frame.pack(fill='both', padx=10, pady=10, expand=True)
