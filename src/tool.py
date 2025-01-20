@@ -2488,7 +2488,7 @@ class MpkStore(Toplevel):
         if app_dict is None:
             app_dict = []
         for data in app_dict:
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=100)
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=150)
             f.pack_propagate(False)
             self.app_infos[data.get('id')] = f
             self.deque.append(f)
@@ -2498,18 +2498,18 @@ class MpkStore(Toplevel):
             ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
             o = ttk.Label(f2,
-                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} Size:{hum_convert(data.get('size'))}"[
-                               :50])
+                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
+                               , wraplength=200)
             o.pack_propagate(False)
             o.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
             f3 = ttk.Frame(fb)
-            ttk.Label(f3, text=f"{data.get('desc')[:27]}").pack(padx=5, pady=5)
+            ttk.Label(f3, text=f"{data.get('desc')}", wraplength=200).pack(padx=5, pady=5)
             f3.pack(side=BOTTOM)
             fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
             bu = ttk.Button(f, text=lang.text21,
-                            command=lambda a=args: create_thread(self.download, *a))
+                            command=lambda a=args: create_thread(self.download, *a), width=15)
             if not ModuleManager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
             self.control[data.get('id')] = bu
