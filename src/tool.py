@@ -2319,9 +2319,10 @@ class Debugger(Toplevel):
             ('Info', self.show_info),
             ('Crash it!', self.crash),
             ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
+            ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
             ('米塔 MiSide', lambda: openurl('https://store.steampowered.com/app/2527500/')),
             ('米塔 MiSide(Demo)', lambda: openurl('steam://install/2527520')),
-            ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
+            ('No More Room in Hell', lambda: openurl('steam://install/224260')),
         ]
         for index, (text, func) in enumerate(functions):
             ttk.Button(self, text=text, command=func, width=20, style="Toggle.TButton").grid(row=row, column=num_c, padx=5, pady=5)
