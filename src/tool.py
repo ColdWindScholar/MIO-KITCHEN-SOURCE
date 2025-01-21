@@ -2320,6 +2320,7 @@ class Debugger(Toplevel):
             ('Crash it!', self.crash),
             ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
             ('米塔 MiSide', lambda: openurl('https://store.steampowered.com/app/2527500/')),
+            ('米塔 MiSide(Demo)', lambda: openurl('steam://install/2527520')),
             ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
         ]
         for index, (text, func) in enumerate(functions):
