@@ -2353,6 +2353,9 @@ class Debugger(Toplevel):
         Uname: {platform.uname()}
         Log File: {tool_log}
         """
+        # _base_executable: {sys._base_executable}
+        if hasattr(sys, '_base_executable'):
+            text += f'_base_executable: {sys._base_executable}'
         ttk.Label(ck, text=text, foreground='gray').grid(row=1, column=0, padx=5, pady=5,
                                                                              sticky='nw')
         move_center(ck)
