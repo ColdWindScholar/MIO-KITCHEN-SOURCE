@@ -82,6 +82,8 @@ class ListBox(Frame):
         args = (var, value)
         var.trace('w',
                   lambda *x, arg=args: self.__set_value(*arg))
+        if state:
+            self.__set_value(var, value)
         self.controls.append(c)
         c.pack(anchor='nw', fill='y', padx=5, pady=3)
         self.update_ui()
