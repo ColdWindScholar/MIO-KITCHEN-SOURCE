@@ -4579,7 +4579,7 @@ def exit_tool():
     win.destroy()
 
 def parse_cmdline(args_list:list):
-    parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!')
+    parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
     subparser = parser.add_subparsers(title='subcommand',
                                       description='Valid subcommands')
     # Unpack Rom
