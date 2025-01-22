@@ -1,17 +1,56 @@
 {
     "error: ext4_allocate_best_fit_partial: failed to allocate xxx blocks, out of space?": {
-        "English": "You should increase the size for the img you are packing, if u use <auto>, You should switch to the <original size> , and modify <PARTNAME>_size.txt(under <config> folder) to increase the size of the image, and try again",
-        "Chinese-Simplified": "您应该增加镜像打包的大小，如果您使用＜自动读取＞，您应该切换到＜原大小＞，并修改＜分区名＞_size.txt(位于<config>文件夹)增加图像的大小，然后重试打包"
+        "detail": {
+            "Chinese-Simplified": "镜像空间不足，无法容纳所有文件",
+            "English": "The image size is too small to accommodate all files",
+            "Russian": "Недостаточно места в образе для размещения всех файлов"
+        },
+        "Chinese-Simplified": "请增大镜像大小或清理无用文件，修改config文件夹中的_size.txt",
+        "English": "Increase image size via _size.txt in config folder",
+        "Russian": "Увеличьте размер образа через файл _size.txt в папке config"
     },
+
     "error: build_directory_structure: cannot lookup security context for xxx": {
         "detail": {
-            "Chinese-Simplified": "这是由于无法找到该文件（夹）的Selinux条目导致的"
+            "Chinese-Simplified": "文件/文件夹缺少SELinux上下文或包含特殊字符",
+            "English": "Missing SELinux context or invalid characters in path",
+            "Russian": "Отсутствует контекст SELinux или недопустимые символы в пути"
         },
-        "English": "You should make sure there is no whitespace characters in directory or file names and try again.",
-        "Chinese-Simplified": "您应该检查此文件夹是否存在名称带空格的文件夹/文件，发现后请重命名或删除，然后重新打包"
+        "Chinese-Simplified": "请检查文件名是否有空格/特殊字符并重命名",
+        "English": "Remove spaces/special characters from file names",
+        "Russian": "Удалите пробелы/спецсимволы из имен файлов"
     },
+
     "Partition table must have at least one entry": {
-        "English": "Please select at least one partition for Super",
-        "Chinese-Simplified": "请为Super至少选择一个分区打包"
+        "detail": {
+            "Chinese-Simplified": "Super镜像未选择任何分区",
+            "English": "No partitions selected for Super image",
+            "Russian": "Для образа Super не выбрано ни одного раздела"
+        },
+        "Chinese-Simplified": "请至少选择一个分区进行打包",
+        "English": "Select at least one partition in Super config",
+        "Russian": "Выберите минимум один раздел в конфигурации Super"
+    },
+
+    "Invalid sparse format": {
+        "detail": {
+            "Chinese-Simplified": "稀疏镜像格式损坏或不兼容",
+            "English": "Corrupted or incompatible sparse image format",
+            "Russian": "Повреждённый или несовместимый формат sparse-образа"
+        },
+        "Chinese-Simplified": "请使用最新工具重新生成镜像",
+        "English": "Regenerate image with updated tools",
+        "Russian": "Пересоберите образ актуальными инструментами"
+    },
+
+    "Failed to parse metadata": {
+        "detail": {
+            "Chinese-Simplified": "元数据文件结构损坏",
+            "English": "Corrupted metadata structure",
+            "Russian": "Повреждена структура метаданных"
+        },
+        "Chinese-Simplified": "请检查更新源文件完整性",
+        "English": "Verify source files integrity",
+        "Russian": "Проверьте целостность исходных файлов"
     }
 }
