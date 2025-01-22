@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import argparse
 import gzip
 import json
 import platform
@@ -4577,7 +4578,21 @@ def exit_tool():
     ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.close)
     win.destroy()
 
-def __init__tk():
+def parse_cmdline(args_list:list):
+    parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!')
+    subparser = parser.add_subparsers(title='subcommand',
+                                      description='Valid subcommands')
+    # Unpack Rom
+    unpack_rom_parser = subparser.add_parser('unpack', add_help=False)
+    unpack_rom_parser.set_defaults(func=dndfile)
+    # End
+    subcmd, subcmd_args = parser.parse_known_args(args_list)
+    if not hasattr(subcmd, 'func'):
+        parser.print_help()
+        return 1
+    subcmd.func(subcmd_args)
+
+def __init__tk(args):
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
@@ -4629,15 +4644,15 @@ def __init__tk():
         do_override_sv_ttk_fonts()
         if sys.getwindowsversion().major <= 6:
             ask_win(lang.warn20)
-    if len(sys.argv) > 1:
-        dndfile(sys.argv[1:])
     states.inited = True
     win.protocol("WM_DELETE_WINDOW", exit_tool)
+    if len(args) > 1:
+        win.after(1000, parse_cmdline, args[1:])
     win.mainloop()
 # Cool Init
 # Miside 米塔
 # Link: https://store.steampowered.com/app/2527500/
-init = lambda :__init__tk()
+init = lambda args:__init__tk(args)
 
 def restart(er=None):
     try:

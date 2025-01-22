@@ -8,4 +8,4 @@ if sys.version_info.major == 3:
 from src.tool import *
 
 if __name__ == "__main__":
-    init()
+    init(sys.argv)
