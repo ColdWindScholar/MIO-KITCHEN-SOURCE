@@ -3478,7 +3478,9 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = lang.text76, text: str = "") -> str:
+def input_(title: str = None, text: str = "") -> str:
+    if not title:
+        title = lang.text76
     (input_var := StringVar()).set(text)
     input__ = ttk.LabelFrame(win, text=title)
     input__.place(relx=0.5, rely=0.5, anchor="center")
