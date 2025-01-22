@@ -62,7 +62,8 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from .core.dumper import Dumper
-from .core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, JsonEdit
+from .core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
+    JsonEdit, project_name
 
 if os.name == 'nt':
     from ctypes import windll
@@ -3628,7 +3629,8 @@ def unpackrom(ifile) -> None:
         except Exception as e:
             win.message_pop(str(e))
         copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source/'))
-        project_menu.listdir()
+        current_project_name.set(os.path.basename(folder))
+        project_menu.set_project(current_project_name.get())
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())])
     else:
