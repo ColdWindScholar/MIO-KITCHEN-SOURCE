@@ -740,7 +740,7 @@ class LpUnpack:
 
             if header.magic != LP_METADATA_HEADER_MAGIC:
                 check_index = index + 1
-                if check_index > len(offsets):
+                if check_index >= len(offsets):
                     raise LpUnpackError('Logical partition metadata has invalid magic value.')
                 else:
                     print(f'Read Backup header by offset 0x{offsets[check_index]:x}')
