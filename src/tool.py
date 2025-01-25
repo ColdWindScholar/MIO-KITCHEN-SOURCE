@@ -4582,26 +4582,44 @@ def exit_tool():
 class ParseCmdline:
     def __init__(self, args_list):
         self.args_list = args_list
+        self.cmd_exit = settings.cmd_exit
         self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
         subparser = self.parser.add_subparsers(title='subcommand',
                                           description='Valid subcommands')
         # Unpack Rom
-        unpack_rom_parser = subparser.add_parser('unpack', add_help=False)
+        unpack_rom_parser = subparser.add_parser('unpack', add_help=False, help="Unpack Suported File")
         unpack_rom_parser.set_defaults(func=dndfile)
+        # Set Config
+        set_config_parse = subparser.add_parser('set', help="Set Config")
+        set_config_parse.set_defaults(func=self.set)
         # End
         if len(args_list) == 1:
             dndfile(args_list)
         else:
-            self.parse()
-        if settings.cmd_exit == '1':
+            self.__parse()
+        if self.cmd_exit == '1':
             sys.exit(1)
-
-    def parse(self):
+    # Hidden Methods
+    def __parse(self):
         subcmd, subcmd_args = self.parser.parse_known_args(self.args_list)
         if not hasattr(subcmd, 'func'):
             self.parser.print_help()
             return
         subcmd.func(subcmd_args)
+    def __pass(self):
+        pass
+    # Export Methods
+
+    def set(self, args):
+        if len(args) > 2:
+            print('Many Args!')
+            return
+        name, value = args
+        settings.set_value(name, value)
+        logging.info(f'Set Config ({name}) ==> [{value}]')
+        self.__pass()
+
+
 
 def __init__tk(args):
     if not os.path.exists(temp):
