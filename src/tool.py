@@ -1504,6 +1504,7 @@ class IconGrid(tk.Frame):
 
 class ModuleManager:
     def __init__(self):
+        sys.stdout_origin = sys.stdout
         sys.stdout = DevNull()
         self.module_dir = os.path.join(cwd_path, "bin", "module")
         self.uninstall_gui = self.UninstallMpk
@@ -4592,11 +4593,19 @@ class ParseCmdline:
         # Set Config
         set_config_parse = subparser.add_parser('set', help="Set Config")
         set_config_parse.set_defaults(func=self.set)
+        get_config_parse = subparser.add_parser('get', help="Get Config")
+        get_config_parse.set_defaults(func=self.get)
+        help_parser = subparser.add_parser('help', help="Print Help")
+        help_parser.set_defaults(func=self.help)
         # End
-        if len(args_list) == 1:
+        if len(args_list) == 1 and args_list[0] not in ["help", '--help', '-h']:
             dndfile(args_list)
         else:
-            self.__parse()
+            try:
+                self.__parse()
+            except argparse.ArgumentError:
+                self.help([])
+                self.cmd_exit = '1'
         if self.cmd_exit == '1':
             sys.exit(1)
     # Hidden Methods
@@ -4618,6 +4627,22 @@ class ParseCmdline:
         logging.info(f'Set Config ({name})[{getattr(settings, name, "")}] ==> [{value}]')
         self.__pass()
 
+    def get(self, args):
+        if len(args) > 1:
+            print('Many Args!')
+            return
+        name, = args
+        if hasattr(sys, 'stdout_origin'):
+            sys.stdout_origin.write(getattr(settings, name))
+        else:
+            logging.warning('sys.stdout_origin not defined!')
+        self.__pass()
+
+    def help(self, args):
+        if hasattr(sys, 'stdout_origin'):
+            self.parser.print_help(sys.stdout_origin)
+        else:
+            logging.warning('sys.stdout_origin not defined!')
 
 
 def __init__tk(args):
