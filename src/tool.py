@@ -2867,11 +2867,13 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly'):
+def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None):
     if not ProjectManager.exist():
         warn_win(text=lang.warn1)
         return False
-    work = ProjectManager.current_work_output_path()
+    work = ProjectManager.current_work_path()
+    if not output_dir:
+        output_dir = ProjectManager.current_work_output_path()
     lb_c = []
     for part in lb:
         if part.endswith('_b') or part.endswith('_a'):
@@ -2908,12 +2910,12 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
             command += ["--virtual-ab"]
     if sparse.get() == 1:
         command += ["--sparse"]
-    command += ['--out', work + 'super.img']
+    command += ['--out', output_dir + 'super.img']
     if return_cmd == 1:
         return command
     if call(command) == 0:
-        if os.access(work + "super.img", os.F_OK):
-            print(lang.text59 % (work + "super.img"))
+        if os.access(output_dir + "super.img", os.F_OK):
+            print(lang.text59 % (output_dir + "super.img"))
             if del_ == 1:
                 for img in lb:
                     if os.path.exists(f"{work}{img}.img"):
@@ -4650,6 +4652,28 @@ class ParseCmdline:
             self.parser.print_help(sys.stdout_origin)
         else:
             logging.warning('sys.stdout_origin not defined!')
+
+    def lpmake(self, arglist):
+        parser = argparse.ArgumentParser(add_help=False)
+        parser.add_argument('output', nargs='?',
+                            type=str,
+                            default=None)
+        parser.add_argument('workdir', type=str, dest='work dir', action='store', default=None)
+        parser.add_argument('--sparse', type=str, dest='rev', action='store', default=global_args.global_rev)
+        parser.add_argument('--flags', type=str, dest='flags',
+                            action='store',
+                            default=global_args.global_flags)
+        parser.add_argument('--custom0', type=str, dest='custom0',
+                            action='store',
+                            default=global_args.global_custom0)
+        parser.add_argument('--custom1', type=str, dest='custom1',
+                            action='store',
+                            default=global_args.global_custom1)
+        parser.add_argument('--custom2', type=str, dest='custom2',
+                            action='store',
+                            default=global_args.global_custom2)
+        args =  parser.parse_args(arglist)
+
 
 
 def __init__tk(args):
