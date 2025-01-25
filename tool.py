@@ -4,8 +4,11 @@ if sys.version_info.major == 3:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
-
-from src.tool import *
+try:
+    from src.tool import *
+except Exception:
+    input("Sorry! We cannot init the tool.\nPlease clone source again!")
+    sys.exit(1)
 
 if __name__ == "__main__":
     init(sys.argv)
