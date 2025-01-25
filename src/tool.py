@@ -4609,14 +4609,13 @@ class ParseCmdline:
     def __pass(self):
         pass
     # Export Methods
-
     def set(self, args):
         if len(args) > 2:
             print('Many Args!')
             return
         name, value = args
         settings.set_value(name, value)
-        logging.info(f'Set Config ({name}) ==> [{value}]')
+        logging.info(f'Set Config ({name})[{getattr(settings, name, "")}] ==> [{value}]')
         self.__pass()
 
 
