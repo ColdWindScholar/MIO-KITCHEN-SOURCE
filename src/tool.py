@@ -4116,7 +4116,7 @@ def rmdir(path, quiet=False):
             win.message_pop(lang.warn1)
     else:
         if not quiet:
-            print(lang.text97 + os.path.basename(path))
+            print(f"{lang.text97} {path}")
         try:
             try:
                 rmtree(path)
