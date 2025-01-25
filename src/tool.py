@@ -4605,6 +4605,8 @@ class ParseCmdline:
         # End
         if len(args_list) == 1 and args_list[0] not in ["help", '--help', '-h']:
             dndfile(args_list)
+        if len(args_list) == 1 and args_list[0]  in ['--help', '-h']:
+            self.help([])
         else:
             try:
                 self.__parse()
