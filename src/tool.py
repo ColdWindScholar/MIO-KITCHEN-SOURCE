@@ -2796,6 +2796,9 @@ class PackSuper(Toplevel):
         lbs = self.tl.selected.copy()
         sc = self.scywj.get()
         self.destroy()
+        if not ProjectManager.exist():
+            warn_win(text=lang.warn1)
+            return False
         packsuper(sparse=self.ssparse, dbfz=self.sdbfz, size=self.supers, set_=self.supersz, lb=lbs, del_=sc,
                   attrib=self.attrib.get())
 
@@ -2868,9 +2871,7 @@ class PackSuper(Toplevel):
 
 @animation
 def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None, work:str=None):
-    if not ProjectManager.exist():
-        warn_win(text=lang.warn1)
-        return False
+
     if not work:
         work = ProjectManager.current_work_path()
     if not output_dir:
