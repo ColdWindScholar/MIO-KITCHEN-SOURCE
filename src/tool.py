@@ -1274,6 +1274,7 @@ class SetUtils:
         self.language = 'English'
         self.updating = ''
         self.new_tool = ''
+        self.cmd_exit = '0'
         self.debug_mode = 'No'
         self.theme = 'dark'
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
@@ -4591,6 +4592,8 @@ def parse_cmdline(args_list:list):
         parser.print_help()
         return 1
     subcmd.func(subcmd_args)
+    if settings.cmd_exit == '1':
+        sys.exit(1)
 
 def __init__tk(args):
     if not os.path.exists(temp):
