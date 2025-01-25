@@ -2867,11 +2867,12 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None):
+def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None, work:str=None):
     if not ProjectManager.exist():
         warn_win(text=lang.warn1)
         return False
-    work = ProjectManager.current_work_path()
+    if not work:
+        work = ProjectManager.current_work_path()
     if not output_dir:
         output_dir = ProjectManager.current_work_output_path()
     lb_c = []
@@ -4655,23 +4656,29 @@ class ParseCmdline:
 
     def lpmake(self, arglist):
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument('output', nargs='?',
+        parser.add_argument('outputdir', nargs='?',
                             type=str,
                             default=None)
         parser.add_argument('workdir', type=str, dest='work dir', action='store', default=None)
-        parser.add_argument('--sparse', type=str, dest='rev', action='store', default=global_args.global_rev)
-        parser.add_argument('--flags', type=str, dest='flags',
+        parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
+        parser.add_argument('--dbfz', type=str, dest='flags',
+                            action='qti_dynamic_partitions main mot_dp_group',
+                            default='qti_dynamic_partitions')
+        parser.add_argument('--size', type=int, dest='Super Size (Bytes)',
                             action='store',
-                            default=global_args.global_flags)
-        parser.add_argument('--custom0', type=str, dest='custom0',
+                            default=9126805504)
+        parser.add_argument('--list', type=str, dest='the including parts of the super, use "," to split, like"odm,system"',
                             action='store',
-                            default=global_args.global_custom0)
-        parser.add_argument('--custom1', type=str, dest='custom1',
+                            default=None)
+        parser.add_argument('--delete', type=int, dest='Delete Source Images:1.del 0.no_del',
                             action='store',
-                            default=global_args.global_custom1)
-        parser.add_argument('--custom2', type=str, dest='custom2',
+                            default=0)
+        parser.add_argument('--part_type', type=int, dest='[1] A-only [2] V-ab [3] a/b',
                             action='store',
-                            default=global_args.global_custom2)
+                            default=1)
+        parser.add_argument('--attrib', type=str, dest='The Attrib Of the super',
+                            action='store',
+                            default='readonly')
         args =  parser.parse_args(arglist)
 
 
