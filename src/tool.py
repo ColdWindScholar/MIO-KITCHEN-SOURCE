@@ -2300,7 +2300,7 @@ def Generate_Bug_Report():
         """)
     pack_zip(inner, bugreport := os.path.join(output,
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
-             slient=True)
+             silent=True)
     re_folder(inner, quiet=True)
     print(f"\tThe Bug Report Was Saved:{bugreport}")
 
@@ -4129,7 +4129,7 @@ def rmdir(path, quiet=False):
 
 
 @animation
-def pack_zip(input_dir=None,output_zip=None, slient=False):
+def pack_zip(input_dir=None,output_zip=None, silent=False):
     if input_dir is None:
         input_dir = ProjectManager.current_work_output_path()
         if not ProjectManager.exist():
@@ -4137,11 +4137,11 @@ def pack_zip(input_dir=None,output_zip=None, slient=False):
             return
     if output_zip is None:
         output_zip = settings.path + os.sep + current_project_name.get() + ".zip"
-    if not slient:
+    if not silent:
         if ask_win(lang.t53) != 1:
             return
     print(lang.text91 % current_project_name.get())
-    if not slient:
+    if not silent:
         if ask_win(lang.t25) == 1:
             PackHybridRom()
     with zipfile.ZipFile(output_zip, 'w',
@@ -4149,7 +4149,7 @@ def pack_zip(input_dir=None,output_zip=None, slient=False):
         for file in utils.get_all_file_paths(input_dir):
             file = str(file)
             arch_name = file.replace(input_dir, '')
-            if not slient:
+            if not silent:
                 print(f"{lang.text1}:{arch_name}")
             try:
                 zip_.write(file, arcname=arch_name)
