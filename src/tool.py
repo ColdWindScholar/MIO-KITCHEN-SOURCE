@@ -1275,6 +1275,7 @@ class SetUtils:
         self.updating = ''
         self.new_tool = ''
         self.cmd_exit = '0'
+        self.cmd_invisible = '0'
         self.debug_mode = 'No'
         self.theme = 'dark'
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
@@ -4584,6 +4585,8 @@ class ParseCmdline:
     def __init__(self, args_list):
         self.args_list = args_list
         self.cmd_exit = settings.cmd_exit
+        if settings.cmd_invisible == '1':
+            win.withdraw()
         self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
         subparser = self.parser.add_subparsers(title='subcommand',
                                           description='Valid subcommands')
