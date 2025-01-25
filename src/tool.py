@@ -4587,6 +4587,7 @@ class ParseCmdline:
         self.cmd_exit = settings.cmd_exit
         if settings.cmd_invisible == '1':
             win.withdraw()
+            win.iconify()
         self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
         subparser = self.parser.add_subparsers(title='subcommand',
                                           description='Valid subcommands')
