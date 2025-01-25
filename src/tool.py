@@ -4675,7 +4675,7 @@ def __init__tk(args):
             ask_win(lang.warn20)
     states.inited = True
     win.protocol("WM_DELETE_WINDOW", exit_tool)
-    if len(args) > 1:
+    if len(args) > 1 and is_pro:
         win.after(1000, ParseCmdline, args[1:])
     win.mainloop()
 # Cool Init
