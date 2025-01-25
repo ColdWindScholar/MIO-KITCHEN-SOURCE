@@ -4579,21 +4579,29 @@ def exit_tool():
     ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.close)
     win.destroy()
 
-def parse_cmdline(args_list:list):
-    parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
-    subparser = parser.add_subparsers(title='subcommand',
-                                      description='Valid subcommands')
-    # Unpack Rom
-    unpack_rom_parser = subparser.add_parser('unpack', add_help=False)
-    unpack_rom_parser.set_defaults(func=dndfile)
-    # End
-    subcmd, subcmd_args = parser.parse_known_args(args_list)
-    if not hasattr(subcmd, 'func'):
-        parser.print_help()
-        return 1
-    subcmd.func(subcmd_args)
-    if settings.cmd_exit == '1':
-        sys.exit(1)
+class ParseCmdline:
+    def __init__(self, args_list):
+        self.args_list = args_list
+        self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
+        subparser = self.parser.add_subparsers(title='subcommand',
+                                          description='Valid subcommands')
+        # Unpack Rom
+        unpack_rom_parser = subparser.add_parser('unpack', add_help=False)
+        unpack_rom_parser.set_defaults(func=dndfile)
+        # End
+        if len(args_list) == 1:
+            dndfile(args_list)
+        else:
+            self.parse()
+        if settings.cmd_exit == '1':
+            sys.exit(1)
+
+    def parse(self):
+        subcmd, subcmd_args = self.parser.parse_known_args(self.args_list)
+        if not hasattr(subcmd, 'func'):
+            self.parser.print_help()
+            return
+        subcmd.func(subcmd_args)
 
 def __init__tk(args):
     if not os.path.exists(temp):
@@ -4650,7 +4658,7 @@ def __init__tk(args):
     states.inited = True
     win.protocol("WM_DELETE_WINDOW", exit_tool)
     if len(args) > 1:
-        win.after(1000, parse_cmdline, args[1:])
+        win.after(1000, ParseCmdline, args[1:])
     win.mainloop()
 # Cool Init
 # Miside 米塔
