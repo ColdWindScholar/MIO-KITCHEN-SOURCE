@@ -3862,6 +3862,11 @@ def unpack(chose, form: str = '') -> bool:
     print(lang.text8)
     return True
 
+def cprint(*args, **kwargs):
+    if not hasattr(sys, 'stdout_origin'):
+        print("stdout_origin not defined!")
+    else:
+        print(*args, **kwargs, file=sys.stdout_origin)
 
 def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
     if not ok:
@@ -4646,13 +4651,10 @@ class ParseCmdline:
 
     def get(self, args):
         if len(args) > 1:
-            print('Many Args!')
+            cprint('Many Args!')
             return
         name, = args
-        if hasattr(sys, 'stdout_origin'):
-            sys.stdout_origin.write(getattr(settings, name))
-        else:
-            logging.warning('sys.stdout_origin not defined!')
+        cprint(getattr(settings, name))
         self.__pass()
 
     def help(self, args):
