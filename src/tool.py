@@ -4691,7 +4691,7 @@ class ParseCmdline:
         args =  parser.parse_args(arglist)
         if not args.workdir or not args.outputdir \
                 or not os.path.exists(args.workdir) or not os.path.exists(args.outputdir):
-            print("Workdir or Output Dir Not Exist!")
+            cprint("Workdir or Output Dir Not Exist!")
             return
 
 
