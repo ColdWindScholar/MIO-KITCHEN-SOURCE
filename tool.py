@@ -6,8 +6,8 @@ if sys.version_info.major == 3:
         sys.exit(1)
 try:
     from src.tool import *
-except Exception:
-    input("Sorry! We cannot init the tool.\nPlease clone source again!")
+except Exception as e:
+    input(f"Sorry! We cannot init the tool.\nPlease clone source again!\n{e}")
     sys.exit(1)
 
 if __name__ == "__main__":
