@@ -4668,7 +4668,7 @@ class ParseCmdline:
                             default=None)
         parser.add_argument('workdir', type=str, help='The Work Dir', action='store', default=None)
         parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
-        parser.add_argument('--dbfz', type=str, dest='flags',action='store',
+        parser.add_argument('--dbfz', type=str, help='The name of the super group',action='store',
                             help='qti_dynamic_partitions main mot_dp_group',
                             default='qti_dynamic_partitions')
         parser.add_argument('--size', type=int, help='Super Size (Bytes)',
