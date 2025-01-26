@@ -4608,6 +4608,9 @@ class ParseCmdline:
         # Help
         help_parser = subparser.add_parser('help', help="Print Help")
         help_parser.set_defaults(func=self.help)
+        # Lpmake
+        lpmake_parser = subparser.add_parser('lpmake', help='To make super image')
+        lpmake_parser.set_defaults(func=self.lpmake)
         # End
         if len(args_list) == 1 and args_list[0] not in ["help", '--help', '-h']:
             dndfile(args_list)
@@ -4616,7 +4619,8 @@ class ParseCmdline:
         else:
             try:
                 self.__parse()
-            except argparse.ArgumentError:
+            except (argparse.ArgumentError, ValueError) as e:
+                logging.exception('CMD')
                 self.help([])
                 self.cmd_exit = '1'
         if self.cmd_exit == '1':
@@ -4662,27 +4666,32 @@ class ParseCmdline:
         parser.add_argument('outputdir', nargs='?',
                             type=str,
                             default=None)
-        parser.add_argument('workdir', type=str, dest='work dir', action='store', default=None)
+        parser.add_argument('workdir', type=str, help='The Work Dir', action='store', default=None)
         parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
-        parser.add_argument('--dbfz', type=str, dest='flags',
-                            action='qti_dynamic_partitions main mot_dp_group',
+        parser.add_argument('--dbfz', type=str, dest='flags',action='store',
+                            help='qti_dynamic_partitions main mot_dp_group',
                             default='qti_dynamic_partitions')
-        parser.add_argument('--size', type=int, dest='Super Size (Bytes)',
+        parser.add_argument('--size', type=int, help='Super Size (Bytes)',
                             action='store',
                             default=9126805504)
-        parser.add_argument('--list', type=str, dest='the including parts of the super, use "," to split, like"odm,system"',
+        parser.add_argument('--list', type=str, help='the including parts of the super, use "," to split, like"odm,system"',
                             action='store',
                             default=None)
-        parser.add_argument('--delete', type=int, dest='Delete Source Images:1.del 0.no_del',
+        parser.add_argument('--delete', type=int, help='Delete Source Images:1.del 0.no_del',
                             action='store',
                             default=0)
-        parser.add_argument('--part_type', type=int, dest='[1] A-only [2] V-ab [3] a/b',
+        parser.add_argument('--part_type', type=int, help='[1] A-only [2] V-ab [3] a/b',
                             action='store',
                             default=1)
-        parser.add_argument('--attrib', type=str, dest='The Attrib Of the super',
+        parser.add_argument('--attrib', type=str, help='The Attrib Of the super',
                             action='store',
                             default='readonly')
         args =  parser.parse_args(arglist)
+        if not args.workdir or not args.outputdir \
+                or not os.path.exists(args.workdir) or not os.path.exists(args.outputdir):
+            print("Workdir or Output Dir Not Exist!")
+            return
+
 
 
 
