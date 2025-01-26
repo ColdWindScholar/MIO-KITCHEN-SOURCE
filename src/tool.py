@@ -1533,7 +1533,7 @@ class ModuleManager:
         return name if (name := self.get_info(id_, 'name')) else id_
 
     def load_plugins(self):
-        if not os.path.exist(self.module_dir) or not os.path.isdir(self.module_dir):
+        if not os.path.exists(self.module_dir) or not os.path.isdir(self.module_dir):
             os.makedirs(self.module_dir, exist_ok=True)
         for i in os.listdir(self.module_dir):
             if self.get_installed(i):
