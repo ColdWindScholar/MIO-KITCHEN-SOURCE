@@ -241,10 +241,8 @@ class ToolBox(ttk.Frame):
         for text, func in functions:
             ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row, column=index_column,
                                                                                  padx=5, pady=5)
-            if index_column < (width_controls - 1):
-                index_column += 1
-            else:
-                index_column = 0
+            index_column = (index_column + 1) % (width_controls)
+            if not index_column:
                 index_row += 1
         self.update_ui()
 
