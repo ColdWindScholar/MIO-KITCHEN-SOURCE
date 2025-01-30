@@ -9,6 +9,7 @@
   "unpack": "解包",
   "ai_engine": "AI引擎",
   "run": "执行",
+  "back_step": "上一步",
   "set_all": "全选",
   "toolbox": "工具箱",
   "project_struct": "项目结构:",

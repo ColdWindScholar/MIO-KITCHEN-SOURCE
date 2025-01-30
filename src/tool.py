@@ -1165,7 +1165,7 @@ class Welcome(ttk.Frame):
         self.frame = ttk.Frame(self)
         self.frame.pack(expand=1, fill=BOTH)
         self.button_frame = ttk.Frame(self)
-        self.back = ttk.Button(self.button_frame, text="Back", command=lambda :self.change_page(self.oobe - 1))
+        self.back = ttk.Button(self.button_frame, text=lang.back_step, command=lambda :self.change_page(self.oobe - 1))
         self.back.pack(fill=X , padx=5, pady=5, side='left', expand=1)
         self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda :self.change_page(self.oobe+1))
         self.next.pack(fill=X , padx=5, pady=5, side='right', expand=1)
