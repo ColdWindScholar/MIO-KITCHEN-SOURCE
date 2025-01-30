@@ -2722,7 +2722,7 @@ class PackSuper(Toplevel):
         self.ssparse = IntVar()
         self.supersz = IntVar()
         self.attrib = StringVar(value='readonly')
-        self.sdbfz = StringVar()
+        self.group_name = StringVar()
         self.scywj = IntVar()
         self.selected = []
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
@@ -2739,13 +2739,13 @@ class PackSuper(Toplevel):
                                                                                              pady=10)
         ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
-        (sdbfzs := ttk.Combobox(lf2, textvariable=self.sdbfz,
+        (show_group_name := ttk.Combobox(lf2, textvariable=self.group_name,
                                 values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
             side='left',
             padx=10,
             pady=10,
             fill='both')
-        sdbfzs.current(0)
+        show_group_name.current(0)
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
         (super_size := ttk.Entry(lf2, textvariable=self.supers)).pack(side='left', padx=10, pady=10)
         super_size.bind("<KeyRelease>",
@@ -2786,7 +2786,7 @@ class PackSuper(Toplevel):
         except (Exception, BaseException):
             self.supers.set(0)
             logging.exception('Bugs')
-        if not self.versize():
+        if not self.verify_size():
             ask_win2(lang.t10.format(self.supers.get()))
             return False
         lbs = self.tl.selected.copy()
@@ -2795,10 +2795,10 @@ class PackSuper(Toplevel):
         if not ProjectManager.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.ssparse, dbfz=self.sdbfz, size=self.supers, set_=self.supersz, lb=lbs, del_=sc,
+        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.supersz, part_list=lbs, del_=sc,
                   attrib=self.attrib.get())
 
-    def versize(self):
+    def verify_size(self):
         size = sum([os.path.getsize(self.work + i + ".img") for i in self.tl.selected])
         diff_size = size
         if size > self.supers.get():
@@ -2821,8 +2821,8 @@ class PackSuper(Toplevel):
 
     def generate(self):
         self.g_b.config(text=lang.t28, state='disabled')
-        utils.generate_dynamic_list(dbfz=self.sdbfz.get(), size=self.supers.get(), set_=self.supersz.get(),
-                                    lb=self.tl.selected.copy(), work=ProjectManager.current_work_path())
+        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(), super_type=self.supersz.get(),
+                                    part_list=self.tl.selected.copy(), work=ProjectManager.current_work_path())
         self.g_b.config(text=lang.text34)
         time.sleep(1)
         try:
@@ -2848,7 +2848,7 @@ class PackSuper(Toplevel):
             if len(data) > 1:
                 fir, sec = data
                 if fir[:-2] == sec[:-2]:
-                    self.sdbfz.set(fir[:-2])
+                    self.group_name.set(fir[:-2])
                     self.supersz.set(2)
                     self.supers.set(int(data[fir]['size']))
                     self.selected = data[fir].get('parts', [])
@@ -2859,52 +2859,52 @@ class PackSuper(Toplevel):
 
             else:
                 dbfz, = data
-                self.sdbfz.set(dbfz)
+                self.group_name.set(dbfz)
                 self.supers.set(int(data[dbfz]['size']))
                 self.selected = data[dbfz].get('parts', [])
                 self.supersz.set(1)
 
 
 @animation
-def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None, work:str=None):
+def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None, work:str=None):
 
     if not work:
         work = ProjectManager.current_work_path()
     if not output_dir:
         output_dir = ProjectManager.current_work_output_path()
     lb_c = []
-    for part in lb:
+    for part in part_list:
         if part.endswith('_b') or part.endswith('_a'):
             part = part.replace('_a', '').replace('_b', '')
         if part not in lb_c:
             lb_c.append(part)
-    lb = lb_c
-    for part in lb:
+    part_list = lb_c
+    for part in part_list:
         if not os.path.exists(work + part + '.img') and os.path.exists(work + part + '_a.img'):
             try:
                 os.rename(work + part + '_a.img', work + part + '.img')
             except:
                 logging.exception('Bugs')
     command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
-    if set_.get() == 1:
-        command += ['2', '-device', f'super:{size.get()}', "--group", f"{dbfz.get()}:{size.get()}"]
-        for part in lb:
-            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}",
+    if super_type.get() == 1:
+        command += ['2', '-device', f'super:{size.get()}', "--group", f"{group_name.get()}:{size.get()}"]
+        for part in part_list:
+            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}",
                         '--image', f'{part}={work + part}.img']
     else:
-        command += ["3", '-device', f'super:{size.get()}', '--group', f"{dbfz.get()}_a:{size.get()}"]
-        for part in lb:
-            command += ['--partition', f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{dbfz.get()}_a",
+        command += ["3", '-device', f'super:{size.get()}', '--group', f"{group_name.get()}_a:{size.get()}"]
+        for part in part_list:
+            command += ['--partition', f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}_a",
                         '--image', f'{part}_a={work + part}.img']
-        command += ["--group", f"{dbfz.get()}_b:{size.get()}"]
-        for part in lb:
+        command += ["--group", f"{group_name.get()}_b:{size.get()}"]
+        for part in part_list:
             if not os.path.exists(f"{work + part}_b.img"):
-                command += ['--partition', f"{part}_b:{attrib}:0:{dbfz.get()}_b"]
+                command += ['--partition', f"{part}_b:{attrib}:0:{group_name.get()}_b"]
             else:
                 command += ['--partition',
-                            f"{part}_b:{attrib}:{os.path.getsize(work + part + '_b.img')}:{dbfz.get()}_b",
+                            f"{part}_b:{attrib}:{os.path.getsize(work + part + '_b.img')}:{group_name.get()}_b",
                             '--image', f'{part}_b={work + part}_b.img']
-        if set_.get() == 2:
+        if super_type.get() == 2:
             command += ["--virtual-ab"]
     if sparse.get() == 1:
         command += ["--sparse"]
@@ -2915,7 +2915,7 @@ def packsuper(sparse, dbfz, size, set_, lb: list, del_=0, return_cmd=0, attrib='
         if os.access(output_dir + "super.img", os.F_OK):
             print(lang.text59 % (output_dir + "super.img"))
             if del_ == 1:
-                for img in lb:
+                for img in part_list:
                     if os.path.exists(f"{work}{img}.img"):
                         try:
                             os.remove(f"{work}{img}.img")
@@ -4664,7 +4664,8 @@ class ParseCmdline:
                             default=None)
         parser.add_argument('workdir', type=str, help='The Work Dir', action='store', default=None)
         parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
-        parser.add_argument('--dbfz', type=str,action='store',
+        # dbfz...
+        parser.add_argument('--group-name', type=str,action='store',
                             help='qti_dynamic_partitions main mot_dp_group',
                             default='qti_dynamic_partitions')
         parser.add_argument('--size', type=int, help='Super Size (Bytes)',
@@ -4673,12 +4674,15 @@ class ParseCmdline:
         parser.add_argument('--list', type=str, help='the including parts of the super, use "," to split, like"odm,system"',
                             action='store',
                             default=None)
+        # Wheather remove source files
         parser.add_argument('--delete', type=int, help='Delete Source Images:1.del 0.no_del',
                             action='store',
                             default=0)
+        # V-AB AB A-ONLY
         parser.add_argument('--part_type', type=int, help='[1] A-only [2] V-ab [3] a/b',
                             action='store',
                             default=1)
+        # the attrib of super
         parser.add_argument('--attrib', type=str, help='The Attrib Of the super',
                             action='store',
                             default='readonly')
