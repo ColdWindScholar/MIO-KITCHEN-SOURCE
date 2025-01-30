@@ -24,6 +24,7 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
+
 from .core import tarsafe
 
 from .core.Magisk import Magisk_patch
@@ -579,10 +580,10 @@ class ToolBox(ttk.Frame):
 class DevNull:
     def __init__(self):
         self.data = ''
-        ...
+
     def write(self, string):
         self.data += string
-        ...
+
     def flush(self):
         ...
 
@@ -1149,39 +1150,56 @@ class Welcome(ttk.Frame):
     def __init__(self):
         super().__init__(master=win)
         self.pack(fill=BOTH, expand=True)
-        self.frame = None
-        oobe = int(settings.oobe)
+
+        self.oobe = int(settings.oobe)
         states.in_oobe = True
-        frames = {
+
+        self.frames = {
+            0: self.hello,
             1: self.main,
             2: self.license,
             3: self.private,
             4: self.support,
             5: self.done
         }
-        if frames.get(oobe):
-            frames.get(oobe, self.main)()
-        else:
-            ttk.Label(self, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
-            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Label(self, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
-            ttk.Button(self, text=lang.text136, command=self.main).pack(fill=X)
+        self.frame = ttk.Frame(self)
+        self.frame.pack(expand=1, fill=BOTH)
+        self.button_frame = ttk.Frame(self)
+        self.back = ttk.Button(self.button_frame, text="Back", command=lambda :self.change_page(self.oobe - 1))
+        self.back.pack(fill=X , padx=5, pady=5, side='left', expand=1)
+        self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda :self.change_page(self.oobe+1))
+        self.next.pack(fill=X , padx=5, pady=5, side='right', expand=1)
+        self.button_frame.pack(expand=1, fill=X, padx=5, pady=5, side='bottom')
+        self.change_page(self.oobe)
         move_center(win)
         self.wait_window()
         states.in_oobe = False
 
-    def reframe(self):
-        if self.frame:
-            self.frame.destroy()
-        self.frame = ttk.Frame(self)
+    def change_page(self, step:int=None):
+        if not step or step not in self.frames.keys():
+            step = 0
+        self.oobe = step
+        settings.set_value('oobe', step)
+        for i in self.frame.winfo_children():
+            i.destroy()
         move_center(win)
-        self.frame.pack(expand=1, fill=BOTH)
+        self.frames[step]()
+        if step == min(self.frames.keys()):
+            self.back.config(state='disabled')
+        else:
+            self.back.config(state='normal')
+        if step == max(self.frames.keys()):
+            self.next.config(text=lang.text34, command=self.destroy)
+        else:
+            if self.next.cget('text') != lang.text138:
+                self.next.config(text=lang.text138, command=lambda:self.change_page(self.oobe + 1))
+
+    def hello(self):
+        ttk.Label(self.frame, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
+        ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        ttk.Label(self.frame, text=lang.text137, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH, expand=True)
 
     def main(self):
-        settings.set_value("oobe", 1)
-        for i in self.winfo_children():
-            i.destroy()
-        self.reframe()
         ttk.Label(self.frame, text=lang.text129, font=(None, 20)).pack(padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         lb3_ = ttk.Combobox(self.frame, state='readonly', textvariable=language,
@@ -1189,19 +1207,17 @@ class Welcome(ttk.Frame):
                                     os.listdir(f"{cwd_path}/bin/languages")])
         lb3_.pack(padx=10, pady=10, side='top', fill=BOTH)
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        ttk.Button(self.frame, text=lang.text138, command=self.license).pack(fill=X, side='bottom')
+
 
     def license(self):
-        settings.set_value("oobe", 2)
         lce = StringVar()
-
         def load_license():
             te.delete(1.0, tk.END)
             with open(f"{cwd_path}/bin/licenses/{lce.get()}.txt", 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
 
-        self.reframe()
+
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           values=[i.rsplit('.')[0] for i in os.listdir(f"{cwd_path}/bin/licenses") if
                                   i != 'private.txt'])
@@ -1214,11 +1230,8 @@ class Welcome(ttk.Frame):
         te.pack(fill=BOTH, side='top', expand=True)
         load_license()
         ttk.Label(self.frame, text=lang.t1).pack()
-        ttk.Button(self.frame, text=lang.text138, command=self.private).pack(fill=BOTH, side='bottom')
 
     def private(self):
-        settings.set_value("oobe", 3)
-        self.reframe()
         ttk.Label(self.frame, text=lang.t2, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         with open(os.path.join(cwd_path, "bin", "licenses", "private.txt"), 'r',
@@ -1226,27 +1239,20 @@ class Welcome(ttk.Frame):
             (te := Text(self.frame, height=10)).insert('insert', f.read())
         te.pack(fill=BOTH, expand=True)
         ttk.Label(self.frame, text=lang.t3).pack()
-        ttk.Button(self.frame, text=lang.text138, command=self.support).pack(fill=BOTH, side='bottom')
 
     def support(self):
-        settings.set_value("oobe", 4)
-        self.reframe()
         ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X
                                                                       )
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.photo = PhotoImage(data=images.wechat_byte)
         Label(self.frame, image=self.photo).pack(padx=5, pady=5)
         ttk.Label(self.frame, text=lang.text109).pack()
-        ttk.Button(self.frame, text=lang.text138, command=self.done).pack(fill=BOTH, side='bottom')
 
     def done(self):
-        settings.set_value("oobe", 5)
-        self.reframe()
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10, expand=True)
-        ttk.Button(self, text=lang.text34, command=self.destroy).pack(fill=BOTH, side='bottom')
 
 
 class SetUtils:
