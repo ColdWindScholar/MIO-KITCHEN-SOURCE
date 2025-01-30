@@ -1,6 +1,6 @@
 # File From https://github.com/5ec1cff/payload-dumper/tree/master
 # Modified By MIO-KITCHEN-TEAM
-# Copyright (C) 2024 The MIO-KITCHEN-SOURCE Project
+# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 #
 # Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.

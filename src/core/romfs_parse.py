@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # pylint: disable=line-too-long, missing-class-docstring, missing-function-docstring
 # Thanks: The File Refer From https://github.com/ddddhm1234/ROMFS_PARSER , Used By MIO-KITCHEN Open Source Project
-# Copyright (C) 2024 The MIO-KITCHEN-SOURCE Project
+# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 #
 # Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
