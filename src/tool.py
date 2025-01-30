@@ -241,7 +241,7 @@ class ToolBox(ttk.Frame):
         for text, func in functions:
             ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row, column=index_column,
                                                                                  padx=5, pady=5)
-            index_column = (index_column + 1) % (width_controls)
+            index_column = (index_column + 1) % width_controls
             if not index_column:
                 index_row += 1
         self.update_ui()
@@ -716,7 +716,7 @@ class Tool(Tk):
             return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
 
         def update_angle():
-            self.rotate_angle -= 10
+            self.rotate_angle = (self.rotate_angle + 10) % 180
             canvas.itemconfigure(text_item, angle=self.rotate_angle)
 
         canvas = tk.Canvas(self.tab4, width=400, height=100)
