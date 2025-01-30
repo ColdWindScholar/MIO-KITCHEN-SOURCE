@@ -102,16 +102,7 @@ python build.py
 ***
 # Contributors:
 ***
-### macOS prebuilt binary for several tools: [sk](https://github.com/sekaiacg)
-### Some part of the code: [Affggh](https://github.com/affggh)
-### Logo co-designer: [Shaaim](https://github.com/786-shaaim)
-### Japanese translator: [reindex-ot](https://github.com/reindex-ot)
-### Portuguese (Brazil) translator: [igor](https://github.com/igormiguell)
-### German translator: [keldrion](https://github.com/keldrion)
-### Russian translator: [@Rayne Kobayashi](https://github.com/MinDeaDBlood)
-### Indonesian translator: [Frostleaft07](https://github.com/Frostleaft07)
-### Vietnamese translator: [Zurimuka亗](https://github.com/Zurimuka07)
-### And MORE...
+### [![contributors](https://contrib.rocks/image?repo=ColdWindScholar/MIO-KITCHEN-SOURCE&max=999&column=20)](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/graphs/contributors)
 ### Thanks to people like you for helping out!
 ***
 # About
