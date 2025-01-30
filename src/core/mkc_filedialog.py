@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import os
 from tkinter import Toplevel, Listbox, X, BOTH, LEFT, END, StringVar
 from tkinter.ttk import Button, Entry, Frame, Combobox
@@ -64,6 +65,8 @@ class askopenfilenames(Toplevel):
         except:
             file = ""
         var = os.path.abspath(os.path.join(self.path.get(), file))
+        if file == '..':
+            var = os.path.join(os.path.dirname(self.path.get()))
         if os.path.isdir(var):
             self.path.set(var)
             create_thread(self.refs)
@@ -74,10 +77,14 @@ class askopenfilenames(Toplevel):
         self.show.delete(0, END)
         if not self.path.get():
             self.path.set(os.path.abspath("/"))
+        self.show.insert(END, '..')
         f, e = self.type.get().replace("*", "").split(".")
-        for f in os.listdir(self.path.get()):
-            if f.startswith(f) and f.endswith(e):
-                self.show.insert(END, f)
+        try:
+            for f in os.listdir(self.path.get()):
+                if f.startswith(f) and f.endswith(e):
+                    self.show.insert(END, f)
+        except PermissionError:
+            logging.exception("Permission Missing.")
 
     def return_var(self):
         try:
@@ -123,6 +130,8 @@ class askdirectorys(Toplevel):
         except:
             file = ""
         var = os.path.abspath(os.path.join(self.path.get(), file))
+        if file == '..':
+            var = os.path.join(os.path.dirname(self.path.get()))
         if os.path.isdir(var):
             self.path.set(var)
             create_thread(self.refs)
@@ -133,9 +142,13 @@ class askdirectorys(Toplevel):
         self.show.delete(0, END)
         if not self.path.get():
             self.path.set(os.path.abspath("/"))
-        for f in os.listdir(self.path.get()):
-            if os.path.isdir(os.path.join(self.path.get(), f)):
-                self.show.insert(END, f)
+        self.show.insert(END, '..')
+        try:
+            for f in os.listdir(self.path.get()):
+                if os.path.isdir(os.path.join(self.path.get(), f)):
+                    self.show.insert(END, f)
+        except PermissionError:
+            logging.exception("Permission Missing.")
 
     def return_var(self):
         try:
