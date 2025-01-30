@@ -40,7 +40,7 @@ class updaterutil:
 def script2fs_context(input_f, outdir, project):
     fs_label = [["/", '0', '0', '0755'], ["/lost\\+found", '0', '0', '0700']]
     fc_label = [['/', 'u:object_r:system_file:s0'], ['/system(/.*)?', 'u:object_r:system_file:s0']]
-    print("分析刷机脚本...")
+    print("Parsing flash script...")
     with open(input_f, 'r', encoding='utf-8') as updater:
         contents = updaterutil(updater).content
     last_fpath = ''
