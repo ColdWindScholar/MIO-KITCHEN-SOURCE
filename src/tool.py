@@ -2720,7 +2720,7 @@ class PackSuper(Toplevel):
         self.title(lang.text53)
         self.supers = IntVar(value=9126805504)
         self.ssparse = IntVar()
-        self.supersz = IntVar()
+        self.super_type = IntVar()
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
         self.scywj = IntVar()
@@ -2729,11 +2729,11 @@ class PackSuper(Toplevel):
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
         (lf3 := ttk.LabelFrame(self, text=lang.text55)).pack(fill=BOTH, expand=True)
-        self.supersz.set(1)
+        self.super_type.set(1)
 
         radios = [("A-only", 1), ("Virtual-ab", 2), ("A/B", 3)]
         for text, value in radios:
-            ttk.Radiobutton(lf1, text=text, variable=self.supersz, value=value).pack(side='left', padx=10, pady=10)
+            ttk.Radiobutton(lf1, text=text, variable=self.super_type, value=value).pack(side='left', padx=10, pady=10)
 
         ttk.Radiobutton(lf1_r, text="Readonly", variable=self.attrib, value='readonly').pack(side='left', padx=10,
                                                                                              pady=10)
@@ -2795,7 +2795,7 @@ class PackSuper(Toplevel):
         if not ProjectManager.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.supersz, part_list=lbs, del_=sc,
+        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.super_type.get(), part_list=lbs, del_=sc,
                   attrib=self.attrib.get())
 
     def verify_size(self):
@@ -2821,7 +2821,7 @@ class PackSuper(Toplevel):
 
     def generate(self):
         self.g_b.config(text=lang.t28, state='disabled')
-        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(), super_type=self.supersz.get(),
+        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(), super_type=self.super_type.get(),
                                     part_list=self.tl.selected.copy(), work=ProjectManager.current_work_path())
         self.g_b.config(text=lang.text34)
         time.sleep(1)
@@ -2849,7 +2849,7 @@ class PackSuper(Toplevel):
                 fir, sec = data
                 if fir[:-2] == sec[:-2]:
                     self.group_name.set(fir[:-2])
-                    self.supersz.set(2)
+                    self.super_type.set(2)
                     self.supers.set(int(data[fir]['size']))
                     self.selected = data[fir].get('parts', [])
                     selected = []
@@ -2862,7 +2862,7 @@ class PackSuper(Toplevel):
                 self.group_name.set(group_name)
                 self.supers.set(int(data[group_name]['size']))
                 self.selected = data[group_name].get('parts', [])
-                self.supersz.set(1)
+                self.super_type.set(1)
 
 
 @animation
@@ -2886,7 +2886,7 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
             except:
                 logging.exception('Bugs')
     command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
-    if super_type.get() == 1:
+    if super_type == 1:
         command += ['2', '-device', f'super:{size.get()}', "--group", f"{group_name.get()}:{size.get()}"]
         for part in part_list:
             command += ['--partition', f"{part}:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}",
@@ -2904,7 +2904,7 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
                 command += ['--partition',
                             f"{part}_b:{attrib}:{os.path.getsize(work + part + '_b.img')}:{group_name.get()}_b",
                             '--image', f'{part}_b={work + part}_b.img']
-        if super_type.get() == 2:
+        if super_type == 2:
             command += ["--virtual-ab"]
     if sparse.get() == 1:
         command += ["--sparse"]
