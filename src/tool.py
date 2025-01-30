@@ -2723,7 +2723,7 @@ class PackSuper(Toplevel):
         self.super_type = IntVar()
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
-        self.scywj = IntVar()
+        self.delete_source_file = IntVar()
         self.selected = []
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
@@ -2761,7 +2761,7 @@ class PackSuper(Toplevel):
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
         t_frame = Frame(self)
-        ttk.Checkbutton(t_frame, text=lang.t11, variable=self.scywj, onvalue=1, offvalue=0,
+        ttk.Checkbutton(t_frame, text=lang.t11, variable=self.delete_source_file, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
         ttk.Button(t_frame, text=lang.text23, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
@@ -2790,7 +2790,7 @@ class PackSuper(Toplevel):
             ask_win2(lang.t10.format(self.supers.get()))
             return False
         lbs = self.tl.selected.copy()
-        sc = self.scywj.get()
+        sc = self.delete_source_file.get()
         self.destroy()
         if not ProjectManager.exist():
             warn_win(text=lang.warn1)
