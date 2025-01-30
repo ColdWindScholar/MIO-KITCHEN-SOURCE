@@ -150,10 +150,7 @@ class LoadAnim:
         self.gifs.append(self.master.gif_label.after(30, self.run, ind))
 
     def get_task_num(self):
-        if self.task_num_index > self.task_num_max:
-            self.task_num_index = 0
-        while self.task_num_index in self.tasks:
-            self.task_num_index += 1
+        self.task_num_index = (self.task_num_index + 1) % self.task_num_max
         return self.task_num_index
 
     def stop(self):
