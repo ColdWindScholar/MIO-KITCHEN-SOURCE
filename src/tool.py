@@ -2858,10 +2858,10 @@ class PackSuper(Toplevel):
                     self.selected = selected
 
             else:
-                dbfz, = data
-                self.group_name.set(dbfz)
-                self.supers.set(int(data[dbfz]['size']))
-                self.selected = data[dbfz].get('parts', [])
+                group_name, = data
+                self.group_name.set(group_name)
+                self.supers.set(int(data[group_name]['size']))
+                self.selected = data[group_name].get('parts', [])
                 self.supersz.set(1)
 
 
