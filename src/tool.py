@@ -2313,7 +2313,7 @@ class Debugger(Toplevel):
 
     def gui(self):
         row = 0
-        num = 3
+        num_max = 3
         num_c = 0
         functions = [
             ('Globals', self.loaded_module),
@@ -2328,10 +2328,9 @@ class Debugger(Toplevel):
         ]
         for index, (text, func) in enumerate(functions):
             ttk.Button(self, text=text, command=func, width=20, style="Toggle.TButton").grid(row=row, column=num_c, padx=5, pady=5)
-            num_c += 1
-            if num_c >= num:
+            num_c = (num_c + 1) % num_max
+            if not num_c:
                 row += 1
-                num_c = 0
 
     @staticmethod
     def crash():
@@ -3433,7 +3432,7 @@ class Packxx(Toplevel):
                     if make_ext4fs(name=dname, work=work, work_output=ProjectManager.current_work_output_path(),
                                    sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
                                    size=ext4_size_value,
-                                   UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                                   UTC=self.UTC.get()) != 0 if self.dbfs.get() == "make_ext4fs" else mke2fs(
                         name=dname, work=work,
                         work_output=ProjectManager.current_work_output_path(),
                         sparse="y" if self.dbgs.get() in [
