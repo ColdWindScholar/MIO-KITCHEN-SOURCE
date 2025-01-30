@@ -16,24 +16,15 @@ import re
 from .posix import symlink
 from . import contextpatch
 from . import fspatch
-
-
-class updaterutil:
-    def __init__(self, fd):
-        # self.path = Path(path)
-        self.fd = fd
-        if not self.fd:
-            raise IOError("fd is not valid!")
-        self.content = self.__parse_commands
-
-    @property
-    def __parse_commands(self):  # This part code from @libchara-dev
-        self.fd.seek(0, 0)  # set seek from start
-        commands = re.findall(r'(\w+)\((.*?)\)', self.fd.read().replace('\n', ''))
-        parsed_commands = [
-            [command, *(arg[0] or arg[1] or arg[2] for arg in re.findall(r'"([^"]+)"|(\b\d+\b)|(\b\S+\b)', args))]
-            for command, args in commands]
-        return parsed_commands
+def parse_update_script(fd):
+    if not fd:
+        raise IOError('fd isn\'t valid!')
+    fd.seek(0, 0)
+    commands = re.findall(r'(\w+)\((.*?)\)', fd.read().replace('\n', ''))
+    parsed_commands = [
+        [command, *(arg[0] or arg[1] or arg[2] for arg in re.findall(r'"([^"]+)"|(\b\d+\b)|(\b\S+\b)', args))]
+        for command, args in commands]
+    return parsed_commands
 
 
 # This Function copy from affggh mtk-porttool(https://gitee.com/affggh/mtk-garbage-porttool)
@@ -42,7 +33,7 @@ def script2fs_context(input_f, outdir, project):
     fc_label = [['/', 'u:object_r:system_file:s0'], ['/system(/.*)?', 'u:object_r:system_file:s0']]
     print("Parsing flash script...")
     with open(input_f, 'r', encoding='utf-8') as updater:
-        contents = updaterutil(updater).content
+        contents = parse_update_script(updater)
     last_fpath = ''
     for content in contents:
         command, *args = content
