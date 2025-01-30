@@ -24,14 +24,11 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-
 from .core import tarsafe
-
 from .core.Magisk import Magisk_patch
 from .core.addon_register import loader, Entry
 from .core.romfs_parse import RomfsParse
 from .core.unkdz import KDZFileTools
-
 
 if platform.system() != 'Darwin':
     try:
@@ -65,7 +62,7 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from .core.dumper import Dumper
 from .core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, project_name
+    JsonEdit
 
 if os.name == 'nt':
     from ctypes import windll
