@@ -1879,7 +1879,7 @@ class ModuleManager:
                     self.runline(other)
             elif modes[mode](var_):
                 self.runline(other)
-
+# fixme:Rewrite it!!!
     class Parse(Toplevel):
         gavs = {}
 
@@ -2085,7 +2085,7 @@ class MpkMan(ttk.Frame):
     def __init__(self):
         super().__init__(master=win.tab7)
         self.pack(padx=10, pady=10, fill=BOTH)
-        self.chosen = tk.StringVar(value='')
+        self.chosen = StringVar(value='')
         self.moduledir = ModuleManager.module_dir
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
