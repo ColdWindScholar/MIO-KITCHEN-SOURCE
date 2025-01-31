@@ -86,6 +86,7 @@ from . import AI_engine
 from .core import ext4
 from .core.config_parser import ConfigParser
 from .core import utils
+
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from .core.extra import fspatch, re, contextpatch
@@ -94,9 +95,11 @@ from .controls import ListBox, ScrollFrame
 from .core.undz import DZFileTools
 from .core.selinux_audit_allow import main as selinux_audit_allow
 import logging
+
 is_pro = False
 try:
     from .pro.sn import v as verify
+
     is_pro = True
 except ImportError:
     is_pro = False
@@ -113,12 +116,6 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
 cwd_path = utils.prog_path
-
-
-
-
-
-
 
 
 class LoadAnim:
@@ -204,6 +201,7 @@ def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: i
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
     ask.after(wait, ask.destroy)
+
 
 class ToolBox(ttk.Frame):
     def __init__(self, master):
@@ -347,7 +345,8 @@ class ToolBox(ttk.Frame):
                             variable=self.KEEPFORCEENCRYPT).pack(fill=X, padx=5, pady=5, side=LEFT)
             ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='RECOVERYMODE', variable=self.RECOVERYMODE).pack(
                 fill=X, padx=5, pady=5, side=LEFT)
-            self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton', command=lambda: create_thread(self.patch))
+            self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton',
+                                       command=lambda: create_thread(self.patch))
             self.patch_bu.pack(fill=X, padx=5, pady=5)
 
     class SelinuxAuditAllow(Toplevel):
@@ -449,7 +448,7 @@ class ToolBox(ttk.Frame):
             self.gui()
             self.geometry("400x450")
             self.resizable(False, False)
-            self.dnd = lambda file_list:create_thread(self.__dnd, file_list)
+            self.dnd = lambda file_list: create_thread(self.__dnd, file_list)
             move_center(self)
 
         def gui(self):
@@ -574,6 +573,8 @@ class ToolBox(ttk.Frame):
             self.choose_button.configure(state='disabled')
             self.do_trim()
             self.button.configure(text=lang.done, state='normal', style='')
+
+
 class DevNull:
     def __init__(self):
         self.data = ''
@@ -583,6 +584,7 @@ class DevNull:
 
     def flush(self):
         ...
+
 
 class Tool(Tk):
     def __init__(self):
@@ -660,7 +662,7 @@ class Tool(Tk):
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
         self.show.pack(side=LEFT, fill=BOTH, expand=True)
-        data:str = sys.stdout.data
+        data: str = sys.stdout.data
         sys.stdout = StdoutRedirector(self.show)
         sys.stdout.write(data)
         del data
@@ -860,8 +862,9 @@ temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 states = States()
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
-# Some Functions for Upgrade
 
+
+# Some Functions for Upgrade
 
 
 class Updater(Toplevel):
@@ -1039,7 +1042,6 @@ class Updater(Toplevel):
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         terminate_process(os.getpid())
 
-
     def update_process2(self):
         self.notice.configure(text=lang.t51)
         time.sleep(2)
@@ -1162,17 +1164,17 @@ class Welcome(ttk.Frame):
         self.frame = ttk.Frame(self)
         self.frame.pack(expand=1, fill=BOTH)
         self.button_frame = ttk.Frame(self)
-        self.back = ttk.Button(self.button_frame, text=lang.back_step, command=lambda :self.change_page(self.oobe - 1))
-        self.back.pack(fill=X , padx=5, pady=5, side='left', expand=1)
-        self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda :self.change_page(self.oobe+1))
-        self.next.pack(fill=X , padx=5, pady=5, side='right', expand=1)
+        self.back = ttk.Button(self.button_frame, text=lang.back_step, command=lambda: self.change_page(self.oobe - 1))
+        self.back.pack(fill=X, padx=5, pady=5, side='left', expand=1)
+        self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
+        self.next.pack(fill=X, padx=5, pady=5, side='right', expand=1)
         self.button_frame.pack(expand=1, fill=X, padx=5, pady=5, side='bottom')
         self.change_page(self.oobe)
         move_center(win)
         self.wait_window()
         states.in_oobe = False
 
-    def change_page(self, step:int=None):
+    def change_page(self, step: int = None):
         if not step or step not in self.frames.keys():
             step = 0
         self.oobe = step
@@ -1189,7 +1191,7 @@ class Welcome(ttk.Frame):
             self.next.config(text=lang.text34, command=self.destroy)
         else:
             if self.next.cget('text') != lang.text138:
-                self.next.config(text=lang.text138, command=lambda:self.change_page(self.oobe + 1))
+                self.next.config(text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
 
     def hello(self):
         ttk.Label(self.frame, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
@@ -1205,15 +1207,14 @@ class Welcome(ttk.Frame):
         lb3_.pack(padx=10, pady=10, side='top', fill=BOTH)
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
 
-
     def license(self):
         lce = StringVar()
+
         def load_license():
             te.delete(1.0, tk.END)
             with open(f"{cwd_path}/bin/licenses/{lce.get()}.txt", 'r',
                       encoding='UTF-8') as f:
                 te.insert('insert', f.read())
-
 
         lb = ttk.Combobox(self.frame, state='readonly', textvariable=lce,
                           values=[i.rsplit('.')[0] for i in os.listdir(f"{cwd_path}/bin/licenses") if
@@ -1441,6 +1442,7 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     re_folder(output + output_name)
     LogoDumper(file_path, output + output_name).unpack()
 
+
 @animation
 def logo_pack(origin_logo=None) -> int:
     work = ProjectManager.current_work_path()
@@ -1522,6 +1524,7 @@ class ModuleManager:
         PlatformNotSupport = 1
         DependsMissing = 2
         IsBroken = 3
+
     def is_virtual(self, id_):
         return id_ in self.addon_loader.virtual.keys()
 
@@ -1545,7 +1548,8 @@ class ModuleManager:
                         elif hasattr(module, 'main'):
                             self.addon_loader.register(i, self.addon_entries.main, module.main)
                         else:
-                            print(f"Can't registry Module {i} as Plugin, But We Found {[i for i in dir(module) if not i.startswith('__') and not i.endswith('__')]} in it.")
+                            print(
+                                f"Can't registry Module {i} as Plugin, But We Found {[i for i in dir(module) if not i.startswith('__') and not i.endswith('__')]} in it.")
                     except Exception:
                         logging.exception('Bugs')
 
@@ -1879,13 +1883,61 @@ class ModuleManager:
                     self.runline(other)
             elif modes[mode](var_):
                 self.runline(other)
-# fixme:Rewrite it!!!
+
+    # fixme:Rewrite it!!!
     class Parse(Toplevel):
         gavs = {}
+        @staticmethod
+        def _text(master, text, fontsize, side):
+            ttk.Label(master, text=text,
+                      font=(None, int(fontsize))).pack(side=side, padx=5, pady=5)
+        @staticmethod
+        def _button(master, text, command):
+            ttk.Button(master, text=text,
+                       command=lambda: print(command)).pack(side='left')
 
+        def _filechose(self, master, set, text):
+            ft = ttk.Frame(master)
+            ft.pack(fill=X)
+            self.gavs[set] = StringVar()
+            ttk.Label(ft, text=text).pack(side='left', padx=10, pady=10)
+            ttk.Entry(ft, textvariable=self.gavs[set]).pack(side='left', padx=5, pady=5)
+            ttk.Button(ft, text=lang.text28,
+                       command=lambda: self.gavs[set].set(
+                           filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+        def _radio(self, master, set, opins, side):
+            radio_var_name = set
+            self.gavs[radio_var_name] = StringVar()
+            options = opins.split()
+            pft1 = ttk.Frame(master)
+            pft1.pack(padx=10, pady=10)
+            for option in options:
+                text, value = option.split('|')
+                self.gavs[radio_var_name].set(value)
+                ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
+                                value=value).pack(side=side)
+        def _input(self, master, set, text):
+            input_frame = Frame(master)
+            input_frame.pack(fill=X)
+            input_var_name = set
+            self.gavs[input_var_name] = StringVar()
+            if text != 'None':
+                ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
+            ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
+                                                                                padx=5,
+                                                                                fill=X)
+        def _checkbutton(self, master, set, text):
+            b_var_name = set
+            self.gavs[b_var_name] = IntVar()
+            text = '' if text == 'None' else text
+            ttk.Checkbutton(master, text=text, variable=self.gavs[b_var_name], onvalue=1,
+                            offvalue=0,
+                            style="Switch.TCheckbutton").pack(
+                padx=5, pady=5, fill=BOTH)
+        def __unknown(self, master, type):
+            print(lang.warn14.format(type))
         def __init__(self, jsons, msh=False):
             super().__init__()
-
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
                     data = json.load(f)
@@ -1905,58 +1957,29 @@ class ModuleManager:
                     logging.exception('Bugs')
                 self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
                 for group_name, group_data in data['main'].items():
-                    if group_name != "info":
-                        group_frame = ttk.LabelFrame(self, text=group_data['title'])
-                        group_frame.pack(padx=10, pady=10)
-                        for con in group_data['controls']:
-                            if con["type"] == "text":
-                                ttk.Label(group_frame, text=con['text'],
-                                          font=(None, int(con['fontsize']))).pack(side=con['side'], padx=5, pady=5)
-                            elif con["type"] == "button":
-                                ttk.Button(group_frame, text=con['text'],
-                                           command=lambda: print(con['command'])).pack(side='left')
-                            elif con["type"] == "filechose":
-                                ft = ttk.Frame(group_frame)
-                                ft.pack(fill=X)
-                                file_var_name = con['set']
-                                self.gavs[file_var_name] = StringVar()
-                                ttk.Label(ft, text=con['text']).pack(side='left', padx=10, pady=10)
-                                ttk.Entry(ft, textvariable=self.gavs[file_var_name]).pack(side='left', padx=5, pady=5)
-                                ttk.Button(ft, text=lang.text28,
-                                           command=lambda: self.gavs[file_var_name].set(
-                                               filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
-                            elif con["type"] == "radio":
-                                radio_var_name = con['set']
-                                self.gavs[radio_var_name] = StringVar()
-                                options = con['opins'].split()
-                                pft1 = ttk.Frame(group_frame)
-                                pft1.pack(padx=10, pady=10)
-                                for option in options:
-                                    text, value = option.split('|')
-                                    self.gavs[radio_var_name].set(value)
-                                    ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
-                                                    value=value).pack(side=con['side'])
-                            elif con["type"] == 'input':
-                                input_frame = Frame(group_frame)
-                                input_frame.pack(fill=X)
-                                input_var_name = con['set']
-                                self.gavs[input_var_name] = StringVar()
-                                if 'text' in con:
-                                    ttk.Label(input_frame, text=con['text']).pack(side=LEFT, padx=5, pady=5, fill=X)
-                                ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
-                                                                                                    padx=5,
-                                                                                                    fill=X)
-                            elif con['type'] == 'checkbutton':
-                                b_var_name = con['set']
-                                self.gavs[b_var_name] = IntVar()
-                                text = '' if 'text' not in con else con['text']
-                                ttk.Checkbutton(group_frame, text=text, variable=self.gavs[b_var_name], onvalue=1,
-                                                offvalue=0,
-                                                style="Switch.TCheckbutton").pack(
-                                    padx=5, pady=5, fill=BOTH)
-                            else:
-                                print(lang.warn14.format(con['type']))
-            ttk.Button(self, text=lang.ok, command=lambda: create_thread(self.generate_msh if msh else self.generate_sh)).pack(
+                    if group_name == 'info':
+                        continue
+                    group_frame = ttk.LabelFrame(self, text=group_data['title'])
+                    group_frame.pack(padx=10, pady=10)
+                    for con in group_data['controls']:
+                        if hasattr(self, f'_{con["type"]}'):
+                            control = getattr(self, f'_{con["type"]}')
+                        else:
+                            control = self.__unknown
+                        try:
+                            varnames = control.__code__.co_varnames[:control.__code__.co_argcount]
+                        except AttributeError:
+                            logging.exception('Var')
+                            continue
+                        args = [group_frame]
+                        args += [con.get(i, 'None') for i in varnames if i not in ['master', 'self']]
+                        try:
+                            control(*args)
+                        except (AttributeError, TypeError):
+                            logging.exception('V!')
+                            print(con, args, varnames)
+            ttk.Button(self, text=lang.ok,
+                       command=lambda: create_thread(self.generate_msh if msh else self.generate_sh)).pack(
                 fill=X,
                 side='bottom')
             move_center(self)
@@ -2006,13 +2029,14 @@ class ModuleManager:
             move_center(self)
             if not ModuleManager.is_virtual(self.value) and self.check_pass:
                 ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                              expand=True)
+                                                                                  expand=True)
             elif not self.check_pass:
                 ttk.Label(self, text=lang.warn2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                                  expand=True)
+                                                                       expand=True)
             else:
-                ttk.Label(self, text="The Plugin %s is virtual." % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
-                                                                                  expand=True)
+                ttk.Label(self, text="The Plugin %s is virtual." % self.value2, font=(None, 30)).pack(padx=10, pady=10,
+                                                                                                      fill=BOTH,
+                                                                                                      expand=True)
             if self.arr:
                 ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
                 ttk.Label(self, text=lang.t8, font=(None, 15)).pack(padx=10, pady=10, fill=BOTH,
@@ -2173,7 +2197,8 @@ class MpkMan(ttk.Frame):
                                 command=lambda: create_thread(ModuleManager.run, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t14, command=lambda: create_thread(ModuleManager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
-                                command=lambda: create_thread(ModuleManager.new.editor_, ModuleManager, self.chosen.get()))
+                                command=lambda: create_thread(ModuleManager.new.editor_, ModuleManager,
+                                                              self.chosen.get()))
         self.list_pls()
         lf1.pack(padx=10, pady=10)
 
@@ -2202,7 +2227,8 @@ class InstallMpk(Toplevel):
         self.prog.pack()
         self.state = Label(self, text=lang.text40, font=(None, 12))
         self.state.pack(padx=10, pady=10)
-        self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton", command=lambda: create_thread(self.install))
+        self.installb = ttk.Button(self, text=lang.text41, style="Accent.TButton",
+                                   command=lambda: create_thread(self.install))
         self.installb.pack(padx=10, pady=10, expand=True, fill=X)
         self.load()
         move_center(self)
@@ -2274,6 +2300,7 @@ class InstallMpk(Toplevel):
         self.state.config()
         self.installb.config(state=DISABLED)
 
+
 def Generate_Bug_Report():
     n = '\n'
     if os.name == 'nt':
@@ -2307,6 +2334,7 @@ def Generate_Bug_Report():
     re_folder(inner, quiet=True)
     print(f"\tThe Bug Report Was Saved:{bugreport}")
 
+
 class Debugger(Toplevel):
     def __init__(self):
         super().__init__()
@@ -2330,7 +2358,8 @@ class Debugger(Toplevel):
             ('No More Room in Hell', lambda: openurl('steam://install/224260')),
         ]
         for index, (text, func) in enumerate(functions):
-            ttk.Button(self, text=text, command=func, width=20, style="Toggle.TButton").grid(row=row, column=num_c, padx=5, pady=5)
+            ttk.Button(self, text=text, command=func, width=20, style="Toggle.TButton").grid(row=row, column=num_c,
+                                                                                             padx=5, pady=5)
             num_c = (num_c + 1) % num_max
             if not num_c:
                 row += 1
@@ -2361,7 +2390,7 @@ class Debugger(Toplevel):
         if hasattr(sys, '_base_executable'):
             text += f'_base_executable: {sys._base_executable}'
         ttk.Label(ck, text=text, foreground='gray').grid(row=1, column=0, padx=5, pady=5,
-                                                                             sticky='nw')
+                                                         sticky='nw')
         move_center(ck)
 
     @staticmethod
@@ -2524,7 +2553,7 @@ class MpkStore(Toplevel):
             # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
             o = ttk.Label(f2,
                           text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
-                               , wraplength=250)
+                          , wraplength=250)
             o.pack_propagate(False)
             o.pack(side=LEFT, padx=5, pady=5)
             f2.pack(side=TOP)
@@ -2743,7 +2772,7 @@ class PackSuper(Toplevel):
         ttk.Radiobutton(lf1_r, text="None", variable=self.attrib, value='none').pack(side='left', padx=10, pady=10)
         Label(lf2, text=lang.text56).pack(side='left', padx=10, pady=10)
         (show_group_name := ttk.Combobox(lf2, textvariable=self.group_name,
-                                values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
+                                         values=("qti_dynamic_partitions", "main", "mot_dp_group"))).pack(
             side='left',
             padx=10,
             pady=10,
@@ -2778,10 +2807,11 @@ class PackSuper(Toplevel):
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
                                                                       fill=X,
                                                                       expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(side='left',
-                                                                                                                  padx=5,
-                                                                                                                  pady=5, fill=X,
-                                                                                                                  expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(
+            side='left',
+            padx=5,
+            pady=5, fill=X,
+            expand=True)
 
     def start_(self):
         try:
@@ -2798,7 +2828,8 @@ class PackSuper(Toplevel):
         if not ProjectManager.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.super_type.get(), part_list=lbs, del_=sc,
+        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.super_type.get(),
+                  part_list=lbs, del_=sc,
                   attrib=self.attrib.get())
 
     def verify_size(self):
@@ -2824,7 +2855,8 @@ class PackSuper(Toplevel):
 
     def generate(self):
         self.g_b.config(text=lang.t28, state='disabled')
-        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(), super_type=self.super_type.get(),
+        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(),
+                                    super_type=self.super_type.get(),
                                     part_list=self.tl.selected.copy(), work=ProjectManager.current_work_path())
         self.g_b.config(text=lang.text34)
         time.sleep(1)
@@ -2869,8 +2901,8 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly', output_dir:str=None, work:str=None):
-
+def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+              output_dir: str = None, work: str = None):
     if not work:
         work = ProjectManager.current_work_path()
     if not output_dir:
@@ -2897,7 +2929,8 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
     else:
         command += ["3", '-device', f'super:{size.get()}', '--group', f"{group_name.get()}_a:{size.get()}"]
         for part in part_list:
-            command += ['--partition', f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}_a",
+            command += ['--partition',
+                        f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}_a",
                         '--image', f'{part}_a={work + part}.img']
         command += ["--group", f"{group_name.get()}_b:{size.get()}"]
         for part in part_list:
@@ -2935,7 +2968,7 @@ class StdoutRedirector:
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
-        self.flush = lambda : error(1, self.error_info) if self.error_info else ...
+        self.flush = lambda: error(1, self.error_info) if self.error_info else ...
 
     def write(self, string):
         if self.error:
@@ -3013,7 +3046,8 @@ def download_api(url, path=None, int_=True, size_=0):
             used_time = time.time() - last_time
             speed = chunk_kb / used_time
             last_time = time.time()
-            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
+            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
+                                                                                             bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
 
@@ -3025,7 +3059,7 @@ def download_file():
     progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
     ttk.Label(down, text=os.path.basename(url), justify='left').pack(padx=10, pady=5)
-    ttk.Label(down, text=url,  wraplength=200, justify='left').pack(padx=10, pady=5)
+    ttk.Label(down, text=url, wraplength=200, justify='left').pack(padx=10, pady=5)
     ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
     c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=True, offvalue=False)
     c1.pack(padx=10, pady=10)
@@ -3261,10 +3295,11 @@ class Packxx(Toplevel):
                                                                       pady=2,
                                                                       fill=X,
                                                                       expand=True)
-        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(side='left',
-                                                                                                                  padx=2, pady=2,
-                                                                                                                  fill=X,
-                                                                                                                  expand=True)
+        ttk.Button(self, text=lang.pack, command=lambda: create_thread(self.start_), style="Accent.TButton").pack(
+            side='left',
+            padx=2, pady=2,
+            fill=X,
+            expand=True)
         move_center(self)
         ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.before_pack)
 
@@ -3464,7 +3499,6 @@ class Packxx(Toplevel):
                 logo_pack()
             else:
                 print(f"Unsupported {i}:{parts_dict[i]}")
-
 
 
 def rdi(work, part_name) -> bool:
@@ -3859,11 +3893,13 @@ def unpack(chose, form: str = '') -> bool:
     print(lang.text8)
     return True
 
+
 def cprint(*args, **kwargs):
     if not hasattr(sys, 'stdout_origin'):
         print("stdout_origin not defined!")
     else:
         print(*args, **kwargs, file=sys.stdout_origin)
+
 
 def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
     if not ok:
@@ -4140,7 +4176,7 @@ def rmdir(path, quiet=False):
 
 
 @animation
-def pack_zip(input_dir=None,output_zip=None, silent=False):
+def pack_zip(input_dir=None, output_zip=None, silent=False):
     if input_dir is None:
         input_dir = ProjectManager.current_work_output_path()
         if not ProjectManager.exist():
@@ -4168,6 +4204,7 @@ def pack_zip(input_dir=None,output_zip=None, silent=False):
                 print(lang.text2.format(file, e))
     if os.path.exists(output_zip):
         print(lang.text3.format(output_zip))
+
 
 def dndfile(files):
     for fi in files:
@@ -4283,7 +4320,8 @@ class UnpackGui(ttk.LabelFrame):
         self.ch.set(True)
         self.fm = ttk.Combobox(self, state="readonly",
                                values=(
-                               'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super', 'update.app'))
+                                   'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
+                                   'update.app'))
         self.lsg = ListBox(self)
         self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
         self.menu.add_command(label=lang.attribute, command=self.info)
@@ -4437,10 +4475,11 @@ class FormatConversion(ttk.LabelFrame):
         t = Frame(self)
         ttk.Button(t, text=lang.cancel, command=self.destroy).pack(side='left', padx=5, pady=5, fill=BOTH,
                                                                    expand=True)
-        ttk.Button(t, text=lang.ok, command=lambda: create_thread(self.conversion), style='Accent.TButton').pack(side='left',
-                                                                                                                 padx=5, pady=5,
-                                                                                                                 fill=BOTH,
-                                                                                                                 expand=True)
+        ttk.Button(t, text=lang.ok, command=lambda: create_thread(self.conversion), style='Accent.TButton').pack(
+            side='left',
+            padx=5, pady=5,
+            fill=BOTH,
+            expand=True)
         t.pack(side=BOTTOM, fill=BOTH)
 
     def relist(self):
@@ -4585,9 +4624,11 @@ def init_verify():
     if not settings.path.isprintable():
         ask_win2(lang.warn16 % lang.special_words)
 
+
 def exit_tool():
     ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.close)
     win.destroy()
+
 
 class ParseCmdline:
     def __init__(self, args_list):
@@ -4596,9 +4637,10 @@ class ParseCmdline:
         if settings.cmd_invisible == '1':
             win.withdraw()
             win.iconify()
-        self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!', exit_on_error=False)
+        self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!',
+                                              exit_on_error=False)
         subparser = self.parser.add_subparsers(title='subcommand',
-                                          description='Valid subcommands')
+                                               description='Valid subcommands')
         # Unpack Rom
         unpack_rom_parser = subparser.add_parser('unpack', add_help=False, help="Unpack Suported File")
         unpack_rom_parser.set_defaults(func=dndfile)
@@ -4616,7 +4658,7 @@ class ParseCmdline:
         # End
         if len(args_list) == 1 and args_list[0] not in ["help", '--help', '-h']:
             dndfile(args_list)
-        if len(args_list) == 1 and args_list[0]  in ['--help', '-h']:
+        if len(args_list) == 1 and args_list[0] in ['--help', '-h']:
             self.help([])
         else:
             try:
@@ -4627,6 +4669,7 @@ class ParseCmdline:
                 self.cmd_exit = '1'
         if self.cmd_exit == '1':
             sys.exit(1)
+
     # Hidden Methods
     def __parse(self):
         subcmd, subcmd_args = self.parser.parse_known_args(self.args_list)
@@ -4634,8 +4677,10 @@ class ParseCmdline:
             self.parser.print_help()
             return
         subcmd.func(subcmd_args)
+
     def __pass(self):
         pass
+
     # Export Methods
     def set(self, args):
         if len(args) > 2:
@@ -4668,13 +4713,14 @@ class ParseCmdline:
         parser.add_argument('workdir', type=str, help='The Work Dir', action='store', default=None)
         parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
         # dbfz...
-        parser.add_argument('--group-name', type=str,action='store',
+        parser.add_argument('--group-name', type=str, action='store',
                             help='qti_dynamic_partitions main mot_dp_group',
                             default='qti_dynamic_partitions')
         parser.add_argument('--size', type=int, help='Super Size (Bytes)',
                             action='store',
                             default=9126805504)
-        parser.add_argument('--list', type=str, help='the including parts of the super, use "," to split, like"odm,system"',
+        parser.add_argument('--list', type=str,
+                            help='the including parts of the super, use "," to split, like"odm,system"',
                             action='store',
                             default=None)
         # Wheather remove source files
@@ -4689,13 +4735,11 @@ class ParseCmdline:
         parser.add_argument('--attrib', type=str, help='The Attrib Of the super',
                             action='store',
                             default='readonly')
-        args =  parser.parse_args(arglist)
+        args = parser.parse_args(arglist)
         if not args.workdir or not args.outputdir \
                 or not os.path.exists(args.workdir) or not os.path.exists(args.outputdir):
             cprint("Workdir or Output Dir Not Exist!")
             return
-
-
 
 
 def __init__tk(args):
@@ -4755,10 +4799,13 @@ def __init__tk(args):
     if len(args) > 1 and is_pro:
         win.after(1000, ParseCmdline, args[1:])
     win.mainloop()
+
+
 # Cool Init
 # Miside 米塔
 # Link: https://store.steampowered.com/app/2527500/
-init = lambda args:__init__tk(args)
+init = lambda args: __init__tk(args)
+
 
 def restart(er=None):
     try:
