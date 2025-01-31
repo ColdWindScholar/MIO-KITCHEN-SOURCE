@@ -15,7 +15,7 @@
 ***
 ## Features
 * Unpack `boot, dtbo, ext4, erofs, payload, logo` and so on
-* Pack `boot, dtbo, ext4, erofs, payload, logo` and so on
+* Pack `boot, dtbo, ext4, erofs, logo` and so on
 ***
 ## Advantages
 * Automatic fs_config and fs_context patch
