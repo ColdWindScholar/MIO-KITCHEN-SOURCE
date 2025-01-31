@@ -1794,7 +1794,7 @@ class ModuleManager:
                          'gettype': lambda file_: gettype(file_),
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
         def sfor(self, vn, vs, do):
-            if do[:1] == "'":
+            if do[:1] in ["(", '"', "'"]:
                 do = do[1:-1]
             [self.runline(do.replace(f'@{vn}@', v)) for v in
              vs.split(',' if ',' in vs else None)]
