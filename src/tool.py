@@ -1934,8 +1934,8 @@ class ModuleManager:
                             offvalue=0,
                             style="Switch.TCheckbutton").pack(
                 padx=5, pady=5, fill=BOTH)
-        def __unknown(self, master, type):
-            print(lang.warn14.format(type))
+        def __unknown(self, master, type, side):
+            self._text(master,lang.warn14.format(type),  10, side if side != 'None' else 'bottom')
         def __init__(self, jsons, msh=False):
             super().__init__()
             with open(jsons, 'r', encoding='UTF-8') as f:
