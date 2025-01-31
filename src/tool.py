@@ -3322,8 +3322,7 @@ class Packxx(Toplevel):
         for i in self.lg:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
-            if parts_dict[i] in ['ext', 'erofs', 'f2fs']:
-                return True
+            return parts_dict[i] in ['ext', 'erofs', 'f2fs']
         return False
 
     def modify_custom_size(self):
@@ -3530,13 +3529,13 @@ def input_(title: str = None, text: str = "") -> str:
     if not title:
         title = lang.text76
     (input_var := StringVar()).set(text)
-    input__ = ttk.LabelFrame(win, text=title)
-    input__.place(relx=0.5, rely=0.5, anchor="center")
-    entry__ = ttk.Entry(input__, textvariable=input_var)
-    entry__.pack(pady=5, padx=5, fill=BOTH)
-    entry__.bind("<Return>", lambda *x: input__.destroy())
-    ttk.Button(input__, text=lang.ok, command=input__.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
-    input__.wait_window()
+    input_frame = ttk.LabelFrame(win, text=title)
+    input_frame.place(relx=0.5, rely=0.5, anchor="center")
+    entry = ttk.Entry(input_frame, textvariable=input_var)
+    entry.pack(pady=5, padx=5, fill=BOTH)
+    entry.bind("<Return>", lambda *x: input_frame.destroy())
+    ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
+    input_frame.wait_window()
     return input_var.get()
 
 
@@ -3807,7 +3806,7 @@ def unpack(chose, form: str = '') -> bool:
             try:
                 parts.pop(i)
             except KeyError:
-                ...
+                logging.exception('Key')
             if gettype(work + i + ".img") != 'sparse':
                 parts[i] = gettype(work + i + ".img")
             if gettype(work + i + ".img") == 'dtbo':
