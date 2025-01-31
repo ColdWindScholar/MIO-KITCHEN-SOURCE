@@ -2634,17 +2634,21 @@ class MpkStore(Toplevel):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
         try:
             for i in files:
-                for percentage, _, _, _, _ in download_api(self.repo + i, temp, size_=size):
-                    if control and states.mpk_store:
-                        control.config(text=f"{percentage} %")
-                    else:
-                        return False
+                info = {}
+                for data in self.data:
+                    if id_ == data.get('id'):
+                        info = data
+                        break
+                if os.path.exists(os.path.join(temp, i)) and os.path.isfile(os.path.join(temp, i)) and os.path.getsize(os.path.join(temp, i)) == info.get('size', -1):
+                    logging.info('Using Cached Package.')
+                else:
+                    for percentage, _, _, _, _ in download_api(self.repo + i, temp, size_=size):
+                        if control and states.mpk_store:
+                            control.config(text=f"{percentage} %")
+                        else:
+                            return False
 
                 create_thread(ModuleManager.install, os.path.join(temp, i), join=True)
-                try:
-                    os.remove(os.path.join(temp, i))
-                except (Exception, BaseException):
-                    logging.exception('Bugs')
         except (ConnectTimeout, HTTPError, BaseException, Exception, TclError):
             logging.exception('Bugs')
             return
