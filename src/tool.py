@@ -40,7 +40,6 @@ if platform.system() != 'Darwin':
         ...
 import os.path
 import pathlib
-import shlex
 import sys
 import time
 from platform import machine
@@ -1794,10 +1793,12 @@ class ModuleManager:
                          "run": lambda cmd: call(exe=str(cmd), extra_path=False),
                          'gettype': lambda file_: gettype(file_),
                          'exist': lambda x: '1' if os.path.exists(x) else '0'}
-
+        def sfor(self, vn, vs, do):
+            if do[:1] == "'":
+                do = do[1:-1]
+            [self.runline(do.replace(f'@{vn}@', v)) for v in
+             vs.split(',' if ',' in vs else None)]
         def __init__(self, sh):
-            self.sfor = lambda vn, vs, do: [self.runline(do.replace(f'@{vn}@', v)) for v in
-                                            vs.split(',' if ',' in vs else None)]
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             self.envs = {'version': settings.version, 'tool_bin': settings.tool_bin.replace('\\', '/'),
@@ -1837,7 +1838,7 @@ class ModuleManager:
                 if i.split()[0] == "if":
                     self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
                 elif i.split()[0] == "for":
-                    self.sfor(i.split()[1], shlex.split(i)[3], shlex.split(i)[4])
+                    self.sfor(i.split()[1], i.split()[3], ' '.join(i.split()[4:]))
                 else:
                     if i.split()[0] in self.grammar_words.keys():
                         self.envs["result"] = self.grammar_words[i.split()[0]](' '.join(i.split()[1:]))
