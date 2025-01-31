@@ -3091,9 +3091,11 @@ def download_file():
 
 
 @animation
-def unpack_boot(name: str = 'boot', boot:str=None):
+def unpack_boot(name: str = 'boot', boot:str=None, work:str=None):
+    if not work:
+        work = ProjectManager.current_work_path()
     if not boot:
-        if not (boot := findfile(f"{name}.img", (work := ProjectManager.current_work_path()))):
+        if not (boot := findfile(f"{name}.img", work)):
             print(lang.warn3.format(name))
             return
     if not os.path.exists(boot):
@@ -3110,20 +3112,18 @@ def unpack_boot(name: str = 'boot', boot:str=None):
         os.chdir(cwd_path)
         rmtree(work + name)
         return
-    if os.access(work + name + "/ramdisk.cpio", os.F_OK):
-        comp = gettype(work + name + "/ramdisk.cpio")
+    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK):
+        comp = gettype(f"{work}/{name}/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
-        with open(work + name + "/comp", "w", encoding='utf-8') as f:
+        with open(f"{work}/{name}/comp", "w", encoding='utf-8') as f:
             f.write(comp)
         if comp != "unknown":
-            os.rename(work + name + "/ramdisk.cpio",
-                      work + name + "/ramdisk.cpio.comp")
-            if call(["magiskboot", "decompress", work + name + '/ramdisk.cpio.comp',
-                     work + name + '/ramdisk.cpio']) != 0:
+            os.rename(f"{work}/{name}/ramdisk.cpio", f"{work}/{name}/ramdisk.cpio.comp")
+            if call(["magiskboot", "decompress", f'{work}/{name}/ramdisk.cpio.comp', f'{work}/{name}/ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
-        if not os.path.exists(work + name + "/ramdisk"):
-            os.mkdir(work + name + "/ramdisk")
+        if not os.path.exists(f"{work}/{name}/ramdisk"):
+            os.mkdir(f"{work}/{name}/ramdisk")
         os.chdir(work + name)
         print("Unpacking Ramdisk...")
         call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
