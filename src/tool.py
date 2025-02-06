@@ -837,6 +837,7 @@ class Tool(Tk):
 
         context.trace("w", lambda *x: enable_contextpatch())
         get_setting_button('ai_engine', sf4, lang.ai_engine)
+        get_setting_button('magisk_not_decompress', sf4, lang.text142)
         if os.name == 'nt':
             get_setting_button('treff', sf4, lang.t61)
         enable_cp = ttk.Checkbutton(sf4, text=lang.context_patch, variable=context, onvalue='1',
@@ -1270,6 +1271,7 @@ class SetUtils:
         self.version = 'basic'
         self.version_old = 'unknown'
         self.language = 'English'
+        self.magisk_not_decompress = '0'
         self.updating = ''
         self.new_tool = ''
         self.cmd_exit = '0'
@@ -3112,7 +3114,7 @@ def unpack_boot(name: str = 'boot', boot:str=None, work:str=None):
             return
     re_folder(work + name)
     os.chdir(work + name)
-    if call(['magiskboot', 'unpack', '-h', '-n', boot]) != 0:
+    if call(['magiskboot', 'unpack', '-h', '-n' if settings.magisk_not_decompress == '1' else '', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cwd_path)
         rmtree(work + name)
