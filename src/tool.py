@@ -1010,7 +1010,7 @@ class Updater(Toplevel):
                 self.progressbar.update()
         self.progressbar['value'] = 100
         self.progressbar.update()
-
+#fixme:Rewrite it.
     def update_process(self):
         [terminate_process(i) for i in states.open_pids]
         self.notice.configure(text=lang.t51)
@@ -1022,7 +1022,7 @@ class Updater(Toplevel):
                         zip_ref.extract(file, cwd_path)
                     except PermissionError:
                         zip_ref.extract(file, temp)
-                        update_files.append([os.path.join(temp, file), file])
+                        update_files.append(file)
                 else:
                     zip_ref.extract(file, os.path.join(cwd_path, "bin"))
         update_dict = {
@@ -1031,7 +1031,7 @@ class Updater(Toplevel):
             'oobe': settings.oobe,
             'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
             "version_old": settings.version,
-            "update_files": update_files
+            "update_files": ' '.join(update_files)
         }
         for i in update_dict.keys():
             settings.set_value(i, update_dict.get(i, ''))
@@ -1046,9 +1046,10 @@ class Updater(Toplevel):
         self.notice.configure(text=lang.t51)
         time.sleep(2)
         if hasattr(settings, 'update_files'):
-            for i in settings.update_files:
+            for i in settings.update_files.split(' '):
                 try:
-                    path, real = i
+                    real = i
+                    path = os.path.join(temp, real)
                 except (KeyError, ValueError):
                     continue
                 if calculate_md5_file(path) == calculate_md5_file(os.path.join(cwd_path, real)):
