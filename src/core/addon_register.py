@@ -29,9 +29,8 @@ class PluginLoader(object):
         if id_ not in self.plugins:
             self.plugins[id_] = {}
         self.plugins[id_][entry] = func
-        if virtual:
-            if not virtual_info:
-                virtual_info = {
+        if virtual and not virtual_info:
+            virtual_info = {
                     "id":id_,
                     "name": id_,
                     "author":"",
