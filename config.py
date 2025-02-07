@@ -163,8 +163,9 @@ def update(args):
                         if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
                             z.extract(z_name, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
-
                 JsonEdit(update_info).write(origin_info)
+        else:
+            pass
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN', exit_on_error=False)
     subparser = parser.add_subparsers(title='Supported subcommands',
