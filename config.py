@@ -167,7 +167,7 @@ def update(args):
         else:
             pass
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN', exit_on_error=False)
+    parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN/TIK', exit_on_error=False)
     subparser = parser.add_subparsers(title='Supported subcommands',
                                            description='Valid subcommands')
     unpack_rom_parser = subparser.add_parser('upbin', help="update binary")
