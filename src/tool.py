@@ -972,7 +972,7 @@ class Updater(Toplevel):
             self.change_log.insert('insert', json_.get('body'))
 
     def get_download_url(self):
-        package = f'{self.package_head}'
+        package = self.package_head
         if platform.system() == 'Windows':
             package += '-win.zip'
         elif platform.system() == 'Linux':
