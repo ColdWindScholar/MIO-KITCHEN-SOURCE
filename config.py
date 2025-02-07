@@ -123,6 +123,7 @@ system_list = {
 def update(args):
     for name, content in links.items():
         blue(f"Updating {name}")
+        origin_info = JsonEdit(update_info).read()
         if content.get('github_json', False):
             url = requests.get(content.get('link'))
             json_:dict = json.loads(url.text)
@@ -130,6 +131,7 @@ def update(args):
             if JsonEdit(update_info).read().get(name) == json_.get('tag_name'):
                 yellow(f"{name} was latest already!")
                 continue
+            origin_info[name] = json_.get('tag_name')
             assets = json_.get('assets')
             for a in assets:
                 browser_download_url = a.get('browser_download_url', None)
@@ -161,8 +163,7 @@ def update(args):
                         if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
                             z.extract(z_name, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
-                origin_info = JsonEdit(update_info).read()
-                origin_info[name] = json_.get('tag_name')
+
                 JsonEdit(update_info).write(origin_info)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN', exit_on_error=False)
