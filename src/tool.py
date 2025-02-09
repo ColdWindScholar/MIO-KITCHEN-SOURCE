@@ -66,7 +66,6 @@ from .core.utils import lang, LogoDumper, States, terminate_process, calculate_m
 if os.name == 'nt':
     from ctypes import windll
     from tkinter import filedialog
-    import pywinstyles
 else:
     from .core import mkc_filedialog as filedialog
 
@@ -873,8 +872,6 @@ class Updater(Toplevel):
         if states.update_window:
             self.destroy()
         super().__init__()
-        if os.name == 'nt' and settings.treff == '1':
-            pywinstyles.apply_style(self, 'acrylic')
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         states.update_window = True
@@ -1312,14 +1309,8 @@ class SetUtils:
             if 'active_code' not in self.__dir__():
                 self.active_code = 'None'
             verify.verify(self.active_code)
-        if os.name != 'nt':
-            win.attributes("-alpha", self.bar_level)
-        else:
-            if self.treff == '1':
-                pywinstyles.apply_style(win, 'acrylic')
-            else:
-                pywinstyles.apply_style(win, 'normal')
-                pywinstyles.apply_style(win, 'mica')
+        win.attributes("-alpha", self.bar_level)
+
 
     @staticmethod
     def load_language(name):
@@ -2482,8 +2473,6 @@ class MpkStore(Toplevel):
             return
         states.mpk_store = True
         super().__init__()
-        if os.name == 'nt' and settings.treff == '1':
-            pywinstyles.apply_style(self, 'acrylic')
         self.title('Mpk Store')
         self.data = []
         self.tasks = []
@@ -2755,8 +2744,7 @@ class PackHybridRom:
 class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
-        if os.name == 'nt' and settings.treff == '1':
-            pywinstyles.apply_style(self, 'acrylic')
+
         self.title(lang.text53)
         self.supers = IntVar(value=9126805504)
         self.ssparse = IntVar()
@@ -3222,8 +3210,7 @@ class Packxx(Toplevel):
             self.start_()
             return
         super().__init__()
-        if os.name == 'nt' and settings.treff == '1':
-            pywinstyles.apply_style(self, 'acrylic')
+
         self.title(lang.text42)
         lf1 = ttk.LabelFrame(self, text=lang.text43)
         lf1.pack(fill=BOTH, padx=5, pady=5)
@@ -4789,8 +4776,6 @@ def __init__tk(args):
     except TclError:
         logging.exception('TclError')
         return
-    if os.name == 'nt' and settings.treff == '1':
-        pywinstyles.apply_style(win, 'acrylic')
     win.gui()
     global unpackg
     unpackg = UnpackGui()

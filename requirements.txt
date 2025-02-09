@@ -9,7 +9,6 @@ future
 pip
 Pygments
 zstandard
-pywinstyles
 asn1crypto
 lxml
 wmi
