@@ -2428,7 +2428,7 @@ class Debugger(Toplevel):
         def save():
             if f.get():
                 if len(f.get().split()) >= 2:
-                    if f.get().split()[0] == 'load':
+                    if f.get().split()[0] == 'import':
                         try:
                             globals()[h.get()] = __import__(f.get().split()[1])
                             read_value()
