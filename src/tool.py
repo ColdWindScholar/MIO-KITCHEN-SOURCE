@@ -3241,10 +3241,10 @@ class Packxx(Toplevel):
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
             side='left', padx=5, pady=5)
-        self.xgdx = ttk.Button(lf1, text=lang.t37, command=self.modify_custom_size)
-        self.xgdx.pack(
+        self.modify_size_button = ttk.Button(lf1, text=lang.t37, command=self.modify_custom_size)
+        self.modify_size_button.pack(
             side='left', padx=5, pady=5)
-        self.show_modify_size = lambda: self.xgdx.pack_forget() if self.ext4_method.get() == lang.t32 else self.xgdx.pack(
+        self.show_modify_size = lambda: self.modify_size_button.pack_forget() if self.ext4_method.get() == lang.t32 else self.modify_size_button.pack(
             side='left', padx=5, pady=5)
         self.ext4_method.trace('w', lambda *x: self.show_modify_size())
         create_thread(self.show_modify_size)
