@@ -3845,7 +3845,7 @@ def unpack(chose, form: str = '') -> bool:
                 try:
                     utils.simg2img(f"{work}/{i}.img")
                 except (Exception, BaseException):
-                    win.message_pop(lang.warn11.format(i + ".img"))
+                    win.message_pop(lang.warn11.format(f"{i}.img"))
             if i not in parts.keys():
                 parts[i] = gettype(f"{work}/{i}.img")
             print(lang.text79 + i + f".img[{file_type}]")
@@ -4095,9 +4095,9 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
     other_ = '-E legacy-compress' if old_kernel else ''
     cmd = ['mkfs.erofs', *other_.split(), f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
            f'--product-out={work}',
-           f'--fs-config-file={work}config{os.sep}{name}_fs_config',
-           f'--file-contexts={work}config{os.sep}{name}_file_contexts',
-           f'{work_output + name}.img', work + name + os.sep]
+           f'--fs-config-file={work}/config/{name}_fs_config',
+           f'--file-contexts={work}/config/{name}_file_contexts',
+           f'{work_output}/{name}.img', work + name + os.sep]
     return call(cmd, out=1)
 
 
@@ -4110,8 +4110,8 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
         size = GetFolderSize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
-        ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}config/{name}_file_contexts', '-l', f'{size}',
-         '-C', f'{work}config{os.sep}{name}_fs_config', '-L', name, '-a', name, f"{work_output + name}.img",
+        ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}/config/{name}_file_contexts', '-l', f'{size}',
+         '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', name, f"{work_output}/{name}.img",
          work + name])
 
 
@@ -4126,7 +4126,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(['mkfs.f2fs', f"{work_output + name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum',
+    if call(['mkfs.f2fs', f"{work_output}/{name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum',
              '-O',
              'compression', '-f']) != 0:
         return 1
@@ -4135,8 +4135,8 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
-        ['sload.f2fs', '-f', work + name, '-C', f'{work}config/{name}_fs_config', '-T', f'{UTC}', '-s',
-         f'{work}config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output + name}.img'])
+        ['sload.f2fs', '-f', work + name, '-C', f'{work}/config/{name}_fs_config', '-T', f'{UTC}', '-s',
+         f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
 
 
 def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
@@ -4148,32 +4148,32 @@ def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
     if call(
             ['mke2fs', '-O',
              '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L', name,
-             '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output + name}_new.img',
+             '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output}/{name}_new.img',
              f'{int(size)}']) != 0:
-        rmdir(f'{work_output + name}_new.img')
+        rmdir(f'{work_output}/{name}_new.img')
         print(lang.text75 % name)
         return 1
     ret = call(
-        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config/{name}_file_contexts', '-C',
-         f'{work}config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}',
-         f'{work_output + name}_new.img'])
+        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
+         f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
+         f'{work_output}/{name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
         print(lang.text75 % name)
         return 1
     if sparse == "y":
-        call(['img2simg', f'{work_output + name}_new.img', f'{work_output + name}.img'])
+        call(['img2simg', f'{work_output}/{name}_new.img', f'{work_output}/{name}.img'])
         try:
-            os.remove(work_output + name + "_new.img")
+            os.remove(f"{work_output}/{name}_new.img")
         except (Exception, BaseException):
             logging.exception('Bugs')
     else:
-        if os.path.isfile(work_output + name + ".img"):
+        if os.path.isfile(f"{work_output}/{name}.img"):
             try:
-                os.remove(work_output + name + ".img")
+                os.remove(f"{work_output}/{name}.img")
             except (Exception, BaseException):
                 logging.exception('Bugs')
-        os.rename(work_output + name + "_new.img", work_output + name + ".img")
+        os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
     return 0
 
 
