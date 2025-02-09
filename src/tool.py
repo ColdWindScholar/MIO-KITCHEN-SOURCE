@@ -64,7 +64,7 @@ from .core.utils import lang, LogoDumper, States, terminate_process, calculate_m
     JsonEdit
 
 if os.name == 'nt':
-    from ctypes import windll
+    from ctypes import windll, c_int, byref, sizeof
     from tkinter import filedialog
 else:
     from .core import mkc_filedialog as filedialog
@@ -115,6 +115,19 @@ except ImportError:
 
 cwd_path = utils.prog_path
 
+if os.name == 'nt':
+    # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
+    def set_title_bar_color(window, dark_value:int=20):
+        window.update()
+        DWMWA_USE_IMMERSIVE_DARK_MODE = dark_value
+        set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
+        get_parent = windll.user32.GetParent
+        hwnd = get_parent(window.winfo_id())
+        rendering_policy = DWMWA_USE_IMMERSIVE_DARK_MODE
+        value = 2
+        value = c_int(value)
+        set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
+        window.update()
 
 class LoadAnim:
     gifs = []
@@ -4760,6 +4773,8 @@ def __init__tk(args):
                         filename=tool_log, filemode='w')
     global win
     win = Tool()
+    if os.name == 'nt':
+        set_title_bar_color(win)
     animation.set_master(win)
     global current_project_name, theme, language
     current_project_name = utils.project_name = StringVar()
