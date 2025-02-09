@@ -4078,7 +4078,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text87 % name)
     else:
         print(lang.text88 % (name, 'br'))
-        call(['brotli', '-q', str(brl), '-j', '-w', '24', f"{work + name}.new.dat", '-o', f"{work + name}.new.dat.br"])
+        call(['brotli', '-q', str(brl), '-j', '-w', '24', f"{work}/{name}.new.dat", '-o', f"{work}/{name}.new.dat.br"])
         if os.access(work + name + ".new.dat", os.F_OK):
             try:
                 os.remove(work + name + ".new.dat")
