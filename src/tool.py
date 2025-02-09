@@ -4631,8 +4631,8 @@ class FormatConversion(ttk.LabelFrame):
                         i = i.rsplit('.xz', 1)[0]
 
                     print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
-                    call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work + i}.br'])
-                    if os.access(work + i + '.br', os.F_OK):
+                    call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work}/{i}.br'])
+                    if os.access(f'{work}/{i}.br', os.F_OK):
                         try:
                             os.remove(work + i)
                         except Exception:
