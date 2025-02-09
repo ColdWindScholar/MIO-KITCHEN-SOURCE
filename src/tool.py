@@ -4189,6 +4189,7 @@ def rmdir(path, quiet=False):
             try:
                 rmtree(path)
             except (Exception, BaseException):
+                logging.exception("Rmtree")
                 call(['busybox', 'rm', '-rf', path], out=1 if quiet else 0)
         except (Exception, BaseException):
             print(lang.warn11.format(path))
