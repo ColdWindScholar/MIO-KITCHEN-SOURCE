@@ -3478,7 +3478,7 @@ class Packxx(Toplevel):
                     if make_ext4fs(name=dname, work=work, work_output=ProjectManager.current_work_output_path(),
                                    sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
                                    size=ext4_size_value,
-                                   UTC=self.UTC.get()) != 0 if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                                   UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
                         name=dname, work=work,
                         work_output=ProjectManager.current_work_output_path(),
                         sparse="y" if self.dbgs.get() in [
@@ -4131,7 +4131,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
              'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
-    with open(f'{work}config/{name}_file_contexts', 'a+', encoding='utf-8') as f:
+    with open(f'{work}/config/{name}_file_contexts', 'a+', encoding='utf-8') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
