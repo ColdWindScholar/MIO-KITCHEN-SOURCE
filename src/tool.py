@@ -3684,8 +3684,13 @@ def unpackrom(ifile) -> None:
             win.message_pop(str(e))
         project_dir = str(folder) if settings.project_struct != 'split' else str(folder + '/Source/')
         copy(ifile, project_dir)
-        if not '.' in os.path.basename(ifile) and os.path.exists(os.path.join(project_dir, os.path.basename(ifile))):
-            shutil.move(os.path.join(project_dir, os.path.basename(ifile)), os.path.join(project_dir, os.path.basename(ifile))+".img")
+        # File Rename
+        file_name:str = os.path.basename(ifile)
+        if os.path.exists(os.path.join(project_dir, file_name)):
+            if not '.' in file_name:
+                shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name+".img"))
+            if file_name.endswith(".bin"):
+                shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name[:-4] + ".img"))
         current_project_name.set(os.path.basename(folder))
         project_menu.set_project(current_project_name.get())
         if settings.auto_unpack == '1':
