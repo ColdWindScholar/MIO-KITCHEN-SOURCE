@@ -3787,7 +3787,7 @@ def unpack(chose, form: str = '') -> bool:
     for i in chose:
         if os.access(f"{work}/{i}.zst", os.F_OK):
             print(lang.text79 + i + ".zst")
-            call(['zstd', '--rm', '-d', work + i + '.zst'])
+            call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
             return True
         if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
             print(lang.text79 + i + ".new.dat.xz")
