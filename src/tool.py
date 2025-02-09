@@ -3555,10 +3555,11 @@ def script2fs(path):
                     parts[v] = 'ext'
         json_.write(parts)
 
-
+#fixme:Rewrite it.
 @animation
 def unpackrom(ifile) -> None:
     print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
+    # gzip
     if ftype == 'gzip':
         print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
@@ -3584,7 +3585,8 @@ def unpackrom(ifile) -> None:
             project_menu.remove()
         current_project_name.set(new_project_name)
         return
-    elif ftype == "ozip":
+    # ozip
+    if ftype == "ozip":
         print(lang.text78 + ifile)
         ozipdecrypt.main(ifile)
         decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
@@ -3597,7 +3599,8 @@ def unpackrom(ifile) -> None:
         except:
             print(f"{ifile} remove Fail!!!")
         return
-    elif ftype == 'tar':
+    #tar
+    if ftype == 'tar':
         print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if not ProjectManager.exist():
@@ -3605,7 +3608,8 @@ def unpackrom(ifile) -> None:
         with tarsafe.TarSafe(ifile) as f:
             f.extractall(ProjectManager.current_work_path())
         return
-    elif ftype == 'kdz':
+    # kdz
+    if ftype == 'kdz':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if not ProjectManager.exist():
             re_folder(ProjectManager.current_work_path())
@@ -3617,7 +3621,8 @@ def unpackrom(ifile) -> None:
                 DZFileTools(ProjectManager.current_work_path() + os.sep + i, ProjectManager.current_work_path(),
                             extract_all=True)
         return
-    elif os.path.splitext(ifile)[1] == '.ofp':
+    #ofp
+    if os.path.splitext(ifile)[1] == '.ofp':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if ask_win(lang.t12) == 1:
             ofp_mtk_decrypt.main(ifile, ProjectManager.current_work_path())
@@ -3626,7 +3631,8 @@ def unpackrom(ifile) -> None:
             script2fs(ProjectManager.current_work_path())
         unpackg.refs(True)
         return
-    elif os.path.splitext(ifile)[1] == '.ops':
+    #ops
+    if os.path.splitext(ifile)[1] == '.ops':
         current_project_name.set(os.path.basename(ifile).split('.')[0])
         args = {'decrypt': True,
                 "<filename>": ifile,
@@ -3634,36 +3640,39 @@ def unpackrom(ifile) -> None:
         opscrypto.main(args)
         unpackg.refs(True)
         return
+    # zip
     if gettype(ifile) == 'zip':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
-        fz = zipfile.ZipFile(ifile, 'r')
-        for fi in fz.namelist():
-            try:
-                file_ = fi.encode('cp437').decode('gbk')
-            except (Exception, BaseException):
+        with zipfile.ZipFile(ifile, 'r') as fz:
+            for fi in fz.namelist():
                 try:
-                    file_ = fi.encode('cp437').decode('utf-8')
+                    member_name = fi.encode('cp437').decode('gbk')
                 except (Exception, BaseException):
-                    file_ = fi
-            print(lang.text79 + file_)
-            try:
-                fz.extract(fi, ProjectManager.current_work_path())
-                if fi != file_:
-                    os.rename(os.path.join(ProjectManager.current_work_path(), fi),
-                              os.path.join(ProjectManager.current_work_path(), file_))
-            except Exception as e:
-                print(lang.text80 % (file_, e))
-                win.message_pop(lang.warn4.format(file_))
-        print(lang.text81)
-        if os.path.isdir(ProjectManager.current_work_path()):
-            project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
-        script2fs(ProjectManager.current_work_path())
-        unpackg.refs(True)
-        fz.close()
+                    try:
+                        member_name = fi.encode('cp437').decode('utf-8')
+                    except (Exception, BaseException):
+                        member_name = fi
+                print(lang.text79 + member_name)
+                try:
+                    fz.extract(fi, ProjectManager.current_work_path())
+                    if fi != member_name:
+                        os.rename(os.path.join(ProjectManager.current_work_path(), fi),
+                                  os.path.join(ProjectManager.current_work_path(), member_name))
+                except Exception as e:
+                    print(lang.text80 % (member_name, e))
+                    win.message_pop(lang.warn4.format(member_name))
+            print(lang.text81)
+            if os.path.isdir(ProjectManager.current_work_path()):
+                project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
+            script2fs(ProjectManager.current_work_path())
+            unpackg.refs(True)
+
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(ProjectManager.current_work_path())])
         return
-    elif ftype != 'unknown':
+
+    # othters.
+    if ftype != 'unknown':
         folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
             os.path.join(
                 settings.path, os.path.splitext(os.path.basename(ifile))[0])) else os.path.join(settings.path,
@@ -3677,7 +3686,10 @@ def unpackrom(ifile) -> None:
             ProjectManager.current_work_output_path()
         except Exception as e:
             win.message_pop(str(e))
-        copy(ifile, str(folder) if settings.project_struct != 'split' else str(folder + '/Source/'))
+        project_dir = str(folder) if settings.project_struct != 'split' else str(folder + '/Source/')
+        copy(ifile, project_dir)
+        if not '.' in os.path.basename(ifile) and os.path.exists(os.path.join(project_dir, os.path.basename(ifile))):
+            shutil.move(os.path.join(project_dir, os.path.basename(ifile)), os.path.join(project_dir, os.path.basename(ifile))+".img")
         current_project_name.set(os.path.basename(folder))
         project_menu.set_project(current_project_name.get())
         if settings.auto_unpack == '1':
