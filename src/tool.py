@@ -1395,7 +1395,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         logging.exception("Bugs")
         print(lang.warn4.format(e))
         return
-    for dtbo in os.listdir(work + bn + os.sep + "dtbo"):
+    for dtbo in os.listdir(work + bn + "/dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
@@ -3774,43 +3774,43 @@ def unpack(chose, form: str = '') -> bool:
                 win.message_pop(lang.warn11.format("super.img"))
         if gettype(work + "super.img") == 'super':
             lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
-            for wjm in os.listdir(work):
-                if wjm.endswith('_a.img') and not os.path.exists(work + wjm.replace('_a', '')):
-                    os.rename(work + wjm, work + wjm.replace('_a', ''))
-                if wjm.endswith('_b.img'):
-                    if not os.path.getsize(work + wjm):
-                        os.remove(work + wjm)
+            for file_name in os.listdir(work):
+                if file_name.endswith('_a.img') and not os.path.exists(work + file_name.replace('_a', '')):
+                    os.rename(work + file_name, work + file_name.replace('_a', ''))
+                if file_name.endswith('_b.img'):
+                    if not os.path.getsize(work + file_name):
+                        os.remove(work + file_name)
         return True
     elif form == 'update.app':
         splituapp.extract(work + "UPDATE.APP", work, chose)
         return True
     for i in chose:
-        if os.access(work + i + ".zst", os.F_OK):
+        if os.access(f"{work}/{i}.zst", os.F_OK):
             print(lang.text79 + i + ".zst")
             call(['zstd', '--rm', '-d', work + i + '.zst'])
             return True
-        if os.access(work + i + ".new.dat.xz", os.F_OK):
+        if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
             print(lang.text79 + i + ".new.dat.xz")
-            Unxz(work + i + ".new.dat.xz")
-        if os.access(work + i + ".new.dat.br", os.F_OK):
+            Unxz(f"{work}/{i}.new.dat.xz")
+        if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
             print(lang.text79 + i + ".new.dat.br")
-            call(['brotli', '-dj', work + i + ".new.dat.br"])
-        if os.access(work + i + ".new.dat.1", os.F_OK):
-            with open(work + i + ".new.dat", 'ab') as ofd:
+            call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
+        if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
+            with open(f"{work}/{i}.new.dat", 'ab') as ofd:
                 for n in range(100):
-                    if os.access(work + i + f".new.dat.{n}", os.F_OK):
+                    if os.access(f"{work}/{i}.new.dat.{n}", os.F_OK):
                         print(lang.text83 % (i + f".new.dat.{n}", f"{i}.new.dat"))
-                        with open(work + i + f".new.dat.{n}", 'rb') as fd:
+                        with open(f"{work}/{i}.new.dat.{n}", 'rb') as fd:
                             ofd.write(fd.read())
-                        os.remove(work + i + f".new.dat.{n}")
-        if os.access(work + i + ".new.dat", os.F_OK):
-            print(lang.text79 + work + i + ".new.dat")
-            if os.path.getsize(work + i + ".new.dat") != 0:
-                transferfile = os.path.abspath(os.path.dirname(work)) + os.sep + i + ".transfer.list"
+                        os.remove(f"{work}/{i}.new.dat.{n}")
+        if os.access(f"{work}/{i}.new.dat", os.F_OK):
+            print(lang.text79 + f"{work}/{i}.new.dat")
+            if os.path.getsize(f"{work}/{i}.new.dat") != 0:
+                transferfile = os.path.abspath(os.path.dirname(work)) + f"/{i}.transfer.list"
                 if os.access(transferfile, os.F_OK):
-                    parts['dat_ver'] = Sdat2img(transferfile, work + i + ".new.dat", work + i + ".img").version
-                    if os.access(work + i + ".img", os.F_OK):
-                        os.remove(work + i + ".new.dat")
+                    parts['dat_ver'] = Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
+                    if os.access(f"{work}/{i}.img", os.F_OK):
+                        os.remove(f"{work}/{i}.new.dat")
                         os.remove(transferfile)
                         try:
                             os.remove(work + i + '.patch.dat')
@@ -3818,54 +3818,54 @@ def unpack(chose, form: str = '') -> bool:
                             logging.exception('Bugs')
                     else:
                         print("transferfile" + lang.text84)
-        if os.access(work + i + ".img", os.F_OK):
+        if os.access(f"{work}/{i}.img", os.F_OK):
             try:
                 parts.pop(i)
             except KeyError:
                 logging.exception('Key')
-            if gettype(work + i + ".img") != 'sparse':
-                parts[i] = gettype(work + i + ".img")
-            if gettype(work + i + ".img") == 'dtbo':
+            if gettype(f"{work}/{i}.img") != 'sparse':
+                parts[i] = gettype(f"{work}/{i}.img")
+            if gettype(f"{work}/{i}.img") == 'dtbo':
                 un_dtbo(i)
-            if gettype(work + i + ".img") in ['boot', 'vendor_boot']:
+            if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
                 unpack_boot(i)
             if i == 'logo':
                 try:
-                    utils.LogoDumper(work + i + ".img", work + i).check_img(work + i + ".img")
+                    utils.LogoDumper(f"{work}/{i}.img", work + i).check_img(f"{work}/{i}.img")
                 except AssertionError:
                     logging.exception('Bugs')
                 else:
-                    logo_dump(work + i + ".img", output_name=i)
-            if gettype(work + i + ".img") == 'vbmeta':
+                    logo_dump(f"{work}/{i}.img", output_name=i)
+            if gettype(f"{work}/{i}.img") == 'vbmeta':
                 print(f"{lang.text85}AVB:{i}")
-                utils.Vbpatch(work + i + ".img").disavb()
-            file_type = gettype(work + i + ".img")
+                utils.Vbpatch(f"{work}/{i}.img").disavb()
+            file_type = gettype(f"{work}/{i}.img")
             if file_type == "sparse":
                 print(lang.text79 + i + f".img[{file_type}]")
                 try:
-                    utils.simg2img(work + i + ".img")
+                    utils.simg2img(f"{work}/{i}.img")
                 except (Exception, BaseException):
                     win.message_pop(lang.warn11.format(i + ".img"))
             if i not in parts.keys():
-                parts[i] = gettype(work + i + ".img")
+                parts[i] = gettype(f"{work}/{i}.img")
             print(lang.text79 + i + f".img[{file_type}]")
-            if gettype(work + i + ".img") == 'super':
-                lpunpack.unpack(work + i + ".img", work)
-                for wjm in os.listdir(work):
-                    if wjm.endswith('_a.img'):
-                        if os.path.exists(work + wjm) and os.path.exists(work + wjm.replace('_a', '')):
-                            if pathlib.Path(work + wjm).samefile(work + wjm.replace('_a', '')):
-                                os.remove(work + wjm)
+            if gettype(f"{work}/{i}.img") == 'super':
+                lpunpack.unpack(f"{work}/{i}.img", work)
+                for file_name in os.listdir(work):
+                    if file_name.endswith('_a.img'):
+                        if os.path.exists(work + file_name) and os.path.exists(work + file_name.replace('_a', '')):
+                            if pathlib.Path(work + file_name).samefile(work + file_name.replace('_a', '')):
+                                os.remove(work + file_name)
                             else:
-                                os.remove(work + wjm.replace('_a', ''))
-                                os.rename(work + wjm, work + wjm.replace('_a', ''))
+                                os.remove(work + file_name.replace('_a', ''))
+                                os.rename(work + file_name, work + file_name.replace('_a', ''))
                         else:
-                            os.rename(work + wjm, work + wjm.replace('_a', ''))
-                    if wjm.endswith('_b.img'):
-                        if os.path.getsize(work + wjm) == 0:
-                            os.remove(work + wjm)
-            if (file_type := gettype(work + i + ".img")) == "ext":
-                with open(work + i + ".img", 'rb+') as e:
+                            os.rename(work + file_name, work + file_name.replace('_a', ''))
+                    if file_name.endswith('_b.img'):
+                        if os.path.getsize(work + file_name) == 0:
+                            os.remove(work + file_name)
+            if (file_type := gettype(f"{work}/{i}.img")) == "ext":
+                with open(f"{work}/{i}.img", 'rb+') as e:
                     mount = ext4.Volume(e).get_mount_point
                     if mount[:1] == '/':
                         mount = mount[1:]
@@ -3877,7 +3877,7 @@ def unpack(chose, form: str = '') -> bool:
                 imgextractor.Extractor().main(ProjectManager.current_work_path() + i + ".img", work + i, work)
                 if os.path.exists(work + i):
                     try:
-                        os.remove(work + i + ".img")
+                        os.remove(f"{work}/{i}.img")
                     except Exception as e:
                         win.message_pop(lang.warn11.format(i + ".img:" + e))
             if file_type == 'romfs':
@@ -3892,7 +3892,7 @@ def unpack(chose, form: str = '') -> bool:
                     continue
                 if os.path.exists(work + i):
                     try:
-                        os.remove(work + i + ".img")
+                        os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
@@ -3902,10 +3902,10 @@ def unpack(chose, form: str = '') -> bool:
                     continue
                 if os.path.exists(work + i):
                     try:
-                        os.remove(work + i + ".img")
+                        os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
-            if file_type == 'unknown' and is_empty_img(work + i + ".img"):
+            if file_type == 'unknown' and is_empty_img(f"{work}/{i}.img"):
                 print(lang.text141)
     if not os.path.exists(work + "config"):
         os.makedirs(work + "config")
@@ -4131,12 +4131,12 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
              'compression', '-f']) != 0:
         return 1
     # todo:Its A Stupid method, we need a new!
-    with open(f'{work}config{os.sep}{name}_file_contexts', 'a+', encoding='utf-8') as f:
+    with open(f'{work}config/{name}_file_contexts', 'a+', encoding='utf-8') as f:
         if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
             f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
     return call(
-        ['sload.f2fs', '-f', work + name, '-C', f'{work}config{os.sep}{name}_fs_config', '-T', f'{UTC}', '-s',
-         f'{work}config{os.sep}{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output + name}.img'])
+        ['sload.f2fs', '-f', work + name, '-C', f'{work}config/{name}_fs_config', '-T', f'{UTC}', '-s',
+         f'{work}config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output + name}.img'])
 
 
 def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
@@ -4154,8 +4154,8 @@ def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
         print(lang.text75 % name)
         return 1
     ret = call(
-        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config{os.sep}{name}_file_contexts', '-C',
-         f'{work}config{os.sep}{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}',
+        ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}config/{name}_file_contexts', '-C',
+         f'{work}config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work + name}',
          f'{work_output + name}_new.img'])
     if ret != 0:
         rmdir(f'{work + name}_new.img')
