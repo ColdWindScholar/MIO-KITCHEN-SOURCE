@@ -3673,8 +3673,9 @@ def unpackrom(ifile) -> None:
 
     # othters.
     if ftype != 'unknown':
-        project_folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0])
-        folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(project_folder) else project_folder
+        file_name: str = os.path.basename(ifile)
+        project_folder = os.path.join(settings.path, os.path.splitext(file_name)[0])
+        folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + v_code()) if os.path.exists(project_folder) else project_folder
         try:
             current_project_name.set(os.path.basename(folder))
             os.mkdir(folder)
@@ -3685,7 +3686,6 @@ def unpackrom(ifile) -> None:
         project_dir = str(folder) if settings.project_struct != 'split' else str(folder + '/Source/')
         copy(ifile, project_dir)
         # File Rename
-        file_name:str = os.path.basename(ifile)
         if os.path.exists(os.path.join(project_dir, file_name)):
             if not '.' in file_name:
                 shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name+".img"))
