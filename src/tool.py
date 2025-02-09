@@ -3673,12 +3673,8 @@ def unpackrom(ifile) -> None:
 
     # othters.
     if ftype != 'unknown':
-        folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(
-            os.path.join(
-                settings.path, os.path.splitext(os.path.basename(ifile))[0])) else os.path.join(settings.path,
-                                                                                                os.path.splitext(
-                                                                                                    os.path.basename(
-                                                                                                        ifile))[0])
+        project_folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0])
+        folder = os.path.join(settings.path, os.path.splitext(os.path.basename(ifile))[0] + v_code()) if os.path.exists(project_folder) else project_folder
         try:
             current_project_name.set(os.path.basename(folder))
             os.mkdir(folder)
