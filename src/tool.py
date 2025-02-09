@@ -3879,12 +3879,12 @@ def unpack(chose, form: str = '') -> bool:
                     try:
                         os.remove(f"{work}/{i}.img")
                     except Exception as e:
-                        win.message_pop(lang.warn11.format(i + ".img:" + e))
+                        win.message_pop(lang.warn11.format(f"{i}.img:" + e))
             if file_type == 'romfs':
-                fs = RomfsParse(ProjectManager.current_work_path() + i + ".img")
+                fs = RomfsParse(ProjectManager.current_work_path() + f"{i}.img")
                 fs.extract(work)
             if file_type == "erofs":
-                if call(exe=['extract.erofs', '-i', os.path.join(ProjectManager.current_work_path(), i + '.img'), '-o',
+                if call(exe=['extract.erofs', '-i', os.path.join(ProjectManager.current_work_path(), f'{i}.img'), '-o',
                              work,
                              '-x'],
                         out=1) != 0:
@@ -3896,7 +3896,7 @@ def unpack(chose, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                if call(exe=['extract.f2fs', '-o', work, os.path.join(ProjectManager.current_work_path(), i + '.img')],
+                if call(exe=['extract.f2fs', '-o', work, os.path.join(ProjectManager.current_work_path(), f'{i}.img')],
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
