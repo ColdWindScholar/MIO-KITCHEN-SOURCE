@@ -50,7 +50,7 @@ from timeit import default_timer as dti
 import zipfile
 from io import BytesIO, StringIO
 from .tkinterdnd2_build_in import Tk, DND_FILES
-from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
+from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
                      HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
 import pygments.lexers
@@ -213,6 +213,14 @@ def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: i
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
     ask.after(wait, ask.destroy)
 
+class Toplevel(TkToplevel):
+    def __init__(self):
+        super().__init__()
+        if os.name == 'nt':
+            if settings.theme == 'dark':
+                set_title_bar_color(self)
+            else:
+                set_title_bar_color(self, 0)
 
 class ToolBox(ttk.Frame):
     def __init__(self, master):
@@ -2757,7 +2765,6 @@ class PackHybridRom:
 class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
-
         self.title(lang.text53)
         self.supers = IntVar(value=9126805504)
         self.ssparse = IntVar()
