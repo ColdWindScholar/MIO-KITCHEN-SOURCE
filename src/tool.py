@@ -1398,20 +1398,20 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     if not (dtboimg := findfile(f"{bn}.img", work := ProjectManager.current_work_path())):
         print(lang.warn3.format(bn))
         return
-    re_folder(work + bn)
-    re_folder(f"{work}{bn}/dtbo")
-    re_folder(work + bn + "/dts")
+    re_folder(f"{work}/{bn}")
+    re_folder(f"{work}/{bn}/dtbo")
+    re_folder(f"{work}/{bn}/dts")
     try:
-        mkdtboimg.dump_dtbo(dtboimg, work + bn + "/dtbo/dtbo")
+        mkdtboimg.dump_dtbo(dtboimg, f"{work}/{bn}/dtbo/dtbo")
     except Exception as e:
         logging.exception("Bugs")
         print(lang.warn4.format(e))
         return
-    for dtbo in os.listdir(work + bn + "/dtbo"):
+    for dtbo in os.listdir(f"{work}/{bn}/dtbo"):
         if dtbo.startswith("dtbo."):
             print(lang.text4.format(dtbo))
             call(
-                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', f'{work}{bn}/dtbo/{dtbo}', '-o',
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', f'{work}/{bn}/dtbo/{dtbo}', '-o',
                      os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
                 out=1)
     print(lang.text5)
@@ -1419,7 +1419,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         os.remove(dtboimg)
     except (Exception, BaseException):
         logging.exception('Bugs')
-    rmdir(work + "dtbo/dtbo")
+    rmdir(f"{work}/dtbo/dtbo")
 
 
 @animation
@@ -1745,16 +1745,16 @@ class ModuleManager:
             if not id_:
                 win.message_pop(lang.warn2)
                 return
-            path = os.path.join(self.module_dir, id_) + os.sep
-            if os.path.exists(path + "main.py"):
+            path = os.path.join(self.module_dir, id_)
+            if os.path.exists(f"{path}/main.py"):
                 editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
-            elif not os.path.exists(path + "main.msh") and not os.path.exists(path + 'main.sh'):
+            elif not os.path.exists(f"{path}/main.msh") and not os.path.exists(f'{path}/main.sh'):
                 s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
-                with open(path + s, 'w+', encoding='utf-8', newline='\n') as sh:
+                with open(f'{path}/{s}', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
                 editor.main(path, s)
             else:
-                editor.main(path, 'main.msh' if os.path.exists(path + "main.msh") else 'main.sh')
+                editor.main(path, 'main.msh' if os.path.exists(f"{path}/main.msh") else 'main.sh')
 
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
@@ -3088,8 +3088,9 @@ def download_file():
         print(lang.text65.format(os.path.basename(url), str(elapsed)))
         down.destroy()
         if var1.get():
-            unpackrom(settings.path + os.sep + os.path.basename(url))
-            os.remove(settings.path + os.sep + os.path.basename(url))
+            downloaded_file = settings.path + os.sep + os.path.basename(url)
+            unpackrom(downloaded_file)
+            os.remove(downloaded_file)
     except Exception as e:
         print(lang.text66, str(e))
         try:
