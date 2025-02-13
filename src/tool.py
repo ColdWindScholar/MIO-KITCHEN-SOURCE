@@ -4571,7 +4571,7 @@ class FormatConversion(ttk.LabelFrame):
                                 os.remove(f'{work}/{i}')
                                 os.remove(transferfile)
                                 try:
-                                    os.remove(work + f'{basename}.patch.dat')
+                                    os.remove(f'{work}/{basename}.patch.dat')
                                 except (IOError, PermissionError, FileNotFoundError):
                                     logging.exception('Bugs')
                         else:
