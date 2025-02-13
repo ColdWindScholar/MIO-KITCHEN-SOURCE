@@ -66,77 +66,75 @@ def main(file_arg):
                 return binascii.unhexlify(key)
         return -1
 
-    def del_rw(action, name, exc):
-        os.chmod(name, stat.S_IWRITE)
-        os.remove(name)
+    def del_rw(s):
+        os.chmod(s, stat.S_IWRITE)
+        os.remove(s)
 
     def rmrf(path):
         if os.path.exists(path):
             if os.path.isfile(path):
-                del_rw("", path, "")
+                del_rw(path)
             else:
-                shutil.rmtree(path, onerror=del_rw)
+                shutil.rmtree(path, onerror=lambda _, fn, __: del_rw(fn))
 
     def decryptfile(key, rfilename):
-        with open(rfilename, 'rb') as rr:
-            with open(rfilename + ".tmp", 'wb') as wf:
-                rr.seek(0x10)
-                dsize = int(rr.read(0x10).replace(b"\x00", b"").decode('utf-8'), 10)
-                rr.seek(0x1050)
-                flen = os.stat(rfilename).st_size - 0x1050
+        with open(rfilename, 'rb') as rr, open(rfilename + ".tmp", 'wb') as wf:
+            rr.seek(0x10)
+            dsize = int(rr.read(0x10).replace(b"\x00", b"").decode('utf-8'), 10)
+            rr.seek(0x1050)
+            flen = os.stat(rfilename).st_size - 0x1050
 
-                ctx = AES.new(key, AES.MODE_ECB)
-                while dsize > 0:
-                    if flen > 0x4000:
-                        size = 0x4000
-                    else:
-                        size = flen
-                    data = rr.read(size)
-                    if dsize < size:
-                        size = dsize
-                    if len(data) == 0:
-                        break
-                    dr = ctx.decrypt(data)
-                    wf.write(dr[:size])
-                    flen -= size
-                    dsize -= size
+            ctx = AES.new(key, AES.MODE_ECB)
+            while dsize > 0:
+                if flen > 0x4000:
+                    size = 0x4000
+                else:
+                    size = flen
+                data = rr.read(size)
+                if dsize < size:
+                    size = dsize
+                if len(data) == 0:
+                    break
+                dr = ctx.decrypt(data)
+                wf.write(dr[:size])
+                flen -= size
+                dsize -= size
         os.remove(rfilename)
         os.rename(rfilename + ".tmp", rfilename)
 
     def decryptfile2(key, rfilename, wfilename):
-        with open(rfilename, 'rb') as rr:
-            with open(wfilename, 'wb') as wf:
-                ctx = AES.new(key, AES.MODE_ECB)
-                bstart = 0
-                goon = True
-                while goon:
-                    rr.seek(bstart)
-                    header = rr.read(12)
-                    if len(header) == 0:
+        with open(rfilename, 'rb') as rr, open(wfilename, 'wb') as wf:
+            ctx = AES.new(key, AES.MODE_ECB)
+            bstart = 0
+            goon = True
+            while goon:
+                rr.seek(bstart)
+                header = rr.read(12)
+                if len(header) == 0:
+                    break
+                if header != b"OPPOENCRYPT!":
+                    return 1
+                rr.seek(0x10 + bstart)
+                bdsize = int(rr.read(0x10).replace(b"\x00", b"").decode('utf-8'), 10)
+                if bdsize < 0x40000:
+                    goon = False
+                rr.seek(0x50 + bstart)
+                while bdsize > 0:
+                    data = rr.read(0x10)
+                    if len(data) == 0:
                         break
-                    if header != b"OPPOENCRYPT!":
-                        return 1
-                    rr.seek(0x10 + bstart)
-                    bdsize = int(rr.read(0x10).replace(b"\x00", b"").decode('utf-8'), 10)
-                    if bdsize < 0x40000:
-                        goon = False
-                    rr.seek(0x50 + bstart)
-                    while bdsize > 0:
-                        data = rr.read(0x10)
-                        if len(data) == 0:
-                            break
-                        size = 0x10
-                        if bdsize < 0x10:
-                            size = bdsize
-                        dr = ctx.decrypt(data)
-                        wf.write(dr[:size])
-                        bdsize -= 0x10
-                        data = rr.read(0x3FF0)
-                        if len(data) == 0:
-                            break
-                        bdsize -= 0x3FF0
-                        wf.write(data)
-                    bstart = bstart + 0x40000 + 0x50
+                    size = 0x10
+                    if bdsize < 0x10:
+                        size = bdsize
+                    dr = ctx.decrypt(data)
+                    wf.write(dr[:size])
+                    bdsize -= 0x10
+                    data = rr.read(0x3FF0)
+                    if len(data) == 0:
+                        break
+                    bdsize -= 0x3FF0
+                    wf.write(data)
+                bstart = bstart + 0x40000 + 0x50
         return 0
 
     def mode2(filename):
