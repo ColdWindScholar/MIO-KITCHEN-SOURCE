@@ -1791,8 +1791,9 @@ class ModuleManager:
                 "depend": self.dep.get()
             }
             self.destroy()
-            if not os.path.exists(self.module_dir + os.sep + iden):
-                os.makedirs(self.module_dir + os.sep + iden)
+
+            if not os.path.exists(f'{self.module_dir}/{iden}'):
+                os.makedirs(f'{self.module_dir}/{iden}')
             with open(self.module_dir + f"/{iden}/info.json", 'w+', encoding='utf-8',
                       newline='\n') as js:
                 json.dump(data, js, ensure_ascii=False, indent=4)
