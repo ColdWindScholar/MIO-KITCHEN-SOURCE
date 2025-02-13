@@ -385,15 +385,16 @@ def qc(file_) -> None:
         f.writelines(data)
     del data
 
-def create_thread(func, *args, join=False):
+def create_thread(func, *args, join=False, deamon:bool=True):
     """
     Multithreaded running tasks
+    :param deamon:
     :param func: Function
     :param args:Args for the task
     :param join:if wait the task
     :return:
     """
-    t = Thread(target=func, args=args, daemon=True)
+    t = Thread(target=func, args=args, daemon=deamon)
     t.start()
     if join:
         t.join()
