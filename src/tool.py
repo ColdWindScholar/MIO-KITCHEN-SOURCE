@@ -4564,23 +4564,23 @@ class FormatConversion(ttk.LabelFrame):
                     if os.access(f'{work}/{i}', os.F_OK):
                         print(lang.text79 + f'{work}/{i}')
                         transferfile = os.path.abspath(
-                            os.path.dirname(work)) + os.sep + basename + ".transfer.list"
+                            os.path.dirname(work)) + f"/{basename}.transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
-                            Sdat2img(transferfile, f'{work}/{i}', work + basename + ".img")
-                            if os.access(work + basename + ".img", os.F_OK):
+                            Sdat2img(transferfile, f'{work}/{i}', f"{work}/{basename}.img")
+                            if os.access(f"{work}/{basename}.img", os.F_OK):
                                 os.remove(f'{work}/{i}')
                                 os.remove(transferfile)
                                 try:
-                                    os.remove(work + basename + '.patch.dat')
+                                    os.remove(work + f'{basename}.patch.dat')
                                 except (IOError, PermissionError, FileNotFoundError):
                                     logging.exception('Bugs')
                         else:
                             print("transferpath" + lang.text84)
-                    if os.path.exists(work + basename + '.img'):
-                        img2simg(work + basename + '.img')
+                    if os.path.exists(f'{work}/{basename}.img'):
+                        img2simg(f'{work}/{basename}.img')
                 if hget == 'raw':
-                    if os.path.exists(work + basename + '.img'):
-                        img2simg(work + basename + '.img')
+                    if os.path.exists(f'{work}/{basename}.img'):
+                        img2simg(f'{work}/{basename}.img')
             elif f_get == 'raw':
                 basename = os.path.basename(i).split('.')[0]
                 if hget == 'br':
