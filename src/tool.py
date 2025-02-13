@@ -294,7 +294,7 @@ class ToolBox(ttk.Frame):
             self.patch_bu.configure(state="disabled", text=lang.running)
             local_path = str(os.path.join(temp, v_code()))
             re_folder(local_path)
-            magiskboot = settings.tool_bin + os.sep + "magiskboot"
+            magiskboot = f"{settings.tool_bin}/magiskboot"
             with Magisk_patch(self.boot_file.get(), None, magiskboot, local_path, self.IS64BIT.get(),
                               self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
                               self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
@@ -1720,9 +1720,7 @@ class ModuleManager:
             if os.path.exists(os.path.join(self.module_dir, value, 'icon')):
                 mpk2.write(os.path.join(self.module_dir, value, 'icon'), 'icon')
             del buffer2, buffer
-        print(lang.t15 % (settings.path + os.sep + name + ".mpk")) if os.path.exists(
-            settings.path + os.sep + name + ".mpk") else print(
-            lang.t16 % (settings.path + os.sep + name + ".mpk"))
+        print(lang.t15 % f"{settings.path}/{name}.mpk") if os.path.exists(f"{settings.path}/{name}.mpk") else print(lang.t16 % f"{settings.path}/{name}.mpk")
 
     class New(Toplevel):
         def __init__(self):
@@ -4104,7 +4102,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
            f'--product-out={work}',
            f'--fs-config-file={work}/config/{name}_fs_config',
            f'--file-contexts={work}/config/{name}_file_contexts',
-           f'{work_output}/{name}.img', work + name + os.sep]
+           f'{work_output}/{name}.img', f'{work}/{name}/']
     return call(cmd, out=1)
 
 
@@ -4212,7 +4210,7 @@ def pack_zip(input_dir=None, output_zip=None, silent=False):
             win.message_pop(lang.warn1)
             return
     if output_zip is None:
-        output_zip = settings.path + os.sep + current_project_name.get() + ".zip"
+        output_zip = f"{settings.path}/{current_project_name.get()}.zip"
     if not silent:
         if ask_win(lang.t53) != 1:
             return
