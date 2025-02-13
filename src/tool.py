@@ -3820,7 +3820,7 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(f"{work}/{i}.new.dat")
                         os.remove(transferfile)
                         try:
-                            os.remove(work + i + '.patch.dat')
+                            os.remove(f'{work}/{i}' + '.patch.dat')
                         except (Exception, BaseException):
                             logging.exception('Bugs')
                     else:
@@ -3838,7 +3838,7 @@ def unpack(chose, form: str = '') -> bool:
                 unpack_boot(i)
             if i == 'logo':
                 try:
-                    utils.LogoDumper(f"{work}/{i}.img", work + i).check_img(f"{work}/{i}.img")
+                    utils.LogoDumper(f"{work}/{i}.img", f'{work}/{i}').check_img(f"{work}/{i}.img")
                 except AssertionError:
                     logging.exception('Bugs')
                 else:
@@ -3881,8 +3881,8 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                imgextractor.Extractor().main(ProjectManager.current_work_path() + i + ".img", work + i, work)
-                if os.path.exists(work + i):
+                imgextractor.Extractor().main(ProjectManager.current_work_path() + i + ".img", f'{work}/{i}', work)
+                if os.path.exists(f'{work}/{i}'):
                     try:
                         os.remove(f"{work}/{i}.img")
                     except Exception as e:
@@ -3897,7 +3897,7 @@ def unpack(chose, form: str = '') -> bool:
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
-                if os.path.exists(work + i):
+                if os.path.exists(f'{work}/{i}'):
                     try:
                         os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
@@ -3907,7 +3907,7 @@ def unpack(chose, form: str = '') -> bool:
                         out=1) != 0:
                     print('Unpack failed...')
                     continue
-                if os.path.exists(work + i):
+                if os.path.exists(f'{work}/{i}'):
                     try:
                         os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
@@ -4525,18 +4525,18 @@ class FormatConversion(ttk.LabelFrame):
                 self.list_b.insert(i, i)
         elif self.h.get() == 'sparse':
             for i in os.listdir(work):
-                if os.path.isfile(work + i) and gettype(work + i) == 'sparse':
+                if os.path.isfile(f'{work}/{i}') and gettype(f'{work}/{i}') == 'sparse':
                     self.list_b.insert(i, i)
         elif self.h.get() == 'raw':
             for i in os.listdir(work):
-                if os.path.isfile(work + i):
-                    if gettype(work + i) in ['ext', 'erofs', 'super', 'f2fs']:
+                if os.path.isfile(f'{work}/{i}'):
+                    if gettype(f'{work}/{i}') in ['ext', 'erofs', 'super', 'f2fs']:
                         self.list_b.insert(i, i)
 
     @staticmethod
     def refile(f):
         for i in os.listdir(work := ProjectManager.current_work_output_path()):
-            if i.endswith(f) and os.path.isfile(work + i):
+            if i.endswith(f) and os.path.isfile(f'{work}/{i}'):
                 yield i
 
     @animation
@@ -4553,22 +4553,22 @@ class FormatConversion(ttk.LabelFrame):
             if f_get == 'sparse':
                 basename = os.path.basename(i).split('.')[0]
                 if hget == 'br':
-                    if os.access(work + i, os.F_OK):
+                    if os.access(f'{work}/{i}', os.F_OK):
                         print(lang.text79 + i)
-                        call(['brotli', '-dj', work + i])
+                        call(['brotli', '-dj', f'{work}/{i}'])
                 if hget == 'xz':
-                    if os.access(work + i, os.F_OK):
+                    if os.access(f'{work}/{i}', os.F_OK):
                         print(lang.text79 + i)
-                        Unxz(work + i)
+                        Unxz(f'{work}/{i}')
                 if hget == 'dat':
-                    if os.access(work + i, os.F_OK):
-                        print(lang.text79 + work + i)
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print(lang.text79 + f'{work}/{i}')
                         transferfile = os.path.abspath(
                             os.path.dirname(work)) + os.sep + basename + ".transfer.list"
-                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                            Sdat2img(transferfile, work + i, work + basename + ".img")
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
+                            Sdat2img(transferfile, f'{work}/{i}', work + basename + ".img")
                             if os.access(work + basename + ".img", os.F_OK):
-                                os.remove(work + i)
+                                os.remove(f'{work}/{i}')
                                 os.remove(transferfile)
                                 try:
                                     os.remove(work + basename + '.patch.dat')
@@ -4584,64 +4584,64 @@ class FormatConversion(ttk.LabelFrame):
             elif f_get == 'raw':
                 basename = os.path.basename(i).split('.')[0]
                 if hget == 'br':
-                    if os.access(work + i, os.F_OK):
+                    if os.access(f'{work}/{i}', os.F_OK):
                         print(lang.text79 + i)
-                        call(['brotli', '-dj', work + i])
+                        call(['brotli', '-dj', f'{work}/{i}'])
                 if hget == 'xz':
-                    if os.access(work + i, os.F_OK):
+                    if os.access(f'{work}/{i}', os.F_OK):
                         print(lang.text79 + i)
-                        Unxz(work + i)
+                        Unxz(f'{work}/{i}')
                 if hget in ['dat', 'br', 'xz']:
                     if os.path.exists(work):
                         if hget == 'br':
                             i = i.replace('.br', '')
                         if hget == 'xz':
                             i = i.replace('.xz', '')
-                        print(lang.text79 + work + i)
+                        print(lang.text79 + f'{work}/{i}')
                         transferfile = os.path.abspath(
                             os.path.dirname(work)) + f"/{basename}.transfer.list"
-                        if os.access(transferfile, os.F_OK) and os.path.getsize(work + i) != 0:
-                            Sdat2img(transferfile, work + i, work + basename + ".img")
-                            if os.access(work + basename + ".img", os.F_OK):
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
+                            Sdat2img(transferfile, f'{work}/{i}', f"{work}/{basename}.img")
+                            if os.access(f"{work}/{basename}.img", os.F_OK):
                                 try:
-                                    os.remove(work + i)
+                                    os.remove(f'{work}/{i}')
                                     os.remove(transferfile)
-                                    if not os.path.getsize(work + basename + '.patch.dat'):
-                                        os.remove(work + basename + '.patch.dat')
+                                    if not os.path.getsize(f'{work}/{basename}.patch.dat'):
+                                        os.remove(f'{work}/{basename}.patch.dat')
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     logging.exception('Bugs')
                         else:
                             print("transferfile" + lang.text84)
                 if hget == 'sparse':
-                    utils.simg2img(work + i)
+                    utils.simg2img(f'{work}/{i}')
             elif f_get == 'dat':
                 if hget == 'raw':
-                    img2simg(work + i)
+                    img2simg(f'{work}/{i}')
                 if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if hget == 'br':
                     print(lang.text79 + i)
-                    call(['brotli', '-dj', work + i])
+                    call(['brotli', '-dj', f'{work}/{i}'])
                 if hget == 'xz':
                     print(lang.text79 + i)
-                    Unxz(work + i)
+                    Unxz(f'{work}/{i}')
 
             elif f_get == 'br':
                 if hget == 'raw':
-                    img2simg(work + i)
+                    img2simg(f'{work}/{i}')
                 if hget in ['raw', 'sparse']:
                     datbr(work, os.path.basename(i).split('.')[0], 0)
                 if hget in ['dat', 'xz']:
                     if hget == 'xz':
                         print(lang.text79 + i)
-                        Unxz(work + i)
+                        Unxz(f'{work}/{i}')
                         i = i.rsplit('.xz', 1)[0]
 
                     print(lang.text88 % (os.path.basename(i).split('.')[0], 'br'))
-                    call(['brotli', '-q', '0', '-j', '-w', '24', work + i, '-o', f'{work}/{i}.br'])
+                    call(['brotli', '-q', '0', '-j', '-w', '24', f'{work}/{i}', '-o', f'{work}/{i}.br'])
                     if os.access(f'{work}/{i}.br', os.F_OK):
                         try:
-                            os.remove(work + i)
+                            os.remove(f'{work}/{i}')
                         except Exception:
                             logging.exception('Bugs')
         print(lang.text8)
