@@ -3820,7 +3820,7 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(f"{work}/{i}.new.dat")
                         os.remove(transferfile)
                         try:
-                            os.remove(f'{work}/{i}' + '.patch.dat')
+                            os.remove(f'{work}/{i}.patch.dat')
                         except (Exception, BaseException):
                             logging.exception('Bugs')
                     else:
