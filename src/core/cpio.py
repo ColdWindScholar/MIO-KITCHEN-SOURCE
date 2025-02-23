@@ -159,7 +159,7 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
         with open(output_info, 'w', encoding='utf-8', newline='\n') as con:
             dump(info, con)
 
-def scan_dir(folder: str):
+def scan_dir(folder: str, return_trailer:bool=True):
     if os.name == 'nt':
         yield os.path.basename(folder).replace('\\', '')
     elif os.name == 'posix':
@@ -171,6 +171,8 @@ def scan_dir(folder: str):
             yield os.path.join(root, dir_).replace(folder, '').replace('\\', '/')[1:]
         for file in files:
             yield os.path.join(root, file).replace(folder, '').replace('\\', '/')[1:]
+    if return_trailer:
+        yield CPIO_TRAILER_NAME
 
 
 def repack(input_dir, config_file, output_file: str, magic_type:CpioMagicFormat=None):
