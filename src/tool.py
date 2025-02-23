@@ -23,7 +23,7 @@ import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-
+from .core.cpio import extract as cpio_extract, repack as cpio_repack
 from .core import tarsafe
 from .core.Magisk import Magisk_patch
 from .core.addon_register import loader, Entry
@@ -3140,10 +3140,8 @@ def unpack_boot(name: str = 'boot', boot:str=None, work:str=None):
                 return
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
-        os.chdir(work + name)
         print("Unpacking Ramdisk...")
-        call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
-        os.chdir(cwd_path)
+        cpio_extract(os.path.join(work , name, 'ramdisk.cpio'), os.path.join(work , name, 'ramdisk'), os.path.join(work , name, 'ramdisk.txt'))
     else:
         print("Unpack Done!")
     os.chdir(cwd_path)
@@ -3160,14 +3158,9 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
     if not os.path.exists(source):
         print(f"Cannot Find {name}...")
         return
-    cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                    settings.tool_bin).replace(
-        '\\', "/")
 
     if os.path.isdir(f"{source}/ramdisk"):
-        os.chdir(f"{source}/ramdisk")
-        call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
-        os.chdir(source)
+        cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
         with open(f"{source}/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
@@ -3184,7 +3177,8 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
                     comp = 'gz'
                 os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
         else:
-            os.remove("ramdisk.cpio")
+            if os.path.exists('ramdisk.cpio'):
+                os.remove("ramdisk.cpio")
             os.rename("ramdisk-new.cpio", "ramdisk.cpio")
         print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
