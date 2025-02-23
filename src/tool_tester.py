@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
             __import__(i)
 
     def test_binaries(self):
-        file_list = ['brotli', 'busybox', 'cpio', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
+        file_list = ['brotli', 'busybox', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
                      'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd']
         if platform.machine() != 'x86_64' or platform.system() != 'Linux':
             file_list.remove('mkfs.f2fs')
