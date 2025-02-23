@@ -3164,6 +3164,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         with open(f"{source}/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
+        os.chdir(source)
         if comp != "unknown":
             if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
                 print("Failed to pack Ramdisk...")
