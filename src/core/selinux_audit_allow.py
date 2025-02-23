@@ -77,7 +77,7 @@ def main(input_log, output_dir):
     for target in [sepolicy_rule, sepolicy_cil]:
         rule_list += handle_target_file(target)
 
-    with open(file, 'r', encoding='utf-8') as f:
+    with open(file, 'r', encoding='utf-8', errors='ignore') as f:
         log = [line for line in f if "avc:  denied" in line and "untrusted_app" not in line]
 
     rules_text_rule = ""
