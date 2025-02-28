@@ -1175,10 +1175,11 @@ class Welcome(ttk.Frame):
         self.frames = {
             0: self.hello,
             1: self.main,
-            2: self.license,
-            3: self.private,
-            4: self.support,
-            5: self.done
+            2: self.set_workdir,
+            3: self.license,
+            4: self.private,
+            5: self.support,
+            6: self.done
         }
         self.frame = ttk.Frame(self)
         self.frame.pack(expand=1, fill=BOTH)
@@ -1225,6 +1226,23 @@ class Welcome(ttk.Frame):
                                     os.listdir(f"{cwd_path}/bin/languages")])
         lb3_.pack(padx=10, pady=10, side='top', fill=BOTH)
         lb3_.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
+
+    def set_workdir(self):
+        def modpath():
+            if not (folder := filedialog.askdirectory()):
+                return
+            settings.set_value("path", folder)
+            show_local.set(folder)
+
+        show_local = StringVar()
+        show_local.set(settings.path)
+        ttk.Label(self.frame, text=lang.text125, font=(None, 20)).pack(padx=10, pady=10, fill=X)
+        ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        slo = ttk.Label(self.frame, textvariable=show_local, wraplength=200)
+        slo.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", show_local.get(), None, None,
+                                                                       1) if os.name == 'nt' else ...)
+        slo.pack(padx=10, pady=10, side='left')
+        ttk.Button(self.frame, text=lang.text126, command=modpath).pack(side="left", padx=10, pady=10)
 
     def license(self):
         lce = StringVar()
@@ -4785,7 +4803,7 @@ def __init__tk(args):
     settings.load()
     if settings.updating in ['1', '2']:
         Updater()
-    if int(settings.oobe) < 5:
+    if int(settings.oobe) < 6:
         Welcome()
     init_verify()
     try:
