@@ -3421,7 +3421,7 @@ class Packxx(Toplevel):
                     if gettype(file) == 'vbmeta':
                         print(lang.text71 % file)
                         utils.Vbpatch(file).disavb()
-            if os.access(os.path.join(work + "config", f"{dname}_fs_config"), os.F_OK):
+            if os.access(os.path.join(f"{work}/config", f"{dname}_fs_config"), os.F_OK):
                 if os.name == 'nt':
                     try:
                         if folder := findfolder(work, "com.google.android.apps.nbu."):
@@ -3433,7 +3433,7 @@ class Packxx(Toplevel):
                 utils.qc(work + f"config/{dname}_fs_config")
                 if settings.contextpatch == "1":
                     contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
-                utils.qc(work + f"config/{dname}_file_contexts")
+                utils.qc(f"{work}/config/{dname}_file_contexts")
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
@@ -3526,7 +3526,9 @@ class Packxx(Toplevel):
             elif parts_dict[i] == 'logo':
                 logo_pack()
             else:
-                print(f"Unsupported {i}:{parts_dict[i]}")
+                if os.path.exists(os.path.join(work, i)):
+                    print(f"Unsupported {i}:{parts_dict[i]}")
+                logging.warning(f"{i} Not Supported.")
 
 
 def rdi(work, part_name) -> bool:
