@@ -1544,7 +1544,7 @@ class ModuleManager:
         self.new = self.New
         self.new.module_dir = self.module_dir
         self.uninstall_gui.module_dir = self.module_dir
-        self.MshParse.module_dir = self.module_dir
+
         self.errorcodes = self.ErrorCodes()
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.addon_loader = loader
@@ -1581,7 +1581,7 @@ class ModuleManager:
                             self.addon_loader.register(i, self.addon_entries.main, module.main)
                         else:
                             print(
-                                f"Can't registry Module {i} as Plugin, But We Found {[i for i in dir(module) if not i.startswith('__') and not i.endswith('__')]} in it.")
+                                f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
                     except Exception:
                         logging.exception('Bugs')
 
@@ -1611,8 +1611,8 @@ class ModuleManager:
                     if not os.path.exists(os.path.join(self.module_dir, n)):
                         print(lang.text36 % (name, n, n))
                         return 2
-        if os.path.exists(script_path + "main.sh") or os.path.exists(script_path + "main.msh"):
-            values = self.Parse(script_path + "main.json", os.path.exists(script_path + "main.msh")) if os.path.exists(
+        if os.path.exists(script_path + "main.sh"):
+            values = self.Parse(script_path + "main.json") if os.path.exists(
                 script_path + "main.json") else None
             if not os.path.exists(temp):
                 re_folder(temp)
@@ -1625,8 +1625,7 @@ class ModuleManager:
                     values.gavs.clear()
                 exports += f"export tool_bin='{settings.tool_bin.replace(os.sep, '/')}';export version='{settings.version}';export language='{settings.language}';export bin='{script_path.replace(os.sep, '/')}';"
                 exports += f"export moddir='{self.module_dir.replace(os.sep, '/')}';export project_output='{ProjectManager.current_work_output_path()}';export project='{ProjectManager.current_work_path()}';"
-            if os.path.exists(script_path + "main.msh"):
-                self.MshParse(script_path + "main.msh")
+
             if os.path.exists(script_path + "main.sh"):
                 shell = 'ash' if os.name == 'posix' else 'bash'
                 call(['busybox', shell, '-c',
@@ -1766,13 +1765,13 @@ class ModuleManager:
             path = os.path.join(self.module_dir, id_)
             if os.path.exists(f"{path}/main.py"):
                 editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
-            elif not os.path.exists(f"{path}/main.msh") and not os.path.exists(f'{path}/main.sh'):
-                s = "main.sh" if ask_win(lang.t18, 'SH', 'MSH') == 1 else "main.msh"
+            elif not os.path.exists(f'{path}/main.sh'):
+                s = "main.sh"
                 with open(f'{path}/{s}', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
                 editor.main(path, s)
             else:
-                editor.main(path, 'main.msh' if os.path.exists(f"{path}/main.msh") else 'main.sh')
+                editor.main(path, 'main.sh')
 
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
@@ -1818,104 +1817,6 @@ class ModuleManager:
             list_pls_plugin()
             self.editor_(iden)
 
-    class MshParse:
-        extra_envs = {}
-        grammar_words = {"echo": lambda strings: print(strings),
-                         "rmdir": lambda path: rmdir(path.strip()),
-                         "run": lambda cmd: call(exe=str(cmd), extra_path=False),
-                         'gettype': lambda file_: gettype(file_),
-                         'exist': lambda x: '1' if os.path.exists(x) else '0'}
-        def sfor(self, vn, vs, do):
-            if do[:1] in ["(", '"', "'"]:
-                do = do[1:-1]
-            [self.runline(do.replace(f'@{vn}@', v)) for v in
-             vs.split(',' if ',' in vs else None)]
-        def __init__(self, sh):
-            if not hasattr(self, 'module_dir'):
-                self.module_dir = os.path.join(cwd_path, "bin", "module")
-            self.envs = {'version': settings.version, 'tool_bin': settings.tool_bin.replace('\\', '/'),
-                         'project': ProjectManager.current_work_path(),
-                         'project_output': ProjectManager.current_work_output_path(),
-                         'moddir': self.module_dir.replace('\\', '/'), 'bin': os.path.dirname(sh).replace('\\', '/')}
-            for n, v in self.extra_envs.items():
-                self.envs[n] = v
-            with open(sh, 'r+', encoding='utf-8', newline='\n') as shell:
-                for i in shell.readlines():
-                    try:
-                        self.runline(i)
-                    except AttributeError as e:
-                        print(f"Unknown Order：{i}\nReason：{e}")
-                    except ValueError as e:
-                        print(f"Exception:{e}")
-                        return
-                    except Exception as e:
-                        print(f"Runtime Error:{i}\nReason：{e}")
-                    except (Exception, BaseException):
-                        print(f"Runtime Error:{i}")
-            self.envs.clear()
-
-        def set(self, cmd):
-            try:
-                vn, va = cmd.strip().split("=" if "=" in cmd else None)
-            except Exception as e:
-                print(f"SetValue Exception：{e}\nSentence：{cmd}")
-                return 1
-            self.envs[vn] = str(va)
-
-        def runline(self, i):
-            for key, value in self.envs.items():
-                if "@" in i:
-                    i = i.replace(f'@{key}@', str(value)).strip()
-            if i[:1] != "#" and i not in ["", '\n', "\r\n"]:
-                if i.split()[0] == "if":
-                    self.sif(i.split()[1], i.split()[2], ' '.join(i.split()[3:]))
-                elif i.split()[0] == "for":
-                    self.sfor(i.split()[1], i.split()[3], ' '.join(i.split()[4:]))
-                else:
-                    if i.split()[0] in self.grammar_words.keys():
-                        self.envs["result"] = self.grammar_words[i.split()[0]](' '.join(i.split()[1:]))
-                    else:
-                        self.envs["result"] = getattr(self, i.split()[0])(' '.join(i.split()[1:]))
-                    if not self.envs['result']:
-                        self.envs['result'] = ""
-
-        def sh(self, cmd):
-            exports = ''
-            sh = "ash" if os.name == 'posix' else "bash"
-            for i in self.envs:
-                exports += f"export {i}='{self.envs.get(i, '')}';"
-            call(['busybox', sh, '-c', f"{exports}exec {module_exec} {cmd.replace(os.sep, '/')}"])
-            del exports
-
-        def msh(self, cmd):
-            try:
-                cmd_, argv = cmd.split()
-            except Exception:
-                raise ValueError(f"MSH: Unsupported {cmd}")
-            if cmd_ == 'run':
-                if not os.path.exists(argv.replace("\\", '/')):
-                    print(f"Script Not Exist：{argv}")
-                    return 1
-                else:
-                    self.__init__(argv)
-            else:
-                print('Usage：\nmsh run [script]')
-
-        @staticmethod
-        def exit(value):
-            raise ValueError(value)
-
-        def sif(self, mode, var_, other):
-            modes = {
-                'exist': lambda var: os.path.exists(str(var)),
-                'equ': lambda var: var.split('--')[0] == var.split('--')[1],
-                'gettype': lambda var: gettype(var.split('--')[0]) == var.split('--')[1]
-            }
-            if mode[:1] == "!":
-                if not modes[mode[1:]](var_):
-                    self.runline(other)
-            elif modes[mode](var_):
-                self.runline(other)
 
     # fixme:Rewrite it!!!
     class Parse(Toplevel):
@@ -1969,7 +1870,7 @@ class ModuleManager:
                 padx=5, pady=5, fill=BOTH)
         def __unknown(self, master, type, side):
             self._text(master,lang.warn14.format(type),  10, side if side != 'None' else 'bottom')
-        def __init__(self, jsons, msh=False):
+        def __init__(self, jsons):
             super().__init__()
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
@@ -2012,7 +1913,7 @@ class ModuleManager:
                             logging.exception('V!')
                             print(con, args, varnames)
             ttk.Button(self, text=lang.ok,
-                       command=lambda: create_thread(self.generate_msh if msh else self.generate_sh)).pack(
+                       command=lambda: create_thread(self.generate_sh)).pack(
                 fill=X,
                 side='bottom')
             move_center(self)
@@ -2023,15 +1924,7 @@ class ModuleManager:
                 os.mkdir(temp)
             self.destroy()
 
-        def generate_msh(self):
-            for va in self.gavs.keys():
-                if gva := self.gavs[va].get():
-                    ModuleManager.MshParse.extra_envs[va] = gva
-                    if gva is str and os.path.isabs(gva) and os.name == 'nt':
-                        if '\\' in gva:
-                            ModuleManager.MshParse.extra_envs[va] = gva.replace("\\", '/')
-            self.destroy()
-            self.gavs.clear()
+
 
     class UninstallMpk(Toplevel):
 

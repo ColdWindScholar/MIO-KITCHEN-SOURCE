@@ -15,9 +15,9 @@ class Entry(IntEnum):
     # When the tool boot
     boot = 3
 class Type(IntEnum):
-    sh = 0
-    msh = 1
-    python = 3
+    normal = 0
+    environment = 1
+
 class PluginLoader(object):
     def __init__(self):
         self.plugins = {}
