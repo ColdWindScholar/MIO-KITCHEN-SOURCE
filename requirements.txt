@@ -13,4 +13,5 @@ asn1crypto
 lxml
 wmi
 httpx
+cryptography
 toml
