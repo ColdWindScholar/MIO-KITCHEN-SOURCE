@@ -3939,7 +3939,7 @@ class GetFolderSize:
 
     def rsize(self, size: int, num: int):
         if size <= 2097152:
-            size_ = 2097152
+            self.rsize_v = 2097152
             bs = 1
         else:
             size_ = int(size + 10086)
@@ -3955,10 +3955,11 @@ class GetFolderSize:
                 bs = 1.1158
             else:
                 bs = 1.1258
+            self.rsize_v = size_ * bs
         print(f"Multiple:{bs}")
         if self.get == 3:
-            self.rsizelist(self.dname, int(size_ * bs), self.list_f)
-        self.rsize_v = int(size_ * bs / num)
+            self.rsizelist(self.dname, self.rsize_v, self.list_f)
+        self.rsize_v = int(self.rsize_v / num)
 
     @staticmethod
     def rsizelist(part_name, size, file):
