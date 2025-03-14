@@ -294,8 +294,7 @@ class ToolBox(ttk.Frame):
             self.patch_bu.configure(state="disabled", text=lang.running)
             local_path = str(os.path.join(temp, v_code()))
             re_folder(local_path)
-            magiskboot = f"{settings.tool_bin}/magiskboot"
-            with Magisk_patch(self.boot_file.get(), None, magiskboot, local_path, self.IS64BIT.get(),
+            with Magisk_patch(self.boot_file.get(), None, f"{settings.tool_bin}/magiskboot", local_path, self.IS64BIT.get(),
                               self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
                               self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
                               ) as m:
@@ -450,7 +449,7 @@ class ToolBox(ttk.Frame):
                 return "0"
 
             units = {
-                "B": 1,
+                "B": 2 ** 0,
                 "KB": 2 ** 10,
                 "MB": 2 ** 20,
                 "GB": 2 ** 30,
@@ -1443,11 +1442,11 @@ def un_dtbo(bn: str = 'dtbo') -> None:
 @animation
 def pack_dtbo() -> bool:
     work = project_manger.current_work_path()
-    if not os.path.exists(work + "dtbo/dts") or not os.path.exists(work + "dtbo"):
+    if not os.path.exists(f"{work}/dtbo/dts") or not os.path.exists(f"{work}/dtbo"):
         print(lang.warn5)
         return False
-    re_folder(work + "dtbo/dtbo")
-    for dts in os.listdir(work + "dtbo/dts"):
+    re_folder(f"{work}/dtbo/dtbo")
+    for dts in os.listdir(f"{work}/dtbo/dts"):
         if dts.startswith("dts."):
             print(f"{lang.text6}:{dts}")
             call(
@@ -1455,11 +1454,11 @@ def pack_dtbo() -> bool:
                      os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
                 out=1)
     print(f"{lang.text7}:dtbo.img")
-    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(work + "dtbo/dtbo") if
+    list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(f"{work}/dtbo/dtbo") if
              f.startswith("dtbo.")]
     mkdtboimg.create_dtbo(project_manger.current_work_output_path() + "dtbo.img",
                           sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
-    rmdir(work + "dtbo")
+    rmdir(f"{work}/dtbo")
     print(lang.text8)
     return True
 
@@ -1480,8 +1479,8 @@ def logo_pack(origin_logo=None) -> int:
     work = project_manger.current_work_path()
     if not origin_logo:
         origin_logo = findfile('logo.img', work)
-    logo = work + "logo-new.img"
-    if not os.path.exists(dir_ := work + "logo") or not os.path.exists(origin_logo):
+    logo = f"{work}/logo-new.img"
+    if not os.path.exists(dir_ := f"{work}/logo") or not os.path.exists(origin_logo):
         print(lang.warn6)
         return 1
     utils.LogoDumper(origin_logo, logo, dir_).repack()
@@ -1612,8 +1611,7 @@ class ModuleManager:
                         print(lang.text36 % (name, n, n))
                         return 2
         if os.path.exists(script_path + "main.sh"):
-            values = self.Parse(script_path + "main.json") if os.path.exists(
-                script_path + "main.json") else None
+            values = self.Parse(f"{script_path}/main.json") if os.path.exists(f"{script_path}/main.json") else None
             if not os.path.exists(temp):
                 re_folder(temp)
             exports = ''
@@ -2759,7 +2757,7 @@ class PackSuper(Toplevel):
                   attrib=self.attrib.get())
 
     def verify_size(self):
-        size = sum([os.path.getsize(self.work + i + ".img") for i in self.tl.selected])
+        size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in self.tl.selected])
         diff_size = size
         if size > self.supers.get():
             for i in range(20):
@@ -2800,9 +2798,9 @@ class PackSuper(Toplevel):
                     self.tl.insert(f"{name} [{file_type}]", name, name in self.selected)
 
     def read_list(self):
-        if os.path.exists(self.work + "dynamic_partitions_op_list"):
+        if os.path.exists(f"{self.work}/dynamic_partitions_op_list"):
             try:
-                data = utils.dynamic_list_reader(self.work + "dynamic_partitions_op_list")
+                data = utils.dynamic_list_reader(f"{self.work}/dynamic_partitions_op_list")
             except (Exception, BaseException):
                 logging.exception('Bugs')
                 return
@@ -2841,17 +2839,17 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
             lb_c.append(part)
     part_list = lb_c
     for part in part_list:
-        if not os.path.exists(work + part + '.img') and os.path.exists(work + part + '_a.img'):
+        if not os.path.exists(f'{work}/{part}.img') and os.path.exists(f'{work}/{part}_a.img'):
             try:
-                os.rename(work + part + '_a.img', work + part + '.img')
+                os.rename(f'{work}/{part}_a.img', f'{work}/{part}.img')
             except:
                 logging.exception('Bugs')
     command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
     if super_type == 1:
         command += ['2', '-device', f'super:{size.get()}', "--group", f"{group_name.get()}:{size.get()}"]
         for part in part_list:
-            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}",
-                        '--image', f'{part}={work + part}.img']
+            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name.get()}",
+                        '--image', f'{part}={work}/{part}.img']
     else:
         command += ["3", '-device', f'super:{size.get()}', '--group', f"{group_name.get()}_a:{size.get()}"]
         for part in part_list:
@@ -3262,8 +3260,8 @@ class Packxx(Toplevel):
                     continue
                 ext4_size_value = 0
                 if self.ext4_method.get() == lang.t33:
-                    if os.path.exists(work + "dynamic_partitions_op_list"):
-                        with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
+                    if os.path.exists(f"{work}/dynamic_partitions_op_list"):
+                        with open(f"{work}/dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
                             for _i_ in t.readlines():
                                 _i = _i_.strip().split()
                                 if len(_i) < 3:
@@ -3272,8 +3270,8 @@ class Packxx(Toplevel):
                                     continue
                                 if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
                                     ext4_size_value = max(ext4_size_value, int(_i[2]))
-                    elif os.path.exists(work + f"config/{dname}_size.txt"):
-                        with open(work + f"config/{dname}_size.txt", encoding='utf-8') as size_f:
+                    elif os.path.exists(f"{work}/config/{dname}_size.txt"):
+                        with open(f"{work}/config/{dname}_size.txt", encoding='utf-8') as size_f:
                             try:
                                 ext4_size_value = int(size_f.read().strip())
                             except ValueError:
@@ -3322,10 +3320,10 @@ class Packxx(Toplevel):
                                   folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception:
                         logging.exception('Bugs')
-                fspatch.main(work + dname, os.path.join(work + "config", f"{dname}_fs_config"))
-                utils.qc(work + f"config/{dname}_fs_config")
+                fspatch.main(work + dname, os.path.join(f"{work}/config", f"{dname}_fs_config"))
+                utils.qc(f"{work}/config/{dname}_fs_config")
                 if settings.contextpatch == "1":
-                    contextpatch.main(work + dname, work + f"config/{dname}_file_contexts")
+                    contextpatch.main(work + dname, f"{work}/config/{dname}_file_contexts")
                 utils.qc(f"{work}/config/{dname}_file_contexts")
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
@@ -3371,8 +3369,9 @@ class Packxx(Toplevel):
                 else:
                     ext4_size_value = self.custom_size.get(dname, 0)
                     if self.ext4_method.get() == lang.t33 and not self.custom_size.get(dname, ''):
-                        if os.path.exists(work + "dynamic_partitions_op_list"):
-                            with open(work + "dynamic_partitions_op_list", 'r', encoding='utf-8') as t:
+                        list_file = f"{work}/dynamic_partitions_op_list"
+                        if os.path.exists(list_file):
+                            with open(list_file, 'r', encoding='utf-8') as t:
                                 for _i_ in t.readlines():
                                     _i = _i_.strip().split()
                                     if len(_i) < 3:
@@ -3381,8 +3380,8 @@ class Packxx(Toplevel):
                                         continue
                                     if _i[1] in [dname, f'{dname}_a', f'{dname}_b']:
                                         ext4_size_value = max(ext4_size_value, int(_i[2]))
-                        elif os.path.exists(work + f"config/{dname}_size.txt"):
-                            with open(work + f"config/{dname}_size.txt", encoding='utf-8') as f:
+                        elif os.path.exists(f"{work}/config/{dname}_size.txt"):
+                            with open(f"{work}/config/{dname}_size.txt", encoding='utf-8') as f:
                                 try:
                                     ext4_size_value = int(f.read().strip())
                                 except ValueError:
@@ -3425,10 +3424,10 @@ class Packxx(Toplevel):
 
 
 def rdi(work, part_name) -> bool:
-    if not os.listdir(work + "config"):
-        rmtree(work + "config")
+    if not os.listdir(f"{work}/config"):
+        rmtree(f"{work}/config")
         return False
-    if os.access(work + part_name + ".img", os.F_OK):
+    if os.access(f"{work}/{part_name}.img", os.F_OK):
         print(lang.text72 % part_name)
         try:
             rmdir(work + part_name)
@@ -3672,7 +3671,7 @@ def unpack(chose, form: str = '') -> bool:
         return False
     if form == 'payload':
         print(lang.text79 + "payload")
-        dumper = Dumper(work + "payload.bin", work, diff=False, old='old', images=chose)
+        dumper = Dumper(f"{work}/payload.bin", work, diff=False, old='old', images=chose)
         try:
             dumper.run()
         except RuntimeError:
@@ -3680,14 +3679,14 @@ def unpack(chose, form: str = '') -> bool:
         return True
     elif form == 'super':
         print(lang.text79 + "Super")
-        file_type = gettype(work + "super.img")
+        file_type = gettype(f"{work}/super.img")
         if file_type == "sparse":
             print(lang.text79 + f"super.img [{file_type}]")
             try:
-                utils.simg2img(work + "super.img")
+                utils.simg2img(f"{work}/super.img")
             except (Exception, BaseException):
                 win.message_pop(lang.warn11.format("super.img"))
-        if gettype(work + "super.img") == 'super':
+        if gettype(f"{work}/super.img") == 'super':
             lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
             for file_name in os.listdir(work):
                 if file_name.endswith('_a.img') and not os.path.exists(work + file_name.replace('_a', '')):
@@ -3697,7 +3696,7 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(work + file_name)
         return True
     elif form == 'update.app':
-        splituapp.extract(work + "UPDATE.APP", work, chose)
+        splituapp.extract(f"{work}/UPDATE.APP", work, chose)
         return True
     for i in chose:
         if os.access(f"{work}/{i}.zst", os.F_OK):
@@ -3794,7 +3793,7 @@ def unpack(chose, form: str = '') -> bool:
                     try:
                         os.remove(f"{work}/{i}.img")
                     except Exception as e:
-                        win.message_pop(lang.warn11.format(f"{i}.img:" + e))
+                        win.message_pop(lang.warn11.format(f"{i}.img:{e.__str__()}"))
             if file_type == 'romfs':
                 fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
                 fs.extract(work)
@@ -3822,8 +3821,8 @@ def unpack(chose, form: str = '') -> bool:
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'unknown' and is_empty_img(f"{work}/{i}.img"):
                 print(lang.text141)
-    if not os.path.exists(work + "config"):
-        os.makedirs(work + "config")
+    if not os.path.exists(f"{work}/config"):
+        os.makedirs(f"{work}/config")
     json_.write(parts)
     parts.clear()
     print(lang.text8)
@@ -3978,25 +3977,25 @@ class GetFolderSize:
 @animation
 def datbr(work, name, brl: any, dat_ver=4):
     print(lang.text86 % (name, name))
-    if not os.path.exists(work + name + ".img"):
-        print(work + name + ".img" + lang.text84)
+    if not os.path.exists(f"{work}/{name}.img"):
+        print(f"{work}/{name}.img" + lang.text84)
         return
     else:
-        utils.img2sdat(work + name + ".img", work, dat_ver, name)
-    if os.access(work + name + ".new.dat", os.F_OK):
+        utils.img2sdat(f"{work}/{name}.img", work, dat_ver, name)
+    if os.access(f"{work}/{name}.new.dat", os.F_OK):
         try:
-            os.remove(work + name + ".img")
+            os.remove(f"{work}/{name}.img")
         except Exception:
             logging.exception('Bugs')
-            os.remove(work + name + ".img")
+            os.remove(f"{work}/{name}.img")
     if brl == "dat":
         print(lang.text87 % name)
     else:
         print(lang.text88 % (name, 'br'))
         call(['brotli', '-q', str(brl), '-j', '-w', '24', f"{work}/{name}.new.dat", '-o', f"{work}/{name}.new.dat.br"])
-        if os.access(work + name + ".new.dat", os.F_OK):
+        if os.access(f"{work}/{name}.new.dat", os.F_OK):
             try:
-                os.remove(work + name + ".new.dat")
+                os.remove(f"{work}/{name}.new.dat")
             except Exception:
                 logging.exception('Bugs')
         print(lang.text89 % (name, 'br'))
@@ -4022,7 +4021,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
     if not UTC:
         UTC = int(time.time())
     if not size:
-        size = GetFolderSize(work + name, 1, 3, work + "dynamic_partitions_op_list").rsize_v
+        size = GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
         ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}/config/{name}_file_contexts', '-l', f'{size}',
@@ -4073,7 +4072,7 @@ def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
          f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
          f'{work_output}/{name}_new.img'])
     if ret != 0:
-        rmdir(f'{work + name}_new.img')
+        rmdir(f'{work}/{name}_new.img')
         print(lang.text75 % name)
         return 1
     if sparse == "y":
@@ -4337,20 +4336,20 @@ class UnpackGui(ttk.LabelFrame):
             self.fm.current(0)
             return
         if self.fm.get() == 'payload':
-            if os.path.exists(work + "payload.bin"):
-                with open(work + "payload.bin", 'rb') as pay:
+            if os.path.exists(f"{work}/payload.bin"):
+                with open(f"{work}/payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
                         self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}",
                                         i.partition_name)
         elif self.fm.get() == 'super':
-            if os.path.exists(work + "super.img"):
-                if gettype(work + "super.img") == 'sparse':
-                    create_thread(utils.simg2img, work + "super.img", join=True)
-                for i in lpunpack.get_parts(work + "super.img"):
+            if os.path.exists(f"{work}/super.img"):
+                if gettype(f"{work}/super.img") == 'sparse':
+                    create_thread(utils.simg2img, f"{work}/super.img", join=True)
+                for i in lpunpack.get_parts(f"{work}/super.img"):
                     self.lsg.insert(i, i)
         elif self.fm.get() == 'update.app':
-            if os.path.exists(work + "UPDATE.APP"):
-                for i in splituapp.get_parts(work + "UPDATE.APP"):
+            if os.path.exists(f"{work}/UPDATE.APP"):
+                for i in splituapp.get_parts(f"{work}/UPDATE.APP"):
                     self.lsg.insert(i, i)
         else:
             for file_name in os.listdir(work):
@@ -4366,7 +4365,7 @@ class UnpackGui(ttk.LabelFrame):
         if not os.path.exists(work := project_manger.current_work_path()):
             win.message_pop(lang.warn1)
             return False
-        parts_dict = JsonEdit(work + "config/parts_info").read()
+        parts_dict = JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(f"{folder} [{parts_dict.get(folder, 'Unknown')}]", folder)
