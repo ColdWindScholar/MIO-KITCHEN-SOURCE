@@ -857,8 +857,7 @@ class Tool(Tk):
         context.trace("w", lambda *x: enable_contextpatch())
         get_setting_button('ai_engine', sf4, lang.ai_engine)
         get_setting_button('magisk_not_decompress', sf4, lang.text142)
-        if os.name == 'nt':
-            get_setting_button('treff', sf4, lang.t61)
+        get_setting_button('treff', sf4, lang.t61)
         enable_cp = ttk.Checkbutton(sf4, text=lang.context_patch, variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
@@ -1347,7 +1346,10 @@ class SetUtils:
             if 'active_code' not in self.__dir__():
                 self.active_code = 'None'
             verify.verify(self.active_code)
-        win.attributes("-alpha", self.bar_level)
+        if self.treff == "1":
+            win.attributes("-alpha", self.bar_level)
+        else:
+            win.attributes("-alpha", 1)
 
 
     @staticmethod
