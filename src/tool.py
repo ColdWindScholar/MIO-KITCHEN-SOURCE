@@ -3985,6 +3985,14 @@ class GetFolderSize:
 
 @animation
 def datbr(work, name, brl: any, dat_ver=4):
+    """
+
+    :param work: working dir
+    :param name: the name of the partitition
+    :param brl: if its a int , will convert the file to br, if "dat" just convert to dat
+    :param dat_ver: dat version
+    :return:None
+    """
     print(lang.text86 % (name, name))
     if not os.path.exists(f"{work}/{name}.img"):
         print(f"{work}/{name}.img" + lang.text84)
