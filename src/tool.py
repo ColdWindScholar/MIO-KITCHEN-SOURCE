@@ -3529,10 +3529,11 @@ def unpackrom(ifile) -> None:
             re_folder(project_manger.current_work_path())
         KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
         for i in os.listdir(project_manger.current_work_path()):
-            if not os.path.isfile(project_manger.current_work_path() + os.sep + i):
+            file = project_manger.current_work_path() + os.sep + i
+            if not os.path.isfile(file):
                 continue
-            if i.endswith('.dz') and gettype(project_manger.current_work_path() + os.sep + i) == 'dz':
-                DZFileTools(project_manger.current_work_path() + os.sep + i, project_manger.current_work_path(),
+            if i.endswith('.dz') and gettype(file) == 'dz':
+                DZFileTools(file, project_manger.current_work_path(),
                             extract_all=True)
         return
     #ofp
@@ -3720,7 +3721,7 @@ def unpack(chose, form: str = '') -> bool:
         if os.access(f"{work}/{i}.new.dat", os.F_OK):
             print(lang.text79 + f"{work}/{i}.new.dat")
             if os.path.getsize(f"{work}/{i}.new.dat") != 0:
-                transferfile = os.path.abspath(os.path.dirname(work)) + f"/{i}.transfer.list"
+                transferfile = f"{work}/{i}.transfer.list"
                 if os.access(transferfile, os.F_OK):
                     parts['dat_ver'] = Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
                     if os.access(f"{work}/{i}.img", os.F_OK):
@@ -3731,7 +3732,9 @@ def unpack(chose, form: str = '') -> bool:
                         except (Exception, BaseException):
                             logging.exception('Bugs')
                     else:
-                        print("transferfile" + lang.text84)
+                        print("File May Not Extracted.")
+                else:
+                    print("transferfile" + lang.text84)
         if os.access(f"{work}/{i}.img", os.F_OK):
             try:
                 parts.pop(i)
@@ -3755,7 +3758,7 @@ def unpack(chose, form: str = '') -> bool:
                 utils.Vbpatch(f"{work}/{i}.img").disavb()
             file_type = gettype(f"{work}/{i}.img")
             if file_type == "sparse":
-                print(lang.text79 + i + f".img[{file_type}]")
+                print(lang.text79 + f"{i}.img[{file_type}]")
                 try:
                     utils.simg2img(f"{work}/{i}.img")
                 except (Exception, BaseException):
