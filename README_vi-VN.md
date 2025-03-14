@@ -16,8 +16,8 @@
 ### [日本語](README_ja-JP.md) | [中文](README_zh-CN.md) | [Português brasileiro](README_pt-BR.md) | [Deutsch](README_de-DE.md) | [Русский язык](README_ru-RU.md) | [Indonesian](README_id-ID.md) | [Tiếng Việt](README_vi-VN.md)  
 ***
 ## Tính năng  
-* Giải nén `boot, dtbo, ext4, erofs, payload, logo` và nhiều định dạng khác  
-* Đóng gói `boot, dtbo, ext4, erofs, logo` và nhiều định dạng khác  
+* Unpack `boot, dtbo, ext4, erofs, payload, logo` và nhiều định dạng khác  
+* Repack `boot, dtbo, ext4, erofs, logo` và nhiều định dạng khác  
 ***
 ## Ưu điểm  
 * Tự động vá fs_config và fs_context  
@@ -36,8 +36,8 @@
 | Windows       | x86_64 x86 amd64 arm64 (bởi sewzj) |
 |  MacOS        | Arm64 X86                         |
 
-## Các loại ảnh đĩa hỗ trợ  
-| Loại ảnh đĩa được hỗ trợ |
+## Các loại img hỗ trợ  
+| Loại img được hỗ trợ |
 |--------------------------|
 | Android Boot Image       |
 | Android Recovery Image   |
