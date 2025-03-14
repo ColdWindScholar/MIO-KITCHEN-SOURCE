@@ -213,9 +213,6 @@ class Dumper:
 
         with self.open_payloadfile() as payloadfile:
             self.tls.payloadfile = payloadfile
-            self.do_ops_for_part(part, out_file, old_file)
+            for op in part["operations"]:
+                self.data_for_op(op, out_file, old_file)
         out_file.close()
-
-    def do_ops_for_part(self, part, out_file, old_file):
-        for op in part["operations"]:
-            self.data_for_op(op, out_file, old_file)
