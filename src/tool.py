@@ -697,12 +697,7 @@ class Tool(Tk):
         self.gif_label.pack(padx=10, pady=10)
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(padx=10, pady=10)
         MpkMan().gui()
-        if settings.custom_system == 'Android' and os.geteuid() != 0:
-            ask_win(lang.warn16, wait=False)
-            if call(['su', '-c', 'echo ok'], extra_path=False) != 0:
-                ask_win(lang.warn17)
-        if settings.custom_system == 'Android' and os.geteuid() == 0:
-            os.makedirs('/data/local/MIO', exist_ok=True)
+
 
     def tab_content(self):
         global kemiaojiang
@@ -4738,8 +4733,6 @@ def __init__tk(args):
         if not verify.state:
             Active(verify, settings, win, images, lang).gui()
     win.update()
-    if settings.custom_system == 'Android':
-        win.attributes('-fullscreen', True)
     move_center(win)
     win.get_time()
     print(lang.text134 % (dti() - start))
