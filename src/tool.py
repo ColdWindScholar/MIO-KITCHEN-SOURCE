@@ -2669,14 +2669,26 @@ class PackHybridRom:
 class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
+        self.title("打包Payload")
+        # super size must 4194304 ahead than group_size?
+        self.super_size = IntVar(value=17179869184)
+        self.group_size = IntVar(value=17175674880)
+        self.group_name = StringVar(value="qti_dynamic_partitions")
+        self.virtual_ab = BooleanVar(value=True)
+        self.part_list = []
+
+    def gui(self):
+        pass
+
+
 
 
 class PackSuper(Toplevel):
     def __init__(self):
         super().__init__()
         self.title(lang.text53)
-        self.supers = IntVar(value=9126805504)
-        self.ssparse = IntVar()
+        self.super_size = IntVar(value=9126805504)
+        self.is_sparse = IntVar()
         self.super_type = IntVar()
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
@@ -2704,7 +2716,7 @@ class PackSuper(Toplevel):
             fill='both')
         show_group_name.current(0)
         Label(lf2, text=lang.text57).pack(side='left', padx=10, pady=10)
-        (super_size := ttk.Entry(lf2, textvariable=self.supers)).pack(side='left', padx=10, pady=10)
+        (super_size := ttk.Entry(lf2, textvariable=self.super_size)).pack(side='left', padx=10, pady=10)
         super_size.bind("<KeyRelease>",
                         lambda *x: super_size.state(["!invalid" if super_size.get().isdigit() else "invalid"]))
 
@@ -2714,7 +2726,7 @@ class PackSuper(Toplevel):
 
         self.tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
 
-        ttk.Checkbutton(self, text=lang.text58, variable=self.ssparse, onvalue=1, offvalue=0,
+        ttk.Checkbutton(self, text=lang.text58, variable=self.is_sparse, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
         t_frame = Frame(self)
@@ -2740,12 +2752,12 @@ class PackSuper(Toplevel):
 
     def start_(self):
         try:
-            self.supers.get()
+            self.super_size.get()
         except (Exception, BaseException):
-            self.supers.set(0)
+            self.super_size.set(0)
             logging.exception('Bugs')
         if not self.verify_size():
-            ask_win2(lang.t10.format(self.supers.get()))
+            ask_win2(lang.t10.format(self.super_size.get()))
             return False
         lbs = self.tl.selected.copy()
         sc = self.delete_source_file.get()
@@ -2753,14 +2765,14 @@ class PackSuper(Toplevel):
         if not project_manger.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.ssparse, group_name=self.group_name, size=self.supers, super_type=self.super_type.get(),
+        packsuper(sparse=self.is_sparse, group_name=self.group_name, size=self.super_size, super_type=self.super_type.get(),
                   part_list=lbs, del_=sc,
                   attrib=self.attrib.get())
 
     def verify_size(self):
         size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in self.tl.selected])
         diff_size = size
-        if size > self.supers.get():
+        if size > self.super_size.get():
             for i in range(20):
                 if not i:
                     continue
@@ -2773,14 +2785,14 @@ class PackSuper(Toplevel):
                 else:
                     size = i * (1024 ** 3)
                     break
-            self.supers.set(int(size))
+            self.super_size.set(int(size))
             return False
         else:
             return True
 
     def generate(self):
         self.g_b.config(text=lang.t28, state='disabled')
-        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.supers.get(),
+        utils.generate_dynamic_list(group_name=self.group_name.get(), size=self.super_size.get(),
                                     super_type=self.super_type.get(),
                                     part_list=self.tl.selected.copy(), work=project_manger.current_work_path())
         self.g_b.config(text=lang.text34)
@@ -2799,9 +2811,10 @@ class PackSuper(Toplevel):
                     self.tl.insert(f"{name} [{file_type}]", name, name in self.selected)
 
     def read_list(self):
-        if os.path.exists(f"{self.work}/dynamic_partitions_op_list"):
+        list_file = f"{self.work}/dynamic_partitions_op_list"
+        if os.path.exists(list_file):
             try:
-                data = utils.dynamic_list_reader(f"{self.work}/dynamic_partitions_op_list")
+                data = utils.dynamic_list_reader(list_file)
             except (Exception, BaseException):
                 logging.exception('Bugs')
                 return
@@ -2810,7 +2823,7 @@ class PackSuper(Toplevel):
                 if fir[:-2] == sec[:-2]:
                     self.group_name.set(fir[:-2])
                     self.super_type.set(2)
-                    self.supers.set(int(data[fir]['size']))
+                    self.super_size.set(int(data[fir]['size']))
                     self.selected = data[fir].get('parts', [])
                     selected = []
                     for i in self.selected:
@@ -2820,7 +2833,7 @@ class PackSuper(Toplevel):
             else:
                 group_name, = data
                 self.group_name.set(group_name)
-                self.supers.set(int(data[group_name]['size']))
+                self.super_size.set(int(data[group_name]['size']))
                 self.selected = data[group_name].get('parts', [])
                 self.super_type.set(1)
 
@@ -2863,13 +2876,13 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
                 command += ['--partition', f"{part}_b:{attrib}:0:{group_name.get()}_b"]
             else:
                 command += ['--partition',
-                            f"{part}_b:{attrib}:{os.path.getsize(work + part + '_b.img')}:{group_name.get()}_b",
-                            '--image', f'{part}_b={work + part}_b.img']
+                            f"{part}_b:{attrib}:{os.path.getsize(f'{work}/{part}_b.img')}:{group_name.get()}_b",
+                            '--image', f'{part}_b={work}/{part}_b.img']
         if super_type == 2:
             command += ["--virtual-ab"]
     if sparse.get() == 1:
         command += ["--sparse"]
-    command += ['--out', output_dir + 'super.img']
+    command += ['--out', f'{output_dir}/super.img']
     if return_cmd == 1:
         return command
     if call(command) == 0:
@@ -4253,7 +4266,6 @@ class Frame3(ttk.LabelFrame):
 
     def gui(self):
         row = 0
-        column = 0
         functions = [
             (lang.text122, lambda: create_thread(pack_zip)),
             (lang.text123, lambda: create_thread(PackSuper)),
