@@ -2666,6 +2666,10 @@ class PackHybridRom:
                 logging.exception('Bugs')
                 print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
 
+class PackPayload(Toplevel):
+    def __init__(self):
+        super().__init__()
+
 
 class PackSuper(Toplevel):
     def __init__(self):
@@ -4248,14 +4252,20 @@ class Frame3(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
+        row = 0
+        column = 0
         functions = [
             (lang.text122, lambda: create_thread(pack_zip)),
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
-            (lang.t13, lambda: create_thread(FormatConversion))
+            (lang.t13, lambda: create_thread(FormatConversion)),
+            ("打包 Payload", lambda: create_thread(PackPayload)),
         ]
         for index, (text, func) in enumerate(functions):
-            ttk.Button(self, text=text, command=func).grid(row=0, column=index, padx=5, pady=5)
+            column = index % 4
+            if not column:
+                row += 1
+            ttk.Button(self, text=text, command=func, width=11).grid(row=row, column=column, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):
@@ -4733,6 +4743,7 @@ def __init__tk(args):
         if not verify.state:
             Active(verify, settings, win, images, lang).gui()
     win.update()
+
     move_center(win)
     win.get_time()
     print(lang.text134 % (dti() - start))
