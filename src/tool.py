@@ -2670,7 +2670,7 @@ class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
         self.title("打包Payload")
-        # super size must 4194304 ahead than group_size?
+        # multi group_size must 4194304 less than super
         self.super_size = IntVar(value=17179869184)
         self.group_size = IntVar(value=17175674880)
         self.group_name = StringVar(value="qti_dynamic_partitions")
