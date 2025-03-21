@@ -1596,7 +1596,12 @@ class ModuleManager:
                         print(lang.text36 % (name, n, n))
                         return 2
         if os.path.exists(script_path + "main.sh"):
-            values = self.Parse(f"{script_path}/main.json") if os.path.exists(f"{script_path}/main.json") else None
+            if os.path.exists(f"{script_path}/main.json"):
+                values = self.Parse(f"{script_path}/main.json")
+                if values.cancel:
+                    return 1
+            else:
+                values = None
             if not os.path.exists(temp):
                 re_folder(temp)
             exports = ''
@@ -1803,6 +1808,7 @@ class ModuleManager:
     # fixme:Rewrite it!!!
     class Parse(Toplevel):
         gavs = {}
+        cancel = False
 
         @staticmethod
         def _text(master, text, fontsize, side):
@@ -1855,8 +1861,13 @@ class ModuleManager:
         def __unknown(self, master, type, side):
             self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
 
+        def cancel(self):
+            self.cancel = True
+            self.destroy()
+
         def __init__(self, jsons):
             super().__init__()
+            self.protocol("WM_DELETE_WINDOW", lambda :self.cancel())
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
                     data = json.load(f)
