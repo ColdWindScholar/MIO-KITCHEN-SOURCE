@@ -2344,18 +2344,20 @@ class Debugger(Toplevel):
         def save():
             if f.get():
                 if len(f.get().split()) >= 2:
-                    if f.get().split()[0] == 'import':
+                    command, argv, *_= f.get().split()
+                    if command == 'import':
                         try:
-                            globals()[h.get()] = __import__(f.get().split()[1])
+                            globals()[h.get()] = __import__(argv)
                             read_value()
                         except ImportError:
                             logging.exception('Bugs')
-                    elif f.get().split()[0] == 'global':
+                    elif command == 'global':
                         try:
-                            globals()[h.get()] = globals()[f.get().split()[1]]
+                            globals()[h.get()] = globals()[argv]
                             read_value()
                         except (Exception, BaseException):
                             logging.exception('Bugs')
+
                 else:
                     globals()[h.get()] = f.get()
             else:
@@ -2602,29 +2604,29 @@ class PackHybridRom:
             win.message_pop(lang.warn1)
             return
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
-            os.rename(dir_ + "firmware-update", dir_ + "images")
-        if not os.path.exists(dir_ + "images"):
-            os.makedirs(dir_ + 'images')
+            os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
+        if not os.path.exists(f"{dir_}/images"):
+            os.makedirs(f'{dir_}/images')
         if os.path.exists(os.path.join(project_manger.current_work_output_path(), 'payload.bin')):
             print("Found payload.bin ,Stop!")
             return
-        if os.path.exists(dir_ + 'META-INF'):
-            rmdir(dir_ + 'META-INF')
+        if os.path.exists(f'{dir_}/META-INF'):
+            rmdir(f'{dir_}/META-INF')
         shutil.copytree(f"{cwd_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
         right_device = input_(lang.t26, 'olive')
-        with open(dir_ + "bin/right_device", 'w', encoding='gbk') as rd:
+        with open(f"{dir_}/bin/right_device", 'w', encoding='gbk') as rd:
             rd.write(right_device + "\n")
         with open(
-                dir_ + 'META-INF/com/google/android/update-binary',
+                f'{dir_}/META-INF/com/google/android/update-binary',
                 'r+', encoding='utf-8', newline='\n') as script:
             lines = script.readlines()
             lines.insert(45, f'right_device="{right_device}"\n')
             add_line = self.get_line_num(lines, '#Other images')
-            for t in os.listdir(dir_ + "images"):
+            for t in os.listdir(f"{dir_}/images"):
                 if t.endswith('.img') and not os.path.isdir(dir_ + t):
                     print(f"Add Flash method {t} to update-binary")
-                    if os.path.getsize(os.path.join(dir_ + 'images', t)) > 209715200:
-                        self.zstd_compress(os.path.join(dir_ + 'images', t))
+                    if os.path.getsize(os.path.join(f'{dir_}/images', t)) > 209715200:
+                        self.zstd_compress(os.path.join(f'{dir_}/images', t))
                         lines.insert(add_line,
                                      f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
                     else:
@@ -2635,13 +2637,13 @@ class PackHybridRom:
                     print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(dir_ + t) > 209715200:
                         self.zstd_compress(dir_ + t)
-                        move(os.path.join(dir_, t + ".zst"), os.path.join(dir_ + "images", t + ".zst"))
+                        move(os.path.join(dir_, f"{t}.zst"), os.path.join(f"{dir_}/images", f"{t}.zst"))
                         lines.insert(add_line,
                                      f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
                     else:
                         lines.insert(add_line,
                                      f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
-                        move(os.path.join(dir_, t), os.path.join(dir_ + "images", t))
+                        move(os.path.join(dir_, t), os.path.join(f"{dir_}/images", t))
             script.seek(0)
             script.truncate()
             script.writelines(lines)
