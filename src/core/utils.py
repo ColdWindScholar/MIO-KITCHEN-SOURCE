@@ -259,11 +259,6 @@ def gettype(file) -> str:
     if not os.path.exists(file):
         return "fne"
 
-    def compare(header: bytes, number: int = 0) -> int:
-        with open(file, 'rb') as f:
-            f.seek(number)
-            return f.read(len(header)) == header
-
     def is_super(fil) -> any:
         with open(fil, 'rb') as file_:
             try:
@@ -278,8 +273,11 @@ def gettype(file) -> str:
     except IndexError:
         ...
     for header, desc, *offset in formats:
-        if compare(header, offset[0] if offset else 0):
-            return desc
+        with open(file, 'rb') as f:
+            f.seek(offset[0] if offset else 0)
+            if f.read(len(header)) == header:
+                return desc
+
     if not zero_start(file, 512) and tarfile.is_tarfile(file):
         return 'tar'
     try:
