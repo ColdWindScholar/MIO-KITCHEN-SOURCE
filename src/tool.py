@@ -1861,13 +1861,13 @@ class ModuleManager:
         def __unknown(self, master, type, side):
             self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
 
-        def cancel(self):
+        def _cancel(self):
             self.cancel = True
             self.destroy()
 
         def __init__(self, jsons):
             super().__init__()
-            self.protocol("WM_DELETE_WINDOW", lambda :self.cancel())
+            self.protocol("WM_DELETE_WINDOW", lambda :self._cancel())
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
                     data = json.load(f)
