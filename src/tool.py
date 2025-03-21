@@ -117,7 +117,7 @@ cwd_path = utils.prog_path
 
 if os.name == 'nt':
     # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
-    def set_title_bar_color(window, dark_value:int=20):
+    def set_title_bar_color(window, dark_value: int = 20):
         window.update()
         DWMWA_USE_IMMERSIVE_DARK_MODE = dark_value
         set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
@@ -128,6 +128,7 @@ if os.name == 'nt':
         value = c_int(value)
         set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
         window.update()
+
 
 class LoadAnim:
     gifs = []
@@ -213,6 +214,7 @@ def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: i
     ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
     ask.after(wait, ask.destroy)
 
+
 class Toplevel(TkToplevel):
     def __init__(self):
         super().__init__()
@@ -221,6 +223,7 @@ class Toplevel(TkToplevel):
                 set_title_bar_color(self)
             else:
                 set_title_bar_color(self, 0)
+
 
 class ToolBox(ttk.Frame):
     def __init__(self, master):
@@ -294,7 +297,8 @@ class ToolBox(ttk.Frame):
             self.patch_bu.configure(state="disabled", text=lang.running)
             local_path = str(os.path.join(temp, v_code()))
             re_folder(local_path)
-            with Magisk_patch(self.boot_file.get(), None, f"{settings.tool_bin}/magiskboot", local_path, self.IS64BIT.get(),
+            with Magisk_patch(self.boot_file.get(), None, f"{settings.tool_bin}/magiskboot", local_path,
+                              self.IS64BIT.get(),
                               self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
                               self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
                               ) as m:
@@ -698,7 +702,6 @@ class Tool(Tk):
         ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(padx=10, pady=10)
         MpkMan().gui()
 
-
     def tab_content(self):
         global kemiaojiang
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
@@ -751,8 +754,6 @@ class Tool(Tk):
                          style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
-
-
 
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0'):
@@ -1006,7 +1007,8 @@ class Updater(Toplevel):
                 self.progressbar.update()
         self.progressbar['value'] = 100
         self.progressbar.update()
-#fixme:Rewrite it.
+
+    #fixme:Rewrite it.
     def update_process(self):
         [terminate_process(i) for i in states.open_pids]
         self.notice.configure(text=lang.t51)
@@ -1258,8 +1260,6 @@ class Welcome(ttk.Frame):
         te.pack(fill=BOTH, expand=True)
         ttk.Label(self.frame, text=lang.t3).pack()
 
-
-
     def done(self):
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
         ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
@@ -1329,7 +1329,6 @@ class SetUtils:
             win.attributes("-alpha", self.bar_level)
         else:
             win.attributes("-alpha", 1)
-
 
     @staticmethod
     def load_language(name):
@@ -1514,6 +1513,7 @@ class IconGrid(tk.Frame):
         self.scrollable_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
+
 """
 """
 
@@ -1523,7 +1523,10 @@ class ModuleErrorCodes(int):
     PlatformNotSupport = 1
     DependsMissing = 2
     IsBroken = 3
-moduleerrorcodes = ModuleErrorCodes()
+
+
+modulerrorcodes = ModuleErrorCodes()
+
 
 class ModuleManager:
     def __init__(self):
@@ -1626,15 +1629,15 @@ class ModuleManager:
 
     def check_mpk(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
-            return moduleerrorcodes.IsBroken, ''
+            return modulerrorcodes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
             if 'info' not in f.namelist():
-                return moduleerrorcodes.IsBroken, ''
-        return moduleerrorcodes.Normal, ''
+                return modulerrorcodes.IsBroken, ''
+        return modulerrorcodes.Normal, ''
 
     def install(self, mpk):
         check_mpk_result = self.check_mpk(mpk)
-        if check_mpk_result[0] != moduleerrorcodes.Normal:
+        if check_mpk_result[0] != modulerrorcodes.Normal:
             return check_mpk_result
         mconf = ConfigParser()
         with zipfile.ZipFile(mpk) as f:
@@ -1643,12 +1646,12 @@ class ModuleManager:
         try:
             supports = mconf.get('module', 'supports').split()
             if platform.system() not in supports:
-                return moduleerrorcodes.PlatformNotSupport, ''
+                return modulerrorcodes.PlatformNotSupport, ''
         except (Exception, BaseException):
             logging.exception('Bugs')
         for dep in mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                return moduleerrorcodes.DependsMissing, dep
+                return modulerrorcodes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
             rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
@@ -1683,7 +1686,7 @@ class ModuleManager:
                         f.write(i.read())
 
         list_pls_plugin()
-        return moduleerrorcodes.Normal, ''
+        return modulerrorcodes.Normal, ''
 
     @animation
     def export(self, id_: str):
@@ -1718,7 +1721,8 @@ class ModuleManager:
             if os.path.exists(os.path.join(self.module_dir, value, 'icon')):
                 mpk2.write(os.path.join(self.module_dir, value, 'icon'), 'icon')
             del buffer2, buffer
-        print(lang.t15 % f"{settings.path}/{name}.mpk") if os.path.exists(f"{settings.path}/{name}.mpk") else print(lang.t16 % f"{settings.path}/{name}.mpk")
+        print(lang.t15 % f"{settings.path}/{name}.mpk") if os.path.exists(f"{settings.path}/{name}.mpk") else print(
+            lang.t16 % f"{settings.path}/{name}.mpk")
 
     class New(Toplevel):
         def __init__(self):
@@ -1798,14 +1802,15 @@ class ModuleManager:
             list_pls_plugin()
             self.editor_(iden)
 
-
     # fixme:Rewrite it!!!
     class Parse(Toplevel):
         gavs = {}
+
         @staticmethod
         def _text(master, text, fontsize, side):
             ttk.Label(master, text=text,
                       font=(None, int(fontsize))).pack(side=side, padx=5, pady=5)
+
         @staticmethod
         def _button(master, text, command):
             ttk.Button(master, text=text,
@@ -1820,6 +1825,7 @@ class ModuleManager:
             ttk.Button(ft, text=lang.text28,
                        command=lambda: self.gavs[set].set(
                            filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+
         def _radio(self, master, set, opins, side):
             radio_var_name = set
             self.gavs[radio_var_name] = StringVar()
@@ -1831,6 +1837,7 @@ class ModuleManager:
                 self.gavs[radio_var_name].set(value)
                 ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
                                 value=value).pack(side=side)
+
         def _input(self, master, set, text):
             input_frame = Frame(master)
             input_frame.pack(fill=X)
@@ -1841,6 +1848,7 @@ class ModuleManager:
             ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
                                                                                 padx=5,
                                                                                 fill=X)
+
         def _checkbutton(self, master, set, text):
             b_var_name = set
             self.gavs[b_var_name] = IntVar()
@@ -1849,8 +1857,10 @@ class ModuleManager:
                             offvalue=0,
                             style="Switch.TCheckbutton").pack(
                 padx=5, pady=5, fill=BOTH)
+
         def __unknown(self, master, type, side):
-            self._text(master,lang.warn14.format(type),  10, side if side != 'None' else 'bottom')
+            self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
+
         def __init__(self, jsons):
             super().__init__()
             with open(jsons, 'r', encoding='UTF-8') as f:
@@ -1904,8 +1914,6 @@ class ModuleManager:
             if not os.path.exists(temp):
                 os.mkdir(temp)
             self.destroy()
-
-
 
     class UninstallMpk(Toplevel):
 
@@ -2149,17 +2157,17 @@ class InstallMpk(Toplevel):
         self.prog.start()
         self.installb.config(state=DISABLED)
         ret, reason = ModuleManager.install(self.mpk)
-        if ret == moduleerrorcodes.PlatformNotSupport:
+        if ret == modulerrorcodes.PlatformNotSupport:
             self.state['text'] = lang.warn15.format(platform.system())
-        elif ret == moduleerrorcodes.DependsMissing:
+        elif ret == modulerrorcodes.DependsMissing:
             self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == moduleerrorcodes.IsBroken:
+        elif ret == modulerrorcodes.IsBroken:
             self.state['text'] = lang.warn2
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == moduleerrorcodes.Normal:
+        elif ret == modulerrorcodes.Normal:
             self.state['text'] = lang.text39
             self.installb['text'] = lang.text34
             self.installb.config(state='normal')
@@ -2330,7 +2338,7 @@ class Debugger(Toplevel):
         def save():
             if f.get():
                 if len(f.get().split()) >= 2:
-                    command, argv, *_= f.get().split()
+                    command, argv, *_ = f.get().split()
                     if command == 'import':
                         try:
                             globals()[h.get()] = __import__(argv)
@@ -2544,7 +2552,8 @@ class MpkStore(Toplevel):
                     if id_ == data.get('id'):
                         info = data
                         break
-                if os.path.exists(os.path.join(temp, i)) and os.path.isfile(os.path.join(temp, i)) and os.path.getsize(os.path.join(temp, i)) == info.get('size', -1):
+                if os.path.exists(os.path.join(temp, i)) and os.path.isfile(os.path.join(temp, i)) and os.path.getsize(
+                        os.path.join(temp, i)) == info.get('size', -1):
                     logging.info('Using Cached Package.')
                 else:
                     for percentage, _, _, _, _ in download_api(self.repo + i, temp, size_=size):
@@ -2654,6 +2663,7 @@ class PackHybridRom:
                 logging.exception('Bugs')
                 print(f"[Fail] Compress {basename} Fail:{e}")
 
+
 class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
@@ -2672,15 +2682,17 @@ class PackPayload(Toplevel):
         group_name_frame = ttk.Frame(self)
         Label(group_name_frame, text="Group Name:").pack(padx=3, pady=5, side='left')
         ttk.Combobox(group_name_frame, textvariable=self.group_name,
-                     values=("qti_dynamic_partitions", "main", "mot_dp_group")).pack(side = 'left',padx = 10,pady = 10,fill = 'both')
-        group_name_frame.pack(padx=5, pady=5,fill='both')
+                     values=("qti_dynamic_partitions", "main", "mot_dp_group")).pack(side='left', padx=10, pady=10,
+                                                                                     fill='both')
+        group_name_frame.pack(padx=5, pady=5, fill='both')
         """Super Size"""
         super_size_frame = ttk.Frame(self)
         Label(super_size_frame, text="Super Size:").pack(padx=3, pady=5, side='left')
         super_size_entry = ttk.Entry(super_size_frame, textvariable=self.super_size)
         super_size_entry.pack(side='left', padx=10, pady=10)
         super_size_entry.bind("<KeyRelease>",
-              lambda *x: super_size_entry.state(["!invalid" if super_size_entry.get().isdigit() else "invalid"]))
+                              lambda *x: super_size_entry.state(
+                                  ["!invalid" if super_size_entry.get().isdigit() else "invalid"]))
         super_size_frame.pack(padx=5, pady=5, fill='both')
         """Group size"""
         group_size_frame = Frame(self)
@@ -2688,9 +2700,6 @@ class PackPayload(Toplevel):
         group_size_entry = ttk.Entry(group_size_frame, textvariable=self.group_size)
         group_size_entry.pack(padx=5, pady=5, fill='both')
         group_size_frame.pack(padx=5, pady=5, fill=BOTH)
-
-
-
 
 
 class PackSuper(Toplevel):
@@ -2775,7 +2784,8 @@ class PackSuper(Toplevel):
         if not project_manger.exist():
             warn_win(text=lang.warn1)
             return False
-        pack_super(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(), super_type=self.super_type.get(),
+        pack_super(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(),
+                   super_type=self.super_type.get(),
                    part_list=lbs, del_=sc,
                    attrib=self.attrib.get())
 
@@ -2849,7 +2859,8 @@ class PackSuper(Toplevel):
 
 
 @animation
-def pack_super(sparse:bool, group_name:str, size:int, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_=0, return_cmd=0,
+               attrib='readonly',
                output_dir: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
@@ -2994,7 +3005,7 @@ def download_api(url, path=None, int_=True, size_=0):
             speed = chunk_kb / used_time
             last_time = time.time()
             percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
-                                                                                             bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
+                                                                                         bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
 
 
@@ -3039,7 +3050,7 @@ def download_file():
 
 
 @animation
-def unpack_boot(name: str = 'boot', boot:str=None, work:str=None):
+def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
     if not boot:
@@ -3067,13 +3078,15 @@ def unpack_boot(name: str = 'boot', boot:str=None, work:str=None):
             f.write(comp)
         if comp != "unknown":
             os.rename(f"{work}/{name}/ramdisk.cpio", f"{work}/{name}/ramdisk.cpio.comp")
-            if call(["magiskboot", "decompress", f'{work}/{name}/ramdisk.cpio.comp', f'{work}/{name}/ramdisk.cpio']) != 0:
+            if call(["magiskboot", "decompress", f'{work}/{name}/ramdisk.cpio.comp',
+                     f'{work}/{name}/ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
                 return
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
         print("Unpacking Ramdisk...")
-        cpio_extract(os.path.join(work , name, 'ramdisk.cpio'), os.path.join(work , name, 'ramdisk'), os.path.join(work , name, 'ramdisk.txt'))
+        cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
+                     os.path.join(work, name, 'ramdisk.txt'))
     else:
         print("Unpack Done!")
     os.chdir(cwd_path)
@@ -3492,6 +3505,7 @@ def script2fs(path):
                     parts[v] = 'ext'
         json_.write(parts)
 
+
 #fixme:Rewrite it.
 @animation
 def unpackrom(ifile) -> None:
@@ -3614,7 +3628,8 @@ def unpackrom(ifile) -> None:
     if ftype != 'unknown':
         file_name: str = os.path.basename(ifile)
         project_folder = os.path.join(settings.path, os.path.splitext(file_name)[0])
-        folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + v_code()) if os.path.exists(project_folder) else project_folder
+        folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + v_code()) if os.path.exists(
+            project_folder) else project_folder
         try:
             current_project_name.set(os.path.basename(folder))
             os.mkdir(folder)
@@ -3627,7 +3642,7 @@ def unpackrom(ifile) -> None:
         # File Rename
         if os.path.exists(os.path.join(project_dir, file_name)):
             if not '.' in file_name:
-                shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name+".img"))
+                shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name + ".img"))
             if file_name.endswith(".bin"):
                 shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name[:-4] + ".img"))
         current_project_name.set(os.path.basename(folder))
@@ -4226,7 +4241,8 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
     def listdir(self):
         hide_items = ['bin', 'src']
-        array = [f for f in os.listdir(settings.path) if os.path.isdir(settings.path + os.sep + f) and f not in hide_items and not f.startswith('.')]
+        array = [f for f in os.listdir(settings.path) if
+                 os.path.isdir(settings.path + os.sep + f) and f not in hide_items and not f.startswith('.')]
         origin_project = current_project_name.get()
         self.combobox["value"] = array
         if not array:
