@@ -2670,15 +2670,37 @@ class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
         self.title("打包Payload")
+        self.overhead = 4194304
         # multi group_size must 4194304 less than super
         self.super_size = IntVar(value=17179869184)
         self.group_size = IntVar(value=17175674880)
         self.group_name = StringVar(value="qti_dynamic_partitions")
         self.virtual_ab = BooleanVar(value=True)
         self.part_list = []
+        self.gui()
 
     def gui(self):
-        pass
+        """Group Name"""
+        group_name_frame = ttk.Frame(self)
+        Label(group_name_frame, text="Group Name:").pack(padx=3, pady=5, side='left')
+        ttk.Combobox(group_name_frame, textvariable=self.group_name,
+                     values=("qti_dynamic_partitions", "main", "mot_dp_group")).pack(side = 'left',padx = 10,pady = 10,fill = 'both')
+        group_name_frame.pack(padx=5, pady=5,fill='both')
+        """Super Size"""
+        super_size_frame = ttk.Frame(self)
+        Label(super_size_frame, text="Super Size:").pack(padx=3, pady=5, side='left')
+        super_size_entry = ttk.Entry(super_size_frame, textvariable=self.super_size)
+        super_size_entry.pack(side='left', padx=10, pady=10)
+        super_size_entry.bind("<KeyRelease>",
+              lambda *x: super_size_entry.state(["!invalid" if super_size_entry.get().isdigit() else "invalid"]))
+        super_size_frame.pack(padx=5, pady=5, fill='both')
+        """Group size"""
+        group_size_frame = Frame(self)
+        Label(group_size_frame, text="Group Size:").pack(padx=3, pady=5, side='left')
+        group_size_entry = ttk.Entry(group_size_frame, textvariable=self.group_size)
+        group_size_entry.pack(padx=5, pady=5, fill='both')
+        group_size_frame.pack(padx=5, pady=5, fill=BOTH)
+
 
 
 
@@ -2765,7 +2787,7 @@ class PackSuper(Toplevel):
         if not project_manger.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.is_sparse, group_name=self.group_name, size=self.super_size, super_type=self.super_type.get(),
+        packsuper(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(), super_type=self.super_type.get(),
                   part_list=lbs, del_=sc,
                   attrib=self.attrib.get())
 
@@ -2839,7 +2861,7 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+def packsuper(sparse, group_name:str, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
               output_dir: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
@@ -2860,27 +2882,27 @@ def packsuper(sparse, group_name, size, super_type, part_list: list, del_=0, ret
                 logging.exception('Bugs')
     command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
     if super_type == 1:
-        command += ['2', '-device', f'super:{size.get()}', "--group", f"{group_name.get()}:{size.get()}"]
+        command += ['2', '-device', f'super:{size}', "--group", f"{group_name}:{size}"]
         for part in part_list:
-            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name.get()}",
+            command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}",
                         '--image', f'{part}={work}/{part}.img']
     else:
-        command += ["3", '-device', f'super:{size.get()}', '--group', f"{group_name.get()}_a:{size.get()}"]
+        command += ["3", '-device', f'super:{size}', '--group', f"{group_name}_a:{size}"]
         for part in part_list:
             command += ['--partition',
-                        f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name.get()}_a",
+                        f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name}_a",
                         '--image', f'{part}_a={work + part}.img']
-        command += ["--group", f"{group_name.get()}_b:{size.get()}"]
+        command += ["--group", f"{group_name}_b:{size}"]
         for part in part_list:
             if not os.path.exists(f"{work + part}_b.img"):
-                command += ['--partition', f"{part}_b:{attrib}:0:{group_name.get()}_b"]
+                command += ['--partition', f"{part}_b:{attrib}:0:{group_name}_b"]
             else:
                 command += ['--partition',
-                            f"{part}_b:{attrib}:{os.path.getsize(f'{work}/{part}_b.img')}:{group_name.get()}_b",
+                            f"{part}_b:{attrib}:{os.path.getsize(f'{work}/{part}_b.img')}:{group_name}_b",
                             '--image', f'{part}_b={work}/{part}_b.img']
         if super_type == 2:
             command += ["--virtual-ab"]
-    if sparse.get() == 1:
+    if sparse == 1:
         command += ["--sparse"]
     command += ['--out', f'{output_dir}/super.img']
     if return_cmd == 1:
