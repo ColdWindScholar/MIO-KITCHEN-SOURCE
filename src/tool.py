@@ -4394,30 +4394,31 @@ class UnpackGui(ttk.LabelFrame):
                     return
             self.fm.current(0)
             return
-        if self.fm.get() == 'payload':
+        form = self.fm.get()
+        if form == 'payload':
             if os.path.exists(f"{work}/payload.bin"):
                 with open(f"{work}/payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
                         self.lsg.insert(f"{i.partition_name}{hum_convert(i.new_partition_info.size):>10}",
                                         i.partition_name)
-        elif self.fm.get() == 'super':
+        elif form == 'super':
             if os.path.exists(f"{work}/super.img"):
                 if gettype(f"{work}/super.img") == 'sparse':
                     create_thread(utils.simg2img, f"{work}/super.img", join=True)
                 for i in lpunpack.get_parts(f"{work}/super.img"):
                     self.lsg.insert(i, i)
-        elif self.fm.get() == 'update.app':
+        elif form == 'update.app':
             if os.path.exists(f"{work}/UPDATE.APP"):
                 for i in splituapp.get_parts(f"{work}/UPDATE.APP"):
                     self.lsg.insert(i, i)
         else:
             for file_name in os.listdir(work):
-                if file_name.endswith(self.fm.get()):
+                if file_name.endswith(form):
                     f_type = gettype(work + file_name)
                     if f_type == 'unknown':
-                        f_type = self.fm.get()
-                    self.lsg.insert(f'{file_name.split("." + self.fm.get())[0]} [{f_type}]',
-                                    file_name.split("." + self.fm.get())[0])
+                        f_type = form
+                    self.lsg.insert(f'{file_name.split(f".{form}")[0]} [{f_type}]',
+                                    file_name.split(f".{form}")[0])
 
     def refs2(self):
         self.lsg.clear()
