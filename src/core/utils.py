@@ -432,9 +432,9 @@ def img2sdat(input_image, out_dir='.', version=None, prefix='system'):
         4: "Android Nougat 7.0/7.1/8.0/8.1"}
     if version not in versions.keys():
         version = 4
-    print("Img2sdat(1.7):" + versions[version])
+    print(f"Img2sdat(1.7):{versions[version]}")
     blockimgdiff.BlockImageDiff(sparse_img.SparseImage(input_image, tempfile.mkstemp()[1], '0'), None, version).Compute(
-        out_dir + '/' + prefix)
+        f'{out_dir}/{prefix}')
 
 
 def findfile(file, dir_) -> str:
