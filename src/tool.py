@@ -446,7 +446,9 @@ class ToolBox(ttk.Frame):
         @staticmethod
         def __calc(origin: str, convert: str, size) -> str:
             if origin == convert:
-                return size
+                if not size.isdigit():
+                    return "0"
+                return str(size)
             try:
                 origin_size = float(size)
             except ValueError:
