@@ -2861,7 +2861,7 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse:bool, group_name:str, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+def packsuper(sparse:bool, group_name:str, size:int, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
               output_dir: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
