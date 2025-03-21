@@ -2710,7 +2710,7 @@ class PackSuper(Toplevel):
         super().__init__()
         self.title(lang.text53)
         self.super_size = IntVar(value=9126805504)
-        self.is_sparse = IntVar()
+        self.is_sparse = BooleanVar()
         self.super_type = IntVar()
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
@@ -2748,7 +2748,7 @@ class PackSuper(Toplevel):
 
         self.tl.pack(padx=10, pady=10, expand=True, fill=BOTH)
 
-        ttk.Checkbutton(self, text=lang.text58, variable=self.is_sparse, onvalue=1, offvalue=0,
+        ttk.Checkbutton(self, text=lang.text58, variable=self.is_sparse, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
         t_frame = Frame(self)
@@ -2861,7 +2861,7 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse, group_name:str, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+def packsuper(sparse:bool, group_name:str, size, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
               output_dir: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
@@ -2902,8 +2902,7 @@ def packsuper(sparse, group_name:str, size, super_type, part_list: list, del_=0,
                             '--image', f'{part}_b={work}/{part}_b.img']
         if super_type == 2:
             command += ["--virtual-ab"]
-    if sparse == 1:
-        command += ["--sparse"]
+    if sparse: command += ["--sparse"]
     command += ['--out', f'{output_dir}/super.img']
     if return_cmd == 1:
         return command
