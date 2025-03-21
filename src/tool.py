@@ -93,10 +93,7 @@ from .controls import ListBox, ScrollFrame
 from .core.undz import DZFileTools
 from .core.selinux_audit_allow import main as selinux_audit_allow
 import logging
-try:
-    from enum import IntEnum
-except ImportError:
-    IntEnum = int
+from enum import IntEnum
 is_pro = False
 try:
     from .pro.sn import v as verify
