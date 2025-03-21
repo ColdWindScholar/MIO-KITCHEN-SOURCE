@@ -93,7 +93,10 @@ from .controls import ListBox, ScrollFrame
 from .core.undz import DZFileTools
 from .core.selinux_audit_allow import main as selinux_audit_allow
 import logging
-
+try:
+    from enum import IntEnum
+except ImportError:
+    IntEnum = int
 is_pro = False
 try:
     from .pro.sn import v as verify
@@ -1518,14 +1521,14 @@ class IconGrid(tk.Frame):
 """
 
 
-class ModuleErrorCodes(int):
+class ModuleErrorCodes(IntEnum):
     Normal = 0
     PlatformNotSupport = 1
     DependsMissing = 2
     IsBroken = 3
 
 
-modulerrorcodes = ModuleErrorCodes()
+module_error_codes = ModuleErrorCodes
 
 
 class ModuleManager:
@@ -1629,15 +1632,15 @@ class ModuleManager:
 
     def check_mpk(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
-            return modulerrorcodes.IsBroken, ''
+            return module_error_codes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
             if 'info' not in f.namelist():
-                return modulerrorcodes.IsBroken, ''
-        return modulerrorcodes.Normal, ''
+                return module_error_codes.IsBroken, ''
+        return module_error_codes.Normal, ''
 
     def install(self, mpk):
         check_mpk_result = self.check_mpk(mpk)
-        if check_mpk_result[0] != modulerrorcodes.Normal:
+        if check_mpk_result[0] != module_error_codes.Normal:
             return check_mpk_result
         mconf = ConfigParser()
         with zipfile.ZipFile(mpk) as f:
@@ -1646,12 +1649,12 @@ class ModuleManager:
         try:
             supports = mconf.get('module', 'supports').split()
             if platform.system() not in supports:
-                return modulerrorcodes.PlatformNotSupport, ''
+                return module_error_codes.PlatformNotSupport, ''
         except (Exception, BaseException):
             logging.exception('Bugs')
         for dep in mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                return modulerrorcodes.DependsMissing, dep
+                return module_error_codes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
             rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
@@ -1686,7 +1689,7 @@ class ModuleManager:
                         f.write(i.read())
 
         list_pls_plugin()
-        return modulerrorcodes.Normal, ''
+        return module_error_codes.Normal, ''
 
     @animation
     def export(self, id_: str):
@@ -2157,17 +2160,17 @@ class InstallMpk(Toplevel):
         self.prog.start()
         self.installb.config(state=DISABLED)
         ret, reason = ModuleManager.install(self.mpk)
-        if ret == modulerrorcodes.PlatformNotSupport:
+        if ret == module_error_codes.PlatformNotSupport:
             self.state['text'] = lang.warn15.format(platform.system())
-        elif ret == modulerrorcodes.DependsMissing:
+        elif ret == module_error_codes.DependsMissing:
             self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == modulerrorcodes.IsBroken:
+        elif ret == module_error_codes.IsBroken:
             self.state['text'] = lang.warn2
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == modulerrorcodes.Normal:
+        elif ret == module_error_codes.Normal:
             self.state['text'] = lang.text39
             self.installb['text'] = lang.text34
             self.installb.config(state='normal')
