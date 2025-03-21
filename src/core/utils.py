@@ -314,9 +314,9 @@ def dynamic_list_reader(path):
 
 
 
-def generate_dynamic_list(group_name, size, super_type, part_list, work):
+def generate_dynamic_list(group_name:str, size:int, super_type:int, part_list:list, work):
     data = ['# Remove all existing dynamic partitions and groups before applying full OTA', 'remove_all_groups']
-    with open(work + "dynamic_partitions_op_list", 'w', encoding='utf-8', newline='\n') as d_list:
+    with open(f"{work}/dynamic_partitions_op_list", 'w', encoding='utf-8', newline='\n') as d_list:
         if super_type == 1:
             data.append(f'# Add group {group_name} with maximum size {size}')
             data.append(f'add_group {group_name} {size}')
@@ -336,12 +336,12 @@ def generate_dynamic_list(group_name, size, super_type, part_list, work):
                 data.append(f'add {part}_b {group_name}_b')
         for part in part_list:
             if super_type == 1:
-                data.append(f'# Grow partition {part} from 0 to {os.path.getsize(work + part + ".img")}')
-                data.append(f'resize {part} {os.path.getsize(work + part + ".img")}')
+                data.append(f'# Grow partition {part} from 0 to {os.path.getsize(f"{work}/{part}.img")}')
+                data.append(f'resize {part} {os.path.getsize(f"{work}/{part}.img")}')
             elif super_type in [2, 3]:
-                data.append(f'# Grow partition {part}_a from 0 to {os.path.getsize(work + part + ".img")}')
-                data.append(f'resize {part}_a {os.path.getsize(work + part + ".img")}')
-        d_list.writelines([key + "\n" for key in data])
+                data.append(f'# Grow partition {part}_a from 0 to {os.path.getsize(f"{work}/{part}.img")}')
+                data.append(f'resize {part}_a {os.path.getsize(f"{work}/{part}.img")}')
+        d_list.writelines([f"{key}\n" for key in data])
         data.clear()
 
 
@@ -434,9 +434,9 @@ def findfile(file, dir_) -> str:
     for root, _, files in os.walk(dir_, topdown=True):
         if file in files:
             if os.name == 'nt':
-                return (root + os.sep + file).replace("\\", '/')
+                return f'{root}/{file}'.replace("\\", '/')
             else:
-                return root + os.sep + file
+                return f'{root}/{file}'
     return ''
 
 

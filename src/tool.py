@@ -3502,7 +3502,7 @@ def script2fs(path):
     if os.path.exists(os.path.join(path, "system", "app")):
         if not os.path.exists(path + "/config"):
             os.makedirs(path + "/config")
-        extra.script2fs_context(findfile("updater-script", path + "/META-INF"), path + "/config", path)
+        extra.script2fs_context(findfile("updater-script", f"{path}/META-INF"), f"{path}/config", path)
         json_ = JsonEdit(os.path.join(path, "config", "parts_info"))
         parts = json_.read()
         for v in os.listdir(path):
