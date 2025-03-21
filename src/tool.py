@@ -1784,7 +1784,7 @@ class ModuleManager:
         def create(self):
             if not self.identifier.get():
                 return
-            if ModuleManager.get_installed(self.identifier.get()):
+            if module_manager.get_installed(self.identifier.get()):
                 info_win(lang.warn19 % self.identifier.get())
                 return
             data = {
@@ -1929,10 +1929,10 @@ class ModuleManager:
             self.wait = wait
             if not hasattr(self, 'module_dir'):
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
-            if id_ and ModuleManager.get_installed(id_):
+            if id_ and module_manager.get_installed(id_):
                 self.check_pass = True
                 self.value = id_
-                self.value2 = ModuleManager.get_name(id_)
+                self.value2 = module_manager.get_name(id_)
                 self.lsdep()
             else:
                 self.check_pass = False
@@ -1947,7 +1947,7 @@ class ModuleManager:
                 logging.exception('Bugs')
             self.title(lang.t6)
             move_center(self)
-            if not ModuleManager.is_virtual(self.value) and self.check_pass:
+            if not module_manager.is_virtual(self.value) and self.check_pass:
                 ttk.Label(self, text=lang.t7 % self.value2, font=(None, 30)).pack(padx=10, pady=10, fill=BOTH,
                                                                                   expand=True)
             elif not self.check_pass:
@@ -1968,7 +1968,7 @@ class ModuleManager:
             ttk.Button(self, text=lang.cancel, command=self.destroy).pack(fill=X, expand=True, side=LEFT,
                                                                           pady=10,
                                                                           padx=10)
-            if not ModuleManager.is_virtual(self.value) and self.check_pass:
+            if not module_manager.is_virtual(self.value) and self.check_pass:
                 self.uninstall_b = ttk.Button(self, text=lang.ok, command=self.uninstall, style="Accent.TButton")
                 self.uninstall_b.pack(fill=X, expand=True, side=LEFT, pady=10, padx=10)
             if self.wait:
@@ -2022,7 +2022,7 @@ class ModuleManager:
                 win.message_pop(lang.warn2)
 
 
-ModuleManager = ModuleManager()
+module_manager = ModuleManager()
 
 
 class MpkMan(ttk.Frame):
@@ -2030,7 +2030,7 @@ class MpkMan(ttk.Frame):
         super().__init__(master=win.tab7)
         self.pack(padx=10, pady=10, fill=BOTH)
         self.chosen = StringVar(value='')
-        self.moduledir = ModuleManager.module_dir
+        self.moduledir = module_manager.module_dir
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
         self.images_ = {}
@@ -2038,20 +2038,20 @@ class MpkMan(ttk.Frame):
     def list_pls(self):
         # self.pls.clean()
         for i in self.pls.apps.keys():
-            if not ModuleManager.get_installed(i):
+            if not module_manager.get_installed(i):
                 self.pls.remove(i)
-        for i in ModuleManager.addon_loader.virtual.keys():
+        for i in module_manager.addon_loader.virtual.keys():
             if i in self.pls.apps.keys():
                 continue
             self.images_[i] = PhotoImage(data=images.none_byte)
             icon = tk.Label(self.pls.scrollable_frame,
                             image=self.images_[i],
                             compound="center",
-                            text=ModuleManager.addon_loader.virtual[i].get('name'),
+                            text=module_manager.addon_loader.virtual[i].get('name'),
                             bg="#4682B4",
                             wraplength=70,
                             justify='center')
-            icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(ModuleManager.run, ar))
+            icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(module_manager.run, ar))
             icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
             self.pls.add_icon(icon, i)
 
@@ -2077,7 +2077,7 @@ class MpkMan(ttk.Frame):
                                 bg="#4682B4",
                                 wraplength=70,
                                 justify='center')
-                icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(ModuleManager.run, ar))
+                icon.bind('<Double-Button-1>', lambda event, ar=i: create_thread(module_manager.run, ar))
                 icon.bind('<Button-3>', lambda event, ar=i: self.popup(ar, event))
                 self.pls.add_icon(icon, i)
 
@@ -2109,15 +2109,15 @@ class MpkMan(ttk.Frame):
         rmenu.add_command(label=lang.text21, command=lambda: InstallMpk(
             filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
         rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh))
-        rmenu.add_command(label=lang.text115, command=lambda: create_thread(ModuleManager.new))
+        rmenu.add_command(label=lang.text115, command=lambda: create_thread(module_manager.new))
         self.rmenu2 = Menu(self.pls, tearoff=False, borderwidth=0)
         self.rmenu2.add_command(label=lang.text20,
-                                command=lambda: create_thread(ModuleManager.uninstall_gui, self.chosen.get()))
+                                command=lambda: create_thread(module_manager.uninstall_gui, self.chosen.get()))
         self.rmenu2.add_command(label=lang.text22,
-                                command=lambda: create_thread(ModuleManager.run, self.chosen.get()))
-        self.rmenu2.add_command(label=lang.t14, command=lambda: create_thread(ModuleManager.export, self.chosen.get()))
+                                command=lambda: create_thread(module_manager.run, self.chosen.get()))
+        self.rmenu2.add_command(label=lang.t14, command=lambda: create_thread(module_manager.export, self.chosen.get()))
         self.rmenu2.add_command(label=lang.t17,
-                                command=lambda: create_thread(ModuleManager.new.editor_, ModuleManager,
+                                command=lambda: create_thread(module_manager.new.editor_, module_manager,
                                                               self.chosen.get()))
         self.list_pls()
         lf1.pack(padx=10, pady=10)
@@ -2161,7 +2161,7 @@ class InstallMpk(Toplevel):
             return 0
         self.prog.start()
         self.installb.config(state=DISABLED)
-        ret, reason = ModuleManager.install(self.mpk)
+        ret, reason = module_manager.install(self.mpk)
         if ret == module_error_codes.PlatformNotSupport:
             self.state['text'] = lang.warn15.format(platform.system())
         elif ret == module_error_codes.DependsMissing:
@@ -2490,7 +2490,7 @@ class MpkStore(Toplevel):
             uninstall_button = ttk.Button(f, text=lang.text20,
                                           command=lambda a=data.get('id'): create_thread(self.uninstall,
                                                                                          a), width=5)
-            if not ModuleManager.get_installed(data.get('id')):
+            if not module_manager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
                 uninstall_button.config(state='disabled')
             else:
@@ -2505,8 +2505,8 @@ class MpkStore(Toplevel):
 
     def uninstall(self, id_):
         bu, uninstall_button = self.control.get(id_)
-        ModuleManager.uninstall_gui(id_, wait=True)
-        if not ModuleManager.get_installed(id_):
+        module_manager.uninstall_gui(id_, wait=True)
+        if not module_manager.get_installed(id_):
             bu.config(style="Accent.TButton")
             uninstall_button.config(state='disabled')
         else:
@@ -2548,7 +2548,7 @@ class MpkStore(Toplevel):
         if depends:
             for i in depends:
                 for i_ in self.data:
-                    if i == i_.get('id') and not ModuleManager.get_installed(i):
+                    if i == i_.get('id') and not module_manager.get_installed(i):
                         self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
         try:
             for i in files:
@@ -2567,12 +2567,12 @@ class MpkStore(Toplevel):
                         else:
                             return False
 
-                create_thread(ModuleManager.install, os.path.join(temp, i), join=True)
+                create_thread(module_manager.install, os.path.join(temp, i), join=True)
         except (ConnectTimeout, HTTPError, BaseException, Exception, TclError):
             logging.exception('Bugs')
             return
         control.config(state='normal', text=lang.text21)
-        if ModuleManager.get_installed(id_):
+        if module_manager.get_installed(id_):
             control.config(style="")
             self.control.get(id_)[1].config(state='normal', style="Accent.TButton")
         if id_ in self.tasks:
@@ -3262,10 +3262,10 @@ class Packxx(Toplevel):
             fill=X,
             expand=True)
         move_center(self)
-        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.before_pack)
+        module_manager.addon_loader.run_entry(module_manager.addon_entries.before_pack)
 
     def start_(self):
-        ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.packing)
+        module_manager.addon_loader.run_entry(module_manager.addon_entries.packing)
         try:
             self.destroy()
         except AttributeError:
@@ -4629,7 +4629,7 @@ def init_verify():
 
 
 def exit_tool():
-    ModuleManager.addon_loader.run_entry(ModuleManager.addon_entries.close)
+    module_manager.addon_loader.run_entry(module_manager.addon_entries.close)
     win.destroy()
 
 
