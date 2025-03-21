@@ -2223,7 +2223,6 @@ class InstallMpk(Toplevel):
 
 
 def Generate_Bug_Report():
-    n = '\n'
     if os.name == 'nt':
         output = filedialog.askdirectory(title="Path To Save Bug Report")
     else:
@@ -2247,8 +2246,8 @@ def Generate_Bug_Report():
         python Implementation: {platform.python_implementation()}
         Uname: {platform.uname()}
         ----Settings-------
-        {[f'{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}{n}' for i in dir(settings)]}
         """)
+        [f.write(f'\t{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}\n') for i in dir(settings)]
     pack_zip(inner, bugreport := os.path.join(output,
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
              silent=True)
