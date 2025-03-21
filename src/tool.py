@@ -2787,9 +2787,9 @@ class PackSuper(Toplevel):
         if not project_manger.exist():
             warn_win(text=lang.warn1)
             return False
-        packsuper(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(), super_type=self.super_type.get(),
-                  part_list=lbs, del_=sc,
-                  attrib=self.attrib.get())
+        pack_super(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(), super_type=self.super_type.get(),
+                   part_list=lbs, del_=sc,
+                   attrib=self.attrib.get())
 
     def verify_size(self):
         size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in self.tl.selected])
@@ -2861,8 +2861,8 @@ class PackSuper(Toplevel):
 
 
 @animation
-def packsuper(sparse:bool, group_name:str, size:int, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
-              output_dir: str = None, work: str = None):
+def pack_super(sparse:bool, group_name:str, size:int, super_type, part_list: list, del_=0, return_cmd=0, attrib='readonly',
+               output_dir: str = None, work: str = None):
     if not work:
         work = project_manger.current_work_path()
     if not output_dir:
