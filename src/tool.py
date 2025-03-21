@@ -2870,7 +2870,7 @@ def packsuper(sparse:bool, group_name:str, size, super_type, part_list: list, de
     lb_c = []
     for part in part_list:
         if part.endswith('_b') or part.endswith('_a'):
-            part = part.replace('_a', '').replace('_b', '')
+            part = part[:-2]
         if part not in lb_c:
             lb_c.append(part)
     part_list = lb_c
@@ -2890,7 +2890,7 @@ def packsuper(sparse:bool, group_name:str, size, super_type, part_list: list, de
         command += ["3", '-device', f'super:{size}', '--group', f"{group_name}_a:{size}"]
         for part in part_list:
             command += ['--partition',
-                        f"{part}_a:{attrib}:{os.path.getsize(work + part + '.img')}:{group_name}_a",
+                        f"{part}_a:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}_a",
                         '--image', f'{part}_a={work + part}.img']
         command += ["--group", f"{group_name}_b:{size}"]
         for part in part_list:
