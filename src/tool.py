@@ -1517,10 +1517,6 @@ class IconGrid(tk.Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
 
-"""
-"""
-
-
 class ModuleErrorCodes(IntEnum):
     Normal = 0
     PlatformNotSupport = 1
@@ -1558,10 +1554,10 @@ class ModuleManager:
             os.makedirs(self.module_dir, exist_ok=True)
         for i in os.listdir(self.module_dir):
             if self.get_installed(i):
-                script_path = self.module_dir + f"/{i}/"
-                if os.path.exists(script_path + "main.py") and imp:
+                script_path = f"{self.module_dir}/{i}"
+                if os.path.exists(f"{script_path}/main.py") and imp:
                     try:
-                        module = imp.load_source('__maddon__', script_path + "main.py")
+                        module = imp.load_source('__maddon__', f"{script_path}/main.py")
                         if hasattr(module, 'entrances'):
                             for entry, func in module.entrances.items():
                                 self.addon_loader.register(i, entry, func)
@@ -1742,7 +1738,7 @@ class ModuleManager:
             ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
             entry_value = tk.StringVar(value=value)
             entry = ttk.Entry(frame, textvariable=entry_value)
-            entry.pack(padx=5, pady=5, side=LEFT)
+            entry.pack(padx=5, pady=5, side=RIGHT)
             frame.pack(padx=5, pady=5, fill=X, side=side)
             return entry_value
 
@@ -1754,10 +1750,9 @@ class ModuleManager:
             if os.path.exists(f"{path}/main.py"):
                 editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
             elif not os.path.exists(f'{path}/main.sh'):
-                s = "main.sh"
-                with open(f'{path}/{s}', 'w+', encoding='utf-8', newline='\n') as sh:
+                with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
-                editor.main(path, s)
+                editor.main(path, "main.sh")
             else:
                 editor.main(path, 'main.sh')
 
