@@ -1514,6 +1514,16 @@ class IconGrid(tk.Frame):
         self.scrollable_frame.update_idletasks()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
+"""
+"""
+
+
+class ModuleErrorCodes(int):
+    Normal = 0
+    PlatformNotSupport = 1
+    DependsMissing = 2
+    IsBroken = 3
+moduleerrorcodes = ModuleErrorCodes()
 
 class ModuleManager:
     def __init__(self):
@@ -1524,18 +1534,10 @@ class ModuleManager:
         self.new = self.New
         self.new.module_dir = self.module_dir
         self.uninstall_gui.module_dir = self.module_dir
-
-        self.errorcodes = self.ErrorCodes()
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.addon_loader = loader
         self.addon_entries = Entry
         create_thread(self.load_plugins)
-
-    class ErrorCodes(int):
-        Normal = 0
-        PlatformNotSupport = 1
-        DependsMissing = 2
-        IsBroken = 3
 
     def is_virtual(self, id_):
         return id_ in self.addon_loader.virtual.keys()
@@ -1624,15 +1626,15 @@ class ModuleManager:
 
     def check_mpk(self, mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
-            return self.errorcodes.IsBroken, ''
+            return moduleerrorcodes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
             if 'info' not in f.namelist():
-                return self.errorcodes.IsBroken, ''
-        return self.errorcodes.Normal, ''
+                return moduleerrorcodes.IsBroken, ''
+        return moduleerrorcodes.Normal, ''
 
     def install(self, mpk):
         check_mpk_result = self.check_mpk(mpk)
-        if check_mpk_result[0] != self.errorcodes.Normal:
+        if check_mpk_result[0] != moduleerrorcodes.Normal:
             return check_mpk_result
         mconf = ConfigParser()
         with zipfile.ZipFile(mpk) as f:
@@ -1641,12 +1643,12 @@ class ModuleManager:
         try:
             supports = mconf.get('module', 'supports').split()
             if platform.system() not in supports:
-                return self.errorcodes.PlatformNotSupport, ''
+                return moduleerrorcodes.PlatformNotSupport, ''
         except (Exception, BaseException):
             logging.exception('Bugs')
         for dep in mconf.get('module', 'depend').split():
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                return self.errorcodes.DependsMissing, dep
+                return moduleerrorcodes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
             rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
@@ -1681,7 +1683,7 @@ class ModuleManager:
                         f.write(i.read())
 
         list_pls_plugin()
-        return self.errorcodes.Normal, ''
+        return moduleerrorcodes.Normal, ''
 
     @animation
     def export(self, id_: str):
@@ -2147,17 +2149,17 @@ class InstallMpk(Toplevel):
         self.prog.start()
         self.installb.config(state=DISABLED)
         ret, reason = ModuleManager.install(self.mpk)
-        if ret == ModuleManager.errorcodes.PlatformNotSupport:
+        if ret == moduleerrorcodes.PlatformNotSupport:
             self.state['text'] = lang.warn15.format(platform.system())
-        elif ret == ModuleManager.errorcodes.DependsMissing:
+        elif ret == moduleerrorcodes.DependsMissing:
             self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == ModuleManager.errorcodes.IsBroken:
+        elif ret == moduleerrorcodes.IsBroken:
             self.state['text'] = lang.warn2
             self.installb['text'] = lang.text37
             self.installb.config(state='normal')
-        elif ret == ModuleManager.errorcodes.Normal:
+        elif ret == moduleerrorcodes.Normal:
             self.state['text'] = lang.text39
             self.installb['text'] = lang.text34
             self.installb.config(state='normal')
