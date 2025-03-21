@@ -752,21 +752,7 @@ class Tool(Tk):
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
 
-    def support(self):
-        if states.donate_window:
-            return
-        states.donate_window = True
-        tab = ttk.LabelFrame(text=lang.text16)
-        tab.place(relx=0.5, rely=0.5, anchor="center")
-        Label(tab,
-              text=lang.t62,
-              font=(None, 20), fg='#008000').pack(padx=10, pady=10)
-        self.photo = PhotoImage(data=images.wechat_byte)
-        Label(tab, image=self.photo).pack(padx=5, pady=5)
-        Label(tab, text=lang.text109, font=(None, 12), fg='#00aafA').pack(padx=10, pady=10)
-        ttk.Button(tab, text=lang.text17,
-                   command=lambda: tab.destroy() == setattr(states, 'donate_window', False)).pack(
-            fill=X, side='bottom')
+
 
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0'):
@@ -863,7 +849,6 @@ class Tool(Tk):
         for i in [sf1, sf2, sf3, sf5, sf6, sf4]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
-        ttk.Button(self.tab3, text=lang.text16, command=self.support).pack(padx=10, pady=10, fill=X, side=BOTTOM)
 
 
 # win = Tool()
@@ -1171,8 +1156,7 @@ class Welcome(ttk.Frame):
             2: self.set_workdir,
             3: self.license,
             4: self.private,
-            5: self.support,
-            6: self.done
+            5: self.done
         }
         self.frame = ttk.Frame(self)
         self.frame.pack(expand=1, fill=BOTH)
@@ -1268,13 +1252,7 @@ class Welcome(ttk.Frame):
         te.pack(fill=BOTH, expand=True)
         ttk.Label(self.frame, text=lang.t3).pack()
 
-    def support(self):
-        ttk.Label(self.frame, text=lang.text16, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X
-                                                                      )
-        ttk.Separator(self.frame, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        self.photo = PhotoImage(data=images.wechat_byte)
-        Label(self.frame, image=self.photo).pack(padx=5, pady=5)
-        ttk.Label(self.frame, text=lang.text109).pack()
+
 
     def done(self):
         ttk.Label(self.frame, text=lang.t4, font=(None, 25)).pack(side='top', padx=10, pady=10, fill=X)
@@ -4757,7 +4735,7 @@ def __init__tk(args):
     settings.load()
     if settings.updating in ['1', '2']:
         Updater()
-    if int(settings.oobe) < 6:
+    if int(settings.oobe) < 5:
         Welcome()
     init_verify()
     try:
