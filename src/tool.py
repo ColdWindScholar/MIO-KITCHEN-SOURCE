@@ -1826,10 +1826,9 @@ class ModuleManager:
 
         def _radio(self, master, set, opins, side):
             self.gavs[set] = StringVar()
-            options = opins.split()
             pft1 = ttk.Frame(master)
             pft1.pack(padx=10, pady=10)
-            for option in options:
+            for option in opins.split():
                 text, value = option.split('|')
                 self.gavs[set].set(value)
                 ttk.Radiobutton(pft1, text=text, variable=self.gavs[set],
