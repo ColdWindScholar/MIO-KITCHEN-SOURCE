@@ -1859,6 +1859,7 @@ class ModuleManager:
                 padx=5, pady=5, fill=BOTH)
 
         def __unknown(self, master, type, side):
+            self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
             self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
 
         def _cancel(self):
@@ -1878,6 +1879,7 @@ class ModuleManager:
                 self.title(data['main']['info']['title'])
                 height = data['main']['info']['height']
                 width = data['main']['info']['weight']
+                self.w_assert = data['main']['info'].get('assert', "False")
                 if height != 'none' and width != 'none':
                     self.geometry(f"{width}x{height}")
                 resizable = data['main']['info']['resize']
