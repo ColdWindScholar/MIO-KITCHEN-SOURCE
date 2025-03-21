@@ -2655,16 +2655,17 @@ class PackHybridRom:
 
     @staticmethod
     def zstd_compress(path):
+        basename = os.path.basename(path)
         if os.path.exists(path):
             if gettype(path) == "sparse":
-                print(f"[INFO] {os.path.basename(path)} is (sparse), converting to (raw)")
+                print(f"[INFO] {basename} is (sparse), converting to (raw)")
                 utils.simg2img(path)
             try:
-                print(f"[Compress] {os.path.basename(path)}...")
+                print(f"[Compress] {basename}...")
                 call(['zstd', '-5', '--rm', path, '-o', f'{path}.zst'])
             except Exception as e:
                 logging.exception('Bugs')
-                print(f"[Fail] Compress {os.path.basename(path)} Fail:{e}")
+                print(f"[Fail] Compress {basename} Fail:{e}")
 
 class PackPayload(Toplevel):
     def __init__(self):
