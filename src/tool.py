@@ -1676,8 +1676,8 @@ class ModuleManager:
         except (Exception, BaseException):
             depends = ''
         minfo = {}
-        for i in mconf.items('module'):
-            minfo[i[0]] = i[1]
+        for n,v in mconf.items('module'):
+            minfo[n] = v
         minfo['depend'] = depends
         with open(os.path.join(cwd_path, "bin", "module", mconf.get('module', 'identifier'), "info.json"),
                   'w', encoding='utf-8') as f:
