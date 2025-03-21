@@ -2247,7 +2247,7 @@ def Generate_Bug_Report():
         python Implementation: {platform.python_implementation()}
         Uname: {platform.uname()}
         ----Settings-------
-        {[i + f'={getattr(settings, i)}{n}' for i in dir(settings)]}
+        {[f'{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}{n}' for i in dir(settings)]}
         """)
     pack_zip(inner, bugreport := os.path.join(output,
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
