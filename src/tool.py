@@ -4667,7 +4667,7 @@ class ParseCmdline:
         else:
             try:
                 self.__parse()
-            except (argparse.ArgumentError, ValueError) as e:
+            except (argparse.ArgumentError, ValueError):
                 logging.exception('CMD')
                 self.help([])
                 self.cmd_exit = '1'

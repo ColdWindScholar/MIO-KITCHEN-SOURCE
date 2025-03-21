@@ -268,23 +268,18 @@ def gettype(file) -> str:
         with open(fil, 'rb') as file_:
             try:
                 file_.seek(4096, 0)
+                return file_.read(4) == b'\x67\x44\x6c\x61'
             except EOFError:
                 return False
-            buf = bytearray(file_.read(4))
-        return buf == b'\x67\x44\x6c\x61'
 
     try:
         if is_super(file):
             return 'super'
     except IndexError:
         ...
-    for f_ in formats:
-        if len(f_) == 2:
-            if compare(f_[0]):
-                return f_[1]
-        elif len(f_) == 3:
-            if compare(f_[0], f_[2]):
-                return f_[1]
+    for header, desc, *offset in formats:
+        if compare(header, offset[0] if offset else 0):
+            return desc
     if not zero_start(file, 512) and tarfile.is_tarfile(file):
         return 'tar'
     try:
