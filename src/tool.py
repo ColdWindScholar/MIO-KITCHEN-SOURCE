@@ -1837,19 +1837,17 @@ class ModuleManager:
         def _input(self, master, set, text):
             input_frame = Frame(master)
             input_frame.pack(fill=X)
-            input_var_name = set
-            self.gavs[input_var_name] = StringVar()
+            self.gavs[set] = StringVar()
             if text != 'None':
                 ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
-            ttk.Entry(input_frame, textvariable=self.gavs[input_var_name]).pack(side=LEFT, pady=5,
+            ttk.Entry(input_frame, textvariable=self.gavs[set]).pack(side=LEFT, pady=5,
                                                                                 padx=5,
                                                                                 fill=X)
 
         def _checkbutton(self, master, set, text):
-            b_var_name = set
-            self.gavs[b_var_name] = IntVar()
+            self.gavs[set] = IntVar()
             text = '' if text == 'None' else text
-            ttk.Checkbutton(master, text=text, variable=self.gavs[b_var_name], onvalue=1,
+            ttk.Checkbutton(master, text=text, variable=self.gavs[set], onvalue=1,
                             offvalue=0,
                             style="Switch.TCheckbutton").pack(
                 padx=5, pady=5, fill=BOTH)
