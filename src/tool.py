@@ -1825,15 +1825,14 @@ class ModuleManager:
                            filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
 
         def _radio(self, master, set, opins, side):
-            radio_var_name = set
-            self.gavs[radio_var_name] = StringVar()
+            self.gavs[set] = StringVar()
             options = opins.split()
             pft1 = ttk.Frame(master)
             pft1.pack(padx=10, pady=10)
             for option in options:
                 text, value = option.split('|')
-                self.gavs[radio_var_name].set(value)
-                ttk.Radiobutton(pft1, text=text, variable=self.gavs[radio_var_name],
+                self.gavs[set].set(value)
+                ttk.Radiobutton(pft1, text=text, variable=self.gavs[set],
                                 value=value).pack(side=side)
 
         def _input(self, master, set, text):
