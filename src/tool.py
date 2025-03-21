@@ -3615,6 +3615,7 @@ def unpackrom(ifile) -> None:
                     win.message_pop(lang.warn4.format(member_name))
             print(lang.text81)
             if os.path.isdir(project_manger.current_work_path()):
+                project_menu.listdir()
                 project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
             script2fs(project_manger.current_work_path())
             unpackg.refs(True)
@@ -3644,6 +3645,7 @@ def unpackrom(ifile) -> None:
             if file_name.endswith(".bin"):
                 shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name[:-4] + ".img"))
         current_project_name.set(os.path.basename(folder))
+        project_menu.listdir()
         project_menu.set_project(current_project_name.get())
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
@@ -4232,9 +4234,8 @@ class ProjectMenuUtils(ttk.LabelFrame):
             ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
 
     def set_project(self, name):
-        if not os.path.isdir(os.path.join(settings.path, name)):
+        if not project_manger.exist(name):
             return
-        self.listdir()
         current_project_name.set(name)
 
     def listdir(self):
