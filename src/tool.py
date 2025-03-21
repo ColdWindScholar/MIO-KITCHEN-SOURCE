@@ -2521,7 +2521,7 @@ class MpkStore(Toplevel):
 
     def modify_repo(self):
         (input_var := StringVar()).set(settings.plugin_repo)
-        a = Toplevel(width=200)
+        a = Toplevel()
         a.title(lang.t58)
         ttk.Entry(a, textvariable=input_var, width=60).pack(pady=5, padx=5, fill=BOTH)
         ttk.Button(a, text=lang.ok,
