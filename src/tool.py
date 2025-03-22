@@ -1594,13 +1594,13 @@ class ModuleManager:
                     if not os.path.exists(os.path.join(self.module_dir, n)):
                         print(lang.text36 % (name, n, n))
                         return 2
+        if os.path.exists(f"{script_path}/main.json"):
+            values = self.Parse(f"{script_path}/main.json")
+            if values.cancel:
+                return 1
+        else:
+            values = None
         if os.path.exists(script_path + "main.sh"):
-            if os.path.exists(f"{script_path}/main.json"):
-                values = self.Parse(f"{script_path}/main.json")
-                if values.cancel:
-                    return 1
-            else:
-                values = None
             if not os.path.exists(temp):
                 re_folder(temp)
             exports = ''
@@ -1619,9 +1619,9 @@ class ModuleManager:
                       f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
-            self.addon_loader.run(id_, Entry.main)
+            self.addon_loader.run(id_, Entry.main, mapped_args=values.gavs)
         elif self.is_virtual(id_):
-            self.addon_loader.run(id_, Entry.main)
+            self.addon_loader.run(id_, Entry.main, mapped_args=values.gavs)
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls_plugin()

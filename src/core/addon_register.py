@@ -46,13 +46,18 @@ class PluginLoader(object):
         if entry == Entry.boot:
             self.run(id_, entry)
 
-    def run(self, id_: str = "addon", entry: Entry = Entry, *args, **kwargs):
+    def run(self, id_: str = "addon", entry: Entry = Entry,mapped_args:dict=None , *args, **kwargs):
         if not id_ in self.plugins.keys():
             print(f"{id_} is not callable.")
             return
         if not entry in self.plugins[id_].keys():
             print(f"{entry} not in {id_}")
             return
+        if mapped_args:
+            func = self.plugins[id_][entry]
+            varnames = func.__code__.co_varnames[:func.__code__.co_argcount]
+            args = [mapped_args.get(i).get() for i in varnames]
+            return func(*args)
         try:
             return self.plugins[id_][entry](*args, **kwargs)
         except TypeError:
