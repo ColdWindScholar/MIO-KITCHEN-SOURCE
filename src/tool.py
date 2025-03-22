@@ -1606,18 +1606,19 @@ class ModuleManager:
             values = self.Parse(f"{script_path}/main.json")
             if values.cancel:
                 return 1
+            values = values.gavs
         else:
-            values = None
+            values = {}
         if os.path.exists(script_path + "main.sh"):
             if not os.path.exists(temp):
                 re_folder(temp)
             exports = ''
             if os.path.exists(script_path + "main.sh"):
                 if values:
-                    for va in values.gavs.keys():
-                        if gva := values.gavs[va].get():
+                    for va in values.keys():
+                        if gva := values[va].get():
                             exports += f"export {va}='{gva}';"
-                    values.gavs.clear()
+                    values.clear()
                 exports += f"export tool_bin='{settings.tool_bin.replace(os.sep, '/')}';export version='{settings.version}';export language='{settings.language}';export bin='{script_path.replace(os.sep, '/')}';"
                 exports += f"export moddir='{self.module_dir.replace(os.sep, '/')}';export project_output='{project_manger.current_work_output_path()}';export project='{project_manger.current_work_path()}';"
 
@@ -1627,9 +1628,9 @@ class ModuleManager:
                       f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
             del exports
         elif os.path.exists(script_path + "main.py") and imp:
-            self.addon_loader.run(id_, Entry.main, mapped_args=values.gavs)
+            self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif self.is_virtual(id_):
-            self.addon_loader.run(id_, Entry.main, mapped_args=values.gavs)
+            self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif not os.path.exists(self.module_dir + os.sep + value):
             win.message_pop(lang.warn7.format(value))
             list_pls_plugin()
