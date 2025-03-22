@@ -4117,7 +4117,8 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
          f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
 
 
-def mke2fs(name, work, sparse, work_output, size=0, UTC=None):
+def mke2fs(name, work, sparse, work_output, size:int=0, UTC=None):
+    if isinstance(size,  str): size = int(size)
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
