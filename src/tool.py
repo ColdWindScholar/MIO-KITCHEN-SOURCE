@@ -1750,6 +1750,9 @@ class ModuleManager:
             if not id_:
                 win.message_pop(lang.warn2)
                 return
+            if module_manager.is_virtual(id_):
+                print(f"{id_} is a virtual plugin.")
+                return 1
             path = os.path.join(self.module_dir, id_)
             if os.path.exists(f"{path}/main.py"):
                 editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
