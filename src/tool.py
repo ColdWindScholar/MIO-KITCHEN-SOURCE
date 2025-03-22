@@ -94,6 +94,7 @@ from .core.undz import DZFileTools
 from .core.selinux_audit_allow import main as selinux_audit_allow
 import logging
 from enum import IntEnum
+
 is_pro = False
 try:
     from .pro.sn import v as verify
@@ -185,9 +186,15 @@ class LoadAnim:
     def __call__(self, func):
         @wraps(func)
         def call_func(*args, **kwargs):
+            return_value = None
+
+            def wrapper(*a, **k):
+                nonlocal return_value
+                return_value = func(*a, *k)
+
             create_thread(self.run())
             task_num = self.get_task_num()
-            task_real = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
+            task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
                 print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
@@ -201,6 +208,7 @@ class LoadAnim:
             del info, task_num
             if not self.tasks:
                 self.stop()
+            return return_value
 
         return call_func
 
@@ -1675,7 +1683,7 @@ class ModuleManager:
         except (Exception, BaseException):
             depends = ''
         minfo = {}
-        for n,v in mconf.items('module'):
+        for n, v in mconf.items('module'):
             minfo[n] = v
         minfo['depend'] = depends
         with open(os.path.join(cwd_path, "bin", "module", mconf.get('module', 'identifier'), "info.json"),
@@ -1849,8 +1857,8 @@ class ModuleManager:
             if text != 'None':
                 ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
             ttk.Entry(input_frame, textvariable=self.gavs[set]).pack(side=LEFT, pady=5,
-                                                                                padx=5,
-                                                                                fill=X)
+                                                                     padx=5,
+                                                                     fill=X)
 
         def _checkbutton(self, master, set, text):
             self.gavs[set] = IntVar()
@@ -1870,7 +1878,7 @@ class ModuleManager:
 
         def __init__(self, jsons):
             super().__init__()
-            self.protocol("WM_DELETE_WINDOW", lambda :self._cancel())
+            self.protocol("WM_DELETE_WINDOW", lambda: self._cancel())
             with open(jsons, 'r', encoding='UTF-8') as f:
                 try:
                     data = json.load(f)
@@ -3432,19 +3440,21 @@ class Packxx(Toplevel):
                                 except ValueError:
                                     ext4_size_value = 0
                     if self.dbfs.get() == "make_ext4fs":
-                        exit_code = make_ext4fs(name=dname, work=work, work_output=project_manger.current_work_output_path(), sparse=self.dbgs.get() in ["dat", "br", "sparse"], size=ext4_size_value, UTC=self.UTC.get())
+                        exit_code = make_ext4fs(name=dname, work=work,
+                                                work_output=project_manger.current_work_output_path(),
+                                                sparse=self.dbgs.get() in ["dat", "br", "sparse"], size=ext4_size_value,
+                                                UTC=self.UTC.get())
 
                     else:
                         exit_code = mke2fs(
-                        name=dname, work=work,
-                        work_output=project_manger.current_work_output_path(),
-                        sparse="y" if self.dbgs.get() in [
-                            "dat",
-                            "br",
-                            "sparse"] else 'n',
-                        size=ext4_size_value,
-                        UTC=self.UTC.get())
-                    print(exit_code, self.dbfs.get())
+                            name=dname, work=work,
+                            work_output=project_manger.current_work_output_path(),
+                            sparse="y" if self.dbgs.get() in [
+                                "dat",
+                                "br",
+                                "sparse"] else 'n',
+                            size=ext4_size_value,
+                            UTC=self.UTC.get())
                     if exit_code:
                         print(lang.text75 % dname)
                         continue
@@ -4083,7 +4093,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse:bool=False, size=0, UTC=None):
+def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0, UTC=None):
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
@@ -4091,7 +4101,8 @@ def make_ext4fs(name: str, work: str, work_output, sparse:bool=False, size=0, UT
         size = GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
-        ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', '-S', f'{work}/config/{name}_file_contexts', '-l', f'{size}',
+        ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', '-S', f'{work}/config/{name}_file_contexts', '-l',
+         f'{size}',
          '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', name, f"{work_output}/{name}.img",
          work + name])
 
@@ -4120,10 +4131,11 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
          f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
 
 
-def mke2fs(name, work, sparse, work_output, size:int=0, UTC=None):
-    if isinstance(size,  str): size = int(size)
+def mke2fs(name, work, sparse, work_output, size: int = 0, UTC=None):
+    if isinstance(size, str): size = int(size)
     print(lang.text91 % name)
-    size = GetFolderSize(work + name, 4096, 3, f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
+    size = GetFolderSize(work + name, 4096, 3,
+                         f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
     if not UTC:
         UTC = int(time.time())
