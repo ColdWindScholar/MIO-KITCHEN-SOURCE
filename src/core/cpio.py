@@ -233,8 +233,8 @@ def repack(input_dir, config_file, output_file: str, magic_type:CpioMagicFormat=
             else:
                 header.c_mode = pack_c_mode(value.get('file_type'), value.get('file_mode')).encode('utf-8')
                 is_mode = parser_c_mode(header.c_mode.decode('utf-8'))[0]
-                is_file =  is_mode == CpioModes.C_ISREG
-                is_link  = is_mode == CpioModes.C_ISLNK
+                is_file = is_mode == CpioModes.C_ISREG
+                is_link = is_mode == CpioModes.C_ISLNK
             header.c_uid = f"{value.get('c_uid', 0):08x}".encode('utf-8')
             header.c_gid = f"{value.get('c_gid', 0):08x}".encode('utf-8')
             header.c_nlink = f"{value.get('c_nlink', 1):08x}".encode('utf-8')

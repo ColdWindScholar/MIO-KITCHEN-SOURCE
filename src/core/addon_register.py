@@ -28,7 +28,7 @@ class PluginLoader(object):
         self.virtual = {}
 
     def register(self, id_: str = "addon", entry: Entry = Entry, func: None = None, virtual: bool = False,
-                 virtual_info: dict = None):
+                 virtual_info: dict = None, parent:str = 'addon'):
         if not func:
             logging.debug(f"{entry} of {id_} is {func}!")
         if id_ not in self.plugins:
@@ -40,6 +40,7 @@ class PluginLoader(object):
                 "name": id_,
                 "author": "",
                 "version": "",
+                "parent": parent
             }
             self.virtual[id_] = virtual_info
         if entry == Entry.boot:
