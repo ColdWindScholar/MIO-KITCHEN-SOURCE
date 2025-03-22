@@ -3449,10 +3449,10 @@ class Packxx(Toplevel):
                         exit_code = mke2fs(
                             name=dname, work=work,
                             work_output=project_manger.current_work_output_path(),
-                            sparse="y" if self.dbgs.get() in [
+                            sparse=self.dbgs.get() in [
                                 "dat",
                                 "br",
-                                "sparse"] else 'n',
+                                "sparse"],
                             size=ext4_size_value,
                             UTC=self.UTC.get())
                     if exit_code:
@@ -4131,7 +4131,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
          f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
 
 
-def mke2fs(name, work, sparse, work_output, size: int = 0, UTC=None):
+def mke2fs(name:str, work:str, sparse:bool, work_output:str, size: int = 0, UTC:int=None):
     if isinstance(size, str): size = int(size)
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 4096, 3,
@@ -4155,7 +4155,7 @@ def mke2fs(name, work, sparse, work_output, size: int = 0, UTC=None):
         rmdir(f'{work}/{name}_new.img')
         print(lang.text75 % name)
         return 1
-    if sparse == "y":
+    if sparse:
         call(['img2simg', f'{work_output}/{name}_new.img', f'{work_output}/{name}.img'])
         try:
             os.remove(f"{work_output}/{name}_new.img")
