@@ -3431,11 +3431,11 @@ class Packxx(Toplevel):
                                     ext4_size_value = int(f.read().strip())
                                 except ValueError:
                                     ext4_size_value = 0
+                    if self.dbfs.get() == "make_ext4fs":
+                        exit_code = make_ext4fs(name=dname, work=work, work_output=project_manger.current_work_output_path(), sparse=self.dbgs.get() in ["dat", "br", "sparse"], size=ext4_size_value, UTC=self.UTC.get())
 
-                    if make_ext4fs(name=dname, work=work, work_output=project_manger.current_work_output_path(),
-                                   sparse="-s" if self.dbgs.get() in ["dat", "br", "sparse"] else '',
-                                   size=ext4_size_value,
-                                   UTC=self.UTC.get()) if self.dbfs.get() == "make_ext4fs" else mke2fs(
+                    else:
+                        exit_code = mke2fs(
                         name=dname, work=work,
                         work_output=project_manger.current_work_output_path(),
                         sparse="y" if self.dbgs.get() in [
@@ -3443,9 +3443,12 @@ class Packxx(Toplevel):
                             "br",
                             "sparse"] else 'n',
                         size=ext4_size_value,
-                        UTC=self.UTC.get()) != 0:
+                        UTC=self.UTC.get())
+                    print(exit_code, self.dbfs.get())
+                    if exit_code:
                         print(lang.text75 % dname)
                         continue
+
                     if self.delywj.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
@@ -4080,7 +4083,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
+def make_ext4fs(name: str, work: str, work_output, sparse:bool=False, size=0, UTC=None):
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
@@ -4088,7 +4091,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse='', size=0, UTC=None):
         size = GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
     return call(
-        ['make_ext4fs', '-J', '-T', f'{UTC}', sparse, '-S', f'{work}/config/{name}_file_contexts', '-l', f'{size}',
+        ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', '-S', f'{work}/config/{name}_file_contexts', '-l', f'{size}',
          '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', name, f"{work_output}/{name}.img",
          work + name])
 
@@ -4120,7 +4123,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
 def mke2fs(name, work, sparse, work_output, size:int=0, UTC=None):
     if isinstance(size,  str): size = int(size)
     print(lang.text91 % name)
-    size = GetFolderSize(work + name, 4096, 3, work + "dynamic_partitions_op_list").rsize_v if not size else size / 4096
+    size = GetFolderSize(work + name, 4096, 3, f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
     print(f"{name}:[{size}]")
     if not UTC:
         UTC = int(time.time())
