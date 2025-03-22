@@ -190,7 +190,7 @@ class LoadAnim:
 
             def wrapper(*a, **k):
                 nonlocal return_value
-                return_value = func(*a, *k)
+                return_value = func(*a, **k)
 
             create_thread(self.run())
             task_num = self.get_task_num()
