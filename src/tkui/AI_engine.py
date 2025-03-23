@@ -20,13 +20,9 @@ suggester = MkcSugges(os.path.join(prog_path, 'bin', 'help_document.json'))
 
 
 def suggest(string: str = '', language='English', ok='ok'):
-    catch_error = [i for i in string.split("\n") if 'error' in i]
+    catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
     if not catch_error:
-        catch_error = [i for i in string.split("\n") if 'failed' in i]
-        if not catch_error:
-            return
-        else:
-            catch_error = catch_error[0]
+        return
     else:
         catch_error = catch_error[0]
     if not catch_error:
