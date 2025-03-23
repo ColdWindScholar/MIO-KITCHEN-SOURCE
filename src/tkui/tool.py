@@ -606,9 +606,6 @@ class ToolBox(ttk.Frame):
             self.button.configure(text=lang.done, state='normal', style='')
 
 
-
-
-
 class Tool(Tk):
     def __init__(self):
         super().__init__()
@@ -1009,7 +1006,7 @@ class Updater(Toplevel):
         self.progressbar['value'] = 100
         self.progressbar.update()
 
-    #fixme:Rewrite it.
+    # fixme:Rewrite it.
     def update_process(self):
         [terminate_process(i) for i in states.open_pids]
         self.notice.configure(text=lang.t51)
@@ -1540,25 +1537,29 @@ class ModuleManager:
             return self.addon_loader.virtual[id_].get("name", id_)
         return name if (name := self.get_info(id_, 'name')) else id_
 
+    def list_packages(self):
+        for i in os.listdir(self.module_dir):
+            if self.get_installed(i):
+                yield i
+
     def load_plugins(self):
         if not os.path.exists(self.module_dir) or not os.path.isdir(self.module_dir):
             os.makedirs(self.module_dir, exist_ok=True)
-        for i in os.listdir(self.module_dir):
-            if self.get_installed(i):
-                script_path = f"{self.module_dir}/{i}"
-                if os.path.exists(f"{script_path}/main.py") and imp:
-                    try:
-                        module = imp.load_source('__maddon__', f"{script_path}/main.py")
-                        if hasattr(module, 'entrances'):
-                            for entry, func in module.entrances.items():
-                                self.addon_loader.register(i, entry, func)
-                        elif hasattr(module, 'main'):
-                            self.addon_loader.register(i, self.addon_entries.main, module.main)
-                        else:
-                            print(
-                                f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
-                    except Exception:
-                        logging.exception('Bugs')
+        for i in self.list_packages():
+            script_path = f"{self.module_dir}/{i}"
+            if os.path.exists(f"{script_path}/main.py") and imp:
+                try:
+                    module = imp.load_source('__maddon__', f"{script_path}/main.py")
+                    if hasattr(module, 'entrances'):
+                        for entry, func in module.entrances.items():
+                            self.addon_loader.register(i, entry, func)
+                    elif hasattr(module, 'main'):
+                        self.addon_loader.register(i, self.addon_entries.main, module.main)
+                    else:
+                        print(
+                            f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
+                except Exception:
+                    logging.exception('Bugs')
 
     def get_info(self, id_: str, item: str, default: str = None) -> str:
         if not default:
@@ -1976,16 +1977,13 @@ class ModuleManager:
         def lsdep(self, name=None):
             if not name:
                 name = self.value
-            for i in [i for i in os.listdir(self.module_dir) if os.path.isdir(self.module_dir + os.sep + i)]:
-                if not os.path.exists(os.path.join(self.module_dir, i, "info.json")):
-                    continue
+            for i in [i for i in module_manager.list_packages()]:
                 for n in module_manager.get_info(i, 'depend').split():
                     if name == n:
                         self.arr[i] = module_manager.get_info(i, 'name')
                         self.lsdep(i)
                         # 检测到依赖后立即停止
                         break
-
 
         def uninstall(self):
             if not self.uninstall_b:
@@ -3505,7 +3503,7 @@ def script2fs(path):
         json_.write(parts)
 
 
-#fixme:Rewrite it.
+# fixme:Rewrite it.
 @animation
 def unpackrom(ifile) -> None:
     print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
@@ -3549,7 +3547,7 @@ def unpackrom(ifile) -> None:
         except:
             print(f"{ifile} remove Fail!!!")
         return
-    #tar
+    # tar
     if ftype == 'tar':
         print(lang.text79 + ifile)
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
@@ -3572,7 +3570,7 @@ def unpackrom(ifile) -> None:
                 DZFileTools(file, project_manger.current_work_path(),
                             extract_all=True)
         return
-    #ofp
+    # ofp
     if os.path.splitext(ifile)[1] == '.ofp':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         if ask_win(lang.t12) == 1:
@@ -3582,7 +3580,7 @@ def unpackrom(ifile) -> None:
             script2fs(project_manger.current_work_path())
         unpackg.refs(True)
         return
-    #ops
+    # ops
     if os.path.splitext(ifile)[1] == '.ops':
         current_project_name.set(os.path.basename(ifile).split('.')[0])
         args = {'decrypt': True,
@@ -4108,7 +4106,7 @@ def make_f2fs(name: str, work: str, work_output, UTC=None):
          f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
 
 
-def mke2fs(name:str, work:str, sparse:bool, work_output:str, size: int = 0, UTC:int=None):
+def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
     if isinstance(size, str): size = int(size)
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 4096, 3,
@@ -4300,8 +4298,8 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            #("打包 Payload", lambda: create_thread(PackPayload)),
-            #todo:finish it .
+            # ("打包 Payload", lambda: create_thread(PackPayload)),
+            # todo:finish it .
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
