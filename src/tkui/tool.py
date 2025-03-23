@@ -1937,7 +1937,6 @@ class ModuleManager:
             else:
                 self.check_pass = False
                 self.value = None
-                win.message_pop(lang.warn2)
             self.ask()
 
         def ask(self):
