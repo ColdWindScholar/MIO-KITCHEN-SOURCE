@@ -1560,12 +1560,14 @@ class ModuleManager:
                     except Exception:
                         logging.exception('Bugs')
 
-    def get_info(self, id_: str, item: str) -> str:
+    def get_info(self, id_: str, item: str, default: str = None) -> str:
+        if not default:
+            default = ''
         info_file = f'{self.module_dir}/{id_}/info.json'
         if not os.path.exists(info_file):
-            return ''
+            return default
         with open(info_file, 'r', encoding='UTF-8') as f:
-            return json.load(f).get(item, '')
+            return json.load(f).get(item, default)
 
     @animation
     def run(self, id_) -> int:
@@ -1977,14 +1979,13 @@ class ModuleManager:
             for i in [i for i in os.listdir(self.module_dir) if os.path.isdir(self.module_dir + os.sep + i)]:
                 if not os.path.exists(os.path.join(self.module_dir, i, "info.json")):
                     continue
-                with open(os.path.join(self.module_dir, i, "info.json"), 'r', encoding='UTF-8') as f:
-                    data = json.load(f)
-                    for n in data['depend'].split():
-                        if name == n:
-                            self.arr[i] = data['name']
-                            self.lsdep(i)
-                            # 检测到依赖后立即停止
-                            break
+                for n in module_manager.get_info(i, 'depend').split():
+                    if name == n:
+                        self.arr[i] = module_manager.get_info(i, 'name')
+                        self.lsdep(i)
+                        # 检测到依赖后立即停止
+                        break
+
 
         def uninstall(self):
             if not self.uninstall_b:
