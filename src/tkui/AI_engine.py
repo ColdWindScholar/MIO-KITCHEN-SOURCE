@@ -14,7 +14,7 @@
 import os.path
 from difflib import SequenceMatcher
 from tkinter import Toplevel, ttk, BOTH
-from .core.utils import move_center, prog_path, lang
+from ..core.utils import move_center, prog_path, lang
 from json import load
 with open(os.path.join(prog_path, 'bin', 'help_document.json'), 'r', encoding='utf-8') as f:
     library = load(f)

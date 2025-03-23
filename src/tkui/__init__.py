@@ -11,10 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from PyQt5.QtWidgets import QMainWindow
-
-
-class MainWindows(QMainWindow):
-    def __init__(self, parent=None):
-        super(MainWindows, self).__init__(parent)
-        self.setWindowTitle("MIO-KITCHEN")

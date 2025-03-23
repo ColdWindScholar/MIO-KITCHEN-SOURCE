@@ -23,12 +23,12 @@ import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-from .core.cpio import extract as cpio_extract, repack as cpio_repack
-from .core import tarsafe
-from .core.Magisk import Magisk_patch
-from .core.addon_register import loader, Entry
-from .core.romfs_parse import RomfsParse
-from .core.unkdz import KDZFileTools
+from ..core.cpio import extract as cpio_extract, repack as cpio_repack
+from ..core import tarsafe
+from ..core.Magisk import Magisk_patch
+from ..core.addon_register import loader, Entry
+from ..core.romfs_parse import RomfsParse
+from ..core.unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
     try:
@@ -59,8 +59,8 @@ from requests import ConnectTimeout, HTTPError
 import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
-from .core.dumper import Dumper
-from .core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
+from ..core.dumper import Dumper
+from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit
 
 if os.name == 'nt':
@@ -69,29 +69,29 @@ if os.name == 'nt':
 else:
     from .core import mkc_filedialog as filedialog
 
-from .core import imgextractor
-from .core import lpunpack
-from .core import mkdtboimg
-from .core import ozipdecrypt
-from .core import splituapp
-from .core import ofp_qc_decrypt
-from .core import ofp_mtk_decrypt
+from ..core import imgextractor
+from ..core import lpunpack
+from ..core import mkdtboimg
+from ..core import ozipdecrypt
+from ..core import splituapp
+from ..core import ofp_qc_decrypt
+from ..core import ofp_mtk_decrypt
 from . import editor
-from .core import opscrypto
-from .core import images
-from .core import extra
+from ..core import opscrypto
+from ..core import images
+from ..core import extra
 from . import AI_engine
-from .core import ext4
-from .core.config_parser import ConfigParser
-from .core import utils
+from ..core import ext4
+from ..core.config_parser import ConfigParser
+from ..core import utils
 
 if os.name == 'nt':
     from .sv_ttk_fixes import *
-from .core.extra import fspatch, re, contextpatch
-from .core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from ..core.extra import fspatch, re, contextpatch
+from ..core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from .controls import ListBox, ScrollFrame
-from .core.undz import DZFileTools
-from .core.selinux_audit_allow import main as selinux_audit_allow
+from ..core.undz import DZFileTools
+from ..core.selinux_audit_allow import main as selinux_audit_allow
 import logging
 from enum import IntEnum
 
