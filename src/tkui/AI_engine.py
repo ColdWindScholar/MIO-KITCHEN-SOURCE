@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os.path
-from difflib import SequenceMatcher
 from tkinter import Toplevel, ttk, BOTH
-from ..core.utils import move_center, prog_path, lang
-from json import load
-with open(os.path.join(prog_path, 'bin', 'help_document.json'), 'r', encoding='utf-8') as f:
-    library = load(f)
+
+from ..core.utils import move_center, prog_path, lang, MkcSugges
+
+suggester = MkcSugges(os.path.join(prog_path, 'bin', 'help_document.json'))
+
 
 def suggest(string: str = '', language='English', ok='ok'):
     catch_error = [i for i in string.split("\n") if 'error' in i]
@@ -31,33 +31,10 @@ def suggest(string: str = '', language='English', ok='ok'):
         catch_error = catch_error[0]
     if not catch_error:
         return
-    similarity = 0
     window = Toplevel()
     window.resizable(False, False)
     window.title("AI ENGINE")
-    text = f"No idea about:\n\t{string}\nPlease Report It To us."
-    detail = 'Unknown'
-    if string:
-        for i in library.keys():
-            if not language in library[i]:
-                language = 'English'
-            if 'detail' in library[i]:
-                try:
-                    detail = library[i]['detail'][language]
-                except (ValueError, KeyError):
-                    detail = 'Unknown'
-            similarity_ = SequenceMatcher(None, i, catch_error).quick_ratio()
-            if similarity_ >= 0.8:
-                text = library[i][language]
-                break
-            else:
-                if similarity_ > similarity:
-                    similarity = similarity_
-                    if similarity < 0.5:
-                        break
-                else:
-                    text = library[i][language]
-                    break
+    text, detail = suggester.get(prompt=string, language=language)
     f1 = ttk.LabelFrame(window, text=lang.detail)
     ttk.Label(f1, text=string, font=(None, 12), foreground="orange", wraplength=400).pack(padx=10, pady=5)
     ttk.Label(f1, text=detail, font=(None, 15),foreground="grey", wraplength=400).pack(padx=10, pady=10)

@@ -21,6 +21,7 @@ import struct
 import sys
 import tempfile
 import traceback
+from difflib import SequenceMatcher
 from os import getcwd
 from os.path import exists
 from random import randint, choice
@@ -685,3 +686,39 @@ class JsonEdit:
         data = self.read()
         data[name] = value
         self.write(data)
+
+class MkcSugges:
+    def __init__(self, help_file:str = 'None'):
+        if not help_file:
+            self.help_file = os.path.join(prog_path, 'bin', 'help_document.json')
+        else:
+            self.help_file = help_file
+        with open(self.help_file, 'r', encoding='utf-8') as f:
+            self.library = json.load(f)
+
+    def get(self, language: str, prompt: str):
+        similarity = 0
+        text = f"No idea about:\n\t{prompt}\nPlease Report It To us."
+        detail = 'Unknown'
+        if prompt:
+            for i in self.library.keys():
+                if not language in self.library[i]:
+                    language = 'English'
+                if 'detail' in self.library[i]:
+                    try:
+                        detail = self.library[i]['detail'][language]
+                    except (ValueError, KeyError):
+                        detail = 'Unknown'
+                similarity_ = SequenceMatcher(None, i, prompt).quick_ratio()
+                if similarity_ >= 0.8:
+                    text = self.library[i][language]
+                    break
+                else:
+                    similarity = max(similarity_, similarity)
+                    if similarity < 0.5:
+                        break
+                    else:
+                        text = self.library[i][language]
+                        break
+        return text, detail
+
