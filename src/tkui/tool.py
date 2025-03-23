@@ -67,7 +67,7 @@ if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
     from tkinter import filedialog
 else:
-    from .core import mkc_filedialog as filedialog
+    from ..core import mkc_filedialog as filedialog
 
 from ..core import imgextractor
 from ..core import lpunpack
@@ -97,20 +97,20 @@ from enum import IntEnum
 
 is_pro = False
 try:
-    from .pro.sn import v as verify
+    from ..pro.sn import v as verify
 
     is_pro = True
 except ImportError:
     is_pro = False
 if is_pro:
-    from .pro.active_ui import Active
+    from ..pro.active_ui import Active
 
 try:
-    from .core import imp
+    from ..core import imp
 except ImportError:
     imp = None
 try:
-    from .core.pycase import ensure_dir_case_sensitive
+    from ..core.pycase import ensure_dir_case_sensitive
 except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
