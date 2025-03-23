@@ -20,17 +20,10 @@ suggester = MkcSugges(os.path.join(prog_path, 'bin', 'help_document.json'))
 
 
 def suggest(string: str = '', language='English', ok='ok'):
-    catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
-    if not catch_error:
-        return
-    else:
-        catch_error = catch_error[0]
-    if not catch_error:
-        return
     window = Toplevel()
     window.resizable(False, False)
     window.title("AI ENGINE")
-    text, detail = suggester.get(prompt=string, language=language)
+    text, detail = suggester.get(prompt=suggester.catch_error(string), language=language)
     f1 = ttk.LabelFrame(window, text=lang.detail)
     ttk.Label(f1, text=string, font=(None, 12), foreground="orange", wraplength=400).pack(padx=10, pady=5)
     ttk.Label(f1, text=detail, font=(None, 15),foreground="grey", wraplength=400).pack(padx=10, pady=10)

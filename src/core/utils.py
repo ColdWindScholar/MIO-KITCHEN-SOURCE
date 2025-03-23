@@ -722,3 +722,12 @@ class MkcSugges:
                         break
         return text, detail
 
+    def catch_error(self, string):
+        catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
+        if not catch_error:
+            return
+        else:
+            catch_error = catch_error[0]
+        if not catch_error:
+            return
+        return catch_error
