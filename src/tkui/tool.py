@@ -23,10 +23,11 @@ import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-from ..core.cpio import extract as cpio_extract, repack as cpio_repack
+
 from ..core import tarsafe
 from ..core.Magisk import Magisk_patch
 from ..core.addon_register import loader, Entry
+from ..core.cpio import extract as cpio_extract, repack as cpio_repack
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
 
@@ -61,7 +62,7 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from ..core.dumper import Dumper
 from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -93,7 +94,6 @@ from .controls import ListBox, ScrollFrame
 from ..core.undz import DZFileTools
 from ..core.selinux_audit_allow import main as selinux_audit_allow
 import logging
-from enum import IntEnum
 
 is_pro = False
 try:
@@ -606,15 +606,7 @@ class ToolBox(ttk.Frame):
             self.button.configure(text=lang.done, state='normal', style='')
 
 
-class DevNull:
-    def __init__(self):
-        self.data = ''
 
-    def write(self, string):
-        self.data += string
-
-    def flush(self):
-        ...
 
 
 class Tool(Tk):
@@ -1523,13 +1515,6 @@ class IconGrid(tk.Frame):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
 
-class ModuleErrorCodes(IntEnum):
-    Normal = 0
-    PlatformNotSupport = 1
-    DependsMissing = 2
-    IsBroken = 3
-
-
 module_error_codes = ModuleErrorCodes
 
 
@@ -2394,15 +2379,6 @@ class Debugger(Toplevel):
         ttk.Button(ck, text=lang.ok, command=ck.destroy).pack(fill=X, side=BOTTOM)
         move_center(ck)
         ck.wait_window()
-
-
-def hum_convert(value):
-    units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    size = 1024.0
-    for i in range(len(units)):
-        if (value / size) < 1:
-            return f"{value:.2f}{units[i]}"
-        value = value / size
 
 
 class MpkStore(Toplevel):

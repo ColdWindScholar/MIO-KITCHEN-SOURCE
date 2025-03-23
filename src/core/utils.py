@@ -22,6 +22,7 @@ import sys
 import tempfile
 import traceback
 from difflib import SequenceMatcher
+from enum import IntEnum
 from os import getcwd
 from os.path import exists
 from random import randint, choice
@@ -720,7 +721,9 @@ class MkcSugges:
                     else:
                         text = self.library[i][language]
                         break
-        return text, detail
+            return text, detail
+        else:
+            return None, None
 
     def catch_error(self, string):
         catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
@@ -731,3 +734,28 @@ class MkcSugges:
         if not catch_error:
             return
         return catch_error
+
+class DevNull:
+    def __init__(self):
+        self.data = ''
+
+    def write(self, string):
+        self.data += string
+
+    def flush(self):
+        ...
+
+def hum_convert(value):
+    units = ["B", "KB", "MB", "GB", "TB", "PB"]
+    size = 1024.0
+    for i in range(len(units)):
+        if (value / size) < 1:
+            return f"{value:.2f}{units[i]}"
+        value = value / size
+
+class ModuleErrorCodes(IntEnum):
+    Normal = 0
+    PlatformNotSupport = 1
+    DependsMissing = 2
+    IsBroken = 3
+
