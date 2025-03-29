@@ -2703,6 +2703,7 @@ class PackSuper(Toplevel):
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
         self.delete_source_file = IntVar()
+        self.block_device_name = StringVar(value='super')
         self.selected = []
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
@@ -2747,8 +2748,6 @@ class PackSuper(Toplevel):
         self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: create_thread(self.generate))
         self.g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
-        self.read_list()
-        create_thread(self.refresh)
         move_center(self)
 
         ttk.Button(self, text=lang.cancel, command=self.destroy).pack(side='left', padx=10, pady=10,
@@ -2759,6 +2758,8 @@ class PackSuper(Toplevel):
             padx=5,
             pady=5, fill=X,
             expand=True)
+        self.read_list()
+        create_thread(self.refresh)
 
     def start_(self):
         try:
@@ -2778,7 +2779,7 @@ class PackSuper(Toplevel):
         pack_super(sparse=self.is_sparse.get(), group_name=self.group_name.get(), size=self.super_size.get(),
                    super_type=self.super_type.get(),
                    part_list=lbs, del_=sc,
-                   attrib=self.attrib.get())
+                   attrib=self.attrib.get(), block_device_name=self.block_device_name.get())
 
     def verify_size(self):
         size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in self.tl.selected])
@@ -2822,6 +2823,34 @@ class PackSuper(Toplevel):
                     self.tl.insert(f"{name} [{file_type}]", name, name in self.selected)
 
     def read_list(self):
+        #Read parts_config
+        parts_info = f"{self.work}/config/parts_info"
+        if os.path.exists(parts_info):
+            try:
+                data:dict = JsonEdit(parts_info).read().get('super_info')
+            except (Exception, BaseException):
+                logging.exception('PackSupper:read_parts_info')
+                return
+            # get block device name
+            for i in data.get('block_devices', []):
+                self.block_device_name.set(i.get('name', 'super'))
+                if isinstance(i.get('size'), int):
+                    self.super_size.set(i.get('size', self.super_size.get()))
+
+            for i in data.get('group_table', []):
+                name = i.get('name')
+                if isinstance(name, str) and name != 'default':
+                    self.group_name.set(name)
+
+            selected = []
+            for i in data.get('partition_table', []):
+                name = i.get('name')
+                if isinstance(name, str) and name not in selected:
+                    selected.append(name)
+            self.selected = selected
+
+
+        #Read dynamic_partitions_op_list
         list_file = f"{self.work}/dynamic_partitions_op_list"
         if os.path.exists(list_file):
             try:
@@ -2836,9 +2865,11 @@ class PackSuper(Toplevel):
                     self.super_type.set(2)
                     self.super_size.set(int(data[fir]['size']))
                     self.selected = data[fir].get('parts', [])
-                    selected = []
+                    selected = self.selected
                     for i in self.selected:
-                        selected.append(i[:-2]) if i.endswith('_a') or i.endswith('_b') else selected.append(i)
+                        name = i[:-2] if i.endswith('_a') or i.endswith('_b') else i
+                        if not name in selected:
+                            selected.append(name)
                     self.selected = selected
 
             else:
@@ -2852,7 +2883,9 @@ class PackSuper(Toplevel):
 @animation
 def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_=0, return_cmd=0,
                attrib='readonly',
-               output_dir: str = None, work: str = None):
+               output_dir: str = None, work: str = None, block_device_name:str='None'):
+    if not block_device_name:
+        block_device_name = 'super'
     if not work:
         work = project_manger.current_work_path()
     if not output_dir:
@@ -2870,9 +2903,9 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
                 os.rename(f'{work}/{part}_a.img', f'{work}/{part}.img')
             except:
                 logging.exception('Bugs')
-    command = ['lpmake', '--metadata-size', '65536', '-super-name', 'super', '-metadata-slots']
+    command = ['lpmake', '--metadata-size', '65536', '-super-name', block_device_name, '-metadata-slots']
     if super_type == 1:
-        command += ['2', '-device', f'super:{size}', "--group", f"{group_name}:{size}"]
+        command += ['2', '-device', f'{block_device_name}:{size}', "--group", f"{group_name}:{size}"]
         for part in part_list:
             command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}",
                         '--image', f'{part}={work}/{part}.img']
