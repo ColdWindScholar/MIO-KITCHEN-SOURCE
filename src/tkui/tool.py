@@ -124,8 +124,7 @@ if os.name == 'nt':
         get_parent = windll.user32.GetParent
         hwnd = get_parent(window.winfo_id())
         rendering_policy = dark_value
-        value = 2
-        value = c_int(value)
+        value = c_int(2)
         set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
         window.update()
 
