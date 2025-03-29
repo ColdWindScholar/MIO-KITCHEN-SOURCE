@@ -3739,14 +3739,14 @@ def unpack(chose, form: str = '') -> bool:
         return True
     for i in chose:
         if os.access(f"{work}/{i}.zst", os.F_OK):
-            print(lang.text79 + i + ".zst")
+            print(f"{lang.text79} {i}.zst")
             call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
             return True
         if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
-            print(lang.text79 + i + ".new.dat.xz")
+            print(lang.text79 + f"{i}.new.dat.xz")
             Unxz(f"{work}/{i}.new.dat.xz")
         if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
-            print(lang.text79 + i + ".new.dat.br")
+            print(lang.text79 + f"{i}.new.dat.br")
             call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
         if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
             with open(f"{work}/{i}.new.dat", 'ab') as ofd:
