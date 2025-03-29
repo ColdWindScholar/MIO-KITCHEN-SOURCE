@@ -3724,6 +3724,8 @@ def unpack(chose, form: str = '') -> bool:
             except (Exception, BaseException):
                 win.message_pop(lang.warn11.format("super.img"))
         if gettype(f"{work}/super.img") == 'super':
+            #should get info here.
+            parts["super_info"] = lpunpack.get_info(os.path.join(work, "super.img"))
             lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
             for file_name in os.listdir(work):
                 if file_name.endswith('_a.img') and not os.path.exists(work + file_name.replace('_a', '')):
@@ -4233,7 +4235,8 @@ class ProjectMenuUtils(ttk.LabelFrame):
         for text, func in functions:
             ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
 
-    def set_project(self, name):
+    @staticmethod
+    def set_project(name):
         if not project_manger.exist(name):
             return
         current_project_name.set(name)

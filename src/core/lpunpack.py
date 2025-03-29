@@ -821,7 +821,7 @@ class LpUnpack:
 
             size -= block_size
 
-    def get_info(self):
+    def get_parts(self):
         try:
             if SparseImage(self._fd).check():
                 print('Sparse image detected.')
@@ -897,6 +897,26 @@ class LpUnpack:
         finally:
             self._fd.close()
 
+    def get_info(self):
+        try:
+            if SparseImage(self._fd).check():
+                print('Sparse image detected.')
+                print('Process conversion to non sparse image...')
+                unsparse_file = SparseImage(self._fd).unsparse()
+                self._fd.close()
+                self._fd = open(str(unsparse_file), 'rb')
+                print('Result:[ok]')
+            self._fd.seek(0)
+            metadata = self._read_metadata()
+            if self._slot_num:
+                if self._slot_num > metadata.geometry.metadata_slot_count:
+                    raise LpUnpackError(f'Invalid metadata slot number: {self._slot_num}')
+            self._fd.close()
+            return metadata.info
+        except LpUnpackError as e:
+            print(e.message)
+            sys.exit(1)
+
 
 def unpack(file: str, out: str, parts: list = None):
     namespace = argparse.Namespace(SUPER_IMAGE=file, OUTPUT_DIR=out, SHOW_INFO=False, NAME=parts)
@@ -905,10 +925,16 @@ def unpack(file: str, out: str, parts: list = None):
     else:
         LpUnpack(**vars(namespace)).unpack()
 
+def get_info(file: str):
+    namespace = argparse.Namespace(SUPER_IMAGE=file)
+    if not os.path.exists(namespace.SUPER_IMAGE):
+        raise FileNotFoundError(f"{namespace.SUPER_IMAGE} Cannot Find")
+    else:
+        return LpUnpack(**vars(namespace)).get_info()
 
 def get_parts(file_):
     namespace = argparse.Namespace(SUPER_IMAGE=file_, SHOW_INFO=False)
     if not os.path.exists(namespace.SUPER_IMAGE):
         raise FileNotFoundError(f"{namespace.SUPER_IMAGE} Cannot Find")
     else:
-        return LpUnpack(**vars(namespace)).get_info()
+        return LpUnpack(**vars(namespace)).get_parts()
