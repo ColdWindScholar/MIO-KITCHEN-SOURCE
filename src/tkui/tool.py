@@ -3807,6 +3807,7 @@ def unpack(chose, form: str = '') -> bool:
                 parts[i] = gettype(f"{work}/{i}.img")
             print(lang.text79 + i + f".img[{file_type}]")
             if gettype(f"{work}/{i}.img") == 'super':
+                parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                 lpunpack.unpack(f"{work}/{i}.img", work)
                 for file_name in os.listdir(work):
                     if file_name.endswith('_a.img'):
@@ -3821,6 +3822,8 @@ def unpack(chose, form: str = '') -> bool:
                     if file_name.endswith('_b.img'):
                         if os.path.getsize(work + file_name) == 0:
                             os.remove(work + file_name)
+                json_.write(parts)
+                parts.clear()
             if (file_type := gettype(f"{work}/{i}.img")) == "ext":
                 with open(f"{work}/{i}.img", 'rb+') as e:
                     mount = ext4.Volume(e).get_mount_point
