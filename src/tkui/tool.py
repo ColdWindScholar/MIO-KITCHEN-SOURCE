@@ -3733,6 +3733,8 @@ def unpack(chose, form: str = '') -> bool:
                 if file_name.endswith('_b.img'):
                     if not os.path.getsize(work + file_name):
                         os.remove(work + file_name)
+            json_.write(parts)
+            parts.clear()
         return True
     elif form == 'update.app':
         splituapp.extract(f"{work}/UPDATE.APP", work, chose)
