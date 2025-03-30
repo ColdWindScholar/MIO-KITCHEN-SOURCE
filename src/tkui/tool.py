@@ -4122,7 +4122,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0,
     context_cmd = ['-S', f'{work}/config/{name}_file_contexts'] if has_contexts else []
     command = ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', *context_cmd, '-l',
          f'{size}',
-         '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', name, f"{work_output}/{name}.img",
+         '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', f'/{name}', f"{work_output}/{name}.img",
          work + name]
     return call(command)
 
