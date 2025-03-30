@@ -20,7 +20,10 @@ suggester = MkcSugges(os.path.join(prog_path, 'bin', 'help_document.json'))
 
 
 def suggest(string: str = '', language='English', ok='ok'):
-    text, detail = suggester.get(prompt=suggester.catch_error(string), language=language)
+    caught_error = suggester.catch_error(string)
+    if not caught_error:
+        return
+    text, detail = suggester.get(prompt=caught_error, language=language)
     if not text:
         return
     window = Toplevel()
