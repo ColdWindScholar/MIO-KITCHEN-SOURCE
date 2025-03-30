@@ -3381,9 +3381,11 @@ class Packxx(Toplevel):
                         logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(f"{work}/config", f"{dname}_fs_config"))
                 utils.qc(f"{work}/config/{dname}_fs_config")
-                if settings.contextpatch == "1":
-                    contextpatch.main(work + dname, f"{work}/config/{dname}_file_contexts")
-                utils.qc(f"{work}/config/{dname}_file_contexts")
+                contexts_file = f"{work}/config/{dname}_file_contexts"
+                if os.path.exists(contexts_file):
+                    if settings.contextpatch == "1":
+                        contextpatch.main(work + dname, contexts_file)
+                    utils.qc(contexts_file)
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
@@ -3449,7 +3451,7 @@ class Packxx(Toplevel):
                         exit_code = make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
                                                 sparse=self.dbgs.get() in ["dat", "br", "sparse"], size=ext4_size_value,
-                                                UTC=self.UTC.get())
+                                                UTC=self.UTC.get(), has_contexts=os.path.exists(contexts_file))
 
                     else:
                         exit_code = mke2fs(
@@ -4096,8 +4098,8 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
     extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
-    other_ = '-E legacy-compress' if old_kernel else ''
-    cmd = ['mkfs.erofs', *other_.split(), f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
+    other_ = ['-E', 'legacy-compress'] if old_kernel else []
+    cmd = ['mkfs.erofs', *other_, f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
            f'--product-out={work}',
            f'--fs-config-file={work}/config/{name}_fs_config',
            f'--file-contexts={work}/config/{name}_file_contexts',
@@ -4106,18 +4108,23 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0, UTC=None):
+def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0, UTC=None, has_contexts:bool=None):
+    if has_contexts is None:
+        has_contexts = True
+    else:
+        print('Warning:file_context not found!!!')
     print(lang.text91 % name)
     if not UTC:
         UTC = int(time.time())
     if not size:
         size = GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
     print(f"{name}:[{size}]")
-    return call(
-        ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', '-S', f'{work}/config/{name}_file_contexts', '-l',
+    context_cmd = ['-S', f'{work}/config/{name}_file_contexts'] if has_contexts else []
+    command = ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', *context_cmd, '-l',
          f'{size}',
          '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', name, f"{work_output}/{name}.img",
-         work + name])
+         work + name]
+    return call(command)
 
 
 @animation
@@ -4808,8 +4815,10 @@ def __init__tk(args):
         logging.exception('TclError')
         return
     win.gui()
-    globals()['unpackg'] = UnpackGui()
-    globals()["project_menu"] = ProjectMenuUtils()
+    global unpackg
+    unpackg = UnpackGui()
+    global project_menu
+    project_menu = ProjectMenuUtils()
     project_menu.gui()
     project_menu.listdir()
     unpackg.gui()
