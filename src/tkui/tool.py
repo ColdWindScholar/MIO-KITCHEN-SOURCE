@@ -4808,10 +4808,8 @@ def __init__tk(args):
         logging.exception('TclError')
         return
     win.gui()
-    global unpackg
-    unpackg = UnpackGui()
-    global project_menu
-    project_menu = ProjectMenuUtils()
+    globals()['unpackg'] = UnpackGui()
+    globals()["project_menu"] = ProjectMenuUtils()
     project_menu.gui()
     project_menu.listdir()
     unpackg.gui()
