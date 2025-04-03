@@ -421,7 +421,13 @@ class ToolBox(ttk.Frame):
     class FileBytes(Toplevel):
         def __init__(self):
             super().__init__()
-            self.values = ("B", "KB", "MB", "GB", 'TB')
+            self.units = {
+                "B": 2 ** 0,
+                "KB": 2 ** 10,
+                "MB": 2 ** 20,
+                "GB": 2 ** 30,
+                "TB": 2 ** 40
+            }
             self.title(lang.t60)
             self.gui()
 
@@ -431,14 +437,14 @@ class ToolBox(ttk.Frame):
             self.origin_size = ttk.Entry(self.f)
             self.origin_size.bind("<KeyRelease>", lambda *x: self.calc())
             self.origin_size.pack(side='left', padx=5)
-            self.h = ttk.Combobox(self.f, values=self.values, state='readonly', width=3)
+            self.h = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
             self.h.current(0)
             self.h.bind("<<ComboboxSelected>>", lambda *x: self.calc())
             self.h.pack(side='left', padx=5)
             Label(self.f, text='=').pack(side='left', padx=5)
             self.result_size = ttk.Entry(self.f)
             self.result_size.pack(side='left', padx=5)
-            self.f_ = ttk.Combobox(self.f, values=self.values, state='readonly', width=3)
+            self.f_ = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
             self.f_.current(0)
             self.f_.bind("<<ComboboxSelected>>", lambda *x: self.calc())
             self.f_.pack(side='left', padx=5)
@@ -449,8 +455,8 @@ class ToolBox(ttk.Frame):
             self.result_size.delete(0, tk.END)
             self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
 
-        @staticmethod
-        def __calc(origin: str, convert: str, size) -> str:
+
+        def __calc(self, origin: str, convert: str, size) -> str:
             if origin == convert:
                 if not size.isdigit():
                     return "0"
@@ -460,15 +466,7 @@ class ToolBox(ttk.Frame):
             except ValueError:
                 return "0"
 
-            units = {
-                "B": 2 ** 0,
-                "KB": 2 ** 10,
-                "MB": 2 ** 20,
-                "GB": 2 ** 30,
-                "TB": 2 ** 40
-            }
-
-            return str(origin_size * units[origin] / units[convert])
+            return str(origin_size * self.units[origin] / self.units[convert])
 
     class GetFileInfo(Toplevel):
         def __init__(self):
@@ -4851,7 +4849,7 @@ def __init__tk(args):
 init = lambda args: __init__tk(args)
 
 
-def restart(er=None):
+def restart(er:Toplevel=None):
     try:
         if animation.tasks:
             if not ask_win2("Your operation will not be saved."):
