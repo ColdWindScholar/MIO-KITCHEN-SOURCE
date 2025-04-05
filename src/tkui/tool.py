@@ -3249,7 +3249,7 @@ class Packxx(Toplevel):
 
         self.fs_conver = BooleanVar(value=False)
 
-        self.erofs_old_kernel = IntVar(value=0)
+        self.erofs_old_kernel = BooleanVar(value=False)
         if not self.verify():
             self.start_()
             return
@@ -3287,7 +3287,7 @@ class Packxx(Toplevel):
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
                      values=("lz4", "lz4hc", "lzma", "deflate", "zstd")).pack(side='left', padx=5, pady=5)
-        ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=1, offvalue=0,
+        ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
         # --
@@ -4040,18 +4040,19 @@ def ask_win2(text='', ok=None, cancel=None) -> int:
     return value.get()
 
 
-def info_win(text: str, ok: str = None):
+def info_win(text: str, ok: str = None, master: Toplevel=None):
     if ok is None:
         ok = lang.ok
-    ask = Toplevel()
-    frame_inner = ttk.Frame(ask)
+    if master is None:
+        master = Toplevel()
+    frame_inner = ttk.Frame(master)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    ttk.Button(frame_inner, text=ok, command=ask.destroy, style="Accent.TButton").pack(padx=5, pady=5,
+    ttk.Button(frame_inner, text=ok, command=master.destroy, style="Accent.TButton").pack(padx=5, pady=5,
                                                                                        fill=X, side='left',
                                                                                        expand=True)
-    move_center(ask)
-    ask.wait_window()
+    move_center(master)
+    master.wait_window()
 
 
 class GetFolderSize:
@@ -4158,7 +4159,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % (name, 'br'))
 
 
-def mkerofs(name: str, format_, work, work_output, level, old_kernel=0, UTC=None):
+def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False, UTC=None):
     if not UTC:
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
