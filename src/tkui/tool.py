@@ -4081,26 +4081,13 @@ class GetFolderSize:
     def rsize(self, size: int, num: int):
         if size <= 2097152:
             self.rsize_v = 2097152
-            bs = 1
         elif size <= 1048576:
             self.rsize_v = 1048576
-            bs = 1
         else:
             size_ = int(size)
-            if size_ > 2684354560:
-                bs = 1.0658
-            elif size_ <= 2684354560:
-                bs = 1.0758
-            elif size_ <= 1073741824:
-                bs = 1.0858
-            elif size_ <= 536870912:
-                bs = 1.0958
-            elif size_ <= 104857600:
-                bs = 1.1158
-            else:
-                bs = 1.1258
-            self.rsize_v = size_ * bs
-        print(f"Multiple:{bs}")
+            if size_ % 4096:
+                size_ = size_ + (4096 - size_ % 4096)
+            self.rsize_v = size_
         if self.get == 3:
             self.rsizelist(self.dname, self.rsize_v, self.list_f)
         self.rsize_v = int(self.rsize_v / num)
