@@ -2312,9 +2312,10 @@ class Debugger(Toplevel):
         move_center(self)
 
     def gui(self):
-        img = open_img(BytesIO(miside_banner.img)).resize((640, 206))
-        states.miside_banner = PhotoImage(img)
-        Label(self, image=states.miside_banner).grid(row=0, column=0, columnspan=3)
+        if not is_pro:
+            img = open_img(BytesIO(miside_banner.img)).resize((640, 206))
+            states.miside_banner = PhotoImage(img)
+            Label(self, image=states.miside_banner).grid(row=0, column=0, columnspan=3)
         row = 1
         num_max = 3
         num_c = 0
