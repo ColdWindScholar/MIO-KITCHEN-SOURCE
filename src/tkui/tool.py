@@ -62,7 +62,7 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from ..core.dumper import Dumper
 from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -3544,6 +3544,8 @@ class Packxx(Toplevel):
                 pack_dtbo()
             elif parts_dict[i] == 'logo':
                 logo_pack()
+            elif parts_dict[i] == 'guoke_logo':
+                GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
@@ -3938,6 +3940,8 @@ def unpack(chose, form: str = '') -> bool:
             if file_type == 'romfs':
                 fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
                 fs.extract(work)
+            if file_type == 'guoke_logo':
+                GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
             if file_type == "erofs":
                 if call(exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'), '-o',
                              work,

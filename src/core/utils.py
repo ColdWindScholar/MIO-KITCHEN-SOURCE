@@ -76,7 +76,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b']\x00\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff', 'lzma'], [b'\x02!L\x18', 'lz4_lg'],
            [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'],
            [b'(\x05\x00\x00$8"%', 'kdz'], [b"\x32\x96\x18\x74", 'dz'], [b'\xcf\xfa\xed\xfe', 'macos_bin'],
-           [b"-rom1fs-", 'romfs']
+           [b"-rom1fs-", 'romfs'], [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P', 'guoke_logo']
            )
 
 
@@ -96,6 +96,36 @@ if os.name == 'nt':
 else:
     def terminate_process(pid):
         os.kill(pid, 9)
+
+class GuoKeLogo:
+    def __init__(self):
+        self.offset = 8192
+        self.header_size = 128
+
+    def unpack(self, file:str, output_dir:str):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+        with open(file, 'rb') as f:
+            with open(os.path.join(output_dir, 'header'), 'wb') as header:
+                header.write(f.read(128))
+            with open(os.path.join(output_dir,'image.jpg'),'wb') as image:
+                f.seek(self.offset)
+                image.write(f.read())
+        print("Unpack Done!")
+
+    def pack(self, output_dir, file):
+        if os.path.exists(file):
+            os.remove(file)
+        if not os.path.exists(os.path.join(output_dir, 'header')) or not os.path.exists(os.path.join(output_dir, 'image.jpg')):
+            print('Cannot Pack The logo!:sth losing.')
+        with open(file,'wb') as f:
+            with open(os.path.join(output_dir, 'header'), 'rb') as header:
+                f.write(header.read())
+            with open(os.path.join(output_dir, 'image.jpg'), 'rb') as image:
+                f.write((self.offset - self.header_size)*b'\x00')
+                f.write(image.read())
+        print('Pack Done!')
+
 
 class Unxz:
     def __init__(self, file_path: str, remove_src: bool = True, buff_size: int = 8192):
