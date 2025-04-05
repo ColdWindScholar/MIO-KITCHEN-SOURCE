@@ -107,7 +107,7 @@ class GuoKeLogo:
             os.makedirs(output_dir, exist_ok=True)
         with open(file, 'rb') as f:
             with open(os.path.join(output_dir, 'header'), 'wb') as header:
-                header.write(f.read(128))
+                header.write(f.read(self.header_size))
             with open(os.path.join(output_dir,'image.jpg'),'wb') as image:
                 f.seek(self.offset)
                 image.write(f.read())
