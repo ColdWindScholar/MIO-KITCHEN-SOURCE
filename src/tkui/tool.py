@@ -24,7 +24,7 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from ..core import tarsafe
+from ..core import tarsafe, miside_banner
 from ..core.Magisk import Magisk_patch
 from ..core.addon_register import loader, Entry
 from ..core.cpio import extract as cpio_extract, repack as cpio_repack
@@ -2312,7 +2312,10 @@ class Debugger(Toplevel):
         move_center(self)
 
     def gui(self):
-        row = 0
+        img = open_img(BytesIO(miside_banner.img)).resize((640, 206))
+        states.miside_banner = PhotoImage(img)
+        Label(self, image=states.miside_banner).grid(row=0, column=0, columnspan=3)
+        row = 1
         num_max = 3
         num_c = 0
         functions = [
