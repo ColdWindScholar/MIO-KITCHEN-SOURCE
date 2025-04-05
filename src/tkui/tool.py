@@ -1462,6 +1462,7 @@ def logo_pack(origin_logo=None) -> int:
     os.remove(origin_logo)
     os.rename(logo, origin_logo)
     rmdir(dir_)
+    return 1
 
 
 class IconGrid(tk.Frame):
@@ -1623,7 +1624,8 @@ class ModuleManager:
             print(lang.warn8)
         return 0
 
-    def check_mpk(self, mpk):
+    @staticmethod
+    def check_mpk(mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return module_error_codes.IsBroken, ''
         with zipfile.ZipFile(mpk) as f:
