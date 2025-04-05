@@ -4159,7 +4159,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % (name, 'br'))
 
 
-def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False, UTC=None):
+def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False, UTC:int=None):
     if not UTC:
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
@@ -4174,7 +4174,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False,
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0, UTC=None, has_contexts:bool=None):
+def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size:int=0, UTC:int=None, has_contexts:bool=None):
     if has_contexts is None:
         has_contexts = True
     else:
@@ -4194,7 +4194,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size=0,
 
 
 @animation
-def make_f2fs(name: str, work: str, work_output, UTC=None):
+def make_f2fs(name: str, work: str, work_output:str, UTC:int=None):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
@@ -4258,7 +4258,7 @@ def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, 
 
 
 @animation
-def rmdir(path, quiet=False):
+def rmdir(path:str, quiet:bool=False):
     if not path:
         if not quiet:
             win.message_pop(lang.warn1)
@@ -4278,7 +4278,7 @@ def rmdir(path, quiet=False):
 
 
 @animation
-def pack_zip(input_dir=None, output_zip=None, silent=False):
+def pack_zip(input_dir:str=None, output_zip:str=None, silent:bool=False):
     if input_dir is None:
         input_dir = project_manger.current_work_output_path()
         if not project_manger.exist():
@@ -4308,7 +4308,7 @@ def pack_zip(input_dir=None, output_zip=None, silent=False):
         print(lang.text3.format(output_zip))
 
 
-def dndfile(files):
+def dndfile(files:list):
     for fi in files:
         if fi.endswith('}') and fi.startswith('{'):
             fi = fi[1:-1]
@@ -4495,7 +4495,7 @@ class UnpackGui(ttk.LabelFrame):
             self.fm.configure(state="disabled")
             self.refs2()
 
-    def refs(self, auto=False):
+    def refs(self, auto:bool=False):
         self.lsg.clear()
         work = project_manger.current_work_path()
         if not project_manger.exist():
@@ -4554,7 +4554,7 @@ class UnpackGui(ttk.LabelFrame):
             Packxx(lbs)
 
 
-def img2simg(path):
+def img2simg(path:str):
     call(['img2simg', path, f'{path}s'])
     if os.path.exists(path + 's'):
         try:
@@ -4852,7 +4852,7 @@ class ParseCmdline:
             return
 
 
-def __init__tk(args):
+def __init__tk(args:list):
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
