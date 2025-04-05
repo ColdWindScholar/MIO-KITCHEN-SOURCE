@@ -4161,10 +4161,8 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False,
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size:int=0, UTC:int=None, has_contexts:bool=None):
-    if has_contexts is None:
-        has_contexts = True
-    else:
+def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size:int=0, UTC:int=None, has_contexts:bool=True):
+    if not has_contexts:
         print('Warning:file_context not found!!!')
     print(lang.text91 % name)
     if not UTC:
