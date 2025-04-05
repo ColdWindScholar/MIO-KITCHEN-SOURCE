@@ -30,7 +30,7 @@ from ..core.addon_register import loader, Entry
 from ..core.cpio import extract as cpio_extract, repack as cpio_repack
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
-
+from ..core.qsb_imger import process_by_xml
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
@@ -229,7 +229,26 @@ class Toplevel(TkToplevel):
                 set_title_bar_color(self)
             else:
                 set_title_bar_color(self, 0)
-
+class CustomControls:
+    def __init__(self):
+        pass
+    @staticmethod
+    def filechose(master, textvariable: tk.Variable, text, is_folder:bool=False):
+        ft = ttk.Frame(master)
+        ft.pack(fill=X)
+        ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
+        ttk.Entry(ft, textvariable=textvariable).pack(side='left', padx=5, pady=5)
+        ttk.Button(ft, text=lang.text28,
+                   command=lambda: textvariable.set(
+                       filedialog.askopenfilename() if not is_folder else filedialog.askdirectory())).pack(side='left', padx=10, pady=10)
+    @staticmethod
+    def combobox(master, textvariable: tk.Variable,values ,text, state:str='normal'):
+        ft = ttk.Frame(master)
+        ft.pack(fill=X)
+        ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
+        ttk.Combobox(ft, textvariable=textvariable,
+                     values=values, state=state).pack(side='left', padx=5, pady=5)
+ccontrols = CustomControls()
 
 class ToolBox(ttk.Frame):
     def __init__(self, master):
@@ -257,6 +276,7 @@ class ToolBox(ttk.Frame):
             (lang.audit_allow, self.SelinuxAuditAllow),
             (lang.trim_image, self.TrimImage),
             (lang.magisk_patch, self.MagiskPatcher),
+            (lang.mergequalcommimage , self.MergeQualcommImage_old)
         ]
         width_controls = 3
         #
@@ -273,6 +293,42 @@ class ToolBox(ttk.Frame):
     def update_ui(self):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class MergeQualcommImage_old(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title(lang.mergequalcommimage)
+            self.rawprogram_xml = StringVar()
+            self.partition_name = StringVar()
+            self.output_path = StringVar()
+            self.gui()
+            move_center(self)
+        def gui(self):
+            ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
+            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
+            ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
+            ttk.Button(self, text=lang.run, command=lambda : create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+
+        def run(self):
+            rawprogram_xml = self.rawprogram_xml.get()
+            if not os.path.exists(rawprogram_xml):
+                print(f'Raw Program not exist!{rawprogram_xml}')
+                return 1
+            partition_name = self.partition_name.get()
+            output_path = self.output_path.get()
+            if not output_path:
+                print('Please Choose OutPut Path.')
+                return 1
+            if not os.path.exists(output_path):
+                os.makedirs(output_path, exist_ok=True)
+            self.destroy()
+            try:
+                process_by_xml(rawprogram_xml, partition_name, output_path)
+            except (Exception, BaseException) as e:
+                print('Merge Fail!')
+                logging.exception('MergeQC RAWPROGRAM')
+
+
 
     class MagiskPatcher(Toplevel):
         def __init__(self):
@@ -2666,6 +2722,7 @@ class PackPayload(Toplevel):
         self.virtual_ab = BooleanVar(value=True)
         self.part_list = []
         self.gui()
+        move_center(self)
 
     def gui(self):
         """Group Name"""
@@ -4344,8 +4401,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            # ("打包 Payload", lambda: create_thread(PackPayload)),
-            # todo:finish it .
+            #("打包 Payload", lambda: create_thread(PackPayload)),
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
