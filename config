@@ -15,6 +15,7 @@
 # limitations under the License.
 import argparse
 import os
+import platform
 import zipfile
 from functools import wraps
 from sys import exit
@@ -25,6 +26,7 @@ import warnings
 import re
 warnings.warn = lambda *args:...
 temp = 'bin/temp'
+tool_bin = os.path.join('bin', platform.system(), platform.machine())
 update_info = 'bin/update.json'
 LOGE = lambda info: print('[%s] \033[91m[ERROR]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
 LOGS = lambda info: print('[%s] \033[92m[SUCCESS]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
@@ -179,14 +181,20 @@ def update(args):
                             z.extract(z_name, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
                 JsonEdit(update_info).write(origin_info)
-        else:
-            pass
+@caller
+def check_supported(args):
+    if os.path.exists(tool_bin):
+        LOGS("Your Device was Supported!")
+    else:
+        LOGE("Your Device Was Not supported Yet.")
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN/TIK', exit_on_error=False)
     subparser = parser.add_subparsers(title='Supported subcommands',
                                            description='Valid subcommands')
     unpack_rom_parser = subparser.add_parser('upbin', help="update binary")
     unpack_rom_parser.set_defaults(func=update)
+    check_support = subparser.add_parser('chksupd', help='check if supported this machine')
+    check_support.set_defaults(func=check_supported)
     subcmd, subcmd_args = parser.parse_known_args()
     if not hasattr(subcmd, 'func'):
         parser.print_help()
