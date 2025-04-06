@@ -877,8 +877,8 @@ class Tool(Tk):
 
         def enable_contextpatch():
             if context.get() == '1':
-                if ask_win2(
-                        lang.warn18):
+                if ask_win(
+                        lang.warn18, is_top=True):
                     settings.set_value('contextpatch', context.get())
                 else:
                     context.set('0')
@@ -2828,7 +2828,7 @@ class PackSuper(Toplevel):
             self.super_size.set(0)
             logging.exception('Bugs')
         if not self.verify_size():
-            ask_win2(lang.t10.format(self.super_size.get()))
+            ask_win(lang.t10.format(self.super_size.get()), is_top=True)
             return False
         lbs = self.tl.selected.copy()
         sc = self.delete_source_file.get()
@@ -3981,14 +3981,18 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top:bool=False) -> int:
     if not ok:
         ok = lang.ok
     if not cancel:
         cancel = lang.cancel
     value = IntVar()
-    ask = ttk.LabelFrame(win)
-    ask.place(relx=0.5, rely=0.5, anchor="center")
+    if is_top:
+        ask = Toplevel()
+        move_center(ask)
+    else:
+        ask = ttk.LabelFrame(win)
+        ask.place(relx=0.5, rely=0.5, anchor="center")
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
@@ -4008,35 +4012,6 @@ def ask_win(text='', ok=None, cancel=None, wait=True) -> int:
 
     if wait:
         ask.wait_window()
-    return value.get()
-
-
-def ask_win2(text='', ok=None, cancel=None) -> int:
-    if not ok:
-        ok = lang.ok
-    if not cancel:
-        cancel = lang.cancel
-    value = IntVar()
-    ask = Toplevel()
-    frame_inner = ttk.Frame(ask)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    frame_button = ttk.Frame(frame_inner)
-
-    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(padx=5, pady=5, fill=X, side='left',
-                                                                             expand=True)
-    ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(padx=5,
-                                                                                                 pady=5,
-                                                                                                 fill=X, side='left',
-                                                                                                 expand=True)
-    frame_button.pack(fill=X, expand=True, padx=10, pady=5)
-
-    def close_ask(value_=1):
-        value.set(value_)
-        ask.destroy()
-
-    move_center(ask)
-    ask.wait_window()
     return value.get()
 
 
@@ -4717,7 +4692,7 @@ def init_verify():
     if not os.path.exists(settings.tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():
-        ask_win2(lang.warn16 % lang.special_words)
+        ask_win(lang.warn16 % lang.special_words, is_top=True)
 
 
 def exit_tool():
@@ -4904,7 +4879,7 @@ init = lambda args: __init__tk(args)
 def restart(er:Toplevel=None):
     try:
         if animation.tasks:
-            if not ask_win2("Your operation will not be saved."):
+            if not ask_win("Your operation will not be saved.", is_top=True):
                 return
     except (TclError, ValueError, AttributeError):
         logging.exception('Restart')
