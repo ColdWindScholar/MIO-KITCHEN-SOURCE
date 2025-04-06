@@ -89,9 +89,7 @@ def crc16(crc: int, src: bytes):
     return crc
 
 def check_path(path):
-    INVALID_STR = [
-        "/", "\\", ":"
-    ]
+    INVALID_STR = ["/", "\\", ":"]
     for s in INVALID_STR:
         if s in path:
             return False
