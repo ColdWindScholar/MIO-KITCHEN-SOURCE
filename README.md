@@ -48,6 +48,7 @@
 | Supported File Types |
 |----------------------|
 | Zip                  |
+| Sprd PAC             |
 | ops                  |
 | Ozip                 |
 | tar.md5              |
