@@ -54,6 +54,26 @@
 | kdz/dz               |
 | ofp                  |
 | tar.gz               |
+## The MIO-KITCHEN Manager
+>[!NOTE]
+>Its a utils to manage MIO-KITCHEN tool.
+<details><summary>Update Prebulit Binary</summary>
+
+```` shell
+python3 config upbin
+````
+
+</details>
+
+<details><summary>Check If Supported My Machine</summary>
+
+```` shell
+python3 config chksupd
+````
+
+</details>
+
+
 ## Start To Use
 > [!NOTE]
 > Currently Only Support Python 3.8 and Newer!
