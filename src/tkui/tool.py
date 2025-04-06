@@ -3689,6 +3689,9 @@ def unpackrom(ifile) -> None:
     if gettype(ifile) == 'pac':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
+        if settings.auto_unpack == '1':
+            unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+        return
     #zip
     if gettype(ifile) == 'zip':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
