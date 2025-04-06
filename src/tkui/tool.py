@@ -726,7 +726,7 @@ class Tool(Tk):
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
         self.tsk.pack(padx=10, pady=10, side='top')
         tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
-        tr2 = Label(tr, text=lang.text132 + '\n(ozip zip tar.md5 tar tar.gz kdz dz ops ofp ext4 erofs boot img)')
+        tr2 = Label(tr, text=lang.text132 + '\n(pac ozip zip tar.md5 tar tar.gz kdz dz ops ofp ext4 erofs boot img)')
         tr2.pack(padx=10, pady=10, side='bottom')
         tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
