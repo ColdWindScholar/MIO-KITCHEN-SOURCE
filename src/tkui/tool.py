@@ -85,7 +85,7 @@ from . import AI_engine
 from ..core import ext4
 from ..core.config_parser import ConfigParser
 from ..core import utils
-
+from ..core.unpac import MODE as PACMODE, unpac
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from ..core.extra import fspatch, re, contextpatch
@@ -3685,7 +3685,11 @@ def unpackrom(ifile) -> None:
         opscrypto.main(args)
         unpackg.refs(True)
         return
-    # zip
+    # pac
+    if gettype(ifile) == 'pac':
+        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+        unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
+    #zip
     if gettype(ifile) == 'zip':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         with zipfile.ZipFile(ifile, 'r') as fz:
