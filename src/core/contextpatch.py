@@ -16,6 +16,7 @@
 # limitations under the License.
 import os
 from re import escape
+from typing import Any, Generator, Union, Optional
 
 fix_permission = {
     "system/app/*/.apk": "u:object_r:system_file:s0",
@@ -47,7 +48,7 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
     return context
 
 
-def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
+def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读取解包的目录，返回一个字典
     part_name = os.path.basename(folder)
     allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}', f'/{part_name}/']
     for root, dirs, files in os.walk(folder, topdown=True):
@@ -57,9 +58,7 @@ def scan_dir(folder) -> list:  # 读取解包的目录，返回一个字典
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
         yield from allfiles
 
-
-def str_to_selinux(string: str):
-    return escape(string).replace('\\-', '-')
+str_to_selinux = lambda string: escape(string).replace('\\-', '-')
 
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
@@ -73,12 +72,8 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     for i in scan_dir(os.path.abspath(dir_path)):
         # 把不可打印字符替换为*
         if not i.isprintable():
-            tmp = ''
-            for c in i:
-                tmp += c if c.isprintable() else '*'
-            i = tmp
-        if ' ' in i:
-            i = i.replace(' ', '*')
+            i = ''.join([c if c.isprintable() or not c.strip(' ') else '*' for c in i])
+
         i = str_to_selinux(i)
         if fs_file.get(i):
             # 如果存在直接使用默认的
