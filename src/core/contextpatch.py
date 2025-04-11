@@ -19,8 +19,6 @@ from re import escape
 from typing import Any, Generator, Union, Optional
 
 
-
-
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
     with open(file, "r", encoding='utf-8') as file_:
@@ -46,6 +44,7 @@ def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读�
         for file in files:
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
         yield from allfiles
+
 
 str_to_selinux = lambda string: escape(string).replace('\\-', '-')
 
