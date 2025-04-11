@@ -54,7 +54,7 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     # 定义已修补过的 避免重复修补
     r_new_fs = {}
     add_new = 0
-    print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d}" + " entries")
+    print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d} entire")
     # 定义默认SeLinux标签
     permission_d = ['u:object_r:system_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
@@ -64,18 +64,12 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
         if fs_file.get(i):
             new_fs[i] = fs_file[i]
         else:
-            permission = None
             if r_new_fs.get(i):
                 continue
-            if i:
-                if not permission:
-                    permission = permission_d
-            if " " in permission[0]:
-                permission = [permission[0].replace(' ', '')]
-            print(f"ADD [{i} {permission}]")
+            print(f"ADD [{i} {permission_d}]")
             add_new += 1
-            r_new_fs[i] = permission
-            new_fs[i] = permission
+            r_new_fs[i] = permission_d
+            new_fs[i] = permission_d
     return new_fs, add_new
 
 
