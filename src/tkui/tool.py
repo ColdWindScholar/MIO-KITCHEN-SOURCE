@@ -4857,7 +4857,8 @@ def __init__tk(args:list):
     Frame3().gui()
     animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
     animation.init()
-    print(lang.text108)
+    if not is_pro:
+        print(lang.text108)
     if is_pro:
         if not verify.state:
             Active(verify, settings, win, images, lang).gui()
