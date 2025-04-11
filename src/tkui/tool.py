@@ -696,14 +696,16 @@ class Tool(Tk):
         self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True)
         self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True)
         self.notepad = ttk.Notebook(self.sub_win2)
-        self.tab = ttk.Frame(self.notepad)
+        if not is_pro:
+            self.tab = ttk.Frame(self.notepad)
         self.tab2 = ttk.Frame(self.notepad)
         self.tab3 = ttk.Frame(self.notepad)
         self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
         self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
-        self.notepad.add(self.tab, text=lang.text11)
+        if not is_pro:
+            self.notepad.add(self.tab, text=lang.text11)
         self.notepad.add(self.tab2, text=lang.text12)
         self.notepad.add(self.tab7, text=lang.text19)
         self.notepad.add(self.tab3, text=lang.text13)
@@ -720,7 +722,8 @@ class Tool(Tk):
         self.tab4_content()
         self.tab6_content()
         self.setting_tab()
-        self.tab_content()
+        if not is_pro:
+            self.tab_content()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
