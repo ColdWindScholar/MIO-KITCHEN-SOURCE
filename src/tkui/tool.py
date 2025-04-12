@@ -2894,7 +2894,6 @@ class PackSuper(Toplevel):
                 data:dict = JsonEdit(parts_info).read().get('super_info')
             except (Exception, BaseException, AttributeError):
                 logging.exception('PackSupper:read_parts_info')
-                return
             else:
                 # get block device name
                 for i in data.get('block_devices', []):
