@@ -19,6 +19,7 @@ from re import escape, search
 from typing import Any, Generator, Union, Optional
 from .utils import JsonEdit
 
+
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
     with open(file, "r", encoding='utf-8') as file_:
@@ -37,7 +38,8 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
 
 def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读取解包的目录，返回一个字典
     part_name = os.path.basename(folder)
-    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}', f'/{part_name}/', f'/{part_name}(/.*)?']
+    allfiles = ['/', '/lost+found', f'/{part_name}/lost+found', f'/{part_name}', f'/{part_name}/',
+                fr'/{part_name}(/.*)?']
     for root, dirs, files in os.walk(folder, topdown=True):
         for dir_ in dirs:
             yield os.path.join(root, dir_).replace(folder, '/' + part_name).replace('\\', '/')
@@ -45,10 +47,11 @@ def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读�
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
         yield from allfiles
 
-str_to_selinux = lambda string: escape(string).replace('\\-', '-')
+
+str_to_selinux = lambda string: escape(string).replace('\\-', '-') if not string.endswith('(/.*)?') else string
 
 
-def context_patch(fs_file, dir_path, fix_permission:dict) -> tuple:  # 接收两个字典对比
+def context_patch(fs_file, dir_path, fix_permission: dict) -> tuple:  # 接收两个字典对比
     new_fs = {}
     # 定义已修补过的 避免重复修补
     r_new_fs = {}
@@ -60,8 +63,8 @@ def context_patch(fs_file, dir_path, fix_permission:dict) -> tuple:  # 接收两
         # 把不可打印字符替换为*
         if not i.isprintable():
             i = ''.join([c if c.isprintable() or not c.strip(' ') else '*' for c in i])
-
         i = str_to_selinux(i)
+
         if fs_file.get(i):
             # 如果存在直接使用默认的
             new_fs[i] = fs_file[i]
@@ -89,7 +92,7 @@ def context_patch(fs_file, dir_path, fix_permission:dict) -> tuple:  # 接收两
 
 def main(dir_path, fs_config, fix_permission_file) -> None:
     if fix_permission_file is not None:
-        fix_permission:dict = JsonEdit(fix_permission_file).read()
+        fix_permission: dict = JsonEdit(fix_permission_file).read()
     else:
         fix_permission = {}
     new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path, fix_permission)
