@@ -26,10 +26,10 @@ def scan_context(file) -> dict:  # 读取context文件返回一个字典
             if not i.strip():
                 print('[W] data is empty!')
                 continue
-            filepath, *other = i.strip().split()
+            filepath, rule, *other = i.strip().split()
             filepath = filepath.replace(r'\@', '@')
-            context[filepath] = other
-            if len(other) > 1:
+            context[filepath] = rule
+            if len(other) > 0:
                 print(f"[Warn] {i[0]} has too much data.Skip.")
                 del context[filepath]
     return context
@@ -55,7 +55,7 @@ def context_patch(fs_file, dir_path, fix_permission:dict) -> tuple:  # 接收两
     add_new = 0
     print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d} entries")
     # 定义默认SeLinux标签
-    permission_d = ['u:object_r:system_file:s0']
+    permission_d = 'u:object_r:system_file:s0'
     for i in scan_dir(os.path.abspath(dir_path)):
         # 把不可打印字符替换为*
         if not i.isprintable():

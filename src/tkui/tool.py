@@ -3450,6 +3450,10 @@ class Packxx(Toplevel):
                 if os.path.exists(contexts_file):
                     if settings.contextpatch == "1":
                         contextpatch.main(work + dname, contexts_file, context_rule_file)
+                        new_rules = contextpatch.scan_context(contexts_file)
+                        rules = JsonEdit(context_rule_file)
+                        rules.write(rules.read()|new_rules)
+
                     utils.qc(contexts_file)
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
