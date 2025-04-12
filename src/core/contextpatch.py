@@ -18,6 +18,19 @@ import os
 from re import escape
 from typing import Any, Generator, Union, Optional
 
+fix_permission = {
+    "system/app/*/.apk": "u:object_r:system_file:s0",
+    "data-app/.apk": "u:object_r:system_file:s0",
+    "android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0",
+    "bin/idmap": "u:object_r:idmap_exec:s0",
+    "bin/fsck": "u:object_r:fsck_exec:s0",
+    "bin/e2fsck": "u:object_r:fsck_exec:s0",
+    "bin/logcat": "u:object_r:logcat_exec:s0",
+    "system/bin": "u:object_r:system_file:s0",
+    "/system/bin/init": "u:object_r:init_exec:s0",
+    r"/lost\+found": "u:object_r:rootfs:s0"
+}
+
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
@@ -45,27 +58,44 @@ def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读�
             yield os.path.join(root, file).replace(folder, '/' + part_name).replace('\\', '/')
         yield from allfiles
 
-
 str_to_selinux = lambda string: escape(string).replace('\\-', '-')
 
 
 def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     new_fs = {}
+    # 定义已修补过的 避免重复修补
+    r_new_fs = {}
     add_new = 0
-    print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d} entire")
+    print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d} entries")
+    # 定义默认SeLinux标签
     permission_d = ['u:object_r:system_file:s0']
     for i in scan_dir(os.path.abspath(dir_path)):
+        # 把不可打印字符替换为*
         if not i.isprintable():
             i = ''.join([c if c.isprintable() or not c.strip(' ') else '*' for c in i])
+
         i = str_to_selinux(i)
         if fs_file.get(i):
+            # 如果存在直接使用默认的
             new_fs[i] = fs_file[i]
         else:
-            if new_fs.get(i):
+            permission = None
+            if r_new_fs.get(i):
                 continue
-            print(f"ADD [{i} {permission_d}]")
+            # 确认i不为空
+            if i:
+                # 搜索已定义的权限
+                for f in fix_permission.keys():
+                    if f in i:
+                        permission = [fix_permission[f]]
+                if not permission:
+                    permission = permission_d
+            if " " in permission[0]:
+                permission = [permission[0].replace(' ', '')]
+            print(f"ADD [{i} {permission}]")
             add_new += 1
-            new_fs[i] = permission_d
+            r_new_fs[i] = permission
+            new_fs[i] = permission
     return new_fs, add_new
 
 
