@@ -154,6 +154,9 @@ class Extractor:
                 self.scan_dir(entry_inode, entry_inode_path)
             elif entry_inode.is_file:
                 file_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
+                file_target_dirname = os.path.dirname(file_target)
+                if not os.path.exists(file_target_dirname):
+                    os.makedirs(file_target_dirname, exist_ok=True)
                 try:
                     with open(file_target, 'wb') as out:
                         out.write(entry_inode.open_read().read())
