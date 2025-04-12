@@ -3452,7 +3452,7 @@ class Packxx(Toplevel):
                         contextpatch.main(work + dname, contexts_file, context_rule_file)
                         new_rules = contextpatch.scan_context(contexts_file)
                         rules = JsonEdit(context_rule_file)
-                        rules.write(rules.read()|new_rules)
+                        rules.write(new_rules|rules.read())
 
                     utils.qc(contexts_file)
                 if self.fs_conver.get():
