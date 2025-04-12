@@ -713,6 +713,9 @@ class JsonEdit:
                 return {}
 
     def write(self, data):
+        dirname = os.path.dirname(self.file)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname, exist_ok=True)
         with open(self.file, 'w+', encoding='utf-8') as pf:
             json.dump(data, pf, indent=4)
 
