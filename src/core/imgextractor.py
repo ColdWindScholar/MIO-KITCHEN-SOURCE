@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import logging
 import os
 import re
 import struct
@@ -157,6 +158,7 @@ class Extractor:
                     with open(file_target, 'wb') as out:
                         out.write(entry_inode.open_read().read())
                 except Exception and BaseException as e:
+                    logging.exception('Ext4Extractor')
                     print(f'[E] Cannot Write to {file_target}, Reason: {e}')
                 if os.name == 'posix' and os.geteuid() == 0:
                     os.chmod(file_target, int(mode, 8))
