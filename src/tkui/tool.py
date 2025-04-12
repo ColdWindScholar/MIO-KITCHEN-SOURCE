@@ -2892,26 +2892,27 @@ class PackSuper(Toplevel):
         if os.path.exists(parts_info):
             try:
                 data:dict = JsonEdit(parts_info).read().get('super_info')
-            except (Exception, BaseException):
+            except (Exception, BaseException, AttributeError):
                 logging.exception('PackSupper:read_parts_info')
                 return
-            # get block device name
-            for i in data.get('block_devices', []):
-                self.block_device_name.set(i.get('name', 'super'))
-                if isinstance(i.get('size'), int):
-                    self.super_size.set(i.get('size', self.super_size.get()))
+            else:
+                # get block device name
+                for i in data.get('block_devices', []):
+                    self.block_device_name.set(i.get('name', 'super'))
+                    if isinstance(i.get('size'), int):
+                        self.super_size.set(i.get('size', self.super_size.get()))
 
-            for i in data.get('group_table', []):
-                name = i.get('name')
-                if isinstance(name, str) and name != 'default':
-                    self.group_name.set(name)
+                for i in data.get('group_table', []):
+                    name = i.get('name')
+                    if isinstance(name, str) and name != 'default':
+                        self.group_name.set(name)
 
-            selected = []
-            for i in data.get('partition_table', []):
-                name = i.get('name')
-                if isinstance(name, str) and name not in selected:
-                    selected.append(name)
-            self.selected = selected
+                selected = []
+                for i in data.get('partition_table', []):
+                    name = i.get('name')
+                    if isinstance(name, str) and name not in selected:
+                        selected.append(name)
+                self.selected = selected
 
 
         #Read dynamic_partitions_op_list
