@@ -913,6 +913,7 @@ start = dti()
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
+context_rule_file = os.path.join(cwd_path, 'bin', "context_rules.json")
 states = States()
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 
@@ -3448,7 +3449,7 @@ class Packxx(Toplevel):
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
                     if settings.contextpatch == "1":
-                        contextpatch.main(work + dname, contexts_file)
+                        contextpatch.main(work + dname, contexts_file, context_rule_file)
                     utils.qc(contexts_file)
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():

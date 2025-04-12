@@ -15,22 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-from re import escape
+from re import escape, search
 from typing import Any, Generator, Union, Optional
-
-fix_permission = {
-    "system/app/*/.apk": "u:object_r:system_file:s0",
-    "data-app/.apk": "u:object_r:system_file:s0",
-    "android.hardware.wifi": "u:object_r:hal_wifi_default_exec:s0",
-    "bin/idmap": "u:object_r:idmap_exec:s0",
-    "bin/fsck": "u:object_r:fsck_exec:s0",
-    "bin/e2fsck": "u:object_r:fsck_exec:s0",
-    "bin/logcat": "u:object_r:logcat_exec:s0",
-    "system/bin": "u:object_r:system_file:s0",
-    "/system/bin/init": "u:object_r:init_exec:s0",
-    r"/lost\+found": "u:object_r:rootfs:s0"
-}
-
+from .utils import JsonEdit
 
 def scan_context(file) -> dict:  # 读取context文件返回一个字典
     context = {}
@@ -61,7 +48,7 @@ def scan_dir(folder) -> Generator[Union[str, Any], Optional[Any], None]:  # 读�
 str_to_selinux = lambda string: escape(string).replace('\\-', '-')
 
 
-def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
+def context_patch(fs_file, dir_path, fix_permission:dict) -> tuple:  # 接收两个字典对比
     new_fs = {}
     # 定义已修补过的 避免重复修补
     r_new_fs = {}
@@ -86,12 +73,13 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
             if i:
                 # 搜索已定义的权限
                 for f in fix_permission.keys():
-                    if f in i:
-                        permission = [fix_permission[f]]
+                    if search(f, i):
+                        permission = fix_permission.get(f)
+                #upper
                 if not permission:
                     permission = permission_d
-            if " " in permission[0]:
-                permission = [permission[0].replace(' ', '')]
+            if " " in permission:
+                permission = permission.replace(' ', '*')
             print(f"ADD [{i} {permission}]")
             add_new += 1
             r_new_fs[i] = permission
@@ -99,8 +87,12 @@ def context_patch(fs_file, dir_path) -> tuple:  # 接收两个字典对比
     return new_fs, add_new
 
 
-def main(dir_path, fs_config) -> None:
-    new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path)
+def main(dir_path, fs_config, fix_permission_file) -> None:
+    if fix_permission_file is not None:
+        fix_permission:dict = JsonEdit(fix_permission_file).read()
+    else:
+        fix_permission = {}
+    new_fs, add_new = context_patch(scan_context(os.path.abspath(fs_config)), dir_path, fix_permission)
     with open(fs_config, "w+", encoding='utf-8', newline='\n') as f:
-        f.writelines([i + " " + " ".join(new_fs[i]) + "\n" for i in sorted(new_fs.keys())])
+        f.writelines([f"{i} {new_fs[i]}\n" for i in sorted(new_fs.keys())])
     print(f'ContextPatcher: Add {add_new:d} entries')

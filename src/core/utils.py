@@ -14,6 +14,7 @@
 # limitations under the License.
 import hashlib
 import json
+import logging
 import os
 import os.path
 import platform
@@ -708,6 +709,7 @@ class JsonEdit:
             try:
                 return json.load(pf)
             except (AttributeError, ValueError, json.decoder.JSONDecodeError):
+                logging.exception('read json')
                 return {}
 
     def write(self, data):

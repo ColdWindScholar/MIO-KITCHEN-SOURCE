@@ -86,4 +86,4 @@ def script2fs_context(input_f, outdir, project):
         for fc in fc_label:
             file_contexts.write(" ".join(fc) + '\n')
     fspatch.main(os.path.join(project, 'system'), os.path.join(outdir, "system_fs_config"))
-    contextpatch.main(os.path.join(project, 'system'), os.path.join(outdir, "system_file_contexts"))
+    contextpatch.main(os.path.join(project, 'system'), os.path.join(outdir, "system_file_contexts"), None)
