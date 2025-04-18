@@ -4060,18 +4060,26 @@ class GetFolderSize:
         self.list_f = list_f
         self.dname = os.path.basename(dir_)
         self.size = 0
-        for root, _, files in os.walk(dir_):
-            try:
-                self.size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
-                                  not os.path.islink(os.path.join(root, name))])
-            except (PermissionError, BaseException, Exception):
-                logging.exception('Bugs')
+        def get_dir_size(path):
+            for root, _, files in os.walk(path):
+                for name in files:
+                    try:
+                        file_path = os.path.join(root, name)
+                        if not os.path.isfile(file_path):
+                            self.size += 1
+                            continue
+                        self.size += os.path.getsize(file_path)
+                    except (PermissionError, BaseException, Exception):
+                        logging.exception(f"Getsize {name}")
+                        self.size += 1
+        get_dir_size(dir_)
         if self.get == 1:
             self.rsize_v = self.size
         else:
             self.rsize(self.size, self.num)
 
     def rsize(self, size: int, num: int):
+        print(f"{self.dname} Size : {hum_convert(size)}")
         if size <= 2097152:
             self.rsize_v = 2097152
         elif size <= 1048576:
