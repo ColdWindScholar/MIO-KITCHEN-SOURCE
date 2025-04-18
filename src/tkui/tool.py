@@ -4066,7 +4066,7 @@ class GetFolderSize:
                     try:
                         file_path = os.path.join(root, name)
                         if not os.path.isfile(file_path):
-                            self.size += 1
+                            self.size += len(name)
                             continue
                         self.size += os.path.getsize(file_path)
                     except (PermissionError, BaseException, Exception):
