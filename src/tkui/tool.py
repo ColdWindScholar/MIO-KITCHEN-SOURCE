@@ -4224,7 +4224,7 @@ def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, 
     ret = call(
         ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
          f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
-         f'{work_output}/{name}_new.img'])
+         f'{work_output}/{name}_new.img'], out=not os.name == 'posix')
     if ret != 0:
         rmdir(f'{work}/{name}_new.img')
         print(lang.text75 % name)
