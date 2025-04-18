@@ -1465,7 +1465,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
             call(
                 exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', f'{work}/{bn}/dtbo/{dtbo}', '-o',
                      os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
-                out=1)
+                out=False)
     print(lang.text5)
     try:
         os.remove(dtboimg)
@@ -1487,7 +1487,7 @@ def pack_dtbo() -> bool:
             call(
                 exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', os.path.join(work, 'dtbo', 'dts', dts), '-o',
                      os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
-                out=1)
+                out=False)
     print(f"{lang.text7}:dtbo.img")
     list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(f"{work}/dtbo/dtbo") if
              f.startswith("dtbo.")]
@@ -3031,7 +3031,7 @@ class StdoutRedirector:
             AI_engine.suggest(string, language=settings.language, ok=lang.ok)
 
 
-def call(exe, extra_path=True, out=0):
+def call(exe, extra_path=True, out:bool=True):
     logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
@@ -3049,22 +3049,24 @@ def call(exe, extra_path=True, out=0):
         pid = ret.pid
         states.open_pids.append(pid)
         for i in iter(ret.stdout.readline, b""):
-            if out == 0:
-                try:
-                    out_put = i.decode("utf-8").strip()
-                except (Exception, BaseException):
-                    out_put = i.decode("gbk").strip()
+            try:
+                out_put = i.decode("utf-8").strip()
+            except (Exception, BaseException):
+                out_put = i.decode("gbk").strip()
+            if out:
                 print(out_put)
+            else:
                 logging.info(out_put)
         states.open_pids.remove(pid)
     except subprocess.CalledProcessError as e:
         for i in iter(e.stdout.readline, b""):
-            if out == 0:
-                try:
-                    out_put = i.decode("utf-8").strip()
-                except (Exception, BaseException):
-                    out_put = i.decode("gbk").strip()
+            try:
+                out_put = i.decode("utf-8").strip()
+            except (Exception, BaseException):
+                out_put = i.decode("gbk").strip()
+            if out:
                 print(out_put)
+            else:
                 logging.info(out_put)
         return 2
     except FileNotFoundError:
@@ -3964,7 +3966,7 @@ def unpack(chose, form: str = '') -> bool:
                 if call(exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'), '-o',
                              work,
                              '-x'],
-                        out=1) != 0:
+                        out=False) != 0:
                     print('Unpack failed...')
                     continue
                 if os.path.exists(f'{work}/{i}'):
@@ -3974,7 +3976,7 @@ def unpack(chose, form: str = '') -> bool:
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
                 if call(exe=['extract.f2fs', '-o', work, os.path.join(project_manger.current_work_path(), f'{i}.img')],
-                        out=1) != 0:
+                        out=False) != 0:
                     print('Unpack failed...')
                     continue
                 if os.path.exists(f'{work}/{i}'):
@@ -4158,7 +4160,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False,
            f'--fs-config-file={work}/config/{name}_fs_config',
            f'--file-contexts={work}/config/{name}_file_contexts',
            f'{work_output}/{name}.img', f'{work}/{name}/']
-    return call(cmd, out=1)
+    return call(cmd, out=False)
 
 
 @animation
@@ -4256,7 +4258,7 @@ def rmdir(path:str, quiet:bool=False):
                 rmtree(path)
             except (Exception, BaseException):
                 logging.exception("Rmtree")
-                call(['busybox', 'rm', '-rf', path], out=1 if quiet else 0)
+                call(['busybox', 'rm', '-rf', path], out=False if quiet else True)
         except (Exception, BaseException):
             print(lang.warn11.format(path))
         if not quiet:
