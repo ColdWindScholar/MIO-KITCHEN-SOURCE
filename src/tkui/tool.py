@@ -2892,6 +2892,8 @@ class PackSuper(Toplevel):
         if os.path.exists(parts_info):
             try:
                 data:dict = JsonEdit(parts_info).read().get('super_info')
+                if data is None:
+                    raise AttributeError("super_info is not dict")
             except (Exception, BaseException, AttributeError):
                 logging.exception('PackSupper:read_parts_info')
             else:
