@@ -196,7 +196,7 @@ class LoadAnim:
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
                 print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
-                return
+                return None
             else:
                 self.tasks[task_num] = info
             task_real.start()
@@ -324,11 +324,11 @@ class ToolBox(ttk.Frame):
             self.destroy()
             try:
                 process_by_xml(rawprogram_xml, partition_name, output_path)
+                return None
             except (Exception, BaseException) as e:
                 print('Merge Fail!')
                 logging.exception('MergeQC RAWPROGRAM')
-
-
+                return None
 
     class MagiskPatcher(Toplevel):
         def __init__(self):
@@ -2844,6 +2844,7 @@ class PackSuper(Toplevel):
                    super_type=self.super_type.get(),
                    part_list=lbs, del_=sc,
                    attrib=self.attrib.get(), block_device_name=self.block_device_name.get())
+        return None
 
     def verify_size(self):
         size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in self.tl.selected])
