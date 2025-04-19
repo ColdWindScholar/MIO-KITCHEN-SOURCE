@@ -3366,7 +3366,8 @@ class Packxx(Toplevel):
         for i in self.lg:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
-            return parts_dict[i] in ['ext', 'erofs', 'f2fs']
+            if parts_dict[i] in ['ext', 'erofs', 'f2fs']:
+                return True
         return False
 
     def modify_custom_size(self):
