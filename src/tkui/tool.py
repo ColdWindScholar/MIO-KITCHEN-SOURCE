@@ -24,13 +24,14 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from ..core import tarsafe, miside_banner, resize_ext4
+from ..core import tarsafe, miside_banner
 from ..core.Magisk import Magisk_patch
 from ..core.addon_register import loader, Entry
 from ..core.cpio import extract as cpio_extract, repack as cpio_repack
+from ..core.qsb_imger import process_by_xml
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
-from ..core.qsb_imger import process_by_xml
+
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
