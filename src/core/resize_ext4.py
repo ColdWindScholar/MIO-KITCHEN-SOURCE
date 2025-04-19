@@ -26,7 +26,7 @@ from ctypes import sizeof
 from time import time
 from zlib import crc32
 
-from ext4 import (
+from .ext4 import (
     ext4_superblock, ext4_group_descriptor, Volume
 )
 
