@@ -4493,9 +4493,9 @@ class UnpackGui(ttk.LabelFrame):
                 self.fm.current(index)
                 self.refs()
                 if len(self.lsg.vars):
-                    return
+                    return True
             self.fm.current(0)
-            return
+            return True
         form = self.fm.get()
         if form == 'payload':
             if os.path.exists(f"{work}/payload.bin"):
@@ -4521,6 +4521,7 @@ class UnpackGui(ttk.LabelFrame):
                         f_type = form
                     self.lsg.insert(f'{file_name.split(f".{form}")[0]} [{f_type}]',
                                     file_name.split(f".{form}")[0])
+        return True
 
     def refs2(self):
         self.lsg.clear()
@@ -4531,6 +4532,7 @@ class UnpackGui(ttk.LabelFrame):
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 self.lsg.insert(f"{folder} [{parts_dict.get(folder, 'Unknown')}]", folder)
+        return True
 
     def close_(self):
         lbs = self.lsg.selected.copy()
