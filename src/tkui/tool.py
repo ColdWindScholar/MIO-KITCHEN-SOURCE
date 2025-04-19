@@ -3786,6 +3786,15 @@ class ProjectManager:
                 os.makedirs(path, exist_ok=True)
         return path if os.name != 'nt' else path.replace('\\', '/')
 
+    def current_origin_path(self):
+        if settings.project_struct == 'single':
+            path = self.get_work_path(current_project_name.get())
+        else:
+            path = os.path.join(self.get_work_path(current_project_name.get()), 'Origin') + os.sep
+            if not os.path.exists(path) and current_project_name.get():
+                os.makedirs(path, exist_ok=True)
+        return path if os.name =='nt' else path.replace('\\', '/')
+
     def current_work_output_path(self):
         if settings.project_struct == 'single':
             path = self.get_work_path(current_project_name.get())
