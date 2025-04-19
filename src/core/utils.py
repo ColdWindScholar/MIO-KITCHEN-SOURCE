@@ -788,6 +788,7 @@ def hum_convert(value):
         if (value / size) < 1:
             return f"{value:.2f}{units[i]}"
         value = value / size
+    return f'{value} B'
 
 class ModuleErrorCodes(IntEnum):
     Normal = 0
