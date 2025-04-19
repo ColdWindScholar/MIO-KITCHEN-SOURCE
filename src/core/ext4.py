@@ -513,6 +513,10 @@ class Volume:
         return self.superblock.s_last_mounted.decode()
 
     @property
+    def get_free_blocks_count(self):
+        return self.superblock.s_free_blocks_count
+
+    @property
     def get_info_list(self):
         return [
             ['Magic number', hex(self.superblock.s_magic).upper()],

@@ -24,7 +24,7 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from ..core import tarsafe, miside_banner
+from ..core import tarsafe, miside_banner, resize_ext4
 from ..core.Magisk import Magisk_patch
 from ..core.addon_register import loader, Entry
 from ..core.cpio import extract as cpio_extract, repack as cpio_repack
