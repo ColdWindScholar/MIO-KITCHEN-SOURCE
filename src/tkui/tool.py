@@ -87,6 +87,7 @@ from ..core import ext4
 from ..core.config_parser import ConfigParser
 from ..core import utils
 from ..core.unpac import MODE as PACMODE, unpac
+
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from ..core.extra import fspatch, re, contextpatch
@@ -230,26 +231,35 @@ class Toplevel(TkToplevel):
                 set_title_bar_color(self)
             else:
                 set_title_bar_color(self, 0)
+
+
 class CustomControls:
     def __init__(self):
         pass
+
     @staticmethod
-    def filechose(master, textvariable: tk.Variable, text, is_folder:bool=False):
+    def filechose(master, textvariable: tk.Variable, text, is_folder: bool = False):
         ft = ttk.Frame(master)
         ft.pack(fill=X)
         ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
         ttk.Entry(ft, textvariable=textvariable).pack(side='left', padx=5, pady=5)
         ttk.Button(ft, text=lang.text28,
                    command=lambda: textvariable.set(
-                       filedialog.askopenfilename() if not is_folder else filedialog.askdirectory())).pack(side='left', padx=10, pady=10)
+                       filedialog.askopenfilename() if not is_folder else filedialog.askdirectory())).pack(side='left',
+                                                                                                           padx=10,
+                                                                                                           pady=10)
+
     @staticmethod
-    def combobox(master, textvariable: tk.Variable,values ,text, state:str='normal'):
+    def combobox(master, textvariable: tk.Variable, values, text, state: str = 'normal'):
         ft = ttk.Frame(master)
         ft.pack(fill=X)
         ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
         ttk.Combobox(ft, textvariable=textvariable,
                      values=values, state=state).pack(side='left', padx=5, pady=5)
+
+
 ccontrols = CustomControls()
+
 
 class ToolBox(ttk.Frame):
     def __init__(self, master):
@@ -277,7 +287,7 @@ class ToolBox(ttk.Frame):
             (lang.audit_allow, self.SelinuxAuditAllow),
             (lang.trim_image, self.TrimImage),
             (lang.magisk_patch, self.MagiskPatcher),
-            (lang.mergequalcommimage , self.MergeQualcommImage_old)
+            (lang.mergequalcommimage, self.MergeQualcommImage_old)
         ]
         width_controls = 3
         #
@@ -304,11 +314,12 @@ class ToolBox(ttk.Frame):
             self.output_path = StringVar()
             self.gui()
             move_center(self)
+
         def gui(self):
             ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
             ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
             ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
-            ttk.Button(self, text=lang.run, command=lambda : create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+            ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
             rawprogram_xml = self.rawprogram_xml.get()
@@ -511,7 +522,6 @@ class ToolBox(ttk.Frame):
         def calc(self):
             self.result_size.delete(0, tk.END)
             self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
-
 
         def __calc(self, origin: str, convert: str, size) -> str:
             if origin == convert:
@@ -2893,7 +2903,7 @@ class PackSuper(Toplevel):
         parts_info = f"{self.work}/config/parts_info"
         if os.path.exists(parts_info):
             try:
-                data:dict = JsonEdit(parts_info).read().get('super_info')
+                data: dict = JsonEdit(parts_info).read().get('super_info')
                 if data is None:
                     raise AttributeError("super_info is not dict")
             except (Exception, BaseException, AttributeError):
@@ -2916,7 +2926,6 @@ class PackSuper(Toplevel):
                     if isinstance(name, str) and name not in selected:
                         selected.append(name)
                 self.selected = selected
-
 
         #Read dynamic_partitions_op_list
         list_file = f"{self.work}/dynamic_partitions_op_list"
@@ -2951,7 +2960,7 @@ class PackSuper(Toplevel):
 @animation
 def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_=0, return_cmd=0,
                attrib='readonly',
-               output_dir: str = None, work: str = None, block_device_name:str='None'):
+               output_dir: str = None, work: str = None, block_device_name: str = 'None'):
     if not block_device_name:
         block_device_name = 'super'
     if not work:
@@ -3032,7 +3041,7 @@ class StdoutRedirector:
             AI_engine.suggest(string, language=settings.language, ok=lang.ok)
 
 
-def call(exe, extra_path=True, out:bool=True):
+def call(exe, extra_path=True, out: bool = True):
     logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
@@ -3459,7 +3468,7 @@ class Packxx(Toplevel):
                         contextpatch.main(work + dname, contexts_file, context_rule_file)
                         new_rules = contextpatch.scan_context(contexts_file)
                         rules = JsonEdit(context_rule_file)
-                        rules.write(new_rules|rules.read())
+                        rules.write(new_rules | rules.read())
 
                     utils.qc(contexts_file)
                 if self.fs_conver.get():
@@ -3795,7 +3804,7 @@ class ProjectManager:
             path = os.path.join(self.get_work_path(current_project_name.get()), 'Origin') + os.sep
             if not os.path.exists(path) and current_project_name.get():
                 os.makedirs(path, exist_ok=True)
-        return path if os.name =='nt' else path.replace('\\', '/')
+        return path if os.name == 'nt' else path.replace('\\', '/')
 
     def current_work_output_path(self):
         if settings.project_struct == 'single':
@@ -4012,7 +4021,7 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True, is_top:bool=False) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> int:
     if not ok:
         ok = lang.ok
     if not cancel:
@@ -4046,7 +4055,7 @@ def ask_win(text='', ok=None, cancel=None, wait=True, is_top:bool=False) -> int:
     return value.get()
 
 
-def info_win(text: str, ok: str = None, master: Toplevel=None):
+def info_win(text: str, ok: str = None, master: Toplevel = None):
     if ok is None:
         ok = lang.ok
     if master is None:
@@ -4055,8 +4064,8 @@ def info_win(text: str, ok: str = None, master: Toplevel=None):
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
     ttk.Button(frame_inner, text=ok, command=master.destroy, style="Accent.TButton").pack(padx=5, pady=5,
-                                                                                       fill=X, side='left',
-                                                                                       expand=True)
+                                                                                          fill=X, side='left',
+                                                                                          expand=True)
     move_center(master)
     master.wait_window()
 
@@ -4073,6 +4082,7 @@ class GetFolderSize:
         self.list_f = list_f
         self.dname = os.path.basename(dir_)
         self.size = 0
+
         def get_dir_size(path):
             for root, _, files in os.walk(path):
                 for name in files:
@@ -4086,7 +4096,8 @@ class GetFolderSize:
                         self.size += 1
             self.size += (self.size / 16384) * 256
             if self.size > 100 * 1024 * 1024:
-                self.size +=  16 * (1024 ** 2)
+                self.size += 16 * (1024 ** 2)
+
         get_dir_size(dir_)
         if self.get == 1:
             self.rsize_v = self.size
@@ -4162,7 +4173,7 @@ def datbr(work, name, brl: any, dat_ver=4):
         print(lang.text89 % (name, 'br'))
 
 
-def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False, UTC:int=None):
+def mkerofs(name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
     if not UTC:
         UTC = int(time.time())
     print(lang.text90 % (name, format_ + f',{level}', "1.x"))
@@ -4177,7 +4188,8 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel:bool=False,
 
 
 @animation
-def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size:int=0, UTC:int=None, has_contexts:bool=True):
+def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size: int = 0, UTC: int = None,
+                has_contexts: bool = True):
     if not has_contexts:
         print('Warning:file_context not found!!!')
     print(lang.text91 % name)
@@ -4188,14 +4200,14 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size:in
     print(f"{name}:[{size}]")
     context_cmd = ['-S', f'{work}/config/{name}_file_contexts'] if has_contexts else []
     command = ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', *context_cmd, '-l',
-         f'{size}',
-         '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', f'/{name}', f"{work_output}/{name}.img",
-         work + name]
+               f'{size}',
+               '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', f'/{name}', f"{work_output}/{name}.img",
+               work + name]
     return call(command)
 
 
 @animation
-def make_f2fs(name: str, work: str, work_output:str, UTC:int=None):
+def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
@@ -4259,7 +4271,7 @@ def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, 
 
 
 @animation
-def rmdir(path:str, quiet:bool=False):
+def rmdir(path: str, quiet: bool = False):
     if not path:
         if not quiet:
             win.message_pop(lang.warn1)
@@ -4279,7 +4291,7 @@ def rmdir(path:str, quiet:bool=False):
 
 
 @animation
-def pack_zip(input_dir:str=None, output_zip:str=None, silent:bool=False):
+def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False):
     if input_dir is None:
         input_dir = project_manger.current_work_output_path()
         if not project_manger.exist():
@@ -4309,7 +4321,7 @@ def pack_zip(input_dir:str=None, output_zip:str=None, silent:bool=False):
         print(lang.text3.format(output_zip))
 
 
-def dndfile(files:list):
+def dndfile(files: list):
     for fi in files:
         if fi.endswith('}') and fi.startswith('{'):
             fi = fi[1:-1]
@@ -4496,7 +4508,7 @@ class UnpackGui(ttk.LabelFrame):
             self.fm.configure(state="disabled")
             self.refs2()
 
-    def refs(self, auto:bool=False):
+    def refs(self, auto: bool = False):
         self.lsg.clear()
         work = project_manger.current_work_path()
         if not project_manger.exist():
@@ -4557,7 +4569,7 @@ class UnpackGui(ttk.LabelFrame):
             Packxx(lbs)
 
 
-def img2simg(path:str):
+def img2simg(path: str):
     call(['img2simg', path, f'{path}s'])
     if os.path.exists(path + 's'):
         try:
@@ -4855,7 +4867,7 @@ class ParseCmdline:
             return
 
 
-def __init__tk(args:list):
+def __init__tk(args: list):
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
@@ -4920,7 +4932,7 @@ def __init__tk(args:list):
 init = lambda args: __init__tk(args)
 
 
-def restart(er:Toplevel=None):
+def restart(er: Toplevel = None):
     try:
         if animation.tasks:
             if not ask_win("Your operation will not be saved.", is_top=True):
