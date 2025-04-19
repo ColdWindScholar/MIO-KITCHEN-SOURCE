@@ -9,7 +9,7 @@ from os.path import exists
 from os.path import join as path_join
 from enum import Enum
 
-class common_struct(ctypes.LittleEndianStructure):
+class CommonStruct(ctypes.LittleEndianStructure):
     @property
     def _size(self):
         return ctypes.sizeof(type(self))
@@ -29,7 +29,7 @@ class common_struct(ctypes.LittleEndianStructure):
         return bytes(self)
 
 
-class sprd_head(common_struct):
+class SprdHead(CommonStruct):
     _fields_ = [
         ("pac_version", ctypes.c_uint16 * 24),
         ("pac_size", ctypes.c_uint32),
@@ -47,7 +47,7 @@ class sprd_head(common_struct):
     ]
 
 
-class sprd_file(common_struct):
+class SprdFile(CommonStruct):
     _fields_ = [
         ("struct_size", ctypes.c_uint32),
         ("id", ctypes.c_uint16 * 256),
@@ -68,7 +68,7 @@ def convert_u16_to_string(data):
     byte_data: bytes = bytes(data)
     return byte_data.decode("utf-16")
 
-class file_types(Enum):
+class FileTypes(Enum):
     operation = 0
     file = 1
     xml = 2
@@ -89,8 +89,8 @@ def crc16(crc: int, src: bytes):
     return crc
 
 def check_path(path):
-    INVALID_STR = ["/", "\\", ":"]
-    for s in INVALID_STR:
+    invalid_str = ["/", "\\", ":"]
+    for s in invalid_str:
         if s in path:
             return False
     return True
@@ -99,7 +99,7 @@ def unpac(image_path: str, out_dir:str, mode: MODE = MODE.LIST):
     if not exists(out_dir):
         makedirs(out_dir, exist_ok=True)
     chunk = 0x1000
-    head = sprd_head()
+    head = SprdHead()
     # file = sprd_file()
 
     with open(image_path, "rb") as fi:
@@ -130,7 +130,7 @@ def unpac(image_path: str, out_dir:str, mode: MODE = MODE.LIST):
 
         if mode == MODE.LIST or mode == MODE.EXTRACT:
             for i in range(head.file_count):
-                file = sprd_file()
+                file = SprdFile()
                 file.unpack(fi.read(len(file)))
 
                 if file.struct_size != len(file):
@@ -140,7 +140,7 @@ def unpac(image_path: str, out_dir:str, mode: MODE = MODE.LIST):
                     if (file.name[0] == 0) or (file.pac_offset == 0) or (file.size == 0): continue
 
                 if mode == MODE.LIST:
-                    print(f"type = {file_types(file.type).name}", end='')
+                    print(f"type = {FileTypes(file.type).name}", end='')
                     if file.size > 0:
                         print(", size = 0x%x" %file.size, end='')
                     if file.pac_offset > 0:
