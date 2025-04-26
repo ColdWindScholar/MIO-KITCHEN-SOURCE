@@ -2244,6 +2244,7 @@ class InstallMpk(Toplevel):
         self.prog.stop()
         self.prog['mode'] = 'determinate'
         self.prog['value'] = 100
+        return 0
 
     def load(self):
         if not self.mpk:
