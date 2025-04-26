@@ -81,7 +81,7 @@ jobs:
           name: MIO-KITCHEN-win
           path: './MIO-KITCHEN-win.zip'
   build-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.10
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
