@@ -2064,17 +2064,18 @@ class ModuleManager:
             self.destroy()
 
         def remove(self, name=None, show_name='') -> None:
+            module_path = f"{self.module_dir}/{name}"
             if name:
                 print(lang.text29.format(name if not show_name else show_name))
                 self.uninstall_b.config(text=lang.text29.format(name if not show_name else show_name))
-                if os.path.exists(self.module_dir + os.sep + name):
+                if os.path.exists(module_path):
                     try:
-                        rmtree(self.module_dir + os.sep + name)
+                        rmtree(module_path)
                     except PermissionError as e:
                         logging.exception('Bugs')
                         print(e)
-                if os.path.exists(self.module_dir + os.sep + name):
-                    win.message_pop(lang.warn9, 'red')
+                if os.path.exists(module_path):
+                    win.message_pop(lang.warn9, 'orange')
                 else:
                     print(lang.text30)
                     self.uninstall_b.config(text=lang.text30)
