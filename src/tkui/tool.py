@@ -1979,15 +1979,14 @@ class ModuleManager:
                             logging.exception('V!')
                             print(con, args, varnames)
             ttk.Button(self, text=lang.ok,
-                       command=lambda: create_thread(self.generate_sh)).pack(
+                       command=lambda: create_thread(self.creat_temp)).pack(
                 fill=X,
                 side='bottom')
             move_center(self)
             self.wait_window()
 
-        def generate_sh(self):
-            if not os.path.exists(temp):
-                os.mkdir(temp)
+        def creat_temp(self):
+            os.makedirs(temp, exist_ok=True)
             self.destroy()
 
     class UninstallMpk(Toplevel):
