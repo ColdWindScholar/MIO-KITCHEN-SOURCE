@@ -487,53 +487,184 @@ class ToolBox(ttk.Frame):
                 self.button.configure(text=lang.done, state='normal', style='')
 
     class FileBytes(Toplevel):
+        """
+        A Toplevel window providing a bidirectional byte unit calculator.
+        Allows converting values between B, KB, MB, GB, TB, PB.
+        """
         def __init__(self):
+            # Initialize the Toplevel window
             super().__init__()
+            # Define the conversion factors for different byte units (base 1024)
             self.units = {
-                "B": 2 ** 0,
-                "KB": 2 ** 10,
-                "MB": 2 ** 20,
-                "GB": 2 ** 30,
-                "TB": 2 ** 40
+                "B": 1,          # Bytes
+                "KB": 1024,      # Kilobytes
+                "MB": 1024**2,   # Megabytes
+                "GB": 1024**3,   # Gigabytes
+                "TB": 1024**4,   # Terabytes
+                "PB": 1024**5    # Petabytes
             }
-            self.title(lang.t60)
+            # Set the window title (fetch the string from the language object)
+            self.title(lang.t60) # e.g., "Byte Calculator"
+            # Flag to prevent infinite calculation loops when updating fields reciprocally
+            self._is_calculating = False
+            # Use Tkinter StringVars to link Entry widgets to variables easily
+            self.origin_size_var = tk.StringVar()
+            self.result_size_var = tk.StringVar()
+            # Build the GUI elements for the calculator
             self.gui()
-
-        def gui(self):
-            self.f = Frame(self)
-            self.f.pack(pady=5, padx=5, fill=X)
-            self.origin_size = ttk.Entry(self.f)
-            self.origin_size.bind("<KeyRelease>", lambda *x: self.calc())
-            self.origin_size.pack(side='left', padx=5)
-            self.h = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
-            self.h.current(0)
-            self.h.bind("<<ComboboxSelected>>", lambda *x: self.calc())
-            self.h.pack(side='left', padx=5)
-            Label(self.f, text='=').pack(side='left', padx=5)
-            self.result_size = ttk.Entry(self.f)
-            self.result_size.pack(side='left', padx=5)
-            self.f_ = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
-            self.f_.current(0)
-            self.f_.bind("<<ComboboxSelected>>", lambda *x: self.calc())
-            self.f_.pack(side='left', padx=5)
-            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, padx=5, pady=5)
+            # Center the window on the screen
             move_center(self)
 
-        def calc(self):
-            self.result_size.delete(0, tk.END)
-            self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
+        def gui(self):
+            """Creates and packs the GUI widgets for the calculator."""
+            # Main frame to contain all widgets
+            self.f_main = Frame(self)
+            self.f_main.pack(pady=5, padx=5, fill=X, expand=True)
 
-        def __calc(self, origin: str, convert: str, size) -> str:
-            if origin == convert:
-                if not size.isdigit():
-                    return "0"
-                return str(size)
+            # Left input field (for the original value)
+            self.origin_size = ttk.Entry(self.f_main, textvariable=self.origin_size_var)
+            # Bind the KeyRelease event: triggers calculation when user types in this field
+            self.origin_size.bind("<KeyRelease>", self.calc_forward)
+            self.origin_size.pack(side='left', padx=5, expand=True, fill=X)
+
+            # Left combobox (for selecting the original unit)
+            self.h = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
+            self.h.current(0) # Set default selection (e.g., "B")
+            # Bind the ComboboxSelected event: triggers calculation when unit changes
+            self.h.bind("<<ComboboxSelected>>", self.calc_forward)
+            self.h.pack(side='left', padx=5)
+
+            # Simple label showing the equals sign
+            Label(self.f_main, text='=').pack(side='left', padx=5)
+
+            # Right input field (for the result value)
+            self.result_size = ttk.Entry(self.f_main, textvariable=self.result_size_var)
+            # Bind the KeyRelease event: triggers reverse calculation
+            self.result_size.bind("<KeyRelease>", self.calc_reverse)
+            self.result_size.pack(side='left', padx=5, expand=True, fill=X)
+
+            # Right combobox (for selecting the target unit)
+            self.f_ = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
+            self.f_.current(0) # Set default selection (e.g., "B")
+            # Bind the ComboboxSelected event: triggers reverse calculation
+            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse)
+            self.f_.pack(side='left', padx=5)
+
+            # Close button for the window
+            # Assumes lang.text17 holds the string for "Close"
+            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5)
+
+        def calc_forward(self, event=None):
+            """
+            Calculates the value from left to right.
+            Triggered by input in the left Entry or change in the left Combobox.
+            Updates the right Entry field.
+            """
+            # Prevent recursive calls if a calculation is already running
+            if self._is_calculating:
+                return
+
+            self._is_calculating = True # Set the flag to indicate calculation started
             try:
-                origin_size = float(size)
-            except ValueError:
-                return "0"
+                # Get current units and the input value string
+                origin_unit = self.h.get()
+                target_unit = self.f_.get()
+                origin_value_str = self.origin_size_var.get()
 
-            return str(origin_size * self.units[origin] / self.units[convert])
+                # Perform the calculation using the helper method
+                result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
+
+                # Update the result field's variable only if the calculated value is different
+                # from the current value, to avoid potential redundant updates/events.
+                if self.result_size_var.get() != result_value_str:
+                    self.result_size_var.set(result_value_str)
+            finally:
+                # Ensure the flag is reset even if an error occurs
+                self._is_calculating = False
+
+        def calc_reverse(self, event=None):
+            """
+            Calculates the value from right to left.
+            Triggered by input in the right Entry or change in the right Combobox.
+            Updates the left Entry field.
+            """
+            # Prevent recursive calls
+            if self._is_calculating:
+                return
+
+            self._is_calculating = True # Set the flag
+            try:
+                # Get units, but swapped for reverse calculation
+                origin_unit = self.f_.get() # Origin unit is from the right combobox
+                target_unit = self.h.get()  # Target unit is from the left combobox
+                # Get the value string from the right field's variable
+                origin_value_str = self.result_size_var.get()
+
+                # Perform the calculation using the helper method
+                result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
+
+                # Update the original field's variable only if the value changed
+                if self.origin_size_var.get() != result_value_str:
+                    self.origin_size_var.set(result_value_str)
+            finally:
+                # Ensure the flag is reset
+                self._is_calculating = False
+
+        def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
+            """
+            Performs the core unit conversion logic.
+
+            Args:
+                origin_unit: The unit of the input value (e.g., "MB").
+                target_unit: The unit to convert to (e.g., "KB").
+                size_str: The input value as a string.
+
+            Returns:
+                The calculated value as a formatted string, or "Invalid" or "" on error/partial input.
+            """
+            # Remove any leading/trailing whitespace from the input string
+            size_str = size_str.strip()
+
+            # If the input string is empty, return an empty string
+            if not size_str:
+                return ""
+
+            try:
+                # Attempt to convert the input string to a floating-point number
+                size = float(size_str)
+            except ValueError:
+                 # Handle cases where conversion to float fails.
+                 # Check if the input looks like a number that's still being typed.
+                 is_partial_negative = size_str.startswith('-') and size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str[1:])
+                 is_partial_positive = size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str)
+                 if size_str in ('.', '-', '-.') or is_partial_negative or is_partial_positive:
+                    # It looks like a valid number in progress, return empty string
+                    # to allow the user to continue typing without showing "Invalid".
+                    return ""
+                 else:
+                    # If it's definitely not a number, return "Invalid".
+                    return "Invalid"
+
+            # If the origin and target units are the same, no conversion is needed
+            if origin_unit == target_unit:
+                # Return the number as a string, converting to int if it's a whole number
+                return str(int(size)) if size.is_integer() else str(size)
+
+            # Perform the conversion using the unit factors
+            # Check if units are valid before accessing the dictionary
+            if origin_unit not in self.units or target_unit not in self.units:
+                logging.error(f"Invalid unit provided: origin='{origin_unit}', target='{target_unit}'")
+                return "Invalid Unit"
+            result = size * self.units[origin_unit] / self.units[target_unit]
+
+            # Format the result nicely for display
+            if result.is_integer():
+                # If the result is a whole number, display it without decimal points
+                return str(int(result))
+            else:
+                # Format to 6 decimal places, then remove trailing zeros and the decimal point
+                # if it becomes unnecessary (e.g., 1.230000 -> 1.23)
+                return f"{result:.6f}".rstrip('0').rstrip('.')
 
     class GetFileInfo(Toplevel):
         def __init__(self):
