@@ -490,51 +490,130 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.units = {
-                "B": 2 ** 0,
-                "KB": 2 ** 10,
-                "MB": 2 ** 20,
-                "GB": 2 ** 30,
-                "TB": 2 ** 40
+                "B": 1,  # Use 1 instead of 2**0 for simplicity
+                "KB": 1024,
+                "MB": 1024**2,
+                "GB": 1024**3,
+                "TB": 1024**4,
+                "PB": 1024**5 # Added PB for completeness
             }
-            self.title(lang.t60)
+            self.title(lang.t60) # lang.t60 = 'Byte Calculator' (пример)
+            self._is_calculating = False # Flag to prevent recursion
+            self.origin_size_var = tk.StringVar() # Separate variables for Entry
+            self.result_size_var = tk.StringVar()
             self.gui()
+            move_center(self) # Make sure that move_center is defined
 
         def gui(self):
-            self.f = Frame(self)
-            self.f.pack(pady=5, padx=5, fill=X)
-            self.origin_size = ttk.Entry(self.f)
-            self.origin_size.bind("<KeyRelease>", lambda *x: self.calc())
-            self.origin_size.pack(side='left', padx=5)
-            self.h = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
+            self.f_main = Frame(self) # The main frame for widgets
+            self.f_main.pack(pady=5, padx=5, fill=X, expand=True)
+
+            # Left input field
+            self.origin_size = ttk.Entry(self.f_main, textvariable=self.origin_size_var)
+            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Binding to the left field
+            self.origin_size.pack(side='left', padx=5, expand=True, fill=X)
+
+           # Left combobox
+            self.h = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.h.current(0)
-            self.h.bind("<<ComboboxSelected>>", lambda *x: self.calc())
+            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Binding to the left combobox
             self.h.pack(side='left', padx=5)
-            Label(self.f, text='=').pack(side='left', padx=5)
-            self.result_size = ttk.Entry(self.f)
-            self.result_size.pack(side='left', padx=5)
-            self.f_ = ttk.Combobox(self.f, values=list(self.units.keys()), state='readonly', width=3)
+
+            # Equal sign
+            Label(self.f_main, text='=').pack(side='left', padx=5)
+
+            # Right input field
+            self.result_size = ttk.Entry(self.f_main, textvariable=self.result_size_var)
+            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Binding to the right field
+            self.result_size.pack(side='left', padx=5, expand=True, fill=X)
+
+            # Right combobox
+            self.f_ = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.f_.current(0)
-            self.f_.bind("<<ComboboxSelected>>", lambda *x: self.calc())
+            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Binding to the right combobox
             self.f_.pack(side='left', padx=5)
-            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=BOTH, padx=5, pady=5)
-            move_center(self)
 
-        def calc(self):
-            self.result_size.delete(0, tk.END)
-            self.result_size.insert(0, self.__calc(self.h.get(), self.f_.get(), self.origin_size.get()))
+            # Close button
+            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5) # lang.text17 = 'Close' (пример)
 
-        def __calc(self, origin: str, convert: str, size) -> str:
-            if origin == convert:
-                if not size.isdigit():
-                    return "0"
-                return str(size)
+        def calc_forward(self, event=None):
+            """Рассчитывает значение справа налево (из левого поля в правое)."""
+            if self._is_calculating:
+                return # Prevent recursion
+
+            self._is_calculating = True
             try:
-                origin_size = float(size)
+                origin_unit = self.h.get()
+                target_unit = self.f_.get()
+                origin_value_str = self.origin_size_var.get()
+
+                result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
+
+                # We update only if the value is different to avoid unnecessary events
+                if self.result_size_var.get() != result_value_str:
+                    self.result_size_var.set(result_value_str)
+            finally:
+                self._is_calculating = False # Dropping the flag
+
+        def calc_reverse(self, event=None):
+            """Рассчитывает значение справа налево (из правого поля в левое)."""
+            if self._is_calculating:
+                return # Prevent recursion
+
+            self._is_calculating = True
+            try:
+                # Units are swapped for calculation
+                origin_unit = self.f_.get() # We take a unit from the right combobox
+                target_unit = self.h.get() # The target unit is from the left
+                origin_value_str = self.result_size_var.get() # Value from the right field
+
+                result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
+
+                # Update only if the value is different
+                if self.origin_size_var.get() != result_value_str:
+                    self.origin_size_var.set(result_value_str)
+            finally:
+                self._is_calculating = False # Dropping the flag
+
+        def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
+            """Выполняет конвертацию значения между единицами."""
+            # Removing the spaces
+            size_str = size_str.strip()
+
+           # Handling empty input
+            if not size_str:
+                return "" # We return an empty string if the output is empty
+
+            try:
+               # Trying to convert to float
+                size = float(size_str)
             except ValueError:
-                return "0"
+                # If it's not a float, check if it's a partially entered number.
+                 if size_str == '.' or size_str == '-' or size_str == '-.' or \
+                   (size_str.startswith('-') and size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str[1:])) or \
+                   (size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str)):
+                    # If it looks like a number in the input process, we don't return anything yet (or can we return "0"?)
+# We return an empty string so as not to interfere with the input
+                    return ""
+                 else:
+                    # If it's not exactly a number, we return "Invalid" or an empty string.
+                    return "Invalid"
 
-            return str(origin_size * self.units[origin] / self.units[convert])
+           # If the units are the same
+            if origin_unit == target_unit:
+                # We return the number as a string by deleting .0 for integers
+                return str(int(size)) if size.is_integer() else str(size)
 
+           # Performing the calculation
+            result = size * self.units[origin_unit] / self.units[target_unit]
+
+            # Format the result: delete it .0 for integers, we limit the precision
+            if result.is_integer():
+                return str(int(result))
+            else:
+                # We limit the number of decimal places for readability
+                return f"{result:.6f}".rstrip('0').rstrip('.')
+                
     class GetFileInfo(Toplevel):
         def __init__(self):
             super().__init__()
@@ -4437,7 +4516,19 @@ class UnpackGui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()
-
+        # 'current_project_name' must be a global StringVar
+        current_project_name.trace_add("write", self._on_project_change)
+        
+    # New handler method called when changing the project
+    def _on_project_change(self, *args):
+         """Is called automatically when current_project_name is changed."""
+        # Check if the hd method exists and the widget itself before calling
+        if hasattr(self, 'hd') and callable(self.hd):
+             if self.winfo_exists():
+                 # Calling hd() will update the list of partitions for the new project,
+                 # Considering the current mode (Unpack/Pack)
+                 self.hd()
+                 
     def gui(self):
         self.pack(padx=5, pady=5)
         self.ch.set(True)
