@@ -292,160 +292,226 @@ if os.name == 'nt':
 
 
 class LoadAnim:
-    gifs = []
+    # gifs классовая переменная - не используется в новой версии таким же образом
+    # self.gifs (список ID от after) удален, т.к. теперь один _after_id_run
 
     def __init__(self, master=None):
         self.master = master
-        self.frames = []
-        self.hide_gif = False
-        self.frame = None
-        self.tasks = {}
+        self.frames = []  # Список PhotoImage кадров
+        self.hide_gif = True  # По умолчанию GIF скрыт
+        self.tasks = {}  # Активные задачи, декорированные этим экземпляром
         self.task_num_index = 0
-        self.task_num_max = 100
+        self.task_num_max = 100  # Можно увеличить, если ожидается много одновременных задач
+        self._after_id_run = None  # ID для запланированного вызова run_gui_update
+        self._current_frame_index = 0 # Текущий индекс кадра для run_gui_update
 
     def set_master(self, master):
         self.master = master
+        if self.master and not hasattr(self.master, 'gif_label'):
+            logging.error("LoadAnim's master does not have 'gif_label'. Animation will not work.")
+            # В идеале, gif_label должен быть неотъемлемой частью master (win.rzf)
 
-    def run(self, ind: int = 0):
-        self.hide_gif = False
-        if not self.hide_gif:
+    def _is_master_valid(self):
+        """Проверяет, валиден ли мастер и его gif_label."""
+        if self.master is None:
+            return False
+        try:
+            # Проверка, что master и gif_label существуют и не уничтожены
+            if not self.master.winfo_exists():
+                return False
+            if not hasattr(self.master, 'gif_label') or \
+               not self.master.gif_label or \
+               not self.master.gif_label.winfo_exists():
+                return False
+        except tk.TclError: # Может возникнуть, если виджет в процессе уничтожения
+            return False
+        return True
+
+    def run_gui_update(self):
+        """Обновляет GIF-анимацию. Должен вызываться через self.master.after."""
+        if not self._is_master_valid():
+            self._after_id_run = None
+            return
+
+        if self.hide_gif: # Если флаг hide_gif установлен
+            if self.master.gif_label.winfo_ismapped():
+                self.master.gif_label.pack_forget()
+            self._after_id_run = None # Останавливаем цикл .after
+            return
+
+        if not self.frames:
+            if self.master.gif_label.winfo_ismapped():
+                self.master.gif_label.pack_forget()
+            self._after_id_run = None
+            return
+
+        if not self.master.gif_label.winfo_ismapped():
             self.master.gif_label.pack(padx=10, pady=10)
-        self.frame = self.frames[ind]
-        ind += 1
-        if ind == len(self.frames):
-            ind = 0
-        self.master.gif_label.configure(image=self.frame)
-        self.gifs.append(self.master.gif_label.after(30, self.run, ind))
+
+        current_frame_image = self.frames[self._current_frame_index]
+        self.master.gif_label.configure(image=current_frame_image)
+        
+        self._current_frame_index += 1
+        if self._current_frame_index >= len(self.frames):
+            self._current_frame_index = 0
+        
+        self._after_id_run = self.master.after(30, self.run_gui_update) # 30 мс - интервал кадров
+
+    def start_animation_threadsafe(self):
+        """Запускает анимацию из любого потока, планируя обновление GUI в главном потоке."""
+        if not self._is_master_valid():
+            logging.warning("LoadAnim: Cannot start animation, master is not valid.")
+            return
+
+        if not self.frames:
+            # Попытка загрузить GIF по умолчанию, если кадров нет
+            # Это требует знания пути к GIF-файлу или хранения объекта PIL.Image
+            # Для простоты, сейчас предполагаем, что load_gif был вызван ранее.
+            logging.warning("LoadAnim: No frames loaded, cannot start animation.")
+            return
+
+        self.hide_gif = False
+        self._current_frame_index = 0 # Сбрасываем индекс кадра
+        
+        if self._after_id_run: # Если уже запущен .after цикл
+            try:
+                self.master.after_cancel(self._after_id_run)
+            except tk.TclError: pass # Игнорируем, если мастер уже уничтожен
+            self._after_id_run = None
+            
+        if self.master and hasattr(self.master, 'after'):
+            # Запускаем первый кадр немедленно через .after(0, ...)
+            self.master.after(0, self.run_gui_update)
+
+    def stop_animation_threadsafe(self):
+        """Останавливает анимацию из любого потока."""
+        self.hide_gif = True # Устанавливаем флаг, run_gui_update его проверит и скроет GIF
+        
+        # Отмена _after_id_run произойдет внутри run_gui_update, когда hide_gif=True
+        # Дополнительно можно попытаться отменить здесь, если это критично по времени:
+        if self._after_id_run and self._is_master_valid() and hasattr(self.master, 'after_cancel'):
+             try:
+                 self.master.after_cancel(self._after_id_run)
+             except tk.TclError: pass
+        self._after_id_run = None
+
+        # Явное сокрытие метки (если run_gui_update не успел)
+        def _hide_label_gui():
+            if self._is_master_valid() and self.master.gif_label.winfo_ismapped():
+                self.master.gif_label.pack_forget()
+        if self._is_master_valid() and hasattr(self.master, 'after'):
+            self.master.after(0, _hide_label_gui)
+
 
     def get_task_num(self):
         self.task_num_index = (self.task_num_index + 1) % self.task_num_max
         return self.task_num_index
 
-    def stop(self):
-        for i in self.gifs:
-            try:
-                self.master.gif_label.after_cancel(i)
-            except (Exception, BaseException):
-                logging.exception('Bugs')
-        self.master.gif_label.pack_forget()
-        self.hide_gif = True
-
     def init(self):
-        self.run()
-        self.stop()
+        # Этот метод можно оставить для первоначальной загрузки GIF, если это нужно делать отдельно.
+        # В текущей логике load_gif вызывается при смене темы или инициализации.
+        # Анимация запускается/останавливается декоратором.
+        # Если нужно показать анимацию при старте программы:
+        # self.start_animation_threadsafe()
+        # self.master.after(2000, self.stop_animation_threadsafe) # Пример: показать на 2 сек
+        pass
 
-    def load_gif(self, gif):
+    def load_gif(self, pil_gif_image_object):
+        """Загружает кадры из объекта PIL Image (открытого GIF)."""
+        if not self._is_master_valid():
+            logging.error("LoadAnim: Master is not set or invalid, cannot create PhotoImage objects for GIF.")
+            self.frames.clear()
+            return
+
+        # Перед загрузкой новых кадров, остановим текущую анимацию, если она идет
+        # чтобы избежать обращения к старому списку self.frames из self.run_gui_update
+        was_running = (self._after_id_run is not None)
+        if was_running:
+            current_hide_gif_state = self.hide_gif # Сохраняем состояние
+            self.stop_animation_threadsafe() # Останавливаем анимацию (установит hide_gif=True)
+            # Ждем короткое время, чтобы .after(0, _hide_label_gui) в stop_animation_threadsafe мог отработать
+            # Это хак, лучше иметь коллбэк или более сложную синхронизацию.
+            # Для простоты, можно пропустить, но могут быть визуальные глитчи.
+            # self.master.update_idletasks() # Может помочь
+
         self.frames.clear()
-        while True:
-            self.frames.append(PhotoImage(gif))
-            try:
-                gif.seek(len(self.frames))
-            except EOFError:
-                break
+        frame_index = 0
+        try:
+            pil_gif_image_object.seek(0) # Убедимся, что начинаем с первого кадра
+            while True:
+                # Копируем кадр перед созданием PhotoImage, чтобы избежать проблем с Pillow
+                current_pil_frame = pil_gif_image_object.copy()
+                photo_frame = PhotoImage(current_pil_frame, master=self.master)
+                self.frames.append(photo_frame)
+                frame_index += 1
+                pil_gif_image_object.seek(frame_index)
+        except EOFError:
+            pass
+        except tk.TclError as e:
+            logging.error(f"LoadAnim: TclError during PhotoImage creation: {e}. Frames loaded: {len(self.frames)}")
+        except Exception as e:
+            logging.error(f"LoadAnim: Error loading GIF frames: {e}")
+            self.frames.clear()
+
+        # Если анимация шла до загрузки нового GIF и есть новые кадры, перезапускаем ее
+        # и восстанавливаем исходное состояние hide_gif (если она была видима)
+        if was_running and self.frames and not current_hide_gif_state:
+             self.start_animation_threadsafe()
+        elif not self.frames: # Если кадры не загрузились, убедимся, что анимация остановлена
+             self.hide_gif = True # Устанавливаем, чтобы run_gui_update не пытался работать
+             if self._is_master_valid() and self.master.gif_label.winfo_ismapped():
+                 self.master.gif_label.pack_forget()
+
 
     def __call__(self, func):
         @wraps(func)
-        def call_func(*args, **kwargs):
-            return_value = None
-
-            def wrapper(*a, **k):
-                nonlocal return_value
-                return_value = func(*a, **k)
-
-            create_thread(self.run())
+        def decorated_func(*args, **kwargs):
+            
             task_num = self.get_task_num()
-            task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
-            info = [func.__name__, args, task_real]
-            if task_num in self.tasks:
-                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
-                return None
-            else:
-                self.tasks[task_num] = info
-            task_real.start()
-            task_real.join()
-            if task_num in self.tasks:
-                del self.tasks[task_num]
-            del info, task_num
-            if not self.tasks:
-                self.stop()
+            
+            # Проверяем, нужно ли запускать анимацию (если это первая активная задача)
+            should_control_animation = not bool(self.tasks)
+            
+            if should_control_animation:
+                self.start_animation_threadsafe()
+
+            # Добавляем задачу в словарь *перед* запуском потока
+            # Это важно для should_control_animation в случае вложенных вызовов
+            self.tasks[task_num] = func.__name__ # Можно хранить более подробную информацию
+
+            try:
+                # Выполняем оригинальную функцию.
+                # Так как @animation часто используется с create_thread,
+                # func сама может быть уже запущена в потоке.
+                # Если func - это длительная операция, она должна быть разработана так,
+                # чтобы не блокировать GUI, если она не в своем потоке.
+                # В данном случае, @animation не создает поток для func,
+                # это делает create_thread(decorated_func).
+                # Если decorated_func вызывается напрямую из GUI (command=...),
+                # то func будет выполнена в главном потоке.
+                # Для функций, которые должны выполняться в фоне, их все равно нужно
+                # оборачивать в create_thread(decorated_func_name).
+                return_value = func(*args, **kwargs)
+            except Exception as e:
+                logging.error(f"LoadAnim: Exception in decorated function {func.__name__}: {e}")
+                import traceback
+                logging.error(traceback.format_exc())
+                return_value = None # или пробросить исключение
+            finally:
+                if task_num in self.tasks:
+                    del self.tasks[task_num]
+                
+                if should_control_animation and not bool(self.tasks):
+                    # Если это была задача, которая инициировала анимацию,
+                    # и теперь задач нет, останавливаем анимацию.
+                    self.stop_animation_threadsafe()
+                elif not bool(self.tasks): 
+                    # Если это была не инициирующая задачу, но после нее задач не осталось
+                    self.stop_animation_threadsafe()
+
+
             return return_value
-
-        return call_func
-
-
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500, parent=None):
-    """
-    Displays a temporary window with a warning or informational message.
-
-    This window automatically closes after a specified 'wait' period.
-    It can be made transient to a parent window if provided.
-
-    Args:
-        text (str): The message text to display.
-        color (str): The color of the message text.
-        title (str): The title of the window.
-        wait (int): Time in milliseconds after which the window will close.
-        parent (tk.Widget, optional): The parent window. If specified,
-                                     the dialog will be transient with respect to it.
-    """
-    # Attempt to use the custom Toplevel if 'Toplevel' is defined in the current scope.
-    # Otherwise, fall back to the standard tkinter.Toplevel.
-    # This assumes the custom Toplevel handles Windows-specific title bar coloring if needed.
-    try:
-        dialog = Toplevel() 
-    except NameError: 
-        import tkinter as tk
-        dialog = tk.Toplevel()
-
-    dialog.title(title)
-    # dialog.resizable(False, False) # Optionally, prevent resizing.
-
-    # If a parent window is provided and exists, make the dialog transient to it.
-    # This helps the window manager handle window layering and behavior correctly.
-    if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
-        try:
-            dialog.transient(parent)
-        except Exception as e:
-            # Log a warning if setting transient fails, but don't interrupt the dialog.
-            if 'logging' in globals() and hasattr(globals()['logging'], 'warning'):
-                logging.warning(f"Could not set transient for warn_win: {e}")
-
-    frame_inner = ttk.Frame(dialog)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    
-    # Default font. Could be customized via 'lang' object if needed, e.g.:
-    # font_tuple = getattr(lang, 'font_warn_win_text', (None, 16))
-    font_tuple = (None, 16) 
-
-    ttk.Label(frame_inner, text=text, font=font_tuple, foreground=color, wraplength=350).pack(side=TOP, pady=(10,10))
-    
-    # Center the window on the screen.
-    if 'move_center' in globals() and callable(globals()['move_center']):
-        move_center(dialog)
-    else: 
-        # Basic fallback for centering if move_center is not available.
-        dialog.update_idletasks()
-        width = dialog.winfo_width()
-        height = dialog.winfo_height()
-        screen_width = dialog.winfo_screenwidth()
-        screen_height = dialog.winfo_screenheight()
-        x = (screen_width // 2) - (width // 2)
-        y = (screen_height // 2) - (height // 2)
-        dialog.geometry(f'{width}x{height}+{x}+{y}')
-
-    # Schedule the window to close automatically.
-    dialog.after(wait, dialog.destroy)
-    
-    # Note: grab_set() and wait_window() are typically not used for 'warn_win'
-    # as it's intended to be a non-blocking notification.
-    # If modal behavior during its display is required:
-    # dialog.grab_set()
-    # dialog.wait_window() # This would make it blocking, changing its nature.
-    
-    # To make the window always on top (but not modal in a blocking sense):
-    # dialog.attributes('-topmost', True) # Behavior might vary across platforms/WMs.
-
-    return dialog # Return the dialog instance, in case it's needed.
+        return decorated_func
 
 
 class Toplevel(TkToplevel):
@@ -5767,73 +5833,97 @@ def __init__tk(args: list):
         logging.basicConfig(level=logging.DEBUG, 
                             format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
 
-    global win, current_project_name, theme, language, unpackg, project_menu, animation, start
-    win = Tool() 
-    if os.name == 'nt': 
-        if 'do_set_window_deffont' in globals(): do_set_window_deffont(win)
-        if 'set_title_bar_color' in globals(): set_title_bar_color(win) 
-    animation = LoadAnim() 
-    animation.set_master(win) 
+     # Объявляем animation здесь
+
+    win = Tool()  # Создаем главное окно
+
+    # Глобальные переменные для Tkinter, связанные с win
     current_project_name = StringVar(master=win) 
     utils.project_name = current_project_name 
     theme = StringVar(master=win)
     language = StringVar(master=win)
+    
+    # Загрузка настроек и начальные окна (OOBE, Updater)
     settings.load() 
+    if os.name == 'nt' and hasattr(win, 'list2') and hasattr(settings, 'theme'): # Установка цвета заголовка после загрузки темы
+        if settings.theme == 'dark':
+            set_title_bar_color(win)
+        else:
+            set_title_bar_color(win, 0)
+
     if settings.updating in ['1', '2']: Updater() 
     if int(settings.oobe) < 5: Welcome() 
-    init_verify() 
-    try: win.winfo_exists()
+    
+    init_verify() # Проверка окружения
+    
+    # Проверка, что главное окно все еще существует перед вызовом win.gui()
+    try: 
+        win.winfo_exists()
     except TclError as e_main_window_invalid:
         logging.exception(f"Main window (win) is invalid before win.gui(): {e_main_window_invalid}")
+        # Возможно, здесь стоит выйти, если главное окно невалидно
         return 
-    win.gui() 
+        
+    win.gui() # <--- ВЫПОЛНЯЕМ win.gui() ЗДЕСЬ. Теперь win.gif_label создан.
+
+    # --- Инициализация animation ПОСЛЕ win.gui() ---
+    animation = LoadAnim() # <--- Создаем экземпляр LoadAnim ТЕПЕРЬ
+    animation.set_master(win) # <--- Устанавливаем master ТЕПЕРЬ. win.gif_label уже существует.
     
-    if not (win.tab2 and win.tab2.winfo_exists()):
-        logging.error("CRITICAL: Parent tab (win.tab2) not found. UI will be incomplete.")
+    # Загрузка GIF для анимации
+    loading_gif_theme_suffix = "dark" # Значение по умолчанию
+    if hasattr(win, 'list2') and hasattr(win.list2, 'get'): 
+        theme_val = win.list2.get()
+        if theme_val: # Убедимся, что значение не пустое
+            loading_gif_theme_suffix = theme_val
+    
+    gif_data_attr_name = f"loading_{loading_gif_theme_suffix}_byte"
+    # Фоллбэк на dark GIF, если для текущей темы нет или атрибут отсутствует
+    default_gif_data = getattr(images, "loading_dark_byte", None) 
+    loading_gif_data = getattr(images, gif_data_attr_name, default_gif_data)
+
+    if loading_gif_data:
+        try:
+            pil_gif_image = open_img(BytesIO(loading_gif_data))
+            animation.load_gif(pil_gif_image) # Передаем объект PIL.Image
+        except Exception as e_animation_gif:
+            logging.error(f"Failed to load animation GIF in __init__tk: {e_animation_gif}")
     else:
-        # 1. Создаем экземпляры с передачей master
+        logging.warning(f"Loading GIF data for theme '{loading_gif_theme_suffix}' (or default) not found in __init__tk.")
+    # --- Конец инициализации animation ---
+    
+    # Создание и размещение остальных GUI-компонентов
+    if not (hasattr(win, 'tab2') and win.tab2 and win.tab2.winfo_exists()): # Проверка существования родительской вкладки
+        logging.error("CRITICAL: Parent tab (win.tab2) not found or destroyed. UI will be incomplete.")
+    else:
         project_menu = ProjectMenuUtils(master=win.tab2)
-        unpackg = UnpackGui(master=win.tab2)
+        unpackg = UnpackGui(master=win.tab2) # <--- unpackg создается здесь
         frame3_instance = Frame3(master=win.tab2)
 
-        # 2. Вызываем .gui() для UnpackGui (он НЕ пакует сам себя)
         unpackg.gui() 
-
-        # 3. Вызываем .gui() для ProjectMenuUtils (он пакует себя первым, side=TOP, fill='x')
         project_menu.gui() 
-                               
-        # 4. Теперь пакуем UnpackGui (он будет под ProjectMenuUtils)
-        #    fill=BOTH и expand=True чтобы он занял оставшееся место
         unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True) 
-
-        # 5. Вызываем .gui() для Frame3 (он пакует себя под UnpackGui, side=TOP, fill='x')
         if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
             frame3_instance.gui()
         
-        # 6. Вызываем listdir после того, как все создано и упаковано
         project_menu.listdir() 
 
-    loading_gif_theme_suffix = "dark"
-    if hasattr(win, 'list2') and hasattr(win.list2, 'get') and win.list2.get():
-        loading_gif_theme_suffix = win.list2.get()
-    loading_gif_data = getattr(images, f"loading_{loading_gif_theme_suffix}_byte", getattr(images, "loading_dark_byte", None))
-    if loading_gif_data:
-        try:
-            animation.load_gif(open_img(BytesIO(loading_gif_data)))
-            animation.init() 
-        except Exception as e_animation_gif:
-            logging.error(f"Failed to load/initialize animation GIF: {e_animation_gif}")
-    else:
-        logging.warning("Loading GIF data not found.")
-
+    # Запуск специфичных для PRO версии частей, если необходимо
     if not is_pro:
         if hasattr(lang, 'text108'): print(lang.text108)
     elif 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
-        Active(verify, settings, win, images, lang).gui() 
+        # Убедитесь, что Active и его зависимости (images, lang) передаются корректно
+        if 'Active' in globals() and 'verify' in globals() and 'settings' in globals() and \
+           'win' in globals() and 'images' in globals() and 'lang' in globals():
+            Active(verify, settings, win, images, lang).gui() 
+        else:
+            logging.error("Cannot initialize Pro 'Active' component due to missing dependencies.")
+            
     win.update() 
     move_center(win) 
     win.get_time() 
-    if 'start' in globals():
+    
+    if 'start' in globals() and callable(dti): # Проверка dti
          startup_time_message_key = 'text134'
          default_startup_time_message = "Startup took: {:.2f} seconds"
          startup_time_message_format = getattr(lang, startup_time_message_key, default_startup_time_message)
@@ -5842,15 +5932,31 @@ def __init__tk(args: list):
          try:
             print(startup_time_message_format.format(dti() - start))
          except TypeError: 
-            print(f"Startup took: {dti() - start:.2f} seconds (fallback format)")
+            # Фоллбэк, если lang или dti некорректны
+            current_time = time.time() # Используем time.time() если dti() не работает
+            if isinstance(start, (int, float)): # Проверяем, что start это число
+                 print(f"Startup took: {current_time - start:.2f} seconds (fallback format)")
+            else:
+                 print(f"Startup time cannot be calculated (start={start}).")
+
+
     if os.name == 'nt':
-        if 'do_override_sv_ttk_fonts' in globals(): do_override_sv_ttk_fonts()
-        if sys.getwindowsversion().major <= 6: 
-            if hasattr(lang, 'warn20') and 'ask_win' in globals(): ask_win(lang.warn20)
+        if 'do_override_sv_ttk_fonts' in globals() and callable(do_override_sv_ttk_fonts): 
+            do_override_sv_ttk_fonts()
+        # Проверка версии Windows и предупреждение
+        if hasattr(sys, 'getwindowsversion') and callable(sys.getwindowsversion):
+            if sys.getwindowsversion().major <= 6: # Windows 7 и старше
+                if hasattr(lang, 'warn20') and 'ask_win' in globals() and callable(ask_win): 
+                    ask_win(lang.warn20)
+        else:
+            logging.warning("sys.getwindowsversion not available for Windows version check.")
+            
     states.inited = True 
     win.protocol("WM_DELETE_WINDOW", exit_tool) 
-    if len(args) > 1 and is_pro : 
-        win.after(100, lambda: ParseCmdline(args[1:]))
+    
+    if len(args) > 1 and is_pro : # Обработка аргументов командной строки
+        win.after(100, lambda: ParseCmdline(args[1:])) # ParseCmdline должен быть определен
+        
     win.mainloop()
 
 
