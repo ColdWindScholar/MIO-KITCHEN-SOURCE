@@ -1,33 +1,16 @@
 #!/usr/bin/env python3
 # pylint: disable=line-too-long
 # Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
-#
-# Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#!/usr/bin/env python3
-# pylint: disable=line-too-long
-# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 # ... (лицензия) ...
 
 import os
-import platform # Import the whole module
+import platform 
 import shutil
 import zipfile
-import sys # For sys.exit
+import sys 
 
-# Determine the root directory of the project (where build.py is located)
 project_root_dir = os.path.abspath(os.path.dirname(__file__))
 
-# Install requirements
 try:
     from pip._internal.cli.main import main as _pip_main
     print("Checking and installing requirements...")
@@ -48,77 +31,66 @@ except ImportError:
     print("Warning: pip is not available. Please ensure all dependencies from requirements.txt are installed manually.")
 
 current_os_type = platform.system()
-app_name_base = "MIO-KITCHEN" # Base name for output files
-output_zip_name = f"{app_name_base.lower()}.zip" # Default zip name
-pyinstaller_app_name = "tool" # Name for the executable and output folder by PyInstaller
-
+# Имена, как в твоем оригинальном скрипте
 if current_os_type == 'Linux':
-    output_zip_name = f'{app_name_base}-linux.zip'
+    output_final_zip_name = 'MIO-KITCHEN-linux.zip'
 elif current_os_type == 'Darwin':
-    if platform.machine() == 'x86_64':
-        output_zip_name = f'{app_name_base}-macos-intel.zip'
+    if platform.machine() == 'x86_64': # Используем platform.machine() напрямую
+        output_final_zip_name = 'MIO-KITCHEN-macos-intel.zip'
     else:
-        output_zip_name = f'{app_name_base}-macos.zip'
-    try:
-        from tkinter import END # Simple check for tkinter availability
-    except ImportError:
-        print("CRITICAL: Tkinter is not available on this macOS system! The build may not work correctly.")
+        output_final_zip_name = 'MIO-KITCHEN-macos.zip'
+    try: from tkinter import END 
+    except ImportError: print("CRITICAL: Tkinter is not available on this macOS system!")
 elif current_os_type == 'Windows':
-    output_zip_name = f'{app_name_base}-win.zip'
+    output_final_zip_name = 'MIO-KITCHEN-win.zip'
 else:
     print(f"Warning: Unsupported OS type: {current_os_type}. Using generic zip name.")
-    output_zip_name = f'{app_name_base}-{current_os_type.lower()}.zip'
+    output_final_zip_name = f'MIO-KITCHEN-{current_os_type.lower()}.zip'
 
+# Имя для исполняемого файла и папки, создаваемой PyInstaller (можно оставить простым)
+pyinstaller_output_name = "tool" 
 
-# --- PyInstaller Configuration ---
-print(f"Starting PyInstaller build for {current_os_type}...")
+print("Building application with PyInstaller...")
 import PyInstaller.__main__
 
 pyinstaller_args = [
-    os.path.join(project_root_dir, 'tool.py'), # Entry point script (PROJECT_ROOT/tool.py)
-    '--name', pyinstaller_app_name,          # Output name for exe and one-dir folder
-    '-D',                                    # Create a one-dir bundle
-    '--console',                             # Keep console for debugging; use '-w' or '--noconsole' for release
-    # '-w',                                  # For windowed (no console) release build
+    os.path.join(project_root_dir, 'tool.py'), 
+    '--name', pyinstaller_output_name,
+    '-D',                                    # One-dir build
+    '--console',                             # Отладочная консоль
+    # '-w',                                  # Для релиза без консоли
     '--icon', os.path.join(project_root_dir, 'icon.ico'),
     '--exclude-module', 'numpy',
     '--collect-data', 'sv_ttk',
     '--collect-data', 'chlorophyll',
-    '--paths', os.path.join(project_root_dir, 'src'), # Add 'src' to module search path
+    '--paths', os.path.join(project_root_dir, 'src'),
 ]
 
-# Data files and folders to include (from PROJECT_ROOT/bin and PROJECT_ROOT)
-# Format: 'source_path_on_disk:destination_path_in_bundle'
-# os.pathsep is ';' on Windows, ':' on POSIX
+# Файлы и папки для включения в сборку
+# Источник относительно project_root_dir, назначение относительно корня сборки
 data_to_bundle = [
-    (os.path.join(project_root_dir, 'bin'), 'bin'),                 # Entire 'bin' directory
-    (os.path.join(project_root_dir, 'LICENSE'), '.'),               # LICENSE file to bundle root
-    (os.path.join(project_root_dir, 'config'), '.'),                # 'config' file to bundle root
-    # Add other root-level files if needed, e.g., READMEs, splash images not handled by --splash
-    # (os.path.join(project_root_dir, 'README.md'), '.'),
+    # Вся папка bin из корня проекта копируется в папку 'bin' внутри сборки
+    (os.path.join(project_root_dir, 'bin'), 'bin'),
+    # Файл LICENSE из корня проекта копируется в корень сборки
+    (os.path.join(project_root_dir, 'LICENSE'), '.'),
+    # Файл config из корня проекта копируется в корень сборки
+    (os.path.join(project_root_dir, 'config'), '.'),
 ]
+
 for src_path, dest_in_bundle in data_to_bundle:
-    if os.path.exists(src_path): # Check if source exists before adding
+    if os.path.exists(src_path):
         pyinstaller_args.append(f'--add-data={src_path}{os.pathsep}{dest_in_bundle}')
     else:
         print(f"Warning: Data source path not found, skipping: {src_path}")
 
-
-# Hidden imports that PyInstaller might miss
-hidden_imports_list = [
-    'tkinter', 'PIL', 'PIL._tkinter_finder', 
-    'requests', 'idna', # Common ones for network
-    # Add any other modules PyInstaller struggles to find
-]
+hidden_imports_list = ['tkinter', 'PIL', 'PIL._tkinter_finder', 'requests', 'idna']
 for hi in hidden_imports_list:
     pyinstaller_args.extend(['--hidden-import', hi])
 
-# Splash screen
 splash_file_path = os.path.join(project_root_dir, 'splash.png')
-if os.path.exists(splash_file_path) and current_os_type != 'Darwin': # Splash for Darwin typically via Info.plist
+if os.path.exists(splash_file_path) and current_os_type != 'Darwin':
     pyinstaller_args.extend(['--splash', splash_file_path])
 
-# Run PyInstaller
 print(f"Executing PyInstaller with arguments: {' '.join(pyinstaller_args)}")
 try:
     PyInstaller.__main__.run(pyinstaller_args)
@@ -127,16 +99,17 @@ except Exception as e_pyinstaller_run:
     print(f"CRITICAL: PyInstaller execution failed: {e_pyinstaller_run}")
     sys.exit(1)
 
-# --- Post-build Processing ---
+# --- Пост-обработка ---
 dist_path = os.path.join(project_root_dir, 'dist')
-app_bundle_path = os.path.join(dist_path, pyinstaller_app_name) # e.g., dist/tool
+# Это папка, созданная PyInstaller, например, dist/tool/
+app_build_output_folder = os.path.join(dist_path, pyinstaller_output_name) 
 
-if not os.path.isdir(app_bundle_path):
-    print(f"CRITICAL: PyInstaller output directory not found: {app_bundle_path}")
+if not os.path.isdir(app_build_output_folder):
+    print(f"CRITICAL: PyInstaller output directory not found: {app_build_output_folder}")
     sys.exit(1)
 
-# Clean up unnecessary tkdnd library versions
-tkdnd_path_in_bundle = os.path.join(app_bundle_path, 'bin', 'tkdnd')
+# Очистка ненужных версий tkdnd
+tkdnd_path_in_bundle = os.path.join(app_build_output_folder, 'bin', 'tkdnd')
 dndplat_to_keep = None
 current_machine_arch_for_dnd = platform.machine()
 
@@ -146,66 +119,117 @@ elif current_os_type == 'Linux':
     dndplat_to_keep = 'linux-arm64' if current_machine_arch_for_dnd == 'aarch64' else 'linux-x64'
 elif current_os_type == 'Windows':
     win_py_arch, _ = platform.architecture()
-    if win_py_arch == '32bit' and current_machine_arch_for_dnd == 'AMD64': # 32-bit Python on 64-bit OS
+    # Корректное определение для 32-битного Python на 64-битной Windows
+    if win_py_arch == '32bit' and current_machine_arch_for_dnd == 'AMD64':
         dndplat_to_keep = 'win-x86'
-    elif current_machine_arch_for_dnd == 'x86':
+    elif current_machine_arch_for_dnd == 'x86': # Нативный 32-bit или уже скорректированный
         dndplat_to_keep = 'win-x86'
-    elif current_machine_arch_for_dnd == 'AMD64':
+    elif current_machine_arch_for_dnd == 'AMD64': # Нативный 64-bit
         dndplat_to_keep = 'win-x64'
     elif current_machine_arch_for_dnd == 'ARM64':
         dndplat_to_keep = 'win-arm64'
 
 if dndplat_to_keep and os.path.isdir(tkdnd_path_in_bundle):
-    print(f"Cleaning tkdnd libraries in bundle, keeping: {dndplat_to_keep}")
+    print(f"Cleaning tkdnd libraries in bundle, keeping only for: {dndplat_to_keep}")
     for item_name in os.listdir(tkdnd_path_in_bundle):
         item_full_path = os.path.join(tkdnd_path_in_bundle, item_name)
         if os.path.isdir(item_full_path) and item_name != dndplat_to_keep:
             print(f"Removing: {item_full_path}")
             shutil.rmtree(item_full_path, ignore_errors=True)
 elif not dndplat_to_keep:
-    print(f"Warning: Could not determine specific tkdnd platform for {current_os_type}/{current_machine_arch_for_dnd}. All versions kept.")
+    print(f"Warning: Could not determine specific tkdnd platform for {current_os_type}/{current_machine_arch_for_dnd}. All tkdnd versions will be kept.")
 else:
     print(f"Warning: TkDnD path not found in bundle: {tkdnd_path_in_bundle}. Skipping tkdnd cleanup.")
 
-# Set executable permissions for POSIX systems (Linux/macOS)
+# Установка прав на выполнение для POSIX систем
 if os.name == 'posix':
-    print(f"Setting executable permissions for POSIX in: {app_bundle_path}")
-    # Binaries that typically need execute permission
-    executables_to_chmod = [pyinstaller_app_name] # The main app
-    # Add other binaries from your 'bin' folder if they are directly executed
-    # Example: os.path.join('bin', platform.system(), platform.machine(), 'my_tool')
-    # For now, just the main app and .sh scripts.
-    for root, _, files in os.walk(app_bundle_path):
-        for file_item in files:
-            if file_item in executables_to_chmod or file_item.endswith(".sh"):
-                file_path_to_chmod = os.path.join(root, file_item)
-                try:
-                    print(f"  chmod +x {file_path_to_chmod}")
-                    # Add execute permission for owner, group, and others (u+x, g+x, o+x)
-                    current_mode = os.stat(file_path_to_chmod).st_mode
-                    os.chmod(file_path_to_chmod, current_mode | 0o111) # stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
-                except Exception as e_chmod_err:
-                    print(f"  Warning: Failed to chmod {file_path_to_chmod}: {e_chmod_err}")
+    print(f"Setting executable permissions for POSIX in: {app_build_output_folder}")
+    main_exe_path_posix = os.path.join(app_build_output_folder, pyinstaller_output_name)
+    if os.path.exists(main_exe_path_posix):
+        try:
+            print(f"  chmod +x {main_exe_path_posix}")
+            os.chmod(main_exe_path_posix, os.stat(main_exe_path_posix).st_mode | 0o111)
+        except Exception as e_chmod_main_posix:
+            print(f"  Warning: Failed to chmod main executable {main_exe_path_posix}: {e_chmod_main_posix}")
 
-# Create final ZIP archive
-final_zip_file_path = os.path.join(project_root_dir, output_zip_name)
-print(f"Creating final ZIP archive: {final_zip_file_path}")
-os.chdir(dist_path) # Change to 'dist' directory to have 'app_name/' as root in ZIP
-try:
-    with zipfile.ZipFile(final_zip_file_path, "w", zipfile.ZIP_DEFLATED) as archive:
-        for root, dirnames, files in os.walk(pyinstaller_app_name): # Walk the 'app_name' folder (e.g., 'tool')
-            # Exclude .git if it somehow ends up here
-            if ".git" in dirnames:
-                dirnames.remove(".git")
+    bundled_bin_path_posix = os.path.join(app_build_output_folder, 'bin')
+    if os.path.isdir(bundled_bin_path_posix):
+        # Список бинарников, которым нужны права на выполнение
+        executables_in_bin = ["exec.sh", "dtc", "magiskboot", "zstd", "brotli", "lpmake", 
+                              "mkfs.erofs", "extract.erofs", "make_ext4fs", "mke2fs", 
+                              "e2fsdroid", "img2simg", "simg2img"] 
+        # Добавь сюда другие специфичные для платформ исполняемые файлы, если они есть в bin/<OS>/
+        for root, _, files in os.walk(bundled_bin_path_posix):
             for file_item in files:
-                file_path_in_dist = os.path.join(root, file_item)
-                # arcname will be like 'tool/tool.exe', 'tool/bin/setting.ini', etc.
-                print(f"  Adding to ZIP: {file_path_in_dist}")
-                archive.write(file_path_in_dist, file_path_in_dist)
-    print(f"Successfully created {final_zip_file_path}")
-except Exception as e_final_zip:
-    print(f"Error creating final ZIP archive: {e_final_zip}")
-finally:
-    os.chdir(project_root_dir) # Important: change back to the original directory
+                # Проверяем по имени или расширению
+                if file_item.endswith(".sh") or file_item in executables_in_bin or \
+                   (current_os_type == 'Linux' and file_item in ["busybox"]) or \
+                   (current_os_type == 'Darwin' and file_item in ["busybox"]): # Пример
+                    file_path_to_chmod = os.path.join(root, file_item)
+                    try:
+                        print(f"  chmod +x {file_path_to_chmod}")
+                        os.chmod(file_path_to_chmod, os.stat(file_path_to_chmod).st_mode | 0o111)
+                    except Exception as e_chmod_bin_posix:
+                        print(f"  Warning: Failed to chmod binary {file_path_to_chmod}: {e_chmod_bin_posix}")
+
+# Создание финального ZIP архива с именем, как в оригинале
+final_zip_full_path = os.path.join(project_root_dir, output_final_zip_name) # ZIP будет в корне проекта
+print(f"Creating final ZIP archive: {final_zip_full_path}")
+
+if os.path.isdir(app_build_output_folder): # Для one-dir сборки
+    # Чтобы в архиве была папка MIO-KITCHEN-.../tool.exe, MIO-KITCHEN-.../bin/, и т.д.
+    # мы можем временно переименовать app_build_output_folder (например, dist/tool)
+    # в имя нашего ZIP-архива без расширения, заархивировать, а потом вернуть имя обратно.
+    # Или проще: архивировать содержимое app_build_output_folder, но в ZIP класть это в папку
+    # с именем output_final_zip_name (без .zip).
+
+    # Вариант 1: Архивируем папку app_build_output_folder (например, 'tool') как есть
+    # Тогда при распаковке будет папка 'tool'. Пользователь может переименовать.
+    # os.chdir(dist_path)
+    # try:
+    #     with zipfile.ZipFile(final_zip_full_path, "w", zipfile.ZIP_DEFLATED) as archive:
+    #         for root, _, files in os.walk(pyinstaller_app_name): 
+    #             for file_item in files:
+    #                 file_path_in_dist = os.path.join(root, file_item)
+    #                 archive.write(file_path_in_dist, file_path_in_dist) 
+    #     print(f"Successfully created {final_zip_full_path}")
+    # except Exception as e_zip_dir:
+    #     print(f"Error creating ZIP for one-dir: {e_zip_dir}")
+    # finally:
+    #     os.chdir(project_root_dir)
+
+    # Вариант 2: Создаем структуру MIO-KITCHEN-os/ внутри ZIP
+    # Для этого нужно архивировать каждый файл с измененным путем.
+    # Проще всего создать временную папку с нужным именем, скопировать туда содержимое
+    # app_build_output_folder, заархивировать эту временную папку и удалить ее.
+    
+    temp_archive_folder_name = os.path.splitext(output_final_zip_name)[0] # e.g., "MIO-KITCHEN-linux"
+    temp_archive_folder_path = os.path.join(dist_path, temp_archive_folder_name)
+
+    if os.path.exists(temp_archive_folder_path):
+        shutil.rmtree(temp_archive_folder_path) # Удаляем, если существует от предыдущей сборки
+    
+    try:
+        shutil.copytree(app_build_output_folder, temp_archive_folder_path) # Копируем dist/tool в dist/MIO-KITCHEN-linux
+        
+        os.chdir(dist_path) # Переходим в dist, чтобы архивировать MIO-KITCHEN-linux/
+        with zipfile.ZipFile(final_zip_full_path, "w", zipfile.ZIP_DEFLATED) as archive:
+            for root, dirnames, files in os.walk(temp_archive_folder_name):
+                 if ".git" in dirnames: dirnames.remove(".git")
+                 for file_item in files:
+                    file_path_in_temp_archive_folder = os.path.join(root, file_item)
+                    print(f"  Adding to ZIP: {file_path_in_temp_archive_folder}")
+                    archive.write(file_path_in_temp_archive_folder, file_path_in_temp_archive_folder)
+        print(f"Successfully created {final_zip_full_path}")
+        
+    except Exception as e_zip_final:
+        print(f"Error creating final ZIP structure: {e_final_zip}")
+    finally:
+        if os.path.exists(temp_archive_folder_path):
+            shutil.rmtree(temp_archive_folder_path) # Удаляем временную папку
+        os.chdir(project_root_dir) # Возвращаемся в корень проекта
+
+else:
+    print(f"Output directory {app_bundle_path} not found for zipping.")
 
 print("Build script finished.")
