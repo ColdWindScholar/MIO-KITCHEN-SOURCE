@@ -4961,36 +4961,31 @@ def dndfile(files: list):
 
 
 class ProjectMenuUtils(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
-        title_text_key = 'text12' # Ключ для "Project"
+    def __init__(self, master=None, **kwargs):
+        title_text_key = 'text12' 
         default_title = "Project"
         title_text = getattr(lang, title_text_key, default_title)
         if not isinstance(title_text, str) or title_text == "None":
             title_text = default_title
-            
-        super().__init__(master=master, text=title_text, **kwargs) # Передаем master
-        
-        self.combobox = None # Будет создан в self.gui()
-        # НЕ ВЫЗЫВАЕМ self.gui() здесь, его вызовет __init__tk И ОН САМ СЕБЯ УПАКУЕТ
+        super().__init__(master=master, text=title_text, **kwargs)
+        self.combobox = None 
+        # НЕ ВЫЗЫВАЕМ self.gui() здесь
 
     def gui(self):
         """Creates and arranges widgets, then packs the LabelFrame itself."""
-        # Этот метод должен вызывать self.pack() для самого ProjectMenuUtils в конце.
         
-        # Combobox for project selection
         self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
-        self.combobox.pack(side="top", padx=10, pady=10, fill=X)
-        if 'lang' in globals() and hasattr(lang, 'text96'):
-            self.combobox.bind('<<ComboboxSelected>>', 
-                               lambda *x: print(f"{getattr(lang, 'text96', 'Selected items:')} {current_project_name.get()}"))
-        else:
-             self.combobox.bind('<<ComboboxSelected>>', 
-                               lambda *x: print(f"Selected project: {current_project_name.get()}"))
+        # Растягиваем Combobox по горизонтали
+        self.combobox.pack(side="top", padx=10, pady=10, fill=X, expand=True) 
+        
+        selected_text_key = getattr(lang, 'text96', 'Selected project:')
+        if not isinstance(selected_text_key, str) or selected_text_key == "None":
+            selected_text_key = 'Selected project:'
+        self.combobox.bind('<<ComboboxSelected>>', 
+                           lambda *x: print(f"{selected_text_key} {current_project_name.get()}"))
 
-
-        # Frame for action buttons
         button_frame = ttk.Frame(self)
-        button_frame.pack(side="top", padx=5, pady=(0,5)) # Buttons below combobox
+        button_frame.pack(side="top", padx=5, pady=(0,5), fill=X, expand=True)
 
         functions_map = [
             (getattr(lang, 'text23', "Refresh"), self.listdir),
@@ -4999,13 +4994,14 @@ class ProjectMenuUtils(ttk.LabelFrame):
             (getattr(lang, 'text117', "Rename"), lambda: create_thread(self.rename)),
         ]
         for text, func in functions_map:
-            # Ensure text is a string
-            if not isinstance(text, str) or text == "None": text = "Action"
-            ttk.Button(button_frame, text=text, command=func).pack(side="left", padx=5, pady=5)
+            button_text_str = str(text) if text is not None else "Action"
+            # Даем кнопкам возможность растягиваться, если button_frame растягивается
+            ttk.Button(button_frame, text=button_text_str, command=func).pack(side="left", padx=5, pady=5, fill=X, expand=True)
 
         # Pack the main LabelFrame itself onto its master (win.tab2)
-        self.pack(padx=5, pady=5, fill='x', side=TOP) # Упаковываем ProjectMenuUtils здесь
-        return self # Возвращаем self для цепочных вызовов, если нужно (хотя здесь не используется)
+        # Растягиваем ProjectMenuUtils по горизонтали, но не по вертикали
+        self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
+        return self
 
     @staticmethod
     def set_project(name):
@@ -5207,22 +5203,18 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
 
 class Frame3(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
-        title_text_key = 'text112' # Ключ для "Other"
+    def __init__(self, master=None, **kwargs):
+        title_text_key = 'text112' 
         default_title = "Other Actions"
         title_text = getattr(lang, title_text_key, default_title)
         if not isinstance(title_text, str) or title_text == "None":
             title_text = default_title
-
-        super().__init__(master=master, text=title_text, **kwargs) # Передаем master
-        # НЕ ВЫЗЫВАЕМ self.gui() здесь, его вызовет __init__tk И ОН САМ СЕБЯ УПАКУЕТ
+        super().__init__(master=master, text=title_text, **kwargs)
+        # НЕ ВЫЗЫВАЕМ self.gui() здесь
 
     def gui(self):
         """Creates and arranges widgets, then packs the LabelFrame itself."""
-        # Этот метод должен вызывать self.pack() для самого Frame3 в конце.
         
-        row = 0
-        # Используем getattr для безопасного доступа к текстам кнопок
         functions_map = [
             (getattr(lang, 'text122', "Pack ZIP"), lambda: create_thread(pack_zip)),
             (getattr(lang, 'text123', "Pack super"), lambda: create_thread(PackSuper)),
@@ -5230,89 +5222,66 @@ class Frame3(ttk.LabelFrame):
             (getattr(lang, 't13', "Convert image"), lambda: create_thread(FormatConversion)),
         ]
 
+        # Используем grid для кнопок, чтобы они были в одной строке и растягивались
+        num_buttons = len(functions_map)
         for index, (text, func) in enumerate(functions_map):
-            column = index % 4 # Предполагаем 4 кнопки в ряду
-            if column == 0 and index != 0 : # Переход на новый ряд (кроме первой кнопки)
-                row += 1
-            
-            # Убедимся, что текст кнопки - это строка
             button_text_str = str(text) if text is not None else "Action"
-            ttk.Button(self, text=button_text_str, command=func, width=11).grid(row=row, column=column, padx=5, pady=5, sticky="ew")
-        
-        # Конфигурируем колонки для равномерного растягивания, если нужно
-        for i in range(4): # Если максимум 4 колонки
-            self.grid_columnconfigure(i, weight=1)
+            # width=11 может быть слишком маленьким, если кнопки должны растягиваться
+            btn = ttk.Button(self, text=button_text_str, command=func) 
+            btn.grid(row=0, column=index, padx=5, pady=5, sticky="ew")
+            self.grid_columnconfigure(index, weight=1) # Позволяет колонкам растягиваться
 
         # Pack the main LabelFrame itself onto its master (win.tab2)
-        self.pack(padx=5, pady=5, fill='x', side=TOP) # Упаковываем Frame3 здесь
+        # Растягиваем Frame3 по горизонтали, но не по вертикали
+        self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
         return self
 
 
 class UnpackGui(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
-        # Безопасное получение текста для заголовка LabelFrame
-        title_text_key = 't57' # Ключ для "Unpack Options" или аналогичного
-        default_title = "Unpack Options" # Запасной текст
+    def __init__(self, master=None, **kwargs):
+        title_text_key = 't57' 
+        default_title = "Firmware File Types" # Более описательно
         title_text = getattr(lang, title_text_key, default_title)
         if not isinstance(title_text, str) or title_text == "None":
             title_text = default_title
         
-        super().__init__(master=master, text=title_text, **kwargs) # Передаем master и text
+        super().__init__(master=master, text=title_text, **kwargs)
         
-        self.ch = BooleanVar() # Для Radiobutton Unpack/Pack
-        # trace_add на current_project_name, чтобы реагировать на смену проекта
+        self.ch = BooleanVar()
         if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], StringVar):
             current_project_name.trace_add("write", self._on_project_change)
         else:
-            logging.error("Global 'current_project_name' not found or not a StringVar for UnpackGui trace.")
+            logging.error("Global 'current_project_name' not found for UnpackGui trace.")
         
-        # Атрибуты для виджетов будут созданы в self.gui()
-        self.fm = None
-        self.lsg = None
+        self.fm = None # Combobox для типов файлов
+        self.lsg = None # ListBox для файлов
         self.menu = None
-        
-        # НЕ ВЫЗЫВАЕМ self.gui() ЗДЕСЬ, его вызовет __init__tk
+        # НЕ ВЫЗЫВАЕМ self.gui() здесь
 
     def _on_project_change(self, *args):
-        """Called automatically when current_project_name changes."""
-        # Ensure widgets are initialized before trying to update them
         if hasattr(self, 'hd') and callable(self.hd) and self.winfo_exists():
-            if hasattr(self, 'fm') and self.fm is not None: # Проверяем, что fm уже создан
+            if hasattr(self, 'fm') and self.fm is not None:
                 self.hd()
-            # else:
-                # logging.debug("UnpackGui._on_project_change: self.fm not yet initialized, skipping self.hd().")
 
     def gui(self):
         """Creates and arranges the widgets within this UnpackGui frame."""
-        # Этот метод НЕ должен вызывать self.pack() или self.grid() для самого UnpackGui.
-        # Он только создает и размещает свои дочерние виджеты.
-        
-        self.ch.set(True) # Default to "Unpack" mode
+        # --- Этот метод НЕ вызывает self.pack() для UnpackGui ---
 
-        # Combobox for format selection
-        self.fm = ttk.Combobox(self, state="readonly",
-                               values=('new.dat.br', 'new.dat.xz', "new.dat", 
-                                       'img', 'zst', 'payload', 'super', 'update.app'))
-        self.fm.current(0)
-        self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
+        self.ch.set(True) # По умолчанию "Unpack"
 
-        # ListBox for displaying items
-        self.lsg = ListBox(self) # Assuming ListBox is your custom control
-        self.lsg.gui() # Initialize the ListBox's own GUI components
-        self.lsg.pack(padx=5, pady=5, fill=X, side=TOP, expand=True) # Pack ListBox inside UnpackGui
+        # --- Верхняя часть: ListBox для файлов и его меню ---
+        self.lsg = ListBox(self) # Твой кастомный ListBox
+        self.lsg.gui() 
+        # Растягиваем ListBox по горизонтали и даем ему занять доступное место по вертикали
+        self.lsg.pack(padx=5, pady=5, fill=BOTH, side=TOP, expand=True) 
 
-        # Context menu for ListBox
-        self.menu = Menu(self.lsg.canvas, tearoff=False, borderwidth=0) # Attach to lsg.canvas or lsg itself
-        menu_attribute_text = getattr(lang, 'attribute', "Attribute") # Localization
-        if not isinstance(menu_attribute_text, str) or menu_attribute_text == "None":
-            menu_attribute_text = "Attribute"
-        self.menu.add_command(label=menu_attribute_text, command=self.info)
-        self.lsg.canvas.bind('<Button-3>', self.show_menu) # Bind to canvas for scrollable area
+        self.menu = Menu(self.lsg.canvas, tearoff=False, borderwidth=0)
+        menu_attr_text = getattr(lang, 'attribute', "Attribute")
+        if not isinstance(menu_attr_text, str) or menu_attr_text == "None": menu_attr_text = "Attribute"
+        self.menu.add_command(label=menu_attr_text, command=self.info)
+        self.lsg.canvas.bind('<Button-3>', self.show_menu)
 
-        # Separator
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, pady=(5,0), fill=X)
-
-        # Radiobuttons for Unpack/Pack mode
+        # --- Средняя часть: Переключатели Unpack/Pack ---
         mode_frame = ttk.Frame(self)
         unpack_text = getattr(lang, 'unpack', "Unpack")
         if not isinstance(unpack_text, str) or unpack_text == "None": unpack_text = "Unpack"
@@ -5321,27 +5290,30 @@ class UnpackGui(ttk.LabelFrame):
 
         ttk.Radiobutton(mode_frame, text=unpack_text, variable=self.ch, value=True).pack(padx=5, pady=5, side='left')
         ttk.Radiobutton(mode_frame, text=pack_text, variable=self.ch, value=False).pack(padx=5, pady=5, side='left')
-        mode_frame.pack(padx=5, pady=0, fill=X) # Pack the mode_frame
+        mode_frame.pack(padx=5, pady=(5,0), side=TOP, fill=X) # Размещаем под ListBox
 
-        # Another Separator
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, pady=(0,5), fill=X)
-        
-        # Bottom controls: Combobox and Run button
+        # --- Нижняя часть: Combobox типов и кнопка Run ---
         bottom_controls_frame = ttk.Frame(self)
-        self.fm.pack(in_=bottom_controls_frame, padx=5, pady=5, side='left', fill=Y) # Pack Combobox
-        
-        run_button_text = getattr(lang, 'run', "Run")
-        if not isinstance(run_button_text, str) or run_button_text == "None": run_button_text = "Run"
-        ttk.Button(bottom_controls_frame, text=run_button_text, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
-        bottom_controls_frame.pack(padx=5, pady=5, side=BOTTOM, fill=X)
-        
-        self.ch.trace_add("write", lambda *x: self.hd()) # Trace mode changes to update UI
-        self.refs() # Initial population of the list
+        self.fm = ttk.Combobox(bottom_controls_frame, state="readonly", width=15, # Можно задать ширину
+                               values=('new.dat.br', 'new.dat.xz', "new.dat", 
+                                       'img', 'zst', 'payload', 'super', 'update.app'))
+        self.fm.current(0)
+        self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
+        self.fm.pack(padx=(5,0), pady=5, side='left', fill=X, expand=True) # Растягиваем Combobox
 
-    # ... (остальные методы UnpackGui: show_menu, info, hd, refs, refs2, close_ - без изменений) ...
+        run_text = getattr(lang, 'run', "Run")
+        if not isinstance(run_text, str) or run_text == "None": run_text = "Run"
+        ttk.Button(bottom_controls_frame, text=run_text, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
+        bottom_controls_frame.pack(padx=5, pady=5, side=TOP, fill=X) # Размещаем под mode_frame
+        
+        self.ch.trace_add("write", lambda *x: self.hd()) 
+        self.refs() 
+
     def show_menu(self, event):
-        if hasattr(self, 'lsg') and self.lsg and len(self.lsg.selected) == 1 and hasattr(self, 'fm') and self.fm and self.fm.get() == 'img':
-            self.menu.post(event.x_root, event.y_root)
+        if hasattr(self, 'lsg') and self.lsg and len(self.lsg.selected) == 1 and \
+           hasattr(self, 'fm') and self.fm and self.fm.get() == 'img':
+            if hasattr(self, 'menu') and self.menu:
+                self.menu.post(event.x_root, event.y_root)
 
     def info(self):
         # ... (код метода info без изменений, но убедись, что Toplevel, lang, gettype, ext4, move_center доступны) ...
@@ -5400,11 +5372,13 @@ class UnpackGui(ttk.LabelFrame):
 
 
     def hd(self):
-        if not (hasattr(self, 'fm') and self.fm): return 
-        if self.ch.get():
+        if not (hasattr(self, 'fm') and self.fm and hasattr(self, 'lsg') and self.lsg): 
+            # logging.debug("UnpackGui.hd(): fm or lsg not initialized.")
+            return 
+        if self.ch.get(): # True для Unpack
             self.fm.configure(state='readonly')
             self.refs()
-        else:
+        else: # False для Pack
             self.fm.configure(state="disabled")
             self.refs2()
 
@@ -5817,22 +5791,27 @@ def __init__tk(args: list):
     if not (win.tab2 and win.tab2.winfo_exists()):
         logging.error("CRITICAL: Parent tab (win.tab2) not found. UI will be incomplete.")
     else:
+        # 1. Создаем экземпляры с передачей master
         project_menu = ProjectMenuUtils(master=win.tab2)
         unpackg = UnpackGui(master=win.tab2)
         frame3_instance = Frame3(master=win.tab2)
 
-        unpackg.gui() # Инициализируем внутренности UnpackGui (self.fm и т.д.)
+        # 2. Вызываем .gui() для UnpackGui (он НЕ пакует сам себя)
+        unpackg.gui() 
 
-        project_menu.gui() # Этот метод теперь сам себя пакует первым
-        
-        # Теперь пакуем UnpackGui. Он будет под project_menu.
-        unpackg.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) # или fill=BOTH, expand=True
+        # 3. Вызываем .gui() для ProjectMenuUtils (он пакует себя первым, side=TOP, fill='x')
+        project_menu.gui() 
+                               
+        # 4. Теперь пакуем UnpackGui (он будет под ProjectMenuUtils)
+        #    fill=BOTH и expand=True чтобы он занял оставшееся место
+        unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True) 
 
-        # Frame3 пакует себя сам внутри своего .gui()
+        # 5. Вызываем .gui() для Frame3 (он пакует себя под UnpackGui, side=TOP, fill='x')
         if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
             frame3_instance.gui()
         
-        project_menu.listdir() # Вызываем listdir после того, как все создано и упаковано
+        # 6. Вызываем listdir после того, как все создано и упаковано
+        project_menu.listdir() 
 
     loading_gif_theme_suffix = "dark"
     if hasattr(win, 'list2') and hasattr(win.list2, 'get') and win.list2.get():
