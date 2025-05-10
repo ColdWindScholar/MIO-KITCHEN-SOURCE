@@ -213,14 +213,79 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500):
-    ask = ttk.LabelFrame(win)
-    ask.configure(text=title)
-    ask.place(relx=0.5, rely=0.5, anchor="nw")
-    frame_inner = ttk.Frame(ask)
+def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500, parent=None):
+    """
+    Displays a temporary window with a warning or informational message.
+
+    This window automatically closes after a specified 'wait' period.
+    It can be made transient to a parent window if provided.
+
+    Args:
+        text (str): The message text to display.
+        color (str): The color of the message text.
+        title (str): The title of the window.
+        wait (int): Time in milliseconds after which the window will close.
+        parent (tk.Widget, optional): The parent window. If specified,
+                                     the dialog will be transient with respect to it.
+    """
+    # Attempt to use the custom Toplevel if 'Toplevel' is defined in the current scope.
+    # Otherwise, fall back to the standard tkinter.Toplevel.
+    # This assumes the custom Toplevel handles Windows-specific title bar coloring if needed.
+    try:
+        dialog = Toplevel() 
+    except NameError: 
+        import tkinter as tk
+        dialog = tk.Toplevel()
+
+    dialog.title(title)
+    # dialog.resizable(False, False) # Optionally, prevent resizing.
+
+    # If a parent window is provided and exists, make the dialog transient to it.
+    # This helps the window manager handle window layering and behavior correctly.
+    if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
+        try:
+            dialog.transient(parent)
+        except Exception as e:
+            # Log a warning if setting transient fails, but don't interrupt the dialog.
+            if 'logging' in globals() and hasattr(globals()['logging'], 'warning'):
+                logging.warning(f"Could not set transient for warn_win: {e}")
+
+    frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
-    ask.after(wait, ask.destroy)
+    
+    # Default font. Could be customized via 'lang' object if needed, e.g.:
+    # font_tuple = getattr(lang, 'font_warn_win_text', (None, 16))
+    font_tuple = (None, 16) 
+
+    ttk.Label(frame_inner, text=text, font=font_tuple, foreground=color, wraplength=350).pack(side=TOP, pady=(10,10))
+    
+    # Center the window on the screen.
+    if 'move_center' in globals() and callable(globals()['move_center']):
+        move_center(dialog)
+    else: 
+        # Basic fallback for centering if move_center is not available.
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        screen_width = dialog.winfo_screenwidth()
+        screen_height = dialog.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        dialog.geometry(f'{width}x{height}+{x}+{y}')
+
+    # Schedule the window to close automatically.
+    dialog.after(wait, dialog.destroy)
+    
+    # Note: grab_set() and wait_window() are typically not used for 'warn_win'
+    # as it's intended to be a non-blocking notification.
+    # If modal behavior during its display is required:
+    # dialog.grab_set()
+    # dialog.wait_window() # This would make it blocking, changing its nature.
+    
+    # To make the window always on top (but not modal in a blocking sense):
+    # dialog.attributes('-topmost', True) # Behavior might vary across platforms/WMs.
+
+    return dialog # Return the dialog instance, in case it's needed.
 
 
 class Toplevel(TkToplevel):
@@ -3193,43 +3258,242 @@ def download_api(url, path=None, int_=True, size_=0):
 
 
 def download_file():
-    var1 = BooleanVar(value=False)
-    down = win.get_frame(lang.text61)
-    url = input_(title=lang.text60)
-    win.message_pop(lang.text62, "green")
-    progressbar = ttk.Progressbar(down, length=200, mode="determinate")
-    progressbar.pack(padx=10, pady=10)
-    ttk.Label(down, text=os.path.basename(url), justify='left').pack(padx=10, pady=5)
-    ttk.Label(down, text=url, wraplength=200, justify='left').pack(padx=10, pady=5)
-    ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
-    c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=True, offvalue=False)
-    c1.pack(padx=10, pady=10)
-    start_time = time.time()
+    """
+    Handles the process of downloading a file based on a URL provided by the user.
+    Displays progress and status messages, and optionally unpacks the file after download.
+    """
+    unpack_after_finish_var = BooleanVar(value=False) 
+    download_progress_frame = None # Will be initialized if URL is valid
+    # url_input_value will be determined after user interaction with the input_ dialog
+
     try:
-        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
-            progressbar["value"] = percentage
-            jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
-            progressbar.update()
-        elapsed = time.time() - start_time
-        print(lang.text65.format(os.path.basename(url), str(elapsed)))
-        down.destroy()
-        if var1.get():
-            downloaded_file = settings.path + os.sep + os.path.basename(url)
-            unpackrom(downloaded_file)
-            os.remove(downloaded_file)
-    except Exception as e:
-        print(lang.text66, str(e))
-        try:
-            os.remove(os.path.basename(url))
-        except (Exception, BaseException):
-            if os.access(os.path.basename(url), os.F_OK):
-                print(lang.text67 + os.path.basename(url))
+        # Prepare and display the URL input dialog
+        input_dialog_title_key = 'text60' # Localization key for "Enter URL"
+        default_input_title = "Enter URL"
+        input_dialog_title = getattr(lang, input_dialog_title_key, default_input_title)
+        if not isinstance(input_dialog_title, str) or input_dialog_title == "None": 
+            input_dialog_title = default_input_title
+        
+        url_input_raw = input_(title=input_dialog_title) # Can return None (cancel), "" (OK empty), or "text"
+        # For production, debug prints should be removed or conditional
+        # print(f"[DEBUG] input_ returned: {repr(url_input_raw)} (type: {type(url_input_raw)})")
+
+        # Scenario 1: User explicitly cancelled or closed the input dialog
+        if url_input_raw is None:
+            cancel_message_key = 'download_cancelled'
+            default_cancel_message = "Download cancelled by user."
+            cancel_message = getattr(lang, cancel_message_key, default_cancel_message)
+            if not isinstance(cancel_message, str) or cancel_message == "None":
+                cancel_message = default_cancel_message
+            # print(f"[DEBUG] Explicit cancel: '{cancel_message}'") # Debug print removed
+            print(cancel_message)
+            return
+
+        # At this point, url_input_raw is a string (empty or with text)
+        url_input_value = str(url_input_raw)
+
+        # Scenario 2: User pressed OK, but the URL field was empty or contained only whitespace
+        if not url_input_value.strip():
+            empty_url_message_key = 'download_url_empty'
+            default_empty_url_message = "URL cannot be empty. Download aborted."
+            empty_url_message = getattr(lang, empty_url_message_key, default_empty_url_message)
+            if not isinstance(empty_url_message, str) or empty_url_message == "None":
+                empty_url_message = default_empty_url_message
+            # print(f"[DEBUG] Empty URL submitted: '{empty_url_message}'") # Debug print removed
+            print(empty_url_message)
+            
+            popup_parent = win if win and win.winfo_exists() else None
+            try:
+                if hasattr(win, 'message_pop') and callable(win.message_pop):
+                     win.message_pop(empty_url_message, "orange", parent=popup_parent) 
+                else: 
+                     import tkinter.messagebox # Fallback if custom message_pop is not available
+                     tkinter.messagebox.showwarning("Input Error", empty_url_message, parent=popup_parent)
+            except Exception as popup_ex:
+                # print(f"[DEBUG] Exception during popup: {popup_ex}") # Debug print removed
+                logging.exception("Exception during popup in download_file (empty URL)")
+            return
+            
+        # Proceed with download if URL is non-empty
+        # print(f"[DEBUG] URL for download: '{url_input_value}'") # Debug print removed
+
+        download_frame_title_key = 'text61' # Localization key for "Download File"
+        default_download_title = "Download File"
+        download_frame_title = getattr(lang, download_frame_title_key, default_download_title)
+        if not isinstance(download_frame_title, str) or download_frame_title == "None": 
+            download_frame_title = default_download_title
+        
+        download_progress_frame = win.get_frame(download_frame_title) # Create the download progress UI
+
+        start_download_message_key = 'text62' # Localization key for "Starting download..."
+        default_start_message = "Starting download..."
+        start_download_message = getattr(lang, start_download_message_key, default_start_message)
+        if not isinstance(start_download_message, str) or start_download_message == "None": 
+            start_download_message = default_start_message
+        
+        if hasattr(win, 'message_pop') and callable(win.message_pop):
+            win.message_pop(start_download_message, "green") 
+
+        # Setup UI elements for download progress
+        progressbar = ttk.Progressbar(download_progress_frame, length=200, mode="determinate")
+        progressbar.pack(padx=10, pady=10)
+        
+        ttk.Label(download_progress_frame, text=os.path.basename(url_input_value), justify='left').pack(padx=10, pady=5)
+        ttk.Label(download_progress_frame, text=url_input_value, wraplength=300, justify='left').pack(padx=10, pady=5)
+
+        progress_details_var = StringVar(master=download_progress_frame) 
+        ttk.Label(download_progress_frame, textvariable=progress_details_var).pack(padx=10, pady=10)
+
+        unpack_checkbox_text_key = 'text63' # Localization key for "Unpack after download"
+        default_unpack_text = "Unpack after download"
+        unpack_checkbox_text = getattr(lang, unpack_checkbox_text_key, default_unpack_text)
+        if not isinstance(unpack_checkbox_text, str) or unpack_checkbox_text == "None": 
+            unpack_checkbox_text = default_unpack_text
+        
+        unpack_checkbox = ttk.Checkbutton(download_progress_frame, text=unpack_checkbox_text, variable=unpack_after_finish_var, onvalue=True, offvalue=False)
+        unpack_checkbox.pack(padx=10, pady=10)
+        
+        start_time = dti() # Start timing the download
+
+        # Perform the download using download_api
+        for percentage, speed, bytes_downloaded, file_size, _ in download_api(url_input_value):
+            if not (download_progress_frame and download_progress_frame.winfo_exists()):
+                # User closed the download progress window
+                abort_message_key = 'download_window_closed'
+                default_abort_message = "Download window closed, aborting download."
+                abort_message = getattr(lang, abort_message_key, default_abort_message)
+                if not isinstance(abort_message, str) or abort_message == "None": 
+                    abort_message = default_abort_message
+                print(abort_message)
+                return # Exit if the progress window is gone
+
+            if progressbar.winfo_exists():
+                progressbar["value"] = percentage
+                progressbar.update_idletasks() # Ensure immediate UI update
+            
+            # Update progress details text
+            try:
+                downloaded_hr = hum_convert(bytes_downloaded)
+                total_hr = hum_convert(file_size) if file_size > 0 else "N/A"
+                speed_bytes_sec = speed * 1024 if speed is not None else 0 
+                speed_hr = hum_convert(speed_bytes_sec) + "/s" if speed is not None else "N/A"
+                
+                status_format_key = 'download_status_format'
+                default_status_format = "{perc}% | Speed: {spd} | {dl}/{tot}"
+                status_text_format = getattr(lang, status_format_key, default_status_format)
+                if not isinstance(status_text_format, str) or status_text_format == "None": 
+                    status_text_format = default_status_format
+
+                status_text = status_text_format.format(perc=int(percentage), spd=speed_hr, dl=downloaded_hr, tot=total_hr)
+                if progress_details_var.get() != status_text: 
+                    progress_details_var.set(status_text)
+            except Exception as e_status_update:
+                logging.error(f"Error updating download status text: {e_status_update}")
+                current_percentage_text = f"{int(percentage)}%"
+                if progress_details_var.get() != current_percentage_text: 
+                    progress_details_var.set(current_percentage_text)
+
+        # Download completed successfully
+        final_elapsed_time = dti() - start_time
+        success_msg_format_key = 'text65' # Localization key for "File {} downloaded..."
+        default_success_format = "File {} downloaded in {:.2f} seconds"
+        success_msg_format = getattr(lang, success_msg_format_key, default_success_format)
+        if not isinstance(success_msg_format, str) or success_msg_format == "None": 
+            success_msg_format = default_success_format
+        
+        success_msg = success_msg_format.format(os.path.basename(url_input_value), final_elapsed_time)
+        print(success_msg)
+        
+        # Optionally unpack the file
+        if unpack_after_finish_var.get():
+            downloaded_file_path = os.path.join(settings.path, os.path.basename(url_input_value))
+            if os.path.exists(downloaded_file_path):
+                create_thread(unpackrom, downloaded_file_path)
             else:
+                not_found_msg_key = 'downloaded_file_not_found'
+                default_not_found_msg = "Error: Downloaded file {} not found for unpacking."
+                not_found_msg_format = getattr(lang, not_found_msg_key, default_not_found_msg)
+                if not isinstance(not_found_msg_format, str) or not_found_msg_format == "None": 
+                    not_found_msg_format = default_not_found_msg
+                print(not_found_msg_format.format(downloaded_file_path))
+
+    except requests.exceptions.MissingSchema:
+        # Handle invalid URL schema (e.g., no http/https)
+        err_msg_key = 'download_invalid_url_scheme'
+        default_err_msg = "Error: Invalid URL '{}'. No schema (e.g., http://, https://) supplied."
+        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
+        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
+            err_msg_format = default_err_msg
+        
+        url_for_error_msg = repr(url_input_raw) if 'url_input_raw' in locals() else "''"
+        error_msg = err_msg_format.format(url_for_error_msg) 
+        print(error_msg)
+        
+        popup_parent = win if win and win.winfo_exists() else None
+        if not (download_progress_frame and download_progress_frame.winfo_exists()): 
+            import tkinter.messagebox
+            tkinter.messagebox.showerror("Error", error_msg, parent=popup_parent)
+        elif download_progress_frame.winfo_exists():
+             if hasattr(win, 'message_pop') and callable(win.message_pop):
+                win.message_pop(error_msg, "red", parent=popup_parent)
+
+    except requests.exceptions.ConnectionError as e_conn:
+        # Handle network connection errors
+        err_msg_key = 'download_connection_error'
+        default_err_msg = "Download Error: Could not connect. {}"
+        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
+        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
+            err_msg_format = default_err_msg
+        
+        error_msg = err_msg_format.format(str(e_conn))
+        print(error_msg)
+        popup_parent = win if win and win.winfo_exists() else None
+        if not (download_progress_frame and download_progress_frame.winfo_exists()):
+            import tkinter.messagebox
+            tkinter.messagebox.showerror("Connection Error", error_msg, parent=popup_parent)
+        elif download_progress_frame.winfo_exists():
+             if hasattr(win, 'message_pop') and callable(win.message_pop):
+                win.message_pop(error_msg, "red", parent=popup_parent)
+             
+    except Exception as e_general:
+        # Handle other general exceptions during download
+        err_msg_key = 'text66' # Localization key for "Download failed: {}"
+        default_err_msg = "Download failed: {}"
+        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
+        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
+            err_msg_format = default_err_msg
+        
+        error_msg = err_msg_format.format(str(e_general))
+        print(error_msg)
+        logging.exception("Download file general exception") # Log the full traceback
+        
+        # Attempt to clean up partially downloaded file
+        url_val_for_cleanup = url_input_value if 'url_input_value' in locals() and url_input_value else None
+        if url_val_for_cleanup: 
+            failed_download_path = os.path.join(settings.path, os.path.basename(url_val_for_cleanup))
+            if os.path.exists(failed_download_path):
                 try:
-                    down.destroy()
-                except Exception as e:
-                    win.message_pop(str(e))
-                win.message_pop(lang.text68, "red")
+                    os.remove(failed_download_path)
+                    removed_msg_key = 'partially_downloaded_removed'
+                    default_removed_msg = "Partially downloaded file {} removed."
+                    removed_msg_format = getattr(lang, removed_msg_key, default_removed_msg)
+                    if not isinstance(removed_msg_format, str) or removed_msg_format == "None": 
+                        removed_msg_format = default_removed_msg
+                    print(removed_msg_format.format(os.path.basename(url_val_for_cleanup)))
+                except Exception as remove_err:
+                    failed_remove_key = 'text67' # Localization key for "Failed to remove..."
+                    default_failed_remove = "Failed to remove partially downloaded file {}: {}"
+                    failed_remove_format = getattr(lang, failed_remove_key, default_failed_remove)
+                    if not isinstance(failed_remove_format, str) or failed_remove_format == "None": 
+                        failed_remove_format = default_failed_remove
+                    print(failed_remove_format.format(os.path.basename(url_val_for_cleanup), str(remove_err)))
+                
+    finally:
+        # Ensure the download progress frame is destroyed if it was created
+        if download_progress_frame and download_progress_frame.winfo_exists():
+            download_progress_frame.destroy()
+            if hasattr(win, 'update_frame') and callable(win.update_frame):
+                win.update_frame() # Update parent UI if necessary
 
 
 @animation
@@ -3675,18 +3939,115 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "") -> str:
+def input_(title: str = None, text: str = "") -> str | None:
+    """
+    Displays a modal dialog prompting the user for text input.
+
+    The dialog includes a text entry field, an "OK" button, and a "Cancel" button.
+    It becomes transient to the main application window and grabs focus.
+    The dialog waits for user interaction before returning.
+
+    Args:
+        title (str, optional): The title for the dialog window. 
+                               If None, a default title is fetched via localization 
+                               (key 'text76') or a hardcoded default ("Input") is used.
+        text (str, optional): The initial text to display in the entry field. 
+                              Defaults to an empty string.
+
+    Returns:
+        str | None: 
+            - The text entered by the user if "OK" is pressed. This can be an
+              empty string if the user clicks "OK" with an empty field.
+            - None if the user presses "Cancel" or closes the dialog window
+              using the window manager's close button.
+    """
+    # Determine dialog title using localization or default
     if not title:
-        title = lang.text76
-    (input_var := StringVar()).set(text)
-    input_frame = ttk.LabelFrame(win, text=title)
-    input_frame.place(relx=0.5, rely=0.5, anchor="center")
-    entry = ttk.Entry(input_frame, textvariable=input_var)
-    entry.pack(pady=5, padx=5, fill=BOTH)
-    entry.bind("<Return>", lambda *x: input_frame.destroy())
-    ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
-    input_frame.wait_window()
-    return input_var.get()
+        title_text_key = 'text76' 
+        default_title_text = "Input"
+        title_text = getattr(lang, title_text_key, default_title_text)
+        # Ensure title_text is a valid string, falling back to default if necessary
+        if not isinstance(title_text, str) or title_text == "None": # "None" as a string from JSON
+            title_text = default_title_text
+    else:
+        title_text = title
+
+    parent_window = win # Assumes 'win' is the main application Tk instance
+
+    dialog = Toplevel() 
+    dialog.title(title_text)
+
+    # Make the dialog transient to the parent window for correct window manager behavior
+    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+        dialog.transient(parent_window)
+
+    input_var = StringVar(master=dialog)
+    input_var.set(text)
+
+    # Use a dictionary to hold the return value, allowing modification within callbacks.
+    # Initialize to None, which will be returned if the dialog is cancelled.
+    result_container = {"value": None} 
+
+    # Main content frame
+    frame_inner = ttk.Frame(dialog)
+    frame_inner.pack(expand=True, fill=BOTH, padx=15, pady=10)
+
+    # Dialog prompt label (using the same text as the title for consistency here)
+    ttk.Label(frame_inner, text=title_text, font=(None, 12)).pack(side=TOP, pady=(0, 10))
+
+    # Text entry field
+    entry = ttk.Entry(frame_inner, textvariable=input_var, font=(None, 10))
+    entry.pack(pady=5, padx=5, fill=X, ipady=4) # ipady for some vertical padding inside entry
+
+    # Frame for buttons
+    button_frame = ttk.Frame(frame_inner)
+    button_frame.pack(fill=X, pady=(10, 0), side=BOTTOM)
+
+    def on_ok(event=None):
+        # OK pressed: store the current value from the entry field.
+        # This will be an empty string if the field is empty.
+        result_container["value"] = input_var.get() 
+        dialog.destroy()
+
+    def on_cancel(event=None):
+        # Cancel pressed or window closed: result_container["value"] remains None.
+        dialog.destroy()
+
+    # Localize button texts
+    ok_button_text_key = 'ok'
+    default_ok_text = "OK"
+    ok_button_text = getattr(lang, ok_button_text_key, default_ok_text)
+    if not isinstance(ok_button_text, str) or ok_button_text == "None":
+        ok_button_text = default_ok_text
+
+    cancel_button_text_key = 'cancel'
+    default_cancel_text = "Cancel"
+    cancel_button_text = getattr(lang, cancel_button_text_key, default_cancel_text)
+    if not isinstance(cancel_button_text, str) or cancel_button_text == "None":
+        cancel_button_text = default_cancel_text
+        
+    # Create and pack buttons
+    ok_button = ttk.Button(button_frame, text=ok_button_text, command=on_ok, style="Accent.TButton")
+    ok_button.pack(side=LEFT, padx=(0, 5), expand=True, fill=X)
+
+    cancel_button = ttk.Button(button_frame, text=cancel_button_text, command=on_cancel)
+    cancel_button.pack(side=LEFT, padx=(5, 0), expand=True, fill=X)
+
+    # Bindings for Enter (OK) and Escape (Cancel) keys
+    entry.bind("<Return>", on_ok)
+    dialog.bind("<Escape>", on_cancel)
+    # Handle window close button (e.g., 'x') as a cancel action
+    dialog.protocol("WM_DELETE_WINDOW", on_cancel) 
+
+    move_center(dialog) # Center the dialog on the screen
+    
+    # Delay focus_set to ensure the window is ready, crucial on some Linux WMs
+    dialog.after(10, lambda: entry.focus_set()) 
+    
+    dialog.grab_set() # Make the dialog modal, grabbing all input
+    dialog.wait_window() # Wait for the dialog to be destroyed before continuing
+
+    return result_container["value"]
 
 
 def script2fs(path):
@@ -4101,53 +4462,187 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> int:
-    if not ok:
-        ok = lang.ok
-    if not cancel:
-        cancel = lang.cancel
-    value = IntVar()
-    if is_top:
-        ask = Toplevel()
-        move_center(ask)
-    else:
-        ask = ttk.LabelFrame(win)
-        ask.place(relx=0.5, rely=0.5, anchor="center")
-    frame_inner = ttk.Frame(ask)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    frame_button = ttk.Frame(frame_inner)
+def ask_win(text: str = '', ok: str = None, cancel: str = None, wait: bool = True, is_top: bool = False) -> int:
+    """
+    Displays a modal confirmation dialog with "OK" and "Cancel" buttons.
 
-    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
-                                                                             expand=True)
-    ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
-                                                                                                 pady=5,
-                                                                                                 fill=BOTH,
-                                                                                                 expand=True)
-    frame_button.pack(side=TOP, fill=BOTH)
+    The dialog presents a message to the user and waits for their response.
+    It becomes transient to the main application window and grabs focus.
+    The 'is_top' argument is considered deprecated and has no effect.
 
-    def close_ask(value_=1):
-        value.set(value_)
-        ask.destroy()
+    Args:
+        text (str, optional): The message text to display in the dialog.
+        ok (str, optional): Custom text for the "OK" button. If None,
+                            uses a localized string for "OK" or a default "OK".
+        cancel (str, optional): Custom text for the "Cancel" button. If None,
+                                uses a localized string for "Cancel" or a default "Cancel".
+        wait (bool, optional): If True (default), the function will block until the
+                               dialog is closed. If False, the dialog is displayed,
+                               but the function returns immediately (not typical for this kind of dialog).
+        is_top (bool, optional): Deprecated. This argument is no longer used.
 
-    if wait:
-        ask.wait_window()
-    return value.get()
-
-
-def info_win(text: str, ok: str = None, master: Toplevel = None):
+    Returns:
+        int: 1 if the "OK" button is pressed, 0 if the "Cancel" button is pressed
+             or the dialog is closed via the window manager.
+    """
+    # Determine "OK" button text using provided argument, localization, or default
     if ok is None:
-        ok = lang.ok
-    if master is None:
-        master = Toplevel()
-    frame_inner = ttk.Frame(master)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    ttk.Button(frame_inner, text=ok, command=master.destroy, style="Accent.TButton").pack(padx=5, pady=5,
-                                                                                          fill=X, side='left',
-                                                                                          expand=True)
-    move_center(master)
-    master.wait_window()
+        ok_button_text_key = 'ok'
+        default_ok_text = "OK"
+        ok_text = getattr(lang, ok_button_text_key, default_ok_text)
+        if not isinstance(ok_text, str) or ok_text == "None":
+            ok_text = default_ok_text
+    else:
+        ok_text = ok
+        
+    # Determine "Cancel" button text
+    if cancel is None:
+        cancel_button_text_key = 'cancel'
+        default_cancel_text = "Cancel"
+        cancel_text = getattr(lang, cancel_button_text_key, default_cancel_text)
+        if not isinstance(cancel_text, str) or cancel_text == "None":
+            cancel_text = default_cancel_text
+    else:
+        cancel_text = cancel
+
+    parent_window = win # Assumes 'win' is the main application Tk instance
+
+    dialog = Toplevel() # Assumes Toplevel is your custom or standard Toplevel
+
+    # Determine dialog title
+    dialog_title_key = 'confirm_title'
+    default_dialog_title = "Confirm"
+    dialog_title = getattr(lang, dialog_title_key, default_dialog_title)
+    if not isinstance(dialog_title, str) or dialog_title == "None":
+        dialog_title = default_dialog_title
+    dialog.title(dialog_title)
+    
+    # Make the dialog transient to the parent window
+    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+        dialog.transient(parent_window)
+    
+    # dialog.resizable(False, False) # Optionally, prevent resizing
+
+    result_var = IntVar(master=dialog, value=0) # Initialize to 0 (Cancel)
+
+    # Main content frame
+    frame_inner = ttk.Frame(dialog)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
+
+    # Display the message text
+    ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 15))
+
+    # Frame for buttons
+    button_frame = ttk.Frame(frame_inner)
+    button_frame.pack(fill=X, pady=(10,0), side=BOTTOM)
+
+    def on_ok(event=None):
+        result_var.set(1)
+        dialog.destroy()
+
+    def on_cancel(event=None):
+        # result_var remains 0 (default or explicitly set if needed)
+        dialog.destroy()
+
+    # Create and pack buttons
+    ok_button = ttk.Button(button_frame, text=ok_text, command=on_ok, style="Accent.TButton")
+    ok_button.pack(side=LEFT, padx=(0,5), expand=True, fill=X) 
+    
+    cancel_button = ttk.Button(button_frame, text=cancel_text, command=on_cancel)
+    cancel_button.pack(side=LEFT, padx=(5,0), expand=True, fill=X)
+    
+    # Bindings for Enter (OK) and Escape (Cancel) keys
+    dialog.bind("<Return>", on_ok) 
+    dialog.bind("<Escape>", on_cancel)
+    # Handle window close button (e.g., 'x') as a cancel action
+    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
+
+    move_center(dialog) # Center the dialog
+    
+    # Delay focus_set to ensure the window is ready, focusing the "OK" button
+    dialog.after(10, lambda: ok_button.focus_set())
+
+    dialog.grab_set() # Make the dialog modal
+    
+    if wait:
+        dialog.wait_window() # Block until the dialog is destroyed
+        
+    return result_var.get()
+
+def info_win(text: str, ok: str = None, title: str = None):
+    """
+    Displays a modal information dialog with a single "OK" button.
+
+    The dialog presents a message and waits for the user to acknowledge it
+    by pressing "OK" or closing the window. It becomes transient to the
+    main application window and grabs focus.
+
+    Args:
+        text (str): The informational message text to display.
+        ok (str, optional): Custom text for the "OK" button. If None,
+                            uses a localized string or a default "OK".
+        title (str, optional): Custom title for the dialog window. If None,
+                               uses a localized string or a default "Information".
+    """
+    # Determine "OK" button text
+    if ok is None:
+        ok_button_text_key = 'ok'
+        default_ok_text = "OK"
+        ok_text = getattr(lang, ok_button_text_key, default_ok_text)
+        if not isinstance(ok_text, str) or ok_text == "None":
+            ok_text = default_ok_text
+    else:
+        ok_text = ok
+        
+    # Determine dialog title
+    if title is None:
+        dialog_title_key = 'info_title'
+        default_dialog_title = "Information"
+        title_text = getattr(lang, dialog_title_key, default_dialog_title)
+        if not isinstance(title_text, str) or title_text == "None":
+            title_text = default_dialog_title
+    else:
+        title_text = title
+
+    parent_window = win # Assumes 'win' is the main application Tk instance
+
+    dialog = Toplevel() # Assumes Toplevel is your custom or standard Toplevel
+    dialog.title(title_text)
+    
+    # Make the dialog transient to the parent window
+    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+        dialog.transient(parent_window)
+        
+    # dialog.resizable(False, False) # Optionally, prevent resizing
+
+    # Main content frame
+    frame_inner = ttk.Frame(dialog)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
+
+    # Display the message text
+    ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 20))
+
+    # Frame for the button
+    button_frame = ttk.Frame(frame_inner) 
+    button_frame.pack(fill=X, pady=(0,5), side=BOTTOM)
+
+    # Create and pack the "OK" button
+    ok_button = ttk.Button(button_frame, text=ok_text, command=dialog.destroy, style="Accent.TButton")
+    ok_button.pack(ipadx=10) # ipadx for some internal padding
+    
+    # Bindings for Enter and Escape keys to close the dialog
+    dialog.bind("<Return>", lambda event: dialog.destroy())
+    dialog.bind("<Escape>", lambda event: dialog.destroy())
+    # Handle window close button (e.g., 'x')
+    dialog.protocol("WM_DELETE_WINDOW", dialog.destroy)
+
+    move_center(dialog) # Center the dialog
+    
+    # Delay focus_set to ensure the window is ready, focusing the "OK" button
+    dialog.after(10, lambda: ok_button.focus_set())
+
+    dialog.grab_set() # Make the dialog modal
+    dialog.wait_window() # Block until the dialog is destroyed
 
 
 class GetFolderSize:
