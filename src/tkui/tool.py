@@ -136,8 +136,8 @@ sys.excepthook = _global_exception_handler
 import tkinter as tk # Now explicitly imported earlier as well for messagebox
 from tkinter import ttk
 from tkinter.ttk import Scrollbar
-from tkinter import (BOTH, BOTTOM, CENTER, DISABLED, HORIZONTAL, INT,
-                     LEFT, LISTBOX, MENU, RIGHT, STRINGVAR, TEXT, TOP, X, Y, BooleanVar,
+from tkinter import (BOTH, BOTTOM, CENTER, DISABLED, HORIZONTAL,
+                     LEFT, RIGHT, TOP, X, Y, BooleanVar,
                      Canvas, Frame, IntVar, Label, Listbox, Menu, StringVar, TclError, Text,
                      Toplevel as TkToplevel)
 
