@@ -8,7 +8,9 @@ Under Macintosh, the Cocoa drag and drop interfaces are used.
 
 Once the TkinterDnD2 package is installed, it is safe to do:
 
-from TkinterDnD2 import *
+from TkinterDnD2 import * # This refers to the original package name.
+                          # In this project, it might be from .tkinterdnd2_build_in import *
+                          # or similar, depending on how it's integrated.
 
 This will add the classes TkinterDnD.Tk to the global
 namespace, plus the following constants:
@@ -17,32 +19,56 @@ DND_TEXT, DND_FILES, DND_ALL, CF_UNICODETEXT, CF_TEXT, CF_HDROP,
 FileGroupDescriptor, FileGroupDescriptorW
 
 Drag and drop for the application can then be enabled by using one of the
-classes TkinterDnD.Tk() as application main window instead of a regular
+classes similar to TkinterDnD.Tk() as application main window instead of a regular
 tkinter.Tk() window. This will add the drag-and-drop specific methods to the
 Tk window and all its descendants.
 """
 
 import tkinter
-from ..core.utils import prog_path
-TkdndVersion = None
+import os # os is used for os.path and os.name
+# Assuming TkinterDnD.py is in 'tkui' and utils.py is in 'core' which is one level up from 'tkui'
+from ..core import utils 
+# from ..core.utils import prog_path # This specific import is now covered by 'utils.prog_path'
 
-def _require(tkroot):
+TkdndVersion = None # Stores the loaded tkdnd library version
+
+def _require(tkroot: tkinter.Tk): # Added type hint for tkroot
+    """
+    Loads the platform-specific tkdnd library.
+
+    This internal function determines the correct tkdnd binary to load based on
+    the operating system and architecture, then tells the Tcl interpreter
+    where to find it and requires the 'tkdnd' package.
+
+    Args:
+        tkroot: The root Tkinter window instance.
+
+    Returns:
+        str: The version string of the loaded tkdnd package.
+
+    Raises:
+        RuntimeError: If the platform/architecture is unsupported or
+                      if the tkdnd library cannot be loaded by Tcl.
+    """
     global TkdndVersion
+    if TkdndVersion is not None: # Avoid reloading if already loaded
+        return TkdndVersion
+
     try:
-        import os.path
-        import platform # Standard import
+        # os.path is implicitly available via 'import os'
+        import platform # Standard library for platform information
         
-        # Determine the machine architecture string locally without modifying platform.machine
+        # Determine the machine architecture string locally without modifying global platform.machine
         current_machine_arch = platform.machine()
-        if os.name == "nt":
-            # Specific logic for Windows 32-bit on 64-bit reporting as AMD64
+        system_name = platform.system()
+
+        # Adjust architecture string for specific Windows cases (32-bit Python on 64-bit OS)
+        if system_name == "Windows": # Changed from os.name == "nt" for consistency with platform.system()
             if platform.architecture()[0] == '32bit' and current_machine_arch == 'AMD64':
                 current_machine_arch = 'x86' 
         
-        # Now use current_machine_arch and platform.system()
-        system_name = platform.system()
-
-        if system_name == "Darwin":
+        # Determine the tkdnd platform representation string
+        if system_name == "Darwin": # macOS
             if current_machine_arch == "arm64":
                 tkdnd_platform_rep = "osx-arm64"
             elif current_machine_arch == "x86_64":
@@ -50,7 +76,7 @@ def _require(tkroot):
             else:
                 raise RuntimeError(f'Unsupported macOS architecture: {current_machine_arch}')
         elif system_name == "Linux":
-            if current_machine_arch == "aarch64":
+            if current_machine_arch == "aarch64": # ARM64 on Linux
                 tkdnd_platform_rep = "linux-arm64"
             elif current_machine_arch == "x86_64":
                 tkdnd_platform_rep = "linux-x64"
@@ -59,87 +85,83 @@ def _require(tkroot):
         elif system_name == "Windows":
             if current_machine_arch == "ARM64":
                 tkdnd_platform_rep = "win-arm64"
-            elif current_machine_arch == "AMD64": # This will be hit for 64-bit Python on 64-bit Windows
+            elif current_machine_arch == "AMD64": # Standard 64-bit Windows
                 tkdnd_platform_rep = "win-x64"
-            elif current_machine_arch == "x86": # This will be hit for 32-bit Python, or after our adjustment
+            elif current_machine_arch == "x86": # 32-bit Windows
                 tkdnd_platform_rep = "win-x86"
             else:
                 raise RuntimeError(f'Unsupported Windows architecture: {current_machine_arch}')
         else:
-            raise RuntimeError(f'Platform not supported: {system_name}')
+            raise RuntimeError(f'Platform not supported by this tkdnd setup: {system_name}')
 
-        # ... (rest of the _require function using tkdnd_platform_rep) ...
-        # tkroot.tk.call('lappend', 'auto_path', os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep))
-        # TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
-    except tkinter.TclError: # tkinter might not be imported here, catch generic Exception or ensure import
-        raise RuntimeError('Unable to load tkdnd library.')
-    # return TkdndVersion # This was missing
-    # Corrected:
-    tkroot.tk.call('lappend', 'auto_path', os.path.join(utils.prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)) # Use utils.prog_path
-    TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
+        # Construct the path to the tkdnd library directory
+        # CRITICAL: utils.prog_path must be correctly set for both dev and bundled environments
+        tkdnd_lib_dir = os.path.join(utils.prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)
+        
+        # Add the library path to Tcl's auto_path and require the package
+        tkroot.tk.call('lappend', 'auto_path', tkdnd_lib_dir)
+        TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
+
+    except tkinter.TclError as e_tcl: 
+        # This occurs if Tcl fails to load the package (e.g., file not found, wrong architecture)
+        # import logging # Optional: for more detailed logging if available
+        # logging.exception("Failed to load tkdnd Tcl package")
+        raise RuntimeError(f'Unable to load tkdnd Tcl package from {tkdnd_lib_dir}. TclError: {e_tcl}')
+    except Exception as e_general:
+        # Catch other potential errors during platform detection or path construction
+        # import logging
+        # logging.exception("Unexpected error during tkdnd library requirement")
+        raise RuntimeError(f'Unexpected error requiring tkdnd: {e_general}')
+        
     return TkdndVersion
 
 class DnDEvent:
-    """Internal class.
-    Container for the properties of a drag-and-drop event, similar to a
-    normal tkinter.Event.
-    An instance of the DnDEvent class has the following attributes:
-        action (string)
-        actions (tuple)
-        button (int)
-        code (string)
-        codes (tuple)
-        commonsourcetypes (tuple)
-        commontargettypes (tuple)
-        data (string)
-        name (string)
-        types (tuple)
-        modifiers (tuple)
-        supportedsourcetypes (tuple)
-        sourcetypes (tuple)
-        type (string)
-        supportedtargettypes (tuple)
-        widget (widget instance)
-        x_root (int)
-        y_root (int)
-    Depending on the type of DnD event however, not all attributes may be set.
     """
-    pass
+    A container for properties of a drag-and-drop event, analogous to
+    a standard tkinter.Event.
+
+    Attributes are dynamically assigned based on the Tcl event substitution,
+    and may include: action, actions, button, code, codes, commonsourcetypes,
+    commontargettypes, data, name, types, modifiers, supportedsourcetypes,
+    sourcetypes, type, supportedtargettypes, widget, x_root, y_root.
+    Not all attributes are set for every type of DnD event.
+    """
+    pass # Attributes are set dynamically
 
 class DnDWrapper:
-    """Internal class."""
-    # some of the percent substitutions need to be enclosed in braces
-    # so we can use splitlist() to convert them into tuples
+    """
+    An internal mixin class that adds Tcl/Tk bindings for tkdnd functionality
+    to Tkinter widgets. This class is not intended to be instantiated directly.
+    """
     _subst_format_dnd = ('%A', '%a', '%b', '%C', '%c', '{%CST}',
                          '{%CTT}', '%D', '%e', '{%L}', '{%m}', '{%ST}',
                          '%T', '{%t}', '{%TT}', '%W', '%X', '%Y')
     _subst_format_str_dnd = " ".join(_subst_format_dnd)
+    
+    # Monkey-patch BaseWidget to include these formats for Tcl substitution
     tkinter.BaseWidget._subst_format_dnd = _subst_format_dnd
     tkinter.BaseWidget._subst_format_str_dnd = _subst_format_str_dnd
 
     def _substitute_dnd(self, *args):
-        """Internal function."""
-        if len(args) != len(self._subst_format_dnd):
-            return args
-        def getint_event(s):
-            try:
-                return int(s)
-            except ValueError:
-                return s
-        def splitlist_event(s):
-            try:
-                return self.tk.splitlist(s)
-            except ValueError:
-                return s
-        # valid percent substitutions for DnD event types
-        # (tested with tkdnd-2.8 on debian jessie):
-        # <<DragInitCmd>> : %W, %X, %Y %e, %t
-        # <<DragEndCmd>> : %A, %W, %e
-        # <<DropEnter>> : all except : %D (always empty)
-        # <<DropLeave>> : all except %D (always empty)
-        # <<DropPosition>> :all except %D (always empty)
-        # <<Drop>> : all
+        """
+        Internal: Converts Tcl event substitution strings into a DnDEvent object.
+        """
+        if len(args) != len(self._subst_format_dnd): # Should not happen if Tcl call is correct
+            return args 
+        
+        # Helper to convert string to int if possible, else return string
+        def getint_event(s_val):
+            try: return int(s_val)
+            except ValueError: return s_val
+        
+        # Helper to split Tcl list strings into Python tuples
+        def splitlist_event(s_list):
+            try: return self.tk.splitlist(s_list)
+            except (tkinter.TclError, ValueError): return s_list # Return as is if not a valid Tcl list
+
+        # Unpack arguments based on _subst_format_dnd
         A, a, b, C, c, CST, CTT, D, e, L, m, ST, T, t, TT, W, X, Y = args
+        
         ev = DnDEvent()
         ev.action = A
         ev.actions = splitlist_event(a)
@@ -149,162 +171,169 @@ class DnDWrapper:
         ev.commonsourcetypes = splitlist_event(CST)
         ev.commontargettypes = splitlist_event(CTT)
         ev.data = D
-        ev.name = e
-        ev.types = splitlist_event(L)
-        ev.modifiers = splitlist_event(m)
+        ev.name = e # Event name (e.g., <<Drop>>)
+        ev.types = splitlist_event(L) # List of data types offered by the source
+        ev.modifiers = splitlist_event(m) # Keyboard modifiers (e.g., Shift, Control)
         ev.supportedsourcetypes = splitlist_event(ST)
-        ev.sourcetypes = splitlist_event(t)
-        ev.type = T
+        ev.sourcetypes = splitlist_event(t) # Alias for ev.types on some events
+        ev.type = T # Actual data type chosen for the drop
         ev.supportedtargettypes = splitlist_event(TT)
         try:
-            ev.widget = self.nametowidget(W)
+            ev.widget = self.nametowidget(W) # Convert widget path to widget instance
         except KeyError:
-            ev.widget = W
-        ev.x_root = getint_event(X)
-        ev.y_root = getint_event(Y)
-        return (ev,)
+            ev.widget = W # Fallback to widget path string if instance not found
+        ev.x_root = getint_event(X) # X-coordinate relative to the screen root
+        ev.y_root = getint_event(Y) # Y-coordinate relative to the screen root
+        
+        return (ev,) # Return as a tuple, similar to standard Tkinter event handling
+    
+    # Monkey-patch BaseWidget with this substitution method
     tkinter.BaseWidget._substitute_dnd = _substitute_dnd
 
     def _dnd_bind(self, what, sequence, func, add, needcleanup=True):
-        """Internal function."""
-        if isinstance(func, str):
+        """
+        Internal: Low-level function to bind TkDnD events.
+        'what' is typically ('bind', self._w).
+        """
+        if isinstance(func, str): # If func is a Tcl command string
             self.tk.call(what + (sequence, func))
-        elif func:
+        elif func: # If func is a Python callable
             funcid = self._register(func, self._substitute_dnd, needcleanup)
-            # FIXME: why doesn't the "return 'break'" mechanism work here??
-            #cmd = ('%sif {"[%s %s]" == "break"} break\n' % (add and '+' or '',
-            #                              funcid, self._subst_format_str_dnd))
-            cmd = '%s%s %s' %(add and '+' or '', funcid,
-                                    self._subst_format_str_dnd)
+            cmd = '%s%s %s' % (add and '+' or '', funcid, self._subst_format_str_dnd)
             self.tk.call(what + (sequence, cmd))
             return funcid
-        elif sequence:
+        elif sequence: # If only sequence is given, return current binding
             return self.tk.call(what + (sequence,))
-        else:
+        else: # If no sequence, return all bindings for this type
             return self.tk.splitlist(self.tk.call(what))
+            
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget._dnd_bind = _dnd_bind
 
     def dnd_bind(self, sequence=None, func=None, add=None):
-        """Bind to this widget at drag and drop event SEQUENCE a call
-        to function FUNC.
-        SEQUENCE may be one of the following:
-        <<DropEnter>>, <<DropPosition>>, <<DropLeave>>, <<Drop>>,
-        <<Drop:type>>, <<DragInitCmd>>, <<DragEndCmd>> .
-        The callbacks for the <Drop*>> events, with the exception of
-        <<DropLeave>>, should always return an action (i.e. one of COPY,
-        MOVE, LINK, ASK or PRIVATE).
-        The callback for the <<DragInitCmd>> event must return a tuple
-        containing three elements: the drop action(s) supported by the
-        drag source, the format type(s) that the data can be dropped as and
-        finally the data that shall be dropped. Each of these three elements
-        may be a tuple of strings or a single string."""
+        """
+        Bind a drag-and-drop event SEQUENCE to a Python function FUNC for this widget.
+
+        Args:
+            sequence (str): The DnD event sequence (e.g., '<<Drop>>', '<<Drop:DND_Files>>').
+                            Common sequences include:
+                            <<DropEnter>>, <<DropPosition>>, <<DropLeave>>, <<Drop>>,
+                            <<Drop:type>>, <<DragInitCmd>>, <<DragEndCmd>>.
+            func (callable): The Python function to call when the event occurs.
+                             It will receive a DnDEvent object as an argument.
+            add (str, optional): If '+', add this binding to any existing ones.
+                                 Otherwise, this binding replaces existing ones.
+
+        Returns:
+            str or list: The Tcl command string of the binding, or a list of bindings.
+
+        Callbacks for <<Drop*>> events (except <<DropLeave>>) should typically return
+        an action string (e.g., COPY, MOVE, ASK, PRIVATE, REFUSE_DROP).
+        The callback for <<DragInitCmd>> must return a 3-tuple:
+        (supported_actions, data_types, data_to_drop).
+        """
         return self._dnd_bind(('bind', self._w), sequence, func, add)
+        
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget.dnd_bind = dnd_bind
 
-    def drag_source_register(self, button=None, *dndtypes):
-        """This command will register SELF as a drag source.
-        A drag source is a widget than can start a drag action. This command
-        can be executed multiple times on a widget.
-        When SELF is registered as a drag source, optional DNDTYPES can be
-        provided. These DNDTYPES will be provided during a drag action, and
-        it can contain platform independent or platform specific types.
-        Platform independent are DND_Text for dropping text portions and
-        DND_Files for dropping a list of files (which can contain one or
-        multiple files) on SELF. However, these types are
-        indicative/informative. SELF can initiate a drag action with even a
-        different type list. Finally, button is the mouse button that will be
-        used for starting the drag action. It can have any of the values 1
-        (left mouse button), 2 (middle mouse button - wheel) and 3
-        (right mouse button). If button is not specified, it defaults to 1."""
-        # hack to fix a design bug from the first version
-        if button is None:
-            button = 1
-        else:
-            try:
-                button = int(button)
-            except ValueError:
-                # no button defined, button is actually
-                # something like DND_TEXT
-                dndtypes = (button,) + dndtypes
-                button = 1
-        self.tk.call(
-                'tkdnd::drag_source', 'register', self._w, dndtypes, button)
+    def drag_source_register(self, button: int = 1, *dndtypes):
+        """
+        Register this widget as a drag source.
+
+        Args:
+            button (int, optional): Mouse button to initiate drag (1, 2, or 3). Defaults to 1 (left).
+            *dndtypes: Variable number of strings representing the data types this source can offer
+                       (e.g., DND_TEXT, DND_FILES, or platform-specific types).
+        """
+        # Original code had a workaround for button potentially being a dndtype.
+        # Modernized to expect button as an int first.
+        if not isinstance(button, int) or button not in [1, 2, 3]:
+            # If button is not a valid int, assume it's the first dndtype
+            dndtypes = (button,) + dndtypes
+            button = 1 # Default to button 1
+            
+        self.tk.call('tkdnd::drag_source', 'register', self._w, dndtypes or DND_ALL, button)
+        
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget.drag_source_register = drag_source_register
 
     def drag_source_unregister(self):
-        """This command will stop SELF from being a drag source. Thus, window
-        will stop receiving events related to drag operations. It is an error
-        to use this command for a window that has not been registered as a
-        drag source with drag_source_register()."""
+        """Unregister this widget as a drag source."""
         self.tk.call('tkdnd::drag_source', 'unregister', self._w)
+        
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget.drag_source_unregister = drag_source_unregister
 
     def drop_target_register(self, *dndtypes):
-        """This command will register SELF as a drop target. A drop target is
-        a widget than can accept a drop action. This command can be executed
-        multiple times on a widget. When SELF is registered as a drop target,
-        optional DNDTYPES can be provided. These types list can contain one or
-        more types that SELF will accept during a drop action, and it can
-        contain platform independent or platform specific types. Platform
-        independent are DND_Text for dropping text portions and DND_Files for
-        dropping a list of files (which can contain one or multiple files) on
-        SELF."""
-        self.tk.call('tkdnd::drop_target', 'register', self._w, dndtypes)
+        """
+        Register this widget as a drop target.
+
+        Args:
+            *dndtypes: Variable number of strings representing the data types this target can accept
+                       (e.g., DND_TEXT, DND_FILES, DND_ALL, or platform-specific types).
+                       If no types are provided, DND_ALL is typically assumed by tkdnd.
+        """
+        self.tk.call('tkdnd::drop_target', 'register', self._w, dndtypes or DND_ALL)
+        
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget.drop_target_register = drop_target_register
 
     def drop_target_unregister(self):
-        """This command will stop SELF from being a drop target. Thus, SELF
-        will stop receiving events related to drop operations. It is an error
-        to use this command for a window that has not been registered as a
-        drop target with drop_target_register()."""
+        """Unregister this widget as a drop target."""
         self.tk.call('tkdnd::drop_target', 'unregister', self._w)
+        
+    # Monkey-patch BaseWidget
     tkinter.BaseWidget.drop_target_unregister = drop_target_unregister
 
-    def platform_independent_types(self, *dndtypes):
-        """This command will accept a list of types that can contain platform
-        independnent or platform specific types. A new list will be returned,
-        where each platform specific type in DNDTYPES will be substituted by
-        one or more platform independent types. Thus, the returned list may
-        have more elements than DNDTYPES."""
-        return self.tk.split(self.tk.call(
-                            'tkdnd::platform_independent_types', dndtypes))
+    # The following methods are tkdnd utility functions, typically called on a widget instance.
+    def platform_independent_types(self, *dndtypes) -> tuple:
+        """Converts platform-specific DnD types to platform-independent ones."""
+        return self.tk.splitlist(self.tk.call('tkdnd::platform_independent_types', dndtypes))
+        
     tkinter.BaseWidget.platform_independent_types = platform_independent_types
 
-    def platform_specific_types(self, *dndtypes):
-        """This command will accept a list of types that can contain platform
-        independnent or platform specific types. A new list will be returned,
-        where each platform independent type in DNDTYPES will be substituted
-        by one or more platform specific types. Thus, the returned list may
-        have more elements than DNDTYPES."""
-        return self.tk.split(self.tk.call(
-                            'tkdnd::platform_specific_types', dndtypes))
+    def platform_specific_types(self, *dndtypes) -> tuple:
+        """Converts platform-independent DnD types to platform-specific ones for the current platform."""
+        return self.tk.splitlist(self.tk.call('tkdnd::platform_specific_types', dndtypes))
+        
     tkinter.BaseWidget.platform_specific_types = platform_specific_types
 
-    def get_dropfile_tempdir(self):
-        """This command will return the temporary directory used by TkDND for
-        storing temporary files. When the package is loaded, this temporary
-        directory will be initialised to a proper directory according to the
-        operating system. This default initial value can be changed to be the
-        value of the following environmental variables:
-        TKDND_TEMP_DIR, TEMP, TMP."""
+    def get_dropfile_tempdir(self) -> str:
+        """Returns the temporary directory used by TkDnD for drop operations involving file contents."""
         return self.tk.call('tkdnd::GetDropFileTempDirectory')
+        
     tkinter.BaseWidget.get_dropfile_tempdir = get_dropfile_tempdir
 
-    def set_dropfile_tempdir(self, tempdir):
-        """This command will change the temporary directory used by TkDND for
-        storing temporary files to TEMPDIR."""
+    def set_dropfile_tempdir(self, tempdir: str):
+        """Sets the temporary directory used by TkDnD."""
         self.tk.call('tkdnd::SetDropFileTempDirectory', tempdir)
+        
     tkinter.BaseWidget.set_dropfile_tempdir = set_dropfile_tempdir
 
-#######################################################################
-####      The main window classes that enable Drag & Drop for      ####
-####      themselves and all their descendant widgets:             ####
-#######################################################################
-
-class Tk(tkinter.Tk, DnDWrapper):
-    """Creates a new instance of a tkinter.Tk() window; all methods of the
-    DnDWrapper class apply to this window and all its descendants."""
-    def __init__(self, *args, **kw):
-        tkinter.Tk.__init__(self, *args, **kw)
-        self.TkdndVersion = _require(self)
+# ------------------------------------------------------------------------------
+# Main TkinterDnD-enabled Tk class
+# Applications should use this (or a subclass) as their root window to enable
+# DnD functionality for all widgets within the application.
+# ------------------------------------------------------------------------------
+class Tk(tkinter.Tk, DnDWrapper): # Inherits from standard tkinter.Tk and our DnDWrapper
+    """
+    A Tkinter.Tk root window subclass that initializes and enables TkDnD
+    functionality for itself and all its descendant widgets.
+    """
+    def __init__(self, screenName: str = None, baseName: str = None, className: str = 'Tk', useTk: bool = True, sync: bool = False, use: str = None):
+        """
+        Initializes the Tk root window and loads the TkDnD extension.
+        Arguments are the same as for tkinter.Tk.
+        """
+        super().__init__(screenName, baseName, className, useTk, sync, use)
+        try:
+            self.TkdndVersion = _require(self) # Load and initialize TkDnD
+        except RuntimeError as e:
+            # Handle tkdnd loading failure gracefully, e.g., log and disable DnD features.
+            # For now, re-raise as it's a critical part of this module.
+            # import logging # If logging is desired here
+            # logging.error(f"Failed to initialize TkDnD: {e}")
+            # self.TkdndVersion = None # Indicate DnD is not available
+            raise # Re-raise the error if DnD is essential
 
