@@ -513,15 +513,142 @@ class LoadAnim:
             return return_value
         return decorated_func
 
+def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500, parent=None):
+    """
+    Displays a temporary window with a warning or informational message.
+    Uses standard tkinter.Toplevel.
+    """
+    # Используем стандартный Toplevel для простоты, если кастомный Toplevel зависит от поздно инициализируемых 'settings'
+    # Если 'settings' доступен глобально к этому моменту, можно использовать ваш кастомный Toplevel.
+    # Для большей надежности на ранних этапах инициализации, стандартный Toplevel безопаснее.
+    
+    # Определяем, какой Toplevel использовать. Если кастомный Toplevel зависит от settings,
+    # которые еще не инициализированы, это вызовет ошибку.
+    # Поэтому, если 'settings' еще не в globals(), используем стандартный tk.Toplevel.
+    
+    _tk_toplevel_available = False
+    _custom_toplevel_available = False
 
-class Toplevel(TkToplevel):
+    if 'Toplevel' in globals() and callable(globals()['Toplevel']) and globals()['Toplevel'] is not TkToplevel:
+        # Проверяем, не зависит ли наш кастомный Toplevel от 'settings', если их еще нет
+        if 'settings' not in globals() and "settings" in globals()['Toplevel'].__init__.__code__.co_varnames:
+             # Кастомный Toplevel зависит от settings, но settings еще нет. Используем стандартный.
+            pass # _custom_toplevel_available остается False
+        else:
+            _custom_toplevel_available = True # Кастомный Toplevel можно использовать
+    
+    if 'tk' in globals() and hasattr(tk, 'Toplevel'):
+        _tk_toplevel_available = True
+
+
+    if _custom_toplevel_available:
+        try:
+            dialog = Toplevel() # Ваш кастомный Toplevel
+        except Exception as e_custom_toplevel:
+            if 'logging' in globals(): logging.warning(f"Failed to use custom Toplevel in warn_win: {e_custom_toplevel}. Falling back to tk.Toplevel.")
+            if not _tk_toplevel_available: # Если и tk.Toplevel нет, это проблема
+                raise RuntimeError("Neither custom Toplevel nor tk.Toplevel are available for warn_win.") from e_custom_toplevel
+            dialog = tk.Toplevel() # Фоллбэк на стандартный
+    elif _tk_toplevel_available:
+        dialog = tk.Toplevel() # Стандартный tkinter.Toplevel
+    else:
+        raise RuntimeError("Toplevel (custom or tk) is not available for warn_win.")
+
+
+    dialog.title(title)
+    # dialog.resizable(False, False) # Опционально
+
+    if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
+        try:
+            dialog.transient(parent)
+        except tk.TclError: # Может случиться, если parent уничтожается
+            if 'logging' in globals(): logging.warning("warn_win: Failed to set transient, parent might be destroyed.")
+        except Exception as e:
+            if 'logging' in globals(): logging.warning(f"Could not set transient for warn_win: {e}")
+
+    # Используем ttk.Frame, если ttk импортирован, иначе tk.Frame
+    frame_module = ttk if 'ttk' in globals() else tk
+    frame_inner = frame_module.Frame(dialog)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    
+    font_tuple = (None, 16) 
+    # Проверка lang и его атрибутов
+    if 'lang' in globals() and hasattr(lang, 'font_warn_win_text'):
+        lang_font = getattr(lang, 'font_warn_win_text', None)
+        if lang_font and isinstance(lang_font, (tuple, list)) and len(lang_font) >= 1: # Простая проверка
+            font_tuple = lang_font
+        elif lang_font:
+            if 'logging' in globals(): logging.warning(f"lang.font_warn_win_text ('{lang_font}') is not a valid font tuple.")
+
+    # Используем ttk.Label, если ttk импортирован
+    label_module = ttk if 'ttk' in globals() else tk
+    label_module.Label(frame_inner, text=text, font=font_tuple, foreground=color, wraplength=350).pack(side=TOP, pady=(10,10))
+    
+    # Проверка move_center
+    if 'move_center' in globals() and callable(globals()['move_center']):
+        try:
+            move_center(dialog)
+        except Exception as e_move_center:
+            if 'logging' in globals(): logging.error(f"Error in move_center for warn_win: {e_move_center}")
+            # Фоллбэк на ручное центрирование, если move_center не сработал
+            dialog.update_idletasks()
+            width = dialog.winfo_width()
+            height = dialog.winfo_height()
+            screen_width = dialog.winfo_screenwidth()
+            screen_height = dialog.winfo_screenheight()
+            x = (screen_width // 2) - (width // 2)
+            y = (screen_height // 2) - (height // 2)
+            dialog.geometry(f'{width}x{height}+{x}+{y}')
+    else: 
+        # Ручное центрирование, если move_center недоступен
+        dialog.update_idletasks()
+        width = dialog.winfo_width()
+        height = dialog.winfo_height()
+        screen_width = dialog.winfo_screenwidth()
+        screen_height = dialog.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        dialog.geometry(f'{width}x{height}+{x}+{y}')
+
+    # Запланировать закрытие
+    try:
+        dialog.after(wait, dialog.destroy)
+    except tk.TclError: # Окно могло быть уже уничтожено
+        if 'logging' in globals(): logging.warning("warn_win: Could not schedule close, dialog might be already destroyed.")
+        
+    return dialog
+
+    
+
+class Toplevel(TkToplevel): # TkToplevel должен быть импортирован
     def __init__(self):
         super().__init__()
         if os.name == 'nt':
-            if settings.theme == 'dark':
-                set_title_bar_color(self)
+            # Эта часть зависит от глобального 'settings' или 'theme'.
+            # Если они инициализируются позже, это может вызвать проблемы.
+            # Либо передавайте тему как аргумент, либо убедитесь, что 'settings' доступен.
+            current_theme_val = 'light' # Безопасное значение по умолчанию
+
+            if 'settings' in globals() and hasattr(settings, 'theme'):
+                current_theme_val = settings.theme
+            elif 'theme' in globals() and hasattr(globals()['theme'], 'get'): # Если theme это StringVar
+                try:
+                    current_theme_val = globals()['theme'].get()
+                except tk.TclError: # Может случиться, если root еще не до конца инициализирован
+                     if 'logging' in globals(): logging.warning("Toplevel: TclError getting theme var, using default.")
             else:
-                set_title_bar_color(self, 0)
+                if 'logging' in globals(): logging.info("Toplevel: 'settings.theme' or global 'theme' StringVar not found, using default theme for title bar.")
+
+            if 'set_title_bar_color' in globals() and callable(globals()['set_title_bar_color']):
+                try:
+                    if current_theme_val == 'dark':
+                        set_title_bar_color(self)
+                    else:
+                        set_title_bar_color(self, 0)
+                except Exception as e_title_color:
+                     if 'logging' in globals(): logging.error(f"Error setting title bar color in Toplevel: {e_title_color}")
+            else:
+                if 'logging' in globals(): logging.warning("Toplevel: 'set_title_bar_color' not available.")
 
 
 class CustomControls:
@@ -1045,13 +1172,19 @@ class Tool(Tk):
         super().__init__()
         self.rotate_angle = 0
         if os.name == 'nt':
-            do_set_window_deffont(self)
-        self.message_pop = warn_win
+            if 'do_set_window_deffont' in globals() and callable(globals()['do_set_window_deffont']):
+                do_set_window_deffont(self) # Убедитесь, что do_set_window_deffont определена
+        
+        # Присваиваем ссылку на функцию warn_win
+        self.message_pop = warn_win  # Теперь warn_win должна быть определена
+        
         self.title('MIO-KITCHEN')
-        if os.name != "posix":
-            self.iconphoto(True,
-                           PhotoImage(
-                               data=images.icon_byte))
+        # Убедитесь, что images и PhotoImage импортированы и доступны
+        if os.name != "posix" and 'images' in globals() and hasattr(images, 'icon_byte') and 'PhotoImage' in globals():
+            try:
+                self.iconphoto(True, PhotoImage(data=images.icon_byte))
+            except Exception as e_icon:
+                 if 'logging' in globals(): logging.error(f"Failed to set application icon: {e_icon}")
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
