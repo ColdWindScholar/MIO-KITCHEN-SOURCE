@@ -4961,23 +4961,51 @@ def dndfile(files: list):
 
 
 class ProjectMenuUtils(ttk.LabelFrame):
-    def __init__(self):
-        super().__init__(master=win.tab2, text=lang.text12)
-        self.combobox: ttk.Combobox
-        self.pack(padx=5, pady=5)
+    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
+        title_text_key = 'text12' # Ключ для "Project"
+        default_title = "Project"
+        title_text = getattr(lang, title_text_key, default_title)
+        if not isinstance(title_text, str) or title_text == "None":
+            title_text = default_title
+            
+        super().__init__(master=master, text=title_text, **kwargs) # Передаем master
+        
+        self.combobox = None # Будет создан в self.gui()
+        # НЕ ВЫЗЫВАЕМ self.gui() здесь, его вызовет __init__tk И ОН САМ СЕБЯ УПАКУЕТ
 
     def gui(self):
+        """Creates and arranges widgets, then packs the LabelFrame itself."""
+        # Этот метод должен вызывать self.pack() для самого ProjectMenuUtils в конце.
+        
+        # Combobox for project selection
         self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
         self.combobox.pack(side="top", padx=10, pady=10, fill=X)
-        self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
-        functions = [
-            (lang.text23, self.listdir),
-            (lang.text115, self.new),
-            (lang.text116, lambda: create_thread(self.remove)),
-            (lang.text117, lambda: create_thread(self.rename)),
+        if 'lang' in globals() and hasattr(lang, 'text96'):
+            self.combobox.bind('<<ComboboxSelected>>', 
+                               lambda *x: print(f"{getattr(lang, 'text96', 'Selected items:')} {current_project_name.get()}"))
+        else:
+             self.combobox.bind('<<ComboboxSelected>>', 
+                               lambda *x: print(f"Selected project: {current_project_name.get()}"))
+
+
+        # Frame for action buttons
+        button_frame = ttk.Frame(self)
+        button_frame.pack(side="top", padx=5, pady=(0,5)) # Buttons below combobox
+
+        functions_map = [
+            (getattr(lang, 'text23', "Refresh"), self.listdir),
+            (getattr(lang, 'text115', "New"), self.new),
+            (getattr(lang, 'text116', "Delete"), lambda: create_thread(self.remove)),
+            (getattr(lang, 'text117', "Rename"), lambda: create_thread(self.rename)),
         ]
-        for text, func in functions:
-            ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
+        for text, func in functions_map:
+            # Ensure text is a string
+            if not isinstance(text, str) or text == "None": text = "Action"
+            ttk.Button(button_frame, text=text, command=func).pack(side="left", padx=5, pady=5)
+
+        # Pack the main LabelFrame itself onto its master (win.tab2)
+        self.pack(padx=5, pady=5, fill='x', side=TOP) # Упаковываем ProjectMenuUtils здесь
+        return self # Возвращаем self для цепочных вызовов, если нужно (хотя здесь не используется)
 
     @staticmethod
     def set_project(name):
@@ -4986,153 +5014,393 @@ class ProjectMenuUtils(ttk.LabelFrame):
         current_project_name.set(name)
 
     def listdir(self):
-        hide_items = ['bin', 'src']
-        array = [f for f in os.listdir(settings.path) if
-                 os.path.isdir(settings.path + os.sep + f) and f not in hide_items and not f.startswith('.')]
-        origin_project = current_project_name.get()
-        self.combobox["value"] = array
-        if not array:
-            current_project_name.set('')
-            self.combobox.current()
-        else:
-            if origin_project and project_manger.exist(origin_project):
-                self.set_project(origin_project)
+        if 'settings' not in globals() or not hasattr(settings, 'path'):
+            logging.error("settings.path not available for ProjectMenuUtils.listdir()")
+            if hasattr(self, 'combobox') and self.combobox:
+                self.combobox["value"] = []
+                self.combobox.set('')
+            if 'current_project_name' in globals(): current_project_name.set('')
+            return
+
+        print(f"[DEBUG] ProjectMenuUtils.listdir: settings.path = {settings.path}")
+        system_folders_to_hide = [
+            'bin', 'src', '.git', '.idea', '.vscode', 'dist', 
+            'build_pyinstaller', 'crash_logs', '__pycache__', 'qtui', 'test'
+            # 'test' добавлена сюда, так как она является частью структуры приложения, а не проектом
+        ]
+        
+        project_candidates = []
+        try:
+            if os.path.isdir(settings.path):
+                project_candidates = os.listdir(settings.path)
             else:
+                print(f"[ERROR] settings.path is not a valid directory: {settings.path}")
+        except Exception as e:
+            print(f"[ERROR] Could not list directory {settings.path}: {e}")
+
+        array_of_projects = [
+            folder_name for folder_name in project_candidates
+            if os.path.isdir(os.path.join(settings.path, folder_name)) and \
+               folder_name not in system_folders_to_hide and \
+               not folder_name.startswith('.')
+        ]
+        print(f"[DEBUG] Filtered project folders: {array_of_projects}")
+
+        origin_project = current_project_name.get()
+        
+        if not hasattr(self, 'combobox') or not self.combobox:
+            logging.error("Combobox not initialized in ProjectMenuUtils before listdir.")
+            return
+
+        self.combobox["value"] = array_of_projects
+
+        if not array_of_projects:
+            current_project_name.set('')
+            self.combobox.set('') 
+        else:
+            if origin_project and origin_project in array_of_projects:
+                self.combobox.set(origin_project)
+                # current_project_name не меняем, если он все еще валиден
+            else: 
                 self.combobox.current(0)
+                current_project_name.set(self.combobox.get())
+
+    @staticmethod
+    def set_project(name):
+        if not project_manger.exist(name): # project_manger должен быть доступен
+            return
+        current_project_name.set(name)
+
+    def new(self): # Должен использовать input_, а не input()
+        new_project_title = getattr(lang, 'text76', "Enter project name") # Пример, используй свой ключ
+        if not isinstance(new_project_title, str) or new_project_title == "None":
+            new_project_title = "Enter project name"
+        
+        inputvar = input_(title=new_project_title) 
+
+        if inputvar is None: # Пользователь отменил
+             if 'win' in globals() and hasattr(win, 'message_pop'): 
+                msg_key = getattr(lang, 'action_cancelled', "Action cancelled.") # Добавь 'action_cancelled' в lang
+                win.message_pop(msg_key)
+             return
+
+        if not inputvar.strip():
+            warn_msg_key = getattr(lang, 'warn12', "Please enter a name.")
+            if not isinstance(warn_msg_key, str) or warn_msg_key == "None":
+                warn_msg_key = "Project name cannot be empty."
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key)
+            return
+
+        inputvar = inputvar.replace(' ', '_')
+        if not inputvar.isprintable(): # Простая проверка на "печатаемость"
+            warn_msg_key_printable = getattr(lang, 'invalid_project_name', "Invalid project name (non-printable characters).")
+            if not isinstance(warn_msg_key_printable, str) or warn_msg_key_printable == "None":
+                warn_msg_key_printable = "Invalid project name (non-printable characters)."
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key_printable)
+            return
+        
+        new_project_path = os.path.join(settings.path, inputvar)
+        if os.path.exists(new_project_path):
+            exists_msg_key = getattr(lang, 'project_exists', "Project with this name already exists.")
+            if not isinstance(exists_msg_key, str) or exists_msg_key == "None":
+                exists_msg_key = "Project with this name already exists."
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(exists_msg_key, "orange")
+            return
+            
+        try:
+            os.makedirs(new_project_path, exist_ok=True) # Используем makedirs для безопасности
+            created_msg_key = getattr(lang, 'text99', "New Project: %s")
+            if not isinstance(created_msg_key, str) or created_msg_key == "None":
+                created_msg_key = "New Project: %s"
+            print(created_msg_key % inputvar)
+        except Exception as e_mkdir:
+            if 'win' in globals() and hasattr(win, 'message_pop'):
+                win.message_pop(f"Failed to create project: {e_mkdir}", "red")
+            logging.error(f"Failed to create directory {new_project_path}: {e_mkdir}")
+            return
+            
+        self.listdir() # Обновляем список
+        # Опционально: выбираем только что созданный проект
+        if inputvar in self.comboboxcget("values"):
+            current_project_name.set(inputvar)
+            self.combobox.set(inputvar)
+
+
+    def remove(self):
+        if not project_manger.exist(): # Проверяет текущий выбранный проект
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
+            return
+        
+        project_to_delete = current_project_name.get()
+        if not project_to_delete:
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1) # "Please select a project"
+            return
+
+        confirm_delete_text_key = getattr(lang, 'confirm_delete_project', "Are you sure you want to delete project '%s'?")
+        if not isinstance(confirm_delete_text_key, str) or confirm_delete_text_key == "None":
+            confirm_delete_text_key = "Are you sure you want to delete project '%s'?"
+            
+        if ask_win(confirm_delete_text_key % project_to_delete) == 1: # ask_win должен быть доступен
+            rmdir(project_manger.get_work_path(project_to_delete)) # rmdir должен быть доступен
+            self.listdir() # Обновить список, current_project_name будет сброшен или установлен в первый, если список не пуст
 
     def rename(self) -> bool:
         if not project_manger.exist():
-            print(lang.warn1)
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
             return False
-        if os.path.exists(settings.path + os.sep + (
-                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
-            print(lang.text103)
+        
+        old_name = current_project_name.get()
+        if not old_name:
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
             return False
-        if inputvar != current_project_name.get():
-            os.rename(settings.path + os.sep + current_project_name.get(), settings.path + os.sep + inputvar)
-            self.listdir()
-        else:
-            print(lang.text104)
+
+        rename_prompt_key = getattr(lang, 'text102', "Rename project '%s' to:")
+        if not isinstance(rename_prompt_key, str) or rename_prompt_key == "None":
+            rename_prompt_key = "Rename project '%s' to:"
+
+        new_name_raw = input_(title=rename_prompt_key % old_name, text=old_name)
+
+        if new_name_raw is None: # Отмена
+             if 'win' in globals() and hasattr(win, 'message_pop'): 
+                msg_key = getattr(lang, 'action_cancelled', "Action cancelled.")
+                win.message_pop(msg_key)
+             return False
+        
+        new_name = new_name_raw.strip().replace(' ', '_')
+
+        if not new_name:
+            warn_msg_key = getattr(lang, 'warn12', "Please enter a name.")
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key)
+            return False
+            
+        if not new_name.isprintable():
+            warn_msg_key_printable = getattr(lang, 'invalid_project_name', "Invalid project name (non-printable characters).")
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key_printable)
+            return False
+
+        if new_name == old_name:
+            same_name_msg_key = getattr(lang, 'text104', "The new name is the same as the old one.")
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(same_name_msg_key)
+            return False # Технически не ошибка, но действие не выполнено
+        
+        old_path = project_manger.get_work_path(old_name)
+        new_path_base = os.path.dirname(old_path.rstrip(os.sep)) # Получаем settings.path
+        new_path = os.path.join(new_path_base, new_name)
+
+        if os.path.exists(new_path):
+            exists_msg_key = getattr(lang, 'text103', "A project with the new name already exists!")
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(exists_msg_key, "orange")
+            return False
+        
+        try:
+            os.rename(old_path, new_path)
+            print(f"Project '{old_name}' renamed to '{new_name}'.")
+            current_project_name.set(new_name) # Обновляем текущий проект
+            self.listdir() # Обновляем список в комбобоксе
+            # self.combobox.set(new_name) # Убедимся, что комбобокс отображает новое имя
+        except Exception as e_rename:
+            if 'win' in globals() and hasattr(win, 'message_pop'):
+                win.message_pop(f"Failed to rename project: {e_rename}", "red")
+            logging.error(f"Failed to rename project from {old_path} to {new_path}: {e_rename}")
+            return False
         return True
-
-    def remove(self):
-        win.message_pop(lang.warn1) if not project_manger.exist() else rmdir(
-            project_manger.get_work_path(current_project_name.get()))
-        self.listdir()
-
-    def new(self):
-        if not (inputvar := input_()):
-            win.message_pop(lang.warn12)
-        else:
-            inputvar = inputvar.replace(' ', '_')
-            if not inputvar.isprintable():
-                win.message_pop(lang.warn12)
-            print(lang.text99 % inputvar)
-            os.mkdir(settings.path + os.sep + inputvar)
-        self.listdir()
 
 
 class Frame3(ttk.LabelFrame):
-    def __init__(self):
-        super().__init__(master=win.tab2, text=lang.text112)
-        self.pack(padx=5, pady=5)
+    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
+        title_text_key = 'text112' # Ключ для "Other"
+        default_title = "Other Actions"
+        title_text = getattr(lang, title_text_key, default_title)
+        if not isinstance(title_text, str) or title_text == "None":
+            title_text = default_title
+
+        super().__init__(master=master, text=title_text, **kwargs) # Передаем master
+        # НЕ ВЫЗЫВАЕМ self.gui() здесь, его вызовет __init__tk И ОН САМ СЕБЯ УПАКУЕТ
 
     def gui(self):
+        """Creates and arranges widgets, then packs the LabelFrame itself."""
+        # Этот метод должен вызывать self.pack() для самого Frame3 в конце.
+        
         row = 0
-        functions = [
-            (lang.text122, lambda: create_thread(pack_zip)),
-            (lang.text123, lambda: create_thread(PackSuper)),
-            (lang.text19, lambda: win.notepad.select(win.tab7)),
-            (lang.t13, lambda: create_thread(FormatConversion)),
-            #("打包 Payload", lambda: create_thread(PackPayload)),
+        # Используем getattr для безопасного доступа к текстам кнопок
+        functions_map = [
+            (getattr(lang, 'text122', "Pack ZIP"), lambda: create_thread(pack_zip)),
+            (getattr(lang, 'text123', "Pack super"), lambda: create_thread(PackSuper)),
+            (getattr(lang, 'text19', "Plugins"), lambda: win.notepad.select(win.tab7) if hasattr(win, 'notepad') and hasattr(win, 'tab7') else None),
+            (getattr(lang, 't13', "Convert image"), lambda: create_thread(FormatConversion)),
         ]
-        for index, (text, func) in enumerate(functions):
-            column = index % 4
-            if not column:
+
+        for index, (text, func) in enumerate(functions_map):
+            column = index % 4 # Предполагаем 4 кнопки в ряду
+            if column == 0 and index != 0 : # Переход на новый ряд (кроме первой кнопки)
                 row += 1
-            ttk.Button(self, text=text, command=func, width=11).grid(row=row, column=column, padx=5, pady=5)
+            
+            # Убедимся, что текст кнопки - это строка
+            button_text_str = str(text) if text is not None else "Action"
+            ttk.Button(self, text=button_text_str, command=func, width=11).grid(row=row, column=column, padx=5, pady=5, sticky="ew")
+        
+        # Конфигурируем колонки для равномерного растягивания, если нужно
+        for i in range(4): # Если максимум 4 колонки
+            self.grid_columnconfigure(i, weight=1)
+
+        # Pack the main LabelFrame itself onto its master (win.tab2)
+        self.pack(padx=5, pady=5, fill='x', side=TOP) # Упаковываем Frame3 здесь
+        return self
 
 
 class UnpackGui(ttk.LabelFrame):
-    def __init__(self):
-        super().__init__(master=win.tab2, text=lang.t57)
-        self.ch = BooleanVar()
-        current_project_name.trace_add("write", self._on_project_change)
+    def __init__(self, master=None, **kwargs): # Принимаем master и kwargs
+        # Безопасное получение текста для заголовка LabelFrame
+        title_text_key = 't57' # Ключ для "Unpack Options" или аналогичного
+        default_title = "Unpack Options" # Запасной текст
+        title_text = getattr(lang, title_text_key, default_title)
+        if not isinstance(title_text, str) or title_text == "None":
+            title_text = default_title
         
-    # Новый метод-обработчик, вызываемый при смене проекта
+        super().__init__(master=master, text=title_text, **kwargs) # Передаем master и text
+        
+        self.ch = BooleanVar() # Для Radiobutton Unpack/Pack
+        # trace_add на current_project_name, чтобы реагировать на смену проекта
+        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], StringVar):
+            current_project_name.trace_add("write", self._on_project_change)
+        else:
+            logging.error("Global 'current_project_name' not found or not a StringVar for UnpackGui trace.")
+        
+        # Атрибуты для виджетов будут созданы в self.gui()
+        self.fm = None
+        self.lsg = None
+        self.menu = None
+        
+        # НЕ ВЫЗЫВАЕМ self.gui() ЗДЕСЬ, его вызовет __init__tk
+
     def _on_project_change(self, *args):
-        """Вызывается автоматически при изменении current_project_name."""
-        # Проверяем, существует ли метод hd и сам виджет перед вызовом
-        if hasattr(self, 'hd') and callable(self.hd):
-             if self.winfo_exists():
-                 # Вызов hd() обновит список разделов для нового проекта,
-                 # учитывая текущий режим (Unpack/Pack)
-                 self.hd()
-                 
+        """Called automatically when current_project_name changes."""
+        # Ensure widgets are initialized before trying to update them
+        if hasattr(self, 'hd') and callable(self.hd) and self.winfo_exists():
+            if hasattr(self, 'fm') and self.fm is not None: # Проверяем, что fm уже создан
+                self.hd()
+            # else:
+                # logging.debug("UnpackGui._on_project_change: self.fm not yet initialized, skipping self.hd().")
+
     def gui(self):
-        self.pack(padx=5, pady=5)
-        self.ch.set(True)
+        """Creates and arranges the widgets within this UnpackGui frame."""
+        # Этот метод НЕ должен вызывать self.pack() или self.grid() для самого UnpackGui.
+        # Он только создает и размещает свои дочерние виджеты.
+        
+        self.ch.set(True) # Default to "Unpack" mode
+
+        # Combobox for format selection
         self.fm = ttk.Combobox(self, state="readonly",
-                               values=(
-                                   'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
-                                   'update.app'))
-        self.lsg = ListBox(self)
-        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
-        self.menu.add_command(label=lang.attribute, command=self.info)
-        self.lsg.bind('<Button-3>', self.show_menu)
+                               values=('new.dat.br', 'new.dat.xz', "new.dat", 
+                                       'img', 'zst', 'payload', 'super', 'update.app'))
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
-        self.lsg.gui()
-        self.lsg.canvas.bind('<Button-3>', self.show_menu)
-        self.lsg.pack(padx=5, pady=5, fill=X, side='top', expand=True)
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
-        ff1 = ttk.Frame(self)
-        ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
-                        value=True).pack(padx=5, pady=5, side='left')
-        ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
-                        value=False).pack(padx=5, pady=5, side='left')
-        ff1.pack(padx=5, pady=5, fill=X)
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
-        self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(self, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
-        self.refs()
-        self.ch.trace("w", lambda *x: self.hd())
 
+        # ListBox for displaying items
+        self.lsg = ListBox(self) # Assuming ListBox is your custom control
+        self.lsg.gui() # Initialize the ListBox's own GUI components
+        self.lsg.pack(padx=5, pady=5, fill=X, side=TOP, expand=True) # Pack ListBox inside UnpackGui
+
+        # Context menu for ListBox
+        self.menu = Menu(self.lsg.canvas, tearoff=False, borderwidth=0) # Attach to lsg.canvas or lsg itself
+        menu_attribute_text = getattr(lang, 'attribute', "Attribute") # Localization
+        if not isinstance(menu_attribute_text, str) or menu_attribute_text == "None":
+            menu_attribute_text = "Attribute"
+        self.menu.add_command(label=menu_attribute_text, command=self.info)
+        self.lsg.canvas.bind('<Button-3>', self.show_menu) # Bind to canvas for scrollable area
+
+        # Separator
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, pady=(5,0), fill=X)
+
+        # Radiobuttons for Unpack/Pack mode
+        mode_frame = ttk.Frame(self)
+        unpack_text = getattr(lang, 'unpack', "Unpack")
+        if not isinstance(unpack_text, str) or unpack_text == "None": unpack_text = "Unpack"
+        pack_text = getattr(lang, 'pack', "Pack")
+        if not isinstance(pack_text, str) or pack_text == "None": pack_text = "Pack"
+
+        ttk.Radiobutton(mode_frame, text=unpack_text, variable=self.ch, value=True).pack(padx=5, pady=5, side='left')
+        ttk.Radiobutton(mode_frame, text=pack_text, variable=self.ch, value=False).pack(padx=5, pady=5, side='left')
+        mode_frame.pack(padx=5, pady=0, fill=X) # Pack the mode_frame
+
+        # Another Separator
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, pady=(0,5), fill=X)
+        
+        # Bottom controls: Combobox and Run button
+        bottom_controls_frame = ttk.Frame(self)
+        self.fm.pack(in_=bottom_controls_frame, padx=5, pady=5, side='left', fill=Y) # Pack Combobox
+        
+        run_button_text = getattr(lang, 'run', "Run")
+        if not isinstance(run_button_text, str) or run_button_text == "None": run_button_text = "Run"
+        ttk.Button(bottom_controls_frame, text=run_button_text, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
+        bottom_controls_frame.pack(padx=5, pady=5, side=BOTTOM, fill=X)
+        
+        self.ch.trace_add("write", lambda *x: self.hd()) # Trace mode changes to update UI
+        self.refs() # Initial population of the list
+
+    # ... (остальные методы UnpackGui: show_menu, info, hd, refs, refs2, close_ - без изменений) ...
     def show_menu(self, event):
-        if len(self.lsg.selected) == 1 and self.fm.get() == 'img':
+        if hasattr(self, 'lsg') and self.lsg and len(self.lsg.selected) == 1 and hasattr(self, 'fm') and self.fm and self.fm.get() == 'img':
             self.menu.post(event.x_root, event.y_root)
 
     def info(self):
-        ck_ = Toplevel()
+        # ... (код метода info без изменений, но убедись, что Toplevel, lang, gettype, ext4, move_center доступны) ...
+        if not (hasattr(self, 'lsg') and self.lsg): return
+        ck_ = Toplevel() 
         move_center(ck_)
-        ck_.title(lang.attribute)
+        title_text = getattr(lang, 'attribute', "Attribute")
+        if not isinstance(title_text, str) or title_text == "None": title_text = "Attribute"
+        ck_.title(title_text)
+
         if not self.lsg.selected:
             ck_.destroy()
             return
+        
+        # Ensure project_manger is accessible
+        if 'project_manger' not in globals() or not hasattr(project_manger, 'current_work_path'):
+            logging.error("project_manger not available for UnpackGui.info()")
+            ck_.destroy()
+            return
+
         f_path = os.path.join(project_manger.current_work_path(), self.lsg.selected[0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
             return
+        
         f_type = gettype(f_path)
-        info = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
-        if f_type == 'ext':
-            with open(f_path, 'rb') as e:
-                for i in ext4.Volume(e).get_info_list:
-                    info.append(i)
+        info_data = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
+        if f_type == 'ext' and 'ext4' in globals() and hasattr(ext4, 'Volume'):
+            try:
+                with open(f_path, 'rb') as e_file:
+                    for item in ext4.Volume(e_file).get_info_list:
+                        info_data.append(item)
+            except Exception as e_ext4:
+                logging.error(f"Error reading EXT4 info: {e_ext4}")
+
         scroll = ttk.Scrollbar(ck_, orient='vertical')
-        columns = [lang.name, 'Value']
+        col_name_text = getattr(lang, 'name', "Name")
+        if not isinstance(col_name_text, str) or col_name_text == "None": col_name_text = "Name"
+        columns = [col_name_text, 'Value']
+        
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
             table.column(column=column, anchor=CENTER)
+        
         scroll.config(command=table.yview)
         scroll.pack(side=RIGHT, fill=Y)
         table.pack(fill=BOTH, expand=True)
-        for data in info:
-            table.insert('', tk.END, values=data)
-        ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
+        
+        for data_row in info_data:
+            table.insert('', tk.END, values=data_row)
+            
+        ok_text = getattr(lang, 'ok', "OK")
+        if not isinstance(ok_text, str) or ok_text == "None": ok_text = "OK"
+        ttk.Button(ck_, text=ok_text, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
+
 
     def hd(self):
+        if not (hasattr(self, 'fm') and self.fm): return 
         if self.ch.get():
             self.fm.configure(state='readonly')
             self.refs()
@@ -5141,7 +5409,9 @@ class UnpackGui(ttk.LabelFrame):
             self.refs2()
 
     def refs(self, auto: bool = False):
+        if not (hasattr(self, 'lsg') and self.lsg and hasattr(self, 'fm') and self.fm): return False
         self.lsg.clear()
+        # ... (остальной код refs без изменений)
         work = project_manger.current_work_path()
         if not project_manger.exist():
             return False
@@ -5180,10 +5450,13 @@ class UnpackGui(ttk.LabelFrame):
                                     file_name.split(f".{form}")[0])
         return True
 
+
     def refs2(self):
+        if not (hasattr(self, 'lsg') and self.lsg): return False
         self.lsg.clear()
+        # ... (остальной код refs2 без изменений)
         if not os.path.exists(work := project_manger.current_work_path()):
-            win.message_pop(lang.warn1)
+            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
             return False
         parts_dict = JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
@@ -5192,14 +5465,14 @@ class UnpackGui(ttk.LabelFrame):
         return True
 
     def close_(self):
+        if not (hasattr(self, 'lsg') and self.lsg): return
         lbs = self.lsg.selected.copy()
-        self.hd()
-        if self.ch.get() == 1:
-            unpack(lbs, self.fm.get())
-            self.refs()
-        else:
-            Packxx(lbs)
-
+        self.hd() # Update UI based on mode
+        if self.ch.get() == 1: # Unpack mode
+            unpack(lbs, self.fm.get()) # 'unpack' should be defined globally
+            self.refs() # Refresh list after unpack
+        else: # Pack mode
+            Packxx(lbs) # 'Packxx' should be defined globally
 
 def img2simg(path: str):
     call(['img2simg', path, f'{path}s'])
@@ -5500,184 +5773,106 @@ class ParseCmdline:
 
 
 def __init__tk(args: list):
-    # Setup temporary folder and logging path
-    if not os.path.exists(temp): # 'temp' should be a global variable like os.path.join(cwd_path, "bin", "temp")
-        re_folder(temp, quiet=True) # 're_folder' should be defined
-    
-    # 'tool_log' should be a global variable like f'{temp}/{...}.log'
-    if not os.path.exists(os.path.dirname(tool_log)): # Ensure log directory exists
-        try:
-            os.makedirs(os.path.dirname(tool_log), exist_ok=True)
-        except OSError as e:
-            print(f"Warning: Could not create log directory {os.path.dirname(tool_log)}: {e}")
-            # Fallback log path if creation fails (e.g., in user's home directory)
-            # This is a simplified fallback; robust fallback might be needed.
-            home_dir = os.path.expanduser("~")
-            fallback_log_path = os.path.join(home_dir, os.path.basename(tool_log))
-            print(f"Logging to fallback path: {fallback_log_path}")
-            # Update tool_log to the fallback path if you want logging to still work
-            # For now, just warn and proceed; logging.basicConfig might fail or use default.
-
-
-    if not os.path.exists(tool_log): # Check if the log file itself needs to be created (e.g. if it's a file path)
-        try:
-            open(tool_log, 'w', encoding="utf-8", newline="\n").close()
-        except IOError as e:
-            print(f"Warning: Could not create log file {tool_log}: {e}")
-
-
-    # Configure logging
-    # Ensure tool_log is a valid file path for logging.
+    # --- Basic Setup: Temporary Folder and Logging ---
+    # Ensure 'temp' directory (from utils.prog_path) exists
+    if not os.path.exists(temp): 
+        re_folder(temp, quiet=True) 
+    log_file_dir = os.path.dirname(tool_log)
+    if not os.path.exists(log_file_dir):
+        try: os.makedirs(log_file_dir, exist_ok=True)
+        except OSError as e: print(f"Warning: Could not create log directory {log_file_dir}: {e}")
+    if not os.path.exists(tool_log):
+        try: open(tool_log, 'w', encoding="utf-8", newline="\n").close()
+        except IOError as e: print(f"Warning: Could not create log file {tool_log}: {e}")
     try:
         logging.basicConfig(level=logging.DEBUG, 
                             format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
-                            filename=tool_log, 
-                            filemode='w', # Overwrite log on each run
-                            encoding='utf-8') # Added encoding for Py 3.9+
-    except Exception as e_logging:
-        print(f"Error configuring logging to {tool_log}: {e_logging}. Logging to stderr might occur.")
+                            filename=tool_log, filemode='w', encoding='utf-8')
+    except Exception as e_logging_config:
+        print(f"Error configuring logging to {tool_log}: {e_logging_config}.")
         logging.basicConfig(level=logging.DEBUG, 
                             format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
 
-
-    # Global Tkinter instances and variables
     global win, current_project_name, theme, language, unpackg, project_menu, animation, start
-
-    win = Tool() # Create the main application window instance
-
-    # Windows-specific title bar color
-    if os.name == 'nt' and 'set_title_bar_color' in globals() and callable(globals()['set_title_bar_color']):
-        set_title_bar_color(win) # Assumes settings.theme is already accessible or default
-
-    animation.set_master(win) # 'animation' should be a pre-initialized LoadAnim instance
-
-    # Initialize Tkinter StringVars for global state AFTER 'win' is created
-    # (though not strictly necessary for StringVar itself, good practice if they were to use 'win' as master)
-    current_project_name = StringVar() 
-    utils.project_name = current_project_name # Link to utils if needed there
-    theme = StringVar()
-    language = StringVar()
-
-    # Load application settings (this might trigger traces on current_project_name)
-    # 'settings' should be a pre-initialized SetUtils instance (e.g., settings = SetUtils(load=False))
+    win = Tool() 
+    if os.name == 'nt': 
+        if 'do_set_window_deffont' in globals(): do_set_window_deffont(win)
+        if 'set_title_bar_color' in globals(): set_title_bar_color(win) 
+    animation = LoadAnim() 
+    animation.set_master(win) 
+    current_project_name = StringVar(master=win) 
+    utils.project_name = current_project_name 
+    theme = StringVar(master=win)
+    language = StringVar(master=win)
     settings.load() 
-
-    # Handle updates or OOBE (Out-Of-Box Experience)
-    if settings.updating in ['1', '2']:
-        Updater() # Updater class should handle its own Toplevel creation
+    if settings.updating in ['1', '2']: Updater() 
+    if int(settings.oobe) < 5: Welcome() 
+    init_verify() 
+    try: win.winfo_exists()
+    except TclError as e_main_window_invalid:
+        logging.exception(f"Main window (win) is invalid before win.gui(): {e_main_window_invalid}")
+        return 
+    win.gui() 
     
-    if int(settings.oobe) < 5: # Check if OOBE is completed
-        Welcome() # Welcome class should handle its own Toplevel/Frame creation
-
-    init_verify() # Perform initial verification checks
-
-    try:
-        win.winfo_exists() # Check if the main window is valid
-    except TclError as e_winfo:
-        logging.exception(f"Main window (win) does not exist or is invalid before win.gui(): {e_winfo}")
-        return # Cannot proceed if main window is broken
-
-    # Initialize the main GUI components of the 'Tool' window
-    win.gui()
-
-    # Initialize GUI components that are part of the main window's tabs
-    # IMPORTANT: Initialize UnpackGui and its GUI *before* ProjectMenuUtils,
-    # as ProjectMenuUtils.listdir() might change current_project_name,
-    # triggering UnpackGui._on_project_change which needs UnpackGui.fm to be ready.
-    
-    unpackg = UnpackGui() # Create instance
-    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
-         unpackg.master = win.tab2 # Explicitly set master if not done in UnpackGui or if needed
-         unpackg.gui() # Create widgets within UnpackGui (including .fm)
+    if not (win.tab2 and win.tab2.winfo_exists()):
+        logging.error("CRITICAL: Parent tab (win.tab2) not found. UI will be incomplete.")
     else:
-        logging.error("Parent tab for UnpackGui (win.tab2) not found or invalid.")
+        project_menu = ProjectMenuUtils(master=win.tab2)
+        unpackg = UnpackGui(master=win.tab2)
+        frame3_instance = Frame3(master=win.tab2)
 
+        unpackg.gui() # Инициализируем внутренности UnpackGui (self.fm и т.д.)
 
-    project_menu = ProjectMenuUtils() # Create instance
-    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
-        project_menu.master = win.tab2 # Explicitly set master
-        project_menu.gui() # Create widgets
-        project_menu.listdir() # This might change current_project_name
-    else:
-        logging.error("Parent tab for ProjectMenuUtils (win.tab2) not found or invalid.")
+        project_menu.gui() # Этот метод теперь сам себя пакует первым
+        
+        # Теперь пакуем UnpackGui. Он будет под project_menu.
+        unpackg.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) # или fill=BOTH, expand=True
 
-    # Other tab content initialization
-    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
-        frame3_instance = Frame3() # Create instance
-        frame3_instance.master = win.tab2 # Explicitly set master
-        # If Frame3 has a .gui() method, call it. Otherwise, it might pack itself in __init__.
+        # Frame3 пакует себя сам внутри своего .gui()
         if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
             frame3_instance.gui()
-        # If Frame3 packs itself in __init__, ensure master is passed correctly there.
-    else:
-        logging.error("Parent tab for Frame3 (win.tab2) not found or invalid.")
+        
+        project_menu.listdir() # Вызываем listdir после того, как все создано и упаковано
 
-
-    # Load and initialize animation GIF
-    # Ensure win.list2 (theme combobox) exists and has a value before getattr
-    # A default loading image should be available if theme/images module is problematic
-    loading_gif_theme_suffix = "dark" # Default if win.list2 is not ready
+    loading_gif_theme_suffix = "dark"
     if hasattr(win, 'list2') and hasattr(win.list2, 'get') and win.list2.get():
         loading_gif_theme_suffix = win.list2.get()
-    
-    loading_gif_data = None
-    if hasattr(images, f"loading_{loading_gif_theme_suffix}_byte"):
-        loading_gif_data = getattr(images, f"loading_{loading_gif_theme_suffix}_byte")
-    elif hasattr(images, "loading_dark_byte"): # Fallback to dark
-        loading_gif_data = images.loading_dark_byte
-    
+    loading_gif_data = getattr(images, f"loading_{loading_gif_theme_suffix}_byte", getattr(images, "loading_dark_byte", None))
     if loading_gif_data:
         try:
             animation.load_gif(open_img(BytesIO(loading_gif_data)))
-            animation.init() # Start and stop to pre-load frames
-        except Exception as e_gif:
-            logging.error(f"Failed to load/init animation GIF: {e_gif}")
+            animation.init() 
+        except Exception as e_animation_gif:
+            logging.error(f"Failed to load/initialize animation GIF: {e_animation_gif}")
     else:
         logging.warning("Loading GIF data not found.")
 
-    # Final UI messages and setup
-    if not is_pro: # is_pro should be a global boolean
+    if not is_pro:
         if hasattr(lang, 'text108'): print(lang.text108)
-
-    if is_pro:
-        if 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
-            # Active class should handle its own Toplevel creation
-            Active(verify, settings, win, images, lang).gui() 
-
-    win.update() # Ensure window is fully drawn and sized
-    move_center(win) # Center the main window
-    win.get_time() # Start the clock update
-
-    # Log startup time - 'start' should be a global dti() call from before __init__tk
+    elif 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
+        Active(verify, settings, win, images, lang).gui() 
+    win.update() 
+    move_center(win) 
+    win.get_time() 
     if 'start' in globals():
          startup_time_message_key = 'text134'
-         default_startup_time_message = "Startup took: {:.2f} seconds" # Use {:.2f} for better formatting
+         default_startup_time_message = "Startup took: {:.2f} seconds"
          startup_time_message_format = getattr(lang, startup_time_message_key, default_startup_time_message)
          if not isinstance(startup_time_message_format, str) or startup_time_message_format == "None":
              startup_time_message_format = default_startup_time_message
          try:
             print(startup_time_message_format.format(dti() - start))
-         except TypeError: # If format string expects %s but gets float
+         except TypeError: 
             print(f"Startup took: {dti() - start:.2f} seconds (fallback format)")
-
-
-    # Windows-specific font and OS version checks
     if os.name == 'nt':
-        if 'do_override_sv_ttk_fonts' in globals() and callable(globals()['do_override_sv_ttk_fonts']):
-            do_override_sv_ttk_fonts()
-        if sys.getwindowsversion().major <= 6: # Windows 7 or older
-            if hasattr(lang, 'warn20') and 'ask_win' in globals() and callable(globals()['ask_win']):
-                ask_win(lang.warn20)
-
-    states.inited = True # 'states' should be a global States instance
-    win.protocol("WM_DELETE_WINDOW", exit_tool) # 'exit_tool' should be defined
-
-    # Command-line argument parsing after GUI is ready
-    if len(args) > 1 and is_pro : # Check is_pro if ParseCmdline is a pro feature
-        # Delay parsing slightly to ensure GUI is fully responsive
-        win.after(100, lambda: ParseCmdline(args[1:])) # ParseCmdline class
-
-    win.mainloop() # Start the Tkinter event loop
+        if 'do_override_sv_ttk_fonts' in globals(): do_override_sv_ttk_fonts()
+        if sys.getwindowsversion().major <= 6: 
+            if hasattr(lang, 'warn20') and 'ask_win' in globals(): ask_win(lang.warn20)
+    states.inited = True 
+    win.protocol("WM_DELETE_WINDOW", exit_tool) 
+    if len(args) > 1 and is_pro : 
+        win.after(100, lambda: ParseCmdline(args[1:]))
+    win.mainloop()
 
 
 # Cool Init
