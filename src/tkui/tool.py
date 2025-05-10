@@ -1113,7 +1113,7 @@ class Tool(Tk):
 
         Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
         Label(self.tab4,
-              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
+              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), platform.machine()), # <--- ИЗМЕНЕНИЕ ЗДЕСЬ
               font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
