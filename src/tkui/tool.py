@@ -13,6 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
+import os
+import traceback
+import time # For unique log file names
 import argparse
 import gzip
 import json
@@ -22,7 +26,153 @@ import subprocess
 import threading
 from functools import wraps
 from random import randrange
+from timeit import default_timer as dti
+import zipfile
+from io import BytesIO, StringIO
+from webbrowser import open as openurl
+import logging # logging should be configured after paths are set, or use basicConfig early
+
+# ------------------------------------------------------------------------------------
+# Global Unhandled Exception Catcher
+# This should be placed as early as possible in your main script.
+# ------------------------------------------------------------------------------------
+_original_excepthook = sys.excepthook # Store original excepthook
+
+def _determine_log_path():
+    """Determines a writable path for crash logs."""
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    filename = f"crash_report_{timestamp}.txt"
+    
+    # Try to place logs in a 'crash_logs' subdirectory
+    # This path determination might need to happen *after* utils.prog_path is correctly set
+    # if utils.prog_path is used here. For now, let's use a simpler approach.
+    if getattr(sys, 'frozen', False): # Running in a bundle (e.g., PyInstaller)
+        base_path = os.path.dirname(sys.executable)
+    else: # Running as a script
+        try:
+            base_path = os.path.abspath(os.path.dirname(__file__))
+        except NameError: # __file__ is not defined (e.g. interactive interpreter)
+            base_path = os.getcwd()
+
+    log_dir = os.path.join(base_path, "crash_logs")
+
+    try:
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir, exist_ok=True)
+        return os.path.join(log_dir, filename)
+    except Exception:
+        # Fallback to user's desktop
+        try:
+            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+            if not os.path.exists(desktop_path):
+                 os.makedirs(desktop_path, exist_ok=True) # Should not be necessary for Desktop
+            return os.path.join(desktop_path, f"mio_kitchen_crash_{timestamp}.txt")
+        except Exception:
+            # Last resort: current working directory
+            return os.path.join(os.getcwd(), f"mio_kitchen_crash_{timestamp}.txt")
+
+_log_file_path_for_crash = _determine_log_path()
+_messagebox_shown_for_crash = False
+
+def _global_exception_handler(exc_type, exc_value, exc_traceback):
+    """
+    Custom global exception handler to log unhandled exceptions to a file
+    and attempt to show an error message to the user.
+    """
+    global _messagebox_shown_for_crash
+    error_details = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    
+    try:
+        with open(_log_file_path_for_crash, "a", encoding='utf-8') as f:
+            f.write(f"--- CRASH REPORT [{time.asctime()}] ---\n")
+            f.write(error_details)
+            f.write("\n---------------------------------------\n")
+        
+        if not _messagebox_shown_for_crash:
+            _messagebox_shown_for_crash = True
+            try:
+                import tkinter # Local import
+                from tkinter import messagebox
+                
+                temp_root_for_msgbox = None
+                # Try to use 'win' if it exists and is valid, otherwise create a temporary root.
+                # This is tricky because 'win' might not be initialized or might be the source of the error.
+                main_app_window = globals().get('win') 
+                parent_for_msgbox = None
+                if main_app_window and isinstance(main_app_window, tkinter.Tk) and main_app_window.winfo_exists():
+                    parent_for_msgbox = main_app_window
+                else:
+                    temp_root_for_msgbox = tkinter.Tk()
+                    temp_root_for_msgbox.withdraw()
+                    parent_for_msgbox = temp_root_for_msgbox
+                
+                messagebox.showerror(
+                    "Unhandled Exception",
+                    f"A critical error occurred. Details have been saved to:\n{_log_file_path_for_crash}\n\nError: {str(exc_value)}", # Use str(exc_value) for a concise error
+                    parent=parent_for_msgbox
+                )
+                if temp_root_for_msgbox:
+                    temp_root_for_msgbox.destroy()
+            except Exception as e_msgbox_critical:
+                sys.stderr.write(f"CRITICAL: Failed to show error messagebox: {e_msgbox_critical}\n")
+                sys.stderr.write(f"Crash report saved to: {_log_file_path_for_crash}\n")
+
+    except Exception as e_log_critical:
+        sys.stderr.write(f"CRITICAL: Failed to write to log file {_log_file_path_for_crash}: {e_log_critical}\n")
+        sys.stderr.write("Original error details:\n")
+        sys.stderr.write(error_details)
+    
+    # _original_excepthook(exc_type, exc_value, exc_traceback) # Call original hook if desired
+    sys.exit(1) # Force exit
+
+sys.excepthook = _global_exception_handler
+# ------------------------------------------------------------------------------------
+# END OF Global Unhandled Exception Catcher
+# ------------------------------------------------------------------------------------
+
+# --- Your Regular Imports Start Here ---
+
+# Tkinter related imports
+import tkinter as tk # Now explicitly imported earlier as well for messagebox
+from tkinter import ttk
 from tkinter.ttk import Scrollbar
+from tkinter import (BOTH, BOTTOM, CANVAS, CENTER, DISABLED, HORIZONTAL, INT,
+                     LEFT, LISTBOX, MENU, RIGHT, STRINGVAR, TEXT, TOP, X, Y, BooleanVar,
+                     Canvas, Frame, IntVar, Label, Listbox, Menu, StringVar, TclError, Text,
+                     Toplevel as TkToplevel)
+
+# Third-party libraries
+import pygments.lexers
+import requests
+from requests import ConnectTimeout, HTTPError
+import sv_ttk
+from PIL.Image import open as open_img
+from PIL.ImageTk import PhotoImage
+
+# Splash screen handling (e.g., for PyInstaller)
+# This should ideally come after the exception hook is set,
+# but before heavy GUI initializations if pyi_splash itself can fail.
+if platform.system() != 'Darwin':
+    try:
+        import pyi_splash
+        if hasattr(pyi_splash, 'is_active') and pyi_splash.is_active():
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+        elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+    except ImportError:
+        pass 
+    except RuntimeError: 
+        pass
+    except Exception: # Catch any other pyi_splash related errors
+        pass
+
+
+# Local application/library specific imports
+# Relative imports assume this file is part of a package.
+# If 'tool.py' is the main entry point run directly, these might need adjustment
+# or your project structure must support them (e.g., running with 'python -m yourpackage.tool').
 
 from ..core import tarsafe, miside_banner
 from ..core.Magisk import Magisk_patch
@@ -32,45 +182,31 @@ from ..core.qsb_imger import process_by_xml
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
 
-if platform.system() != 'Darwin':
-    try:
-        import pyi_splash
+# Local UI components and helpers
+from .tkinterdnd2_build_in import Tk, DND_FILES # Custom TkinterDnD2. '.tkinterdnd2_build_in'
 
-        pyi_splash.update_text('Loading ...')
-        pyi_splash.close()
-    except ModuleNotFoundError:
-        ...
-import os.path
-import pathlib
-import sys
-import time
-from platform import machine
-from webbrowser import open as openurl
-import tkinter as tk
-from tkinter import ttk
-from timeit import default_timer as dti
-import zipfile
-from io import BytesIO, StringIO
-from .tkinterdnd2_build_in import Tk, DND_FILES
-from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
-                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
-from shutil import rmtree, copy, move
-import pygments.lexers
-import requests
-from requests import ConnectTimeout, HTTPError
-import sv_ttk
-from PIL.Image import open as open_img
-from PIL.ImageTk import PhotoImage
-from ..core.dumper import Dumper
-from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
+# Core utilities and data structures
+from ..core.utils import (lang, LogoDumper, States, terminate_process, 
+                          calculate_md5_file, calculate_sha256_file, JsonEdit, 
+                          DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo,
+                          create_thread, move_center, v_code, gettype, 
+                          is_empty_img, findfile, findfolder, Sdat2img, Unxz)
+from ..core import utils # For utils.prog_path and utils.project_name
 
+# Platform-specific imports
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
-    from tkinter import filedialog
+    from tkinter import filedialog # Standard filedialog for Windows
 else:
-    from ..core import mkc_filedialog as filedialog
+    # Ensure ..core.mkc_filedialog exists or adjust path
+    try:
+        from ..core import mkc_filedialog as filedialog # Custom filedialog
+    except ImportError:
+        from tkinter import filedialog # Fallback for safety
+        logging.warning("Custom filedialog 'mkc_filedialog' not found, using standard filedialog.")
 
+
+# More core functionalities
 from ..core import imgextractor
 from ..core import lpunpack
 from ..core import mkdtboimg
@@ -78,57 +214,81 @@ from ..core import ozipdecrypt
 from ..core import splituapp
 from ..core import ofp_qc_decrypt
 from ..core import ofp_mtk_decrypt
-from . import editor
 from ..core import opscrypto
-from ..core import images
+from ..core import images 
 from ..core import extra
-from . import AI_engine
-from ..core import ext4
-from ..core.config_parser import ConfigParser
-from ..core import utils
-from ..core.unpac import MODE as PACMODE, unpac
-
-if os.name == 'nt':
-    from .sv_ttk_fixes import *
 from ..core.extra import fspatch, re, contextpatch
-from ..core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
-from .controls import ListBox, ScrollFrame
+from ..core.config_parser import ConfigParser
+from ..core.unpac import MODE as PACMODE, unpac
 from ..core.undz import DZFileTools
 from ..core.selinux_audit_allow import main as selinux_audit_allow
-import logging
 
+# Local UI components and helpers
+from . import editor # Assuming editor.py is in the same directory
+from . import AI_engine # Assuming AI_engine.py is in the same directory
+if os.name == 'nt':
+    from .sv_ttk_fixes import * # Windows-specific ttk fixes
+from .controls import ListBox, ScrollFrame # Assuming controls.py is in the same directory
+# from .home_tab import HomeTab # If used
+
+# --- Global Variables and Initial Setup ---
 is_pro = False
 try:
     from ..pro.sn import v as verify
-
     is_pro = True
 except ImportError:
-    is_pro = False
+    is_pro = False 
+
 if is_pro:
     from ..pro.active_ui import Active
 
 try:
-    from ..core import imp
+    # 'imp' is deprecated since Python 3.4, consider 'importlib' for future compatibility
+    from ..core import imp 
 except ImportError:
     imp = None
+
 try:
     from ..core.pycase import ensure_dir_case_sensitive
 except ImportError:
-    ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
+    ensure_dir_case_sensitive = lambda *x: logging.warning(f"Case sensitivity check not available for path(s): {x}")
 
-cwd_path = utils.prog_path
+# CRITICAL: 'utils.prog_path' must be correctly determined for compiled applications
+# *before* it's used to form other paths like cwd_path, tool_bin, temp, etc.
+# This is often a major source of issues in bundled apps.
+# The global exception handler might catch errors if this path is wrong and files are not found.
+cwd_path = utils.prog_path 
 
 if os.name == 'nt':
-    # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
-    def set_title_bar_color(window, dark_value: int = 20):
-        window.update()
-        set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
-        get_parent = windll.user32.GetParent
-        hwnd = get_parent(window.winfo_id())
-        rendering_policy = dark_value
-        value = c_int(2)
-        set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
-        window.update()
+    def set_title_bar_color(window, dark_value: int = 20): # 20 for dark mode hint
+        """
+        Sets the window title bar color on Windows, typically for dark mode.
+        The 'dark_value' and 'value=c_int(2)' logic is specific to certain dwmapi calls.
+        """
+        try:
+            window.update() # Ensure HWND is available
+            set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
+            get_parent = windll.user32.GetParent
+            hwnd = get_parent(window.winfo_id())
+            
+            # This logic is preserved from your original code.
+            # DWMWA_USE_IMMERSIVE_DARK_MODE (attribute 20 on newer Win10/11) usually takes a BOOL (0 or 1).
+            # The use of dark_value as the attribute and c_int(2) as the value is specific.
+            rendering_policy_attribute_id = dark_value 
+            attribute_value_pointer = byref(c_int(2)) # As per original code
+            
+            # A more common way to enable dark mode if attribute 20 is for IMMERSIVE_DARK_MODE:
+            # if dark_value == 20: # Assuming 20 is a flag to enable dark mode
+            #     rendering_policy_attribute_id = 20 # DWMWA_USE_IMMERSIVE_DARK_MODE
+            #     attribute_value_pointer = byref(c_int(1)) # TRUE to enable
+            # elif dark_value == 0: # Assuming 0 is a flag to disable dark mode / use light
+            #    rendering_policy_attribute_id = 20
+            #    attribute_value_pointer = byref(c_int(0)) # FALSE to disable
+
+            set_window_attribute(hwnd, rendering_policy_attribute_id, attribute_value_pointer, sizeof(c_int))
+            window.update()
+        except Exception as e_title_bar:
+            logging.warning(f"Could not set Windows title bar color: {e_title_bar}")
 
 
 class LoadAnim:
