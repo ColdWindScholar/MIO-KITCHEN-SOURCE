@@ -5057,17 +5057,16 @@ class UnpackGui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()
-        # 'current_project_name' must be a global StringVar
         current_project_name.trace_add("write", self._on_project_change)
         
-    # New handler method called when changing the project
+    # Новый метод-обработчик, вызываемый при смене проекта
     def _on_project_change(self, *args):
-         """Is called automatically when current_project_name is changed."""
-        # Check if the hd method exists and the widget itself before calling
+        """Вызывается автоматически при изменении current_project_name."""
+        # Проверяем, существует ли метод hd и сам виджет перед вызовом
         if hasattr(self, 'hd') and callable(self.hd):
              if self.winfo_exists():
-                 # Calling hd() will update the list of partitions for the new project,
-                 # Considering the current mode (Unpack/Pack)
+                 # Вызов hd() обновит список разделов для нового проекта,
+                 # учитывая текущий режим (Unpack/Pack)
                  self.hd()
                  
     def gui(self):
