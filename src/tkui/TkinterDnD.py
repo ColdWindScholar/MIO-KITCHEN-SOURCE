@@ -27,35 +27,56 @@ from ..core.utils import prog_path
 TkdndVersion = None
 
 def _require(tkroot):
-    """Internal function."""
     global TkdndVersion
     try:
         import os.path
-        import platform
+        import platform # Standard import
+        
+        # Determine the machine architecture string locally without modifying platform.machine
+        current_machine_arch = platform.machine()
         if os.name == "nt":
-            mach_ = platform.machine()
-            platform.machine = lambda: 'x86' if platform.architecture()[0] == '32bit' and mach_ == 'AMD64' else mach_
-        if platform.system()=="Darwin" and platform.machine()=="arm64":
-            tkdnd_platform_rep = "osx-arm64"
-        elif platform.system()=="Darwin" and platform.machine()=="x86_64":
-            tkdnd_platform_rep = "osx-x64"
-        elif platform.system()=="Linux" and platform.machine()=="aarch64":
-            tkdnd_platform_rep = "linux-arm64"
-        elif platform.system()=="Linux" and platform.machine()=="x86_64":
-            tkdnd_platform_rep = "linux-x64"
-        elif platform.system()=="Windows" and platform.machine()=="ARM64":
-            tkdnd_platform_rep = "win-arm64"
-        elif platform.system()=="Windows" and platform.machine()=="AMD64":
-            tkdnd_platform_rep = "win-x64"
-        elif platform.system()=="Windows" and platform.machine()=="x86":
-            tkdnd_platform_rep = "win-x86"
-        else:
-            raise RuntimeError('Plaform not supported.')
+            # Specific logic for Windows 32-bit on 64-bit reporting as AMD64
+            if platform.architecture()[0] == '32bit' and current_machine_arch == 'AMD64':
+                current_machine_arch = 'x86' 
+        
+        # Now use current_machine_arch and platform.system()
+        system_name = platform.system()
 
-        tkroot.tk.call('lappend', 'auto_path', os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep))
-        TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
-    except tkinter.TclError:
+        if system_name == "Darwin":
+            if current_machine_arch == "arm64":
+                tkdnd_platform_rep = "osx-arm64"
+            elif current_machine_arch == "x86_64":
+                tkdnd_platform_rep = "osx-x64"
+            else:
+                raise RuntimeError(f'Unsupported macOS architecture: {current_machine_arch}')
+        elif system_name == "Linux":
+            if current_machine_arch == "aarch64":
+                tkdnd_platform_rep = "linux-arm64"
+            elif current_machine_arch == "x86_64":
+                tkdnd_platform_rep = "linux-x64"
+            else:
+                raise RuntimeError(f'Unsupported Linux architecture: {current_machine_arch}')
+        elif system_name == "Windows":
+            if current_machine_arch == "ARM64":
+                tkdnd_platform_rep = "win-arm64"
+            elif current_machine_arch == "AMD64": # This will be hit for 64-bit Python on 64-bit Windows
+                tkdnd_platform_rep = "win-x64"
+            elif current_machine_arch == "x86": # This will be hit for 32-bit Python, or after our adjustment
+                tkdnd_platform_rep = "win-x86"
+            else:
+                raise RuntimeError(f'Unsupported Windows architecture: {current_machine_arch}')
+        else:
+            raise RuntimeError(f'Platform not supported: {system_name}')
+
+        # ... (rest of the _require function using tkdnd_platform_rep) ...
+        # tkroot.tk.call('lappend', 'auto_path', os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep))
+        # TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
+    except tkinter.TclError: # tkinter might not be imported here, catch generic Exception or ensure import
         raise RuntimeError('Unable to load tkdnd library.')
+    # return TkdndVersion # This was missing
+    # Corrected:
+    tkroot.tk.call('lappend', 'auto_path', os.path.join(utils.prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)) # Use utils.prog_path
+    TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
     return TkdndVersion
 
 class DnDEvent:
