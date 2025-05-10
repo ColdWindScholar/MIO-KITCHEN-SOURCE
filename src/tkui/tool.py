@@ -1837,201 +1837,200 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini: str = None): # load=True убрано из аргументов по умолчанию
+    def __init__(self, set_ini: str = None):
+        # Атрибуты по умолчанию
         self.project_struct = 'single'
         self.auto_unpack = '0'
-        self.treff = '0' # Прозрачность включена/выключена
-        
-        # cwd_path должен быть определен глобально до создания экземпляра SetUtils
-        _cwd_path = os.getcwd() # Безопасный фоллбэк
-        if 'cwd_path' in globals() and globals()['cwd_path']:
-            _cwd_path = globals()['cwd_path']
-        else:
-            if 'logging' in globals(): logging.warning("SetUtils.__init__: Global 'cwd_path' not found, using os.getcwd().")
-
-        if set_ini:
-            self.set_file = set_ini
-        else:
-            self.set_file = os.path.join(_cwd_path, "bin", "setting.ini")
-            
-        self.plugin_repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/" # Значение по умолчанию
+        self.treff = '0'
+        self.plugin_repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
         self.contextpatch = '0'
         self.oobe = '0'
-        
-        # path инициализируется в load_from_file
-        self.path = None # Будет установлено из файла или фоллбэка
-        
-        self.bar_level = '0.9' # Уровень прозрачности
+        self.path = None # Будет определен в load_from_file
+        self.bar_level = '0.9'
         self.ai_engine = '0'
-        self.version = 'basic' # Это значение будет перезаписано из .ini
+        self.version = 'basic' # Будет перезаписано из .ini
         self.version_old = 'unknown'
-        self.language = 'English' # Значение по умолчанию, будет перезаписано из .ini
+        self.language = 'English' # Будет перезаписано из .ini
         self.magisk_not_decompress = '0'
         self.updating = ''
         self.new_tool = ''
         self.cmd_exit = '0'
         self.cmd_invisible = '0'
         self.debug_mode = 'No'
-        self.theme = 'dark' # Значение по умолчанию, будет перезаписано из .ini
+        self.theme = 'dark' # Будет перезаписано из .ini
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
-        
-        # custom_system и tool_bin инициализируются в конце load_from_file
-        self.custom_system = None
-        self.tool_bin = None
+        self.custom_system = None # Будет определен в load_from_file
+        self.tool_bin = None # Будет определен в load_from_file
 
-        # ConfigParser должен быть доступен
-        if 'ConfigParser' in globals() and callable(globals()['ConfigParser']):
-            self.config = ConfigParser()
+        # Инициализация ConfigParser (ваш кастомный)
+        # Убедитесь, что ConfigParser импортирован правильно перед созданием экземпляра SetUtils
+        if 'ConfigParser' not in globals() or not callable(globals()['ConfigParser']):
+            # Это критическая ошибка, приложение не сможет работать без парсера конфигурации
+            _msg = "FATAL: Custom ConfigParser class is not available. Application cannot continue."
+            if 'logging' in globals(): logging.critical(_msg)
+            # Можно либо выбросить исключение, либо попытаться аварийно завершить работу
+            raise RuntimeError(_msg)
+        self.config = ConfigParser() # Используем ваш кастомный ConfigParser
+
+        # Определение пути к файлу настроек
+        _cwd_path = os.getcwd() # Безопасный фоллбэк
+        if 'cwd_path' in globals() and globals()['cwd_path']:
+            _cwd_path = globals()['cwd_path']
+        elif 'logging' in globals():
+            logging.warning("SetUtils.__init__: Global 'cwd_path' not found, using os.getcwd() for settings path.")
+
+        if set_ini:
+            self.set_file = set_ini
         else:
-            if 'logging' in globals(): logging.error("SetUtils.__init__: ConfigParser not available.")
-            # Это критическая зависимость, возможно, стоит выбросить исключение или завершить работу
-            raise RuntimeError("ConfigParser is not available for SetUtils.")
-
-        # Загрузка из файла НЕ происходит здесь автоматически. Вызывается явно из __init__tk.
-        # Если файл настроек не существует при первом запуске, load_from_file обработает это.
-
+            self.set_file = os.path.join(_cwd_path, "bin", "setting.ini")
+            
+        # Загрузка из файла НЕ происходит здесь автоматически.
+        # Она должна вызываться явно из __init__tk после того, как все зависимости готовы.
 
     def load_from_file(self):
-        """Загружает настройки из .ini файла в атрибуты экземпляра."""
-        # cwd_path должен быть определен глобально
+        """Загружает настройки из .ini файла в атрибуты экземпляра, используя кастомный ConfigParser."""
         _cwd_path = os.getcwd()
         if 'cwd_path' in globals() and globals()['cwd_path']:
             _cwd_path = globals()['cwd_path']
 
         if not os.access(self.set_file, os.F_OK):
-            if 'logging' in globals(): logging.warning(f"Settings file {self.set_file} not found. Using defaults and attempting to create.")
-            # Попытка создать файл настроек с базовыми значениями может быть здесь, если это нужно.
-            # Пока просто продолжаем с дефолтными значениями атрибутов.
-            # Вызов error(1, ...) здесь может быть преждевременным, если это первый запуск.
-            # Вместо этого, просто используем значения по умолчанию, установленные в __init__.
+            if 'logging' in globals():
+                logging.warning(f"Settings file {self.set_file} not found. Using default attribute values.")
+            # Если файла нет, атрибуты экземпляра сохранят свои значения по умолчанию из __init__
         else:
             try:
-                self.config.read(self.set_file, encoding='utf-8') # Явно указываем кодировку
-                if 'setting' in self.config:
-                    for key, value in self.config.items('setting'):
-                        setattr(self, key, value)
-                else:
-                    if 'logging' in globals(): logging.warning(f"Section 'setting' not found in {self.set_file}. Defaults will be used.")
+                self.config.read(self.set_file) # Ваш ConfigParser.read() не принимает 'encoding'
+                
+                if 'setting' in self.config.dict: # Проверяем наличие секции в словаре вашего парсера
+                    for key, value in self.config.items('setting'): # Используем ваш items()
+                        if key is not None: # Ваш items() может вернуть (None, None)
+                            setattr(self, key, value)
+                elif 'logging' in globals():
+                    logging.warning(f"Section 'setting' not found in {self.set_file} (custom parser). Defaults will be used for missing settings.")
             except Exception as e_read_config:
-                if 'logging' in globals(): logging.error(f"Error reading settings file {self.set_file}: {e_read_config}. Defaults will be used.")
+                if 'logging' in globals():
+                    logging.error(f"Error reading settings file {self.set_file} with custom parser: {e_read_config}. Using default attribute values.")
 
-
-        # Обработка self.path (должен быть utils.prog_path)
-        prog_path_fallback = _cwd_path # Используем _cwd_path, который уже учитывает глобальный cwd_path
+        # Обработка self.path (используем utils.prog_path, если он доступен)
+        prog_path_fallback = _cwd_path
         if 'utils' in globals() and hasattr(utils, 'prog_path') and utils.prog_path:
             prog_path_fallback = utils.prog_path
 
-        # getattr(self, 'path', None) для безопасного доступа, если атрибут мог не установиться из файла
         current_path_setting = getattr(self, 'path', None)
-        if not current_path_setting: # Если path не был в .ini или пустой
+        if not current_path_setting:
             self.path = prog_path_fallback
-        elif not os.path.isdir(current_path_setting): # Проверяем, что это существующая директория
-             if 'logging' in globals(): logging.warning(f"Path from settings '{current_path_setting}' is not a valid directory. Falling back to '{prog_path_fallback}'.")
+        elif not os.path.isdir(current_path_setting):
+             if 'logging' in globals():
+                 logging.warning(f"Path from settings '{current_path_setting}' is not a valid directory. Falling back to '{prog_path_fallback}'.")
              self.path = prog_path_fallback
-        # Иначе self.path остается тем, что было прочитано из файла и является валидной директорией
+        # Иначе self.path корректен и остается как есть
 
-        # Убедимся, что self.language и self.theme имеют значения по умолчанию, если не загрузились
-        if not hasattr(self, 'language') or not self.language: self.language = 'English'
-        if not hasattr(self, 'theme') or self.theme not in ['light', 'dark']: self.theme = 'dark'
-
-
-        # Загрузка локализации на основе self.language
-        # self.load_language вызывается из apply_loaded_settings_to_gui после того, как lang объект точно доступен
-        # но сам self.language должен быть установлен здесь из файла.
+        # Убедимся, что основные атрибуты имеют значения по умолчанию, если не загрузились
+        default_attrs = {
+            'language': 'English', 'theme': 'dark', 'oobe': '0',
+            'treff': '0', 'bar_level': '0.9', 'project_struct': 'single',
+            'auto_unpack': '0', 'plugin_repo': "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
+            'contextpatch': '0', 'ai_engine': '0', 'version': 'basic', 'version_old': 'unknown',
+            'magisk_not_decompress': '0', 'updating': '', 'new_tool': '', 'cmd_exit': '0',
+            'cmd_invisible': '0', 'debug_mode': 'No',
+            'update_url': 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+        }
+        for attr, default_val in default_attrs.items():
+            if not hasattr(self, attr) or getattr(self, attr, None) is None: # Проверяем на None тоже
+                setattr(self, attr, default_val)
+                if 'logging' in globals():
+                    logging.debug(f"Attribute '{attr}' not found in settings, defaulted to '{default_val}'.")
+        
+        if self.theme not in ['light', 'dark']: self.theme = 'dark' # Коррекция темы
 
         # Инициализация custom_system и tool_bin
-        if hasattr(self, 'custom_system') and isinstance(self.custom_system, str) and self.custom_system.strip():
-            pass # custom_system уже установлен из .ini и не пустой
+        current_custom_system = getattr(self, 'custom_system', None)
+        if current_custom_system and isinstance(current_custom_system, str) and current_custom_system.strip():
+            pass # Используем значение из .ini
         else:
             self.custom_system = platform.system() # platform должен быть импортирован
 
-        # platform.machine() должен быть доступен
         self.tool_bin = os.path.join(_cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
-        self.tool_bin = self.tool_bin.replace('\\', '/') # Нормализация для единообразия
+        self.tool_bin = self.tool_bin.replace('\\', '/')
 
-        # Верификация pro версии (если зависимости доступны)
+        # Верификация pro версии
         if 'is_pro' in globals() and is_pro:
             if 'verify' in globals() and hasattr(verify, 'verify') and callable(verify.verify):
-                active_code_to_verify = getattr(self, 'active_code', 'None') # 'active_code' должно быть в .ini или иметь дефолт
+                active_code_to_verify = getattr(self, 'active_code', 'None')
                 try:
                     verify.verify(active_code_to_verify)
                 except Exception as e_verify:
                     if 'logging' in globals(): logging.error(f"Error during pro verification: {e_verify}")
             elif 'logging' in globals() and not ('verify' in globals() and hasattr(verify, 'verify')):
-                logging.debug("SetUtils.load_from_file: 'verify' module/function not available for pro version check.")
+                logging.debug("load_from_file: 'verify' module/function not available for pro check.")
         
-        # Атрибуты для прозрачности (уже установлены в __init__ или из файла)
-        if not hasattr(self, 'treff'): self.treff = '0'
-        if not hasattr(self, 'bar_level'): self.bar_level = '0.9'
+        # Проверка bar_level
         try:
-            float(self.bar_level) # Проверка, что bar_level можно преобразовать во float
+            float(self.bar_level)
         except ValueError:
             if 'logging' in globals(): logging.warning(f"Invalid bar_level '{self.bar_level}', defaulting to 0.9.")
             self.bar_level = '0.9'
 
-
     def apply_loaded_settings_to_gui(self):
-        """Обновляет глобальные tk.StringVar и применяет тему к GUI.
-           Вызывается после создания StringVar и главного окна.
-        """
-        # lang объект должен быть доступен глобально
+        """Обновляет tk.StringVars и применяет тему к GUI."""
+        # lang (объект) должен быть доступен
         if 'lang' in globals() and globals()['lang'] is not None:
-            self.load_language(self.language) # Загружаем языковые строки в объект lang
-        else:
-            if 'logging' in globals(): logging.error("Global 'lang' object not available, cannot load language strings.")
+            self.load_language(self.language) # self.language уже установлен из load_from_file
+        elif 'logging' in globals():
+            logging.error("apply_loaded_settings_to_gui: Global 'lang' object not available.")
 
-        # Глобальная переменная language (tk.StringVar) должна быть доступна
+        # language (tk.StringVar) должен быть доступен
         if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
             try:
                 globals()['language'].set(self.language)
-            except tk.TclError as e_lang_set: # Если master окна для StringVar еще не готов
-                if 'logging' in globals(): logging.error(f"TclError setting language StringVar: {e_lang_set}. GUI might not reflect language setting immediately.")
+            except tk.TclError as e_lang_set:
+                if 'logging' in globals(): logging.error(f"TclError setting language StringVar: {e_lang_set}.")
         elif 'logging' in globals():
-            logging.debug("Global tk.StringVar 'language' not available for GUI update.")
+            logging.debug("apply_loaded_settings_to_gui: Global tk.StringVar 'language' not available.")
 
-        # Глобальная переменная theme (tk.StringVar) должна быть доступна
+        # theme (tk.StringVar) должен быть доступен
         if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
             try:
                 globals()['theme'].set(self.theme)
             except tk.TclError as e_theme_set:
-                if 'logging' in globals(): logging.error(f"TclError setting theme StringVar: {e_theme_set}. GUI might not reflect theme setting immediately.")
+                if 'logging' in globals(): logging.error(f"TclError setting theme StringVar: {e_theme_set}.")
         elif 'logging' in globals():
-            logging.debug("Global tk.StringVar 'theme' not available for GUI update.")
+            logging.debug("apply_loaded_settings_to_gui: Global tk.StringVar 'theme' not available.")
         
-        # sv_ttk должен быть импортирован и доступен
+        # sv_ttk должен быть доступен
         if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme') and callable(sv_ttk.set_theme):
             try:
                 sv_ttk.set_theme(self.theme)
             except Exception as e_svttk:
                 if 'logging' in globals(): logging.error(f"Error applying sv_ttk theme '{self.theme}': {e_svttk}")
         elif 'logging' in globals():
-            logging.debug("sv_ttk.set_theme not available.")
+            logging.debug("apply_loaded_settings_to_gui: sv_ttk.set_theme not available.")
 
         # win (главное окно) должен быть доступен
         if 'win' in globals() and hasattr(win, 'attributes') and hasattr(win, 'winfo_exists') and callable(win.winfo_exists):
             try:
-                if win.winfo_exists(): # Дополнительная проверка
-                    if self.treff == "1":
-                        win.attributes("-alpha", float(self.bar_level))
+                if win.winfo_exists():
+                    if getattr(self, 'treff', '0') == "1": # Безопасный доступ к treff
+                        win.attributes("-alpha", float(getattr(self, 'bar_level', '0.9')))
                     else:
                         win.attributes("-alpha", 1.0)
             except (tk.TclError, ValueError) as e_alpha:
                 if 'logging' in globals(): logging.error(f"Error setting window alpha: {e_alpha}")
-        elif 'logging' in globals() and hasattr(self, 'treff') and self.treff == "1":
-             logging.debug("Cannot apply window transparency: 'win' object not ready or does not support attributes.")
-
+        elif 'logging' in globals() and getattr(self, 'treff', '0') == "1":
+             logging.debug("apply_loaded_settings_to_gui: 'win' object not ready or no attributes for transparency.")
 
     @staticmethod
     def load_language(name_of_language_to_load):
+        """Загружает языковые строки в глобальный объект 'lang'."""
         _cwd_path = os.getcwd()
         if 'cwd_path' in globals() and globals()['cwd_path']:
             _cwd_path = globals()['cwd_path']
         
         _lang_obj = None
-        if 'lang' in globals() and globals()['lang'] is not None: # lang - это экземпляр класса-контейнера
+        if 'lang' in globals() and globals()['lang'] is not None:
             _lang_obj = globals()['lang']
         else:
-            if 'logging' in globals(): logging.error("Global 'lang' object not available in SetUtils.load_language.")
+            if 'logging' in globals(): logging.error("load_language: Global 'lang' object not available.")
             return
 
         lang_file_path = os.path.join(_cwd_path, 'bin', 'languages', f'{name_of_language_to_load}.json')
@@ -2040,216 +2039,194 @@ class SetUtils:
         _loaded_lang_data: dict = {}
         json_edit_available = 'JsonEdit' in globals() and callable(globals()['JsonEdit'])
 
-        def _read_json_file(file_path):
+        def _read_json_file(file_path_to_read):
             data = {}
             try:
                 if json_edit_available:
-                    data = JsonEdit(file_path).read() # JsonEdit должен быть импортирован
-                else: # Фоллбэк на стандартный json
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        data = json.load(f) # json должен быть импортирован
-            except Exception as e_load:
-                if 'logging' in globals(): logging.error(f"Failed to load language file {file_path}: {e_load}")
+                    data = JsonEdit(file_path_to_read).read()
+                elif 'json' in globals() and hasattr(json, 'load'): # Фоллбэк на стандартный json
+                    with open(file_path_to_read, 'r', encoding='utf-8') as f_json:
+                        data = json.load(f_json)
+                else:
+                    if 'logging' in globals(): logging.error(f"Cannot read JSON file {file_path_to_read}: No JSON parser (JsonEdit or standard json) available.")
+            except Exception as e_load_json:
+                if 'logging' in globals(): logging.error(f"Failed to load/parse language file {file_path_to_read}: {e_load_json}")
             return data
 
-        primary_language_loaded = False
+        primary_language_loaded_successfully = False
         if name_of_language_to_load and os.path.exists(lang_file_path):
             _loaded_lang_data = _read_json_file(lang_file_path)
-            if _loaded_lang_data:
-                primary_language_loaded = True
+            if _loaded_lang_data: # Если словарь не пустой
+                primary_language_loaded_successfully = True
         
-        if not primary_language_loaded: # Если основной язык не загружен или не указан, грузим английский
+        if not primary_language_loaded_successfully:
             if 'logging' in globals() and name_of_language_to_load != 'English': 
-                logging.warning(f"Language '{name_of_language_to_load}' not found or failed to load. Falling back to English.")
+                logging.warning(f"Language '{name_of_language_to_load}' not found or empty. Falling back to English.")
             if os.path.exists(english_lang_file_path):
                 _loaded_lang_data = _read_json_file(english_lang_file_path)
-            elif 'error' in globals() and callable(error): # error - ваша кастомная функция
-                error(1, "Critical: English language file missing.")
+                if not _loaded_lang_data and 'logging' in globals(): # Если и английский не загрузился
+                     logging.error("Critical: English language file is empty or failed to load.")
+            elif 'error' in globals() and callable(error):
+                error(1, "Critical: English language file missing.") # Ваша кастомная функция error
                 return
-            elif 'logging' in globals():
+            elif 'logging' in globals(): # Если error не доступна
                  logging.critical("FATAL: English language file missing and error function unavailable.")
-                 sys.exit("English language file missing.")
+                 if 'sys' in globals() : sys.exit("English language file missing.")
 
-        # Установка вторичного языка (английского) для lang.second, если он есть
+        # Установка вторичного языка (английского) для lang.second
         if hasattr(_lang_obj, 'second') and os.path.exists(english_lang_file_path):
-            english_data = _read_json_file(english_lang_file_path)
-            if english_data:
-                _lang_obj.second = english_data
+            english_data_for_second = _read_json_file(english_lang_file_path)
+            if english_data_for_second:
+                _lang_obj.second = english_data_for_second
             elif 'logging' in globals():
-                logging.warning("Failed to load secondary (English) language data for lang.second.")
+                logging.warning("Failed to load secondary (English) language data for lang.second (file empty or parse error).")
         
         # Применение загруженных строк к объекту lang
         if _loaded_lang_data:
             for n, v in _loaded_lang_data.items():
                 setattr(_lang_obj, n, v)
         elif 'logging' in globals():
-            logging.error("No language data was loaded to apply to 'lang' object.")
-
+            logging.error("No language data was loaded to apply to 'lang' object (primary and English fallback failed).")
 
     def set_value(self, name, value):
-        # self.config (ConfigParser) должен быть инициализирован
+        """Сохраняет значение настройки в .ini файл и в атрибут экземпляра."""
         if not hasattr(self, 'config') or self.config is None:
-            if 'logging' in globals(): logging.error("SetUtils.set_value: self.config is not initialized.")
+            if 'logging' in globals(): logging.error("SetUtils.set_value: self.config (custom parser) is not initialized.")
             return
 
         try:
-            # Убедимся, что секция 'setting' существует
-            if not self.config.has_section('setting'):
-                self.config.add_section('setting')
-                
-            self.config.set("setting", str(name), str(value)) # Ключи и значения должны быть строками для ConfigParser
+            # Ваш кастомный ConfigParser.set(section, key, value)
+            self.config.set("setting", str(name), str(value)) 
+            
             with open(self.set_file, 'w', encoding='utf-8') as fil:
-                self.config.write(fil)
-            setattr(self, name, value) # Обновляем атрибут экземпляра
+                self.config.write(fil) # Ваш ConfigParser.write(opened_file_descriptor)
+            setattr(self, name, value)
         except Exception as e_set_value:
-            if 'logging' in globals(): logging.error(f"Error in set_value for '{name}': {e_set_value}")
+            if 'logging' in globals():
+                logging.error(f"Error in set_value for '{name}' with custom parser: {e_set_value}")
 
-        # Если изменяемые настройки влияют на GUI немедленно (кроме theme/language, которые обрабатываются отдельно)
-        # например, прозрачность, то нужно вызвать apply_loaded_settings_to_gui
-        if name in ['treff', 'bar_level']: # Используйте bar_level, а не barlevel
-            self.apply_loaded_settings_to_gui()
-
+        if name in ['treff', 'bar_level']:
+            self.apply_loaded_settings_to_gui() # Обновить GUI, если изменилась прозрачность
 
     def set_theme(self):
-        # lang, theme (StringVar), win, sv_ttk, animation, images, open_img, BytesIO, logging, error должны быть доступны
-        new_theme_value = 'dark' # Значение по умолчанию
+        """Устанавливает новую тему, сохраняет ее и обновляет GUI."""
+        new_theme_from_gui = 'dark' # Безопасное значение по умолчанию
         if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
             try:
-                new_theme_value = globals()['theme'].get()
-            except tk.TclError as e_get_theme:
-                 if 'logging' in globals(): logging.warning(f"set_theme: TclError getting theme StringVar: {e_get_theme}. Using current self.theme or default.")
-                 new_theme_value = getattr(self, 'theme', 'dark') # Фоллбэк на текущее значение или дефолт
+                new_theme_from_gui = globals()['theme'].get()
+                if new_theme_from_gui not in ['light', 'dark']: # Валидация
+                    if 'logging' in globals(): logging.warning(f"Invalid theme value from GUI '{new_theme_from_gui}', defaulting to 'dark'.")
+                    new_theme_from_gui = 'dark'
+            except tk.TclError: # Если StringVar еще не готов
+                new_theme_from_gui = getattr(self, 'theme', 'dark') # Берем из текущих настроек
+                if 'logging' in globals(): logging.debug("set_theme: TclError getting theme StringVar, using self.theme.")
         else:
-            new_theme_value = getattr(self, 'theme', 'dark') # Если StringVar нет, берем из self
+            new_theme_from_gui = getattr(self, 'theme', 'dark') # Если StringVar нет
+            if 'logging' in globals(): logging.debug("set_theme: Global theme StringVar not found, using self.theme.")
 
-        lang_text100 = getattr(lang, 'text100', 'Theme set to: ') if 'lang' in globals() else 'Theme set to: '
-        print(f"{lang_text100}{new_theme_value}")
+        lang_text100_val = getattr(lang, 'text100', 'Theme changed to: ') if 'lang' in globals() else 'Theme changed to: '
+        print(f"{lang_text100_val}{new_theme_from_gui}")
         
-        self.theme = new_theme_value # Обновляем атрибут экземпляра
+        self.theme = new_theme_from_gui # Обновляем атрибут
         self.set_value("theme", self.theme) # Сохраняем в файл
 
-        # Применяем тему к GUI (обновит sv_ttk)
-        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
-            try:
-                sv_ttk.set_theme(self.theme)
-            except Exception as e_svttk_apply:
-                if 'logging' in globals(): logging.error(f"Error applying sv_ttk theme in set_theme: {e_svttk_apply}")
+        # Применяем к sv_ttk и цвету заголовка Windows
+        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'): sv_ttk.set_theme(self.theme)
         
-        # Обновление цвета заголовка окна для Windows
         if os.name == 'nt' and 'win' in globals() and 'set_title_bar_color' in globals():
             try:
-                if self.theme == 'dark':
-                    set_title_bar_color(win)
-                else:
-                    set_title_bar_color(win, 0)
-            except Exception as e_title_bar:
-                 if 'logging' in globals(): logging.warning(f"Could not set Windows title bar color in set_theme: {e_title_bar}")
+                if win.winfo_exists(): # Проверка перед обращением
+                    if self.theme == 'dark': set_title_bar_color(win)
+                    else: set_title_bar_color(win, 0)
+            except tk.TclError: pass # Окно может быть в процессе уничтожения
+            except Exception as e_title_bar_st:
+                if 'logging' in globals(): logging.warning(f"Could not set title bar color in set_theme: {e_title_bar_st}")
 
-        # Загрузка GIF для анимации
-        if 'animation' in globals() and hasattr(animation, 'load_gif') and 'images' in globals() and \
-           'open_img' in globals() and 'BytesIO' in globals():
-            theme_suffix = self.theme 
-            gif_data_attr_name = f"loading_{theme_suffix}_byte"
-            default_gif_data = getattr(images, "loading_dark_byte", None) 
-            gif_data = getattr(images, gif_data_attr_name, default_gif_data)
-            if gif_data:
+        # Обновление GIF анимации
+        if 'animation' in globals() and animation is not None and hasattr(animation, 'load_gif') and \
+           'images' in globals() and 'open_img' in globals() and 'BytesIO' in globals():
+            theme_suffix_for_gif = self.theme 
+            gif_attr_name = f"loading_{theme_suffix_for_gif}_byte"
+            default_gif_attr = getattr(images, "loading_dark_byte", None)
+            gif_bytes = getattr(images, gif_attr_name, default_gif_attr)
+            if gif_bytes:
                 try:
-                    pil_gif_image = open_img(BytesIO(gif_data))
-                    animation.load_gif(pil_gif_image)
-                except Exception as e_load_gif:
-                     if 'logging' in globals(): logging.error(f"Error loading GIF for theme {theme_suffix} in set_theme: {e_load_gif}")
+                    pil_img = open_img(BytesIO(gif_bytes))
+                    animation.load_gif(pil_img)
+                except Exception as e_gif_st:
+                    if 'logging' in globals(): logging.error(f"Error loading animation GIF in set_theme: {e_gif_st}")
             elif 'logging' in globals():
-                 logging.warning(f"GIF data for theme {theme_suffix} (or default) not found in set_theme.")
+                logging.warning(f"Animation GIF bytes not found for theme '{theme_suffix_for_gif}' in set_theme.")
         elif 'logging' in globals():
-             logging.debug("set_theme: Dependencies for GIF loading (animation, images, etc.) not fully available.")
-
+             logging.debug("set_theme: Dependencies for GIF reload (animation, images, etc.) not available.")
 
     def set_language(self):
-        # lang, language (StringVar), states, ask_win, restart, logging должны быть доступны
-        new_language_value = 'English' # Значение по умолчанию
+        """Устанавливает новый язык, сохраняет, перезагружает строки и предлагает перезапуск."""
+        new_lang_from_gui = 'English' # Безопасное значение по умолчанию
         if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
             try:
-                new_language_value = globals()['language'].get()
-            except tk.TclError as e_get_lang:
-                if 'logging' in globals(): logging.warning(f"set_language: TclError getting language StringVar: {e_get_lang}. Using current self.language or default.")
-                new_language_value = getattr(self, 'language', 'English')
+                new_lang_from_gui = globals()['language'].get()
+            except tk.TclError:
+                new_lang_from_gui = getattr(self, 'language', 'English')
+                if 'logging' in globals(): logging.debug("set_language: TclError getting language StringVar, using self.language.")
         else:
-            new_language_value = getattr(self, 'language', 'English')
+            new_lang_from_gui = getattr(self, 'language', 'English')
+            if 'logging' in globals(): logging.debug("set_language: Global language StringVar not found, using self.language.")
 
-        lang_text129 = getattr(lang, 'text129', 'Language set to: ') if 'lang' in globals() else 'Language set to: '
-        print(f"{lang_text129}{new_language_value}")
+        lang_text129_val = getattr(lang, 'text129', 'Language changed to: ') if 'lang' in globals() else 'Language changed to: '
+        print(f"{lang_text129_val}{new_lang_from_gui}")
 
-        self.language = new_language_value # Обновляем атрибут экземпляра
+        self.language = new_lang_from_gui # Обновляем атрибут
         self.set_value("language", self.language) # Сохраняем в файл
         
         self.load_language(self.language) # Перезагружаем строки в объект lang
-
-        # Обновляем GUI (например, тексты виджетов, которые не обновляются автоматически через StringVar)
-        # Это может потребовать пересоздания или обновления частей GUI.
-        # В данном случае, если `ask_win` предлагает перезапуск, то GUI перестроится полностью.
+        # GUI StringVars уже должны быть привязаны и обновятся, если тексты берутся из объекта lang динамически.
+        # Если нет, потребуется явное обновление виджетов.
 
         if 'states' in globals() and hasattr(states, 'in_oobe') and not states.in_oobe:
-            lang_t36 = getattr(lang, 't36', 'Restart application to apply language changes?') if 'lang' in globals() else 'Restart application to apply language changes?'
+            lang_t36_val = getattr(lang, 't36', 'Restart for language changes?') if 'lang' in globals() else 'Restart for language changes?'
             if 'ask_win' in globals() and callable(ask_win):
-                if ask_win(lang_t36): # ask_win должен быть определен
-                    if 'restart' in globals() and callable(restart): # restart должен быть определен
-                        restart()
-                    elif 'logging' in globals():
-                        logging.error("set_language: 'restart' function not available.")
+                if ask_win(lang_t36_val):
+                    if 'restart' in globals() and callable(restart): restart()
+                    elif 'logging' in globals(): logging.error("set_language: 'restart' function not available.")
             elif 'logging' in globals():
                  logging.debug("set_language: 'ask_win' not available for restart prompt.")
         elif 'logging' in globals():
             logging.debug("set_language: Not prompting for restart (in OOBE or 'states' unavailable).")
 
-
     def modpath(self):
-        # filedialog, settings (self), win (для show_local), lang должны быть доступны
-        # Обратите внимание, что filedialog импортируется по-разному для Windows и других ОС.
-        _filedialog = None
-        if 'filedialog' in globals(): # Если filedialog уже импортирован глобально
-            _filedialog = globals()['filedialog']
+        """Позволяет пользователю выбрать новую рабочую директорию."""
+        _filedialog_module = None
+        if 'filedialog' in globals(): 
+            _filedialog_module = globals()['filedialog']
         elif os.name == 'nt':
-            from tkinter import filedialog as tk_filedialog_nt # Локальный импорт стандартного
-            _filedialog = tk_filedialog_nt
+            from tkinter import filedialog as tk_fd_nt
+            _filedialog_module = tk_fd_nt
         else:
             try:
-                # Попытка импортировать кастомный mkc_filedialog
-                from ..core import mkc_filedialog as custom_filedialog 
-                _filedialog = custom_filedialog
+                from ..core import mkc_filedialog as custom_fd 
+                _filedialog_module = custom_fd
             except ImportError:
-                if 'logging' in globals(): logging.warning("Custom filedialog 'mkc_filedialog' not found, using standard tkinter.filedialog for modpath.")
-                from tkinter import filedialog as tk_filedialog_fallback # Фоллбэк
-                _filedialog = tk_filedialog_fallback
+                if 'logging' in globals(): logging.warning("Custom mkc_filedialog not found, using standard filedialog.")
+                from tkinter import filedialog as tk_fd_fallback
+                _filedialog_module = tk_fd_fallback
         
-        if not _filedialog:
-            if 'logging' in globals(): logging.error("modpath: File dialog module not available.")
+        if not (_filedialog_module and hasattr(_filedialog_module, 'askdirectory')):
+            if 'logging' in globals(): logging.error("modpath: File dialog askdirectory not available.")
             return
 
-        folder = _filedialog.askdirectory()
-        if not folder: # Пользователь отменил выбор
-            return
+        chosen_folder = _filedialog_module.askdirectory()
+        if not chosen_folder: return # Пользователь отменил
             
-        self.set_value("path", folder) # Сохраняет и обновляет self.path
+        self.set_value("path", chosen_folder)
 
-        # Обновление отображения пути в GUI, если win.show_local существует
         if 'win' in globals() and hasattr(win, 'show_local') and isinstance(win.show_local, tk.StringVar):
-            try:
-                win.show_local.set(folder)
-            except tk.TclError as e_set_show_local:
-                 if 'logging' in globals(): logging.warning(f"modpath: TclError setting win.show_local: {e_set_show_local}")
-        elif 'logging' in globals():
-            logging.debug("modpath: 'win.show_local' (StringVar) not available for updating display path.")
+            try: win.show_local.set(chosen_folder)
+            except tk.TclError: pass # Если GUI еще не готово
         
-        # self.load_from_file() # Полная перезагрузка настроек после смены пути может быть избыточной,
-                                # если только self.path влияет на другие загружаемые ресурсы.
-                                # Если self.path используется для поиска других файлов конфигурации, то да, нужна.
-                                # В данном контексте, set_value уже обновил self.path.
-                                # Если другие части load_from_file зависят от нового self.path, то нужно.
-                                # Пока что, кажется, только tool_bin зависит от cwd_path, а не self.path.
-                                # Если путь влияет на загрузку языков или тем, то да.
-                                # Безопаснее вызвать, если есть сомнения.
-        self.load_from_file() # Перезагружаем, т.к. self.path мог измениться, и это может влиять на что-то.
-        self.apply_loaded_settings_to_gui() # Применяем к GUI
+        # Перезагружаем настройки, так как путь мог измениться и повлиять на что-то
+        self.load_from_file() 
+        self.apply_loaded_settings_to_gui()
 
 
 settings = SetUtils()
