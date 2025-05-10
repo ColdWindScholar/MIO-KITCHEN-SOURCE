@@ -2252,7 +2252,7 @@ class SetUtils:
         self.apply_loaded_settings_to_gui() # Применяем к GUI
 
 
-settings = SetUtils(load=False)
+settings = SetUtils()
 
 
 def re_folder(path, quiet=False):
