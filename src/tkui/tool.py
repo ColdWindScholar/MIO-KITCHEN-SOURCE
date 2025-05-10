@@ -1837,118 +1837,419 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini: str = None, load=True):
+    def __init__(self, set_ini: str = None): # load=True убрано из аргументов по умолчанию
         self.project_struct = 'single'
         self.auto_unpack = '0'
-        self.treff = '0'
+        self.treff = '0' # Прозрачность включена/выключена
+        
+        # cwd_path должен быть определен глобально до создания экземпляра SetUtils
+        _cwd_path = os.getcwd() # Безопасный фоллбэк
+        if 'cwd_path' in globals() and globals()['cwd_path']:
+            _cwd_path = globals()['cwd_path']
+        else:
+            if 'logging' in globals(): logging.warning("SetUtils.__init__: Global 'cwd_path' not found, using os.getcwd().")
+
         if set_ini:
             self.set_file = set_ini
         else:
-            self.set_file = os.path.join(cwd_path, "bin", "setting.ini")
-        self.plugin_repo = None
+            self.set_file = os.path.join(_cwd_path, "bin", "setting.ini")
+            
+        self.plugin_repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/" # Значение по умолчанию
         self.contextpatch = '0'
         self.oobe = '0'
-        self.path = None
-        self.bar_level = '0.9'
+        
+        # path инициализируется в load_from_file
+        self.path = None # Будет установлено из файла или фоллбэка
+        
+        self.bar_level = '0.9' # Уровень прозрачности
         self.ai_engine = '0'
-        self.version = 'basic'
+        self.version = 'basic' # Это значение будет перезаписано из .ini
         self.version_old = 'unknown'
-        self.language = 'English'
+        self.language = 'English' # Значение по умолчанию, будет перезаписано из .ini
         self.magisk_not_decompress = '0'
         self.updating = ''
         self.new_tool = ''
         self.cmd_exit = '0'
         self.cmd_invisible = '0'
         self.debug_mode = 'No'
-        self.theme = 'dark'
+        self.theme = 'dark' # Значение по умолчанию, будет перезаписано из .ini
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
-        self.config = ConfigParser()
-        if os.access(self.set_file, os.F_OK):
-            if load:
-                self.load()
-        else:
-            sv_ttk.set_theme("dark")
-            error(1,
-                  'Some necessary files were lost, please reinstall this software to fix the problem!')
-        if hasattr(self, 'custom_system'):
-            if not self.custom_system.strip():
-                self.custom_system = platform.system()
-        else:
-            self.custom_system = platform.system()
-        self.tool_bin = os.path.join(cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
+        
+        # custom_system и tool_bin инициализируются в конце load_from_file
+        self.custom_system = None
+        self.tool_bin = None
 
-    def load(self):
-        self.config.read(self.set_file)
-        for i in self.config.items('setting'):
-            setattr(self, i[0], i[1])
-        if os.path.exists(self.path):
-            if not self.path:
-                self.path = os.getcwd()
+        # ConfigParser должен быть доступен
+        if 'ConfigParser' in globals() and callable(globals()['ConfigParser']):
+            self.config = ConfigParser()
         else:
-            self.path = utils.prog_path
-        language.set(self.language)
-        self.load_language(language.get())
-        theme.set(self.theme)
-        sv_ttk.set_theme(self.theme)
-        if is_pro:
-            if 'active_code' not in self.__dir__():
-                self.active_code = 'None'
-            verify.verify(self.active_code)
-        if self.treff == "1":
-            win.attributes("-alpha", self.bar_level)
+            if 'logging' in globals(): logging.error("SetUtils.__init__: ConfigParser not available.")
+            # Это критическая зависимость, возможно, стоит выбросить исключение или завершить работу
+            raise RuntimeError("ConfigParser is not available for SetUtils.")
+
+        # Загрузка из файла НЕ происходит здесь автоматически. Вызывается явно из __init__tk.
+        # Если файл настроек не существует при первом запуске, load_from_file обработает это.
+
+
+    def load_from_file(self):
+        """Загружает настройки из .ini файла в атрибуты экземпляра."""
+        # cwd_path должен быть определен глобально
+        _cwd_path = os.getcwd()
+        if 'cwd_path' in globals() and globals()['cwd_path']:
+            _cwd_path = globals()['cwd_path']
+
+        if not os.access(self.set_file, os.F_OK):
+            if 'logging' in globals(): logging.warning(f"Settings file {self.set_file} not found. Using defaults and attempting to create.")
+            # Попытка создать файл настроек с базовыми значениями может быть здесь, если это нужно.
+            # Пока просто продолжаем с дефолтными значениями атрибутов.
+            # Вызов error(1, ...) здесь может быть преждевременным, если это первый запуск.
+            # Вместо этого, просто используем значения по умолчанию, установленные в __init__.
         else:
-            win.attributes("-alpha", 1)
+            try:
+                self.config.read(self.set_file, encoding='utf-8') # Явно указываем кодировку
+                if 'setting' in self.config:
+                    for key, value in self.config.items('setting'):
+                        setattr(self, key, value)
+                else:
+                    if 'logging' in globals(): logging.warning(f"Section 'setting' not found in {self.set_file}. Defaults will be used.")
+            except Exception as e_read_config:
+                if 'logging' in globals(): logging.error(f"Error reading settings file {self.set_file}: {e_read_config}. Defaults will be used.")
+
+
+        # Обработка self.path (должен быть utils.prog_path)
+        prog_path_fallback = _cwd_path # Используем _cwd_path, который уже учитывает глобальный cwd_path
+        if 'utils' in globals() and hasattr(utils, 'prog_path') and utils.prog_path:
+            prog_path_fallback = utils.prog_path
+
+        # getattr(self, 'path', None) для безопасного доступа, если атрибут мог не установиться из файла
+        current_path_setting = getattr(self, 'path', None)
+        if not current_path_setting: # Если path не был в .ini или пустой
+            self.path = prog_path_fallback
+        elif not os.path.isdir(current_path_setting): # Проверяем, что это существующая директория
+             if 'logging' in globals(): logging.warning(f"Path from settings '{current_path_setting}' is not a valid directory. Falling back to '{prog_path_fallback}'.")
+             self.path = prog_path_fallback
+        # Иначе self.path остается тем, что было прочитано из файла и является валидной директорией
+
+        # Убедимся, что self.language и self.theme имеют значения по умолчанию, если не загрузились
+        if not hasattr(self, 'language') or not self.language: self.language = 'English'
+        if not hasattr(self, 'theme') or self.theme not in ['light', 'dark']: self.theme = 'dark'
+
+
+        # Загрузка локализации на основе self.language
+        # self.load_language вызывается из apply_loaded_settings_to_gui после того, как lang объект точно доступен
+        # но сам self.language должен быть установлен здесь из файла.
+
+        # Инициализация custom_system и tool_bin
+        if hasattr(self, 'custom_system') and isinstance(self.custom_system, str) and self.custom_system.strip():
+            pass # custom_system уже установлен из .ini и не пустой
+        else:
+            self.custom_system = platform.system() # platform должен быть импортирован
+
+        # platform.machine() должен быть доступен
+        self.tool_bin = os.path.join(_cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
+        self.tool_bin = self.tool_bin.replace('\\', '/') # Нормализация для единообразия
+
+        # Верификация pro версии (если зависимости доступны)
+        if 'is_pro' in globals() and is_pro:
+            if 'verify' in globals() and hasattr(verify, 'verify') and callable(verify.verify):
+                active_code_to_verify = getattr(self, 'active_code', 'None') # 'active_code' должно быть в .ini или иметь дефолт
+                try:
+                    verify.verify(active_code_to_verify)
+                except Exception as e_verify:
+                    if 'logging' in globals(): logging.error(f"Error during pro verification: {e_verify}")
+            elif 'logging' in globals() and not ('verify' in globals() and hasattr(verify, 'verify')):
+                logging.debug("SetUtils.load_from_file: 'verify' module/function not available for pro version check.")
+        
+        # Атрибуты для прозрачности (уже установлены в __init__ или из файла)
+        if not hasattr(self, 'treff'): self.treff = '0'
+        if not hasattr(self, 'bar_level'): self.bar_level = '0.9'
+        try:
+            float(self.bar_level) # Проверка, что bar_level можно преобразовать во float
+        except ValueError:
+            if 'logging' in globals(): logging.warning(f"Invalid bar_level '{self.bar_level}', defaulting to 0.9.")
+            self.bar_level = '0.9'
+
+
+    def apply_loaded_settings_to_gui(self):
+        """Обновляет глобальные tk.StringVar и применяет тему к GUI.
+           Вызывается после создания StringVar и главного окна.
+        """
+        # lang объект должен быть доступен глобально
+        if 'lang' in globals() and globals()['lang'] is not None:
+            self.load_language(self.language) # Загружаем языковые строки в объект lang
+        else:
+            if 'logging' in globals(): logging.error("Global 'lang' object not available, cannot load language strings.")
+
+        # Глобальная переменная language (tk.StringVar) должна быть доступна
+        if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
+            try:
+                globals()['language'].set(self.language)
+            except tk.TclError as e_lang_set: # Если master окна для StringVar еще не готов
+                if 'logging' in globals(): logging.error(f"TclError setting language StringVar: {e_lang_set}. GUI might not reflect language setting immediately.")
+        elif 'logging' in globals():
+            logging.debug("Global tk.StringVar 'language' not available for GUI update.")
+
+        # Глобальная переменная theme (tk.StringVar) должна быть доступна
+        if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
+            try:
+                globals()['theme'].set(self.theme)
+            except tk.TclError as e_theme_set:
+                if 'logging' in globals(): logging.error(f"TclError setting theme StringVar: {e_theme_set}. GUI might not reflect theme setting immediately.")
+        elif 'logging' in globals():
+            logging.debug("Global tk.StringVar 'theme' not available for GUI update.")
+        
+        # sv_ttk должен быть импортирован и доступен
+        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme') and callable(sv_ttk.set_theme):
+            try:
+                sv_ttk.set_theme(self.theme)
+            except Exception as e_svttk:
+                if 'logging' in globals(): logging.error(f"Error applying sv_ttk theme '{self.theme}': {e_svttk}")
+        elif 'logging' in globals():
+            logging.debug("sv_ttk.set_theme not available.")
+
+        # win (главное окно) должен быть доступен
+        if 'win' in globals() and hasattr(win, 'attributes') and hasattr(win, 'winfo_exists') and callable(win.winfo_exists):
+            try:
+                if win.winfo_exists(): # Дополнительная проверка
+                    if self.treff == "1":
+                        win.attributes("-alpha", float(self.bar_level))
+                    else:
+                        win.attributes("-alpha", 1.0)
+            except (tk.TclError, ValueError) as e_alpha:
+                if 'logging' in globals(): logging.error(f"Error setting window alpha: {e_alpha}")
+        elif 'logging' in globals() and hasattr(self, 'treff') and self.treff == "1":
+             logging.debug("Cannot apply window transparency: 'win' object not ready or does not support attributes.")
+
 
     @staticmethod
-    def load_language(name):
-        lang_file = f'{cwd_path}/bin/languages/{name}.json'
-        _lang: dict = {}
-        if not name and not os.path.exists(f'{cwd_path}/bin/languages/English.json'):
-            error(1)
-        elif not os.path.exists(lang_file):
-            _lang = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
+    def load_language(name_of_language_to_load):
+        _cwd_path = os.getcwd()
+        if 'cwd_path' in globals() and globals()['cwd_path']:
+            _cwd_path = globals()['cwd_path']
+        
+        _lang_obj = None
+        if 'lang' in globals() and globals()['lang'] is not None: # lang - это экземпляр класса-контейнера
+            _lang_obj = globals()['lang']
         else:
-            _lang = JsonEdit(lang_file).read()
-        lang.second = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
-        [setattr(lang, n, v) for n, v in _lang.items()]
+            if 'logging' in globals(): logging.error("Global 'lang' object not available in SetUtils.load_language.")
+            return
+
+        lang_file_path = os.path.join(_cwd_path, 'bin', 'languages', f'{name_of_language_to_load}.json')
+        english_lang_file_path = os.path.join(_cwd_path, 'bin', 'languages', 'English.json')
+        
+        _loaded_lang_data: dict = {}
+        json_edit_available = 'JsonEdit' in globals() and callable(globals()['JsonEdit'])
+
+        def _read_json_file(file_path):
+            data = {}
+            try:
+                if json_edit_available:
+                    data = JsonEdit(file_path).read() # JsonEdit должен быть импортирован
+                else: # Фоллбэк на стандартный json
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f) # json должен быть импортирован
+            except Exception as e_load:
+                if 'logging' in globals(): logging.error(f"Failed to load language file {file_path}: {e_load}")
+            return data
+
+        primary_language_loaded = False
+        if name_of_language_to_load and os.path.exists(lang_file_path):
+            _loaded_lang_data = _read_json_file(lang_file_path)
+            if _loaded_lang_data:
+                primary_language_loaded = True
+        
+        if not primary_language_loaded: # Если основной язык не загружен или не указан, грузим английский
+            if 'logging' in globals() and name_of_language_to_load != 'English': 
+                logging.warning(f"Language '{name_of_language_to_load}' not found or failed to load. Falling back to English.")
+            if os.path.exists(english_lang_file_path):
+                _loaded_lang_data = _read_json_file(english_lang_file_path)
+            elif 'error' in globals() and callable(error): # error - ваша кастомная функция
+                error(1, "Critical: English language file missing.")
+                return
+            elif 'logging' in globals():
+                 logging.critical("FATAL: English language file missing and error function unavailable.")
+                 sys.exit("English language file missing.")
+
+        # Установка вторичного языка (английского) для lang.second, если он есть
+        if hasattr(_lang_obj, 'second') and os.path.exists(english_lang_file_path):
+            english_data = _read_json_file(english_lang_file_path)
+            if english_data:
+                _lang_obj.second = english_data
+            elif 'logging' in globals():
+                logging.warning("Failed to load secondary (English) language data for lang.second.")
+        
+        # Применение загруженных строк к объекту lang
+        if _loaded_lang_data:
+            for n, v in _loaded_lang_data.items():
+                setattr(_lang_obj, n, v)
+        elif 'logging' in globals():
+            logging.error("No language data was loaded to apply to 'lang' object.")
+
 
     def set_value(self, name, value):
-        self.config.read(self.set_file)
-        self.config.set("setting", name, value)
-        with open(self.set_file, 'w', encoding='utf-8') as fil:
-            self.config.write(fil)
-        setattr(self, name, value)
-        if name in ['treff', 'barlevel', 'theme']:
-            self.load()
+        # self.config (ConfigParser) должен быть инициализирован
+        if not hasattr(self, 'config') or self.config is None:
+            if 'logging' in globals(): logging.error("SetUtils.set_value: self.config is not initialized.")
+            return
+
+        try:
+            # Убедимся, что секция 'setting' существует
+            if not self.config.has_section('setting'):
+                self.config.add_section('setting')
+                
+            self.config.set("setting", str(name), str(value)) # Ключи и значения должны быть строками для ConfigParser
+            with open(self.set_file, 'w', encoding='utf-8') as fil:
+                self.config.write(fil)
+            setattr(self, name, value) # Обновляем атрибут экземпляра
+        except Exception as e_set_value:
+            if 'logging' in globals(): logging.error(f"Error in set_value for '{name}': {e_set_value}")
+
+        # Если изменяемые настройки влияют на GUI немедленно (кроме theme/language, которые обрабатываются отдельно)
+        # например, прозрачность, то нужно вызвать apply_loaded_settings_to_gui
+        if name in ['treff', 'bar_level']: # Используйте bar_level, а не barlevel
+            self.apply_loaded_settings_to_gui()
+
 
     def set_theme(self):
-        print(lang.text100 + theme.get())
-        try:
-            self.set_value("theme", theme.get())
-            sv_ttk.set_theme(theme.get())
-            animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
-        except Exception as e:
-            logging.exception('Bugs')
-            win.message_pop(lang.text101 % (theme.get(), e))
+        # lang, theme (StringVar), win, sv_ttk, animation, images, open_img, BytesIO, logging, error должны быть доступны
+        new_theme_value = 'dark' # Значение по умолчанию
+        if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
+            try:
+                new_theme_value = globals()['theme'].get()
+            except tk.TclError as e_get_theme:
+                 if 'logging' in globals(): logging.warning(f"set_theme: TclError getting theme StringVar: {e_get_theme}. Using current self.theme or default.")
+                 new_theme_value = getattr(self, 'theme', 'dark') # Фоллбэк на текущее значение или дефолт
+        else:
+            new_theme_value = getattr(self, 'theme', 'dark') # Если StringVar нет, берем из self
+
+        lang_text100 = getattr(lang, 'text100', 'Theme set to: ') if 'lang' in globals() else 'Theme set to: '
+        print(f"{lang_text100}{new_theme_value}")
+        
+        self.theme = new_theme_value # Обновляем атрибут экземпляра
+        self.set_value("theme", self.theme) # Сохраняем в файл
+
+        # Применяем тему к GUI (обновит sv_ttk)
+        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
+            try:
+                sv_ttk.set_theme(self.theme)
+            except Exception as e_svttk_apply:
+                if 'logging' in globals(): logging.error(f"Error applying sv_ttk theme in set_theme: {e_svttk_apply}")
+        
+        # Обновление цвета заголовка окна для Windows
+        if os.name == 'nt' and 'win' in globals() and 'set_title_bar_color' in globals():
+            try:
+                if self.theme == 'dark':
+                    set_title_bar_color(win)
+                else:
+                    set_title_bar_color(win, 0)
+            except Exception as e_title_bar:
+                 if 'logging' in globals(): logging.warning(f"Could not set Windows title bar color in set_theme: {e_title_bar}")
+
+        # Загрузка GIF для анимации
+        if 'animation' in globals() and hasattr(animation, 'load_gif') and 'images' in globals() and \
+           'open_img' in globals() and 'BytesIO' in globals():
+            theme_suffix = self.theme 
+            gif_data_attr_name = f"loading_{theme_suffix}_byte"
+            default_gif_data = getattr(images, "loading_dark_byte", None) 
+            gif_data = getattr(images, gif_data_attr_name, default_gif_data)
+            if gif_data:
+                try:
+                    pil_gif_image = open_img(BytesIO(gif_data))
+                    animation.load_gif(pil_gif_image)
+                except Exception as e_load_gif:
+                     if 'logging' in globals(): logging.error(f"Error loading GIF for theme {theme_suffix} in set_theme: {e_load_gif}")
+            elif 'logging' in globals():
+                 logging.warning(f"GIF data for theme {theme_suffix} (or default) not found in set_theme.")
+        elif 'logging' in globals():
+             logging.debug("set_theme: Dependencies for GIF loading (animation, images, etc.) not fully available.")
+
 
     def set_language(self):
-        print(lang.text129 + language.get())
-        try:
-            self.set_value("language", language.get())
-            self.load_language(language.get())
-            if not states.in_oobe:
-                if ask_win(lang.t36):
-                    restart()
-        except Exception as e:
-            logging.exception('Bugs')
-            print(lang.t130, e)
+        # lang, language (StringVar), states, ask_win, restart, logging должны быть доступны
+        new_language_value = 'English' # Значение по умолчанию
+        if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
+            try:
+                new_language_value = globals()['language'].get()
+            except tk.TclError as e_get_lang:
+                if 'logging' in globals(): logging.warning(f"set_language: TclError getting language StringVar: {e_get_lang}. Using current self.language or default.")
+                new_language_value = getattr(self, 'language', 'English')
+        else:
+            new_language_value = getattr(self, 'language', 'English')
+
+        lang_text129 = getattr(lang, 'text129', 'Language set to: ') if 'lang' in globals() else 'Language set to: '
+        print(f"{lang_text129}{new_language_value}")
+
+        self.language = new_language_value # Обновляем атрибут экземпляра
+        self.set_value("language", self.language) # Сохраняем в файл
+        
+        self.load_language(self.language) # Перезагружаем строки в объект lang
+
+        # Обновляем GUI (например, тексты виджетов, которые не обновляются автоматически через StringVar)
+        # Это может потребовать пересоздания или обновления частей GUI.
+        # В данном случае, если `ask_win` предлагает перезапуск, то GUI перестроится полностью.
+
+        if 'states' in globals() and hasattr(states, 'in_oobe') and not states.in_oobe:
+            lang_t36 = getattr(lang, 't36', 'Restart application to apply language changes?') if 'lang' in globals() else 'Restart application to apply language changes?'
+            if 'ask_win' in globals() and callable(ask_win):
+                if ask_win(lang_t36): # ask_win должен быть определен
+                    if 'restart' in globals() and callable(restart): # restart должен быть определен
+                        restart()
+                    elif 'logging' in globals():
+                        logging.error("set_language: 'restart' function not available.")
+            elif 'logging' in globals():
+                 logging.debug("set_language: 'ask_win' not available for restart prompt.")
+        elif 'logging' in globals():
+            logging.debug("set_language: Not prompting for restart (in OOBE or 'states' unavailable).")
+
 
     def modpath(self):
-        if not (folder := filedialog.askdirectory()):
+        # filedialog, settings (self), win (для show_local), lang должны быть доступны
+        # Обратите внимание, что filedialog импортируется по-разному для Windows и других ОС.
+        _filedialog = None
+        if 'filedialog' in globals(): # Если filedialog уже импортирован глобально
+            _filedialog = globals()['filedialog']
+        elif os.name == 'nt':
+            from tkinter import filedialog as tk_filedialog_nt # Локальный импорт стандартного
+            _filedialog = tk_filedialog_nt
+        else:
+            try:
+                # Попытка импортировать кастомный mkc_filedialog
+                from ..core import mkc_filedialog as custom_filedialog 
+                _filedialog = custom_filedialog
+            except ImportError:
+                if 'logging' in globals(): logging.warning("Custom filedialog 'mkc_filedialog' not found, using standard tkinter.filedialog for modpath.")
+                from tkinter import filedialog as tk_filedialog_fallback # Фоллбэк
+                _filedialog = tk_filedialog_fallback
+        
+        if not _filedialog:
+            if 'logging' in globals(): logging.error("modpath: File dialog module not available.")
             return
-        self.set_value("path", folder)
-        win.show_local.set(folder)
-        self.load()
+
+        folder = _filedialog.askdirectory()
+        if not folder: # Пользователь отменил выбор
+            return
+            
+        self.set_value("path", folder) # Сохраняет и обновляет self.path
+
+        # Обновление отображения пути в GUI, если win.show_local существует
+        if 'win' in globals() and hasattr(win, 'show_local') and isinstance(win.show_local, tk.StringVar):
+            try:
+                win.show_local.set(folder)
+            except tk.TclError as e_set_show_local:
+                 if 'logging' in globals(): logging.warning(f"modpath: TclError setting win.show_local: {e_set_show_local}")
+        elif 'logging' in globals():
+            logging.debug("modpath: 'win.show_local' (StringVar) not available for updating display path.")
+        
+        # self.load_from_file() # Полная перезагрузка настроек после смены пути может быть избыточной,
+                                # если только self.path влияет на другие загружаемые ресурсы.
+                                # Если self.path используется для поиска других файлов конфигурации, то да, нужна.
+                                # В данном контексте, set_value уже обновил self.path.
+                                # Если другие части load_from_file зависят от нового self.path, то нужно.
+                                # Пока что, кажется, только tool_bin зависит от cwd_path, а не self.path.
+                                # Если путь влияет на загрузку языков или тем, то да.
+                                # Безопаснее вызвать, если есть сомнения.
+        self.load_from_file() # Перезагружаем, т.к. self.path мог измениться, и это может влиять на что-то.
+        self.apply_loaded_settings_to_gui() # Применяем к GUI
 
 
 settings = SetUtils(load=False)
@@ -5947,149 +6248,247 @@ class ParseCmdline:
 
 def __init__tk(args: list):
     # --- Basic Setup: Temporary Folder and Logging ---
-    # Ensure 'temp' directory (from utils.prog_path) exists
-    if not os.path.exists(temp): 
-        re_folder(temp, quiet=True) 
-    log_file_dir = os.path.dirname(tool_log)
+    # Глобальные переменные cwd_path, temp, tool_log должны быть определены до этого момента
+    # re_folder, v_code, time также должны быть доступны
+    _temp_path = os.path.join(os.getcwd(), "bin", "temp") # Фоллбэк, если cwd_path еще не готов
+    if 'temp' in globals() and globals()['temp']:
+        _temp_path = globals()['temp']
+    
+    _tool_log_path = os.path.join(_temp_path, f'{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log' if 'v_code' in globals() and callable(v_code) else "default.log")
+    if 'tool_log' in globals() and globals()['tool_log']:
+        _tool_log_path = globals()['tool_log']
+
+    if 're_folder' in globals() and callable(re_folder):
+        if not os.path.exists(_temp_path): 
+            re_folder(_temp_path, quiet=True) 
+    else: # Ручное создание, если re_folder недоступен
+        if not os.path.exists(_temp_path):
+            try: os.makedirs(_temp_path, exist_ok=True)
+            except OSError as e_mkdir: print(f"Warning: Could not create temp directory {_temp_path}: {e_mkdir}")
+
+    log_file_dir = os.path.dirname(_tool_log_path)
     if not os.path.exists(log_file_dir):
         try: os.makedirs(log_file_dir, exist_ok=True)
-        except OSError as e: print(f"Warning: Could not create log directory {log_file_dir}: {e}")
-    if not os.path.exists(tool_log):
-        try: open(tool_log, 'w', encoding="utf-8", newline="\n").close()
-        except IOError as e: print(f"Warning: Could not create log file {tool_log}: {e}")
+        except OSError as e_mkdir_log: print(f"Warning: Could not create log directory {log_file_dir}: {e_mkdir_log}")
+    
+    if not os.path.exists(_tool_log_path):
+        try: open(_tool_log_path, 'w', encoding="utf-8", newline="\n").close()
+        except IOError as e_create_log: print(f"Warning: Could not create log file {_tool_log_path}: {e_create_log}")
+    
+    # logging должен быть импортирован
     try:
         logging.basicConfig(level=logging.DEBUG, 
                             format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
-                            filename=tool_log, filemode='w', encoding='utf-8')
+                            filename=_tool_log_path, filemode='w', encoding='utf-8')
     except Exception as e_logging_config:
-        print(f"Error configuring logging to {tool_log}: {e_logging_config}.")
+        print(f"Error configuring logging to {_tool_log_path}: {e_logging_config}.")
         logging.basicConfig(level=logging.DEBUG, 
-                            format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
+                            format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s') # Фоллбэк на stdout/stderr
 
-     # Объявляем animation здесь
+    # Объявление глобальных переменных, которые будут созданы в этой функции
+    # 'settings' создается раньше, поэтому здесь только для информации или если он переопределяется
+    global win, current_project_name, theme, language, unpackg, project_menu, animation, start
 
-    win = Tool()  # Создаем главное окно
-
-    # Глобальные переменные для Tkinter, связанные с win
+    # --- Создание главного окна ---
+    # Tool, do_set_window_deffont, set_title_bar_color должны быть определены
+    win = Tool() 
+    
+    # --- Инициализация Tkinter StringVars ---
+    # utils (для project_name) должен быть доступен
     current_project_name = StringVar(master=win) 
-    utils.project_name = current_project_name 
+    if 'utils' in globals() and hasattr(utils, 'project_name'):
+        utils.project_name = current_project_name 
+    else:
+        logging.warning("__init__tk: 'utils.project_name' not available to link with current_project_name StringVar.")
+        
     theme = StringVar(master=win)
     language = StringVar(master=win)
-    
-    # Загрузка настроек и начальные окна (OOBE, Updater)
-    settings.load() 
-    if os.name == 'nt' and hasattr(win, 'list2') and hasattr(settings, 'theme'): # Установка цвета заголовка после загрузки темы
-        if settings.theme == 'dark':
-            set_title_bar_color(win)
-        else:
-            set_title_bar_color(win, 0)
 
-    if settings.updating in ['1', '2']: Updater() 
-    if int(settings.oobe) < 5: Welcome() 
+    # --- Загрузка настроек и применение их к объекту settings ---
+    # settings (глобальный экземпляр SetUtils) должен быть уже создан
+    if 'settings' in globals() and hasattr(settings, 'load_from_file'):
+        settings.load_from_file()
+    else:
+        logging.critical("__init__tk: Global 'settings' object or 'settings.load_from_file' method not available. Cannot load settings.")
+        # Возможно, стоит прервать выполнение, так как приложение не сможет корректно работать
+        return
+
+    # --- Начальные окна и проверки (OOBE, Updater, окружение) ---
+    # Updater, Welcome, init_verify, lang должны быть доступны
+    # Также set_title_bar_color для Windows
+    if os.name == 'nt' and 'set_title_bar_color' in globals() and callable(set_title_bar_color): 
+        try:
+            if settings.theme == 'dark': # settings.theme уже должен быть установлен из load_from_file
+                set_title_bar_color(win)
+            else:
+                set_title_bar_color(win, 0)
+        except Exception as e_title_init:
+            logging.warning(f"Could not set initial Windows title bar color: {e_title_init}")
+
+
+    if hasattr(settings, 'updating') and settings.updating in ['1', '2']:
+        if 'Updater' in globals() and callable(Updater): Updater() 
+        else: logging.warning("__init__tk: 'Updater' class not available.")
+
+    if hasattr(settings, 'oobe') and int(settings.oobe) < 5:
+        if 'Welcome' in globals() and callable(Welcome): Welcome()
+        else: logging.warning("__init__tk: 'Welcome' class not available.")
     
-    init_verify() # Проверка окружения
+    if 'init_verify' in globals() and callable(init_verify): init_verify() 
+    else: logging.warning("__init__tk: 'init_verify' function not available.")
     
     # Проверка, что главное окно все еще существует перед вызовом win.gui()
     try: 
-        win.winfo_exists()
-    except TclError as e_main_window_invalid:
-        logging.exception(f"Main window (win) is invalid before win.gui(): {e_main_window_invalid}")
-        # Возможно, здесь стоит выйти, если главное окно невалидно
+        if not win.winfo_exists(): # Дополнительная проверка после Welcome/Updater
+            logging.error("Main window (win) was destroyed before win.gui() call. Aborting UI setup.")
+            return 
+    except tk.TclError:
+        logging.exception("Main window (win) is invalid before win.gui() (TclError). Aborting UI setup.")
         return 
         
-    win.gui() # <--- ВЫПОЛНЯЕМ win.gui() ЗДЕСЬ. Теперь win.gif_label создан.
+    # --- Создание основного GUI ---
+    win.gui() # win.gif_label создается внутри этого вызова
 
-    # --- Инициализация animation ПОСЛЕ win.gui() ---
-    animation = LoadAnim() # <--- Создаем экземпляр LoadAnim ТЕПЕРЬ
-    animation.set_master(win) # <--- Устанавливаем master ТЕПЕРЬ. win.gif_label уже существует.
-    
-    # Загрузка GIF для анимации
-    loading_gif_theme_suffix = "dark" # Значение по умолчанию
-    if hasattr(win, 'list2') and hasattr(win.list2, 'get'): 
-        theme_val = win.list2.get()
-        if theme_val: # Убедимся, что значение не пустое
-            loading_gif_theme_suffix = theme_val
-    
-    gif_data_attr_name = f"loading_{loading_gif_theme_suffix}_byte"
-    # Фоллбэк на dark GIF, если для текущей темы нет или атрибут отсутствует
-    default_gif_data = getattr(images, "loading_dark_byte", None) 
-    loading_gif_data = getattr(images, gif_data_attr_name, default_gif_data)
-
-    if loading_gif_data:
-        try:
-            pil_gif_image = open_img(BytesIO(loading_gif_data))
-            animation.load_gif(pil_gif_image) # Передаем объект PIL.Image
-        except Exception as e_animation_gif:
-            logging.error(f"Failed to load animation GIF in __init__tk: {e_animation_gif}")
-    else:
-        logging.warning(f"Loading GIF data for theme '{loading_gif_theme_suffix}' (or default) not found in __init__tk.")
-    # --- Конец инициализации animation ---
-    
-    # Создание и размещение остальных GUI-компонентов
-    if not (hasattr(win, 'tab2') and win.tab2 and win.tab2.winfo_exists()): # Проверка существования родительской вкладки
-        logging.error("CRITICAL: Parent tab (win.tab2) not found or destroyed. UI will be incomplete.")
-    else:
-        project_menu = ProjectMenuUtils(master=win.tab2)
-        unpackg = UnpackGui(master=win.tab2) # <--- unpackg создается здесь
-        frame3_instance = Frame3(master=win.tab2)
-
-        unpackg.gui() 
-        project_menu.gui() 
-        unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True) 
-        if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
-            frame3_instance.gui()
+    # --- Инициализация анимации (ПОСЛЕ win.gui()) ---
+    # LoadAnim, images, open_img, BytesIO должны быть доступны
+    if 'LoadAnim' in globals() and callable(LoadAnim):
+        animation = LoadAnim() 
+        animation.set_master(win) 
         
-        project_menu.listdir() 
+        loading_gif_theme_suffix = getattr(settings, 'theme', 'dark') # Берем из уже загруженных настроек
+        
+        gif_data_attr_name = f"loading_{loading_gif_theme_suffix}_byte"
+        default_gif_data = getattr(images, "loading_dark_byte", None) if 'images' in globals() else None
+        loading_gif_data = getattr(images, gif_data_attr_name, default_gif_data) if 'images' in globals() else None
 
-    # Запуск специфичных для PRO версии частей, если необходимо
-    if not is_pro:
-        if hasattr(lang, 'text108'): print(lang.text108)
-    elif 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
-        # Убедитесь, что Active и его зависимости (images, lang) передаются корректно
-        if 'Active' in globals() and 'verify' in globals() and 'settings' in globals() and \
-           'win' in globals() and 'images' in globals() and 'lang' in globals():
-            Active(verify, settings, win, images, lang).gui() 
+        if loading_gif_data and 'open_img' in globals() and 'BytesIO' in globals():
+            try:
+                pil_gif_image = open_img(BytesIO(loading_gif_data))
+                animation.load_gif(pil_gif_image)
+            except Exception as e_animation_gif:
+                logging.error(f"Failed to load animation GIF in __init__tk: {e_animation_gif}")
+        elif 'logging' in globals():
+             logging.debug(f"Loading GIF data for theme '{loading_gif_theme_suffix}' (or default) not found or dependencies missing in __init__tk.")
+    else:
+        logging.warning("__init__tk: 'LoadAnim' class not available. Animation will not work.")
+        animation = None # Устанавливаем в None, чтобы последующий код не падал
+
+    # --- Применение загруженных настроек к элементам GUI ---
+    # Должно быть после создания StringVar, win.gui() и animation
+    if hasattr(settings, 'apply_loaded_settings_to_gui'):
+        settings.apply_loaded_settings_to_gui()
+    else:
+        logging.error("__init__tk: 'settings.apply_loaded_settings_to_gui' not available.")
+
+
+    # --- Создание и размещение остальных GUI-компонентов (вкладок и т.д.) ---
+    # ProjectMenuUtils, UnpackGui, Frame3, lang должны быть доступны
+    if not (hasattr(win, 'tab2') and win.tab2 and win.tab2.winfo_exists()):
+        logging.error("CRITICAL: Parent tab (win.tab2) not found or destroyed. UI components for tab2 will not be created.")
+    else:
+        if 'ProjectMenuUtils' in globals() and callable(ProjectMenuUtils):
+            project_menu = ProjectMenuUtils(master=win.tab2)
+            project_menu.gui() # .gui() пакует сам себя
         else:
-            logging.error("Cannot initialize Pro 'Active' component due to missing dependencies.")
-            
-    win.update() 
-    move_center(win) 
-    win.get_time() 
-    
-    if 'start' in globals() and callable(dti): # Проверка dti
-         startup_time_message_key = 'text134'
-         default_startup_time_message = "Startup took: {:.2f} seconds"
-         startup_time_message_format = getattr(lang, startup_time_message_key, default_startup_time_message)
-         if not isinstance(startup_time_message_format, str) or startup_time_message_format == "None":
-             startup_time_message_format = default_startup_time_message
-         try:
-            print(startup_time_message_format.format(dti() - start))
-         except TypeError: 
-            # Фоллбэк, если lang или dti некорректны
-            current_time = time.time() # Используем time.time() если dti() не работает
-            if isinstance(start, (int, float)): # Проверяем, что start это число
-                 print(f"Startup took: {current_time - start:.2f} seconds (fallback format)")
+            logging.error("__init__tk: 'ProjectMenuUtils' not available.")
+            project_menu = None
+
+        if 'UnpackGui' in globals() and callable(UnpackGui):
+            unpackg = UnpackGui(master=win.tab2)
+            unpackg.gui() 
+            unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True) 
+        else:
+            logging.error("__init__tk: 'UnpackGui' not available.")
+            unpackg = None
+        
+        if 'Frame3' in globals() and callable(Frame3):
+            frame3_instance = Frame3(master=win.tab2)
+            if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
+                frame3_instance.gui() # .gui() пакует сам себя
+        else:
+            logging.warning("__init__tk: 'Frame3' not available.")
+        
+        if project_menu and hasattr(project_menu, 'listdir'):
+            project_menu.listdir() 
+        elif logging:
+             logging.debug("__init__tk: 'project_menu' or 'project_menu.listdir' not available after UI setup.")
+
+    # --- PRO-версия и завершение инициализации ---
+    # is_pro, lang, verify, Active, images, move_center, dti, do_override_sv_ttk_fonts,
+    # ask_win, states, exit_tool, ParseCmdline должны быть доступны
+    if 'is_pro' in globals() and not is_pro:
+        lang_text108 = getattr(lang, 'text108', "Non-pro version specific message.") if 'lang' in globals() else "Non-pro version specific message."
+        print(lang_text108)
+    elif 'is_pro' in globals() and is_pro:
+        if 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
+            if 'Active' in globals() and callable(Active) and \
+               'images' in globals() and 'lang' in globals(): # Проверка зависимостей Active
+                Active(verify, settings, win, images, lang).gui() 
             else:
-                 print(f"Startup time cannot be calculated (start={start}).")
+                logging.error("__init__tk: Cannot initialize Pro 'Active' component due to missing dependencies (Active, images, lang).")
+    
+    try:
+        win.update() 
+        if 'move_center' in globals() and callable(move_center):
+            move_center(win) 
+        else: logging.warning("__init__tk: 'move_center' function not available.")
+    except tk.TclError as e_win_update:
+        logging.error(f"Error during win.update/move_center: {e_win_update}")
 
+    win.get_time() # Предполагается, что это метод класса Tool
+    
+    # Сообщение о времени запуска
+    if 'start' in globals() and isinstance(start, (int, float)) and 'dti' in globals() and callable(dti):
+         _start_time = start
+         try:
+             elapsed_time = dti() - _start_time
+             lang_text134 = getattr(lang, 'text134', "Startup took: {:.2f} seconds") if 'lang' in globals() else "Startup took: {:.2f} seconds"
+             if not (isinstance(lang_text134, str) and "{:.2f}" in lang_text134): # Проверка формата
+                 lang_text134 = "Startup took: {:.2f} seconds"
+             print(lang_text134.format(elapsed_time))
+         except Exception as e_startup_time:
+             logging.error(f"Error calculating/printing startup time: {e_startup_time}")
+             # Фоллбэк, если dti() или lang вызывают проблемы
+             current_timestamp = time.time()
+             print(f"Startup took: {current_timestamp - _start_time:.2f} seconds (fallback format)")
+    elif 'logging' in globals():
+        logging.debug("__init__tk: 'start' time or 'dti' function not available for startup time calculation.")
 
+    # Настройки для Windows
     if os.name == 'nt':
         if 'do_override_sv_ttk_fonts' in globals() and callable(do_override_sv_ttk_fonts): 
             do_override_sv_ttk_fonts()
-        # Проверка версии Windows и предупреждение
         if hasattr(sys, 'getwindowsversion') and callable(sys.getwindowsversion):
             if sys.getwindowsversion().major <= 6: # Windows 7 и старше
-                if hasattr(lang, 'warn20') and 'ask_win' in globals() and callable(ask_win): 
-                    ask_win(lang.warn20)
-        else:
-            logging.warning("sys.getwindowsversion not available for Windows version check.")
+                lang_warn20 = getattr(lang, 'warn20', "Warning for older Windows versions.") if 'lang' in globals() else "Warning for older Windows versions."
+                if 'ask_win' in globals() and callable(ask_win): 
+                    ask_win(lang_warn20)
+                elif 'logging' in globals():
+                     logging.debug("__init__tk: 'ask_win' not available for older Windows warning.")
+        elif 'logging' in globals():
+            logging.debug("__init__tk: sys.getwindowsversion not available for Windows version check.")
             
-    states.inited = True 
-    win.protocol("WM_DELETE_WINDOW", exit_tool) 
+    # Установка флага инициализации и обработчика закрытия окна
+    # states и exit_tool должны быть доступны
+    if 'states' in globals() and hasattr(states, 'inited'):
+        states.inited = True 
+    else: logging.warning("__init__tk: 'states.inited' not available.")
+
+    if 'exit_tool' in globals() and callable(exit_tool):
+        try:
+            win.protocol("WM_DELETE_WINDOW", exit_tool) 
+        except tk.TclError as e_protocol:
+            logging.error(f"Error setting WM_DELETE_WINDOW protocol: {e_protocol}")
+    else: logging.warning("__init__tk: 'exit_tool' function not available for WM_DELETE_WINDOW protocol.")
     
-    if len(args) > 1 and is_pro : # Обработка аргументов командной строки
-        win.after(100, lambda: ParseCmdline(args[1:])) # ParseCmdline должен быть определен
-        
+    # Обработка аргументов командной строки
+    if len(args) > 1 and ('is_pro' not in globals() or is_pro): # Если не pro, или если pro и аргументы есть
+        if 'ParseCmdline' in globals() and callable(ParseCmdline):
+            # Запускаем парсер с небольшой задержкой, чтобы GUI успел инициализироваться
+             win.after(100, lambda: ParseCmdline(args[1:]))
+        elif 'logging' in globals():
+             logging.debug("__init__tk: 'ParseCmdline' class not available for command line argument processing.")
+             
     win.mainloop()
 
 
