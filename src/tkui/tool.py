@@ -5284,78 +5284,132 @@ def dndfile(files: list):
 
 
 class ProjectMenuUtils(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, **kwargs): # Принимаем master
+        # Получаем текст для заголовка из lang или используем дефолт
         title_text_key = 'text12' 
-        default_title = "Project"
-        title_text = getattr(lang, title_text_key, default_title)
-        if not isinstance(title_text, str) or title_text == "None":
-            title_text = default_title
-        super().__init__(master=master, text=title_text, **kwargs)
-        self.combobox = None 
-        # НЕ ВЫЗЫВАЕМ self.gui() здесь
+        default_title = "Project Management" 
+        title_text = default_title
+
+        # Проверяем наличие lang и ключа, а также что значение не "None" (строка)
+        if 'lang' in globals() and hasattr(lang, title_text_key):
+            lang_val = getattr(lang, title_text_key)
+            if lang_val and isinstance(lang_val, str) and lang_val.lower() != "none":
+                title_text = lang_val
+            elif 'logging' in globals() and lang_val is not None: # Если есть, но не строка или "None"
+                 logging.warning(f"ProjectMenuUtils: lang.{title_text_key} ('{lang_val}') is not a valid title string. Using default.")
+        elif 'logging' in globals():
+            logging.debug(f"ProjectMenuUtils: lang or lang.{title_text_key} not found. Using default title.")
+        
+        super().__init__(master=master, text=title_text, **kwargs) # Передаем master в super
+        
+        self.combobox: ttk.Combobox = None # Только объявление типа для подсказок
+        # Метод gui() будет отвечать за создание виджетов и упаковку самого LabelFrame
 
     def gui(self):
-        """Creates and arranges widgets, then packs the LabelFrame itself."""
+        """Создает и размещает виджеты внутри этого LabelFrame, а затем пакует сам LabelFrame."""
         
-        self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
-        # Растягиваем Combobox по горизонтали
-        self.combobox.pack(side="top", padx=10, pady=10, fill=X, expand=True) 
-        
-        selected_text_key = getattr(lang, 'text96', 'Selected project:')
-        if not isinstance(selected_text_key, str) or selected_text_key == "None":
-            selected_text_key = 'Selected project:'
-        self.combobox.bind('<<ComboboxSelected>>', 
-                           lambda *x: print(f"{selected_text_key} {current_project_name.get()}"))
+        # --- Создание Combobox для выбора проекта ---
+        # current_project_name (StringVar) должен быть определен глобально
+        _current_project_name_var = None
+        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
+            _current_project_name_var = globals()['current_project_name']
+        else:
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.gui: Global StringVar 'current_project_name' not found.")
+            # Можно создать временный StringVar, чтобы избежать падения, но это не исправит логику
+            _current_project_name_var = tk.StringVar(master=self)
 
+
+        self.combobox = ttk.Combobox(self, textvariable=_current_project_name_var, state='readonly')
+        self.combobox.pack(side="top", padx=10, pady=(10, 5), fill=X, expand=True) # Растягиваем по X
+
+        # Текст для события выбора проекта
+        selected_text_log_key = 'text96'
+        default_selected_text_log = "Selected project (ProjectMenuUtils):"
+        selected_text_log_format = default_selected_text_log
+        if 'lang' in globals() and hasattr(lang, selected_text_log_key):
+            lang_val_log = getattr(lang, selected_text_log_key)
+            if lang_val_log and isinstance(lang_val_log, str) and lang_val_log.lower() != "none":
+                selected_text_log_format = lang_val_log
+        
+        # Используем lambda, чтобы передать актуальное значение current_project_name.get()
+        self.combobox.bind('<<ComboboxSelected>>', 
+                           lambda event: print(f"{selected_text_log_format} {_current_project_name_var.get()}"))
+
+        # --- Создание кнопок управления проектами ---
         button_frame = ttk.Frame(self)
-        button_frame.pack(side="top", padx=5, pady=(0,5), fill=X, expand=True)
+        button_frame.pack(side="top", padx=5, pady=(0, 10), fill=X, expand=True)
+
+        # Функции и их тексты (используем getattr для безопасного доступа к lang)
+        # create_thread должен быть доступен глобально
+        _create_thread_func = globals().get('create_thread', lambda func, *args: func(*args)) # Фоллбэк на прямой вызов
 
         functions_map = [
             (getattr(lang, 'text23', "Refresh"), self.listdir),
-            (getattr(lang, 'text115', "New"), self.new),
-            (getattr(lang, 'text116', "Delete"), lambda: create_thread(self.remove)),
-            (getattr(lang, 'text117', "Rename"), lambda: create_thread(self.rename)),
-        ]
-        for text, func in functions_map:
-            button_text_str = str(text) if text is not None else "Action"
-            # Даем кнопкам возможность растягиваться, если button_frame растягивается
-            ttk.Button(button_frame, text=button_text_str, command=func).pack(side="left", padx=5, pady=5, fill=X, expand=True)
-
-        # Pack the main LabelFrame itself onto its master (win.tab2)
-        # Растягиваем ProjectMenuUtils по горизонтали, но не по вертикали
-        self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
-        return self
-
-    @staticmethod
-    def set_project(name):
-        if not project_manger.exist(name):
-            return
-        current_project_name.set(name)
-
-    def listdir(self):
-        if 'settings' not in globals() or not hasattr(settings, 'path'):
-            logging.error("settings.path not available for ProjectMenuUtils.listdir()")
-            if hasattr(self, 'combobox') and self.combobox:
-                self.combobox["value"] = []
-                self.combobox.set('')
-            if 'current_project_name' in globals(): current_project_name.set('')
-            return
-
-        print(f"[DEBUG] ProjectMenuUtils.listdir: settings.path = {settings.path}")
-        system_folders_to_hide = [
-            'bin', 'src', '.git', '.idea', '.vscode', 'dist', 
-            'build_pyinstaller', 'crash_logs', '__pycache__', 'qtui', 'test'
-            # 'test' добавлена сюда, так как она является частью структуры приложения, а не проектом
+            (getattr(lang, 'text115', "New"), self.new), # self.new должен быть потокобезопасным или быстрым
+            (getattr(lang, 'text116', "Delete"), lambda: _create_thread_func(self.remove)),
+            (getattr(lang, 'text117', "Rename"), lambda: _create_thread_func(self.rename)),
         ]
         
+        for i, (text, func) in enumerate(functions_map):
+            button_text_str = str(text) if text is not None else f"Action{i+1}"
+            btn = ttk.Button(button_frame, text=button_text_str, command=func)
+            # Размещаем кнопки так, чтобы они делили доступное пространство
+            btn.pack(side="left", padx=5, pady=5, fill=X, expand=True)
+
+        # --- Упаковка самого ProjectMenuUtils (LabelFrame) на его master ---
+        # Это делается в __init__tk, где создается экземпляр ProjectMenuUtils,
+        # например: project_menu.pack(padx=5, pady=5, fill='x', side=TOP, expand=False)
+        # Однако, если вы хотите, чтобы gui() сам себя паковал, можно сделать так:
+        # (но тогда в __init__tk не нужно делать project_menu.pack())
+        # self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) # Пример
+        
+        return self # Для возможного использования в цепочных вызовах
+
+    @staticmethod
+    def set_project(name_to_set):
+        """Устанавливает текущий проект, если он существует."""
+        # project_manger и current_project_name (StringVar) должны быть доступны глобально
+        if 'project_manger' not in globals() or not hasattr(project_manger, 'exist'):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.set_project: 'project_manger' not available.")
+            return
+        if not project_manger.exist(name_to_set):
+            if 'logging' in globals(): logging.info(f"ProjectMenuUtils.set_project: Project '{name_to_set}' does not exist or path invalid.")
+            return
+        
+        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
+            globals()['current_project_name'].set(name_to_set)
+        elif 'logging' in globals():
+            logging.error("ProjectMenuUtils.set_project: Global StringVar 'current_project_name' not available.")
+
+    def listdir(self):
+        """Обновляет список проектов в Combobox."""
+        # settings, current_project_name (StringVar), project_manger должны быть доступны глобально
+        if 'settings' not in globals() or not hasattr(settings, 'path') or not settings.path:
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.listdir: settings.path not available.")
+            if hasattr(self, 'combobox') and self.combobox: self.combobox["values"] = []
+            if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
+                globals()['current_project_name'].set('')
+            return
+
+        # Папки, которые не являются проектами
+        system_folders_to_hide = [
+            'bin', 'src', '.git', '.idea', '.vscode', 'dist', 
+            'build_pyinstaller', 'crash_logs', '__pycache__', 'qtui', 'test', # Добавьте другие, если нужно
+            os.path.basename(getattr(sys, 'executable', '')) # Имя исполняемого файла, если в той же папке
+        ] 
+        if getattr(sys, 'frozen', False): # Если скомпилировано
+            exe_name_no_ext, _ = os.path.splitext(os.path.basename(sys.executable))
+            system_folders_to_hide.append(exe_name_no_ext) # Добавляем имя exe без расширения
+
+
         project_candidates = []
         try:
             if os.path.isdir(settings.path):
                 project_candidates = os.listdir(settings.path)
-            else:
-                print(f"[ERROR] settings.path is not a valid directory: {settings.path}")
-        except Exception as e:
-            print(f"[ERROR] Could not list directory {settings.path}: {e}")
+            elif 'logging' in globals():
+                logging.warning(f"ProjectMenuUtils.listdir: settings.path ('{settings.path}') is not a valid directory.")
+        except Exception as e_listdir:
+            if 'logging' in globals(): logging.error(f"ProjectMenuUtils.listdir: Error listing directory '{settings.path}': {e_listdir}")
 
         array_of_projects = [
             folder_name for folder_name in project_candidates
@@ -5363,164 +5417,219 @@ class ProjectMenuUtils(ttk.LabelFrame):
                folder_name not in system_folders_to_hide and \
                not folder_name.startswith('.')
         ]
-        print(f"[DEBUG] Filtered project folders: {array_of_projects}")
-
-        origin_project = current_project_name.get()
         
-        if not hasattr(self, 'combobox') or not self.combobox:
-            logging.error("Combobox not initialized in ProjectMenuUtils before listdir.")
+        if 'logging' in globals(): logging.debug(f"[DEBUG] ProjectMenuUtils.listdir: Filtered project folders: {array_of_projects}")
+
+        _current_project_name_var = globals().get('current_project_name')
+        original_project_name = _current_project_name_var.get() if _current_project_name_var and isinstance(_current_project_name_var, tk.StringVar) else ""
+        
+        if not (hasattr(self, 'combobox') and self.combobox):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.listdir: Combobox not initialized.")
             return
 
-        self.combobox["value"] = array_of_projects
+        self.combobox["values"] = array_of_projects
 
         if not array_of_projects:
-            current_project_name.set('')
+            if _current_project_name_var: _current_project_name_var.set('')
             self.combobox.set('') 
         else:
-            if origin_project and origin_project in array_of_projects:
-                self.combobox.set(origin_project)
-                # current_project_name не меняем, если он все еще валиден
+            if original_project_name and original_project_name in array_of_projects:
+                self.combobox.set(original_project_name)
+                # current_project_name уже установлен, не меняем, если он валиден
             else: 
-                self.combobox.current(0)
-                current_project_name.set(self.combobox.get())
+                self.combobox.current(0) # Выбираем первый элемент
+                if _current_project_name_var: _current_project_name_var.set(self.combobox.get())
 
-    @staticmethod
-    def set_project(name):
-        if not project_manger.exist(name): # project_manger должен быть доступен
-            return
-        current_project_name.set(name)
 
-    def new(self): # Должен использовать input_, а не input()
-        new_project_title = getattr(lang, 'text76', "Enter project name") # Пример, используй свой ключ
-        if not isinstance(new_project_title, str) or new_project_title == "None":
-            new_project_title = "Enter project name"
+    def new(self):
+        """Создает новый проект."""
+        # input_, lang, settings, win (для message_pop), logging, os, current_project_name (StringVar) должны быть доступны
+        _input_func = globals().get('input_')
+        _win_obj = globals().get('win')
         
-        inputvar = input_(title=new_project_title) 
+        if not (_input_func and callable(_input_func) and _win_obj and hasattr(_win_obj, 'message_pop')):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.new: Dependencies (input_, win.message_pop) missing.")
+            return
 
-        if inputvar is None: # Пользователь отменил
-             if 'win' in globals() and hasattr(win, 'message_pop'): 
-                msg_key = getattr(lang, 'action_cancelled', "Action cancelled.") # Добавь 'action_cancelled' в lang
-                win.message_pop(msg_key)
+        title_key = getattr(lang, 'text76', "Enter new project name") if 'lang' in globals() else "Enter new project name"
+        new_name_raw = _input_func(title=title_key)
+
+        if new_name_raw is None: # Пользователь отменил
+             msg_cancelled = getattr(lang, 'action_cancelled', "Action cancelled.") if 'lang' in globals() else "Action cancelled."
+             _win_obj.message_pop(msg_cancelled, "orange")
              return
 
-        if not inputvar.strip():
-            warn_msg_key = getattr(lang, 'warn12', "Please enter a name.")
-            if not isinstance(warn_msg_key, str) or warn_msg_key == "None":
-                warn_msg_key = "Project name cannot be empty."
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key)
-            return
+        new_name = new_name_raw.strip().replace(' ', '_') # Заменяем пробелы на подчеркивания
 
-        inputvar = inputvar.replace(' ', '_')
-        if not inputvar.isprintable(): # Простая проверка на "печатаемость"
-            warn_msg_key_printable = getattr(lang, 'invalid_project_name', "Invalid project name (non-printable characters).")
-            if not isinstance(warn_msg_key_printable, str) or warn_msg_key_printable == "None":
-                warn_msg_key_printable = "Invalid project name (non-printable characters)."
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key_printable)
+        if not new_name:
+            msg_empty = getattr(lang, 'warn12', "Project name cannot be empty.") if 'lang' in globals() else "Project name cannot be empty."
+            _win_obj.message_pop(msg_empty, "orange")
             return
         
-        new_project_path = os.path.join(settings.path, inputvar)
-        if os.path.exists(new_project_path):
-            exists_msg_key = getattr(lang, 'project_exists', "Project with this name already exists.")
-            if not isinstance(exists_msg_key, str) or exists_msg_key == "None":
-                exists_msg_key = "Project with this name already exists."
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(exists_msg_key, "orange")
+        # Проверка на недопустимые символы в имени папки (простая)
+        # Можно расширить список недопустимых символов
+        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+        if any(char in new_name for char in invalid_chars) or not new_name.isprintable():
+            msg_invalid_name = getattr(lang, 'invalid_project_name_chars', "Invalid characters in project name.") if 'lang' in globals() else "Invalid characters in project name."
+            _win_obj.message_pop(msg_invalid_name, "orange")
+            return
+            
+        new_project_full_path = os.path.join(settings.path, new_name) # settings должен быть доступен
+
+        if os.path.exists(new_project_full_path):
+            msg_exists = getattr(lang, 'project_exists_already', "Project '%s' already exists.") % new_name if 'lang' in globals() else f"Project '{new_name}' already exists."
+            _win_obj.message_pop(msg_exists, "orange")
             return
             
         try:
-            os.makedirs(new_project_path, exist_ok=True) # Используем makedirs для безопасности
-            created_msg_key = getattr(lang, 'text99', "New Project: %s")
-            if not isinstance(created_msg_key, str) or created_msg_key == "None":
-                created_msg_key = "New Project: %s"
-            print(created_msg_key % inputvar)
+            os.makedirs(new_project_full_path) # Используем makedirs для создания, если settings.path не существует (хотя он должен)
+            msg_created = getattr(lang, 'text99', "Created new project: %s") % new_name if 'lang' in globals() else f"Created new project: {new_name}"
+            print(msg_created) # Вывод в консоль/лог
+            if 'logging' in globals(): logging.info(msg_created)
         except Exception as e_mkdir:
-            if 'win' in globals() and hasattr(win, 'message_pop'):
-                win.message_pop(f"Failed to create project: {e_mkdir}", "red")
-            logging.error(f"Failed to create directory {new_project_path}: {e_mkdir}")
+            msg_fail_create = getattr(lang, 'fail_create_project', "Failed to create project '%s': %s") % (new_name, e_mkdir) if 'lang' in globals() else f"Failed to create project '{new_name}': {e_mkdir}"
+            _win_obj.message_pop(msg_fail_create, "red")
+            if 'logging' in globals(): logging.error(f"Failed to create directory {new_project_full_path}: {e_mkdir}")
             return
             
-        self.listdir() # Обновляем список
-        # Опционально: выбираем только что созданный проект
-        if inputvar in self.comboboxcget("values"):
-            current_project_name.set(inputvar)
-            self.combobox.set(inputvar)
+        self.listdir() # Обновляем список в Combobox
+        
+        # Автоматически выбираем только что созданный проект
+        _cpn_var = globals().get('current_project_name')
+        if _cpn_var and isinstance(_cpn_var, tk.StringVar) and hasattr(self, 'combobox') and self.combobox:
+            if new_name in self.combobox.cget("values"):
+                _cpn_var.set(new_name)
+                self.combobox.set(new_name)
 
 
     def remove(self):
-        if not project_manger.exist(): # Проверяет текущий выбранный проект
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
-            return
-        
-        project_to_delete = current_project_name.get()
-        if not project_to_delete:
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1) # "Please select a project"
+        """Удаляет выбранный проект."""
+        # project_manger, current_project_name (StringVar), win, lang, ask_win, rmdir, logging должны быть доступны
+        _pm = globals().get('project_manger')
+        _cpn_var = globals().get('current_project_name')
+        _win_obj = globals().get('win')
+        _ask_win_func = globals().get('ask_win')
+        _rmdir_func = globals().get('rmdir')
+
+        if not (_pm and _cpn_var and _win_obj and _ask_win_func and _rmdir_func):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.remove: Missing critical dependencies.")
             return
 
-        confirm_delete_text_key = getattr(lang, 'confirm_delete_project', "Are you sure you want to delete project '%s'?")
-        if not isinstance(confirm_delete_text_key, str) or confirm_delete_text_key == "None":
-            confirm_delete_text_key = "Are you sure you want to delete project '%s'?"
+        project_to_delete = _cpn_var.get()
+        if not project_to_delete:
+            msg_select = getattr(lang, 'warn1_select_project', "Please select a project to delete.") if 'lang' in globals() else "Please select a project to delete."
+            _win_obj.message_pop(msg_select, "orange")
+            return
+        
+        if not _pm.exist(project_to_delete): # Проверяем, существует ли он на самом деле
+            msg_not_exist = getattr(lang, 'warn1_project_not_exist', "Project '%s' does not exist or path is invalid.") % project_to_delete if 'lang' in globals() else f"Project '{project_to_delete}' does not exist."
+            _win_obj.message_pop(msg_not_exist, "red")
+            self.listdir() # Обновить список, на всякий случай
+            return
+
+        confirm_text_key = 'confirm_delete_project_q' # Более конкретный ключ
+        default_confirm_text = "Are you sure you want to PERMANENTLY DELETE project '%s' and all its contents?"
+        confirm_text_format = getattr(lang, confirm_text_key, default_confirm_text) if 'lang' in globals() else default_confirm_text
             
-        if ask_win(confirm_delete_text_key % project_to_delete) == 1: # ask_win должен быть доступен
-            rmdir(project_manger.get_work_path(project_to_delete)) # rmdir должен быть доступен
-            self.listdir() # Обновить список, current_project_name будет сброшен или установлен в первый, если список не пуст
+        if _ask_win_func(confirm_text_format % project_to_delete) == 1:
+            project_path_to_delete = _pm.get_work_path(project_to_delete) # Получаем полный путь
+            try:
+                _rmdir_func(project_path_to_delete) # rmdir должен быть потокобезопасным, если вызывается из create_thread
+                msg_deleted = getattr(lang, 'project_deleted_ok', "Project '%s' deleted.") % project_to_delete if 'lang' in globals() else f"Project '{project_to_delete}' deleted."
+                print(msg_deleted) # В консоль/лог
+                if 'logging' in globals(): logging.info(msg_deleted)
+            except Exception as e_rm:
+                msg_fail_delete = getattr(lang, 'fail_delete_project', "Failed to delete project '%s': %s") % (project_to_delete, e_rm) if 'lang' in globals() else f"Failed to delete project '{project_to_delete}': {e_rm}"
+                _win_obj.message_pop(msg_fail_delete, "red")
+                if 'logging' in globals(): logging.error(f"Error deleting project {project_path_to_delete}: {e_rm}")
+            
+            self.listdir() # Обновить список. current_project_name будет сброшен или установлен в первый.
+
 
     def rename(self) -> bool:
-        if not project_manger.exist():
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
+        """Переименовывает выбранный проект."""
+        # project_manger, current_project_name (StringVar), input_, win, lang, settings, os, logging должны быть доступны
+        _pm = globals().get('project_manger')
+        _cpn_var = globals().get('current_project_name')
+        _input_func = globals().get('input_')
+        _win_obj = globals().get('win')
+
+        if not (_pm and _cpn_var and _input_func and _win_obj):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: Missing critical dependencies.")
             return False
         
-        old_name = current_project_name.get()
+        old_name = _cpn_var.get()
         if not old_name:
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
+            msg_select = getattr(lang, 'warn1_select_project_rename', "Please select a project to rename.") if 'lang' in globals() else "Please select a project to rename."
+            _win_obj.message_pop(msg_select, "orange")
             return False
 
-        rename_prompt_key = getattr(lang, 'text102', "Rename project '%s' to:")
-        if not isinstance(rename_prompt_key, str) or rename_prompt_key == "None":
-            rename_prompt_key = "Rename project '%s' to:"
+        if not _pm.exist(old_name): # Проверка, что старый проект еще существует
+            msg_not_exist_old = getattr(lang, 'warn1_project_not_exist_rename', "Selected project '%s' for rename does not exist.") % old_name if 'lang' in globals() else f"Selected project '{old_name}' for rename does not exist."
+            _win_obj.message_pop(msg_not_exist_old, "red")
+            self.listdir()
+            return False
 
-        new_name_raw = input_(title=rename_prompt_key % old_name, text=old_name)
+        title_rename_key = 'text102_rename_title' # Более конкретный ключ
+        default_title_rename = "Rename project '%s' to:"
+        title_rename_format = getattr(lang, title_rename_key, default_title_rename) if 'lang' in globals() else default_title_rename
+
+        new_name_raw = _input_func(title=title_rename_format % old_name, text=old_name)
 
         if new_name_raw is None: # Отмена
-             if 'win' in globals() and hasattr(win, 'message_pop'): 
-                msg_key = getattr(lang, 'action_cancelled', "Action cancelled.")
-                win.message_pop(msg_key)
+             msg_cancelled = getattr(lang, 'action_cancelled', "Action cancelled.") if 'lang' in globals() else "Action cancelled."
+             _win_obj.message_pop(msg_cancelled, "orange")
              return False
         
         new_name = new_name_raw.strip().replace(' ', '_')
 
         if not new_name:
-            warn_msg_key = getattr(lang, 'warn12', "Please enter a name.")
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key)
+            msg_empty = getattr(lang, 'warn12_new_name_empty', "New project name cannot be empty.") if 'lang' in globals() else "New project name cannot be empty."
+            _win_obj.message_pop(msg_empty, "orange")
             return False
             
-        if not new_name.isprintable():
-            warn_msg_key_printable = getattr(lang, 'invalid_project_name', "Invalid project name (non-printable characters).")
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(warn_msg_key_printable)
+        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+        if any(char in new_name for char in invalid_chars) or not new_name.isprintable():
+            msg_invalid_chars = getattr(lang, 'invalid_project_name_chars_rename', "Invalid characters in new project name.") if 'lang' in globals() else "Invalid characters in new project name."
+            _win_obj.message_pop(msg_invalid_chars, "orange")
             return False
 
         if new_name == old_name:
-            same_name_msg_key = getattr(lang, 'text104', "The new name is the same as the old one.")
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(same_name_msg_key)
-            return False # Технически не ошибка, но действие не выполнено
+            msg_same_name = getattr(lang, 'text104_same_name', "The new name is the same as the old one. No changes made.") if 'lang' in globals() else "The new name is the same as the old one."
+            _win_obj.message_pop(msg_same_name, "info") # Используем "info" или просто ничего не делаем
+            return True # Технически не ошибка, но действие не выполнено как изменение
         
-        old_path = project_manger.get_work_path(old_name)
-        new_path_base = os.path.dirname(old_path.rstrip(os.sep)) # Получаем settings.path
-        new_path = os.path.join(new_path_base, new_name)
+        old_path = _pm.get_work_path(old_name) # Полный путь к старой папке
+        
+        # settings.path должен быть доступен и корректен
+        if 'settings' not in globals() or not hasattr(settings, 'path') or not settings.path:
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: settings.path not available.")
+            _win_obj.message_pop("Error: Base path for projects not configured.", "red")
+            return False
+        
+        new_path = os.path.join(settings.path, new_name) # Полный путь к новой папке
 
         if os.path.exists(new_path):
-            exists_msg_key = getattr(lang, 'text103', "A project with the new name already exists!")
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(exists_msg_key, "orange")
+            msg_new_exists = getattr(lang, 'text103_new_name_exists', "A project with the name '%s' already exists!") % new_name if 'lang' in globals() else f"A project with the name '{new_name}' already exists!"
+            _win_obj.message_pop(msg_new_exists, "orange")
             return False
         
         try:
             os.rename(old_path, new_path)
-            print(f"Project '{old_name}' renamed to '{new_name}'.")
-            current_project_name.set(new_name) # Обновляем текущий проект
+            msg_renamed_ok = getattr(lang, 'project_renamed_ok', "Project '%s' renamed to '%s'.") % (old_name, new_name) if 'lang' in globals() else f"Project '{old_name}' renamed to '{new_name}'."
+            print(msg_renamed_ok) # В консоль/лог
+            if 'logging' in globals(): logging.info(msg_renamed_ok)
+            
+            _cpn_var.set(new_name) # Обновляем текущий проект в StringVar
             self.listdir() # Обновляем список в комбобоксе
-            # self.combobox.set(new_name) # Убедимся, что комбобокс отображает новое имя
+            # self.combobox.set(new_name) # Убедимся, что комбобокс отображает новое имя (listdir должен это сделать)
         except Exception as e_rename:
-            if 'win' in globals() and hasattr(win, 'message_pop'):
-                win.message_pop(f"Failed to rename project: {e_rename}", "red")
-            logging.error(f"Failed to rename project from {old_path} to {new_path}: {e_rename}")
+            msg_fail_rename = getattr(lang, 'fail_rename_project', "Failed to rename project '%s' to '%s': %s") % (old_name, new_name, e_rename) if 'lang' in globals() else f"Failed to rename project: {e_rename}"
+            _win_obj.message_pop(msg_fail_rename, "red")
+            if 'logging' in globals(): logging.error(f"Failed to rename project from {old_path} to {new_path}: {e_rename}")
+            # Если переименование не удалось, возможно, стоит восстановить старое имя в current_project_name,
+            # если оно изменилось до ошибки, и перечитать список.
+            # self.listdir() # Обновить список, чтобы отразить реальное состояние ФС
             return False
         return True
 
@@ -6071,9 +6180,8 @@ class ParseCmdline:
 
 def __init__tk(args: list):
     # --- Basic Setup: Global Paths and Logging ---
-    # Глобальные cwd_path, temp, tool_log, re_folder, v_code, time должны быть определены
     _temp_path = globals().get('temp', os.path.join(os.getcwd(), "bin", "temp"))
-    _tool_log_path = globals().get('tool_log', os.path.join(_temp_path, "default.log"))
+    _tool_log_path = globals().get('tool_log', os.path.join(_temp_path, f"mio_kitchen_{time.strftime('%Y%m%d_%H%M%S')}.log")) # Более простое имя файла лога
 
     _re_folder_func = globals().get('re_folder')
     if _re_folder_func and callable(_re_folder_func):
@@ -6086,43 +6194,75 @@ def __init__tk(args: list):
     if not os.path.exists(log_dir):
         try: os.makedirs(log_dir, exist_ok=True)
         except OSError as e: print(f"Warning: Could not create log dir {log_dir}: {e}")
-    if not os.path.exists(_tool_log_path):
-        try: open(_tool_log_path, 'w', encoding="utf-8").close()
-        except IOError as e: print(f"Warning: Could not create log file {_tool_log_path}: {e}")
     
-    logging.basicConfig(level=logging.DEBUG, 
-                        format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
-                        filename=_tool_log_path, filemode='w', encoding='utf-8')
+    # Убедимся, что можем писать в лог-файл
+    try:
+        with open(_tool_log_path, 'a', encoding="utf-8") as f_test_log: # 'a' для добавления, если файл уже есть
+            f_test_log.write(f"--- Log Start [{time.asctime()}] ---\n")
+    except IOError as e: 
+        print(f"Warning: Could not write to log file {_tool_log_path}: {e}. Logging to console.")
+        _tool_log_path = None # Не используем файл, если не можем писать
+
+    logging.basicConfig(
+        level=logging.DEBUG, 
+        format='%(levelname)s:%(asctime)s:%(filename)s:%(lineno)d:%(name)s:%(message)s', # Добавил lineno
+        filename=_tool_log_path if _tool_log_path else None, # None если не можем писать в файл
+        filemode='a' if _tool_log_path else None, # 'a' для добавления к существующему логу
+        encoding='utf-8' if _tool_log_path else None
+    )
+    if not _tool_log_path:
+        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout)) # Дублируем в stdout, если файл не доступен
+
+    logging.info(f"Application MIO-KITCHEN starting with args: {args}")
+    logging.info(f"Python version: {sys.version}")
+    logging.info(f"Platform: {platform.system()} {platform.release()} ({platform.machine()})")
+    logging.info(f"cwd_path: {globals().get('cwd_path', 'Not Set')}")
+    logging.info(f"temp path: {_temp_path}")
+    logging.info(f"Log path: {_tool_log_path if _tool_log_path else 'Console Only'}")
+
 
     # Объявление глобальных переменных, которые будут созданы/использованы
     global win, current_project_name, theme, language, unpackg, project_menu, animation, start, settings
 
     # --- Инициализация Settings ---
-    # settings (глобальный экземпляр SetUtils) должен быть создан до __init__tk
     if 'settings' not in globals() or not isinstance(settings, SetUtils):
-        logging.critical("'settings' object is not initialized or is of wrong type before __init__tk.")
-        # Это фатально, так как настройки нужны для всего остального.
-        # Можно попытаться создать его здесь, но лучше, если он создается глобально раньше.
-        # settings = SetUtils() # Рискованно, если cwd_path и др. не готовы
-        return # Прерываем, если settings не готов
-
-    settings.load_from_file() # Загружаем настройки из файла в объект settings
+        logging.critical("'settings' object is not initialized or is of wrong type. Attempting to create.")
+        # Это должно быть сделано глобально до __init__tk, но как крайняя мера:
+        try:
+            settings = SetUtils() # Предполагает, что SetUtils и cwd_path определены
+        except Exception as e_set_init:
+            logging.critical(f"FATAL: Could not create SetUtils instance: {e_set_init}. Application cannot continue.")
+            return
+    
+    try:
+        settings.load_from_file()
+    except Exception as e_load_set:
+        logging.critical(f"FATAL: Error during settings.load_from_file: {e_load_set}. Application may not work correctly.")
+        # Решите, нужно ли прерывать выполнение
 
     # --- Создание главного окна и Tkinter StringVars ---
-    # Tool, utils, lang (как объект) должны быть доступны
+    if 'Tool' not in globals() or not callable(Tool):
+        logging.critical("FATAL: Main window class 'Tool' is not defined. Application cannot start.")
+        return
     win = Tool() 
-    current_project_name = StringVar(master=win) 
+    
+    # Убедимся, что win - это Tk окно
+    if not isinstance(win, tk.Tk): # или ваш кастомный базовый класс Tk
+        logging.critical("FATAL: 'win' is not a valid Tkinter window. Application cannot start.")
+        return
+
+    # Инициализация StringVars с указанием master=win
+    current_project_name = StringVar(master=win, name="mio_current_project_name") 
     if 'utils' in globals() and hasattr(utils, 'project_name'): utils.project_name = current_project_name 
     else: logging.warning("__init__tk: utils.project_name link failed.")
         
-    theme = StringVar(master=win)
-    language = StringVar(master=win)
-
-    # --- Применение темы ДО OOBE (очень важно для внешнего вида Welcome) ---
-    # sv_ttk, set_title_bar_color должны быть доступны
+    theme = StringVar(master=win, name="mio_theme_var", value=getattr(settings, 'theme', 'dark')) # Устанавливаем начальное значение из settings
+    language = StringVar(master=win, name="mio_language_var", value=getattr(settings, 'language', 'English')) # Устанавливаем начальное значение
+    
+    # --- Применение темы ДО OOBE ---
     if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
         try: 
-            sv_ttk.set_theme(settings.theme) # settings.theme уже загружен
+            sv_ttk.set_theme(settings.theme) 
             logging.info(f"Theme '{settings.theme}' set via sv_ttk before OOBE.")
         except Exception as e: logging.error(f"Error setting sv_ttk theme before OOBE: {e}")
     else: logging.warning("Cannot set theme before OOBE: sv_ttk not available.")
@@ -6134,50 +6274,51 @@ def __init__tk(args: list):
         except Exception as e: logging.warning(f"Could not set Win title bar color before OOBE: {e}")
 
     # --- Начальные окна (OOBE, Updater) и проверки ---
-    # Updater, Welcome, init_verify должны быть доступны
-    if hasattr(settings, 'updating') and settings.updating in ['1', '2']:
-        if 'Updater' in globals() and callable(Updater): Updater() 
-        else: logging.warning("__init__tk: 'Updater' class not available.")
-
-    # Язык для OOBE должен быть загружен в объект lang до Welcome()
-    # settings.apply_loaded_settings_to_gui() делает это, но также и другое.
-    # Вызовем только load_language здесь, если объект lang уже есть.
+    # Загрузка языка для OOBE (статический метод, чтобы не зависеть от полного apply_loaded_settings_to_gui)
     if 'lang' in globals() and globals()['lang'] is not None:
-        SetUtils.load_language(settings.language) # Статический вызов для загрузки строк
+        SetUtils.load_language(settings.language) # settings.language уже из файла
     else:
         logging.error("Cannot load language for OOBE: global 'lang' object not ready.")
 
     if hasattr(settings, 'oobe') and int(settings.oobe) < 5:
-        if 'Welcome' in globals() and callable(Welcome): Welcome()
+        if 'Welcome' in globals() and callable(Welcome): Welcome() # Welcome должен использовать глобальный lang
         else: logging.warning("__init__tk: 'Welcome' class not available.")
+
+    if hasattr(settings, 'updating') and settings.updating in ['1', '2']:
+        if 'Updater' in globals() and callable(Updater): Updater() 
+        else: logging.warning("__init__tk: 'Updater' class not available.")
     
     if 'init_verify' in globals() and callable(init_verify): init_verify() 
     else: logging.warning("__init__tk: 'init_verify' function not available.")
     
     try: 
-        if not win.winfo_exists():
-            logging.error("Main window destroyed before win.gui(). Aborting.")
+        if not win.winfo_exists(): # Проверка после Welcome/Updater
+            logging.error("Main window (win) was destroyed before win.gui() call. Aborting UI setup.")
             return 
     except tk.TclError:
         logging.exception("Main window invalid before win.gui() (TclError). Aborting.")
         return 
         
-    win.gui() # Построение основного GUI (включая win.gif_label)
+    win.gui() # Построение основного GUI (включая win.gif_label, win.tab, win.tab2 и т.д.)
 
     # --- Инициализация анимации (ПОСЛЕ win.gui()) ---
-    # LoadAnim (новая версия), images, open_img, BytesIO должны быть доступны
     if 'LoadAnim' in globals() and callable(LoadAnim):
         animation = LoadAnim() 
         animation.set_master(win) 
         
-        gif_theme = getattr(settings, 'theme', 'dark')
-        gif_attr = f"loading_{gif_theme}_byte"
-        gif_bytes = getattr(images, gif_attr, getattr(images, "loading_dark_byte", None)) if 'images' in globals() else None
+        gif_theme_suffix = getattr(settings, 'theme', 'dark')
+        gif_data_attr = f"loading_{gif_theme_suffix}_byte"
+        _images_module = globals().get('images')
+        _open_img_func = globals().get('open_img')
+        _bytes_io_class = globals().get('BytesIO')
 
-        if gif_bytes and 'open_img' in globals() and 'BytesIO' in globals():
-            try: animation.load_gif(open_img(BytesIO(gif_bytes)))
-            except Exception as e: logging.error(f"Failed to load animation GIF: {e}")
-        elif 'logging' in globals(): logging.debug(f"GIF data for '{gif_attr}' or deps missing.")
+        default_gif_bytes = getattr(_images_module, "loading_dark_byte", None) if _images_module else None
+        gif_bytes_to_load = getattr(_images_module, gif_data_attr, default_gif_bytes) if _images_module else None
+
+        if gif_bytes_to_load and _open_img_func and _bytes_io_class:
+            try: animation.load_gif(_open_img_func(_bytes_io_class(gif_bytes_to_load)))
+            except Exception as e: logging.error(f"Failed to load animation GIF in __init__tk: {e}")
+        elif 'logging' in globals(): logging.debug(f"GIF data for '{gif_data_attr}' or image deps missing.")
     else:
         logging.warning("__init__tk: 'LoadAnim' not available. Animation disabled.")
         animation = None 
@@ -6188,59 +6329,79 @@ def __init__tk(args: list):
     else:
         logging.error("__init__tk: 'settings.apply_loaded_settings_to_gui' not available.")
 
-    # --- Создание и размещение остальных GUI-компонентов ---
-    # ProjectMenuUtils, UnpackGui, Frame3 должны быть доступны
-    if not (hasattr(win, 'tab2') and win.tab2 and win.tab2.winfo_exists()):
-        logging.error("CRITICAL: Parent tab (win.tab2) not found/destroyed. UI for tab2 skipped.")
+    # --- Создание и размещение остальных GUI-компонентов (вкладок и т.д.) ---
+    # Убедимся, что win.tab2 (родительская вкладка для этих компонентов) существует и является Frame
+    if not (hasattr(win, 'tab2') and win.tab2 and isinstance(win.tab2, (tk.Frame, ttk.Frame)) and win.tab2.winfo_exists()):
+        logging.error("CRITICAL: Parent tab (win.tab2) for Project/Unpack/Frame3 not found, not a Frame, or destroyed. UI will be incorrect.")
     else:
-        project_menu_instance = None
+        # ProjectMenuUtils
         if 'ProjectMenuUtils' in globals() and callable(ProjectMenuUtils):
-            project_menu = ProjectMenuUtils() # Используем глобальную переменную project_menu
-            project_menu.gui() 
-        else: logging.error("__init__tk: 'ProjectMenuUtils' not available.")
+            project_menu = ProjectMenuUtils(master=win.tab2) # Явно передаем master
+            if hasattr(project_menu, 'gui'): project_menu.gui() # gui() создает виджеты
+            # Упаковка ProjectMenuUtils (LabelFrame) на win.tab2
+            project_menu.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
+        else: 
+            logging.error("__init__tk: 'ProjectMenuUtils' class not available.")
+            project_menu = None 
 
+        # UnpackGui
         if 'UnpackGui' in globals() and callable(UnpackGui):
-            unpackg = UnpackGui() # Используем глобальную unpackg
-            unpackg.gui() 
-            unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True) 
-        else: logging.error("__init__tk: 'UnpackGui' not available.")
+            unpackg = UnpackGui(master=win.tab2) # Явно передаем master
+            if hasattr(unpackg, 'gui'): unpackg.gui() # gui() создает виджеты
+            # Упаковка UnpackGui (LabelFrame) на win.tab2
+            unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True)
+        else: 
+            logging.error("__init__tk: 'UnpackGui' class not available.")
+            unpackg = None
         
+        # Frame3
         if 'Frame3' in globals() and callable(Frame3):
-            frame3_instance = Frame3()
-            if hasattr(frame3_instance, 'gui'): frame3_instance.gui()
-        else: logging.warning("__init__tk: 'Frame3' not available.")
+            frame3_instance = Frame3(master=win.tab2) # Явно передаем master
+            if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
+                frame3_instance.gui() # gui() создает виджеты
+                # Упаковка Frame3 (LabelFrame) на win.tab2
+                frame3_instance.pack(padx=5, pady=5, fill='x', side=TOP, expand=False)
+        else: 
+            logging.warning("__init__tk: 'Frame3' class not available.")
         
-        if project_menu and hasattr(project_menu, 'listdir'): project_menu.listdir() 
-        elif logging: logging.debug("__init__tk: project_menu.listdir not called.")
+        # Обновление списка проектов
+        if project_menu and hasattr(project_menu, 'listdir') and callable(project_menu.listdir): 
+            project_menu.listdir() 
+        elif logging: 
+             logging.debug("__init__tk: project_menu.listdir not called (project_menu is None or listdir missing).")
 
     # --- PRO-версия и завершение инициализации ---
-    # is_pro, verify, Active, images, lang, move_center, dti, do_override_sv_ttk_fonts,
-    # ask_win, states, exit_tool, ParseCmdline должны быть доступны
-    if 'is_pro' in globals():
-        if not is_pro:
-            lang_text108 = getattr(lang, 'text108', "Non-pro message.") if 'lang' in globals() else "Non-pro message."
-            print(lang_text108)
-        elif 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
-            if 'Active' in globals() and callable(Active) and 'images' in globals() and 'lang' in globals():
-                Active(verify, settings, win, images, lang).gui() 
-            else: logging.error("Cannot init Pro 'Active': missing deps.")
+    _is_pro_flag = globals().get('is_pro', False)
+    _lang_obj = globals().get('lang')
+
+    if not _is_pro_flag:
+        lang_txt108 = getattr(_lang_obj, 'text108', "Non-pro version message.") if _lang_obj else "Non-pro version message."
+        print(lang_txt108)
+    elif _is_pro_flag: # Если is_pro == True
+        _verify_obj = globals().get('verify')
+        if _verify_obj and hasattr(_verify_obj, 'state') and not _verify_obj.state: # Неактивировано
+            _active_class = globals().get('Active')
+            _images_module = globals().get('images')
+            if _active_class and callable(_active_class) and _images_module and _lang_obj:
+                Active(_verify_obj, settings, win, _images_module, _lang_obj).gui() 
+            else: logging.error("Cannot init Pro 'Active': missing deps (Active, images, lang).")
     
     try:
         win.update() 
         if 'move_center' in globals() and callable(move_center): move_center(win) 
-        else: logging.warning("__init__tk: 'move_center' not available.")
+        else: logging.warning("__init__tk: 'move_center' function not available.")
     except tk.TclError as e: logging.error(f"Error win.update/move_center: {e}")
 
-    if hasattr(win, 'get_time'): win.get_time() 
+    if hasattr(win, 'get_time') and callable(win.get_time): win.get_time() 
     
     _start_time_var = globals().get('start')
     _dti_func = globals().get('dti')
     if isinstance(_start_time_var, (int, float)) and callable(_dti_func):
          try:
              el_time = _dti_func() - _start_time_var
-             lang_txt134 = getattr(lang, 'text134', "Startup: {:.2f}s") if 'lang' in globals() else "Startup: {:.2f}s"
-             if "{:.2f}" in lang_txt134 : print(lang_txt134.format(el_time))
-             else: print(f"{lang_txt134} {el_time:.2f}s") # Fallback format
+             lang_txt134 = getattr(_lang_obj, 'text134', "Startup took: {:.2f} seconds") if _lang_obj else "Startup took: {:.2f} seconds"
+             if isinstance(lang_txt134, str) and "{:.2f}" in lang_txt134 : print(lang_txt134.format(el_time))
+             else: print(f"{lang_txt134} {el_time:.2f}s") 
          except Exception as e: logging.error(f"Error printing startup time: {e}")
     elif 'logging' in globals(): logging.debug("__init__tk: Startup time vars missing.")
 
@@ -6249,22 +6410,25 @@ def __init__tk(args: list):
             do_override_sv_ttk_fonts()
         if hasattr(sys, 'getwindowsversion') and callable(sys.getwindowsversion):
             if sys.getwindowsversion().major <= 6:
-                lang_w20 = getattr(lang, 'warn20', "Old Windows warning.") if 'lang' in globals() else "Old Windows warning."
+                lang_w20 = getattr(_lang_obj, 'warn20', "Warning for older Windows.") if _lang_obj else "Warning for older Windows."
                 if 'ask_win' in globals() and callable(ask_win): ask_win(lang_w20)
                 elif 'logging' in globals(): logging.debug("ask_win for old Win warning missing.")
         elif 'logging' in globals(): logging.debug("sys.getwindowsversion missing.")
             
-    if 'states' in globals() and hasattr(states, 'inited'): states.inited = True 
+    _states_obj = globals().get('states')
+    if _states_obj and hasattr(_states_obj, 'inited'): _states_obj.inited = True 
     else: logging.warning("__init__tk: 'states.inited' missing.")
 
-    if 'exit_tool' in globals() and callable(exit_tool):
-        try: win.protocol("WM_DELETE_WINDOW", exit_tool) 
+    _exit_tool_func = globals().get('exit_tool')
+    if _exit_tool_func and callable(_exit_tool_func):
+        try: win.protocol("WM_DELETE_WINDOW", _exit_tool_func) 
         except tk.TclError as e: logging.error(f"Error WM_DELETE_WINDOW: {e}")
-    else: logging.warning("__init__tk: 'exit_tool' missing.")
+    else: logging.warning("__init__tk: 'exit_tool' function missing.")
     
-    if len(args) > 1 and ('is_pro' not in globals() or globals().get('is_pro', False)):
-        if 'ParseCmdline' in globals() and callable(ParseCmdline):
-             win.after(100, lambda: ParseCmdline(args[1:])) # Задержка для GUI
+    if len(args) > 1 and _is_pro_flag : # Только для PRO и если есть аргументы
+        _parse_cmd_class = globals().get('ParseCmdline')
+        if _parse_cmd_class and callable(_parse_cmd_class):
+             win.after(200, lambda: _parse_cmd_class(args[1:])) # Увеличил задержку
         elif 'logging' in globals(): logging.debug("ParseCmdline missing.")
              
     win.mainloop()
