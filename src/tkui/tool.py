@@ -3939,81 +3939,52 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "") -> str | None:
-    """
-    Displays a modal dialog prompting the user for text input.
-
-    The dialog includes a text entry field, an "OK" button, and a "Cancel" button.
-    It becomes transient to the main application window and grabs focus.
-    The dialog waits for user interaction before returning.
-
-    Args:
-        title (str, optional): The title for the dialog window. 
-                               If None, a default title is fetched via localization 
-                               (key 'text76') or a hardcoded default ("Input") is used.
-        text (str, optional): The initial text to display in the entry field. 
-                              Defaults to an empty string.
-
-    Returns:
-        str | None: 
-            - The text entered by the user if "OK" is pressed. This can be an
-              empty string if the user clicks "OK" with an empty field.
-            - None if the user presses "Cancel" or closes the dialog window
-              using the window manager's close button.
-    """
-    # Determine dialog title using localization or default
+def input_(title: str = None, text: str = "") -> str: # Тип возвращаемого значения изменен для ясности, но может быть и Optional[str]
     if not title:
-        title_text_key = 'text76' 
+        title_text_key = 'text76' # Используем ключ, если есть
         default_title_text = "Input"
         title_text = getattr(lang, title_text_key, default_title_text)
-        # Ensure title_text is a valid string, falling back to default if necessary
-        if not isinstance(title_text, str) or title_text == "None": # "None" as a string from JSON
+        if not isinstance(title_text, str) or title_text == "None":
             title_text = default_title_text
     else:
         title_text = title
 
-    parent_window = win # Assumes 'win' is the main application Tk instance
+    parent_window = win 
 
     dialog = Toplevel() 
     dialog.title(title_text)
 
-    # Make the dialog transient to the parent window for correct window manager behavior
-    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+    if parent_window and parent_window.winfo_exists():
         dialog.transient(parent_window)
 
     input_var = StringVar(master=dialog)
     input_var.set(text)
 
-    # Use a dictionary to hold the return value, allowing modification within callbacks.
-    # Initialize to None, which will be returned if the dialog is cancelled.
+    # ИЗМЕНЕНИЕ: result_container["value"] изначально None
     result_container = {"value": None} 
 
-    # Main content frame
     frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=15, pady=10)
 
-    # Dialog prompt label (using the same text as the title for consistency here)
     ttk.Label(frame_inner, text=title_text, font=(None, 12)).pack(side=TOP, pady=(0, 10))
 
-    # Text entry field
     entry = ttk.Entry(frame_inner, textvariable=input_var, font=(None, 10))
-    entry.pack(pady=5, padx=5, fill=X, ipady=4) # ipady for some vertical padding inside entry
+    entry.pack(pady=5, padx=5, fill=X, ipady=4)
 
-    # Frame for buttons
     button_frame = ttk.Frame(frame_inner)
     button_frame.pack(fill=X, pady=(10, 0), side=BOTTOM)
 
     def on_ok(event=None):
-        # OK pressed: store the current value from the entry field.
-        # This will be an empty string if the field is empty.
+        # При ОК, мы берем значение из поля ввода.
+        # Если поле пустое, input_var.get() вернет "" (пустую строку).
         result_container["value"] = input_var.get() 
         dialog.destroy()
 
     def on_cancel(event=None):
-        # Cancel pressed or window closed: result_container["value"] remains None.
+        # При Отмене, result_container["value"] остается None (как было инициализировано)
+        # или можно явно: result_container["value"] = None
         dialog.destroy()
 
-    # Localize button texts
     ok_button_text_key = 'ok'
     default_ok_text = "OK"
     ok_button_text = getattr(lang, ok_button_text_key, default_ok_text)
@@ -4026,28 +3997,22 @@ def input_(title: str = None, text: str = "") -> str | None:
     if not isinstance(cancel_button_text, str) or cancel_button_text == "None":
         cancel_button_text = default_cancel_text
         
-    # Create and pack buttons
     ok_button = ttk.Button(button_frame, text=ok_button_text, command=on_ok, style="Accent.TButton")
     ok_button.pack(side=LEFT, padx=(0, 5), expand=True, fill=X)
 
     cancel_button = ttk.Button(button_frame, text=cancel_button_text, command=on_cancel)
     cancel_button.pack(side=LEFT, padx=(5, 0), expand=True, fill=X)
 
-    # Bindings for Enter (OK) and Escape (Cancel) keys
     entry.bind("<Return>", on_ok)
     dialog.bind("<Escape>", on_cancel)
-    # Handle window close button (e.g., 'x') as a cancel action
-    dialog.protocol("WM_DELETE_WINDOW", on_cancel) 
+    dialog.protocol("WM_DELETE_WINDOW", on_cancel) # Обработка закрытия окна крестиком как отмена
 
-    move_center(dialog) # Center the dialog on the screen
-    
-    # Delay focus_set to ensure the window is ready, crucial on some Linux WMs
+    move_center(dialog)    
     dialog.after(10, lambda: entry.focus_set()) 
-    
-    dialog.grab_set() # Make the dialog modal, grabbing all input
-    dialog.wait_window() # Wait for the dialog to be destroyed before continuing
+    dialog.grab_set()
+    dialog.wait_window()
 
-    return result_container["value"]
+    return result_container["value"] # Вернет None при отмене, "" при ОК с пустым полем, или "текст"
 
 
 def script2fs(path):
@@ -4462,77 +4427,34 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text: str = '', ok: str = None, cancel: str = None, wait: bool = True, is_top: bool = False) -> int:
-    """
-    Displays a modal confirmation dialog with "OK" and "Cancel" buttons.
-
-    The dialog presents a message to the user and waits for their response.
-    It becomes transient to the main application window and grabs focus.
-    The 'is_top' argument is considered deprecated and has no effect.
-
-    Args:
-        text (str, optional): The message text to display in the dialog.
-        ok (str, optional): Custom text for the "OK" button. If None,
-                            uses a localized string for "OK" or a default "OK".
-        cancel (str, optional): Custom text for the "Cancel" button. If None,
-                                uses a localized string for "Cancel" or a default "Cancel".
-        wait (bool, optional): If True (default), the function will block until the
-                               dialog is closed. If False, the dialog is displayed,
-                               but the function returns immediately (not typical for this kind of dialog).
-        is_top (bool, optional): Deprecated. This argument is no longer used.
-
-    Returns:
-        int: 1 if the "OK" button is pressed, 0 if the "Cancel" button is pressed
-             or the dialog is closed via the window manager.
-    """
-    # Determine "OK" button text using provided argument, localization, or default
+def ask_win(text: str = '', ok: str = None, cancel: str = None, wait: bool = True, is_top: bool = False) -> int: # is_top is deprecated
     if ok is None:
-        ok_button_text_key = 'ok'
-        default_ok_text = "OK"
-        ok_text = getattr(lang, ok_button_text_key, default_ok_text)
-        if not isinstance(ok_text, str) or ok_text == "None":
-            ok_text = default_ok_text
+        ok_text = lang.ok if hasattr(lang, 'ok') else "OK"
     else:
         ok_text = ok
         
-    # Determine "Cancel" button text
     if cancel is None:
-        cancel_button_text_key = 'cancel'
-        default_cancel_text = "Cancel"
-        cancel_text = getattr(lang, cancel_button_text_key, default_cancel_text)
-        if not isinstance(cancel_text, str) or cancel_text == "None":
-            cancel_text = default_cancel_text
+        cancel_text = lang.cancel if hasattr(lang, 'cancel') else "Cancel"
     else:
         cancel_text = cancel
 
-    parent_window = win # Assumes 'win' is the main application Tk instance
+    parent_window = win
 
-    dialog = Toplevel() # Assumes Toplevel is your custom or standard Toplevel
-
-    # Determine dialog title
-    dialog_title_key = 'confirm_title'
-    default_dialog_title = "Confirm"
-    dialog_title = getattr(lang, dialog_title_key, default_dialog_title)
-    if not isinstance(dialog_title, str) or dialog_title == "None":
-        dialog_title = default_dialog_title
-    dialog.title(dialog_title)
+    dialog = Toplevel()
+    dialog.title(lang.confirm_title if hasattr(lang, 'confirm_title') else "Confirm")
     
-    # Make the dialog transient to the parent window
-    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+    if parent_window and parent_window.winfo_exists():
         dialog.transient(parent_window)
     
-    # dialog.resizable(False, False) # Optionally, prevent resizing
+    # dialog.resizable(False, False) # Опционально
 
-    result_var = IntVar(master=dialog, value=0) # Initialize to 0 (Cancel)
+    result_var = IntVar(master=dialog) 
 
-    # Main content frame
     frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
 
-    # Display the message text
     ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 15))
 
-    # Frame for buttons
     button_frame = ttk.Frame(frame_inner)
     button_frame.pack(fill=X, pady=(10,0), side=BOTTOM)
 
@@ -4541,108 +4463,72 @@ def ask_win(text: str = '', ok: str = None, cancel: str = None, wait: bool = Tru
         dialog.destroy()
 
     def on_cancel(event=None):
-        # result_var remains 0 (default or explicitly set if needed)
+        result_var.set(0)
         dialog.destroy()
 
-    # Create and pack buttons
     ok_button = ttk.Button(button_frame, text=ok_text, command=on_ok, style="Accent.TButton")
     ok_button.pack(side=LEFT, padx=(0,5), expand=True, fill=X) 
     
     cancel_button = ttk.Button(button_frame, text=cancel_text, command=on_cancel)
     cancel_button.pack(side=LEFT, padx=(5,0), expand=True, fill=X)
     
-    # Bindings for Enter (OK) and Escape (Cancel) keys
     dialog.bind("<Return>", on_ok) 
     dialog.bind("<Escape>", on_cancel)
-    # Handle window close button (e.g., 'x') as a cancel action
-    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
 
-    move_center(dialog) # Center the dialog
+    # dialog.update_idletasks()
+    move_center(dialog)
     
-    # Delay focus_set to ensure the window is ready, focusing the "OK" button
-    dialog.after(10, lambda: ok_button.focus_set())
+    dialog.after(10, lambda: ok_button.focus_set()) # Фокус на кнопку OK
 
-    dialog.grab_set() # Make the dialog modal
+    dialog.grab_set()
     
     if wait:
-        dialog.wait_window() # Block until the dialog is destroyed
+        dialog.wait_window()
         
     return result_var.get()
 
 def info_win(text: str, ok: str = None, title: str = None):
-    """
-    Displays a modal information dialog with a single "OK" button.
-
-    The dialog presents a message and waits for the user to acknowledge it
-    by pressing "OK" or closing the window. It becomes transient to the
-    main application window and grabs focus.
-
-    Args:
-        text (str): The informational message text to display.
-        ok (str, optional): Custom text for the "OK" button. If None,
-                            uses a localized string or a default "OK".
-        title (str, optional): Custom title for the dialog window. If None,
-                               uses a localized string or a default "Information".
-    """
-    # Determine "OK" button text
     if ok is None:
-        ok_button_text_key = 'ok'
-        default_ok_text = "OK"
-        ok_text = getattr(lang, ok_button_text_key, default_ok_text)
-        if not isinstance(ok_text, str) or ok_text == "None":
-            ok_text = default_ok_text
+        ok_text = lang.ok if hasattr(lang, 'ok') else "OK"
     else:
         ok_text = ok
         
-    # Determine dialog title
     if title is None:
-        dialog_title_key = 'info_title'
-        default_dialog_title = "Information"
-        title_text = getattr(lang, dialog_title_key, default_dialog_title)
-        if not isinstance(title_text, str) or title_text == "None":
-            title_text = default_dialog_title
+        title_text = lang.info_title if hasattr(lang, 'info_title') else "Information"
     else:
         title_text = title
 
-    parent_window = win # Assumes 'win' is the main application Tk instance
+    parent_window = win
 
-    dialog = Toplevel() # Assumes Toplevel is your custom or standard Toplevel
+    dialog = Toplevel()
     dialog.title(title_text)
     
-    # Make the dialog transient to the parent window
-    if parent_window and hasattr(parent_window, 'winfo_exists') and parent_window.winfo_exists():
+    if parent_window and parent_window.winfo_exists():
         dialog.transient(parent_window)
         
-    # dialog.resizable(False, False) # Optionally, prevent resizing
+    # dialog.resizable(False, False) # Опционально
 
-    # Main content frame
     frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
 
-    # Display the message text
     ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 20))
 
-    # Frame for the button
     button_frame = ttk.Frame(frame_inner) 
     button_frame.pack(fill=X, pady=(0,5), side=BOTTOM)
 
-    # Create and pack the "OK" button
     ok_button = ttk.Button(button_frame, text=ok_text, command=dialog.destroy, style="Accent.TButton")
-    ok_button.pack(ipadx=10) # ipadx for some internal padding
+    ok_button.pack(ipadx=10) 
     
-    # Bindings for Enter and Escape keys to close the dialog
     dialog.bind("<Return>", lambda event: dialog.destroy())
     dialog.bind("<Escape>", lambda event: dialog.destroy())
-    # Handle window close button (e.g., 'x')
-    dialog.protocol("WM_DELETE_WINDOW", dialog.destroy)
 
-    move_center(dialog) # Center the dialog
+    # dialog.update_idletasks()
+    move_center(dialog)
     
-    # Delay focus_set to ensure the window is ready, focusing the "OK" button
-    dialog.after(10, lambda: ok_button.focus_set())
+    dialog.after(10, lambda: ok_button.focus_set()) # Фокус на кнопку OK
 
-    dialog.grab_set() # Make the dialog modal
-    dialog.wait_window() # Block until the dialog is destroyed
+    dialog.grab_set()
+    dialog.wait_window()
 
 
 class GetFolderSize:
