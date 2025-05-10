@@ -5500,62 +5500,184 @@ class ParseCmdline:
 
 
 def __init__tk(args: list):
-    if not os.path.exists(temp):
-        re_folder(temp, quiet=True)
-    if not os.path.exists(tool_log):
-        open(tool_log, 'w', encoding="utf-8", newline="\n").close()
-    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
-                        filename=tool_log, filemode='w')
-    global win
-    win = Tool()
-    if os.name == 'nt':
-        set_title_bar_color(win)
-    animation.set_master(win)
-    global current_project_name, theme, language
-    current_project_name = utils.project_name = StringVar()
+    # Setup temporary folder and logging path
+    if not os.path.exists(temp): # 'temp' should be a global variable like os.path.join(cwd_path, "bin", "temp")
+        re_folder(temp, quiet=True) # 're_folder' should be defined
+    
+    # 'tool_log' should be a global variable like f'{temp}/{...}.log'
+    if not os.path.exists(os.path.dirname(tool_log)): # Ensure log directory exists
+        try:
+            os.makedirs(os.path.dirname(tool_log), exist_ok=True)
+        except OSError as e:
+            print(f"Warning: Could not create log directory {os.path.dirname(tool_log)}: {e}")
+            # Fallback log path if creation fails (e.g., in user's home directory)
+            # This is a simplified fallback; robust fallback might be needed.
+            home_dir = os.path.expanduser("~")
+            fallback_log_path = os.path.join(home_dir, os.path.basename(tool_log))
+            print(f"Logging to fallback path: {fallback_log_path}")
+            # Update tool_log to the fallback path if you want logging to still work
+            # For now, just warn and proceed; logging.basicConfig might fail or use default.
+
+
+    if not os.path.exists(tool_log): # Check if the log file itself needs to be created (e.g. if it's a file path)
+        try:
+            open(tool_log, 'w', encoding="utf-8", newline="\n").close()
+        except IOError as e:
+            print(f"Warning: Could not create log file {tool_log}: {e}")
+
+
+    # Configure logging
+    # Ensure tool_log is a valid file path for logging.
+    try:
+        logging.basicConfig(level=logging.DEBUG, 
+                            format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
+                            filename=tool_log, 
+                            filemode='w', # Overwrite log on each run
+                            encoding='utf-8') # Added encoding for Py 3.9+
+    except Exception as e_logging:
+        print(f"Error configuring logging to {tool_log}: {e_logging}. Logging to stderr might occur.")
+        logging.basicConfig(level=logging.DEBUG, 
+                            format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
+
+
+    # Global Tkinter instances and variables
+    global win, current_project_name, theme, language, unpackg, project_menu, animation, start
+
+    win = Tool() # Create the main application window instance
+
+    # Windows-specific title bar color
+    if os.name == 'nt' and 'set_title_bar_color' in globals() and callable(globals()['set_title_bar_color']):
+        set_title_bar_color(win) # Assumes settings.theme is already accessible or default
+
+    animation.set_master(win) # 'animation' should be a pre-initialized LoadAnim instance
+
+    # Initialize Tkinter StringVars for global state AFTER 'win' is created
+    # (though not strictly necessary for StringVar itself, good practice if they were to use 'win' as master)
+    current_project_name = StringVar() 
+    utils.project_name = current_project_name # Link to utils if needed there
     theme = StringVar()
     language = StringVar()
-    settings.load()
-    if settings.updating in ['1', '2']:
-        Updater()
-    if int(settings.oobe) < 5:
-        Welcome()
-    init_verify()
-    try:
-        win.winfo_exists()
-    except TclError:
-        logging.exception('TclError')
-        return
-    win.gui()
-    global unpackg
-    unpackg = UnpackGui()
-    global project_menu
-    project_menu = ProjectMenuUtils()
-    project_menu.gui()
-    project_menu.listdir()
-    unpackg.gui()
-    Frame3().gui()
-    animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
-    animation.init()
-    if not is_pro:
-        print(lang.text108)
-    if is_pro:
-        if not verify.state:
-            Active(verify, settings, win, images, lang).gui()
-    win.update()
 
-    move_center(win)
-    win.get_time()
-    print(lang.text134 % (dti() - start))
+    # Load application settings (this might trigger traces on current_project_name)
+    # 'settings' should be a pre-initialized SetUtils instance (e.g., settings = SetUtils(load=False))
+    settings.load() 
+
+    # Handle updates or OOBE (Out-Of-Box Experience)
+    if settings.updating in ['1', '2']:
+        Updater() # Updater class should handle its own Toplevel creation
+    
+    if int(settings.oobe) < 5: # Check if OOBE is completed
+        Welcome() # Welcome class should handle its own Toplevel/Frame creation
+
+    init_verify() # Perform initial verification checks
+
+    try:
+        win.winfo_exists() # Check if the main window is valid
+    except TclError as e_winfo:
+        logging.exception(f"Main window (win) does not exist or is invalid before win.gui(): {e_winfo}")
+        return # Cannot proceed if main window is broken
+
+    # Initialize the main GUI components of the 'Tool' window
+    win.gui()
+
+    # Initialize GUI components that are part of the main window's tabs
+    # IMPORTANT: Initialize UnpackGui and its GUI *before* ProjectMenuUtils,
+    # as ProjectMenuUtils.listdir() might change current_project_name,
+    # triggering UnpackGui._on_project_change which needs UnpackGui.fm to be ready.
+    
+    unpackg = UnpackGui() # Create instance
+    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
+         unpackg.master = win.tab2 # Explicitly set master if not done in UnpackGui or if needed
+         unpackg.gui() # Create widgets within UnpackGui (including .fm)
+    else:
+        logging.error("Parent tab for UnpackGui (win.tab2) not found or invalid.")
+
+
+    project_menu = ProjectMenuUtils() # Create instance
+    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
+        project_menu.master = win.tab2 # Explicitly set master
+        project_menu.gui() # Create widgets
+        project_menu.listdir() # This might change current_project_name
+    else:
+        logging.error("Parent tab for ProjectMenuUtils (win.tab2) not found or invalid.")
+
+    # Other tab content initialization
+    if win.tab2 and win.tab2.winfo_exists(): # Ensure parent tab (win.tab2) exists
+        frame3_instance = Frame3() # Create instance
+        frame3_instance.master = win.tab2 # Explicitly set master
+        # If Frame3 has a .gui() method, call it. Otherwise, it might pack itself in __init__.
+        if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
+            frame3_instance.gui()
+        # If Frame3 packs itself in __init__, ensure master is passed correctly there.
+    else:
+        logging.error("Parent tab for Frame3 (win.tab2) not found or invalid.")
+
+
+    # Load and initialize animation GIF
+    # Ensure win.list2 (theme combobox) exists and has a value before getattr
+    # A default loading image should be available if theme/images module is problematic
+    loading_gif_theme_suffix = "dark" # Default if win.list2 is not ready
+    if hasattr(win, 'list2') and hasattr(win.list2, 'get') and win.list2.get():
+        loading_gif_theme_suffix = win.list2.get()
+    
+    loading_gif_data = None
+    if hasattr(images, f"loading_{loading_gif_theme_suffix}_byte"):
+        loading_gif_data = getattr(images, f"loading_{loading_gif_theme_suffix}_byte")
+    elif hasattr(images, "loading_dark_byte"): # Fallback to dark
+        loading_gif_data = images.loading_dark_byte
+    
+    if loading_gif_data:
+        try:
+            animation.load_gif(open_img(BytesIO(loading_gif_data)))
+            animation.init() # Start and stop to pre-load frames
+        except Exception as e_gif:
+            logging.error(f"Failed to load/init animation GIF: {e_gif}")
+    else:
+        logging.warning("Loading GIF data not found.")
+
+    # Final UI messages and setup
+    if not is_pro: # is_pro should be a global boolean
+        if hasattr(lang, 'text108'): print(lang.text108)
+
+    if is_pro:
+        if 'verify' in globals() and hasattr(verify, 'state') and not verify.state:
+            # Active class should handle its own Toplevel creation
+            Active(verify, settings, win, images, lang).gui() 
+
+    win.update() # Ensure window is fully drawn and sized
+    move_center(win) # Center the main window
+    win.get_time() # Start the clock update
+
+    # Log startup time - 'start' should be a global dti() call from before __init__tk
+    if 'start' in globals():
+         startup_time_message_key = 'text134'
+         default_startup_time_message = "Startup took: {:.2f} seconds" # Use {:.2f} for better formatting
+         startup_time_message_format = getattr(lang, startup_time_message_key, default_startup_time_message)
+         if not isinstance(startup_time_message_format, str) or startup_time_message_format == "None":
+             startup_time_message_format = default_startup_time_message
+         try:
+            print(startup_time_message_format.format(dti() - start))
+         except TypeError: # If format string expects %s but gets float
+            print(f"Startup took: {dti() - start:.2f} seconds (fallback format)")
+
+
+    # Windows-specific font and OS version checks
     if os.name == 'nt':
-        do_override_sv_ttk_fonts()
-        if sys.getwindowsversion().major <= 6:
-            ask_win(lang.warn20)
-    states.inited = True
-    win.protocol("WM_DELETE_WINDOW", exit_tool)
-    if len(args) > 1 and is_pro:
-        win.after(1000, ParseCmdline, args[1:])
-    win.mainloop()
+        if 'do_override_sv_ttk_fonts' in globals() and callable(globals()['do_override_sv_ttk_fonts']):
+            do_override_sv_ttk_fonts()
+        if sys.getwindowsversion().major <= 6: # Windows 7 or older
+            if hasattr(lang, 'warn20') and 'ask_win' in globals() and callable(globals()['ask_win']):
+                ask_win(lang.warn20)
+
+    states.inited = True # 'states' should be a global States instance
+    win.protocol("WM_DELETE_WINDOW", exit_tool) # 'exit_tool' should be defined
+
+    # Command-line argument parsing after GUI is ready
+    if len(args) > 1 and is_pro : # Check is_pro if ParseCmdline is a pro feature
+        # Delay parsing slightly to ensure GUI is fully responsive
+        win.after(100, lambda: ParseCmdline(args[1:])) # ParseCmdline class
+
+    win.mainloop() # Start the Tkinter event loop
 
 
 # Cool Init
