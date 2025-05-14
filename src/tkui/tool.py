@@ -13,6 +13,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#!/usr/bin/env python3
+# pylint: disable=line-too-long, missing-class-docstring, missing-function-docstring
+# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
+#
+# Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import sys
 import os
 import traceback
@@ -642,21 +657,36 @@ class ToolBox(ttk.Frame):
 
     def gui(self):
         self.pack_basic()
+
+        # Получаем тексты для кнопок с фоллбэками
+        # Для lang.text114, lang.t59 и т.д. предполагается, что они всегда корректны,
+        # но можно добавить аналогичные проверки при необходимости.
+
+        merge_qualcomm_text_key = 'mergequalcommimage'
+        merge_qualcomm_default_text = "Merge Qualcomm Image"
+        merge_qualcomm_text = getattr(lang, merge_qualcomm_text_key, merge_qualcomm_default_text)
+        if not isinstance(merge_qualcomm_text, str) or \
+           merge_qualcomm_text.strip().lower() == "none" or \
+           not merge_qualcomm_text.strip():
+            merge_qualcomm_text = merge_qualcomm_default_text
+            if 'logging' in globals(): logging.warning(f"Fallback for lang.{merge_qualcomm_text_key}, used default: '{merge_qualcomm_default_text}'")
+
+
         functions = [
-            (lang.text114, lambda: create_thread(download_file)),
-            (lang.t59, self.GetFileInfo),
-            (lang.t60, self.FileBytes),
-            (lang.audit_allow, self.SelinuxAuditAllow),
-            (lang.trim_image, self.TrimImage),
-            (lang.magisk_patch, self.MagiskPatcher),
-            (lang.mergequalcommimage, self.MergeQualcommImage_old)
+            (getattr(lang, 'text114', "Download File (fallback)"), lambda: create_thread(download_file)),
+            (getattr(lang, 't59', "Get File Info (fallback)"), self.GetFileInfo),
+            (getattr(lang, 't60', "Byte Calculator (fallback)"), self.FileBytes),
+            (getattr(lang, 'audit_allow', "Selinux Audit Allow (fallback)"), self.SelinuxAuditAllow),
+            (getattr(lang, 'trim_image', "Trim Image (fallback)"), self.TrimImage),
+            (getattr(lang, 'magisk_patch', "Magisk Patcher (fallback)"), self.MagiskPatcher),
+            (merge_qualcomm_text, self.MergeQualcommImage_old) # Используем полученный и проверенный текст
         ]
         width_controls = 3
-        #
         index_row = 0
         index_column = 0
         for text, func in functions:
-            ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row, column=index_column,
+            button_display_text = str(text) # Текст уже должен быть валидной строкой после проверок выше
+            ttk.Button(self.label_frame, text=button_display_text, command=func, width=17).grid(row=index_row, column=index_column,
                                                                                  padx=5, pady=5)
             index_column = (index_column + 1) % width_controls
             if not index_column:
@@ -667,42 +697,153 @@ class ToolBox(ttk.Frame):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
-    class MergeQualcommImage_old(Toplevel):
+    class MergeQualcommImage_old(Toplevel): # Toplevel должен быть импортирован или определен
         def __init__(self):
             super().__init__()
-            self.title(lang.mergequalcommimage)
+            
+            window_title_key = 'mergequalcommimage'
+            window_title_default = "Merge Qualcomm Image"
+            window_title = getattr(lang, window_title_key, window_title_default)
+            if not isinstance(window_title, str) or \
+               window_title.strip().lower() == "none" or \
+               not window_title.strip():
+                window_title = window_title_default
+                if 'logging' in globals(): logging.warning(f"Fallback for Toplevel title lang.{window_title_key}, used default: '{window_title_default}'")
+
+            self.title(window_title)
             self.rawprogram_xml = StringVar()
             self.partition_name = StringVar()
             self.output_path = StringVar()
             self.gui()
-            move_center(self)
+            if 'move_center' in globals() and callable(globals()['move_center']):
+                move_center(self)
+            else:
+                if 'logging' in globals(): logging.warning("MergeQualcommImage_old: move_center not available.")
+
 
         def gui(self):
-            ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
-            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
-            ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
-            ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+            # Получаем тексты для меток и кнопки с фоллбэками
+            # ccontrols должен быть доступен (экземпляр CustomControls)
+            if 'ccontrols' not in globals():
+                if 'logging' in globals(): logging.error("MergeQualcommImage_old.gui: 'ccontrols' not found.")
+                # Можно создать временный, если CustomControls определен, но это не исправит зависимость
+                # Для демонстрации, предполагаем, что ccontrols доступен.
+
+            rawprogram_xml_label_key = 'rawprogram_xml_label'
+            rawprogram_xml_default_label = "RawProgram XML:"
+            rawprogram_xml_label_text = getattr(lang, rawprogram_xml_label_key, rawprogram_xml_default_label)
+            if not isinstance(rawprogram_xml_label_text, str) or \
+               rawprogram_xml_label_text.strip().lower() == "none" or \
+               not rawprogram_xml_label_text.strip():
+                rawprogram_xml_label_text = rawprogram_xml_default_label
+                if 'logging' in globals(): logging.warning(f"Fallback for lang.{rawprogram_xml_label_key}, used default: '{rawprogram_xml_default_label}'")
+
+            partition_name_label_key = 'partition_name'
+            partition_name_default_label = "Partition Name:"
+            partition_name_label_text = getattr(lang, partition_name_label_key, partition_name_default_label)
+            if not isinstance(partition_name_label_text, str) or \
+               partition_name_label_text.strip().lower() == "none" or \
+               not partition_name_label_text.strip():
+                partition_name_label_text = partition_name_default_label
+                if 'logging' in globals(): logging.warning(f"Fallback for lang.{partition_name_label_key}, used default: '{partition_name_default_label}'")
+
+            output_path_label_key = 'output_path'
+            output_path_default_label = "Output Path:"
+            output_path_label_text = getattr(lang, output_path_label_key, output_path_default_label)
+            if not isinstance(output_path_label_text, str) or \
+               output_path_label_text.strip().lower() == "none" or \
+               not output_path_label_text.strip():
+                output_path_label_text = output_path_default_label
+                if 'logging' in globals(): logging.warning(f"Fallback for lang.{output_path_label_key}, used default: '{output_path_default_label}'")
+                
+            run_button_key = 'run'
+            run_button_default_text = "Run"
+            run_button_text = getattr(lang, run_button_key, run_button_default_text)
+            if not isinstance(run_button_text, str) or \
+               run_button_text.strip().lower() == "none" or \
+               not run_button_text.strip():
+                run_button_text = run_button_default_text
+                if 'logging' in globals(): logging.warning(f"Fallback for lang.{run_button_key}, used default: '{run_button_default_text}'")
+
+            ccontrols.filechose(self, self.rawprogram_xml, rawprogram_xml_label_text)
+            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), partition_name_label_text)
+            ccontrols.filechose(self, self.output_path, output_path_label_text, is_folder=True)
+            ttk.Button(self, text=run_button_text, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
             rawprogram_xml = self.rawprogram_xml.get()
             if not os.path.exists(rawprogram_xml):
-                print(f'Raw Program not exist!{rawprogram_xml}')
-                return 1
+                # Используем logging для ошибок, которые видит разработчик,
+                # и print/messagebox для пользователя
+                logging.error(f'Raw Program not exist! Path: {rawprogram_xml}')
+                user_msg_key = 'rawprogram_not_exist_error' # Ключ для локализации
+                user_msg_default = "Error: RawProgram XML file not found at specified path."
+                user_msg = getattr(lang, user_msg_key, user_msg_default)
+                if hasattr(win, 'message_pop') and callable(win.message_pop): # Предполагаем, что win - главное окно
+                    win.message_pop(user_msg, color='red', title="File Error")
+                elif 'tkinter.messagebox' in sys.modules:
+                     tkinter.messagebox.showerror("File Error", user_msg)
+                else: print(user_msg) # Фоллбэк на консоль
+                return 1 # Возвращаем код ошибки
+
             partition_name = self.partition_name.get()
             output_path = self.output_path.get()
+
             if not output_path:
-                print('Please Choose OutPut Path.')
-                return 1
+                logging.warning('Output path not selected for MergeQualcommImage.')
+                user_msg_key = 'output_path_empty_error'
+                user_msg_default = "Please choose an output path."
+                user_msg = getattr(lang, user_msg_key, user_msg_default)
+                if hasattr(win, 'message_pop') and callable(win.message_pop):
+                    win.message_pop(user_msg, color='orange', title="Input Required")
+                elif 'tkinter.messagebox' in sys.modules:
+                     tkinter.messagebox.showwarning("Input Required", user_msg)
+                else: print(user_msg)
+                return 1 # Возвращаем код ошибки
+
             if not os.path.exists(output_path):
-                os.makedirs(output_path, exist_ok=True)
-            self.destroy()
+                try:
+                    os.makedirs(output_path, exist_ok=True)
+                except OSError as e:
+                    logging.error(f"Failed to create output directory {output_path}: {e}")
+                    user_msg_key = 'create_output_dir_failed_error'
+                    user_msg_default = f"Error: Could not create output directory:\n{output_path}\n\nDetails: {e}"
+                    user_msg = getattr(lang, user_msg_key, user_msg_default)
+                    if hasattr(win, 'message_pop') and callable(win.message_pop):
+                        win.message_pop(user_msg, color='red', title="Directory Error")
+                    elif 'tkinter.messagebox' in sys.modules:
+                         tkinter.messagebox.showerror("Directory Error", user_msg)
+                    else: print(user_msg)
+                    return 1 # Код ошибки
+            
+            self.destroy() # Закрываем окно настроек перед длительной операцией
+            
             try:
-                process_by_xml(rawprogram_xml, partition_name, output_path)
-                return None
-            except (Exception, BaseException) as e:
-                print('Merge Fail!')
-                logging.exception('MergeQC RAWPROGRAM')
-                return None
+                # process_by_xml должен быть доступен
+                if 'process_by_xml' in globals() and callable(globals()['process_by_xml']):
+                     process_by_xml(rawprogram_xml, partition_name, output_path)
+                     # Сообщение об успехе, если нужно
+                else:
+                    logging.error("MergeQualcommImage_old.run: 'process_by_xml' function not found.")
+                    # Сообщить пользователю, если это критично
+                return None 
+            except Exception as e: # Ловим конкретные исключения, если это возможно
+                logging.exception('MergeQC RAWPROGRAM process_by_xml failed')
+                user_msg_key = 'merge_qc_failed_error'
+                user_msg_default = f"Merge Fail!\nAn error occurred during processing.\n\nDetails: {e}"
+                user_msg_details = getattr(lang, user_msg_key, user_msg_default) # В lang можно передать {error_details}
+                
+                # Для пользователя лучше не показывать полный traceback, а общее сообщение + лог
+                user_msg_simple_key = 'merge_qc_failed_simple'
+                user_msg_simple_default = "Merge Fail! An error occurred. Check logs for details."
+                user_msg_simple = getattr(lang, user_msg_simple_key, user_msg_simple_default)
+
+                if hasattr(win, 'message_pop') and callable(win.message_pop):
+                    win.message_pop(user_msg_simple, color='red', title="Processing Error")
+                elif 'tkinter.messagebox' in sys.modules:
+                     tkinter.messagebox.showerror("Processing Error", user_msg_simple)
+                else: print(user_msg_simple)
+                return None # В оригинале было None, хотя можно и код 
 
     class MagiskPatcher(Toplevel):
         def __init__(self):
@@ -4715,335 +4856,192 @@ project_manger = ProjectManager()
 
 
 @animation
-def unpack(chose_items: list, form_type: str = '') -> bool:
-    """
-    Распаковывает выбранные элементы в зависимости от их типа/формата.
-    """
-    # Получение глобальных зависимостей с проверками
-    _pm = globals().get('project_manger')
-    _win_obj = globals().get('win')
-    _lang_obj = globals().get('lang')
-    _settings_obj = globals().get('settings')
-    _json_edit_class = globals().get('JsonEdit')
-    _utils_module = globals().get('utils')
-    _call_func = globals().get('call')
-    _gettype_func = globals().get('gettype')
-    _logging_module = globals().get('logging')
-    _unpackg_obj = globals().get('unpackg')
-    _cwd_path = globals().get('cwd_path', os.getcwd())
-
-    _un_dtbo_func = globals().get('un_dtbo')
-    _unpack_boot_func = globals().get('unpack_boot')
-    _logo_dump_func = globals().get('logo_dump')
-    _sdat2img_class = globals().get('Sdat2img')
-    _unxz_func = globals().get('Unxz')
-    _dumper_class = globals().get('Dumper')
-    _lpunpack_module = globals().get('lpunpack')
-    _splituapp_module = globals().get('splituapp')
-    _vbpatch_class = getattr(_utils_module, 'Vbpatch', None) if _utils_module else None
-    _imgextractor_class = globals().get('imgextractor')
-    _romfs_parse_class = globals().get('RomfsParse')
-    _guoke_logo_class = globals().get('GuoKeLogo')
-    _is_empty_img_func = globals().get('is_empty_img')
-    _findfile_func = globals().get('findfile')
-    _rmdir_func = globals().get('rmdir')
-    _re_folder_func = globals().get('re_folder')
-    _ext4_module = globals().get('ext4')
-    _pathlib_module = globals().get('pathlib') # Используется в вашей оригинальной логике super
-    _shutil_copy_func = getattr(shutil, 'copy', None) if 'shutil' in globals() else None # shutil.copy
-
-    # Функция для вывода сообщений (в print и лог)
-    def log_and_print(message, level="info"):
-        # print(message) # Ваш StdoutRedirector уже должен это делать
-        if _logging_module:
-            if level == "info": _logging_module.info(message)
-            elif level == "warning": _logging_module.warning(message)
-            elif level == "error": _logging_module.error(message)
-            else: _logging_module.debug(message)
-        else: # Если logging недоступен, просто печатаем
-            print(f"[{level.upper()}] {message}")
-
-
-    critical_deps_map = {
-        "project_manger": _pm, "win": _win_obj, "lang": _lang_obj,
-        "settings": _settings_obj, "JsonEdit": _json_edit_class, "utils": _utils_module,
-        "call": _call_func, "gettype": _gettype_func, "logging": _logging_module,
-        "unpackg (GUI component)": _unpackg_obj, "cwd_path": _cwd_path
-    }
-    for name, dep in critical_deps_map.items():
-        if dep is None:
-            log_and_print(f"unpack: CRITICAL DEPENDENCY MISSING: {name}. Aborting unpack.", "error")
-            if _win_obj and hasattr(_win_obj, 'message_pop'):
-                 _win_obj.message_pop(f"Error: Core component '{name}' missing. Unpack failed.", "red", wait=3000)
-            return False
-
-    # Вызов ensure_dir_case_sensitive УБРАН ОТСЮДА.
-    # Он должен вызываться только при СОЗДАНИИ нового проекта в ProjectMenuUtils.new().
-
-    if not _pm.exist():
-        msg = getattr(_lang_obj, 'warn1', "Project not selected or does not exist.")
-        _win_obj.message_pop(msg, "orange")
-        log_and_print(f"unpack: {msg}", "warning")
-        return False
-    
-    current_work_path = _pm.current_work_path()
-    if not os.path.isdir(current_work_path):
-        msg = getattr(_lang_obj, 'warn1_invalid_path', "Project working path ('%s') is invalid.") % current_work_path
-        _win_obj.message_pop(msg, "red")
-        log_and_print(f"unpack: {msg}", "error")
-        return False
-
-    log_and_print(f"Starting unpack process for items: {chose_items}, form_type: '{form_type}' in '{current_work_path}'")
-
-    parts_info_config_dir = os.path.join(current_work_path, "config")
-    if not os.path.exists(parts_info_config_dir):
-        try:
-            os.makedirs(parts_info_config_dir, exist_ok=True)
-        except OSError as e_mkdir_conf:
-            log_and_print(f"unpack: Failed to create config dir '{parts_info_config_dir}': {e_mkdir_conf}", "error")
-            _win_obj.message_pop(f"Error creating config directory: {e_mkdir_conf}", "red")
-            return False
-            
-    parts_info_path = os.path.join(parts_info_config_dir, "parts_info")
-    json_editor = _json_edit_class(parts_info_path)
-    parts_data = {}
-    if os.path.exists(parts_info_path) and os.path.getsize(parts_info_path) > 0:
-        try:
-            parts_data = json_editor.read()
-            if not isinstance(parts_data, dict):
-                log_and_print(f"unpack: Content of '{parts_info_path}' is not a dict. Re-initializing.", "warning")
-                parts_data = {}
-        except Exception as e_read_parts:
-            log_and_print(f"unpack: Error reading '{parts_info_path}': {e_read_parts}. Re-initializing.", "error")
-            parts_data = {}
-
-    if not chose_items:
-        log_and_print("unpack: No items chosen for unpacking.", "info")
-        return True 
-
-    all_items_successful = True
-
-    # --- Специальные обработчики для общих форматов контейнеров ---
-    if form_type == 'payload':
-        if not _dumper_class: log_and_print("unpack: Dumper class not found.", "error"); return False
-        payload_bin = os.path.join(current_work_path, "payload.bin")
-        if not os.path.exists(payload_bin):
-            _win_obj.message_pop(f"payload.bin not found in {current_work_path}", "red")
-            log_and_print(f"unpack: payload.bin not found at {payload_bin}", "error")
-            return False
-        log_and_print(f"{getattr(_lang_obj, 'text79', 'Unpacking')} payload.bin", "info")
-        dumper = _dumper_class(payload_bin, current_work_path, diff=False, old='old', images=chose_items)
-        try: dumper.run()
-        except RuntimeError: dumper.run(slow=True)
-        except Exception as e: log_and_print(f"Payload Dumper error: {e}", "error"); all_items_successful = False
-        # json_editor.write(parts_data) # Если Dumper меняет parts_data
-        if _unpackg_obj and hasattr(_unpackg_obj, 'refs'): _unpackg_obj.refs(True)
-        return all_items_successful
-
-    elif form_type == 'super':
-        if not _lpunpack_module: log_and_print("unpack: lpunpack module not found.", "error"); return False
-        super_img = os.path.join(current_work_path, "super.img")
-        if not os.path.exists(super_img):
-            _win_obj.message_pop(f"super.img not found in {current_work_path}", "red")
-            log_and_print(f"unpack: super.img not found at {super_img}", "error")
-            return False
-        log_and_print(f"{getattr(_lang_obj, 'text79', 'Unpacking')} super.img", "info")
-        s_type = _gettype_func(super_img)
-        if s_type == "sparse":
-            try: _utils_module.simg2img(super_img)
-            except Exception as e: log_and_print(f"simg2img error: {e}", "error"); _win_obj.message_pop("simg2img error", "red"); return False
-        if _gettype_func(super_img) == 'super':
-            parts_data["super_info"] = _lpunpack_module.get_info(super_img)
-            _lpunpack_module.unpack(super_img, current_work_path, chose_items)
-            for fn in os.listdir(current_work_path): # Ваша логика переименования
-                fp = os.path.join(current_work_path, fn)
-                if fn.endswith('_a.img'):
-                    base = fn[:-6]; target = base + ".img"; tp = os.path.join(current_work_path, target)
-                    if not os.path.exists(tp) or (_pathlib_module and _pathlib_module.Path(fp).resolve() != _pathlib_module.Path(tp).resolve()): # pathlib для samefile
-                        try: os.rename(fp, tp)
-                        except OSError as e_ren: log_and_print(f"Error renaming {fn} to {target}: {e_ren}", "warning")
-                    elif os.path.exists(fp) and os.path.exists(tp) and (_pathlib_module and _pathlib_module.Path(fp).resolve() == _pathlib_module.Path(tp).resolve()):
-                        pass # Уже переименовано или символическая ссылка
-                    elif os.path.exists(fp): # Если target существует и это другой файл, _a версию можно удалить
-                        try: os.remove(fp)
-                        except OSError as e_rem_a: log_and_print(f"Error removing {fn}: {e_rem_a}", "warning")
-
-                elif fn.endswith('_b.img'):
-                    if os.path.getsize(fp) == 0: try: os.remove(fp)
-                    except OSError as e_rem_b: log_and_print(f"Error removing empty {fn}: {e_rem_b}", "warning")
-            json_editor.write(parts_data)
-        else:
-            log_and_print(f"super.img is not valid (type: {_gettype_func(super_img)}).", "warning")
-            all_items_successful = False
-        if _unpackg_obj and hasattr(_unpackg_obj, 'refs'): _unpackg_obj.refs(True)
-        return all_items_successful
-
-    elif form_type == 'update.app':
-        if not _splituapp_module: log_and_print("unpack: splituapp module not found.", "error"); return False
-        app_path = os.path.join(current_work_path, "UPDATE.APP")
-        if not os.path.exists(app_path):
-            _win_obj.message_pop(f"UPDATE.APP not found in {current_work_path}", "red")
-            log_and_print(f"unpack: UPDATE.APP not found at {app_path}", "error")
-            return False
-        log_and_print(f"{getattr(_lang_obj, 'text79', 'Unpacking')} UPDATE.APP", "info")
-        try: _splituapp_module.extract(app_path, current_work_path, chose_items)
-        except Exception as e: log_and_print(f"UPDATE.APP error: {e}", "error"); all_items_successful = False
-        if _unpackg_obj and hasattr(_unpackg_obj, 'refs'): _unpackg_obj.refs(True)
-        return all_items_successful
-
-    # --- Основной цикл обработки для других форматов ---
-    for item_base_name in chose_items:
-        current_file_on_disk = os.path.join(current_work_path, f"{item_base_name}.{form_type}")
-        target_img_path = os.path.join(current_work_path, f"{item_base_name}.img")
-        log_and_print(f"--- Processing item: '{item_base_name}' from '{current_file_on_disk}' ---", "info")
-
-        active_file_path = current_file_on_disk # Файл, с которым работаем на данном шаге
-        
-        # Этап 1: Распаковка архивов до .new.dat или .img
-        if active_file_path.endswith(".zst") and os.access(active_file_path, os.F_OK):
-            unpacked_name = active_file_path[:-4]
-            if _call_func(['zstd', '--rm', '-f', '-d', active_file_path, '-o', unpacked_name]) == 0: # -f для перезаписи
-                log_and_print(f"Unpacked ZST: {active_file_path} -> {unpacked_name}", "info")
-                active_file_path = unpacked_name
-            else: log_and_print(f"Failed ZST: {active_file_path}", "error"); all_items_successful=False; continue
-        
-        if active_file_path.endswith(".new.dat.xz") and os.access(active_file_path, os.F_OK):
-            if _unxz_func and _unxz_func(active_file_path): # Unxz должен удалить .xz
-                active_file_path = active_file_path[:-3]
-                log_and_print(f"Unpacked XZ: -> {active_file_path}", "info")
-            else: log_and_print(f"Failed XZ: {active_file_path}", "error"); all_items_successful=False; continue
-        
-        if active_file_path.endswith(".new.dat.br") and os.access(active_file_path, os.F_OK):
-            if _call_func(['brotli', '-fdj', active_file_path]) == 0: # -f перезапись, -d удалить исходный
-                active_file_path = active_file_path[:-3]
-                log_and_print(f"Unpacked Brotli: -> {active_file_path}", "info")
-            else: log_and_print(f"Failed Brotli: {active_file_path}", "error"); all_items_successful=False; continue
-
-        # Слияние .new.dat.1, .new.dat.2... в один .new.dat
-        # Проверяем, если active_file_path это *.new.dat.1 или если просто есть файлы с таким паттерном
-        first_split_dat_part = os.path.join(current_work_path, f"{item_base_name}.new.dat.1")
-        merged_dat_target = os.path.join(current_work_path, f"{item_base_name}.new.dat")
-
-        if os.access(first_split_dat_part, os.F_OK):
-            log_and_print(f"Merging split .new.dat for {item_base_name} into {merged_dat_target}", "info")
+def unpack(chose, form: str = '') -> bool:
+    if os.name == 'nt':
+        if windll.shell32.IsUserAnAdmin():
             try:
-                with open(merged_dat_target, 'wb') as ofd:
-                    for n in range(1, 100):
-                        part_path = os.path.join(current_work_path, f"{item_base_name}.new.dat.{n}")
-                        if os.access(part_path, os.F_OK):
-                            log_and_print(f"Appending {os.path.basename(part_path)}", "debug")
-                            with open(part_path, 'rb') as pfd: shutil.copyfileobj(pfd, ofd)
-                            os.remove(part_path)
-                        else: break
-                active_file_path = merged_dat_target
-            except Exception as e: log_and_print(f"Error merging .dat parts: {e}", "error"); all_items_successful=False; continue
-        
-        # Обработка .new.dat в .img
-        if active_file_path.endswith(".new.dat") and os.access(active_file_path, os.F_OK):
-            log_and_print(f"Converting .new.dat: {active_file_path} to .img", "info")
-            if os.path.getsize(active_file_path) == 0:
-                log_and_print(f"{active_file_path} is empty, skipping.", "warning"); os.remove(active_file_path)
-                all_items_successful=False; continue
-            
-            transfer_list = os.path.join(current_work_path, f"{item_base_name}.transfer.list")
-            patch_dat = os.path.join(current_work_path, f"{item_base_name}.patch.dat")
-            if not os.access(transfer_list, os.F_OK):
-                log_and_print(f"Missing {transfer_list} for {active_file_path}", "error"); all_items_successful=False; continue
-            
-            if not _sdat2img_class: log_and_print("Sdat2img class missing", "error"); all_items_successful=False; continue
-            
-            sdat_conv = _sdat2img_class(transfer_list, active_file_path, target_img_path)
-            dat_v = getattr(sdat_conv, 'version', None)
-            if dat_v is not None: parts_data['dat_ver'] = dat_v
-
-            if os.access(target_img_path, os.F_OK):
-                log_and_print(f"Converted to {target_img_path}", "info")
-                try: os.remove(active_file_path)
-                except OSError: pass
-                try: os.remove(transfer_list)
-                except OSError: pass
-                if os.path.exists(patch_dat): try: os.remove(patch_dat)
-                except OSError: pass
-                active_file_path = target_img_path # Теперь работаем с .img
-            else:
-                log_and_print(f"sdat2img failed for {active_file_path}", "error"); all_items_successful=False; continue
-        
-        # Этап 2: Обработка полученного .img файла
-        if active_file_path == target_img_path and os.access(target_img_path, os.F_OK):
-            parts_data.pop(item_base_name, None)
-            img_type = _gettype_func(target_img_path)
-            log_and_print(f"Processing image: {target_img_path}, type: {img_type}", "info")
-
-            if img_type == "sparse":
+                ensure_dir_case_sensitive(project_manger.current_work_path())
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+    if not project_manger.exist():
+        win.message_pop(lang.warn1)
+        return False
+    elif not os.path.exists(project_manger.current_work_path()):
+        win.message_pop(lang.warn1, "red")
+        return False
+    json_ = JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
+    parts = json_.read()
+    if not chose:
+        return False
+    if form == 'payload':
+        print(lang.text79 + "payload")
+        dumper = Dumper(f"{work}/payload.bin", work, diff=False, old='old', images=chose)
+        try:
+            dumper.run()
+        except RuntimeError:
+            dumper.run(slow=True)
+        return True
+    elif form == 'super':
+        print(lang.text79 + "Super")
+        file_type = gettype(f"{work}/super.img")
+        if file_type == "sparse":
+            print(lang.text79 + f"super.img [{file_type}]")
+            try:
+                utils.simg2img(f"{work}/super.img")
+            except (Exception, BaseException):
+                win.message_pop(lang.warn11.format("super.img"))
+        if gettype(f"{work}/super.img") == 'super':
+            #should get info here.
+            parts["super_info"] = lpunpack.get_info(os.path.join(work, "super.img"))
+            lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
+            for file_name in os.listdir(work):
+                if file_name.endswith('_a.img') and not os.path.exists(work + file_name.replace('_a', '')):
+                    os.rename(work + file_name, work + file_name.replace('_a', ''))
+                if file_name.endswith('_b.img'):
+                    if not os.path.getsize(work + file_name):
+                        os.remove(work + file_name)
+            json_.write(parts)
+            parts.clear()
+        return True
+    elif form == 'update.app':
+        splituapp.extract(f"{work}/UPDATE.APP", work, chose)
+        return True
+    for i in chose:
+        if os.access(f"{work}/{i}.zst", os.F_OK):
+            print(f"{lang.text79} {i}.zst")
+            call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
+            return True
+        if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
+            print(lang.text79 + f"{i}.new.dat.xz")
+            Unxz(f"{work}/{i}.new.dat.xz")
+        if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
+            print(lang.text79 + f"{i}.new.dat.br")
+            call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
+        if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
+            with open(f"{work}/{i}.new.dat", 'ab') as ofd:
+                for n in range(100):
+                    if os.access(f"{work}/{i}.new.dat.{n}", os.F_OK):
+                        print(lang.text83 % (i + f".new.dat.{n}", f"{i}.new.dat"))
+                        with open(f"{work}/{i}.new.dat.{n}", 'rb') as fd:
+                            ofd.write(fd.read())
+                        os.remove(f"{work}/{i}.new.dat.{n}")
+        if os.access(f"{work}/{i}.new.dat", os.F_OK):
+            print(lang.text79 + f"{work}/{i}.new.dat")
+            if os.path.getsize(f"{work}/{i}.new.dat") != 0:
+                transferfile = f"{work}/{i}.transfer.list"
+                if os.access(transferfile, os.F_OK):
+                    parts['dat_ver'] = Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
+                    if os.access(f"{work}/{i}.img", os.F_OK):
+                        os.remove(f"{work}/{i}.new.dat")
+                        os.remove(transferfile)
+                        try:
+                            os.remove(f'{work}/{i}.patch.dat')
+                        except (Exception, BaseException):
+                            logging.exception('Bugs')
+                    else:
+                        print("File May Not Extracted.")
+                else:
+                    print("transferfile" + lang.text84)
+        if os.access(f"{work}/{i}.img", os.F_OK):
+            try:
+                parts.pop(i)
+            except KeyError:
+                logging.exception('Key')
+            if gettype(f"{work}/{i}.img") != 'sparse':
+                parts[i] = gettype(f"{work}/{i}.img")
+            if gettype(f"{work}/{i}.img") == 'dtbo':
+                un_dtbo(i)
+            if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
+                unpack_boot(i)
+            if i == 'logo':
                 try:
-                    _utils_module.simg2img(target_img_path)
-                    img_type = _gettype_func(target_img_path)
-                    log_and_print(f"Converted sparse to raw, new type: {img_type}", "info")
-                except Exception as e: log_and_print(f"simg2img failed: {e}", "error"); all_items_successful=False; continue
-            
-            parts_data[item_base_name] = img_type
-            item_unpacked_ok = True
-
-            if img_type == 'dtbo' and _un_dtbo_func: _un_dtbo_func(item_base_name, work=current_work_path)
-            elif img_type in ['boot', 'vendor_boot'] and _unpack_boot_func: _unpack_boot_func(item_base_name, boot=target_img_path, work=current_work_path)
-            elif item_base_name == 'logo' and img_type != 'unknown' and _logo_dump_func and getattr(_utils_module, 'LogoDumper', None):
-                try: 
-                    _utils_module.LogoDumper(target_img_path, os.path.join(current_work_path, item_base_name)).check_img(target_img_path)
-                    _logo_dump_func(target_img_path, output=current_work_path, output_name=item_base_name)
-                except AssertionError: log_and_print(f"Logo check_img failed for {target_img_path}", "warning")
-                except Exception as e: log_and_print(f"logo_dump error: {e}", "error")
-            elif img_type == 'vbmeta' and _vbpatch_class:
-                try: _vbpatch_class(target_img_path).disavb()
-                except Exception as e: log_and_print(f"Vbpatch error: {e}", "error")
-            elif img_type == "ext" and _imgextractor_class and _ext4_module:
-                # ... (логика извлечения ext4 как в вашем коде, с проверками и удалением .img если нужно) ...
-                # Пример:
-                # out_dir = os.path.join(current_work_path, item_base_name)
-                # _imgextractor_class().main(target_img_path, out_dir, current_work_path)
-                # if os.path.isdir(out_dir): os.remove(target_img_path)
-                pass # Замените на вашу детальную логику
-            elif img_type == 'romfs' and _romfs_parse_class:
-                try: _romfs_parse_class(target_img_path).extract(current_work_path) # Проверить путь извлечения
-                except Exception as e: log_and_print(f"RomfsParse error: {e}", "error"); item_unpacked_ok=False
-            elif img_type == 'guoke_logo' and _guoke_logo_class:
-                try: _guoke_logo_class().unpack(target_img_path, os.path.join(current_work_path, item_base_name))
-                except Exception as e: log_and_print(f"GuoKeLogo unpack error: {e}", "error"); item_unpacked_ok=False
-            elif img_type == "erofs":
-                out_erofs = os.path.join(current_work_path, item_base_name) # Целевая папка
-                _re_folder_func(out_erofs, quiet=True) # Очищаем/создаем папку
-                if _call_func(['extract.erofs', '-i', target_img_path, '-o', out_erofs, '-x'], out=False) != 0:
-                    log_and_print(f"extract.erofs failed for {target_img_path}", "error"); item_unpacked_ok=False
-                # else: os.remove(target_img_path) # Если нужно удалить .img
-            elif img_type == 'f2fs':
-                out_f2fs = os.path.join(current_work_path, item_base_name)
-                _re_folder_func(out_f2fs, quiet=True)
-                if _call_func(['extract.f2fs', '-o', out_f2fs, target_img_path], out=False) != 0:
-                    log_and_print(f"extract.f2fs failed for {target_img_path}", "error"); item_unpacked_ok=False
-                # else: os.remove(target_img_path)
-            elif img_type == 'unknown' and _is_empty_img_func and _is_empty_img_func(target_img_path):
-                log_and_print(f"{target_img_path} is empty.", "info")
-            elif img_type == 'unknown':
-                log_and_print(f"{target_img_path} type unknown, no unpacker.", "warning")
-            
-            if not item_unpacked_ok: all_items_successful = False
-
-        else: # Если .img файл не был получен
-            log_and_print(f"Target .img for '{item_base_name}' (from {current_file_on_disk}) not found/created.", "error")
-            all_items_successful = False
-            parts_data[item_base_name] = 'unpack_error_no_img'
-            
-    # Сохранение parts_info.json
-    try:
-        json_editor.write(parts_data)
-    except Exception as e: log_and_print(f"Failed to write parts_info.json: {e}", "error")
-
-    log_and_print(f"--- {getattr(_lang_obj, 'text8', 'Unpacking process finished.')} ---", "info")
-    
-    if _unpackg_obj and hasattr(_unpackg_obj, 'refs'):
-        try: _unpackg_obj.refs(True)
-        except Exception as e: log_and_print(f"Error updating GUI via unpackg.refs: {e}", "warning")
-            
-    return all_items_successful
+                    utils.LogoDumper(f"{work}/{i}.img", f'{work}/{i}').check_img(f"{work}/{i}.img")
+                except AssertionError:
+                    logging.exception('Bugs')
+                else:
+                    logo_dump(f"{work}/{i}.img", output_name=i)
+            if gettype(f"{work}/{i}.img") == 'vbmeta':
+                print(f"{lang.text85}AVB:{i}")
+                utils.Vbpatch(f"{work}/{i}.img").disavb()
+            file_type = gettype(f"{work}/{i}.img")
+            if file_type == "sparse":
+                print(lang.text79 + f"{i}.img[{file_type}]")
+                try:
+                    utils.simg2img(f"{work}/{i}.img")
+                except (Exception, BaseException):
+                    win.message_pop(lang.warn11.format(f"{i}.img"))
+            if i not in parts.keys():
+                parts[i] = gettype(f"{work}/{i}.img")
+            print(lang.text79 + i + f".img[{file_type}]")
+            if gettype(f"{work}/{i}.img") == 'super':
+                parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
+                lpunpack.unpack(f"{work}/{i}.img", work)
+                for file_name in os.listdir(work):
+                    if file_name.endswith('_a.img'):
+                        if os.path.exists(work + file_name) and os.path.exists(work + file_name.replace('_a', '')):
+                            if pathlib.Path(work + file_name).samefile(work + file_name.replace('_a', '')):
+                                os.remove(work + file_name)
+                            else:
+                                os.remove(work + file_name.replace('_a', ''))
+                                os.rename(work + file_name, work + file_name.replace('_a', ''))
+                        else:
+                            os.rename(work + file_name, work + file_name.replace('_a', ''))
+                    if file_name.endswith('_b.img'):
+                        if os.path.getsize(work + file_name) == 0:
+                            os.remove(work + file_name)
+                json_.write(parts)
+                parts.clear()
+            if (file_type := gettype(f"{work}/{i}.img")) == "ext":
+                with open(f"{work}/{i}.img", 'rb+') as e:
+                    mount = ext4.Volume(e).get_mount_point
+                    if mount[:1] == '/':
+                        mount = mount[1:]
+                    if '/' in mount:
+                        mount = mount.split('/')
+                        mount = mount[len(mount) - 1]
+                    if mount != i and mount and i != 'mi_ext':
+                        parts[mount] = 'ext'
+                imgextractor.Extractor().main(project_manger.current_work_path() + i + ".img", f'{work}/{i}', work)
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except Exception as e:
+                        win.message_pop(lang.warn11.format(f"{i}.img:{e.__str__()}"))
+            if file_type == 'romfs':
+                fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
+                fs.extract(work)
+            if file_type == 'guoke_logo':
+                GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
+            if file_type == "erofs":
+                if call(exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'), '-o',
+                             work,
+                             '-x'],
+                        out=False) != 0:
+                    print('Unpack failed...')
+                    continue
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except (Exception, BaseException):
+                        win.message_pop(lang.warn11.format(i + ".img"))
+            if file_type == 'f2fs':
+                if call(exe=['extract.f2fs', '-o', work, os.path.join(project_manger.current_work_path(), f'{i}.img')],
+                        out=False) != 0:
+                    print('Unpack failed...')
+                    continue
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except (Exception, BaseException):
+                        win.message_pop(lang.warn11.format(i + ".img"))
+            if file_type == 'unknown' and is_empty_img(f"{work}/{i}.img"):
+                print(lang.text141)
+    if not os.path.exists(f"{work}/config"):
+        os.makedirs(f"{work}/config")
+    json_.write(parts)
+    parts.clear()
+    print(lang.text8)
+    return True
 
 
 def cprint(*args, **kwargs):
@@ -6324,7 +6322,7 @@ class ParseCmdline:
 def __init__tk(args: list):
     # --- Basic Setup: Global Paths and Logging ---
     _temp_path = globals().get('temp', os.path.join(os.getcwd(), "bin", "temp"))
-    _tool_log_path = globals().get('tool_log', os.path.join(_temp_path, f"mio_kitchen_{time.strftime('%Y%m%d_%H%M%S')}.log")) # Более простое имя файла лога
+    _tool_log_path = globals().get('tool_log', os.path.join(_temp_path, f"mio_kitchen_{time.strftime('%Y%m%d_%H%M%S')}.log"))
 
     _re_folder_func = globals().get('re_folder')
     if _re_folder_func and callable(_re_folder_func):
@@ -6338,23 +6336,22 @@ def __init__tk(args: list):
         try: os.makedirs(log_dir, exist_ok=True)
         except OSError as e: print(f"Warning: Could not create log dir {log_dir}: {e}")
     
-    # Убедимся, что можем писать в лог-файл
     try:
-        with open(_tool_log_path, 'a', encoding="utf-8") as f_test_log: # 'a' для добавления, если файл уже есть
+        with open(_tool_log_path, 'a', encoding="utf-8") as f_test_log:
             f_test_log.write(f"--- Log Start [{time.asctime()}] ---\n")
     except IOError as e: 
         print(f"Warning: Could not write to log file {_tool_log_path}: {e}. Logging to console.")
-        _tool_log_path = None # Не используем файл, если не можем писать
+        _tool_log_path = None
 
     logging.basicConfig(
         level=logging.DEBUG, 
-        format='%(levelname)s:%(asctime)s:%(filename)s:%(lineno)d:%(name)s:%(message)s', # Добавил lineno
-        filename=_tool_log_path if _tool_log_path else None, # None если не можем писать в файл
-        filemode='a' if _tool_log_path else None, # 'a' для добавления к существующему логу
+        format='%(levelname)s:%(asctime)s:%(filename)s:%(lineno)d:%(name)s:%(message)s',
+        filename=_tool_log_path if _tool_log_path else None,
+        filemode='a' if _tool_log_path else None,
         encoding='utf-8' if _tool_log_path else None
     )
     if not _tool_log_path:
-        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout)) # Дублируем в stdout, если файл не доступен
+        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
     logging.info(f"Application MIO-KITCHEN starting with args: {args}")
     logging.info(f"Python version: {sys.version}")
@@ -6363,16 +6360,12 @@ def __init__tk(args: list):
     logging.info(f"temp path: {_temp_path}")
     logging.info(f"Log path: {_tool_log_path if _tool_log_path else 'Console Only'}")
 
-
-    # Объявление глобальных переменных, которые будут созданы/использованы
     global win, current_project_name, theme, language, unpackg, project_menu, animation, start, settings
 
-    # --- Инициализация Settings ---
     if 'settings' not in globals() or not isinstance(settings, SetUtils):
         logging.critical("'settings' object is not initialized or is of wrong type. Attempting to create.")
-        # Это должно быть сделано глобально до __init__tk, но как крайняя мера:
         try:
-            settings = SetUtils() # Предполагает, что SetUtils и cwd_path определены
+            settings = SetUtils()
         except Exception as e_set_init:
             logging.critical(f"FATAL: Could not create SetUtils instance: {e_set_init}. Application cannot continue.")
             return
@@ -6381,28 +6374,23 @@ def __init__tk(args: list):
         settings.load_from_file()
     except Exception as e_load_set:
         logging.critical(f"FATAL: Error during settings.load_from_file: {e_load_set}. Application may not work correctly.")
-        # Решите, нужно ли прерывать выполнение
 
-    # --- Создание главного окна и Tkinter StringVars ---
     if 'Tool' not in globals() or not callable(Tool):
         logging.critical("FATAL: Main window class 'Tool' is not defined. Application cannot start.")
         return
     win = Tool() 
     
-    # Убедимся, что win - это Tk окно
-    if not isinstance(win, tk.Tk): # или ваш кастомный базовый класс Tk
+    if not isinstance(win, tk.Tk):
         logging.critical("FATAL: 'win' is not a valid Tkinter window. Application cannot start.")
         return
 
-    # Инициализация StringVars с указанием master=win
     current_project_name = StringVar(master=win, name="mio_current_project_name") 
     if 'utils' in globals() and hasattr(utils, 'project_name'): utils.project_name = current_project_name 
     else: logging.warning("__init__tk: utils.project_name link failed.")
         
-    theme = StringVar(master=win, name="mio_theme_var", value=getattr(settings, 'theme', 'dark')) # Устанавливаем начальное значение из settings
-    language = StringVar(master=win, name="mio_language_var", value=getattr(settings, 'language', 'English')) # Устанавливаем начальное значение
+    theme = StringVar(master=win, name="mio_theme_var", value=getattr(settings, 'theme', 'dark'))
+    language = StringVar(master=win, name="mio_language_var", value=getattr(settings, 'language', 'English'))
     
-    # --- Применение темы ДО OOBE ---
     if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
         try: 
             sv_ttk.set_theme(settings.theme) 
@@ -6416,15 +6404,13 @@ def __init__tk(args: list):
             else: set_title_bar_color(win, 0)
         except Exception as e: logging.warning(f"Could not set Win title bar color before OOBE: {e}")
 
-    # --- Начальные окна (OOBE, Updater) и проверки ---
-    # Загрузка языка для OOBE (статический метод, чтобы не зависеть от полного apply_loaded_settings_to_gui)
     if 'lang' in globals() and globals()['lang'] is not None:
-        SetUtils.load_language(settings.language) # settings.language уже из файла
+        SetUtils.load_language(settings.language)
     else:
         logging.error("Cannot load language for OOBE: global 'lang' object not ready.")
 
     if hasattr(settings, 'oobe') and int(settings.oobe) < 5:
-        if 'Welcome' in globals() and callable(Welcome): Welcome() # Welcome должен использовать глобальный lang
+        if 'Welcome' in globals() and callable(Welcome): Welcome()
         else: logging.warning("__init__tk: 'Welcome' class not available.")
 
     if hasattr(settings, 'updating') and settings.updating in ['1', '2']:
@@ -6435,16 +6421,15 @@ def __init__tk(args: list):
     else: logging.warning("__init__tk: 'init_verify' function not available.")
     
     try: 
-        if not win.winfo_exists(): # Проверка после Welcome/Updater
+        if not win.winfo_exists():
             logging.error("Main window (win) was destroyed before win.gui() call. Aborting UI setup.")
             return 
     except tk.TclError:
         logging.exception("Main window invalid before win.gui() (TclError). Aborting.")
         return 
         
-    win.gui() # Построение основного GUI (включая win.gif_label, win.tab, win.tab2 и т.д.)
+    win.gui()
 
-    # --- Инициализация анимации (ПОСЛЕ win.gui()) ---
     if 'LoadAnim' in globals() and callable(LoadAnim):
         animation = LoadAnim() 
         animation.set_master(win) 
@@ -6466,63 +6451,52 @@ def __init__tk(args: list):
         logging.warning("__init__tk: 'LoadAnim' not available. Animation disabled.")
         animation = None 
 
-    # --- Применение всех настроек к GUI (включая StringVars, тему и т.д.) ---
     if hasattr(settings, 'apply_loaded_settings_to_gui'):
         settings.apply_loaded_settings_to_gui()
     else:
         logging.error("__init__tk: 'settings.apply_loaded_settings_to_gui' not available.")
 
-    # --- Создание и размещение остальных GUI-компонентов (вкладок и т.д.) ---
-    # Убедимся, что win.tab2 (родительская вкладка для этих компонентов) существует и является Frame
     if not (hasattr(win, 'tab2') and win.tab2 and isinstance(win.tab2, (tk.Frame, ttk.Frame)) and win.tab2.winfo_exists()):
         logging.error("CRITICAL: Parent tab (win.tab2) for Project/Unpack/Frame3 not found, not a Frame, or destroyed. UI will be incorrect.")
     else:
-        # ProjectMenuUtils
         if 'ProjectMenuUtils' in globals() and callable(ProjectMenuUtils):
-            project_menu = ProjectMenuUtils(master=win.tab2) # Явно передаем master
-            if hasattr(project_menu, 'gui'): project_menu.gui() # gui() создает виджеты
-            # Упаковка ProjectMenuUtils (LabelFrame) на win.tab2
+            project_menu = ProjectMenuUtils(master=win.tab2)
+            if hasattr(project_menu, 'gui'): project_menu.gui()
             project_menu.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
         else: 
             logging.error("__init__tk: 'ProjectMenuUtils' class not available.")
             project_menu = None 
 
-        # UnpackGui
         if 'UnpackGui' in globals() and callable(UnpackGui):
-            unpackg = UnpackGui(master=win.tab2) # Явно передаем master
-            if hasattr(unpackg, 'gui'): unpackg.gui() # gui() создает виджеты
-            # Упаковка UnpackGui (LabelFrame) на win.tab2
+            unpackg = UnpackGui(master=win.tab2)
+            if hasattr(unpackg, 'gui'): unpackg.gui()
             unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True)
         else: 
             logging.error("__init__tk: 'UnpackGui' class not available.")
             unpackg = None
         
-        # Frame3
         if 'Frame3' in globals() and callable(Frame3):
-            frame3_instance = Frame3(master=win.tab2) # Явно передаем master
+            frame3_instance = Frame3(master=win.tab2)
             if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
-                frame3_instance.gui() # gui() создает виджеты
-                # Упаковка Frame3 (LabelFrame) на win.tab2
-                frame3_instance.pack(padx=5, pady=5, fill='x', side=TOP, expand=False)
+                frame3_instance.gui()
+                # Убрал pack отсюда, так как он теперь в Frame3.gui()
         else: 
             logging.warning("__init__tk: 'Frame3' class not available.")
         
-        # Обновление списка проектов
         if project_menu and hasattr(project_menu, 'listdir') and callable(project_menu.listdir): 
             project_menu.listdir() 
         elif logging: 
              logging.debug("__init__tk: project_menu.listdir not called (project_menu is None or listdir missing).")
 
-    # --- PRO-версия и завершение инициализации ---
     _is_pro_flag = globals().get('is_pro', False)
     _lang_obj = globals().get('lang')
 
     if not _is_pro_flag:
         lang_txt108 = getattr(_lang_obj, 'text108', "Non-pro version message.") if _lang_obj else "Non-pro version message."
         print(lang_txt108)
-    elif _is_pro_flag: # Если is_pro == True
+    elif _is_pro_flag:
         _verify_obj = globals().get('verify')
-        if _verify_obj and hasattr(_verify_obj, 'state') and not _verify_obj.state: # Неактивировано
+        if _verify_obj and hasattr(_verify_obj, 'state') and not _verify_obj.state:
             _active_class = globals().get('Active')
             _images_module = globals().get('images')
             if _active_class and callable(_active_class) and _images_module and _lang_obj:
@@ -6542,11 +6516,58 @@ def __init__tk(args: list):
     if isinstance(_start_time_var, (int, float)) and callable(_dti_func):
          try:
              el_time = _dti_func() - _start_time_var
-             lang_txt134 = getattr(_lang_obj, 'text134', "Startup took: {:.2f} seconds") if _lang_obj else "Startup took: {:.2f} seconds"
-             if isinstance(lang_txt134, str) and "{:.2f}" in lang_txt134 : print(lang_txt134.format(el_time))
-             else: print(f"{lang_txt134} {el_time:.2f}s") 
-         except Exception as e: logging.error(f"Error printing startup time: {e}")
-    elif 'logging' in globals(): logging.debug("__init__tk: Startup time vars missing.")
+             el_time_str_formatted = f"{el_time:.2f}" # Время с двумя знаками после запятой
+             
+             _lang_obj = globals().get('lang')
+             
+             default_format_string = "Startup took: {} seconds"
+             localized_format_str = default_format_string
+
+             if _lang_obj and hasattr(_lang_obj, 'text134'):
+                 lang_val = getattr(_lang_obj, 'text134')
+                 if isinstance(lang_val, str) and lang_val.strip():
+                     localized_format_str = lang_val
+             
+             output_message = ""
+             try:
+                 placeholder_match_curly = None
+                 # Предполагаем, что 're' доступно глобально через from ..core.extra import re
+                 if 're' in globals() and hasattr(re, 'search') and callable(re.search):
+                    placeholder_match_curly = re.search(r"\{[:\w\.\d]*\}", localized_format_str)
+
+                 if placeholder_match_curly:
+                     output_message = localized_format_str.replace(placeholder_match_curly.group(0), el_time_str_formatted, 1)
+                 elif '%s' in localized_format_str:
+                     if localized_format_str.count('%s') == 1 and \
+                        localized_format_str.count('%') == localized_format_str.count('%s'):
+                         output_message = localized_format_str % el_time_str_formatted
+                     else:
+                         output_message = "" 
+                         if not output_message: # Если предыдущие замены не сработали
+                            prefix = localized_format_str.rstrip()
+                            if prefix and not prefix.endswith(' ') and not prefix.endswith(':'):
+                                prefix += " "
+                            elif prefix and prefix.endswith(':') and not prefix.endswith(' '):
+                                prefix += " "
+                            output_message = f"{prefix}{el_time_str_formatted} seconds"
+                 else:
+                     prefix = localized_format_str.rstrip()
+                     if prefix and not prefix.endswith(' ') and not prefix.endswith(':'):
+                         prefix += " "
+                     elif prefix and prefix.endswith(':') and not prefix.endswith(' '):
+                         prefix += " "
+                     output_message = f"{prefix}{el_time_str_formatted} seconds"
+                 
+                 print(output_message)
+
+             except Exception as e_format:
+                 logging.error(f"Error formatting startup time message with string '{localized_format_str}': {e_format}")
+                 print(f"Startup took: {el_time_str_formatted} seconds (Fallback due to formatting error)")
+
+         except Exception as e: 
+             logging.error(f"Error printing startup time: {e}")
+    elif 'logging' in globals(): 
+        logging.debug("__init__tk: Startup time variables ('start', 'dti') or 'lang' object missing.")
 
     if os.name == 'nt':
         if 'do_override_sv_ttk_fonts' in globals() and callable(do_override_sv_ttk_fonts): 
@@ -6568,10 +6589,10 @@ def __init__tk(args: list):
         except tk.TclError as e: logging.error(f"Error WM_DELETE_WINDOW: {e}")
     else: logging.warning("__init__tk: 'exit_tool' function missing.")
     
-    if len(args) > 1 and _is_pro_flag : # Только для PRO и если есть аргументы
+    if len(args) > 1 and _is_pro_flag :
         _parse_cmd_class = globals().get('ParseCmdline')
         if _parse_cmd_class and callable(_parse_cmd_class):
-             win.after(200, lambda: _parse_cmd_class(args[1:])) # Увеличил задержку
+             win.after(200, lambda: _parse_cmd_class(args[1:]))
         elif 'logging' in globals(): logging.debug("ParseCmdline missing.")
              
     win.mainloop()
@@ -6585,31 +6606,99 @@ init = lambda args: __init__tk(args)
 
 def restart(er: Toplevel = None):
     try:
-        if animation.tasks:
-            if not ask_win("Your operation will not be saved.", is_top=True):
-                return
-    except (TclError, ValueError, AttributeError):
-        logging.exception('Restart')
+        if 'animation' in globals() and hasattr(animation, 'tasks') and animation.tasks:
+            _ask_win_func = globals().get('ask_win')
+            _lang_obj = globals().get('lang')
+            
+            prompt_text = "Your operation will not be saved. Continue with restart?"
+            if _lang_obj and hasattr(_lang_obj, 'restart_confirm_unsaved'):
+                prompt_text = getattr(_lang_obj, 'restart_confirm_unsaved', prompt_text)
 
-    def _inner():
-        argv = [sys.executable]
-        if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
-            # only needed when running within a Python intepreter
-            argv.append(tool_self)
-        argv.extend(sys.argv[1:])
-        p = subprocess.Popen(argv)
-        p.wait()
-        sys.exit(p.returncode)
+            if _ask_win_func and callable(_ask_win_func):
+                if not _ask_win_func(prompt_text, is_top=True):
+                    if 'logging' in globals(): logging.info("Restart cancelled by user due to active tasks.")
+                    return
+            elif 'logging' in globals():
+                logging.warning("restart: ask_win not available for confirming restart with active tasks.")
+    except (tk.TclError, AttributeError, NameError) as e:
+        if 'logging' in globals(): logging.exception(f'Error checking animation tasks during restart: {e}')
 
-    if er: er.destroy()
+    # --- Закрытие GUI перед запуском нового процесса ---
+    if er and isinstance(er, tk.Toplevel) and er.winfo_exists():
+        try: er.destroy()
+        except tk.TclError: pass
+
+    _main_win_for_cleanup = globals().get('win')
+    if _main_win_for_cleanup and hasattr(_main_win_for_cleanup, 'destroy') and callable(_main_win_for_cleanup.destroy):
+        try:
+            if _main_win_for_cleanup.winfo_exists():
+                # Сначала уничтожаем дочерние элементы, затем главное окно
+                # Это может помочь предотвратить некоторые TclError
+                children = list(_main_win_for_cleanup.winfo_children()) # Копируем список
+                for child in children:
+                    try:
+                        if child.winfo_exists(): # Дополнительная проверка
+                            child.destroy()
+                    except (tk.TclError, AttributeError):
+                        if 'logging' in globals(): logging.debug(f"Minor error destroying child widget {child} during restart.")
+                _main_win_for_cleanup.destroy() # Уничтожаем главное окно
+                # Даем Tkinter шанс обработать события уничтожения
+                _main_win_for_cleanup.update_idletasks() 
+                _main_win_for_cleanup.update()
+
+        except tk.TclError as e_destroy:
+            if 'logging' in globals(): logging.error(f"TclError during main window destroy on restart: {e_destroy}")
+        except Exception as e_generic_destroy: # Ловим другие возможные ошибки
+            if 'logging' in globals(): logging.error(f"Generic error during main window destroy on restart: {e_generic_destroy}")
+
+
+    # --- Логика запуска нового процесса ---
+    _tool_self_path = globals().get('tool_self')
+    if not _tool_self_path:
+        if 'logging' in globals(): logging.critical("restart: 'tool_self' path not defined. Cannot restart.")
+        return
+
+    executable_path = sys.executable
+    argv = [executable_path]
+
     try:
-        for i in win.winfo_children():
+        is_same_file = False
+        if os.path.exists(_tool_self_path) and os.path.exists(executable_path):
             try:
-                i.destroy()
-            except (TclError, ValueError, AttributeError):
-                logging.exception('Restart')
-        win.destroy()
-    except (Exception, BaseException):
-        logging.exception('Restart')
+                is_same_file = os.path.samefile(_tool_self_path, executable_path)
+            except OSError as e_samefile:
+                if 'logging' in globals(): logging.warning(f"restart: OSError in os.path.samefile: {e_samefile}")
+        
+        if not is_same_file and _tool_self_path.endswith(".py"):
+             argv.append(_tool_self_path)
+        # Если tool_self это exe и он же executable_path, то _tool_self_path добавлять не нужно.
+        # Если getattr(sys, 'frozen', False) и пути разные, то argv[0] уже должен быть правильным.
 
-    threading.Thread(target=_inner).start()
+    except Exception as e_path_check:
+        if 'logging' in globals(): logging.error(f"restart: Error checking paths for Popen: {e_path_check}")
+        # Безопасный фоллбэк: если tool_self не совпадает с argv[0], добавляем его
+        if _tool_self_path != argv[0]: # Простая строковая проверка как фоллбэк
+             argv.append(_tool_self_path)
+
+    if len(sys.argv) > 1:
+        argv.extend(sys.argv[1:])
+    
+    if 'logging' in globals(): logging.info(f"Attempting to restart application with command: {argv}")
+    
+    try:
+        kwargs_popen = {}
+        if os.name == 'nt':
+            kwargs_popen['creationflags'] = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+            
+        subprocess.Popen(argv, **kwargs_popen) # Запускаем и не ждем
+        if 'logging' in globals(): logging.info("New process for restart initiated.")
+    except Exception as e_popen:
+        if 'logging' in globals(): logging.critical(f"Failed to start new process for restart: {e_popen}")
+        # Сообщить пользователю, что автоматический перезапуск не удался
+        # Так как GUI уже закрыт, это сообщение может не отобразиться.
+        # Можно попробовать показать его до закрытия GUI, если Popen падает сразу.
+        print(f"ERROR: Automatic restart failed. Please restart the application manually. Details: {e_popen}") # Вывод в консоль
+        return # Не вызываем sys.exit, если не смогли запустить новый процесс
+
+    if 'logging' in globals(): logging.info("Exiting current process to complete restart.")
+    sys.exit(0) # Выход из текущего процесса
