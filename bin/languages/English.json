@@ -281,5 +281,8 @@
   "downloaded_file_not_found": "Error: Downloaded file {} not found for unpacking.",
   "download_invalid_url_scheme": "Error: Invalid URL '{}'. No schema (e.g., http://, https://) supplied.",
   "download_connection_error": "Download Error: Could not connect. {}",
-  "partially_downloaded_removed": "Partially downloaded file {} removed."
+  "partially_downloaded_removed": "Partially downloaded file {} removed.",
+  "rawprogram_not_exist_error": "Error: RawProgram XML file not found at the specified path.",
+  "file_error_title": "File Error"
 }
+
