@@ -1255,21 +1255,68 @@ class ToolBox(ttk.Frame):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
-        self.rotate_angle = 0
+        self.rotate_angle = 0 # Перемещено из tab4_content, т.к. это состояние окна
+
+        # Попытка получить текущее значение alpha перед "встряской"
+        # Это может быть важно, если настройки пользователя уже включают прозрачность по умолчанию
+        try:
+            # Важно: attributes() может быть недоступен, если окно еще не сопоставлено (mapped)
+            # Однако, для __init__ это обычно еще не проблема.
+            # Если это вызывает ошибку, можно предположить initial_alpha = 1.0
+            self.update_idletasks() # Убедимся, что окно готово к запросу атрибутов
+            current_alpha_str = self.attributes("-alpha")
+            initial_alpha = float(current_alpha_str)
+            if 'logging' in globals(): logging.info(f"Tool.__init__: Initial alpha detected as {initial_alpha}")
+        except (tk.TclError, ValueError) as e_alpha_get:
+            initial_alpha = 1.0 # Значение по умолчанию (полностью непрозрачное)
+            if 'logging' in globals(): logging.warning(f"Tool.__init__: Could not get initial alpha ({e_alpha_get}), assuming {initial_alpha}.")
+        
         if os.name == 'nt':
             if 'do_set_window_deffont' in globals() and callable(globals()['do_set_window_deffont']):
-                do_set_window_deffont(self) # Убедитесь, что do_set_window_deffont определена
+                try:
+                    do_set_window_deffont(self)
+                except Exception as e_font_fix:
+                    if 'logging' in globals(): logging.error(f"Tool.__init__: Error in do_set_window_deffont: {e_font_fix}")
         
-        # Присваиваем ссылку на функцию warn_win
-        self.message_pop = warn_win  # Теперь warn_win должна быть определена
+        self.message_pop = warn_win
         
         self.title('MIO-KITCHEN')
-        # Убедитесь, что images и PhotoImage импортированы и доступны
         if os.name != "posix" and 'images' in globals() and hasattr(images, 'icon_byte') and 'PhotoImage' in globals():
             try:
                 self.iconphoto(True, PhotoImage(data=images.icon_byte))
             except Exception as e_icon:
                  if 'logging' in globals(): logging.error(f"Failed to set application icon: {e_icon}")
+
+        # --- Предлагаемое исправление для микрофризов на Windows ---
+        if os.name == 'nt':
+            # Эта "встряска" атрибута alpha может помочь DWM Windows
+            # правильно инициализировать композицию окна для плавной отрисовки.
+            # Мы делаем это один раз при инициализации окна.
+            # Значение 0.99 используется, чтобы изменение было минимально заметным,
+            # но достаточным для срабатывания механизма DWM.
+            try:
+                if 'logging' in globals(): logging.info("Tool.__init__: Applying alpha 'shake' fix for Windows.")
+                
+                # Кратковременно устанавливаем альфа чуть меньше 1.0
+                self.attributes("-alpha", 0.99) 
+                
+                # Даем Tkinter и системе время обработать это изменение.
+                # self.update() может быть слишком агрессивным здесь и вызвать другие проблемы.
+                # self.update_idletasks() обычно безопаснее.
+                self.update_idletasks() 
+                
+                # Возвращаем исходное или желаемое значение альфа-канала.
+                # Если initial_alpha было успешно получено и оно не 1.0 (например, из настроек),
+                # то мы вернем его. Иначе, вернем 1.0.
+                self.attributes("-alpha", initial_alpha) 
+                self.update_idletasks() # Еще раз, чтобы закрепить
+                
+                if 'logging' in globals(): logging.info(f"Tool.__init__: Alpha 'shake' fix applied. Alpha restored to {initial_alpha}.")
+            except tk.TclError as e_alpha_fix:
+                # Эта ошибка может возникнуть, если окно еще не готово к изменению атрибутов
+                if 'logging' in globals(): logging.error(f"Tool.__init__: TclError during alpha 'shake' fix: {e_alpha_fix}. Window might not be ready.")
+            except Exception as e_generic_alpha_fix:
+                if 'logging' in globals(): logging.error(f"Tool.__init__: Generic error during alpha 'shake' fix: {e_generic_alpha_fix}")
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
@@ -3262,9 +3309,17 @@ class MpkStore(Toplevel):
         create_thread(self.get_db)
         self.label_frame.update_idletasks()
         self.canvas.bind_all("<MouseWheel>",
-                             lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
+                             lambda event: self._safe_scroll(-1 * (int(event.delta / 120))))
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
         move_center(self)
+
+    def _safe_scroll(self, delta_units):
+        try:
+            if hasattr(self, 'canvas') and self.canvas and self.canvas.winfo_exists():
+                self.canvas.yview_scroll(delta_units, "units")
+        except tk.TclError:
+            # Игнорируем ошибку, если виджет уже не существует или команда недействительна
+            pass
 
     def init_repo(self):
         if not hasattr(settings, 'plugin_repo'):
@@ -3284,53 +3339,100 @@ class MpkStore(Toplevel):
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def add_app(self, app_dict=None):
-        self.clear()
+        self.clear() # Предполагается, что self.clear() корректно очищает self.deque и self.app_infos
+        
+        _lang_obj = globals().get('lang') # Получаем lang для локализации
+
         if app_dict is None:
-            app_dict = []
+            app_dict = [] # Инициализируем пустым списком, если ничего не передано
+            
         for data in app_dict:
-            if data.get('id') in self.app_infos:
+            if data.get('id') in self.app_infos: # Пропускаем, если информация уже добавлена
                 continue
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=150)
-            f.pack_propagate(False)
-            self.app_infos[data.get('id')] = f
-            self.deque.append(f)
-            ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
-            fb = ttk.Frame(f)
-            f2 = ttk.Frame(fb)
-            ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
-            # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
-            o = ttk.Label(f2,
-                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
-                          , wraplength=250)
-            o.pack_propagate(False)
-            o.pack(side=LEFT, padx=5, pady=5)
-            f2.pack(side=TOP)
-            f3 = ttk.Frame(fb)
-            desc = data.get('desc')
-            if not desc:
-                desc = 'No Description.'
-            ttk.Label(f3, text=f"{desc}", wraplength=250).pack(padx=5, pady=5)
-            f3.pack(side=BOTTOM)
-            fb.pack(side=LEFT, padx=5, pady=5)
+            
+            # Получаем локализованный текст для LabelFrame
+            app_name_text = data.get('name', "Unknown App") # Фоллбэк, если имя отсутствует
+            
+            f_labelframe = ttk.LabelFrame(self.label_frame, text=app_name_text, width=590, height=150)
+            f_labelframe.pack_propagate(False) # Чтобы размеры LabelFrame не менялись из-за содержимого
+            self.app_infos[data.get('id')] = f_labelframe # Сохраняем ссылку на LabelFrame
+            self.deque.append(f_labelframe) # Добавляем в список для очистки
+            
+            # Левая часть: Иконка (если есть)
+            # Предполагаем, что self.logo - это PhotoImage для заглушки
+            # В реальном коде здесь должна быть логика загрузки иконки для каждого плагина
+            icon_label = ttk.Label(f_labelframe, image=self.logo) # self.logo должен быть определен
+            icon_label.pack(side=LEFT, padx=5, pady=5)
+
+            # Центральная часть: Информация о приложении (имя, автор, версия, размер, описание)
+            info_frame = ttk.Frame(f_labelframe)
+            
+            # Верхняя строка информации: Автор, Версия, Размер
+            details_frame = ttk.Frame(info_frame)
+            author_text = getattr(_lang_obj, 't21', "Author:") # lang.t21 = "Author:"
+            version_text = getattr(_lang_obj, 't22', "Version:") # lang.t22 = "Version:"
+            size_text = getattr(_lang_obj, 'size', "Size:") # lang.size = "Size" (у вас в JSON)
+            
+            # Формируем строку с деталями
+            details_str = (
+                f"{author_text} {data.get('author', 'N/A')} | "
+                f"{version_text} {data.get('version', 'N/A')} | "
+                f"{size_text} {hum_convert(data.get('size', 0)) if 'hum_convert' in globals() else data.get('size', 0)}"
+            )
+            details_label = ttk.Label(details_frame, text=details_str, wraplength=350) # Увеличил wraplength
+            details_label.pack(side=LEFT, padx=5, pady=2, anchor='w')
+            details_frame.pack(side=TOP, fill=X, anchor='w')
+
+            # Описание
+            desc_text = data.get('desc', 'No Description.')
+            description_label = ttk.Label(info_frame, text=desc_text, wraplength=350) # Увеличил wraplength
+            description_label.pack(side=TOP, padx=5, pady=2, fill=X, expand=True, anchor='w')
+            
+            info_frame.pack(side=LEFT, padx=5, pady=5, fill=BOTH, expand=True)
+
+            # Правая часть: Кнопки "Установить" и "Удалить"
+            buttons_frame = ttk.Frame(f_labelframe)
+            
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
 
-            bu = ttk.Button(f, text=lang.text21,
-                            command=lambda a=args: create_thread(self.download, *a), width=5)
-            uninstall_button = ttk.Button(f, text=lang.text20,
-                                          command=lambda a=data.get('id'): create_thread(self.uninstall,
-                                                                                         a), width=5)
-            if not module_manager.get_installed(data.get('id')):
-                bu.config(style="Accent.TButton")
-                uninstall_button.config(state='disabled')
+            # Локализация текста кнопок
+            install_button_text = getattr(_lang_obj, 'text21', "Install") # lang.text21 = "Install"
+            if not isinstance(install_button_text, str) or install_button_text.strip().lower() == "none":
+                install_button_text = "Install"
+
+            uninstall_button_text = getattr(_lang_obj, 'text20', "Uninstall") # lang.text20 = "Uninstall"
+            if not isinstance(uninstall_button_text, str) or uninstall_button_text.strip().lower() == "none":
+                uninstall_button_text = "Uninstall"
+
+            # --- ИЗМЕНЕНИЕ: Убираем фиксированную width ---
+            install_btn = ttk.Button(buttons_frame, text=install_button_text,
+                                     command=lambda a=args: create_thread(self.download, *a))
+            
+            uninstall_btn = ttk.Button(buttons_frame, text=uninstall_button_text,
+                                       command=lambda a=data.get('id'): create_thread(self.uninstall, a))
+            # --- КОНЕЦ ИЗМЕНЕНИЯ ---
+
+            # Логика отображения/скрытия кнопок и стилей
+            _module_manager_obj = globals().get('module_manager') # Глобальный объект module_manager
+            if _module_manager_obj and _module_manager_obj.get_installed(data.get('id')):
+                install_btn.config(state='disabled') # Или другой стиль/текст для уже установленного
+                uninstall_btn.config(style="Accent.TButton") # Акцент на удаление
             else:
-                bu.config(width=5)
-                uninstall_button.config(style="Accent.TButton")
-            self.control[data.get('id')] = bu, uninstall_button
-            uninstall_button.pack(side=RIGHT, padx=5, pady=5)
-            bu.pack(side=RIGHT, padx=5, pady=5)
-            f.pack(padx=5, pady=5, anchor='nw', expand=1)
-        self.label_frame.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+                install_btn.config(style="Accent.TButton") # Акцент на установку
+                uninstall_btn.config(state='disabled')
+
+            self.control[data.get('id')] = (install_btn, uninstall_btn) # Сохраняем ссылки на кнопки
+
+            # Упаковываем кнопки одну под другой для лучшего использования вертикального пространства
+            install_btn.pack(side=TOP, padx=5, pady=(0, 2), fill=X) # fill=X чтобы растянуть по ширине buttons_frame
+            uninstall_btn.pack(side=TOP, padx=5, pady=(2, 0), fill=X)
+            
+            buttons_frame.pack(side=RIGHT, padx=5, pady=5, fill=Y) # fill=Y чтобы занять высоту f_labelframe
+            
+            f_labelframe.pack(padx=5, pady=5, anchor='nw', fill=X, expand=True) # fill=X для LabelFrame
+
+        self.label_frame.update_idletasks() # Обновляем для корректного scrollregion
+        self.canvas.config(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
 
     def uninstall(self, id_):
         bu, uninstall_button = self.control.get(id_)
@@ -4563,34 +4665,46 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "") -> str: # Тип возвращаемого значения изменен для ясности, но может быть и Optional[str]
-    if not title:
-        title_text_key = 'text76' # Используем ключ, если есть
-        default_title_text = "Input"
-        title_text = getattr(lang, title_text_key, default_title_text)
-        if not isinstance(title_text, str) or title_text == "None":
-            title_text = default_title_text
-    else:
-        title_text = title
+def input_(title: str = None, text: str = "") -> str: 
+    _lang_obj = globals().get('lang')
+    parent_window = globals().get('win')
 
-    parent_window = win 
+    effective_title_str = title 
 
+    if not title or (isinstance(title, str) and title.strip().lower() == "none"):
+        # Используем ваш ключ text76 ("Enter text") как заголовок по умолчанию
+        default_title_key = 'text76' 
+        fallback_default_text = "Input" # Абсолютный фоллбэк
+        
+        title_from_lang = fallback_default_text 
+        if _lang_obj:
+            title_from_lang = getattr(_lang_obj, default_title_key, fallback_default_text)
+        
+        if not isinstance(title_from_lang, str) or title_from_lang.strip().lower() == "none":
+            effective_title_str = fallback_default_text
+        else:
+            effective_title_str = title_from_lang
+    
     dialog = Toplevel() 
-    dialog.title(title_text)
+    dialog.title(effective_title_str)
 
     if parent_window and parent_window.winfo_exists():
-        dialog.transient(parent_window)
+        try: 
+            dialog.transient(parent_window)
+        except tk.TclError:
+            if 'logging' in globals(): logging.warning("input_: Failed to set transient, parent might be destroyed.")
 
     input_var = StringVar(master=dialog)
     input_var.set(text)
-
-    # ИЗМЕНЕНИЕ: result_container["value"] изначально None
     result_container = {"value": None} 
 
     frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=15, pady=10)
 
-    ttk.Label(frame_inner, text=title_text, font=(None, 12)).pack(side=TOP, pady=(0, 10))
+    # Метка внутри диалога. Используем тот же effective_title_str.
+    # Если текст метки должен отличаться от заголовка окна,
+    # потребуется передавать отдельный аргумент 'label_text' в input_()
+    ttk.Label(frame_inner, text=effective_title_str, font=(None, 12)).pack(side=TOP, pady=(0, 10))
 
     entry = ttk.Entry(frame_inner, textvariable=input_var, font=(None, 10))
     entry.pack(pady=5, padx=5, fill=X, ipady=4)
@@ -4599,27 +4713,19 @@ def input_(title: str = None, text: str = "") -> str: # Тип возвраща�
     button_frame.pack(fill=X, pady=(10, 0), side=BOTTOM)
 
     def on_ok(event=None):
-        # При ОК, мы берем значение из поля ввода.
-        # Если поле пустое, input_var.get() вернет "" (пустую строку).
         result_container["value"] = input_var.get() 
-        dialog.destroy()
+        if dialog.winfo_exists(): dialog.destroy()
 
     def on_cancel(event=None):
-        # При Отмене, result_container["value"] остается None (как было инициализировано)
-        # или можно явно: result_container["value"] = None
-        dialog.destroy()
+        result_container["value"] = None 
+        if dialog.winfo_exists(): dialog.destroy()
 
-    ok_button_text_key = 'ok'
-    default_ok_text = "OK"
-    ok_button_text = getattr(lang, ok_button_text_key, default_ok_text)
-    if not isinstance(ok_button_text, str) or ok_button_text == "None":
-        ok_button_text = default_ok_text
+    # Используем ваши ключи "ok" и "cancel"
+    ok_button_text = getattr(_lang_obj, 'ok', "OK")
+    if not isinstance(ok_button_text, str) or ok_button_text.strip().lower() == "none": ok_button_text = "OK"
 
-    cancel_button_text_key = 'cancel'
-    default_cancel_text = "Cancel"
-    cancel_button_text = getattr(lang, cancel_button_text_key, default_cancel_text)
-    if not isinstance(cancel_button_text, str) or cancel_button_text == "None":
-        cancel_button_text = default_cancel_text
+    cancel_button_text = getattr(_lang_obj, 'cancel', "Cancel")
+    if not isinstance(cancel_button_text, str) or cancel_button_text.strip().lower() == "none": cancel_button_text = "Cancel"
         
     ok_button = ttk.Button(button_frame, text=ok_button_text, command=on_ok, style="Accent.TButton")
     ok_button.pack(side=LEFT, padx=(0, 5), expand=True, fill=X)
@@ -4629,15 +4735,20 @@ def input_(title: str = None, text: str = "") -> str: # Тип возвраща�
 
     entry.bind("<Return>", on_ok)
     dialog.bind("<Escape>", on_cancel)
-    dialog.protocol("WM_DELETE_WINDOW", on_cancel) # Обработка закрытия окна крестиком как отмена
+    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
 
-    move_center(dialog)    
-    dialog.after(10, lambda: entry.focus_set()) 
+    _move_center_func = globals().get('move_center')
+    if _move_center_func and callable(_move_center_func):
+        try:
+            _move_center_func(dialog)
+        except Exception as e_mc:
+             if 'logging' in globals(): logging.error(f"Error in move_center for input_ dialog: {e_mc}")
+    
+    dialog.after(10, lambda: entry.focus_set() if entry.winfo_exists() else None) 
     dialog.grab_set()
     dialog.wait_window()
 
-    return result_container["value"] # Вернет None при отмене, "" при ОК с пустым полем, или "текст"
-
+    return result_container["value"]
 
 def script2fs(path):
     if os.path.exists(os.path.join(path, "system", "app")):
@@ -5645,132 +5756,270 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
     def remove(self):
         """Удаляет выбранный проект."""
-        # project_manger, current_project_name (StringVar), win, lang, ask_win, rmdir, logging должны быть доступны
         _pm = globals().get('project_manger')
         _cpn_var = globals().get('current_project_name')
         _win_obj = globals().get('win')
         _ask_win_func = globals().get('ask_win')
         _rmdir_func = globals().get('rmdir')
+        _lang_obj = globals().get('lang')
 
-        if not (_pm and _cpn_var and _win_obj and _ask_win_func and _rmdir_func):
+        if not (_pm and _cpn_var and _win_obj and _ask_win_func and _rmdir_func and _lang_obj):
             if 'logging' in globals(): logging.error("ProjectMenuUtils.remove: Missing critical dependencies.")
             return
 
         project_to_delete = _cpn_var.get()
         if not project_to_delete:
-            msg_select = getattr(lang, 'warn1_select_project', "Please select a project to delete.") if 'lang' in globals() else "Please select a project to delete."
+            # Используем warn1: "Please select a project"
+            msg_select = getattr(_lang_obj, 'warn1', "Please select a project to delete.")
+            if not isinstance(msg_select, str) or msg_select.strip().lower() == "none": msg_select = "Please select a project to delete."
             _win_obj.message_pop(msg_select, "orange")
             return
         
-        if not _pm.exist(project_to_delete): # Проверяем, существует ли он на самом деле
-            msg_not_exist = getattr(lang, 'warn1_project_not_exist', "Project '%s' does not exist or path is invalid.") % project_to_delete if 'lang' in globals() else f"Project '{project_to_delete}' does not exist."
+        if not _pm.exist(project_to_delete):
+            # Предлагаю новый ключ
+            msg_not_exist_key = 'delete_error_project_not_exist_format'
+            default_msg_not_exist = "Project '%s' to delete does not exist or path is invalid."
+            msg_not_exist_template = getattr(_lang_obj, msg_not_exist_key, default_msg_not_exist)
+            if not isinstance(msg_not_exist_template, str) or msg_not_exist_template.strip().lower() == "none": msg_not_exist_template = default_msg_not_exist
+            
+            try:
+                msg_not_exist = msg_not_exist_template % project_to_delete.replace('%', '%%')
+            except TypeError:
+                msg_not_exist = default_msg_not_exist.replace('%s', project_to_delete.replace('%', '%%'))
             _win_obj.message_pop(msg_not_exist, "red")
-            self.listdir() # Обновить список, на всякий случай
+            self.listdir()
             return
 
-        confirm_text_key = 'confirm_delete_project_q' # Более конкретный ключ
-        default_confirm_text = "Are you sure you want to PERMANENTLY DELETE project '%s' and all its contents?"
-        confirm_text_format = getattr(lang, confirm_text_key, default_confirm_text) if 'lang' in globals() else default_confirm_text
+        # --- ИЗМЕНЕНИЕ ДЛЯ ЗАДАЧИ 3 (используем ваш ключ t9) ---
+        confirm_text_key = 't9' # Ваш ключ: "Delete {}?"
+        default_confirm_pattern = "Delete project '%s'?" # Альтернативный шаблон с %s для единообразия
+        
+        pattern_from_lang = getattr(_lang_obj, confirm_text_key, default_confirm_pattern)
+        
+        if not isinstance(pattern_from_lang, str) or pattern_from_lang.strip().lower() == "none":
+            pattern_from_lang = default_confirm_pattern # Если t9 пустой, используем наш %s шаблон
+            if 'logging' in globals():
+                logging.warning(f"ProjectMenuUtils.remove: Fallback for lang.{confirm_text_key}. Used default pattern.")
+
+        project_name_for_formatting = str(project_to_delete).replace('%', '%%').replace('{', '{{').replace('}', '}}')
+        
+        message_for_dialog: str
+        try:
+            if '{}' in pattern_from_lang: # Если используется ваш формат с {}
+                message_for_dialog = pattern_from_lang.format(project_name_for_formatting)
+            elif '%s' in pattern_from_lang: # Если используется формат с %s (наш фоллбэк)
+                final_template_pattern = pattern_from_lang.replace('%', '%%').replace('%%s', '%s', 1)
+                message_for_dialog = final_template_pattern % project_name_for_formatting
+            else: # Если нет плейсхолдеров, просто используем строку
+                message_for_dialog = pattern_from_lang.replace('%', '%%')
+        except (IndexError, KeyError, ValueError, TypeError) as e_format_ask:
+            # Фоллбэк, если форматирование не удалось
+            simple_confirm_key = 'delete_confirm_simple' # Новый ключ
+            default_simple_confirm = "Are you sure you want to delete this project?"
+            message_for_dialog = getattr(_lang_obj, simple_confirm_key, default_simple_confirm)
+            if not isinstance(message_for_dialog, str) or message_for_dialog.strip().lower() == "none":
+                message_for_dialog = default_simple_confirm
+            if 'logging' in globals():
+                logging.warning(f"ProjectMenuUtils.remove: Formatting error for confirm message pattern '{pattern_from_lang}' with project '{project_to_delete}'. Error: {e_format_ask}. Using simple confirm: '{message_for_dialog}'")
+        # --- КОНЕЦ ИЗМЕНЕНИЯ ДЛЯ ЗАДАЧИ 3 ---
             
-        if _ask_win_func(confirm_text_format % project_to_delete) == 1:
-            project_path_to_delete = _pm.get_work_path(project_to_delete) # Получаем полный путь
+        if _ask_win_func(message_for_dialog) == 1: # ask_win должен использовать lang.confirm_title для заголовка
+            project_path_to_delete = _pm.get_work_path(project_to_delete)
             try:
-                _rmdir_func(project_path_to_delete) # rmdir должен быть потокобезопасным, если вызывается из create_thread
-                msg_deleted = getattr(lang, 'project_deleted_ok', "Project '%s' deleted.") % project_to_delete if 'lang' in globals() else f"Project '{project_to_delete}' deleted."
-                print(msg_deleted) # В консоль/лог
+                _rmdir_func(project_path_to_delete)
+                # Предлагаю новый ключ
+                msg_deleted_key = 'delete_success_format'
+                default_msg_deleted = "Project '%s' deleted."
+                msg_deleted_template = getattr(_lang_obj, msg_deleted_key, default_msg_deleted)
+                if not isinstance(msg_deleted_template, str) or msg_deleted_template.strip().lower() == "none": msg_deleted_template = default_msg_deleted
+                
+                try:
+                    msg_deleted = msg_deleted_template % project_to_delete.replace('%', '%%')
+                except TypeError:
+                    msg_deleted = default_msg_deleted.replace('%s', project_to_delete.replace('%', '%%'))
+                print(msg_deleted)
                 if 'logging' in globals(): logging.info(msg_deleted)
+
             except Exception as e_rm:
-                msg_fail_delete = getattr(lang, 'fail_delete_project', "Failed to delete project '%s': %s") % (project_to_delete, e_rm) if 'lang' in globals() else f"Failed to delete project '{project_to_delete}': {e_rm}"
+                # Предлагаю новый ключ
+                msg_fail_delete_key = 'delete_error_failed_format'
+                default_msg_fail_delete = "Failed to delete project '%s': %s"
+                msg_fail_delete_template = getattr(_lang_obj, msg_fail_delete_key, default_msg_fail_delete)
+                if not isinstance(msg_fail_delete_template, str) or msg_fail_delete_template.strip().lower() == "none": msg_fail_delete_template = default_msg_fail_delete
+                
+                try:
+                    str_e_rm = str(e_rm).replace('%', '%%')
+                    msg_fail_delete = msg_fail_delete_template % (project_to_delete.replace('%', '%%'), str_e_rm)
+                except TypeError:
+                    msg_fail_delete = default_msg_fail_delete.replace('%s', project_to_delete.replace('%', '%%'), 1).replace('%s', str(e_rm).replace('%', '%%'), 1)
                 _win_obj.message_pop(msg_fail_delete, "red")
                 if 'logging' in globals(): logging.error(f"Error deleting project {project_path_to_delete}: {e_rm}")
             
-            self.listdir() # Обновить список. current_project_name будет сброшен или установлен в первый.
+            self.listdir()
 
 
     def rename(self) -> bool:
         """Переименовывает выбранный проект."""
-        # project_manger, current_project_name (StringVar), input_, win, lang, settings, os, logging должны быть доступны
         _pm = globals().get('project_manger')
         _cpn_var = globals().get('current_project_name')
         _input_func = globals().get('input_')
         _win_obj = globals().get('win')
+        _lang_obj = globals().get('lang') 
 
-        if not (_pm and _cpn_var and _input_func and _win_obj):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: Missing critical dependencies.")
+        if not (_pm and _cpn_var and _input_func and _win_obj and _lang_obj):
+            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: Missing critical dependencies (project_manger, current_project_name, input_, win, lang).")
             return False
         
         old_name = _cpn_var.get()
         if not old_name:
-            msg_select = getattr(lang, 'warn1_select_project_rename', "Please select a project to rename.") if 'lang' in globals() else "Please select a project to rename."
+            # Используем существующий warn1, если подходит, или создаем новый более специфичный
+            # msg_select_key = 'warn1_select_project_rename' -> 'warn1' (существующий)
+            # default_msg_select = "Please select a project to rename."
+            msg_select = getattr(_lang_obj, 'warn1', "Please select a project to rename.") # lang.warn1 = "Please select a project"
+            if not isinstance(msg_select, str) or msg_select.strip().lower() == "none": msg_select = "Please select a project to rename."
             _win_obj.message_pop(msg_select, "orange")
             return False
 
-        if not _pm.exist(old_name): # Проверка, что старый проект еще существует
-            msg_not_exist_old = getattr(lang, 'warn1_project_not_exist_rename', "Selected project '%s' for rename does not exist.") % old_name if 'lang' in globals() else f"Selected project '{old_name}' for rename does not exist."
+        if not _pm.exist(old_name):
+            # Предлагаю новый ключ для большей специфичности
+            msg_not_exist_old_key = 'rename_error_old_project_not_exist'
+            default_msg_not_exist_old = "Selected project '%s' for rename does not exist."
+            msg_not_exist_old_template = getattr(_lang_obj, msg_not_exist_old_key, default_msg_not_exist_old)
+            if not isinstance(msg_not_exist_old_template, str) or msg_not_exist_old_template.strip().lower() == "none": msg_not_exist_old_template = default_msg_not_exist_old
+            
+            try:
+                msg_not_exist_old = msg_not_exist_old_template % old_name.replace('%', '%%')
+            except TypeError:
+                 msg_not_exist_old = default_msg_not_exist_old.replace("%s", old_name.replace('%', '%%'))
             _win_obj.message_pop(msg_not_exist_old, "red")
             self.listdir()
             return False
 
-        title_rename_key = 'text102_rename_title' # Более конкретный ключ
-        default_title_rename = "Rename project '%s' to:"
-        title_rename_format = getattr(lang, title_rename_key, default_title_rename) if 'lang' in globals() else default_title_rename
+        title_rename_key = 'text102' # Ваш ключ: "Rename:"
+        # Поскольку text102 не содержит %s, изменим логику формирования заголовка.
+        # Либо text102 должен быть "Rename Project '%s'"
+        # Либо мы просто используем "Rename: ProjectName"
+        title_base_from_lang = getattr(_lang_obj, title_rename_key, "Rename:")
+        if not isinstance(title_base_from_lang, str) or title_base_from_lang.strip().lower() == "none":
+            title_base_from_lang = "Rename:"
+        
+        # Формируем заголовок: "Rename: ИмяПроекта" или просто "Rename Project", если имя не нужно
+        # Для большей гибкости можно иметь два ключа: один общий "Rename Project" и один с плейсхолдером.
+        # Здесь для простоты будем конкатенировать, если text102 это просто "Rename:".
+        # Если text102 = "Rename Project '%s'", то код из Задачи 2 будет работать.
+        # Предположим, что text102 - это "Rename:"
+        final_title_for_dialog = f"{title_base_from_lang.rstrip()} {old_name}" 
+        # Если text102 = "Rename Project '%s'", то код должен быть как в решении задачи 2:
+        # title_pattern_from_lang = getattr(_lang_obj, title_rename_key, "Rename Project '%s'")
+        # if not isinstance(title_pattern_from_lang, str) or title_pattern_from_lang.strip().lower() == "none":
+        #     title_pattern_from_lang = "Rename Project '%s'"
+        # try:
+        #     final_title_for_dialog = title_pattern_from_lang % str(old_name).replace('%', '%%')
+        # except (TypeError, ValueError):
+        #     final_title_for_dialog = "Rename Project" # Фоллбэк
 
-        new_name_raw = _input_func(title=title_rename_format % old_name, text=old_name)
 
-        if new_name_raw is None: # Отмена
-             msg_cancelled = getattr(lang, 'action_cancelled', "Action cancelled.") if 'lang' in globals() else "Action cancelled."
-             _win_obj.message_pop(msg_cancelled, "orange")
-             return False
+        new_name_raw = _input_func(title=final_title_for_dialog, text=old_name)
+
+        if new_name_raw is None: 
+            # msg_cancelled_key = 'rename_cancelled_by_user' # Новый ключ
+            # default_msg_cancelled = "Rename operation cancelled by user."
+            # msg_cancelled = getattr(_lang_obj, msg_cancelled_key, default_msg_cancelled)
+            # if not isinstance(msg_cancelled, str) or msg_cancelled.strip().lower() == "none": msg_cancelled = default_msg_cancelled
+            # _win_obj.message_pop(msg_cancelled, "orange") # УБРАЛИ ЭТО СООБЩЕНИЕ СОГЛАСНО ЗАДАЧЕ
+            if 'logging' in globals():
+                logging.info(f"User cancelled renaming project '{old_name}'.")
+            return False
         
         new_name = new_name_raw.strip().replace(' ', '_')
 
         if not new_name:
-            msg_empty = getattr(lang, 'warn12_new_name_empty', "New project name cannot be empty.") if 'lang' in globals() else "New project name cannot be empty."
+            # Используем warn12: "Please enter"
+            # Для большей точности можно создать: 'rename_error_new_name_empty': "New project name cannot be empty."
+            msg_empty = getattr(_lang_obj, 'warn12', "New project name cannot be empty.")
+            if not isinstance(msg_empty, str) or msg_empty.strip().lower() == "none": msg_empty = "New project name cannot be empty."
             _win_obj.message_pop(msg_empty, "orange")
             return False
             
         invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
         if any(char in new_name for char in invalid_chars) or not new_name.isprintable():
-            msg_invalid_chars = getattr(lang, 'invalid_project_name_chars_rename', "Invalid characters in new project name.") if 'lang' in globals() else "Invalid characters in new project name."
+            # Предлагаю новый ключ
+            msg_invalid_chars_key = 'rename_error_invalid_chars'
+            default_msg_invalid_chars = "Invalid characters in new project name."
+            msg_invalid_chars = getattr(_lang_obj, msg_invalid_chars_key, default_msg_invalid_chars)
+            if not isinstance(msg_invalid_chars, str) or msg_invalid_chars.strip().lower() == "none": msg_invalid_chars = default_msg_invalid_chars
             _win_obj.message_pop(msg_invalid_chars, "orange")
             return False
 
         if new_name == old_name:
-            msg_same_name = getattr(lang, 'text104_same_name', "The new name is the same as the old one. No changes made.") if 'lang' in globals() else "The new name is the same as the old one."
-            _win_obj.message_pop(msg_same_name, "info") # Используем "info" или просто ничего не делаем
-            return True # Технически не ошибка, но действие не выполнено как изменение
+            # Используем text104: "The new name is the same as the previous one."
+            msg_same_name = getattr(_lang_obj, 'text104', "The new name is the same as the old one. No changes made.")
+            if not isinstance(msg_same_name, str) or msg_same_name.strip().lower() == "none": msg_same_name = "The new name is the same as the old one. No changes made."
+            _win_obj.message_pop(msg_same_name, "info")
+            return True
         
-        old_path = _pm.get_work_path(old_name) # Полный путь к старой папке
+        old_path = _pm.get_work_path(old_name)
         
-        # settings.path должен быть доступен и корректен
-        if 'settings' not in globals() or not hasattr(settings, 'path') or not settings.path:
+        _settings_obj = globals().get('settings')
+        if not (_settings_obj and hasattr(_settings_obj, 'path') and _settings_obj.path):
             if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: settings.path not available.")
-            _win_obj.message_pop("Error: Base path for projects not configured.", "red")
+            base_path_error_key = 'error_base_path_not_configured' # Новый ключ
+            default_base_path_error = "Error: Base path for projects not configured."
+            base_path_error_msg = getattr(_lang_obj, base_path_error_key, default_base_path_error)
+            if not isinstance(base_path_error_msg, str) or base_path_error_msg.strip().lower() == "none": base_path_error_msg = default_base_path_error
+            _win_obj.message_pop(base_path_error_msg, "red")
             return False
         
-        new_path = os.path.join(settings.path, new_name) # Полный путь к новой папке
+        new_path = os.path.join(_settings_obj.path, new_name)
 
         if os.path.exists(new_path):
-            msg_new_exists = getattr(lang, 'text103_new_name_exists', "A project with the name '%s' already exists!") % new_name if 'lang' in globals() else f"A project with the name '{new_name}' already exists!"
-            _win_obj.message_pop(msg_new_exists, "orange")
+            # Используем text103: "A folder or file with the same name exists!"
+            # Для форматирования с именем нужен другой ключ или изменение text103
+            msg_new_exists_key = 'rename_error_new_name_exists_format' # Новый ключ
+            default_msg_new_exists = "A project with the name '%s' already exists!"
+            msg_new_exists_template = getattr(_lang_obj, msg_new_exists_key, default_msg_new_exists)
+            if not isinstance(msg_new_exists_template, str) or msg_new_exists_template.strip().lower() == "none": msg_new_exists_template = default_msg_new_exists
+            
+            try:
+                msg_new_exists = msg_new_exists_template % new_name.replace('%', '%%')
+            except TypeError:
+                msg_new_exists = default_msg_new_exists.replace("%s", new_name.replace('%', '%%'))
+            _win_obj.message_pop(msg_new_exists, "orange") # Ваш text103 не параметризован
             return False
         
         try:
             os.rename(old_path, new_path)
-            msg_renamed_ok = getattr(lang, 'project_renamed_ok', "Project '%s' renamed to '%s'.") % (old_name, new_name) if 'lang' in globals() else f"Project '{old_name}' renamed to '{new_name}'."
-            print(msg_renamed_ok) # В консоль/лог
+            # Предлагаю новый ключ для сообщения об успехе
+            msg_renamed_ok_key = 'rename_success_format'
+            default_msg_renamed_ok = "Project '%s' renamed to '%s'."
+            msg_renamed_ok_template = getattr(_lang_obj, msg_renamed_ok_key, default_msg_renamed_ok)
+            if not isinstance(msg_renamed_ok_template, str) or msg_renamed_ok_template.strip().lower() == "none": msg_renamed_ok_template = default_msg_renamed_ok
+
+            try:
+                msg_renamed_ok = msg_renamed_ok_template % (old_name.replace('%', '%%'), new_name.replace('%', '%%'))
+            except TypeError:
+                msg_renamed_ok = default_msg_renamed_ok.replace("%s", old_name.replace('%', '%%'), 1).replace("%s", new_name.replace('%', '%%'), 1)
+
+            print(msg_renamed_ok)
             if 'logging' in globals(): logging.info(msg_renamed_ok)
             
-            _cpn_var.set(new_name) # Обновляем текущий проект в StringVar
-            self.listdir() # Обновляем список в комбобоксе
-            # self.combobox.set(new_name) # Убедимся, что комбобокс отображает новое имя (listdir должен это сделать)
+            _cpn_var.set(new_name)
+            self.listdir()
         except Exception as e_rename:
-            msg_fail_rename = getattr(lang, 'fail_rename_project', "Failed to rename project '%s' to '%s': %s") % (old_name, new_name, e_rename) if 'lang' in globals() else f"Failed to rename project: {e_rename}"
+            # Предлагаю новый ключ
+            msg_fail_rename_key = 'rename_error_failed_format'
+            default_msg_fail_rename = "Failed to rename project '%s' to '%s': %s"
+            msg_fail_rename_template = getattr(_lang_obj, msg_fail_rename_key, default_msg_fail_rename)
+            if not isinstance(msg_fail_rename_template, str) or msg_fail_rename_template.strip().lower() == "none": msg_fail_rename_template = default_msg_fail_rename
+
+            try:
+                str_e_rename = str(e_rename).replace('%', '%%')
+                msg_fail_rename = msg_fail_rename_template % (old_name.replace('%', '%%'), new_name.replace('%', '%%'), str_e_rename)
+            except TypeError:
+                 msg_fail_rename = default_msg_fail_rename.replace("%s", old_name.replace('%', '%%'), 1).replace("%s", new_name.replace('%', '%%'), 1).replace("%s", str(e_rename).replace('%', '%%'), 1)
+
             _win_obj.message_pop(msg_fail_rename, "red")
             if 'logging' in globals(): logging.error(f"Failed to rename project from {old_path} to {new_path}: {e_rename}")
-            # Если переименование не удалось, возможно, стоит восстановить старое имя в current_project_name,
-            # если оно изменилось до ошибки, и перечитать список.
-            # self.listdir() # Обновить список, чтобы отразить реальное состояние ФС
             return False
         return True
 
@@ -6012,14 +6261,134 @@ class UnpackGui(ttk.LabelFrame):
         return True
 
     def close_(self):
-        if not (hasattr(self, 'lsg') and self.lsg): return
-        lbs = self.lsg.selected.copy()
-        self.hd() # Update UI based on mode
-        if self.ch.get() == 1: # Unpack mode
-            unpack(lbs, self.fm.get()) # 'unpack' should be defined globally
-            self.refs() # Refresh list after unpack
-        else: # Pack mode
-            Packxx(lbs) # 'Packxx' should be defined globally
+        # --- Получение глобальных зависимостей ---
+        _cpn_var = globals().get('current_project_name')
+        _win_obj = globals().get('win')
+        _lang_obj = globals().get('lang')
+        _logging_obj = globals().get('logging') # Предполагаем, что logging импортирован и доступен
+
+        # Проверка наличия критических зависимостей
+        if not (_cpn_var and isinstance(_cpn_var, tk.StringVar) and \
+                _win_obj and hasattr(_win_obj, 'message_pop') and callable(_win_obj.message_pop) and \
+                _lang_obj):
+            if _logging_obj:
+                _logging_obj.error("UnpackGui.close_: Critical global dependencies (current_project_name, win.message_pop, lang) are missing or invalid.")
+            # В этом случае можно показать пользователю общее сообщение об ошибке, если _win_obj.message_pop доступен
+            # Например: _win_obj.message_pop("Internal error: Required components missing. Please restart.", "red", "Critical Error")
+            return
+
+        # --- Проверка, выбран ли проект ---
+        if not _cpn_var.get(): # Если имя текущего проекта пустое
+            # Текст предупреждения из локализации
+            warning_text_key = 'warn1' # Используем существующий ключ "Please select a project"
+            default_warning_text = "Please select a project first to proceed."
+            warning_text = getattr(_lang_obj, warning_text_key, default_warning_text)
+            if not isinstance(warning_text, str) or not warning_text.strip() or warning_text.strip().lower() == "none":
+                warning_text = default_warning_text
+                if _logging_obj: _logging_obj.warning(f"UnpackGui.close_: Fallback for lang.{warning_text_key}. Used default: '{default_warning_text}'")
+
+            # Заголовок окна предупреждения из локализации
+            warning_title_key = 'title_warning' # Предлагаемый новый ключ
+            default_warning_title = "Warning" # Текст по умолчанию для английского языка
+            warning_title = getattr(_lang_obj, warning_title_key, default_warning_title)
+            if not isinstance(warning_title, str) or not warning_title.strip() or warning_title.strip().lower() == "none":
+                warning_title = default_warning_title
+                if _logging_obj: _logging_obj.warning(f"UnpackGui.close_: Fallback for lang.{warning_title_key}. Used default: '{default_warning_title}'")
+            
+            # Родительское окно для message_pop (главное окно приложения)
+            parent_for_popup = None
+            if hasattr(_win_obj, 'winfo_exists') and _win_obj.winfo_exists(): # Проверка, что главное окно существует
+                parent_for_popup = _win_obj
+            
+            # Вызов стилизованного предупреждения
+            # win.message_pop является псевдонимом для warn_win, которая по умолчанию использует wait=1500ms
+            _win_obj.message_pop(text=warning_text, color="orange", title=warning_title, parent=parent_for_popup)
+            return # Прерываем выполнение метода, так как проект не выбран
+
+        # --- Основная логика метода, если проект выбран ---
+        # Проверка, что необходимые UI компоненты класса инициализированы
+        if not (hasattr(self, 'lsg') and self.lsg and \
+                hasattr(self, 'fm') and self.fm and \
+                hasattr(self, 'ch') and isinstance(self.ch, tk.BooleanVar)):
+            if _logging_obj:
+                _logging_obj.error("UnpackGui.close_: Internal UI components (lsg, fm, ch) are not properly initialized.")
+            # Можно показать сообщение пользователю о внутренней ошибке UI
+            # _win_obj.message_pop("Internal UI error. Please try restarting the application.", "red", "Error")
+            return
+
+        selected_items = self.lsg.selected.copy() # Копируем список выбранных элементов
+        
+        # Вызываем self.hd() для обновления UI перед основной операцией, если это необходимо
+        # и если метод hd существует и является вызываемым
+        if hasattr(self, 'hd') and callable(self.hd):
+            try:
+                self.hd()
+            except Exception as e_hd_call:
+                 if _logging_obj: _logging_obj.error(f"Error calling self.hd() in UnpackGui.close_: {e_hd_call}")
+        
+        # Получаем глобальные функции/классы для операций
+        _unpack_func = globals().get('unpack')
+        _packxx_class = globals().get('Packxx')
+
+        if self.ch.get(): # Режим "Unpack" (ch.get() вернет True)
+            if not (_unpack_func and callable(_unpack_func)):
+                if _logging_obj: _logging_obj.error("UnpackGui.close_ (Unpack Mode): Global function 'unpack' is not available.")
+                # Информируем пользователя об ошибке
+                unavailable_error_key = 'error_unpack_unavailable'
+                default_unavailable_text = "Error: Unpack functionality is currently unavailable. Please check application setup."
+                unavailable_text = getattr(_lang_obj, unavailable_error_key, default_unavailable_text)
+                if not isinstance(unavailable_text, str) or not unavailable_text.strip() or unavailable_text.strip().lower() == "none": unavailable_text = default_unavailable_text
+                _win_obj.message_pop(unavailable_text, "red", "Operation Error")
+                return
+
+            file_format_to_unpack = self.fm.get() # Получаем выбранный формат файла
+            if not file_format_to_unpack: # Проверка, если формат не выбран
+                if _logging_obj: _logging_obj.warning("UnpackGui.close_ (Unpack Mode): No file format selected for unpacking.")
+                # Информируем пользователя
+                no_format_key = 'unpack_no_format_selected_warn'
+                default_no_format_text = "Please select a file format from the dropdown to unpack."
+                no_format_text = getattr(_lang_obj, no_format_key, default_no_format_text)
+                if not isinstance(no_format_text, str) or not no_format_text.strip() or no_format_text.strip().lower() == "none": no_format_text = default_no_format_text
+                _win_obj.message_pop(no_format_text, "orange", getattr(_lang_obj, 'title_input_needed', "Input Needed"))
+                return
+            
+            if not selected_items: # Проверка, выбраны ли элементы для распаковки
+                 no_items_key = 'unpack_no_items_selected_warn'
+                 default_no_items_text = "Please select items from the list to unpack."
+                 no_items_text = getattr(_lang_obj, no_items_key, default_no_items_text)
+                 if not isinstance(no_items_text, str) or not no_items_text.strip() or no_items_text.strip().lower() == "none": no_items_text = default_no_items_text
+                 _win_obj.message_pop(text=no_items_text, color="orange", title=getattr(_lang_obj, 'title_warning', "Warning"))
+                 return
+
+            _unpack_func(selected_items, file_format_to_unpack) # Выполняем распаковку
+            
+            # Обновляем список файлов после распаковки, если метод refs существует
+            if hasattr(self, 'refs') and callable(self.refs):
+                try:
+                    self.refs() 
+                except Exception as e_refs_call:
+                    if _logging_obj: _logging_obj.error(f"Error calling self.refs() after unpack operation: {e_refs_call}")
+
+        else: # Режим "Pack" (ch.get() вернет False)
+            if not (_packxx_class and callable(_packxx_class)):
+                if _logging_obj: _logging_obj.error("UnpackGui.close_ (Pack Mode): Global class 'Packxx' is not available.")
+                # Информируем пользователя об ошибке
+                unavailable_pack_key = 'error_pack_unavailable'
+                default_pack_unavailable_text = "Error: Pack functionality is currently unavailable. Please check application setup."
+                pack_unavailable_text = getattr(_lang_obj, unavailable_pack_key, default_pack_unavailable_text)
+                if not isinstance(pack_unavailable_text, str) or not pack_unavailable_text.strip() or pack_unavailable_text.strip().lower() == "none": pack_unavailable_text = default_pack_unavailable_text
+                _win_obj.message_pop(pack_unavailable_text, "red", "Operation Error")
+                return
+            
+            if not selected_items: # Проверка, выбраны ли элементы для упаковки
+                 no_items_pack_key = 'pack_no_items_selected_warn'
+                 default_no_items_pack_text = "Please select items from the list to pack."
+                 no_items_pack_text = getattr(_lang_obj, no_items_pack_key, default_no_items_pack_text)
+                 if not isinstance(no_items_pack_text, str) or not no_items_pack_text.strip() or no_items_pack_text.strip().lower() == "none": no_items_pack_text = default_no_items_pack_text
+                 _win_obj.message_pop(text=no_items_pack_text, color="orange", title=getattr(_lang_obj, 'title_warning', "Warning"))
+                 return
+
+            _packxx_class(selected_items) # Создаем экземпляр Packxx и передаем выбранные элементы
 
 def img2simg(path: str):
     call(['img2simg', path, f'{path}s'])
