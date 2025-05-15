@@ -1,22 +1,24 @@
-# tool.spec
-
 # -*- mode: python ; coding: utf-8 -*-
 
-# УДАЛИТЕ ЭТУ СТРОКУ, ЕСЛИ НЕ ИСПОЛЬЗУЕТЕ SPLASH ИЗ .SPEC:
-# from PyInstaller.utils.hooks import Splash # НЕПРАВИЛЬНЫЙ ИМПОРТ БЫЛ ЗДЕСЬ
-# ПРАВИЛЬНЫЙ ИМПОРТ ДЛЯ SPLASH (если нужен): from PyInstaller.ूद import Splash
-# НО ЕСЛИ ВЫ НЕ ОПРЕДЕЛЯЕТЕ ОБЪЕКТ SPLASH НИЖЕ, ЭТОТ ИМПОРТ НЕ НУЖЕН.
+# Импорт Splash УДАЛЕН, так как сплэш-экран будет управляться из build.py (через --splash)
+# или не будет использоваться, если его там нет.
+# from PyInstaller.ूद import Splash # <-- ЭТА СТРОКА УДАЛЕНА
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 block_cipher = None
 
+# Точка входа - корневой tool.py
 ANALYSIS_TARGET_SCRIPT = ['tool.py']
-ANALYSIS_PATHEX = ['src']
+# Пути для поиска модулей PyInstaller
+ANALYSIS_PATHEX = ['src'] # Для импортов из src/
 
+# Данные, которые должны быть ВНУТРИ _MEIPASS
 ANALYSIS_DATAS = [
     ('LICENSE', '.'),
-    ('README.md', '.'),
+    ('README.md', '.'), # Если есть
+    # Иконка и сплэш-картинка НЕ добавляются сюда, если они используются для EXE/сборки,
+    # а не как ресурсы внутри _MEIPASS, читаемые программой.
 ]
 ANALYSIS_DATAS += collect_data_files('PIL', include_py_files=True)
 ANALYSIS_DATAS += collect_data_files('sv_ttk')
@@ -28,8 +30,8 @@ HIDDEN_IMPORTS = [
     'pygments.lexers',
 ]
 HIDDEN_IMPORTS += collect_submodules('requests')
-HIDDEN_IMPORTS += collect_submodules('core')
-HIDDEN_IMPORTS += collect_submodules('tkui')
+HIDDEN_IMPORTS += collect_submodules('core') # Собирает все из src/core
+HIDDEN_IMPORTS += collect_submodules('tkui') # Собирает все из src/tkui
 
 EXCLUDES = ['numpy']
 
@@ -52,11 +54,12 @@ a = Analysis(
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 EXE_APP_NAME = 'tool'
-EXE_ICON_PATH = 'icon.ico'
+EXE_ICON_PATH = 'icon.ico' # Иконка для tool.exe (лежит в корне проекта)
 
 exe = EXE(
     pyz,
     a.scripts,
+    # Параметр splash УДАЛЕН отсюда
     name=EXE_APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
@@ -72,16 +75,15 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=EXE_ICON_PATH
-    # Если вы НЕ используете сплэш из .spec, здесь не должно быть параметра splash=
 )
 
-APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase'
+APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase' # Временная папка для PyInstaller
 
 coll = COLLECT(
     exe,
     a.binaries,
     a.zipfiles,
-    a.datas,
+    a.datas, # Включает LICENSE, README, данные PIL, sv_ttk, chlorophyll в _MEIPASS
     strip=False,
     upx=True,
     upx_exclude=[],
