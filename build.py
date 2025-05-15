@@ -121,20 +121,21 @@ if not spec_file_path.is_file():
     print(f"FATAL ERROR: PyInstaller .spec file not found at '{spec_file_path}'.")
     sys.exit(1)
 
+# Аргументы для PyInstaller теперь не включают --splash
 pyinstaller_args = [
     str(spec_file_path),
     '--noconfirm',
     '--clean',
 ]
-# Если сплэш НЕ определен в .spec, добавляем его здесь:
-if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
-     # Проверьте, что в вашем .spec нет определения объекта Splash для exe, если используете здесь.
-    pyinstaller_args.extend(['--splash', str(splash_file_path)])
-elif (ostype == 'Windows' or ostype == 'Linux'):
-    print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used.")
+
+# БЛОК КОДА ДЛЯ --splash ПОЛНОСТЬЮ УДАЛЕН:
+# if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
+# pyinstaller_args.extend(['--splash', str(splash_file_path)])
+# elif (ostype == 'Windows' or ostype == 'Linux'):
+# print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used.")
 
 try:
-    PyInstaller.__main__.run(pyinstaller_args)
+    PyInstaller.__main__.run(pyinstaller_args) # Запускаем без аргументов, связанных со сплэш
     print("PyInstaller build completed.")
 except Exception as e_pyinst:
     error_message = str(e_pyinst)
