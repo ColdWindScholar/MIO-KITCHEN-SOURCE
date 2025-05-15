@@ -1,24 +1,19 @@
+# tool.spec
+
 # -*- mode: python ; coding: utf-8 -*-
 
-# Импорт Splash УДАЛЕН, так как сплэш-экран будет управляться из build.py (через --splash)
-# или не будет использоваться, если его там нет.
-# from PyInstaller.ूद import Splash # <-- ЭТА СТРОКА УДАЛЕНА
-
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller.utils.splash import Splash # <<< ИСПРАВЛЕННЫЙ ИМПОРТ
 
 block_cipher = None
 
-# Точка входа - корневой tool.py
 ANALYSIS_TARGET_SCRIPT = ['tool.py']
-# Пути для поиска модулей PyInstaller
-ANALYSIS_PATHEX = ['src'] # Для импортов из src/
+ANALYSIS_PATHEX = ['src']
 
-# Данные, которые должны быть ВНУТРИ _MEIPASS
 ANALYSIS_DATAS = [
     ('LICENSE', '.'),
-    ('README.md', '.'), # Если есть
-    # Иконка и сплэш-картинка НЕ добавляются сюда, если они используются для EXE/сборки,
-    # а не как ресурсы внутри _MEIPASS, читаемые программой.
+    ('README.md', '.'),
+    ('splash.png', '.') # Добавляем splash.png в datas, чтобы Splash мог его найти в _MEIPASS
 ]
 ANALYSIS_DATAS += collect_data_files('PIL', include_py_files=True)
 ANALYSIS_DATAS += collect_data_files('sv_ttk')
@@ -30,8 +25,8 @@ HIDDEN_IMPORTS = [
     'pygments.lexers',
 ]
 HIDDEN_IMPORTS += collect_submodules('requests')
-HIDDEN_IMPORTS += collect_submodules('core') # Собирает все из src/core
-HIDDEN_IMPORTS += collect_submodules('tkui') # Собирает все из src/tkui
+HIDDEN_IMPORTS += collect_submodules('core')
+HIDDEN_IMPORTS += collect_submodules('tkui')
 
 EXCLUDES = ['numpy']
 
@@ -54,12 +49,25 @@ a = Analysis(
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 EXE_APP_NAME = 'tool'
-EXE_ICON_PATH = 'icon.ico' # Иконка для tool.exe (лежит в корне проекта)
+EXE_ICON_PATH = 'icon.ico'
+
+# Создаем объект Splash
+# PyInstaller будет использовать 'splash.png' из ANALYSIS_DATAS (т.е. из _MEIPASS)
+# text_pos, text_size, text_color - опциональные параметры для текста на сплэш-экране
+splash = Splash(
+   'splash.png', # Имя файла, как оно будет в _MEIPASS (благодаря ANALYSIS_DATAS)
+   binaries=a.binaries, # Передаем, если сплэш их использует (маловероятно для простого PNG)
+   datas=a.datas,       # Передаем, чтобы Splash мог найти splash.png
+   # text_font=None,    # Можно указать шрифт
+   # text_pos=None,     # Позиция текста (x, y) или None для автоматического
+   # text_size=12,      # Размер текста
+   # text_color='black' # Цвет текста
+)
 
 exe = EXE(
     pyz,
     a.scripts,
-    # Параметр splash УДАЛЕН отсюда
+    splash, # <--- ДОБАВЛЯЕМ ОБЪЕКТ SPLASH СЮДА
     name=EXE_APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
@@ -77,13 +85,13 @@ exe = EXE(
     icon=EXE_ICON_PATH
 )
 
-APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase' # Временная папка для PyInstaller
+APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase'
 
 coll = COLLECT(
-    exe,
+    exe, # EXE уже содержит конфигурацию Splash
     a.binaries,
     a.zipfiles,
-    a.datas, # Включает LICENSE, README, данные PIL, sv_ttk, chlorophyll в _MEIPASS
+    a.datas,
     strip=False,
     upx=True,
     upx_exclude=[],
