@@ -1,23 +1,24 @@
+# tool.spec
+
 # -*- mode: python ; coding: utf-8 -*-
 
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller. επίσης.splash import Splash # Импортируем Splash, если будем использовать
 
 block_cipher = None
 
 # Точка входа - корневой tool.py
 ANALYSIS_TARGET_SCRIPT = ['tool.py']
-PAT ร่วมกันHEX_PATHS = ['src'] # Для импортов из src/
+# Пути для поиска модулей PyInstaller
+ANALYSIS_PATHEX = ['src'] # ИСПРАВЛЕНО: PAT ร่วมกันHEX_PATHS -> ANALYSIS_PATHEX
 
-# Данные, которые должны быть ВНУТРИ _MEIPASS (только для Python-библиотек и критичных файлов)
+# Данные, которые должны быть ВНУТРИ _MEIPASS
 ANALYSIS_DATAS = [
-    # Ничего из вашей папки `bin` здесь НЕ указываем, так как она будет скопирована целиком.
-    # Исключение: если какой-то файл из `bin` нужен для самого первого импорта/запуска
-    # до того, как utils.PROG_PATH укажет на внешнюю папку `bin`.
-    # Если такого нет, этот список может быть почти пустым, кроме LICENSE/README.
     ('LICENSE', '.'),
-    ('README.md', '.'), # Если есть
+    ('README.md', '.'),
+    # ('icon.ico', '.'), # Иконка указывается в EXE
+    # ('splash.png', '.') # Сплэш-картинка будет здесь, если используем Splash из .spec
 ]
-# Данные для библиотек
 ANALYSIS_DATAS += collect_data_files('PIL', include_py_files=True)
 ANALYSIS_DATAS += collect_data_files('sv_ttk')
 ANALYSIS_DATAS += collect_data_files('chlorophyll')
@@ -28,14 +29,14 @@ HIDDEN_IMPORTS = [
     'pygments.lexers',
 ]
 HIDDEN_IMPORTS += collect_submodules('requests')
-HIDDEN_IMPORTS += collect_submodules('core') # Собирает все из src/core
-HIDDEN_IMPORTS += collect_submodules('tkui') # Собирает все из src/tkui
+HIDDEN_IMPORTS += collect_submodules('core')
+HIDDEN_IMPORTS += collect_submodules('tkui')
 
 EXCLUDES = ['numpy']
 
 a = Analysis(
     ANALYSIS_TARGET_SCRIPT,
-    pathex=PAT ร่วมกันHEX_PATHS,
+    pathex=ANALYSIS_PATHEX, # ИСПРАВЛЕНО
     binaries=[],
     datas=ANALYSIS_DATAS,
     hiddenimports=HIDDEN_IMPORTS,
@@ -51,8 +52,8 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-EXE_APP_NAME = 'tool'       # Имя исполняемого файла: tool.exe
-EXE_ICON_PATH = 'icon.ico'  # Иконка для tool.exe (лежит в корне проекта)
+EXE_APP_NAME = 'tool'
+EXE_ICON_PATH = 'icon.ico'
 
 exe = EXE(
     pyz,
@@ -71,17 +72,25 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=EXE_ICON_PATH
+    icon=EXE_ICON_PATH,
+    # Добавляем сплэш-экран сюда для EXE, если файл splash.png существует
+    # Это предпочтительнее, чем --splash в командной строке, когда используется .spec
+    # PyInstaller автоматически найдет splash.png, если он в том же каталоге, что и .spec
+    # или можно указать полный путь ('path/to/splash.png', binaries_to_filter_out=[])
+    # splash=Splash('splash.png', binaries=a.binaries, datas=a.datas) # Закомментировано, если splash.png нет
 )
 
-# Имя папки, куда PyInstaller временно соберет приложение (в dist/)
-APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase' # Временная папка для PyInstaller
+# Если splash.png существует, раскомментируйте и настройте Splash выше.
+# Убедитесь, что splash.png находится там, где его ожидает PyInstaller (обычно рядом со .spec файлом).
+# Если вы определяете Splash здесь, то НЕ используйте --splash в build.py.
+
+APP_COLLECTION_NAME = 'MIO-Kitchen-AppBase'
 
 coll = COLLECT(
     exe,
     a.binaries,
     a.zipfiles,
-    a.datas, # Включает LICENSE, README, данные PIL, sv_ttk, chlorophyll в _MEIPASS
+    a.datas,
     strip=False,
     upx=True,
     upx_exclude=[],
