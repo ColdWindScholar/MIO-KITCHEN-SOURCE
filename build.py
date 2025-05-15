@@ -110,7 +110,7 @@ def zip_folder_contents(folder_to_zip_path_str, output_zip_file_path_str):
         print(f"Error during archiving '{output_path}': {e_zip}")
 
 
-# --- Шаг 5: Сборка PyInstaller ---
+# --- Шаг 5: Сборка с помощью PyInstaller ---
 print(f"Starting PyInstaller build for {ostype} ({platform.machine()})...")
 if not spec_file_path.is_file():
     print(f"FATAL ERROR: PyInstaller .spec file not found at '{spec_file_path}'.")
@@ -121,13 +121,19 @@ pyinstaller_args = [
     '--noconfirm',
     '--clean',
 ]
-if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
-    pyinstaller_args.extend(['--splash', str(splash_file_path)])
-elif (ostype == 'Windows' or ostype == 'Linux'):
-    print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used.")
+
+# УДАЛЕНО: Логика добавления --splash из командной строки,
+# так как это конфликтует с использованием .spec файла.
+# Сплэш-экран теперь должен быть настроен ВНУТРИ tool.spec, если он нужен.
+# splash_arg = []
+# if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
+#    pyinstaller_args.extend(['--splash', str(splash_file_path)])
+# elif (ostype == 'Windows' or ostype == 'Linux'):
+#    print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used (if not defined in .spec).")
+# final_pyinstaller_args = pyinstaller_base_args + splash_arg # pyinstaller_base_args переименован в pyinstaller_args
 
 try:
-    PyInstaller.__main__.run(pyinstaller_args)
+    PyInstaller.__main__.run(pyinstaller_args) # Используем pyinstaller_args без splash_arg
     print("PyInstaller build completed.")
 except Exception as e_pyinst:
     print(f"FATAL ERROR: PyInstaller failed: {e_pyinst}")
