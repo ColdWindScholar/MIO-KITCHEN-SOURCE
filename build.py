@@ -32,7 +32,6 @@ try:
         def _pip_main_subprocess(args):
             try:
                 result = subprocess.run([sys.executable, "-m", "pip"] + args, check=True, capture_output=True, text=True)
-                # print(result.stdout) # Можно раскомментировать для отладки pip
                 return 0
             except subprocess.CalledProcessError as e:
                 print(f"Error running pip command: {' '.join(args)}\nStderr: {e.stderr}")
@@ -69,27 +68,33 @@ except ImportError:
     print("FATAL ERROR: PyInstaller is not installed. Please install it: pip install pyinstaller")
     sys.exit(1)
 
-# --- Шаг 3: Определение переменных ---
+# --- Шаг 3: Определение переменных для сборки ---
 ostype = platform.system()
 current_dir_path = Path.cwd()
 spec_file_path = current_dir_path / 'tool.spec'
-splash_file_path = current_dir_path / 'splash.png' # Сплэш-экран в корне
+splash_file_path = current_dir_path / 'splash.png'
 
-final_zip_archive_name = ""
+# --- ИЗМЕНЕНИЕ ЗДЕСЬ: Определяем имя папки релиза и имя ZIP-архива ---
+base_release_name = ""
 if ostype == 'Linux':
-    final_zip_archive_name = 'MIO-KITCHEN-linux.zip'
+    base_release_name = 'MIO-KITCHEN-linux'
 elif ostype == 'Darwin':
-    final_zip_archive_name = 'MIO-KITCHEN-macos-intel.zip' if platform.machine() == 'x86_64' else 'MIO-KITCHEN-macos.zip'
+    base_release_name = 'MIO-KITCHEN-macos-intel' if platform.machine() == 'x86_64' else 'MIO-KITCHEN-macos'
 else: # Windows
-    final_zip_archive_name = 'MIO-KITCHEN-win.zip'
+    base_release_name = 'MIO-KITCHEN-win' # Это имя папки, которое ожидает ваш CI
+
+final_release_build_folder_name = base_release_name # Папка, в которую все будет собрано в dist/
+final_zip_archive_name = f"{base_release_name}.zip"  # Имя ZIP-архива
+# -----------------------------------------------------------------------
 
 # Имя папки, куда PyInstaller временно соберет приложение (из COLLECT(name=...) в .spec)
+# Должно совпадать с APP_COLLECTION_NAME в tool.spec
 pyinstaller_temp_output_folder_name = 'MIO-Kitchen-AppBase'
-# Имя финальной папки, куда будет помещена вся сборка (tool.exe, bin/, LICENSE)
-final_release_folder_name = f"MIO-KITCHEN-Release-{ostype}-{platform.machine()}" # Делаем имя уникальным
 
-# --- Шаг 4: Функция для архивации ---
+
+# --- Шаг 4: Функция для архивации (без изменений) ---
 def zip_folder_contents(folder_to_zip_path_str, output_zip_file_path_str):
+    # ... (код функции как в предыдущем ответе) ...
     source_path = Path(folder_to_zip_path_str).resolve()
     output_path = Path(output_zip_file_path_str).resolve()
     if not source_path.is_dir():
@@ -110,7 +115,7 @@ def zip_folder_contents(folder_to_zip_path_str, output_zip_file_path_str):
         print(f"Error during archiving '{output_path}': {e_zip}")
 
 
-# --- Шаг 5: Сборка с помощью PyInstaller ---
+# --- Шаг 5: Сборка PyInstaller (без изменений, кроме удаления --splash, если он в .spec) ---
 print(f"Starting PyInstaller build for {ostype} ({platform.machine()})...")
 if not spec_file_path.is_file():
     print(f"FATAL ERROR: PyInstaller .spec file not found at '{spec_file_path}'.")
@@ -121,58 +126,46 @@ pyinstaller_args = [
     '--noconfirm',
     '--clean',
 ]
-
-# УДАЛЕНО: Логика добавления --splash из командной строки,
-# так как это конфликтует с использованием .spec файла.
-# Сплэш-экран теперь должен быть настроен ВНУТРИ tool.spec, если он нужен.
-# splash_arg = []
-# if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
-#    pyinstaller_args.extend(['--splash', str(splash_file_path)])
-# elif (ostype == 'Windows' or ostype == 'Linux'):
-#    print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used (if not defined in .spec).")
-# final_pyinstaller_args = pyinstaller_base_args + splash_arg # pyinstaller_base_args переименован в pyinstaller_args
+# Если сплэш НЕ определен в .spec, добавляем его здесь:
+if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
+     # Проверьте, что в вашем .spec нет определения объекта Splash для exe, если используете здесь.
+    pyinstaller_args.extend(['--splash', str(splash_file_path)])
+elif (ostype == 'Windows' or ostype == 'Linux'):
+    print(f"Warning: Splash file '{splash_file_path}' not found. Splash screen will not be used.")
 
 try:
     PyInstaller.__main__.run(pyinstaller_args)
     print("PyInstaller build completed.")
 except Exception as e_pyinst:
-    # Формируем безопасную для вывода строку ошибки
     error_message = str(e_pyinst)
     try:
-        # Попытка декодировать, если это bytes (маловероятно для объекта исключения)
-        if isinstance(error_message, bytes):
-            error_message = error_message.decode(sys.stdout.encoding or 'utf-8', 'replace')
-    except Exception:
-        pass # Если декодирование не удалось, используем str(e_pyinst)
-
-    # Вывод с обработкой ошибок кодировки
-    try:
-        print(f"FATAL ERROR: PyInstaller failed: {error_message}")
+        if isinstance(error_message, bytes): error_message = error_message.decode(sys.stdout.encoding or 'utf-8', 'replace')
+    except Exception: pass
+    try: print(f"FATAL ERROR: PyInstaller failed: {error_message}")
     except UnicodeEncodeError:
         safe_error_message = error_message.encode(sys.stdout.encoding or 'utf-8', 'replace').decode(sys.stdout.encoding or 'utf-8', 'replace')
-        print(f"FATAL ERROR: PyInstaller failed (error message has unprintable characters): {safe_error_message}")
+        print(f"FATAL ERROR: PyInstaller failed (unprintable chars): {safe_error_message}")
     sys.exit(1)
 
 # --- Шаг 6: Пост-обработка и создание финальной структуры ---
 print("Starting post-build processing...")
 
-# Путь к временной папке, созданной PyInstaller (например, dist/MIO-Kitchen-AppBase)
 pyinstaller_temp_dist_app_folder = current_dir_path / 'dist' / pyinstaller_temp_output_folder_name
 if not pyinstaller_temp_dist_app_folder.is_dir():
     print(f"Error: PyInstaller output directory '{pyinstaller_temp_dist_app_folder}' not found.")
     sys.exit(1)
 
-# Путь к финальной папке релиза (например, dist/MIO-KITCHEN-Release-Windows-AMD64)
-final_release_target_path = current_dir_path / 'dist' / final_release_folder_name
+# --- ИЗМЕНЕНИЕ ЗДЕСЬ: Путь к финальной папке релиза теперь использует final_release_build_folder_name ---
+final_release_target_path = current_dir_path / 'dist' / final_release_build_folder_name
+# ----------------------------------------------------------------------------------------------------
+
 if final_release_target_path.exists():
     print(f"Removing existing final release directory: {final_release_target_path}")
     shutil.rmtree(final_release_target_path)
-# Перемещаем/переименовываем результат PyInstaller в финальную папку
 print(f"Moving PyInstaller output from '{pyinstaller_temp_dist_app_folder}' to '{final_release_target_path}'")
 shutil.move(str(pyinstaller_temp_dist_app_folder), str(final_release_target_path))
 
-
-# 1. Копируем ВСЮ папку `bin` из исходников в `final_release_target_path/bin`
+# Копирование `bin` и `LICENSE` (без изменений, пути теперь корректны)
 release_bin_path = final_release_target_path / 'bin'
 project_source_bin_path = current_dir_path / 'bin'
 if project_source_bin_path.is_dir():
@@ -181,7 +174,6 @@ if project_source_bin_path.is_dir():
 else:
     print(f"CRITICAL WARNING: Source 'bin' directory not found at '{project_source_bin_path}'. It will be MISSING in the release!")
 
-# 2. Копируем `LICENSE` в `final_release_target_path/LICENSE`
 project_source_license_file = current_dir_path / 'LICENSE'
 release_license_path = final_release_target_path / 'LICENSE'
 if project_source_license_file.is_file():
@@ -190,23 +182,22 @@ if project_source_license_file.is_file():
 else:
     print(f"Warning: LICENSE file not found at '{project_source_license_file}'.")
 
-# 3. Фильтрация `tkdnd` в `final_release_target_path/bin/tkdnd`
+# Фильтрация `tkdnd` (без изменений, пути теперь корректны)
 tkdnd_in_release_bin = release_bin_path / 'tkdnd'
 if tkdnd_in_release_bin.is_dir():
     dndplat_filter_key = None
-    # ... (логика определения dndplat_filter_key как в предыдущем ответе) ...
-    if ostype == 'Darwin':
+    # ... (логика определения dndplat_filter_key) ...
+    if ostype == 'Darwin': # ...
         dndplat_filter_key = 'osx-x64' if platform.machine() == 'x86_64' else 'osx-arm64'
-    elif ostype == 'Linux':
+    elif ostype == 'Linux': # ...
         dndplat_filter_key = 'linux-x64' if platform.machine() == 'x86_64' else 'linux-arm64'
-    elif ostype == 'Windows':
+    elif ostype == 'Windows': # ...
         mach = platform.machine()
         arch_32 = platform.architecture()[0] == '32bit'
         if arch_32 and mach == 'AMD64': dndplat_filter_key = 'win-x86'
         elif mach == 'x86': dndplat_filter_key = 'win-x86'
         elif mach == 'AMD64': dndplat_filter_key = 'win-x64'
         elif mach == 'ARM64': dndplat_filter_key = 'win-arm64'
-
     if dndplat_filter_key:
         print(f"Filtering tkdnd versions in '{tkdnd_in_release_bin}' for platform: {dndplat_filter_key}")
         target_tkdnd_platform_path = tkdnd_in_release_bin / dndplat_filter_key
@@ -222,15 +213,15 @@ if tkdnd_in_release_bin.is_dir():
     else:
         print(f"Warning: Could not determine tkdnd platform for filtering in '{tkdnd_in_release_bin}'. All versions kept.")
 else:
-    if project_source_bin_path.is_dir(): # Только если папка bin вообще была
+    if project_source_bin_path.is_dir():
          print(f"Warning: tkdnd directory not found at '{tkdnd_in_release_bin}'. Skipping tkdnd filtering.")
 
-# 4. Выдача прав на исполняемый файл (tool.exe или tool)
-executable_name_from_spec = 'tool' # Имя из EXE(name=...) в .spec
+
+# Выдача прав на исполняемый файл (без изменений, пути теперь корректны)
+executable_name_from_spec = 'tool'
 executable_path_in_release = final_release_target_path / executable_name_from_spec
 if ostype == 'Windows':
     executable_path_in_release = final_release_target_path / (executable_name_from_spec + '.exe')
-
 if (ostype == 'Linux' or ostype == 'Darwin'):
     if executable_path_in_release.is_file():
         print(f"Setting execute permissions for: {executable_path_in_release}")
@@ -239,8 +230,9 @@ if (ostype == 'Linux' or ostype == 'Darwin'):
     else:
         print(f"Warning: Executable '{executable_path_in_release}' not found for setting permissions.")
 
-# --- Шаг 7: Архивация финальной папки релиза ---
+# --- Шаг 7: Архивация финальной папки релиза (без изменений, пути теперь корректны) ---
 if final_release_target_path.is_dir():
+    # Архив будет создан в папке 'dist/'
     zip_output_file_path = current_dir_path / 'dist' / final_zip_archive_name
     zip_folder_contents(str(final_release_target_path), str(zip_output_file_path))
 else:
