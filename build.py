@@ -133,10 +133,24 @@ pyinstaller_args = [
 # final_pyinstaller_args = pyinstaller_base_args + splash_arg # pyinstaller_base_args переименован в pyinstaller_args
 
 try:
-    PyInstaller.__main__.run(pyinstaller_args) # Используем pyinstaller_args без splash_arg
+    PyInstaller.__main__.run(pyinstaller_args)
     print("PyInstaller build completed.")
 except Exception as e_pyinst:
-    print(f"FATAL ERROR: PyInstaller failed: {e_pyinst}")
+    # Формируем безопасную для вывода строку ошибки
+    error_message = str(e_pyinst)
+    try:
+        # Попытка декодировать, если это bytes (маловероятно для объекта исключения)
+        if isinstance(error_message, bytes):
+            error_message = error_message.decode(sys.stdout.encoding or 'utf-8', 'replace')
+    except Exception:
+        pass # Если декодирование не удалось, используем str(e_pyinst)
+
+    # Вывод с обработкой ошибок кодировки
+    try:
+        print(f"FATAL ERROR: PyInstaller failed: {error_message}")
+    except UnicodeEncodeError:
+        safe_error_message = error_message.encode(sys.stdout.encoding or 'utf-8', 'replace').decode(sys.stdout.encoding or 'utf-8', 'replace')
+        print(f"FATAL ERROR: PyInstaller failed (error message has unprintable characters): {safe_error_message}")
     sys.exit(1)
 
 # --- Шаг 6: Пост-обработка и создание финальной структуры ---
