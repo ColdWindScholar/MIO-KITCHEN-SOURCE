@@ -21,13 +21,17 @@
 # pylint: disable=line-too-long, broad-except
 # Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 
+#!/usr/bin/env python3
+# pylint: disable=line-too-long, broad-except
+# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
+# ... (лицензия) ...
 
 import os
 import platform
 import shutil
 import zipfile
 import sys
-from pathlib import Path
+from pathlib import Path # Используем pathlib для путей
 
 # --- Шаг 1: Установка зависимостей ---
 try:
@@ -38,6 +42,7 @@ try:
         import subprocess
         print("Using subprocess for pip commands.")
         def _pip_main_subprocess(args):
+            # ... (код _pip_main_subprocess как в предыдущем ответе) ...
             try:
                 result = subprocess.run([sys.executable, "-m", "pip"] + args, check=True, capture_output=True, text=True)
                 return 0
@@ -58,10 +63,8 @@ try:
                 if requirement and not requirement.startswith('#'):
                     print(f"Processing requirement: {requirement}")
                     ret_code = _pip_main(['install', '--upgrade', '--no-cache-dir', '--disable-pip-version-check', '--no-input', requirement])
-                    if ret_code == 0:
-                        print(f"Successfully processed {requirement}")
-                    elif ret_code != 0 :
-                        print(f"Warning: pip install for {requirement} returned code {ret_code}.")
+                    if ret_code == 0: print(f"Successfully processed {requirement}")
+                    elif ret_code != 0: print(f"Warning: pip install for {requirement} returned code {ret_code}.")
     else:
         print(f"Warning: '{requirements_file}' not found. Skipping dependency installation.")
 except ImportError:
@@ -78,121 +81,112 @@ except ImportError:
 
 # --- Шаг 3: Определение переменных ---
 ostype = platform.system()
-current_dir_path = Path.cwd()
-# .spec файл НЕ используется явно, PyInstaller сгенерирует его
-# spec_file_path = current_dir_path / 'tool.spec' 
-splash_file_path = current_dir_path / 'splash.png'
-
-base_release_name = ""
+current_dir_path = Path.cwd() # Переименовано из 'local'
+# Имя ZIP-архива (переменная 'name' из вашего оригинального кода)
+final_zip_archive_name = ""
 if ostype == 'Linux':
-    base_release_name = 'MIO-KITCHEN-linux'
+    final_zip_archive_name = 'MIO-KITCHEN-linux.zip'
 elif ostype == 'Darwin':
-    base_release_name = 'MIO-KITCHEN-macos-intel' if platform.machine() == 'x86_64' else 'MIO-KITCHEN-macos'
+    final_zip_archive_name = 'MIO-KITCHEN-macos-intel.zip' if platform.machine() == 'x86_64' else 'MIO-KITCHEN-macos.zip'
 else: # Windows
-    base_release_name = 'MIO-KITCHEN-win'
+    final_zip_archive_name = 'MIO-KITCHEN-win.zip'
 
-final_release_build_folder_name = base_release_name
-final_zip_archive_name = f"{base_release_name}.zip"
+# from src.tool_tester import test_main, Test # Если этот путь актуален и файл существует
+# if 'Test' in globals() and Test:
+#    test_main(exit=False)
 
 entry_script = 'tool.py' # Корневой tool.py
 output_executable_name = 'tool' # Имя .exe файла будет tool.exe
 
-# --- Шаг 4: Функция для архивации (без изменений) ---
+# --- Шаг 4: Функция для архивации ---
 def zip_folder_contents(folder_to_zip_path_str, output_zip_file_path_str):
-    # ... (код функции как в предыдущем полном build.py) ...
     source_path = Path(folder_to_zip_path_str).resolve()
-    output_path = Path(output_zip_file_path_str).resolve()
+    output_zip_path = Path(output_zip_file_path_str).resolve() # Используем правильное имя переменной
+
     if not source_path.is_dir():
         print(f"Error: Source for zipping '{source_path}' is not a directory.")
         return
-    print(f"Archiving contents of '{source_path}' into '{output_path}'...")
+
+    print(f"Archiving contents of '{source_path}' into '{output_zip_path}'...")
     try:
-        with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+        with zipfile.ZipFile(output_zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for item_path in source_path.rglob('*'):
                 archive_item_path = item_path.relative_to(source_path)
                 if item_path.is_file():
                     archive.write(item_path, archive_item_path)
-                elif item_path.is_dir() and not any(item_path.iterdir()):
+                elif item_path.is_dir() and not any(item_path.iterdir()): # Только действительно пустые папки
                     dir_info = zipfile.ZipInfo(str(archive_item_path) + '/')
                     archive.writestr(dir_info, '')
-        print(f"Archive '{output_path}' created successfully!")
+        print(f"Archive '{output_zip_path}' created successfully!")
     except Exception as e_zip:
-        print(f"Error during archiving '{output_path}': {e_zip}")
+        print(f"Error during archiving '{output_zip_path}': {e_zip}")
 
-# --- Шаг 5: Сборка PyInstaller (конфигурация через командную строку) ---
-print(f"Starting PyInstaller build for {ostype} ({platform.machine()})...")
 
-pyinstaller_args = [
+# --- Шаг 5: Сборка PyInstaller ---
+print(f"Building {output_executable_name} for {ostype} ({platform.machine()})...")
+
+# Общие аргументы для всех платформ
+base_pyinstaller_args = [
     entry_script,
     '--name', output_executable_name,
-    '--onefile',    # -F
-    '--windowed',   # -w / --noconsole
+    '--onefile',  # -F
+    '--windowed', # -w
     '--icon=icon.ico',
     '--exclude-module=numpy',
-    '--clean',      # Очистка перед сборкой
-    '--noconfirm',  # Не спрашивать подтверждения
-    
-    # Добавляем пути поиска для ваших модулей в src/
-    f'--paths={current_dir_path / "src"}',
+    '--clean',
+    '--noconfirm',
+    f'--paths={current_dir_path / "src"}', # Путь к вашим модулям в src/
 
-    # --- КЛЮЧЕВЫЕ ИЗМЕНЕНИЯ ДЛЯ PILLOW И ДРУГИХ БИБЛИОТЕК ---
-    # Используем --collect-all, если доступно, это более надежно.
-    # Если ваша версия PyInstaller старая и не поддерживает --collect-all,
-    # используйте --collect-data ИМЯ_ПАКЕТА.
+    # --- Улучшенные инструкции для Pillow ---
     '--collect-all=PIL',
-    '--collect-all=sv_ttk',
-    '--collect-all=chlorophyll',
-    # Если --collect-all недоступен:
-    # '--collect-data=PIL',
-    # '--collect-data=sv_ttk',
-    # '--collect-data=chlorophyll',
-
-    # Скрытые импорты
-    '--hidden-import=PIL', # Для надежности, даже с --collect-all
+    '--hidden-import=PIL',
     '--hidden-import=PIL._imaging',
     '--hidden-import=PIL._imagingtk',
     '--hidden-import=PIL.ImageTk',
     '--hidden-import=PIL._tkinter_finder',
-    '--hidden-import=tkinterdnd2',
+    # ------------------------------------
+
+    '--collect-all=sv_ttk',     # Заменил --collect-data на --collect-all
+    '--collect-all=chlorophyll',# Заменил --collect-data на --collect-all
+    
+    '--hidden-import=tkinterdnd2', # TkinterDnD2 (если это имя пакета)
     '--hidden-import=pygments.lexers',
-    # Явное указание ваших основных пакетов/модулей из папки 'src'
+    # Ваши основные модули (если PyInstaller их не находит автоматически)
     '--hidden-import=tkui',
-    '--hidden-import=tkui.tool', # Главный GUI модуль
+    '--hidden-import=tkui.tool',
     '--hidden-import=core',
     '--hidden-import=core.utils',
-    # '--hidden-import=requests', # requests обычно находится сам, но можно добавить
-    # '--hidden-import=Crypto', # Если используете PyCryptodome
 ]
 
-# Добавление --add-data для папки bin и LICENSE
-# Это упакует их ВНУТРЬ EXE файла, в _MEIPASS.
-# Структура: ('источник_в_проекте:путь_внутри_exe')
-# Разделитель зависит от ОС: ; для Windows, : для Linux/macOS
-data_separator = ';' if ostype == 'Windows' else ':'
+# Аргументы, специфичные для ОС
+platform_specific_args = []
+if ostype == 'Darwin':
+    # Ваш оригинальный код для macOS не имел --splash и некоторых hidden-imports.
+    # Если tkinter/PIL специфичные hidden-imports для macOS не нужны, их можно убрать из base_args
+    # и добавить только нужные здесь. Но обычно они требуются.
+    pass # Нет специфичных аргументов для macOS в вашем оригинале, кроме отсутствия сплэша
+elif ostype == 'Linux':
+    splash_file = current_dir_path / 'splash.png'
+    if splash_file.is_file():
+        platform_specific_args.extend(['--splash', str(splash_file)])
+    else:
+        print(f"Warning: Splash file '{splash_file}' not found for Linux.")
+elif ostype == 'Windows': # 'nt'
+    splash_file = current_dir_path / 'splash.png'
+    if splash_file.is_file():
+        platform_specific_args.extend(['--splash', str(splash_file)])
+    else:
+        print(f"Warning: Splash file '{splash_file}' not found for Windows.")
+    # Ваш оригинальный код для Windows не включал --hidden-import tkinter, PIL, PIL._tkinter_finder
+    # Но они, скорее всего, нужны, поэтому оставлены в base_pyinstaller_args.
 
-# Упаковываем всю папку bin в корень _MEIPASS/bin
-# Это может сделать EXE очень большим и не соответствует вашему желанию иметь bin рядом.
-# НО, если мы не используем .spec, это один из способов заставить PyInstaller
-# узнать о файлах, если они нужны для _MEIPASS.
-# Для вашей цели "bin рядом с EXE", этот --add-data для всей папки bin НЕ НУЖЕН.
-# PyInstaller при --onefile должен упаковать только то, что импортируется.
-# Ваша логика копирования bin рядом с EXE после сборки остается основной.
-
-# Если какие-то файлы из bin нужны для самого раннего старта, их можно добавить точечно:
-# pyinstaller_args.append(f'--add-data=LICENSE{data_separator}.') # LICENSE в корень _MEIPASS
-# pyinstaller_args.append(f'--add-data=bin/setting.ini{data_separator}bin') # setting.ini в _MEIPASS/bin
-# pyinstaller_args.append(f'--add-data=bin/languages/English.json{data_separator}bin/languages')
-
-# Сплэш-экран
-if (ostype == 'Windows' or ostype == 'Linux') and splash_file_path.is_file():
-    pyinstaller_args.extend(['--splash', str(splash_file_path)])
-elif (ostype == 'Windows' or ostype == 'Linux'):
-    print(f"Warning: Splash file '{splash_file_path}' not found.")
+final_pyinstaller_args = base_pyinstaller_args + platform_specific_args
 
 try:
-    PyInstaller.__main__.run(pyinstaller_args)
+    PyInstaller.__main__.run(final_pyinstaller_args)
     print("PyInstaller build completed. Executable in 'dist/' directory.")
 except Exception as e_pyinst:
+    # ... (обработка UnicodeEncodeError как в предыдущем ответе) ...
     error_message = str(e_pyinst)
     try:
         if isinstance(error_message, bytes): error_message = error_message.decode(sys.stdout.encoding or 'utf-8', 'replace')
@@ -203,16 +197,14 @@ except Exception as e_pyinst:
         print(f"FATAL ERROR: PyInstaller failed (unprintable chars): {safe_error_message}")
     sys.exit(1)
 
-# --- Шаг 6: Пост-обработка: копирование папки bin и LICENSE ---
-# PyInstaller создаст dist/tool.exe (или tool).
-# Копируем bin и LICENSE рядом с ним.
-print("Starting post-build file copying...")
 
+# --- Шаг 6: Пост-обработка: копирование папки bin и LICENSE ---
+print("Starting post-build file copying...")
 dist_output_path = current_dir_path / 'dist'
 
 # 1. Копируем ВСЮ папку `bin` из исходников в `dist/bin`
 target_bin_in_dist = dist_output_path / 'bin'
-source_bin_dir = current_dir_path / 'bin'
+source_bin_dir = current_dir_path / 'bin' # Путь к вашей папке bin в проекте
 if source_bin_dir.is_dir():
     if target_bin_in_dist.exists():
         print(f"Removing existing target 'bin' directory: {target_bin_in_dist}")
@@ -232,65 +224,54 @@ if source_license_file.is_file():
 else:
     print(f"Warning: LICENSE file not found at '{source_license_file}'.")
 
-# 3. Фильтрация `tkdnd` в `dist/bin/tkdnd` (как в вашем оригинале)
-# ... (полный блок фильтрации tkdnd, как в предыдущем ответе, он не меняется) ...
-tkdnd_final_path = target_bin_in_dist / 'tkdnd' # target_bin_in_dist это dist/bin/
-
+# 3. Фильтрация `tkdnd` в `dist/bin/tkdnd`
+tkdnd_final_path = target_bin_in_dist / 'tkdnd'
 if tkdnd_final_path.is_dir():
-    # Определяем ключ для целевой платформы tkdnd (имя папки)
-    dndplat_folder_to_keep = None 
+    dndplat_folder_to_keep = None
     if ostype == 'Darwin':
         dndplat_folder_to_keep = 'osx-x64' if platform.machine() == 'x86_64' else 'osx-arm64'
     elif ostype == 'Linux':
         dndplat_folder_to_keep = 'linux-x64' if platform.machine() == 'x86_64' else 'linux-arm64'
     elif ostype == 'Windows':
-        mach = platform.machine()
-        arch_32 = platform.architecture()[0] == '32bit'
-        # Определяем текущую "эффективную" машину для Windows
-        if arch_32 and mach == 'AMD64': # WoW64 (32-битное приложение на 64-битной ОС)
-            current_machine_for_tkdnd = 'x86'
-        else: # Либо нативное 32-битное, либо нативное 64-битное, либо ARM
-            current_machine_for_tkdnd = mach # 'x86', 'AMD64', 'ARM64'
-        
-        # Сопоставляем с именами ваших папок
-        if current_machine_for_tkdnd == 'x86': 
+        mach = platform.machine() # Оригинальное значение
+        # Ваша логика platform.machine = lambda... изменяла глобальное состояние, что не очень хорошо.
+        # Лучше определять нужную платформу здесь локально.
+        is_32bit_python_on_64bit_windows = platform.architecture()[0] == '32bit' and mach == 'AMD64'
+
+        if is_32bit_python_on_64bit_windows:
             dndplat_folder_to_keep = 'win-x86'
-        elif current_machine_for_tkdnd == 'AMD64': # Обычно соответствует x64
+        elif mach == 'x86': # Настоящая 32-битная машина или 32-битный Python на 32-битной ОС
+            dndplat_folder_to_keep = 'win-x86'
+        elif mach == 'AMD64': # 64-битный Python на 64-битной ОС
             dndplat_folder_to_keep = 'win-x64'
-        elif current_machine_for_tkdnd == 'ARM64':
+        elif mach == 'ARM64':
             dndplat_folder_to_keep = 'win-arm64'
 
     if dndplat_folder_to_keep:
         print(f"Filtering tkdnd versions in '{tkdnd_final_path}', keeping: '{dndplat_folder_to_keep}'")
-        
-        # Проверяем, существует ли папка, которую нужно оставить
         if not (tkdnd_final_path / dndplat_folder_to_keep).is_dir():
-            print(f"  CRITICAL WARNING: Target tkdnd platform folder '{dndplat_folder_to_keep}' not found in '{tkdnd_final_path}'. Drag'n'Drop will likely NOT work!")
-            # В этом случае, возможно, не стоит удалять ничего, или удалить всю папку tkdnd,
-            # чтобы избежать путаницы с неработающими библиотеками.
-            # Пока оставим как есть (ничего не удаляем, если целевой нет).
+            print(f"  CRITICAL WARNING: Target tkdnd platform folder '{dndplat_folder_to_keep}' not found. Drag'n'Drop will likely NOT work!")
         else:
-            # Итерируемся по всем элементам в tkdnd_final_path
             for item in tkdnd_final_path.iterdir():
-                if item.is_dir(): # Работаем только с папками
-                    if item.name == dndplat_folder_to_keep:
-                        print(f"  Keeping tkdnd version: {item.name}")
-                    else:
-                        # Удаляем все остальные папки платформ
-                        print(f"  Removing tkdnd platform folder: {item.name}")
-                        shutil.rmtree(item, ignore_errors=True)
-                # Если есть файлы прямо в tkdnd_final_path (не в подпапках платформ), они останутся.
-                # Ваша структура предполагает, что все библиотеки лежат в подпапках.
+                if item.is_dir() and item.name != dndplat_folder_to_keep:
+                    # Восстанавливаем вашу оригинальную логику "не удалять x64, если целевая x86"
+                    # if item.name.startswith(dndplat_folder_to_keep[:3]) and item.name.endswith("x64") and dndplat_folder_to_keep.endswith("x86"):
+                    #    print(f"  Specific case: Keeping {item.name} for {dndplat_folder_to_keep} compatibility.")
+                    #    continue
+                    # Эта логика была в вашем оригинале: if i[:3] == dndplat[:3] and i.endswith("x64") and dndplat.endswith('x86'): continue
+                    # Если dndplat_folder_to_keep = 'win-x86', а item.name = 'win-x64', то условие будет:
+                    # 'win' == 'win' (True) AND 'win-x64'.endswith('x64') (True) AND 'win-x86'.endswith('x86') (True) => continue
+                    # То есть, если собираем для x86, папка x64 НЕ удаляется. Это может быть сделано для универсальности сборки,
+                    # но обычно оставляют только точную целевую.
+                    # Если вы хотите удалить все, КРОМЕ dndplat_folder_to_keep, то код ниже правильный.
+                    # Если нужна более сложная логика сохранения, ее нужно реализовать здесь.
+                    print(f"  Removing tkdnd platform folder: {item.name}")
+                    shutil.rmtree(item, ignore_errors=True)
     else:
-        print(f"Warning: Could not determine target tkdnd platform folder to keep in '{tkdnd_final_path}'. All platform subfolders might be kept, or this could indicate an issue.")
+        print(f"Warning: Could not determine target tkdnd platform in '{tkdnd_final_path}'. All versions might be kept.")
 else:
-    # Эта проверка происходит после копирования project_source_bin_path в target_bin_in_dist
-    # Если source_bin_dir существует и содержит tkdnd, то и tkdnd_final_path должен существовать.
     if source_bin_dir.is_dir() and (source_bin_dir / 'tkdnd').is_dir():
-         print(f"Warning: tkdnd directory was expected but not found at '{tkdnd_final_path}' after copying. Skipping tkdnd filtering.")
-    # Если source_bin_dir/tkdnd не существует, то это нормально, что его нет и в dist.
-    # else: (можно добавить логирование, если папки tkdnd в исходниках нет)
-    #    print(f"Info: tkdnd directory not found in source at '{source_bin_dir / 'tkdnd'}'. No tkdnd filtering needed.")
+         print(f"Warning: tkdnd directory was expected but not found at '{tkdnd_final_path}' after copying.")
 
 # 4. Выдача прав на Linux/macOS (для tool в dist/)
 executable_final_path_in_dist = dist_output_path / output_executable_name
@@ -306,13 +287,13 @@ if (ostype == 'Linux' or ostype == 'Darwin'):
     else:
         print(f"Warning: Executable '{executable_final_path_in_dist}' not found for setting permissions.")
 
+
 # --- Шаг 7: Архивация папки dist ---
 # Архивируем все содержимое папки dist (tool.exe, bin/, LICENSE)
 # Архив будет создан в корне проекта.
-# Имя архива берется из переменной final_zip_archive_name, определенной ранее.
 if dist_output_path.is_dir() and any(dist_output_path.iterdir()):
-    zip_output_target_file = current_dir_path / final_zip_archive_name # Имя архива из начала скрипта
-    zip_folder_contents(str(dist_output_path), str(zip_output_target_file))
+    zip_output_target_file = current_dir_path / final_zip_archive_name
+    zip_dist_folder_contents(str(dist_output_path), str(zip_output_target_file))
 else:
     print(f"Error: Distribution directory '{dist_output_path}' is empty or not found. Archiving failed.")
 
