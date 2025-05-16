@@ -312,7 +312,7 @@ if (ostype == 'Linux' or ostype == 'Darwin'):
 # Имя архива берется из переменной final_zip_archive_name, определенной ранее.
 if dist_output_path.is_dir() and any(dist_output_path.iterdir()):
     zip_output_target_file = current_dir_path / final_zip_archive_name # Имя архива из начала скрипта
-    zip_dist_folder_contents(str(dist_output_path), str(zip_output_target_file))
+    zip_folder_contents(str(dist_output_path), str(zip_output_target_file))
 else:
     print(f"Error: Distribution directory '{dist_output_path}' is empty or not found. Archiving failed.")
 
