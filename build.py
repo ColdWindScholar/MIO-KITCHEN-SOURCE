@@ -234,37 +234,63 @@ else:
 
 # 3. Фильтрация `tkdnd` в `dist/bin/tkdnd` (как в вашем оригинале)
 # ... (полный блок фильтрации tkdnd, как в предыдущем ответе, он не меняется) ...
-tkdnd_final_path = target_bin_in_dist / 'tkdnd'
+tkdnd_final_path = target_bin_in_dist / 'tkdnd' # target_bin_in_dist это dist/bin/
+
 if tkdnd_final_path.is_dir():
-    dndplat_filter_key = None
+    # Определяем ключ для целевой платформы tkdnd (имя папки)
+    dndplat_folder_to_keep = None 
     if ostype == 'Darwin':
-        dndplat_filter_key = 'osx-x64' if platform.machine() == 'x86_64' else 'osx-arm64'
+        dndplat_folder_to_keep = 'osx-x64' if platform.machine() == 'x86_64' else 'osx-arm64'
     elif ostype == 'Linux':
-        dndplat_filter_key = 'linux-x64' if platform.machine() == 'x86_64' else 'linux-arm64'
+        dndplat_folder_to_keep = 'linux-x64' if platform.machine() == 'x86_64' else 'linux-arm64'
     elif ostype == 'Windows':
         mach = platform.machine()
         arch_32 = platform.architecture()[0] == '32bit'
-        if arch_32 and mach == 'AMD64': current_machine_for_tkdnd = 'x86'
-        else: current_machine_for_tkdnd = mach
-        if current_machine_for_tkdnd == 'x86': dndplat_filter_key = 'win-x86'
-        elif current_machine_for_tkdnd == 'AMD64': dndplat_filter_key = 'win-x64'
-        elif current_machine_for_tkdnd == 'ARM64': dndplat_filter_key = 'win-arm64'
-    if dndplat_filter_key:
-        print(f"Filtering tkdnd versions in '{tkdnd_final_path}' for platform: {dndplat_filter_key}")
-        if not (tkdnd_final_path / dndplat_filter_key).exists():
-             print(f"  Warning: Target tkdnd platform folder '{dndplat_filter_key}' not found. TkDND might not work.")
-        for item in tkdnd_final_path.iterdir():
-            if item.name == dndplat_filter_key:
-                print(f"  Keeping tkdnd version: {item.name}")
-                continue
-            print(f"  Removing tkdnd version: {item.name}")
-            if item.is_dir(): shutil.rmtree(item, ignore_errors=True)
-            else: item.unlink(missing_ok=True)
+        # Определяем текущую "эффективную" машину для Windows
+        if arch_32 and mach == 'AMD64': # WoW64 (32-битное приложение на 64-битной ОС)
+            current_machine_for_tkdnd = 'x86'
+        else: # Либо нативное 32-битное, либо нативное 64-битное, либо ARM
+            current_machine_for_tkdnd = mach # 'x86', 'AMD64', 'ARM64'
+        
+        # Сопоставляем с именами ваших папок
+        if current_machine_for_tkdnd == 'x86': 
+            dndplat_folder_to_keep = 'win-x86'
+        elif current_machine_for_tkdnd == 'AMD64': # Обычно соответствует x64
+            dndplat_folder_to_keep = 'win-x64'
+        elif current_machine_for_tkdnd == 'ARM64':
+            dndplat_folder_to_keep = 'win-arm64'
+
+    if dndplat_folder_to_keep:
+        print(f"Filtering tkdnd versions in '{tkdnd_final_path}', keeping: '{dndplat_folder_to_keep}'")
+        
+        # Проверяем, существует ли папка, которую нужно оставить
+        if not (tkdnd_final_path / dndplat_folder_to_keep).is_dir():
+            print(f"  CRITICAL WARNING: Target tkdnd platform folder '{dndplat_folder_to_keep}' not found in '{tkdnd_final_path}'. Drag'n'Drop will likely NOT work!")
+            # В этом случае, возможно, не стоит удалять ничего, или удалить всю папку tkdnd,
+            # чтобы избежать путаницы с неработающими библиотеками.
+            # Пока оставим как есть (ничего не удаляем, если целевой нет).
+        else:
+            # Итерируемся по всем элементам в tkdnd_final_path
+            for item in tkdnd_final_path.iterdir():
+                if item.is_dir(): # Работаем только с папками
+                    if item.name == dndplat_folder_to_keep:
+                        print(f"  Keeping tkdnd version: {item.name}")
+                    else:
+                        # Удаляем все остальные папки платформ
+                        print(f"  Removing tkdnd platform folder: {item.name}")
+                        shutil.rmtree(item, ignore_errors=True)
+                # Если есть файлы прямо в tkdnd_final_path (не в подпапках платформ), они останутся.
+                # Ваша структура предполагает, что все библиотеки лежат в подпапках.
     else:
-        print(f"Warning: Could not determine tkdnd platform for filtering. All versions in '{tkdnd_final_path}' might be kept.")
+        print(f"Warning: Could not determine target tkdnd platform folder to keep in '{tkdnd_final_path}'. All platform subfolders might be kept, or this could indicate an issue.")
 else:
-    if source_bin_dir.is_dir():
-         print(f"Warning: tkdnd directory not found at '{tkdnd_final_path}'. Skipping tkdnd filtering.")
+    # Эта проверка происходит после копирования project_source_bin_path в target_bin_in_dist
+    # Если source_bin_dir существует и содержит tkdnd, то и tkdnd_final_path должен существовать.
+    if source_bin_dir.is_dir() and (source_bin_dir / 'tkdnd').is_dir():
+         print(f"Warning: tkdnd directory was expected but not found at '{tkdnd_final_path}' after copying. Skipping tkdnd filtering.")
+    # Если source_bin_dir/tkdnd не существует, то это нормально, что его нет и в dist.
+    # else: (можно добавить логирование, если папки tkdnd в исходниках нет)
+    #    print(f"Info: tkdnd directory not found in source at '{source_bin_dir / 'tkdnd'}'. No tkdnd filtering needed.")
 
 # 4. Выдача прав на Linux/macOS (для tool в dist/)
 executable_final_path_in_dist = dist_output_path / output_executable_name
