@@ -2232,7 +2232,7 @@ class ModuleManager:
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
                 return module_error_codes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
-            rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
+            shutil.rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
         with zipfile.ZipFile(mpk, 'r') as myfile:
             with myfile.open(mconf.get('module', 'resource'), 'r') as inner_file:
