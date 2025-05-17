@@ -157,12 +157,12 @@ class Builder:
         else:
             raise FileNotFoundError("Cannot Build!!!TkinterDnd2 Missing!!!!!!!!!!")
         if os.name == 'posix':
-            if platform.machine() == 'x86_64' and os.path.exists(f'{local}/dist/bin/Linux/aarch64'):
+            if platform.machine() == 'x86_64' and os.path.exists(f'{self.local}/dist/bin/Linux/aarch64'):
                 try:
-                    shutil.rmtree(f'{local}/dist/bin/Linux/aarch64')
+                    shutil.rmtree(f'{self.local}/dist/bin/Linux/aarch64')
                 except:
                     pass
-            for root, dirs, files in os.walk(local + os.sep + 'dist', topdown=True):
+            for root, dirs, files in os.walk(self.local + '/dist', topdown=True):
                 for i in files:
                     print(f"Chmod {os.path.join(root, i)}")
                     os.system(f"chmod a+x {os.path.join(root, i)}")
