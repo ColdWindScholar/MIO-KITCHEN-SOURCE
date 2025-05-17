@@ -1,134 +1,295 @@
-name: "Build Tool"
+name: "Build Tool & Release" # More descriptive name
 permissions:
-  contents: write
-  discussions: write
+  contents: write # Needed to create releases and tags
+  # discussions: write # Only if you use GitHub Discussions for release notes
+
 on:
   push:
+    branches:
+      - main # Or your primary branch
     paths:
-      - "bin/setting.ini"
-  workflow_dispatch:
+      - "bin/setting.ini" # Trigger on version change
+      - ".github/workflows/main.yml" # Trigger if workflow itself changes
+  workflow_dispatch: # Allows manual triggering
+
 jobs:
-  build:
-    needs: [build-win,build-linux,build-macos]
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ["3.12.6"]
+  build-win:
+    name: "Build for Windows"
+    runs-on: windows-latest # Use the latest available Windows runner
+    outputs: # Define output for the artifact name
+      artifact_name: ${{ steps.upload_artifact.outputs.artifact-name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Specify major.minor, let actions/setup-python find latest patch
+          architecture: 'x86' # Build 32-bit version for wider compatibility, or 'x64' if preferred
+
+      - name: Update pip
+        shell: pwsh # Use PowerShell for consistency on Windows runner
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies and Build
+        shell: pwsh
+        run: python build.py # build.py should handle dependency installation if needed
+
+      - name: Get Version from settings.ini
+        id: version_reader
+        shell: pwsh
+        run: |
+          $versionLine = Get-Content -Path "bin/setting.ini" | Select-String -Pattern "version"
+          $version = ($versionLine -split '=')[1].Trim()
+          Write-Host "Detected version: $version"
+          echo "app_version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Determine Artifact and ZIP Name
+        id: names
+        shell: pwsh
+        run: |
+          $os_suffix = "win"
+          $arch_suffix = if ('${{ runner.arch }}' -eq 'X86') { "x86" } elseif ('${{ runner.arch }}' -eq 'X64') { "x64" } else { "unknownarch" }
+          # $app_version = (Get-Content -Path "bin/setting.ini" | Where-Object { $_ -match "version\s*=\s*(.+)" } | ForEach-Object { $Matches[1].Trim() })
+          $app_version = "${{ steps.version_reader.outputs.app_version }}"
+          $artifact_folder_name = "MIO-KITCHEN-${os_suffix}" # Folder name for artifact contents
+          $zip_file_name = "MIO-KITCHEN-${app_version}-${os_suffix}.zip" # Final ZIP name for release
+          
+          echo "artifact_folder_name=$artifact_folder_name" >> $env:GITHUB_OUTPUT
+          echo "zip_file_name=$zip_file_name" >> $env:GITHUB_OUTPUT
+          
+          Write-Host "Artifact folder name: $artifact_folder_name"
+          Write-Host "ZIP file name for release: $zip_file_name"
+
+      - name: Prepare Artifact for Upload
+        shell: pwsh
+        run: |
+          # Assuming build.py creates MIO-KITCHEN-win.zip in the root or ./dist
+          # We need to ensure the ZIP to be uploaded is named correctly for the release step
+          # The build.py script's zip_folder function creates a zip with version in its name.
+          # Let's find that zip.
+          $expected_built_zip = "${{ steps.names.outputs.zip_file_name }}" # This is the name build.py should create
+          if (-not (Test-Path $expected_built_zip)) {
+            Write-Error "Build script did not produce the expected ZIP: $expected_built_zip"
+            # Try to find any MIO-KITCHEN*.zip as a fallback
+            $found_zips = Get-ChildItem -Path "." -Filter "MIO-KITCHEN*.zip" | Select-Object -First 1
+            if ($found_zips) {
+              Write-Warning "Expected ZIP not found. Found '$($found_zips.Name)' instead. Renaming for upload."
+              Rename-Item -Path $found_zips.FullName -NewName $expected_built_zip -Force
+            } else {
+               Write-Error "No MIO-KITCHEN*.zip found after build."
+               exit 1
+            }
+          }
+          Write-Host "ZIP file to upload: $expected_built_zip"
+
+      - name: Upload Windows Build Artifact
+        id: upload_artifact # Give an ID to the step
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.names.outputs.artifact_folder_name }} # e.g., MIO-KITCHEN-win
+          path: ${{ steps.names.outputs.zip_file_name }} # e.g., MIO-KITCHEN-1.2.3-win.zip
+          retention-days: 7 # Optional: how long to keep the artifact
+
+  # Similar structures for build-linux and build-macos
+  build-linux:
+    name: "Build for Linux"
+    runs-on: ubuntu-latest # ubuntu-22.04 or newer
+    outputs:
+      artifact_name: ${{ steps.upload_artifact.outputs.artifact-name }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-      - name: Generate Release Body
-        run: |
-            set ver $(cat bin\setting.ini | findstr version).Split()[2]
-            echo "Build times: ${{ github.run_number }}" >> body.md
-            echo "Version: $ver" >> body.md && echo Ok
-            echo "Changelog:"  >> body.md
-            echo '```' >> body.md
-            git log -1 --pretty=%B $(git rev-parse HEAD) >> body.md
-            echo '```' >> body.md
-            echo $ver > version.txt && echo Ok
-      - name: Read version.txt
-        id: version
-        uses: juliangruber/read-file-action@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
         with:
-          path: ./version.txt
-          trim: true
-      - name: Rename Tool
+          python-version: '3.10'
+      - name: Install System Dependencies & Update pip
         run: |
-          cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-win.zip
-          cd ..
-          cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-linux.zip
-          cd ..
-          cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
-          cd ..
-          cd MIO-KITCHEN-macos-intel
-          move ./MIO-KITCHEN-macos-intel.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos-intel.zip
-          cd ..
-      - name: Upload release
+          python3 -m pip install --upgrade pip
+          sudo apt-get update -y
+          sudo apt-get install -y python3-tk libasound2-dev # Tkinter and potentially audio for some libs
+      - name: Install dependencies and Build
+        run: python3 build.py
+      - name: Get Version from settings.ini
+        id: version_reader
+        run: |
+          version_line=$(grep "version\s*=" "bin/setting.ini")
+          app_version=$(echo "$version_line" | cut -d'=' -f2 | tr -d '[:space:]')
+          echo "Detected version: $app_version"
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
+      - name: Determine Artifact and ZIP Name
+        id: names
+        run: |
+          os_suffix="linux"
+          # arch_suffix=$(uname -m) # x86_64, aarch64 etc.
+          app_version="${{ steps.version_reader.outputs.app_version }}"
+          artifact_folder_name="MIO-KITCHEN-${os_suffix}"
+          zip_file_name="MIO-KITCHEN-${app_version}-${os_suffix}.zip"
+          echo "artifact_folder_name=$artifact_folder_name" >> $GITHUB_OUTPUT
+          echo "zip_file_name=$zip_file_name" >> $GITHUB_OUTPUT
+      - name: Prepare Artifact for Upload (Linux)
+        run: |
+          expected_built_zip="${{ steps.names.outputs.zip_file_name }}"
+          if [ ! -f "$expected_built_zip" ]; then
+            echo "Build script did not produce the expected ZIP: $expected_built_zip" >&2
+            found_zip=$(ls MIO-KITCHEN*.zip 2>/dev/null | head -n 1)
+            if [ -n "$found_zip" ]; then
+              echo "WARNING: Expected ZIP not found. Found '$found_zip' instead. Renaming for upload." >&2
+              mv "$found_zip" "$expected_built_zip"
+            else
+              echo "ERROR: No MIO-KITCHEN*.zip found after build." >&2
+              exit 1
+            fi
+          fi
+          echo "ZIP file to upload: $expected_built_zip"
+      - name: Upload Linux Build Artifact
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.names.outputs.artifact_folder_name }}
+          path: ${{ steps.names.outputs.zip_file_name }}
+          retention-days: 7
+
+  build-macos:
+    name: "Build for macOS (${{ matrix.os_image }})"
+    strategy:
+      matrix:
+        # Use more descriptive names for matrix, map to runner images
+        os_image: [macos-13, macos-14] # macos-13 for Intel (usually), macos-14 for Arm (usually)
+        include:
+          - os_image: macos-13
+            target_arch_suffix: "macos-intel"
+            python_version: '3.12' # Python version for this macOS image
+          - os_image: macos-14 # Often an ARM runner by default on GitHub
+            target_arch_suffix: "macos-arm" # Assuming build.py creates this for ARM
+            python_version: '3.12'
+    runs-on: ${{ matrix.os_image }}
+    outputs:
+      artifact_name: ${{ steps.upload_artifact.outputs.artifact-name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python_version }}
+      - name: Install Packages & Update pip
+        run: |
+          python3 -m pip install --upgrade pip
+          # Any macOS specific system dependencies if needed
+      - name: Install dependencies and Build
+        run: python3 build.py
+      - name: Get Version from settings.ini
+        id: version_reader
+        run: |
+          version_line=$(grep "version\s*=" "bin/setting.ini")
+          app_version=$(echo "$version_line" | cut -d'=' -f2 | tr -d '[:space:]')
+          echo "Detected version: $app_version"
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
+      - name: Determine Artifact and ZIP Name
+        id: names
+        run: |
+          os_suffix="${{ matrix.target_arch_suffix }}" # e.g., macos-intel or macos-arm
+          app_version="${{ steps.version_reader.outputs.app_version }}"
+          artifact_folder_name="MIO-KITCHEN-${os_suffix}" # e.g. MIO-KITCHEN-macos-intel
+          zip_file_name="MIO-KITCHEN-${app_version}-${os_suffix}.zip" # e.g. MIO-KITCHEN-1.2.3-macos-intel.zip
+          echo "artifact_folder_name=$artifact_folder_name" >> $GITHUB_OUTPUT
+          echo "zip_file_name=$zip_file_name" >> $GITHUB_OUTPUT
+      - name: Prepare Artifact for Upload (macOS)
+        run: |
+          expected_built_zip="${{ steps.names.outputs.zip_file_name }}"
+          if [ ! -f "$expected_built_zip" ]; then
+            echo "Build script did not produce the expected ZIP: $expected_built_zip for ${{ matrix.os_image }}" >&2
+            found_zip=$(ls MIO-KITCHEN*${{ matrix.target_arch_suffix }}.zip 2>/dev/null | head -n 1 || ls MIO-KITCHEN*.zip 2>/dev/null | head -n 1)
+            if [ -n "$found_zip" ]; then
+              echo "WARNING: Expected ZIP not found. Found '$found_zip' instead. Renaming for upload." >&2
+              mv "$found_zip" "$expected_built_zip"
+            else
+              echo "ERROR: No MIO-KITCHEN ZIP found for ${{ matrix.os_image }} after build." >&2
+              exit 1
+            fi
+          fi
+          echo "ZIP file to upload: $expected_built_zip"
+      - name: Upload macOS Build Artifact (${{ matrix.target_arch_suffix }})
+        id: upload_artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.names.outputs.artifact_folder_name }} # e.g., MIO-KITCHEN-macos-intel
+          path: ${{ steps.names.outputs.zip_file_name }} # e.g., MIO-KITCHEN-1.2.3-macos-intel.zip
+          retention-days: 7
+
+  release: # Renamed 'build' job to 'release' for clarity
+    name: "Create GitHub Release"
+    needs: [build-win, build-linux, build-macos] # Depends on all build jobs
+    runs-on: ubuntu-latest # Release creation can run on any OS, Ubuntu is common
+    steps:
+      - name: Checkout repository (for release notes, version)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for git log
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          # No 'name' specified, downloads all artifacts produced in this workflow run
+          # Each artifact will be in a subdirectory named after the artifact.
+          path: downloaded_artifacts # All artifacts go into 'downloaded_artifacts/' subfolder
+
+      - name: Get Version from settings.ini (for release tag and name)
+        id: version_reader # Ensure this ID is unique if used multiple times across jobs or make it job-local
+        run: |
+          version_line=$(grep "version\s*=" "bin/setting.ini")
+          app_version=$(echo "$version_line" | cut -d'=' -f2 | tr -d '[:space:]')
+          echo "App Version for Release: $app_version"
+          echo "app_version=$app_version" >> $GITHUB_OUTPUT
+          
+      - name: Generate Release Body
+        id: generate_body
+        run: |
+          app_version="${{ steps.version_reader.outputs.app_version }}"
+          echo "## MIO-KITCHEN Version $app_version" > body.md
+          echo "**Build Number:** ${{ github.run_number }}" >> body.md
+          echo "" >> body.md
+          echo "### Changelog:" >> body.md
+          echo '```text' >> body.md
+          # Get commit message of the commit that triggered the workflow (if push) or latest if manual
+          # For push, GITHUB_SHA is the commit. For workflow_dispatch, it's the ref chosen.
+          git log -1 --pretty=%B ${{ github.sha }} >> body.md
+          echo '```' >> body.md
+          echo "Release body generated."
+
+      - name: Prepare Release Assets
+        id: prep_assets
+        shell: bash
+        run: |
+          echo "Preparing release assets..."
+          # The downloaded artifacts are in downloaded_artifacts/<artifact_name>/<zip_file_name>
+          # We need to move/rename them to the root of 'assets_for_release' for easier upload.
+          mkdir -p assets_for_release
+          
+          # Example: downloaded_artifacts/MIO-KITCHEN-win/MIO-KITCHEN-1.2.3-win.zip
+          # needs to become assets_for_release/MIO-KITCHEN-1.2.3-win.zip
+          
+          find downloaded_artifacts -type f -name "*.zip" -print0 | while IFS= read -r -d $'\0' file; do
+            echo "Found artifact ZIP: $file"
+            cp "$file" assets_for_release/
+          done
+
+          echo "Listing assets prepared for release:"
+          ls -l assets_for_release/
+          echo "assets_path=assets_for_release/*.zip" >> $GITHUB_OUTPUT
+
+
+      - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true
-          omitBodyDuringUpdate: true
-          removeArtifacts: true
-          name: "MIO-KITCHEN-${{ steps.version.outputs.content }}"
-          tag: "CI_BUILD_${{ github.run_number }}"
+          allowUpdates: true # Allows updating an existing release with the same tag
+          # omitBodyDuringUpdate: true # If true, body won't be updated if release exists
+          # removeArtifacts: true # If true, removes existing artifacts before uploading new ones for the same tag
+          name: "MIO-KITCHEN v${{ steps.version_reader.outputs.app_version }} (Build ${{ github.run_number }})"
+          tag: "v${{ steps.version_reader.outputs.app_version }}_b${{ github.run_number }}" # e.g. v4.1.0_b123
           bodyFile: "body.md"
-          artifacts: "*.zip"
-
-  build-win:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.12.6
-        uses: actions/setup-python@v5
-        with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.12.6'
-          # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x86'
-      # You can test your matrix by printing the current Python version
-      - name: Update pip
-        run:  python -m pip install -U --force-reinstall pip
-      - name: Pack tool
-        run: python build.py
-      - name: Upload Win Build
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: MIO-KITCHEN-win
-          path: './MIO-KITCHEN-win.zip'
-  build-linux:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.10'
-          # Optional - x64 or x86 architecture, defaults to x64
-      - name: Install Packages
-        run: |
-            python3 -m pip install -U --force-reinstall pip
-            sudo apt update -y && sudo apt install python3-tk -y
-      - name: Pack Tool
-        run: python3 build.py
-      - name: Upload Linux Build
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: MIO-KITCHEN-linux
-          path: './MIO-KITCHEN-linux.zip'
-  build-macos:
-    strategy:
-      matrix:
-        os: [macos-latest, macos-13]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          # Semantic version range syntax or exact version of a Python version
-          python-version: '3.12'
-          # Optional - x64 or x86 architecture, defaults to x64
-      - name: Install Packages
-        run: |
-          python3 -m pip install -U --force-reinstall pip
-      - name: Pack Tool
-        run: python3 build.py
-      - name: Upload Arm64 Macos Build
-        if: success() && matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: MIO-KITCHEN-macos
-          path: './MIO-KITCHEN-macos.zip'
-      - name: Upload x86_64 Macos Build
-        if: success() && matrix.os == 'macos-13'
-        uses: actions/upload-artifact@v4
-        with:
-          name: MIO-KITCHEN-macos-intel
-          path: './MIO-KITCHEN-macos-intel.zip'
+          artifacts: ${{ steps.prep_assets.outputs.assets_path }} # Path to the ZIP files for upload
+          # token: ${{ secrets.GITHUB_TOKEN }} # Default, already has permissions
+          prerelease: false # Set to true if this is a pre-release
+          draft: false # Set to true to create a draft release
