@@ -13,6 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
+import os
+import traceback
+import time # For unique log file names
 import argparse
 import gzip
 import json
@@ -22,7 +26,162 @@ import subprocess
 import threading
 from functools import wraps
 from random import randrange
-from tkinter.ttk import Scrollbar
+from timeit import default_timer as dti
+import zipfile
+from io import BytesIO, StringIO
+from webbrowser import open as openurl
+import logging # logging should be configured after paths are set, or use basicConfig early
+
+# ------------------------------------------------------------------------------------
+# Global Unhandled Exception Catcher
+# This should be placed as early as possible in your main script.
+# ------------------------------------------------------------------------------------
+_original_excepthook = sys.excepthook # Store original excepthook
+
+def _determine_log_path():
+    """Determines a writable path for crash logs."""
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    filename = f"crash_report_{timestamp}.txt"
+    
+    # Try to place logs in a 'crash_logs' subdirectory
+    # This path determination might need to happen *after* utils.prog_path is correctly set
+    # if utils.prog_path is used here. For now, let's use a simpler approach.
+    if getattr(sys, 'frozen', False): # Running in a bundle (e.g., PyInstaller)
+        base_path = os.path.dirname(sys.executable)
+    else: # Running as a script
+        try:
+            base_path = os.path.abspath(os.path.dirname(__file__))
+        except NameError: # __file__ is not defined (e.g. interactive interpreter)
+            base_path = os.getcwd()
+
+    log_dir = os.path.join(base_path, "crash_logs")
+
+    try:
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir, exist_ok=True)
+        return os.path.join(log_dir, filename)
+    except Exception:
+        # Fallback to user's desktop
+        try:
+            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+            if not os.path.exists(desktop_path): # Should not be necessary for Desktop but good practice
+                 os.makedirs(desktop_path, exist_ok=True)
+            return os.path.join(desktop_path, f"mio_kitchen_crash_{timestamp}.txt")
+        except Exception:
+            # Last resort: current working directory
+            return os.path.join(os.getcwd(), f"mio_kitchen_crash_{timestamp}.txt")
+
+_log_file_path_for_crash = _determine_log_path()
+_messagebox_shown_for_crash = False
+
+def _global_exception_handler(exc_type, exc_value, exc_traceback):
+    """
+    Custom global exception handler to log unhandled exceptions to a file
+    and attempt to show an error message to the user.
+    """
+    global _messagebox_shown_for_crash
+    error_details = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+    
+    try:
+        with open(_log_file_path_for_crash, "a", encoding='utf-8') as f:
+            f.write(f"--- CRASH REPORT [{time.asctime()}] ---\n")
+            f.write(error_details)
+            f.write("\n---------------------------------------\n")
+        
+        if not _messagebox_shown_for_crash:
+            _messagebox_shown_for_crash = True
+            try:
+                import tkinter # Local import
+                from tkinter import messagebox
+                
+                temp_root_for_msgbox = None
+                # Try to use 'win' if it exists and is valid, otherwise create a temporary root.
+                # This is tricky because 'win' might not be initialized or might be the source of the error.
+                main_app_window = globals().get('win') 
+                parent_for_msgbox = None
+                if main_app_window and isinstance(main_app_window, tkinter.Tk) and main_app_window.winfo_exists():
+                    parent_for_msgbox = main_app_window
+                else:
+                    temp_root_for_msgbox = tkinter.Tk()
+                    temp_root_for_msgbox.withdraw()
+                    parent_for_msgbox = temp_root_for_msgbox
+                
+                messagebox.showerror(
+                    "Unhandled Exception",
+                    f"A critical error occurred. Details have been saved to:\n{_log_file_path_for_crash}\n\nError: {str(exc_value)}", # Use str(exc_value) for a concise error
+                    parent=parent_for_msgbox
+                )
+                if temp_root_for_msgbox:
+                    temp_root_for_msgbox.destroy()
+            except Exception as e_msgbox_critical:
+                # This print will go to stderr, which is useful if logging itself is broken
+                sys.stderr.write(f"CRITICAL: Failed to show error messagebox: {e_msgbox_critical}\n")
+                sys.stderr.write(f"Crash report saved to: {_log_file_path_for_crash}\n")
+
+    except Exception as e_log_critical:
+        sys.stderr.write(f"CRITICAL: Failed to write to log file {_log_file_path_for_crash}: {e_log_critical}\n")
+        sys.stderr.write("Original error details:\n")
+        sys.stderr.write(error_details)
+    
+    # Call original excepthook if you want Python's default behavior too (e.g., printing to stderr)
+    # _original_excepthook(exc_type, exc_value, exc_traceback) 
+    sys.exit(1) # Force exit after attempting to log and notify
+
+sys.excepthook = _global_exception_handler
+# ------------------------------------------------------------------------------------
+# END OF Global Unhandled Exception Catcher
+# ------------------------------------------------------------------------------------
+
+# --- Your Regular Imports Start Here ---
+
+# Tkinter related imports
+import tkinter as tk # Now explicitly imported earlier as well for messagebox
+from tkinter import ttk
+from tkinter.ttk import Scrollbar # Explicit import for clarity
+from tkinter import (BOTH, BOTTOM, CENTER, DISABLED, HORIZONTAL,
+                     LEFT, RIGHT, TOP, X, Y, BooleanVar,
+                     Canvas, Frame, IntVar, Label, Listbox, Menu, StringVar, TclError, Text,
+                     Toplevel as TkToplevel)
+
+# Third-party libraries
+import pygments.lexers
+import requests
+from requests import ConnectTimeout, HTTPError
+import sv_ttk
+from PIL.Image import open as open_img
+from PIL.ImageTk import PhotoImage
+
+# Splash screen handling (e.g., for PyInstaller)
+# This should ideally come after the exception hook is set,
+# but before heavy GUI initializations if pyi_splash itself can fail.
+if platform.system() != 'Darwin':
+    try:
+        import pyi_splash
+        # Check if pyi_splash is active before trying to update or close it
+        if hasattr(pyi_splash, 'is_active') and pyi_splash.is_active():
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+        elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
+            # Assuming if it's imported and doesn't have is_active, we can try to use it.
+            # This might be risky if the splash isn't actually running.
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+    except ImportError:
+        pass # pyi_splash not available (e.g., running as script)
+    except RuntimeError: 
+        # pyi_splash.close() might raise RuntimeError if splash is already closed
+        # or not active, especially with older pyi_splash versions.
+        pass
+    except Exception: # Catch any other pyi_splash related errors
+        # Log this if logging is already configured, or print to stderr
+        # sys.stderr.write("Warning: Failed to interact with pyi_splash.\n")
+        pass
+
+
+# Local application/library specific imports
+# Relative imports assume this file is part of a package.
+# If 'tool.py' is the main entry point run directly, these might need adjustment
+# or your project structure must support them (e.g., running with 'python -m yourpackage.tool').
 
 from ..core import tarsafe, miside_banner
 from ..core.Magisk import Magisk_patch
@@ -32,45 +191,33 @@ from ..core.qsb_imger import process_by_xml
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
 
-if platform.system() != 'Darwin':
-    try:
-        import pyi_splash
+# Local UI components and helpers
+from .tkinterdnd2_build_in import Tk, DND_FILES # Custom TkinterDnD2. '.tkinterdnd2_build_in'
 
-        pyi_splash.update_text('Loading ...')
-        pyi_splash.close()
-    except ModuleNotFoundError:
-        ...
-import os.path
-import pathlib
-import sys
-import time
-from platform import machine
-from webbrowser import open as openurl
-import tkinter as tk
-from tkinter import ttk
-from timeit import default_timer as dti
-import zipfile
-from io import BytesIO, StringIO
-from .tkinterdnd2_build_in import Tk, DND_FILES
-from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
-                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
-from shutil import rmtree, copy, move
-import pygments.lexers
-import requests
-from requests import ConnectTimeout, HTTPError
-import sv_ttk
-from PIL.Image import open as open_img
-from PIL.ImageTk import PhotoImage
-from ..core.dumper import Dumper
-from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
+# Core utilities and data structures
+from ..core.utils import (lang, LogoDumper, States, terminate_process, 
+                          calculate_md5_file, calculate_sha256_file, JsonEdit, 
+                          DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo,
+                          create_thread, move_center, v_code, gettype, 
+                          is_empty_img, findfile, findfolder, Sdat2img, Unxz)
+from ..core import utils # For utils.prog_path and utils.project_name
 
+# Platform-specific imports
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
-    from tkinter import filedialog
+    from tkinter import filedialog # Standard filedialog for Windows
 else:
-    from ..core import mkc_filedialog as filedialog
+    # Ensure ..core.mkc_filedialog exists or adjust path
+    try:
+        from ..core import mkc_filedialog as filedialog # Custom filedialog
+    except ImportError:
+        from tkinter import filedialog # Fallback for safety
+        # Logging might not be configured here yet, so print to stderr or use basicConfig early.
+        # Consider moving logging setup even earlier if such warnings are critical.
+        sys.stderr.write("Warning: Custom filedialog 'mkc_filedialog' not found, using standard filedialog.\n")
 
+
+# More core functionalities
 from ..core import imgextractor
 from ..core import lpunpack
 from ..core import mkdtboimg
@@ -78,57 +225,85 @@ from ..core import ozipdecrypt
 from ..core import splituapp
 from ..core import ofp_qc_decrypt
 from ..core import ofp_mtk_decrypt
-from . import editor
 from ..core import opscrypto
-from ..core import images
+from ..core import images 
 from ..core import extra
-from . import AI_engine
-from ..core import ext4
+from ..core.extra import fspatch, re, contextpatch # Ensure 're' from here is intended if shadowing standard 're'
 from ..core.config_parser import ConfigParser
-from ..core import utils
 from ..core.unpac import MODE as PACMODE, unpac
-
-if os.name == 'nt':
-    from .sv_ttk_fixes import *
-from ..core.extra import fspatch, re, contextpatch
-from ..core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
-from .controls import ListBox, ScrollFrame
 from ..core.undz import DZFileTools
 from ..core.selinux_audit_allow import main as selinux_audit_allow
-import logging
 
+# Local UI components and helpers
+from . import editor # Assuming editor.py is in the same directory
+from . import AI_engine # Assuming AI_engine.py is in the same directory
+if os.name == 'nt':
+    from .sv_ttk_fixes import * # Windows-specific ttk fixes
+from .controls import ListBox, ScrollFrame # Assuming controls.py is in the same directory
+# from .home_tab import HomeTab # If used, ensure it's correctly imported or defined
+
+# --- Global Variables and Initial Setup ---
 is_pro = False
 try:
     from ..pro.sn import v as verify
-
     is_pro = True
 except ImportError:
-    is_pro = False
+    is_pro = False 
+
 if is_pro:
     from ..pro.active_ui import Active
 
 try:
-    from ..core import imp
+    # 'imp' is deprecated since Python 3.4, consider 'importlib' for future compatibility
+    from ..core import imp 
 except ImportError:
-    imp = None
+    imp = None # Keep imp as None if it cannot be imported
+
 try:
     from ..core.pycase import ensure_dir_case_sensitive
 except ImportError:
-    ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
+    # Provide a fallback lambda that logs a warning or just passes
+    ensure_dir_case_sensitive = lambda *x: logging.warning(f"Case sensitivity check not available for path(s): {x}")
 
-cwd_path = utils.prog_path
+# CRITICAL: 'utils.prog_path' must be correctly determined for compiled applications
+# *before* it's used to form other paths like cwd_path, tool_bin, temp, etc.
+# This is often a major source of issues in bundled apps.
+# The global exception handler might catch errors if this path is wrong and files are not found.
+cwd_path = utils.prog_path # Assuming utils.prog_path is correctly set by this point.
 
 if os.name == 'nt':
-    # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
-    def set_title_bar_color(window, dark_value: int = 20):
-        window.update()
-        set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
-        get_parent = windll.user32.GetParent
-        hwnd = get_parent(window.winfo_id())
-        rendering_policy = dark_value
-        value = c_int(2)
-        set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
-        window.update()
+    def set_title_bar_color(window, dark_value: int = 20): # 20 for dark mode hint
+        """
+        Sets the window title bar color on Windows, typically for dark mode.
+        The 'dark_value' and 'value=c_int(2)' logic is specific to certain dwmapi calls.
+        """
+        try:
+            window.update() # Ensure HWND is available
+            set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
+            get_parent = windll.user32.GetParent
+            hwnd = get_parent(window.winfo_id())
+            
+            # This logic is preserved from your original code.
+            # DWMWA_USE_IMMERSIVE_DARK_MODE (attribute 20 on newer Win10/11) usually takes a BOOL (0 or 1).
+            # The use of dark_value as the attribute and c_int(2) as the value is specific.
+            # It's possible that dark_value=20 refers to DWMWA_USE_IMMERSIVE_DARK_MODE and c_int(2) is a typo
+            # and should be c_int(1) for TRUE. Or it's a different, less common attribute.
+            rendering_policy_attribute_id = dark_value 
+            attribute_value_pointer = byref(c_int(2)) # As per original code
+            
+            # For DWMWA_USE_IMMERSIVE_DARK_MODE (20) or DWMWA_BORDER_COLOR (34) or DWMWA_CAPTION_COLOR (35)
+            # the value parameter might need adjustment.
+            # Example for dark mode (if dark_value is indeed for IMMERSIVE_DARK_MODE):
+            # if dark_value == 20: # DWMWA_USE_IMMERSIVE_DARK_MODE
+            #    attribute_value_pointer = byref(c_int(1)) # TRUE to enable
+            # elif dark_value == 19: # DWMWA_FORCE_ICONIC_REPRESENTATION (older, might not be relevant)
+            #    attribute_value_pointer = byref(c_int(1)) # TRUE
+
+            set_window_attribute(hwnd, rendering_policy_attribute_id, attribute_value_pointer, sizeof(c_int))
+            window.update() # Update again to apply changes
+        except Exception as e_title_bar:
+            # Logging might not be fully configured yet.
+            sys.stderr.write(f"Warning: Could not set Windows title bar color: {e_title_bar}\n")
 
 
 class LoadAnim:
@@ -490,56 +665,56 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.units = {
-                "B": 1,  # Use 1 instead of 2**0 for simplicity
+                "B": 1,  # Используем 1 вместо 2**0 для простоты
                 "KB": 1024,
                 "MB": 1024**2,
                 "GB": 1024**3,
                 "TB": 1024**4,
-                "PB": 1024**5 # Added PB for completeness
+                "PB": 1024**5 # Добавил PB для полноты
             }
             self.title(lang.t60) # lang.t60 = 'Byte Calculator' (пример)
-            self._is_calculating = False # Flag to prevent recursion
-            self.origin_size_var = tk.StringVar() # Separate variables for Entry
+            self._is_calculating = False # Флаг для предотвращения рекурсии
+            self.origin_size_var = tk.StringVar() # Отдельные переменные для Entry
             self.result_size_var = tk.StringVar()
             self.gui()
-            move_center(self) # Make sure that move_center is defined
+            move_center(self) # Убедись, что move_center определена
 
         def gui(self):
-            self.f_main = Frame(self) # The main frame for widgets
+            self.f_main = Frame(self) # Основной фрейм для виджетов
             self.f_main.pack(pady=5, padx=5, fill=X, expand=True)
 
-            # Left input field
+            # Левое поле ввода
             self.origin_size = ttk.Entry(self.f_main, textvariable=self.origin_size_var)
-            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Binding to the left field
+            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Биндинг на левое поле
             self.origin_size.pack(side='left', padx=5, expand=True, fill=X)
 
-           # Left combobox
+            # Левый комбобокс
             self.h = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.h.current(0)
-            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Binding to the left combobox
+            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Биндинг на левый комбобокс
             self.h.pack(side='left', padx=5)
 
-            # Equal sign
+            # Знак равенства
             Label(self.f_main, text='=').pack(side='left', padx=5)
 
-            # Right input field
+            # Правое поле ввода
             self.result_size = ttk.Entry(self.f_main, textvariable=self.result_size_var)
-            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Binding to the right field
+            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Биндинг на правое поле
             self.result_size.pack(side='left', padx=5, expand=True, fill=X)
 
-            # Right combobox
+            # Правый комбобокс
             self.f_ = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.f_.current(0)
-            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Binding to the right combobox
+            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Биндинг на правый комбобокс
             self.f_.pack(side='left', padx=5)
 
-            # Close button
+            # Кнопка закрытия
             ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5) # lang.text17 = 'Close' (пример)
 
         def calc_forward(self, event=None):
             """Рассчитывает значение справа налево (из левого поля в правое)."""
             if self._is_calculating:
-                return # Prevent recursion
+                return # Предотвращаем рекурсию
 
             self._is_calculating = True
             try:
@@ -549,71 +724,70 @@ class ToolBox(ttk.Frame):
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # We update only if the value is different to avoid unnecessary events
+                # Обновляем только если значение отличается, чтобы избежать лишних событий
                 if self.result_size_var.get() != result_value_str:
                     self.result_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Dropping the flag
+                self._is_calculating = False # Сбрасываем флаг
 
         def calc_reverse(self, event=None):
             """Рассчитывает значение справа налево (из правого поля в левое)."""
             if self._is_calculating:
-                return # Prevent recursion
+                return # Предотвращаем рекурсию
 
             self._is_calculating = True
             try:
-                # Units are swapped for calculation
-                origin_unit = self.f_.get() # We take a unit from the right combobox
-                target_unit = self.h.get() # The target unit is from the left
-                origin_value_str = self.result_size_var.get() # Value from the right field
+                # Единицы меняются местами для расчета
+                origin_unit = self.f_.get() # Берем единицу из правого комбобокса
+                target_unit = self.h.get()  # Целевая единица - из левого
+                origin_value_str = self.result_size_var.get() # Значение из правого поля
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # Update only if the value is different
+                # Обновляем только если значение отличается
                 if self.origin_size_var.get() != result_value_str:
                     self.origin_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Dropping the flag
+                self._is_calculating = False # Сбрасываем флаг
 
         def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
             """Выполняет конвертацию значения между единицами."""
-            # Removing the spaces
+            # Убираем пробелы
             size_str = size_str.strip()
 
-           # Handling empty input
+            # Обработка пустого ввода
             if not size_str:
-                return "" # We return an empty string if the output is empty
+                return "" # Возвращаем пустую строку, если ввод пуст
 
             try:
-               # Trying to convert to float
+                # Пытаемся преобразовать во float
                 size = float(size_str)
             except ValueError:
-                # If it's not a float, check if it's a partially entered number.
+                 # Если не float, проверяем, не является ли это частично введенным числом
                  if size_str == '.' or size_str == '-' or size_str == '-.' or \
                    (size_str.startswith('-') and size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str[1:])) or \
                    (size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str)):
-                    # If it looks like a number in the input process, we don't return anything yet (or can we return "0"?)
-# We return an empty string so as not to interfere with the input
+                    # Если это похоже на число в процессе ввода, пока ничего не возвращаем (или можно вернуть "0"?)
+                    # Возвращаем пустую строку, чтобы не мешать вводу
                     return ""
                  else:
-                    # If it's not exactly a number, we return "Invalid" or an empty string.
+                    # Если это точно не число, возвращаем "Invalid" или пустую строку
                     return "Invalid"
 
-           # If the units are the same
+            # Если единицы одинаковые
             if origin_unit == target_unit:
-                # We return the number as a string by deleting .0 for integers
+                # Возвращаем число в виде строки, удаляя .0 для целых чисел
                 return str(int(size)) if size.is_integer() else str(size)
 
-           # Performing the calculation
+            # Выполняем расчет
             result = size * self.units[origin_unit] / self.units[target_unit]
 
-            # Format the result: delete it .0 for integers, we limit the precision
+            # Форматируем результат: удаляем .0 для целых чисел, ограничиваем точность
             if result.is_integer():
                 return str(int(result))
             else:
-                # We limit the number of decimal places for readability
+                # Ограничиваем количество знаков после запятой для читаемости
                 return f"{result:.6f}".rstrip('0').rstrip('.')
-                
     class GetFileInfo(Toplevel):
         def __init__(self):
             super().__init__()
@@ -752,15 +926,73 @@ class ToolBox(ttk.Frame):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
-        self.rotate_angle = 0
+        self.rotate_angle = 0  # Moved from tab4_content as it's a window state
+
+        # Attempt to get the current alpha value before the "shake".
+        # This is important if user settings already include transparency by default.
+        initial_alpha = 1.0  # Default to fully opaque
+        try:
+            # Important: attributes() might not be available if the window isn't mapped yet,
+            # though this is usually not an issue in __init__.
+            # If this causes an error, we'll stick with initial_alpha = 1.0.
+            self.update_idletasks()  # Ensure the window is ready for attribute queries
+            current_alpha_str = self.attributes("-alpha")
+            initial_alpha = float(current_alpha_str)
+            if 'logging' in globals(): logging.info(f"Tool.__init__: Initial alpha detected as {initial_alpha}")
+        except (tk.TclError, ValueError) as e_alpha_get:
+            # If getting alpha fails, assume it's 1.0 (fully opaque).
+            if 'logging' in globals(): logging.warning(f"Tool.__init__: Could not get initial alpha ({e_alpha_get}), assuming {initial_alpha}.")
+        
+        # Apply Windows-specific default font settings if available.
         if os.name == 'nt':
-            do_set_window_deffont(self)
+            if 'do_set_window_deffont' in globals() and callable(globals()['do_set_window_deffont']):
+                try:
+                    do_set_window_deffont(self)
+                except Exception as e_font_fix:
+                    if 'logging' in globals(): logging.error(f"Tool.__init__: Error in do_set_window_deffont: {e_font_fix}")
+        
+        # Assign the warning window function to a method for easier access.
         self.message_pop = warn_win
+        
         self.title('MIO-KITCHEN')
-        if os.name != "posix":
-            self.iconphoto(True,
-                           PhotoImage(
-                               data=images.icon_byte))
+        # Set application icon, except on POSIX systems (where it might behave differently or not be needed).
+        if os.name != "posix" and 'images' in globals() and hasattr(images, 'icon_byte') and 'PhotoImage' in globals():
+            try:
+                self.iconphoto(True, PhotoImage(data=images.icon_byte))
+            except Exception as e_icon:
+                 if 'logging' in globals(): logging.error(f"Failed to set application icon: {e_icon}")
+
+        # --- Proposed fix for micro-freezes on Windows ---
+        if os.name == 'nt':
+            # This "shake" of the alpha attribute can help the Windows DWM (Desktop Window Manager)
+            # correctly initialize window composition for smoother rendering.
+            # This is done once during window initialization.
+            # A value like 0.99 is used to make the change minimally noticeable,
+            # yet sufficient to trigger the DWM mechanism.
+            try:
+                if 'logging' in globals(): logging.info("Tool.__init__: Applying alpha 'shake' fix for Windows.")
+                
+                # Briefly set alpha to slightly less than 1.0.
+                self.attributes("-alpha", 0.99) 
+                
+                # Allow Tkinter and the system time to process this change.
+                # self.update() can be too aggressive here and might cause other issues.
+                # self.update_idletasks() is generally safer.
+                self.update_idletasks() 
+                
+                # Restore the original or desired alpha value.
+                # If initial_alpha was successfully retrieved and is not 1.0 (e.g., from user settings),
+                # restore it. Otherwise, restore to 1.0.
+                self.attributes("-alpha", initial_alpha) 
+                self.update_idletasks() # Call again to ensure the change is applied.
+                
+                if 'logging' in globals(): logging.info(f"Tool.__init__: Alpha 'shake' fix applied. Alpha restored to {initial_alpha}.")
+            except tk.TclError as e_alpha_fix:
+                # This error can occur if the window is not yet ready for attribute changes.
+                if 'logging' in globals(): logging.error(f"Tool.__init__: TclError during alpha 'shake' fix: {e_alpha_fix}. Window might not be ready.")
+            except Exception as e_generic_alpha_fix:
+                # Catch any other unexpected errors during the fix.
+                if 'logging' in globals(): logging.error(f"Tool.__init__: Generic error during alpha 'shake' fix: {e_generic_alpha_fix}")
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
@@ -862,40 +1094,129 @@ class Tool(Tk):
         tool_box.pack(fill=BOTH, expand=True)
 
     def tab4_content(self):
-        self.rotate_angle = 0
-        debugger_num = 0
+        # self.rotate_angle is now an instance attribute of Tool, initialized in Tool.__init__
+        debugger_num = 0 # Counter for a debug feature trigger
 
         def getColor():
             nonlocal debugger_num
             debugger_num += 1
-            if debugger_num >= 5:
+            if debugger_num >= 5: # Trigger debugger after 5 clicks
                 debugger_num = 0
-                a = Debugger()
-                a.lift()
-                a.focus_force()
+                # Ensure Debugger class is defined and accessible
+                if 'Debugger' in globals() and callable(Debugger):
+                    a = Debugger()
+                    a.lift()
+                    a.focus_force()
+                elif 'logging' in globals():
+                    logging.warning("tab4_content.getColor: Debugger class not found.")
+            # Generate a random hex color string
             return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
 
         def update_angle():
-            self.rotate_angle = (self.rotate_angle + 10) % 180
-            canvas.itemconfigure(text_item, angle=self.rotate_angle)
+            # Access self.rotate_angle, which is an instance attribute of Tool
+            self.rotate_angle = (self.rotate_angle + 10) % 180 
+            # Check if canvas and text_item exist before configuring
+            if canvas.winfo_exists() and text_item: 
+                try:
+                    canvas.itemconfigure(text_item, angle=self.rotate_angle)
+                except tk.TclError: # Catch TclError if item is already destroyed or invalid
+                    if 'logging' in globals(): logging.warning("tab4_content.update_angle: TclError configuring canvas item angle.")
 
+
+        # Ensure self.tab4 (the parent frame for this content) exists and is a valid Tkinter widget
+        if not (hasattr(self, 'tab4') and self.tab4 and isinstance(self.tab4, (tk.Frame, ttk.Frame)) and self.tab4.winfo_exists()):
+            if 'logging' in globals(): logging.error("tab4_content: self.tab4 (parent frame) is not valid or has been destroyed.")
+            return
+
+        # --- Animated Text Canvas ---
         canvas = tk.Canvas(self.tab4, width=400, height=100)
         canvas.pack()
         text_item = canvas.create_text(200, 50, text='MIO-KITCHEN', font=('Arial', 30), fill='white')
 
+        # Bind mouse events for text animation and color change
         canvas.tag_bind(text_item, '<B1-Motion>', lambda event: update_angle())
-        canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
+        canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()) if canvas.winfo_exists() and text_item else None)
+        
+        # --- Application Information Labels ---
+        _lang_obj = globals().get('lang')
+        _settings_obj = globals().get('settings')
 
-        Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
-        Label(self.tab4,
-              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
-              font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
-        ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
-                  background='gray').pack()
-        Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
-        ttk.Label(self.tab4, text=lang.t63, style="Link.TLabel").pack()
-        link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
-                         style="Link.TLabel")
+        # "Focus on Android ROM modification" label
+        text111_key = 'text111'
+        default_text111 = "Focus on Android ROM modification"
+        text111_val = default_text111
+        if _lang_obj and hasattr(_lang_obj, text111_key):
+            lang_val = getattr(_lang_obj, text111_key)
+            if isinstance(lang_val, str) and lang_val.strip().lower() != "none":
+                text111_val = lang_val
+        Label(self.tab4, text=text111_val, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
+
+        # Version and platform information label
+        version_info_text = "Version info not available" # Default text
+        text128_key = 'text128' # Localization key for the format string
+        default_text128_template = "Tool: {}, Python: {}, OS: {}, Arch: {}" # Default template
+
+        if _lang_obj and hasattr(_lang_obj, text128_key) and \
+           _settings_obj and hasattr(_settings_obj, 'version'):
+            
+            template_from_lang = getattr(_lang_obj, text128_key, default_text128_template)
+            if not isinstance(template_from_lang, str) or template_from_lang.strip().lower() == "none":
+                template_from_lang = default_text128_template # Fallback to default template
+
+            try:
+                # Correctly use platform.machine() for architecture information
+                version_info_text = template_from_lang.format(
+                    _settings_obj.version, 
+                    sys.version[:6], 
+                    platform.system(), 
+                    platform.machine() # CORRECTED: Was 'machine()'
+                )
+            except (IndexError, KeyError, ValueError) as e_format: # Catch formatting errors
+                if 'logging' in globals(): logging.error(f"tab4_content: Error formatting lang.{text128_key} ('{template_from_lang}'): {e_format}")
+                # Fallback to a simple display if formatting fails
+                version_info_text = f"Tool: {_settings_obj.version}, Py: {sys.version[:6]}, OS: {platform.system()}, Arch: {platform.machine()}"
+        
+        Label(self.tab4, text=version_info_text, font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
+
+        # Language information (e.g., "English By AuthorName")
+        language_info_text = "Language info not available" # Default
+        if _settings_obj and hasattr(_settings_obj, 'language') and \
+           _lang_obj and hasattr(_lang_obj, 'language_file_by'):
+            
+            settings_lang = getattr(_settings_obj, 'language', 'N/A')
+            lang_author = getattr(_lang_obj, 'language_file_by', 'N/A')
+            
+            # Ensure both parts are valid strings
+            if isinstance(settings_lang, str) and settings_lang.strip().lower() != "none" and \
+               isinstance(lang_author, str) and lang_author.strip().lower() != "none":
+                language_info_text = f"{settings_lang} By {lang_author}"
+            elif 'logging' in globals():
+                logging.warning(f"tab4_content: Invalid language ('{settings_lang}') or author ('{lang_author}') from settings/lang.")
+                
+        ttk.Label(self.tab4, text=language_info_text, foreground='orange', background='gray').pack()
+        
+        # Copyright notice
+        text110_key = 'text110'
+        default_text110 = "© YYYY ColdWindScholar. All Rights Reserved." # Example default
+        text110_val = default_text110
+        if _lang_obj and hasattr(_lang_obj, text110_key):
+            lang_val = getattr(_lang_obj, text110_key)
+            if isinstance(lang_val, str) and lang_val.strip().lower() != "none":
+                text110_val = lang_val
+        Label(self.tab4, text=text110_val, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
+        
+        # "Open Source, free, faster" label
+        t63_key = 't63'
+        default_t63 = "Open Source, free, faster"
+        t63_val = default_t63
+        if _lang_obj and hasattr(_lang_obj, t63_key):
+            lang_val = getattr(_lang_obj, t63_key)
+            if isinstance(lang_val, str) and lang_val.strip().lower() != "none":
+                t63_val = lang_val
+        ttk.Label(self.tab4, text=t63_val, style="Link.TLabel").pack()
+        
+        # GitHub link
+        link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2", style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         link.pack()
 
@@ -1291,11 +1612,40 @@ def error(code, desc="unknown error"):
 
 class Welcome(ttk.Frame):
     def __init__(self):
-        super().__init__(master=win)
-        self.pack(fill=BOTH, expand=True)
+        # master=win здесь означает, что Welcome будет дочерним виджетом главного окна 'win'
+        _main_app_window = globals().get('win')
+        if not (_main_app_window and isinstance(_main_app_window, tk.Tk)):
+            # Это критическая ситуация, если Welcome ожидает win как master
+            if 'logging' in globals():
+                logging.critical("Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+            # Можно либо упасть, либо создать временный Toplevel, если Welcome должен работать автономно (что маловероятно здесь)
+            # For now, let's assume 'win' is always available as per the original design.
+            # If 'win' is truly missing, the super().__init__ below would likely fail or misbehave.
+            pass # Let it proceed, error might be caught later or if win is not tk.Tk like
 
-        self.oobe = int(settings.oobe)
-        states.in_oobe = True
+        super().__init__(master=_main_app_window) # Explicitly pass master
+        self.pack(fill=BOTH, expand=True) # Welcome frame fills its master (win)
+
+        _settings_obj = globals().get('settings')
+        _states_obj = globals().get('states')
+        _lang_obj = globals().get('lang')
+
+        if not (_settings_obj and _states_obj and _lang_obj):
+            if 'logging' in globals():
+                logging.error("Welcome.__init__: Global objects (settings, states, lang) not fully available.")
+            # Handle missing globals if necessary, e.g., by disabling functionality or using defaults
+
+        self.oobe = 0 # Default value
+        if _settings_obj and hasattr(_settings_obj, 'oobe'):
+            try:
+                self.oobe = int(_settings_obj.oobe)
+            except (ValueError, TypeError):
+                if 'logging' in globals():
+                    logging.warning(f"Welcome.__init__: Invalid value for settings.oobe ('{_settings_obj.oobe}'). Defaulting to 0.")
+                self.oobe = 0
+        
+        if _states_obj:
+            _states_obj.in_oobe = True
 
         self.frames = {
             0: self.hello,
@@ -1305,37 +1655,118 @@ class Welcome(ttk.Frame):
             4: self.private,
             5: self.done
         }
-        self.frame = ttk.Frame(self)
-        self.frame.pack(expand=1, fill=BOTH)
-        self.button_frame = ttk.Frame(self)
-        self.back = ttk.Button(self.button_frame, text=lang.back_step, command=lambda: self.change_page(self.oobe - 1))
-        self.back.pack(fill=X, padx=5, pady=5, side='left', expand=1)
-        self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
-        self.next.pack(fill=X, padx=5, pady=5, side='right', expand=1)
-        self.button_frame.pack(expand=1, fill=X, padx=5, pady=5, side='bottom')
-        self.change_page(self.oobe)
-        move_center(win)
-        self.wait_window()
-        states.in_oobe = False
+        self.frame = ttk.Frame(self) # This is the inner frame that holds the content of each page
+        self.frame.pack(expand=True, fill=BOTH, padx=10, pady=10) # Added padding for aesthetics
 
-    def change_page(self, step: int = None):
-        if not step or step not in self.frames.keys():
-            step = 0
+        self.button_frame = ttk.Frame(self)
+        
+        back_text = "Back"
+        if _lang_obj and hasattr(_lang_obj, 'back_step'):
+            lang_back = getattr(_lang_obj, 'back_step')
+            if isinstance(lang_back, str) and lang_back.strip().lower() != "none":
+                back_text = lang_back
+        
+        next_text = "Next"
+        if _lang_obj and hasattr(_lang_obj, 'text138'):
+            lang_next = getattr(_lang_obj, 'text138')
+            if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
+                next_text = lang_next
+
+        self.back = ttk.Button(self.button_frame, text=back_text, command=lambda: self.change_page(self.oobe - 1))
+        self.back.pack(fill=X, padx=5, pady=5, side='left', expand=True) # expand=True
+        self.next = ttk.Button(self.button_frame, text=next_text, command=lambda: self.change_page(self.oobe + 1))
+        self.next.pack(fill=X, padx=5, pady=5, side='right', expand=True) # expand=True
+        
+        self.button_frame.pack(expand=False, fill=X, padx=5, pady=5, side='bottom') # expand=False for button_frame
+
+        self.change_page(self.oobe) # Initial page load
+        
+        # Centering the main window 'win' after Welcome frame is packed and first page is loaded
+        _move_center_func = globals().get('move_center')
+        if _main_app_window and _move_center_func and callable(_move_center_func):
+            try:
+                # Ensure Welcome frame itself and its content are updated before centering master
+                self.update_idletasks() 
+                _main_app_window.update_idletasks() # Ensure master (win) knows its new size with Welcome packed
+                _move_center_func(_main_app_window)
+            except Exception as e_mc:
+                 if 'logging' in globals(): logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
+        
+        self.wait_window() # This makes the Welcome sequence modal relative to 'win'
+        
+        if _states_obj:
+            _states_obj.in_oobe = False
+
+    def change_page(self, step: int = 0): # Default step to 0 if None
+        _main_app_window = globals().get('win') # The main Tk window
+        _settings_obj = globals().get('settings')
+        _lang_obj = globals().get('lang')
+        _move_center_func = globals().get('move_center')
+
+        if not isinstance(step, int) or step not in self.frames:
+            step = 0 # Default to the first page if step is invalid
+
         self.oobe = step
-        settings.set_value('oobe', step)
-        for i in self.frame.winfo_children():
-            i.destroy()
-        move_center(win)
-        self.frames[step]()
+        if _settings_obj:
+            try:
+                _settings_obj.set_value('oobe', str(step)) # Ensure value is string for set_value
+            except Exception as e_set_oobe:
+                if 'logging' in globals(): logging.error(f"Welcome.change_page: Failed to save OOBE step {step}: {e_set_oobe}")
+
+        # Clear previous page content from the inner frame
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+        
+        # Load the new page content
+        self.frames[step]() # This populates self.frame with new widgets
+
+        # Update the inner frame to get its new size based on content
+        self.frame.update_idletasks()
+        # Update the Welcome frame itself (which contains self.frame and button_frame)
+        self.update_idletasks() 
+        
+        # Center the main application window ('win') after page content has changed
+        if _main_app_window and _move_center_func and callable(_move_center_func):
+            try:
+                _main_app_window.update_idletasks() # Ensure 'win' knows its size with the new Welcome content
+                _move_center_func(_main_app_window)
+            except Exception as e_mc:
+                if 'logging' in globals(): logging.error(f"Welcome.change_page: Error centering main window: {e_mc}")
+        
+        # Update button states and text
+        finish_text = "Finish"
+        if _lang_obj and hasattr(_lang_obj, 'text34'):
+            lang_finish = getattr(_lang_obj, 'text34')
+            if isinstance(lang_finish, str) and lang_finish.strip().lower() != "none":
+                finish_text = lang_finish
+        
+        next_text = "Next" # Default, defined in __init__
+        if _lang_obj and hasattr(_lang_obj, 'text138'):
+            lang_next = getattr(_lang_obj, 'text138')
+            if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
+                next_text = lang_next
+
         if step == min(self.frames.keys()):
             self.back.config(state='disabled')
         else:
             self.back.config(state='normal')
+
         if step == max(self.frames.keys()):
-            self.next.config(text=lang.text34, command=self.destroy)
+            self.next.config(text=finish_text, command=self.destroy_welcome) # Use a new method to destroy
         else:
-            if self.next.cget('text') != lang.text138:
-                self.next.config(text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
+            # Ensure 'Next' button is correctly configured if not on the last page
+            current_next_text = self.next.cget('text')
+            if current_next_text != next_text or self.next.cget('command') == str(self.destroy_welcome): # Compare command carefully
+                self.next.config(text=next_text, command=lambda: self.change_page(self.oobe + 1))
+    
+    def destroy_welcome(self):
+        """ Safely destroys the Welcome frame. """
+        _states_obj = globals().get('states')
+        if _states_obj:
+            _states_obj.in_oobe = False # Set this before destroying, so mainloop doesn't get stuck
+        
+        if self.winfo_exists():
+            self.destroy()
 
     def hello(self):
         ttk.Label(self.frame, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
@@ -4516,17 +4947,16 @@ class UnpackGui(ttk.LabelFrame):
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()
-        # 'current_project_name' must be a global StringVar
         current_project_name.trace_add("write", self._on_project_change)
         
-    # New handler method called when changing the project
+    # Новый метод-обработчик, вызываемый при смене проекта
     def _on_project_change(self, *args):
          """Is called automatically when current_project_name is changed."""
         # Check if the hd method exists and the widget itself before calling
          if hasattr(self, 'hd') and callable(self.hd):
              if self.winfo_exists():
-                 # Calling hd() will update the list of partitions for the new project,
-                 # Considering the current mode (Unpack/Pack)
+                 # Вызов hd() обновит список разделов для нового проекта,
+                 # учитывая текущий режим (Unpack/Pack)
                  self.hd()
                  
     def gui(self):
@@ -5025,12 +5455,135 @@ init = lambda args: __init__tk(args)
 
 
 def restart(er: Toplevel = None):
+    # Access global objects safely
+    _animation_obj = globals().get('animation')
+    _ask_win_func = globals().get('ask_win')
+    _lang_obj = globals().get('lang')
+    _logging_obj = globals().get('logging')
+    _win_obj = globals().get('win')
+    _tool_self_path = globals().get('tool_self')
+
+    # Check for active tasks and confirm with the user
     try:
-        if animation.tasks:
-            if not ask_win("Your operation will not be saved.", is_top=True):
-                return
-    except (TclError, ValueError, AttributeError):
-        logging.exception('Restart')
+        if _animation_obj and hasattr(_animation_obj, 'tasks') and _animation_obj.tasks:
+            confirm_text = "Your current operation will not be saved if you restart. Continue?"
+            if _lang_obj and hasattr(_lang_obj, 'restart_confirm_unsaved_tasks'):
+                lang_confirm_text = getattr(_lang_obj, 'restart_confirm_unsaved_tasks')
+                if isinstance(lang_confirm_text, str) and lang_confirm_text.strip():
+                    confirm_text = lang_confirm_text
+            
+            if _ask_win_func and callable(_ask_win_func):
+                if not _ask_win_func(confirm_text, is_top=True): # is_top might be deprecated in your ask_win
+                    if _logging_obj: _logging_obj.info("Restart cancelled by user due to active tasks.")
+                    return
+            elif _logging_obj:
+                 _logging_obj.warning("restart: ask_win function not available for task confirmation.")
+    except Exception as e_task_check: # Catch a broader range of exceptions during task check
+        if _logging_obj: _logging_obj.error(f"Error checking animation tasks during restart: {e_task_check}")
+
+    # --- Prepare arguments for the new process ---
+    if not _tool_self_path:
+        if _logging_obj: _logging_obj.critical("restart: 'tool_self' path (application entry point) not defined. Cannot restart.")
+        if _win_obj and hasattr(_win_obj, 'message_pop'):
+            _win_obj.message_pop("Critical error: Application path missing. Cannot restart.", "red", "Restart Error")
+        return
+
+    executable_path = sys.executable # Path to the python interpreter or the bundled executable
+    argv_new_process = [executable_path]
+
+    try:
+        # If running as a script (not frozen) and tool_self is a .py file, add it.
+        # If frozen, sys.executable is usually the app itself.
+        if not getattr(sys, 'frozen', False): # Running as a Python script
+            if os.path.abspath(sys.executable) != os.path.abspath(_tool_self_path) and _tool_self_path.lower().endswith(".py"):
+                 argv_new_process.append(_tool_self_path)
+        # For frozen apps, sys.executable is the app. If tool_self is different (e.g. a specific launcher script),
+        # this logic might need adjustment based on your build process.
+        # The original pathlib check was:
+        # if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
+        #    argv.append(tool_self)
+        # This can be complex if tool_self and sys.executable point to the same file via symlinks etc.
+        # A simpler check for non-frozen apps is often sufficient.
+
+    except Exception as e_path_build:
+        if _logging_obj: _logging_obj.error(f"restart: Error constructing arguments for new process: {e_path_build}")
+        # Fallback: if tool_self looks different from executable, add it.
+        if _tool_self_path != executable_path: # Basic string comparison
+            argv_new_process.append(_tool_self_path)
+
+    # Append original command-line arguments (if any), skipping the script name itself if already handled
+    if len(sys.argv) > 1:
+        argv_new_process.extend(sys.argv[1:])
+    
+    if _logging_obj: _logging_obj.info(f"Attempting to restart application with command: {argv_new_process}")
+
+    # --- Close GUI elements of the current process ---
+    if er and isinstance(er, tk.Toplevel) and er.winfo_exists():
+        try:
+            er.destroy()
+        except tk.TclError:
+            if _logging_obj: _logging_obj.debug("restart: Minor TclError destroying error dialog.")
+        except Exception as e_er_destroy: # Catch any other error
+            if _logging_obj: _logging_obj.warning(f"restart: Error destroying error dialog: {e_er_destroy}")
+
+
+    if _win_obj and hasattr(_win_obj, 'destroy') and callable(_win_obj.destroy):
+        try:
+            if _win_obj.winfo_exists():
+                # Destroy children first, then the main window
+                # Make a copy of the children list as it might change during iteration
+                children_to_destroy = list(_win_obj.winfo_children())
+                for child in children_to_destroy:
+                    try:
+                        if child.winfo_exists(): # Check if child still exists
+                            child.destroy()
+                    except (tk.TclError, AttributeError):
+                        if _logging_obj: _logging_obj.debug(f"restart: Minor error destroying child widget {child}.")
+                
+                _win_obj.destroy() # Destroy the main window
+                # Allow Tkinter to process destroy events
+                _win_obj.update_idletasks() 
+                # _win_obj.update() # update() can sometimes hang if called at the wrong time during shutdown.
+                                  # update_idletasks() is generally safer.
+            if _logging_obj: _logging_obj.info("Main window and its children scheduled for destruction.")
+        except tk.TclError as e_main_destroy_tcl:
+            if _logging_obj: _logging_obj.error(f"restart: TclError during main window destruction: {e_main_destroy_tcl}")
+        except Exception as e_main_destroy_generic:
+            if _logging_obj: _logging_obj.error(f"restart: Generic error during main window destruction: {e_main_destroy_generic}")
+    else:
+        if _logging_obj: _logging_obj.warning("restart: Main window 'win' not available or not destroyable for cleanup.")
+
+
+    # --- Start the new process ---
+    try:
+        # For Windows, DETACHED_PROCESS and CREATE_NEW_PROCESS_GROUP help the new process
+        # run independently of the parent, which is about to exit.
+        popen_kwargs = {}
+        if os.name == 'nt':
+            popen_kwargs['creationflags'] = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+            # Close file handles in the new process on Windows, except for stdin, stdout, stderr
+            popen_kwargs['close_fds'] = False # Default on Windows, but explicitly for clarity
+        elif os.name == 'posix':
+            # On POSIX, close_fds=True is generally recommended for detached processes
+            # to prevent child from inheriting open file descriptors.
+            popen_kwargs['close_fds'] = True
+            # Optionally, start a new session
+            # popen_kwargs['start_new_session'] = True
+
+
+        subprocess.Popen(argv_new_process, **popen_kwargs)
+        if _logging_obj: _logging_obj.info("New process for restart has been launched.")
+        
+        # Exit the current process successfully
+        sys.exit(0)
+
+    except Exception as e_popen:
+        if _logging_obj: _logging_obj.critical(f"Failed to start new process for restart: {e_popen}")
+        # If Popen fails, the old process is still running (GUI might be closed).
+        # A critical error message should be logged. It's hard to show a GUI message at this point.
+        # Standard error is the best bet.
+        sys.stderr.write(f"CRITICAL ERROR: Failed to restart application. Please start it manually.\nDetails: {e_popen}\n")
+        sys.exit(1) # Exit with an error code
 
     def _inner():
         argv = [sys.executable]
