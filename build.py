@@ -160,12 +160,12 @@ class Builder:
             if platform.machine() == 'x86_64' and os.path.exists(f'{self.local}/dist/bin/Linux/aarch64'):
                 try:
                     shutil.rmtree(f'{self.local}/dist/bin/Linux/aarch64')
-                except:
-                    pass
-            for root, dirs, files in os.walk(self.local + '/dist', topdown=True):
+                except Exception as e:
+                    print(e)
+            for root, dirs, files in os.walk(f'{self.local}/dist', topdown=True):
                 for i in files:
                     print(f"Chmod {os.path.join(root, i)}")
-                    os.system(f"chmod a+x {os.path.join(root, i)}")
+                    os.chmod(os.path.join(root, i), 0o7777, follow_symlinks=False)
     def pack_zip(self, source, name):
             # 获取文件夹的绝对路径和文件夹名称
             abs_folder_path = os.path.abspath(source)
