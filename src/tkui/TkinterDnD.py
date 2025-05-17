@@ -336,4 +336,3 @@ class Tk(tkinter.Tk, DnDWrapper): # Inherits from standard tkinter.Tk and our Dn
             # logging.error(f"Failed to initialize TkDnD: {e}")
             # self.TkdndVersion = None # Indicate DnD is not available
             raise # Re-raise the error if DnD is essential
-
