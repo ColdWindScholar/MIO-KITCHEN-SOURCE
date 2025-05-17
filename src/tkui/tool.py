@@ -2580,7 +2580,7 @@ class ModuleManager:
                 self.uninstall_b.config(text=lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(module_path):
                     try:
-                        rmtree(module_path)
+                        shutil.rmtree(module_path)
                     except PermissionError as e:
                         logging.exception('Bugs')
                         print(e)
@@ -2637,9 +2637,9 @@ class MpkMan(ttk.Frame):
                 continue
             if not os.path.exists(os.path.join(self.moduledir, i, "info.json")):
                 try:
-                    rmtree(os.path.join(self.moduledir, i))
-                finally:
-                    continue
+                    shutil.rmtree(os.path.join(self.moduledir, i))
+                except Exception:
+                    logging.error("uninstall plugin")
             if os.path.isdir(self.moduledir + os.sep + i):
                 self.images_[i] = PhotoImage(
                     open_img(os.path.join(self.moduledir, i, 'icon')).resize((70, 70))) if os.path.exists(
