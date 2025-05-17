@@ -65,6 +65,60 @@ from ..core.dumper import Dumper
 from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
 
+
+
+# Splash screen handling (e.g., for PyInstaller)
+# This should ideally come after the exception hook is set,
+# but before heavy GUI initializations if pyi_splash itself can fail.
+if platform.system() != 'Darwin':
+    try:
+        import pyi_splash
+        # Check if pyi_splash is active before trying to update or close it
+        if hasattr(pyi_splash, 'is_active') and pyi_splash.is_active():
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+        elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
+            # Assuming if it's imported and doesn't have is_active, we can try to use it.
+            # This might be risky if the splash isn't running.
+            pyi_splash.update_text('Loading ...')
+            pyi_splash.close()
+    except ImportError:
+        pass # pyi_splash not available (e.g., running as script)
+    except RuntimeError: 
+        # pyi_splash.close() might raise RuntimeError if splash is already closed
+        # or not active, especially with older pyi_splash versions.
+        pass
+    except Exception: # Catch any other pyi_splash related errors
+        # Log this if logging is already configured, or print to stderr
+        # sys.stderr.write("Warning: Failed to interact with pyi_splash.\n")
+        pass
+
+
+# Local application/library specific imports
+# Relative imports assume this file is part of a package.
+# If 'tool.py' is the main entry point run directly, these might need adjustment
+# or your project structure must support them (e.g., running with 'python -m yourpackage.tool').
+
+from ..core import tarsafe, miside_banner
+from ..core.Magisk import Magisk_patch
+from ..core.addon_register import loader, Entry
+from ..core.cpio import extract as cpio_extract, repack as cpio_repack
+from ..core.qsb_imger import process_by_xml
+from ..core.romfs_parse import RomfsParse
+from ..core.unkdz import KDZFileTools
+
+# Local UI components and helpers
+from .tkinterdnd2_build_in import Tk, DND_FILES # Custom TkinterDnD2. '.tkinterdnd2_build_in'
+
+# Core utilities and data structures
+from ..core.utils import (lang, LogoDumper, States, terminate_process, 
+                          calculate_md5_file, calculate_sha256_file, JsonEdit, 
+                          DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo,
+                          create_thread, move_center, v_code, gettype, 
+                          is_empty_img, findfile, findfolder, Sdat2img, Unxz)
+from ..core import utils # For utils.prog_path and utils.project_name
+
+# Platform-specific imports
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
     from tkinter import filedialog
@@ -1968,7 +2022,7 @@ class ModuleManager:
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
                 return module_error_codes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
-            rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
+            shutil.rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
         with zipfile.ZipFile(mpk, 'r') as myfile:
             with myfile.open(mconf.get('module', 'resource'), 'r') as inner_file:
@@ -2316,7 +2370,7 @@ class ModuleManager:
                 self.uninstall_b.config(text=lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(module_path):
                     try:
-                        rmtree(module_path)
+                        shutil.rmtree(module_path)
                     except PermissionError as e:
                         logging.exception('Bugs')
                         print(e)
@@ -2373,9 +2427,9 @@ class MpkMan(ttk.Frame):
                 continue
             if not os.path.exists(os.path.join(self.moduledir, i, "info.json")):
                 try:
-                    rmtree(os.path.join(self.moduledir, i))
-                finally:
-                    continue
+                    shutil.rmtree(os.path.join(self.moduledir, i))
+                except Exception:
+                    logging.error("uninstall plugin")
             if os.path.isdir(self.moduledir + os.sep + i):
                 self.images_[i] = PhotoImage(
                     open_img(os.path.join(self.moduledir, i, 'icon')).resize((70, 70))) if os.path.exists(
