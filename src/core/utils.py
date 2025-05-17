@@ -46,21 +46,36 @@ DataImage = blockimgdiff.DataImage
 # -----
 # ----VALUES
 
-# Prevent system errors
+# Prevent system errors for large integer to string conversions
 try:
     sys.set_int_max_str_digits(0)
 except AttributeError:
-    ...
-if os.name == 'nt':
-    prog_path = getcwd()
+    # This attribute might not exist on older Python versions, so pass silently.
+    pass
+
+# --- CORRECTED prog_path DEFINITION ---
+if getattr(sys, 'frozen', False):
+    # Application is "frozen" (compiled by PyInstaller or similar)
+    # sys.executable is the path to the executable file itself.
+    # os.path.dirname(sys.executable) is the directory where the executable is located.
+    # This directory is considered the root for finding bundled resources like 'bin'.
+    prog_path = os.path.dirname(sys.executable)
 else:
-    prog_path = os.path.normpath(os.path.abspath(os.path.dirname(sys.argv[0])))
-    if platform.system() == 'Darwin':
-        path_frags = prog_path.split(os.path.sep)
-        if path_frags[-3:] == ['tool.app', 'Contents', 'MacOS']:
-            path_frags = path_frags[:-3]
-            prog_path = os.path.sep.join(path_frags)
-project_name = None
+    # Application is not frozen (running as a .py script)
+    # __file__ is the path to this utils.py file.
+    # Determine project root relative to this file's location.
+    # Adjust the number of ".." parts depending on where utils.py is relative to the project root.
+    # If utils.py is in src/core/, and project root (containing tool.py and 'bin' folder) is two levels up:
+    try:
+        prog_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    except NameError: 
+        # __file__ is not defined (e.g., running in an interactive interpreter or exec())
+        # Fallback to current working directory, though this might not be reliable for finding resources.
+        prog_path = os.getcwd()
+        sys.stderr.write(f"[utils.py WARNING] __file__ not defined, prog_path set to current working directory: {prog_path}. This might be incorrect for resource loading.\n")
+# --- END OF CORRECTED prog_path DEFINITION ---
+
+project_name = None # Global variable for current project name (usually a Tkinter StringVar assigned in tool.py)
 # [header, desc, offset (if exist)]
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
