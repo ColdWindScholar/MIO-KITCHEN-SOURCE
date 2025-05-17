@@ -163,7 +163,7 @@ if platform.system() != 'Darwin':
             pyi_splash.close()
         elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
             # Assuming if it's imported and doesn't have is_active, we can try to use it.
-            # This might be risky if the splash isn't actually running.
+            # This might be risky if the splash isn't running.
             pyi_splash.update_text('Loading ...')
             pyi_splash.close()
     except ImportError:
