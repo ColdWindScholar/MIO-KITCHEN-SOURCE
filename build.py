@@ -164,8 +164,8 @@ if dndplat:
             continue
         if i == dndplat:
             continue
-        if os.path.isdir(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i):
-            shutil.rmtree(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd' + os.sep + i, ignore_errors=True)
+        if os.path.isdir(f"{local}/dist/bin/tkdnd/{i}"):
+            shutil.rmtree(f'{local}/dist/bin/tkdnd/{i}', ignore_errors=True)
 else:
     print("Cannot Build!!!TkinterDnd2 Missing!!!!!!!!!!")
     exit(-1)
