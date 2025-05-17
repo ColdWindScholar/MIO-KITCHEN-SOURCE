@@ -35,13 +35,6 @@ if _pip_main:
                 requirement = requirement_line.strip()
                 if requirement and not requirement.startswith('#'): # Skip empty lines and comments
                     print(f"Installing {requirement}...")
-                    # Use a subprocess call for pip install for better isolation and error handling
-                    # result = subprocess.run([sys.executable, "-m", "pip", "install", requirement], capture_output=True, text=True)
-                    # if result.returncode != 0:
-                    #     print(f"ERROR installing {requirement}: {result.stderr}")
-                    # else:
-                    #     print(f"Successfully installed {requirement}.")
-                    # For simplicity, keeping _pip_main if it works for you, but subprocess is more robust.
                     return_code = _pip_main(['install', requirement])
                     if return_code != 0:
                         print(f"WARNING: pip install for '{requirement}' returned code {return_code}.")
@@ -52,32 +45,50 @@ if _pip_main:
 else:
     print("INFO: pip command interface not available. Skipping dependency installation from requirements.txt.")
 
+import re # For version reading
 
-current_os_type = plat.system() # 'Windows', 'Linux', 'Darwin'
-current_machine_arch = plat.machine() # e.g., 'AMD64', 'x86_64', 'arm64', 'aarch64'
+def get_version_from_settings_ini(settings_file_path="bin/setting.ini"):
+    """Reads the version from the settings.ini file."""
+    try:
+        with open(settings_file_path, 'r', encoding='utf-8') as f_settings:
+            for line in f_settings:
+                if line.strip().startswith("version"): # More robust check
+                    match = re.search(r"version\s*=\s*([\w.-]+)", line.strip()) # Use re.search
+                    if match:
+                        return match.group(1)
+    except FileNotFoundError:
+        print(f"WARNING: Settings file '{settings_file_path}' not found for version reading.")
+    except Exception as e:
+        print(f"WARNING: Error reading version from '{settings_file_path}': {e}")
+    return "unknown" # Fallback version
 
-archive_name_prefix = 'MIO-KITCHEN' # Base name for executable and zip
-archive_version = "4.1.0" # Example version, manage this as needed
+current_os_type = plat.system() 
+current_machine_arch = plat.machine()
+
+archive_name_prefix = 'MIO-KITCHEN' 
+archive_version = get_version_from_settings_ini() 
+
+if archive_version == "unknown":
+    print("CRITICAL WARNING: Could not determine application version from settings.ini. Using 'unknown'.")
+    # sys.exit(1) # Optionally exit if version is critical
 
 if current_os_type == 'Linux':
     zip_archive_name = f'{archive_name_prefix}-{archive_version}-linux.zip'
-elif current_os_type == 'Darwin': # macOS
+elif current_os_type == 'Darwin': 
     if current_machine_arch == 'x86_64':
         zip_archive_name = f'{archive_name_prefix}-{archive_version}-macos-intel.zip'
-    else: # Assuming arm64 (Apple Silicon) or other
+    else: 
         zip_archive_name = f'{archive_name_prefix}-{archive_version}-macos-arm.zip'
     try:
-        import tkinter # Early check for Tkinter on macOS
+        import tkinter 
     except ImportError:
         print("CRITICAL ERROR: Tkinter is not installed or not found! The macOS build will likely fail.")
-        # sys.exit(1) # Consider exiting if Tkinter is essential
-else: # Default to Windows
+else: 
     zip_archive_name = f'{archive_name_prefix}-{archive_version}-win.zip'
 
-# --- Test Suite (Optional) ---
 try:
     from src.tool_tester import test_main, Test as TestFlag
-    if TestFlag and callable(test_main): # Check if TestFlag is True and test_main is callable
+    if TestFlag and callable(test_main): 
         print("Running pre-build tests...")
         test_main(exit=False)
 except ImportError:
@@ -86,43 +97,33 @@ except ImportError:
 
 
 def create_zip_archive(source_folder_to_zip, output_zip_full_path):
-    """
-    Zips the contents of the source_folder_to_zip into output_zip_full_path.
-    The paths inside the zip will be relative to source_folder_to_zip.
-    """
     abs_source_folder = os.path.abspath(source_folder_to_zip)
     print(f"Creating ZIP archive: {output_zip_full_path} from folder: {abs_source_folder}")
     try:
         with zipfile.ZipFile(output_zip_full_path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for root, dirs, files in os.walk(abs_source_folder):
-                # Exclude .git from being added to the zip
                 if '.git' in dirs:
                     dirs.remove('.git')
                 
                 for file_item in files:
                     full_file_path = os.path.join(root, file_item)
-                    # Path inside the ZIP, relative to the source_folder_to_zip
                     path_in_archive = os.path.relpath(full_file_path, abs_source_folder)
-                    print(f"Adding to ZIP: {path_in_archive}")
+                    # print(f"Adding to ZIP: {path_in_archive}") # Can be too verbose
                     archive.write(full_file_path, path_in_archive)
         print(f"Successfully created ZIP: {output_zip_full_path}")
     except Exception as e_zip_creation:
         print(f"ERROR creating ZIP archive '{output_zip_full_path}': {e_zip_creation}")
 
-# --- PyInstaller Build Configuration ---
-project_root_dir = os.getcwd() # Assuming build.py is at the project root
-dist_output_dir = os.path.join(project_root_dir, 'dist') # Standard PyInstaller output
-final_app_dir_in_dist = os.path.join(dist_output_dir, archive_name_prefix) # e.g., dist/MIO-KITCHEN (for one-dir)
+project_root_dir = os.getcwd() 
+dist_output_dir = os.path.join(project_root_dir, 'dist') 
+build_temp_dir = os.path.join(project_root_dir, 'build')
 
-# Clean previous build (optional, but recommended)
 if os.path.isdir(dist_output_dir):
     print(f"Cleaning previous build directory: {dist_output_dir}")
     shutil.rmtree(dist_output_dir, ignore_errors=True)
-build_temp_dir = os.path.join(project_root_dir, 'build')
 if os.path.isdir(build_temp_dir):
     print(f"Cleaning previous PyInstaller build temp directory: {build_temp_dir}")
     shutil.rmtree(build_temp_dir, ignore_errors=True)
-
 
 print("Starting PyInstaller build process...")
 try:
@@ -131,88 +132,105 @@ except ImportError:
     print("CRITICAL ERROR: PyInstaller is not installed. Please install it with 'pip install pyinstaller'.")
     sys.exit(1)
 
-# Common PyInstaller arguments
-# We will build as one-folder ('-D' or default) first for easier debugging of tkdnd,
-# then you can switch to one-file ('-F') if tkdnd works correctly.
-# One-file can sometimes make path resolution for external Tcl libraries harder.
 pyinstaller_base_args = [
     'tool.py',
-    '--noconfirm',         # Overwrite output without asking
+    '--noconfirm',
     '--name', archive_name_prefix,
     '--icon', 'icon.ico',
-    '--distpath', dist_output_dir, # Output to 'dist/'
-    '--workpath', build_temp_dir,  # Temporary build files to 'build/'
-    # '--onedir',  # Build as a directory (one-dir) - RECOMMENDED FOR DEBUGGING TKDND
-                      # If you must use one-file, change to '--onefile' later
+    '--distpath', dist_output_dir,
+    '--workpath', build_temp_dir,
+    '--clean',
+    '--paths', os.path.join(project_root_dir, 'src'), # Tell PyInstaller where 'src' package is
     '--collect-data', 'sv_ttk',
     '--collect-data', 'chlorophyll',
-    # Hidden imports crucial for Pillow and Tkinter integration
     '--hidden-import', 'tkinter',
     '--hidden-import', 'PIL',
-    '--hidden-import', 'PIL.Image',       # Explicitly include PIL.Image
+    '--hidden-import', 'PIL.Image',
     '--hidden-import', 'PIL.ImageTk',
     '--hidden-import', 'PIL._tkinter_finder',
-    '--hidden-import', 'PIL._imaging',    # Core C extension
-    '--hidden-import', 'PIL._imagingtk',  # Tkinter display support
+    '--hidden-import', 'PIL._imaging',
+    '--hidden-import', 'PIL._imagingtk',
+    '--hidden-import', 'src.tkui.tool',
+    '--hidden-import', 'src.tkui.TkinterDnD',
+    '--hidden-import', 'src.tkui.tkinterdnd2_build_in',
+    '--hidden-import', 'src.core.utils',
+    '--hidden-import', 'src.core.config_parser',
+    '--hidden-import', 'src.core.dumper',
+    '--hidden-import', 'src.core.Magisk',
+    '--hidden-import', 'src.core.addon_register',
+    '--hidden-import', 'src.core.cpio',
+    '--hidden-import', 'src.core.qsb_imger',
+    '--hidden-import', 'src.core.romfs_parse',
+    '--hidden-import', 'src.core.unkdz',
+    '--hidden-import', 'src.core.imgextractor',
+    '--hidden-import', 'src.core.lpunpack',
+    '--hidden-import', 'src.core.mkdtboimg',
+    '--hidden-import', 'src.core.ozipdecrypt',
+    '--hidden-import', 'src.core.splituapp',
+    '--hidden-import', 'src.core.ofp_qc_decrypt',
+    '--hidden-import', 'src.core.ofp_mtk_decrypt',
+    '--hidden-import', 'src.core.opscrypto',
+    '--hidden-import', 'src.core.images',
+    '--hidden-import', 'src.core.extra',
+    '--hidden-import', 'src.core.ext4',
+    '--hidden-import', 'src.core.unpac',
+    '--hidden-import', 'src.core.undz',
+    '--hidden-import', 'src.core.selinux_audit_allow',
+    '--hidden-import', 'src.core.pycase',
+    '--hidden-import', 'src.core.blockimgdiff',
+    '--hidden-import', 'src.core.sparse_img',
+    '--hidden-import', 'src.core.update_metadata_pb2',
+    '--hidden-import', 'src.tkui.editor',
+    '--hidden-import', 'src.tkui.AI_engine',
+    '--hidden-import', 'src.tkui.controls',
+    '--hidden-import', 'src.tkui.sv_ttk_fixes',
+    # Add Pro modules if they exist and are in src/pro
+    # '--hidden-import', 'src.pro.sn',
+    # '--hidden-import', 'src.pro.active_ui',
     '--exclude-module', 'numpy',
-    '--exclude-module', 'matplotlib', # Example of another large library you might not need
+    '--exclude-module', 'matplotlib',
     '--exclude-module', 'scipy',
     '--exclude-module', 'pandas',
-    # Consider adding '--clean' to clear PyInstaller cache before build
-    '--clean',
 ]
 
-# Platform-specific arguments for PyInstaller
-dndplat_tkdnd_subdir_name = None  # This will be like 'win-x64', 'linux-x64', etc.
-
-if current_os_type == 'Darwin': # macOS
-    pyinstaller_base_args.append('--windowed') # Creates a .app bundle
+dndplat_tkdnd_subdir_name = None
+if current_os_type == 'Darwin':
+    pyinstaller_base_args.append('--windowed')
     if current_machine_arch == 'x86_64':
         dndplat_tkdnd_subdir_name = 'osx-x64'
     elif current_machine_arch == 'arm64':
         dndplat_tkdnd_subdir_name = 'osx-arm64'
-    # Add macOS specific options if needed, e.g., bundle identifier
-    # pyinstaller_base_args.extend(['--osx-bundle-identifier', 'com.yourdomain.miokitchen'])
-
 elif current_os_type == 'Linux':
-    pyinstaller_base_args.append('--windowed') # Typically for windowed apps
+    pyinstaller_base_args.append('--windowed')
     pyinstaller_base_args.extend(['--splash', 'splash.png'])
     if current_machine_arch == 'x86_64':
         dndplat_tkdnd_subdir_name = 'linux-x64'
-    elif current_machine_arch == 'aarch64': # Common for ARM Linux (e.g. Raspberry Pi 64-bit)
+    elif current_machine_arch == 'aarch64':
         dndplat_tkdnd_subdir_name = 'linux-arm64'
-    # For 32-bit Linux (less common now)
     elif current_machine_arch in ['i386', 'i686']:
-        dndplat_tkdnd_subdir_name = 'linux-x86' # Assuming your tkdnd has this structure
-
+        dndplat_tkdnd_subdir_name = 'linux-x86'
 elif current_os_type == 'Windows':
-    pyinstaller_base_args.append('--windowed') # No console window
+    pyinstaller_base_args.append('--windowed')
     pyinstaller_base_args.extend(['--splash', 'splash.png'])
-    
-    if current_machine_arch == 'AMD64': # Standard 64-bit Windows
+    if current_machine_arch == 'AMD64':
         dndplat_tkdnd_subdir_name = 'win-x64'
     elif current_machine_arch == 'ARM64':
         dndplat_tkdnd_subdir_name = 'win-arm64'
-    # For 32-bit Windows, platform.machine() might be 'x86' or 'IA32' or 'i386' etc.
-    # platform.architecture()[0] is more reliable for '32bit' vs '64bit'
     elif '32bit' in plat.architecture()[0] or current_machine_arch.lower() in ['x86', 'i386', 'i686']:
         dndplat_tkdnd_subdir_name = 'win-x86'
     else:
-        print(f"WARNING: Unhandled Windows architecture '{current_machine_arch}'. Trying a default for tkdnd.")
-        dndplat_tkdnd_subdir_name = 'win-x64' if sys.maxsize > 2**32 else 'win-x86' # Default based on Python's bitness
+        print(f"WARNING: Unhandled Windows architecture '{current_machine_arch}'. Defaulting tkdnd.")
+        dndplat_tkdnd_subdir_name = 'win-x64' if sys.maxsize > 2**32 else 'win-x86'
         print(f"Defaulted tkdnd sub-directory to: {dndplat_tkdnd_subdir_name}")
 else:
     print(f"ERROR: Unsupported OS type '{current_os_type}' for PyInstaller build.")
     sys.exit(1)
 
 if not dndplat_tkdnd_subdir_name:
-    print("CRITICAL ERROR: Could not determine the platform-specific sub-directory for tkdnd. Build aborted.")
+    print("CRITICAL ERROR: Could not determine platform-specific sub-directory for tkdnd. Build aborted.")
     sys.exit(1)
 
-# Add one-file or one-dir option LAST
-# For debugging TkDnD, one-dir is often easier. Switch to --onefile for final release.
-# pyinstaller_base_args.append('--onefile') # For one-file executable
-pyinstaller_base_args.append('--onedir')  # For one-folder bundle
+pyinstaller_base_args.append('--onedir') # Build as a folder for easier debugging initially
 
 print(f"Running PyInstaller with arguments: {pyinstaller_base_args}")
 try:
@@ -222,27 +240,16 @@ except Exception as e_pyinstaller_run:
     print(f"CRITICAL ERROR: PyInstaller execution failed: {e_pyinstaller_run}")
     sys.exit(1)
 
-# --- Post-build: Copying additional data and filtering tkdnd ---
-
-# Path to the directory created by PyInstaller (e.g., dist/MIO-KITCHEN if one-dir)
-# If one-file, the actual executable is dist/MIO-KITCHEN.exe (or similar)
-# and data files need to be placed relative to where the user runs it from,
-# or handled via sys._MEIPASS at runtime if collected by PyInstaller.
-# Since we're now assuming one-dir for easier tkdnd, this is dist/MIO-KITCHEN/
 app_bundle_root_dir = os.path.join(dist_output_dir, archive_name_prefix) 
-
-# Target for our 'bin' folder *inside* the app bundle
 final_custom_bin_dir = os.path.join(app_bundle_root_dir, 'bin')
 if not os.path.exists(final_custom_bin_dir):
     os.makedirs(final_custom_bin_dir, exist_ok=True)
 
-# Files and folders to copy from 'project_root_dir/bin' to 'app_bundle_root_dir/bin'
 items_to_copy_to_bundle_bin = [
     "images", "languages", "licenses", "module", 
     "extra_flash", "setting.ini", "kemiaojiang.png", 
     "License_kemiaojiang.txt", "tkdnd", "help_document.json", "exec.sh"
 ]
-# Also copy platform-specific binaries from 'project_root_dir/bin/<ostype>'
 platform_specific_source_dir = os.path.join(project_root_dir, "bin", current_os_type)
 if os.path.isdir(platform_specific_source_dir):
     platform_specific_dest_dir = os.path.join(final_custom_bin_dir, current_os_type)
@@ -257,43 +264,37 @@ for item_name in items_to_copy_to_bundle_bin:
     if os.path.exists(source_item_path):
         try:
             if os.path.isdir(source_item_path):
-                print(f"Copying directory: '{source_item_path}' to '{dest_item_path}'")
+                # print(f"Copying directory: '{source_item_path}' to '{dest_item_path}'") # Verbose
                 shutil.copytree(source_item_path, dest_item_path, dirs_exist_ok=True)
-            else: # It's a file
-                print(f"Copying file: '{source_item_path}' to '{dest_item_path}'")
+            else: 
+                # print(f"Copying file: '{source_item_path}' to '{dest_item_path}'") # Verbose
                 shutil.copy2(source_item_path, dest_item_path)
         except Exception as e_file_copy:
             print(f"ERROR copying '{source_item_path}' to '{dest_item_path}': {e_file_copy}")
-    else:
-        print(f"Warning: Source item '{source_item_path}' not found for copying.")
+    # else: # Can be too verbose if some optional files are not present
+        # print(f"Warning: Source item '{source_item_path}' not found for copying.")
 
-# Create 'temp' directory structure if needed (usually runtime generated, but if structure is important)
 temp_dir_in_bundle_bin = os.path.join(final_custom_bin_dir, 'temp')
 if not os.path.exists(temp_dir_in_bundle_bin):
     os.makedirs(temp_dir_in_bundle_bin, exist_ok=True)
-    print(f"Ensured 'temp' directory exists at: {temp_dir_in_bundle_bin}")
 
-# Copy main LICENSE file to the root of the app bundle
 main_license_source = os.path.join(project_root_dir, 'LICENSE')
 main_license_dest = os.path.join(app_bundle_root_dir, 'LICENSE')
 if os.path.exists(main_license_source):
     try:
-        print(f"Copying '{main_license_source}' to '{main_license_dest}'")
         shutil.copy2(main_license_source, main_license_dest)
     except Exception as e_main_license_copy:
         print(f"ERROR copying main LICENSE file: {e_main_license_copy}")
 else:
     print(f"Warning: Main LICENSE file '{main_license_source}' not found.")
 
-
-# Filter tkdnd libraries within 'app_bundle_root_dir/bin/tkdnd'
 tkdnd_path_in_bundle_bin = os.path.join(final_custom_bin_dir, 'tkdnd')
 if os.path.isdir(tkdnd_path_in_bundle_bin):
     print(f"Filtering tkdnd libraries in '{tkdnd_path_in_bundle_bin}' for platform: {dndplat_tkdnd_subdir_name}")
     found_correct_tkdnd = False
     for item_in_tkdnd_dir in os.listdir(tkdnd_path_in_bundle_bin):
         item_full_path = os.path.join(tkdnd_path_in_bundle_bin, item_in_tkdnd_dir)
-        if os.path.isdir(item_full_path): # We are interested in platform subdirectories
+        if os.path.isdir(item_full_path): 
             if item_in_tkdnd_dir == dndplat_tkdnd_subdir_name:
                 print(f"Keeping correct tkdnd platform folder: {item_full_path}")
                 found_correct_tkdnd = True
@@ -305,21 +306,17 @@ if os.path.isdir(tkdnd_path_in_bundle_bin):
 else:
     print(f"WARNING: tkdnd directory '{tkdnd_path_in_bundle_bin}' not found. Drag and Drop will likely fail.")
 
-
-# POSIX: Set execute permissions
 if current_os_type == 'Linux' or current_os_type == 'Darwin':
     print("Setting execute permissions for specific files in bundle (POSIX)...")
-    # Main executable (its name is archive_name_prefix)
     main_exe_path = os.path.join(app_bundle_root_dir, archive_name_prefix)
     if os.path.exists(main_exe_path):
         try:
-            os.chmod(main_exe_path, 0o755) # rwxr-xr-x
+            os.chmod(main_exe_path, 0o755) 
             print(f"Set +x on '{main_exe_path}'")
         except Exception as e_chmod_main_exe:
             print(f"Warning: Could not chmod main executable '{main_exe_path}': {e_chmod_main_exe}")
     
-    # Scripts like exec.sh in 'app_bundle_root_dir/bin/'
-    scripts_to_make_executable = ["exec.sh"] # Add others if needed
+    scripts_to_make_executable = ["exec.sh"] 
     for script_filename in scripts_to_make_executable:
         script_full_path = os.path.join(final_custom_bin_dir, script_filename)
         if os.path.isfile(script_full_path):
@@ -329,30 +326,18 @@ if current_os_type == 'Linux' or current_os_type == 'Darwin':
             except Exception as e_chmod_script:
                 print(f"Warning: Could not chmod script '{script_full_path}': {e_chmod_script}")
 
-# --- Create final ZIP archive ---
-# The ZIP will contain the 'app_bundle_root_dir' (e.g., 'dist/MIO-KITCHEN')
 final_zip_output_path = os.path.join(project_root_dir, zip_archive_name)
-
-# We want to zip the 'MIO-KITCHEN' folder itself, not its contents directly into the root of the zip.
-# So, the source_folder_to_zip should be 'dist', and inside the zip, we'll have 'MIO-KITCHEN/...'
-# Or, more simply, zip the 'app_bundle_root_dir' directly.
-# Let's zip the 'app_bundle_root_dir' such that its name is the root inside the zip.
-# To do this, we can temporarily chdir into 'dist' and zip 'MIO-KITCHEN' folder.
-
-if os.path.isdir(app_bundle_root_dir): # e.g. dist/MIO-KITCHEN
+if os.path.isdir(app_bundle_root_dir): 
     print(f"Zipping the application bundle: {app_bundle_root_dir}")
     try:
-        # To get 'MIO-KITCHEN/...' inside the zip, we chdir to 'dist'
-        # and then zip the 'MIO-KITCHEN' folder.
-        os.chdir(dist_output_dir) # Go into 'dist'
-        # Now zip 'archive_name_prefix' (which is 'MIO-KITCHEN')
+        os.chdir(dist_output_dir) 
         create_zip_archive(archive_name_prefix, final_zip_output_path)
     except FileNotFoundError:
         print(f"ERROR: Could not change directory to '{dist_output_dir}' for zipping the bundle.")
     except Exception as e_chdir_zip_bundle:
         print(f"ERROR during zipping of the application bundle: {e_chdir_zip_bundle}")
     finally:
-        os.chdir(project_root_dir) # Always change back to the original project root directory
+        os.chdir(project_root_dir) 
 else:
     print(f"ERROR: Application bundle directory '{app_bundle_root_dir}' not found. Cannot create ZIP.")
 
