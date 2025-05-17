@@ -4523,7 +4523,7 @@ class UnpackGui(ttk.LabelFrame):
     def _on_project_change(self, *args):
          """Is called automatically when current_project_name is changed."""
         # Check if the hd method exists and the widget itself before calling
-        if hasattr(self, 'hd') and callable(self.hd):
+         if hasattr(self, 'hd') and callable(self.hd):
              if self.winfo_exists():
                  # Calling hd() will update the list of partitions for the new project,
                  # Considering the current mode (Unpack/Pack)
