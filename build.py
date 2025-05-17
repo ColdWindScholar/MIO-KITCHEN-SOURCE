@@ -157,9 +157,9 @@ for i in os.listdir(local + os.sep + "bin"):
         else:
             shutil.copy(f"{local}/bin/{i}", f"{local}/dist/bin/{i}")
 if not os.path.exists('dist/LICENSE'):
-    shutil.copy(f'{local}/LICENSE', local + os.sep + "dist" + os.sep + 'LICENSE')
+    shutil.copy(f'{local}/LICENSE', f"{local}/dist/LICENSE")
 if dndplat:
-    for i in os.listdir(local + os.sep + "dist" + os.sep +"bin" + os.sep + 'tkdnd'):
+    for i in os.listdir(f"{local}/dist/bin/tkdnd"):
         if i[:3] == dndplat[:3] and i.endswith("x64") and dndplat.endswith('x86'):
             continue
         if i == dndplat:
