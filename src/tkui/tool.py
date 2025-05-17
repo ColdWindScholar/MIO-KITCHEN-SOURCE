@@ -13,25 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#!/usr/bin/env python3
-# pylint: disable=line-too-long, missing-class-docstring, missing-function-docstring
-# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
-#
-# Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-import sys
-import os
-import traceback
-import time # For unique log file names
 import argparse
 import gzip
 import json
@@ -41,153 +22,7 @@ import subprocess
 import threading
 from functools import wraps
 from random import randrange
-from timeit import default_timer as dti
-import zipfile
-from io import BytesIO, StringIO
-from webbrowser import open as openurl
-import logging # logging should be configured after paths are set, or use basicConfig early
-
-# ------------------------------------------------------------------------------------
-# Global Unhandled Exception Catcher
-# This should be placed as early as possible in your main script.
-# ------------------------------------------------------------------------------------
-_original_excepthook = sys.excepthook # Store original excepthook
-
-def _determine_log_path():
-    """Determines a writable path for crash logs."""
-    timestamp = time.strftime('%Y%m%d_%H%M%S')
-    filename = f"crash_report_{timestamp}.txt"
-    
-    # Try to place logs in a 'crash_logs' subdirectory
-    # This path determination might need to happen *after* utils.prog_path is correctly set
-    # if utils.prog_path is used here. For now, let's use a simpler approach.
-    if getattr(sys, 'frozen', False): # Running in a bundle (e.g., PyInstaller)
-        base_path = os.path.dirname(sys.executable)
-    else: # Running as a script
-        try:
-            base_path = os.path.abspath(os.path.dirname(__file__))
-        except NameError: # __file__ is not defined (e.g. interactive interpreter)
-            base_path = os.getcwd()
-
-    log_dir = os.path.join(base_path, "crash_logs")
-
-    try:
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
-        return os.path.join(log_dir, filename)
-    except Exception:
-        # Fallback to user's desktop
-        try:
-            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-            if not os.path.exists(desktop_path):
-                 os.makedirs(desktop_path, exist_ok=True) # Should not be necessary for Desktop
-            return os.path.join(desktop_path, f"mio_kitchen_crash_{timestamp}.txt")
-        except Exception:
-            # Last resort: current working directory
-            return os.path.join(os.getcwd(), f"mio_kitchen_crash_{timestamp}.txt")
-
-_log_file_path_for_crash = _determine_log_path()
-_messagebox_shown_for_crash = False
-
-def _global_exception_handler(exc_type, exc_value, exc_traceback):
-    """
-    Custom global exception handler to log unhandled exceptions to a file
-    and attempt to show an error message to the user.
-    """
-    global _messagebox_shown_for_crash
-    error_details = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-    
-    try:
-        with open(_log_file_path_for_crash, "a", encoding='utf-8') as f:
-            f.write(f"--- CRASH REPORT [{time.asctime()}] ---\n")
-            f.write(error_details)
-            f.write("\n---------------------------------------\n")
-        
-        if not _messagebox_shown_for_crash:
-            _messagebox_shown_for_crash = True
-            try:
-                import tkinter # Local import
-                from tkinter import messagebox
-                
-                temp_root_for_msgbox = None
-                # Try to use 'win' if it exists and is valid, otherwise create a temporary root.
-                # This is tricky because 'win' might not be initialized or might be the source of the error.
-                main_app_window = globals().get('win') 
-                parent_for_msgbox = None
-                if main_app_window and isinstance(main_app_window, tkinter.Tk) and main_app_window.winfo_exists():
-                    parent_for_msgbox = main_app_window
-                else:
-                    temp_root_for_msgbox = tkinter.Tk()
-                    temp_root_for_msgbox.withdraw()
-                    parent_for_msgbox = temp_root_for_msgbox
-                
-                messagebox.showerror(
-                    "Unhandled Exception",
-                    f"A critical error occurred. Details have been saved to:\n{_log_file_path_for_crash}\n\nError: {str(exc_value)}", # Use str(exc_value) for a concise error
-                    parent=parent_for_msgbox
-                )
-                if temp_root_for_msgbox:
-                    temp_root_for_msgbox.destroy()
-            except Exception as e_msgbox_critical:
-                sys.stderr.write(f"CRITICAL: Failed to show error messagebox: {e_msgbox_critical}\n")
-                sys.stderr.write(f"Crash report saved to: {_log_file_path_for_crash}\n")
-
-    except Exception as e_log_critical:
-        sys.stderr.write(f"CRITICAL: Failed to write to log file {_log_file_path_for_crash}: {e_log_critical}\n")
-        sys.stderr.write("Original error details:\n")
-        sys.stderr.write(error_details)
-    
-    # _original_excepthook(exc_type, exc_value, exc_traceback) # Call original hook if desired
-    sys.exit(1) # Force exit
-
-sys.excepthook = _global_exception_handler
-# ------------------------------------------------------------------------------------
-# END OF Global Unhandled Exception Catcher
-# ------------------------------------------------------------------------------------
-
-# --- Your Regular Imports Start Here ---
-
-# Tkinter related imports
-import tkinter as tk # Now explicitly imported earlier as well for messagebox
-from tkinter import ttk
 from tkinter.ttk import Scrollbar
-from tkinter import (BOTH, BOTTOM, CENTER, DISABLED, HORIZONTAL,
-                     LEFT, RIGHT, TOP, X, Y, BooleanVar,
-                     Canvas, Frame, IntVar, Label, Listbox, Menu, StringVar, TclError, Text,
-                     Toplevel as TkToplevel)
-
-# Third-party libraries
-import pygments.lexers
-import requests
-from requests import ConnectTimeout, HTTPError
-import sv_ttk
-from PIL.Image import open as open_img
-from PIL.ImageTk import PhotoImage
-
-# Splash screen handling (e.g., for PyInstaller)
-# This should ideally come after the exception hook is set,
-# but before heavy GUI initializations if pyi_splash itself can fail.
-if platform.system() != 'Darwin':
-    try:
-        import pyi_splash
-        if hasattr(pyi_splash, 'is_active') and pyi_splash.is_active():
-            pyi_splash.update_text('Loading ...')
-            pyi_splash.close()
-        elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
-            pyi_splash.update_text('Loading ...')
-            pyi_splash.close()
-    except ImportError:
-        pass 
-    except RuntimeError: 
-        pass
-    except Exception: # Catch any other pyi_splash related errors
-        pass
-
-
-# Local application/library specific imports
-# Relative imports assume this file is part of a package.
-# If 'tool.py' is the main entry point run directly, these might need adjustment
-# or your project structure must support them (e.g., running with 'python -m yourpackage.tool').
 
 from ..core import tarsafe, miside_banner
 from ..core.Magisk import Magisk_patch
@@ -197,31 +32,45 @@ from ..core.qsb_imger import process_by_xml
 from ..core.romfs_parse import RomfsParse
 from ..core.unkdz import KDZFileTools
 
-# Local UI components and helpers
-from .tkinterdnd2_build_in import Tk, DND_FILES # Custom TkinterDnD2. '.tkinterdnd2_build_in'
+if platform.system() != 'Darwin':
+    try:
+        import pyi_splash
 
-# Core utilities and data structures
-from ..core.utils import (lang, LogoDumper, States, terminate_process, 
-                          calculate_md5_file, calculate_sha256_file, JsonEdit, 
-                          DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo,
-                          create_thread, move_center, v_code, gettype, 
-                          is_empty_img, findfile, findfolder, Sdat2img, Unxz)
-from ..core import utils # For utils.prog_path and utils.project_name
+        pyi_splash.update_text('Loading ...')
+        pyi_splash.close()
+    except ModuleNotFoundError:
+        ...
+import os.path
+import pathlib
+import sys
+import time
+from platform import machine
+from webbrowser import open as openurl
+import tkinter as tk
+from tkinter import ttk
+from timeit import default_timer as dti
+import zipfile
+from io import BytesIO, StringIO
+from .tkinterdnd2_build_in import Tk, DND_FILES
+from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
+                     HORIZONTAL, TclError, Frame, Label, Listbox, DISABLED, Menu, BooleanVar, CENTER)
+from shutil import rmtree, copy, move
+import pygments.lexers
+import requests
+from requests import ConnectTimeout, HTTPError
+import sv_ttk
+from PIL.Image import open as open_img
+from PIL.ImageTk import PhotoImage
+from ..core.dumper import Dumper
+from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
 
-# Platform-specific imports
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
-    from tkinter import filedialog # Standard filedialog for Windows
+    from tkinter import filedialog
 else:
-    # Ensure ..core.mkc_filedialog exists or adjust path
-    try:
-        from ..core import mkc_filedialog as filedialog # Custom filedialog
-    except ImportError:
-        from tkinter import filedialog # Fallback for safety
-        logging.warning("Custom filedialog 'mkc_filedialog' not found, using standard filedialog.")
+    from ..core import mkc_filedialog as filedialog
 
-
-# More core functionalities
 from ..core import imgextractor
 from ..core import lpunpack
 from ..core import mkdtboimg
@@ -229,385 +78,159 @@ from ..core import ozipdecrypt
 from ..core import splituapp
 from ..core import ofp_qc_decrypt
 from ..core import ofp_mtk_decrypt
+from . import editor
 from ..core import opscrypto
-from ..core import images 
+from ..core import images
 from ..core import extra
-from ..core.extra import fspatch, re, contextpatch
+from . import AI_engine
+from ..core import ext4
 from ..core.config_parser import ConfigParser
+from ..core import utils
 from ..core.unpac import MODE as PACMODE, unpac
+
+if os.name == 'nt':
+    from .sv_ttk_fixes import *
+from ..core.extra import fspatch, re, contextpatch
+from ..core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from .controls import ListBox, ScrollFrame
 from ..core.undz import DZFileTools
 from ..core.selinux_audit_allow import main as selinux_audit_allow
+import logging
 
-# Local UI components and helpers
-from . import editor # Assuming editor.py is in the same directory
-from . import AI_engine # Assuming AI_engine.py is in the same directory
-if os.name == 'nt':
-    from .sv_ttk_fixes import * # Windows-specific ttk fixes
-from .controls import ListBox, ScrollFrame # Assuming controls.py is in the same directory
-# from .home_tab import HomeTab # If used
-
-# --- Global Variables and Initial Setup ---
 is_pro = False
 try:
     from ..pro.sn import v as verify
+
     is_pro = True
 except ImportError:
-    is_pro = False 
-
+    is_pro = False
 if is_pro:
     from ..pro.active_ui import Active
 
 try:
-    # 'imp' is deprecated since Python 3.4, consider 'importlib' for future compatibility
-    from ..core import imp 
+    from ..core import imp
 except ImportError:
     imp = None
-
 try:
     from ..core.pycase import ensure_dir_case_sensitive
 except ImportError:
-    ensure_dir_case_sensitive = lambda *x: logging.warning(f"Case sensitivity check not available for path(s): {x}")
+    ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
-# CRITICAL: 'utils.prog_path' must be correctly determined for compiled applications
-# *before* it's used to form other paths like cwd_path, tool_bin, temp, etc.
-# This is often a major source of issues in bundled apps.
-# The global exception handler might catch errors if this path is wrong and files are not found.
-cwd_path = utils.prog_path 
+cwd_path = utils.prog_path
 
 if os.name == 'nt':
-    def set_title_bar_color(window, dark_value: int = 20): # 20 for dark mode hint
-        """
-        Sets the window title bar color on Windows, typically for dark mode.
-        The 'dark_value' and 'value=c_int(2)' logic is specific to certain dwmapi calls.
-        """
-        try:
-            window.update() # Ensure HWND is available
-            set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
-            get_parent = windll.user32.GetParent
-            hwnd = get_parent(window.winfo_id())
-            
-            # This logic is preserved from your original code.
-            # DWMWA_USE_IMMERSIVE_DARK_MODE (attribute 20 on newer Win10/11) usually takes a BOOL (0 or 1).
-            # The use of dark_value as the attribute and c_int(2) as the value is specific.
-            rendering_policy_attribute_id = dark_value 
-            attribute_value_pointer = byref(c_int(2)) # As per original code
-            
-            # A more common way to enable dark mode if attribute 20 is for IMMERSIVE_DARK_MODE:
-            # if dark_value == 20: # Assuming 20 is a flag to enable dark mode
-            #     rendering_policy_attribute_id = 20 # DWMWA_USE_IMMERSIVE_DARK_MODE
-            #     attribute_value_pointer = byref(c_int(1)) # TRUE to enable
-            # elif dark_value == 0: # Assuming 0 is a flag to disable dark mode / use light
-            #    rendering_policy_attribute_id = 20
-            #    attribute_value_pointer = byref(c_int(0)) # FALSE to disable
-
-            set_window_attribute(hwnd, rendering_policy_attribute_id, attribute_value_pointer, sizeof(c_int))
-            window.update()
-        except Exception as e_title_bar:
-            logging.warning(f"Could not set Windows title bar color: {e_title_bar}")
+    # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
+    def set_title_bar_color(window, dark_value: int = 20):
+        window.update()
+        set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
+        get_parent = windll.user32.GetParent
+        hwnd = get_parent(window.winfo_id())
+        rendering_policy = dark_value
+        value = c_int(2)
+        set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
+        window.update()
 
 
-# Убедитесь, что ЭТА ВЕРСИЯ LoadAnim используется в вашем tool.py
 class LoadAnim:
+    gifs = []
+
     def __init__(self, master=None):
         self.master = master
         self.frames = []
-        self.hide_gif = True
-        self._after_id_run = None
-        self._current_frame_index = 0
+        self.hide_gif = False
+        self.frame = None
         self.tasks = {}
         self.task_num_index = 0
         self.task_num_max = 100
 
     def set_master(self, master):
         self.master = master
-        if self.master and not hasattr(self.master, 'gif_label'):
-            if 'logging' in globals(): logging.error("LoadAnim's master does not have 'gif_label'. Animation will not work.")
 
-    def _is_master_valid(self):
-        if self.master is None: return False
-        try:
-            if not self.master.winfo_exists(): return False
-            if not hasattr(self.master, 'gif_label') or \
-               not self.master.gif_label or \
-               not self.master.gif_label.winfo_exists():
-                return False
-        except tk.TclError: return False
-        return True
-
-    def run_gui_update(self):
-        if not self._is_master_valid():
-            self._after_id_run = None
-            return
-
-        if self.hide_gif:
-            if self.master.gif_label.winfo_ismapped():
-                self.master.gif_label.pack_forget()
-            self._after_id_run = None
-            return
-
-        if not self.frames:
-            if self.master.gif_label.winfo_ismapped():
-                self.master.gif_label.pack_forget()
-            self._after_id_run = None
-            return
-
-        if not self.master.gif_label.winfo_ismapped():
-            self.master.gif_label.pack(padx=10, pady=10)
-
-        current_frame_image = self.frames[self._current_frame_index]
-        self.master.gif_label.configure(image=current_frame_image)
-        
-        self._current_frame_index = (self._current_frame_index + 1) % len(self.frames)
-        self._after_id_run = self.master.after(30, self.run_gui_update)
-
-    def start_animation_threadsafe(self):
-        if not self._is_master_valid():
-            if 'logging' in globals(): logging.warning("LoadAnim: Cannot start, master invalid.")
-            return
-        if not self.frames:
-            if 'logging' in globals(): logging.warning("LoadAnim: No frames, cannot start.")
-            return
-
+    def run(self, ind: int = 0):
         self.hide_gif = False
-        self._current_frame_index = 0
-        
-        if self._after_id_run:
-            try: self.master.after_cancel(self._after_id_run)
-            except tk.TclError: pass
-            self._after_id_run = None
-            
-        if self.master and hasattr(self.master, 'after'):
-            self.master.after(0, self.run_gui_update)
-
-    def stop_animation_threadsafe(self):
-        self.hide_gif = True
-        if self._after_id_run and self._is_master_valid() and hasattr(self.master, 'after_cancel'):
-             try: self.master.after_cancel(self._after_id_run)
-             except tk.TclError: pass
-        self._after_id_run = None
-
-        def _hide_label_gui():
-            if self._is_master_valid() and hasattr(self.master, 'gif_label') and \
-               self.master.gif_label.winfo_ismapped():
-                self.master.gif_label.pack_forget()
-        if self._is_master_valid() and hasattr(self.master, 'after'):
-            self.master.after(0, _hide_label_gui)
+        if not self.hide_gif:
+            self.master.gif_label.pack(padx=10, pady=10)
+        self.frame = self.frames[ind]
+        ind += 1
+        if ind == len(self.frames):
+            ind = 0
+        self.master.gif_label.configure(image=self.frame)
+        self.gifs.append(self.master.gif_label.after(30, self.run, ind))
 
     def get_task_num(self):
         self.task_num_index = (self.task_num_index + 1) % self.task_num_max
         return self.task_num_index
 
+    def stop(self):
+        for i in self.gifs:
+            try:
+                self.master.gif_label.after_cancel(i)
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+        self.master.gif_label.pack_forget()
+        self.hide_gif = True
+
     def init(self):
-        # Этот метод теперь используется только для первоначальной загрузки GIF, если это нужно.
-        # Анимация управляется декоратором.
-        pass
+        self.run()
+        self.stop()
 
-    def load_gif(self, pil_gif_image_object):
-        if not self._is_master_valid():
-            if 'logging' in globals(): logging.error("LoadAnim: Master invalid, cannot create PhotoImage for GIF.")
-            self.frames.clear()
-            return
-
-        was_running = (self._after_id_run is not None and not self.hide_gif)
-        if self._after_id_run: # Останавливаем любую текущую анимацию
-            try: self.master.after_cancel(self._after_id_run)
-            except tk.TclError: pass
-            self._after_id_run = None
-        
-        # Скрываем метку перед сменой кадров, чтобы избежать проблем с PhotoImage
-        # если старые кадры были привязаны к другому master или master был уничтожен
-        # Этот вызов должен быть безопасным, т.к. _is_master_valid уже прошла
-        if self.master.gif_label.winfo_ismapped():
-            self.master.gif_label.pack_forget()
-
+    def load_gif(self, gif):
         self.frames.clear()
-        frame_idx = 0
-        try:
-            pil_gif_image_object.seek(0)
-            while True:
-                # Копируем кадр, чтобы избежать проблем с Pillow и Tkinter
-                # PhotoImage ожидает, что исходное изображение не изменится.
-                current_pil_frame = pil_gif_image_object.copy()
-                # Явно указываем master для PhotoImage
-                photo_frame = PhotoImage(current_pil_frame, master=self.master.winfo_toplevel())
-                self.frames.append(photo_frame)
-                frame_idx += 1
-                pil_gif_image_object.seek(frame_idx)
-        except EOFError:
-            pass # Достигнут конец GIF
-        except tk.TclError as e:
-            if 'logging' in globals(): logging.error(f"LoadAnim: TclError during PhotoImage creation: {e}. Frames loaded: {len(self.frames)}")
-        except Exception as e:
-            if 'logging' in globals(): logging.error(f"LoadAnim: Error loading GIF frames: {e}")
-            self.frames.clear()
-
-        if was_running and self.frames:
-             self.start_animation_threadsafe() # Перезапускаем, если была активна и кадры загружены
-        elif not self.frames:
-             self.hide_gif = True # Убедимся, что скрыто, если кадры не загрузились
+        while True:
+            self.frames.append(PhotoImage(gif))
+            try:
+                gif.seek(len(self.frames))
+            except EOFError:
+                break
 
     def __call__(self, func):
         @wraps(func)
-        def decorated_func(*args, **kwargs):
-            task_num = self.get_task_num()
-            is_first_task = not bool(self.tasks)
-            
-            if is_first_task:
-                self.start_animation_threadsafe()
-
-            self.tasks[task_num] = func.__name__
+        def call_func(*args, **kwargs):
             return_value = None
-            try:
-                return_value = func(*args, **kwargs)
-            except Exception as e:
-                if 'logging' in globals(): logging.error(f"LoadAnim: Exception in decorated function {func.__name__}: {e}\n{traceback.format_exc()}")
-                # Можно пробросить исключение дальше, если это необходимо
-                # raise
-            finally:
-                if task_num in self.tasks:
-                    del self.tasks[task_num]
-                
-                if not bool(self.tasks): # Если задач больше не осталось
-                    self.stop_animation_threadsafe()
+
+            def wrapper(*a, **k):
+                nonlocal return_value
+                return_value = func(*a, **k)
+
+            create_thread(self.run())
+            task_num = self.get_task_num()
+            task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
+            info = [func.__name__, args, task_real]
+            if task_num in self.tasks:
+                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
+                return None
+            else:
+                self.tasks[task_num] = info
+            task_real.start()
+            task_real.join()
+            if task_num in self.tasks:
+                del self.tasks[task_num]
+            del info, task_num
+            if not self.tasks:
+                self.stop()
             return return_value
-        return decorated_func
 
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500, parent=None):
-    """
-    Displays a temporary window with a warning or informational message.
-    Uses standard tkinter.Toplevel.
-    """
-    # Используем стандартный Toplevel для простоты, если кастомный Toplevel зависит от поздно инициализируемых 'settings'
-    # Если 'settings' доступен глобально к этому моменту, можно использовать ваш кастомный Toplevel.
-    # Для большей надежности на ранних этапах инициализации, стандартный Toplevel безопаснее.
-    
-    # Определяем, какой Toplevel использовать. Если кастомный Toplevel зависит от settings,
-    # которые еще не инициализированы, это вызовет ошибку.
-    # Поэтому, если 'settings' еще не в globals(), используем стандартный tk.Toplevel.
-    
-    _tk_toplevel_available = False
-    _custom_toplevel_available = False
-
-    if 'Toplevel' in globals() and callable(globals()['Toplevel']) and globals()['Toplevel'] is not TkToplevel:
-        # Проверяем, не зависит ли наш кастомный Toplevel от 'settings', если их еще нет
-        if 'settings' not in globals() and "settings" in globals()['Toplevel'].__init__.__code__.co_varnames:
-             # Кастомный Toplevel зависит от settings, но settings еще нет. Используем стандартный.
-            pass # _custom_toplevel_available остается False
-        else:
-            _custom_toplevel_available = True # Кастомный Toplevel можно использовать
-    
-    if 'tk' in globals() and hasattr(tk, 'Toplevel'):
-        _tk_toplevel_available = True
+        return call_func
 
 
-    if _custom_toplevel_available:
-        try:
-            dialog = Toplevel() # Ваш кастомный Toplevel
-        except Exception as e_custom_toplevel:
-            if 'logging' in globals(): logging.warning(f"Failed to use custom Toplevel in warn_win: {e_custom_toplevel}. Falling back to tk.Toplevel.")
-            if not _tk_toplevel_available: # Если и tk.Toplevel нет, это проблема
-                raise RuntimeError("Neither custom Toplevel nor tk.Toplevel are available for warn_win.") from e_custom_toplevel
-            dialog = tk.Toplevel() # Фоллбэк на стандартный
-    elif _tk_toplevel_available:
-        dialog = tk.Toplevel() # Стандартный tkinter.Toplevel
-    else:
-        raise RuntimeError("Toplevel (custom or tk) is not available for warn_win.")
-
-
-    dialog.title(title)
-    # dialog.resizable(False, False) # Опционально
-
-    if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
-        try:
-            dialog.transient(parent)
-        except tk.TclError: # Может случиться, если parent уничтожается
-            if 'logging' in globals(): logging.warning("warn_win: Failed to set transient, parent might be destroyed.")
-        except Exception as e:
-            if 'logging' in globals(): logging.warning(f"Could not set transient for warn_win: {e}")
-
-    # Используем ttk.Frame, если ttk импортирован, иначе tk.Frame
-    frame_module = ttk if 'ttk' in globals() else tk
-    frame_inner = frame_module.Frame(dialog)
+def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500):
+    ask = ttk.LabelFrame(win)
+    ask.configure(text=title)
+    ask.place(relx=0.5, rely=0.5, anchor="nw")
+    frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    
-    font_tuple = (None, 16) 
-    # Проверка lang и его атрибутов
-    if 'lang' in globals() and hasattr(lang, 'font_warn_win_text'):
-        lang_font = getattr(lang, 'font_warn_win_text', None)
-        if lang_font and isinstance(lang_font, (tuple, list)) and len(lang_font) >= 1: # Простая проверка
-            font_tuple = lang_font
-        elif lang_font:
-            if 'logging' in globals(): logging.warning(f"lang.font_warn_win_text ('{lang_font}') is not a valid font tuple.")
+    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
+    ask.after(wait, ask.destroy)
 
-    # Используем ttk.Label, если ttk импортирован
-    label_module = ttk if 'ttk' in globals() else tk
-    label_module.Label(frame_inner, text=text, font=font_tuple, foreground=color, wraplength=350).pack(side=TOP, pady=(10,10))
-    
-    # Проверка move_center
-    if 'move_center' in globals() and callable(globals()['move_center']):
-        try:
-            move_center(dialog)
-        except Exception as e_move_center:
-            if 'logging' in globals(): logging.error(f"Error in move_center for warn_win: {e_move_center}")
-            # Фоллбэк на ручное центрирование, если move_center не сработал
-            dialog.update_idletasks()
-            width = dialog.winfo_width()
-            height = dialog.winfo_height()
-            screen_width = dialog.winfo_screenwidth()
-            screen_height = dialog.winfo_screenheight()
-            x = (screen_width // 2) - (width // 2)
-            y = (screen_height // 2) - (height // 2)
-            dialog.geometry(f'{width}x{height}+{x}+{y}')
-    else: 
-        # Ручное центрирование, если move_center недоступен
-        dialog.update_idletasks()
-        width = dialog.winfo_width()
-        height = dialog.winfo_height()
-        screen_width = dialog.winfo_screenwidth()
-        screen_height = dialog.winfo_screenheight()
-        x = (screen_width // 2) - (width // 2)
-        y = (screen_height // 2) - (height // 2)
-        dialog.geometry(f'{width}x{height}+{x}+{y}')
 
-    # Запланировать закрытие
-    try:
-        dialog.after(wait, dialog.destroy)
-    except tk.TclError: # Окно могло быть уже уничтожено
-        if 'logging' in globals(): logging.warning("warn_win: Could not schedule close, dialog might be already destroyed.")
-        
-    return dialog
-
-    
-
-class Toplevel(TkToplevel): # TkToplevel должен быть импортирован
+class Toplevel(TkToplevel):
     def __init__(self):
         super().__init__()
         if os.name == 'nt':
-            # Эта часть зависит от глобального 'settings' или 'theme'.
-            # Если они инициализируются позже, это может вызвать проблемы.
-            # Либо передавайте тему как аргумент, либо убедитесь, что 'settings' доступен.
-            current_theme_val = 'light' # Безопасное значение по умолчанию
-
-            if 'settings' in globals() and hasattr(settings, 'theme'):
-                current_theme_val = settings.theme
-            elif 'theme' in globals() and hasattr(globals()['theme'], 'get'): # Если theme это StringVar
-                try:
-                    current_theme_val = globals()['theme'].get()
-                except tk.TclError: # Может случиться, если root еще не до конца инициализирован
-                     if 'logging' in globals(): logging.warning("Toplevel: TclError getting theme var, using default.")
+            if settings.theme == 'dark':
+                set_title_bar_color(self)
             else:
-                if 'logging' in globals(): logging.info("Toplevel: 'settings.theme' or global 'theme' StringVar not found, using default theme for title bar.")
-
-            if 'set_title_bar_color' in globals() and callable(globals()['set_title_bar_color']):
-                try:
-                    if current_theme_val == 'dark':
-                        set_title_bar_color(self)
-                    else:
-                        set_title_bar_color(self, 0)
-                except Exception as e_title_color:
-                     if 'logging' in globals(): logging.error(f"Error setting title bar color in Toplevel: {e_title_color}")
-            else:
-                if 'logging' in globals(): logging.warning("Toplevel: 'set_title_bar_color' not available.")
+                set_title_bar_color(self, 0)
 
 
 class CustomControls:
@@ -657,36 +280,21 @@ class ToolBox(ttk.Frame):
 
     def gui(self):
         self.pack_basic()
-
-        # Получаем тексты для кнопок с фоллбэками
-        # Для lang.text114, lang.t59 и т.д. предполагается, что они всегда корректны,
-        # но можно добавить аналогичные проверки при необходимости.
-
-        merge_qualcomm_text_key = 'mergequalcommimage'
-        merge_qualcomm_default_text = "Merge Qualcomm Image"
-        merge_qualcomm_text = getattr(lang, merge_qualcomm_text_key, merge_qualcomm_default_text)
-        if not isinstance(merge_qualcomm_text, str) or \
-           merge_qualcomm_text.strip().lower() == "none" or \
-           not merge_qualcomm_text.strip():
-            merge_qualcomm_text = merge_qualcomm_default_text
-            if 'logging' in globals(): logging.warning(f"Fallback for lang.{merge_qualcomm_text_key}, used default: '{merge_qualcomm_default_text}'")
-
-
         functions = [
-            (getattr(lang, 'text114', "Download File (fallback)"), lambda: create_thread(download_file)),
-            (getattr(lang, 't59', "Get File Info (fallback)"), self.GetFileInfo),
-            (getattr(lang, 't60', "Byte Calculator (fallback)"), self.FileBytes),
-            (getattr(lang, 'audit_allow', "Selinux Audit Allow (fallback)"), self.SelinuxAuditAllow),
-            (getattr(lang, 'trim_image', "Trim Image (fallback)"), self.TrimImage),
-            (getattr(lang, 'magisk_patch', "Magisk Patcher (fallback)"), self.MagiskPatcher),
-            (merge_qualcomm_text, self.MergeQualcommImage_old) # Используем полученный и проверенный текст
+            (lang.text114, lambda: create_thread(download_file)),
+            (lang.t59, self.GetFileInfo),
+            (lang.t60, self.FileBytes),
+            (lang.audit_allow, self.SelinuxAuditAllow),
+            (lang.trim_image, self.TrimImage),
+            (lang.magisk_patch, self.MagiskPatcher),
+            (lang.mergequalcommimage, self.MergeQualcommImage_old)
         ]
         width_controls = 3
+        #
         index_row = 0
         index_column = 0
         for text, func in functions:
-            button_display_text = str(text) # Текст уже должен быть валидной строкой после проверок выше
-            ttk.Button(self.label_frame, text=button_display_text, command=func, width=17).grid(row=index_row, column=index_column,
+            ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row, column=index_column,
                                                                                  padx=5, pady=5)
             index_column = (index_column + 1) % width_controls
             if not index_column:
@@ -697,153 +305,42 @@ class ToolBox(ttk.Frame):
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
-    class MergeQualcommImage_old(Toplevel): # Toplevel должен быть импортирован или определен
+    class MergeQualcommImage_old(Toplevel):
         def __init__(self):
             super().__init__()
-            
-            window_title_key = 'mergequalcommimage'
-            window_title_default = "Merge Qualcomm Image"
-            window_title = getattr(lang, window_title_key, window_title_default)
-            if not isinstance(window_title, str) or \
-               window_title.strip().lower() == "none" or \
-               not window_title.strip():
-                window_title = window_title_default
-                if 'logging' in globals(): logging.warning(f"Fallback for Toplevel title lang.{window_title_key}, used default: '{window_title_default}'")
-
-            self.title(window_title)
+            self.title(lang.mergequalcommimage)
             self.rawprogram_xml = StringVar()
             self.partition_name = StringVar()
             self.output_path = StringVar()
             self.gui()
-            if 'move_center' in globals() and callable(globals()['move_center']):
-                move_center(self)
-            else:
-                if 'logging' in globals(): logging.warning("MergeQualcommImage_old: move_center not available.")
-
+            move_center(self)
 
         def gui(self):
-            # Получаем тексты для меток и кнопки с фоллбэками
-            # ccontrols должен быть доступен (экземпляр CustomControls)
-            if 'ccontrols' not in globals():
-                if 'logging' in globals(): logging.error("MergeQualcommImage_old.gui: 'ccontrols' not found.")
-                # Можно создать временный, если CustomControls определен, но это не исправит зависимость
-                # Для демонстрации, предполагаем, что ccontrols доступен.
-
-            rawprogram_xml_label_key = 'rawprogram_xml_label'
-            rawprogram_xml_default_label = "RawProgram XML:"
-            rawprogram_xml_label_text = getattr(lang, rawprogram_xml_label_key, rawprogram_xml_default_label)
-            if not isinstance(rawprogram_xml_label_text, str) or \
-               rawprogram_xml_label_text.strip().lower() == "none" or \
-               not rawprogram_xml_label_text.strip():
-                rawprogram_xml_label_text = rawprogram_xml_default_label
-                if 'logging' in globals(): logging.warning(f"Fallback for lang.{rawprogram_xml_label_key}, used default: '{rawprogram_xml_default_label}'")
-
-            partition_name_label_key = 'partition_name'
-            partition_name_default_label = "Partition Name:"
-            partition_name_label_text = getattr(lang, partition_name_label_key, partition_name_default_label)
-            if not isinstance(partition_name_label_text, str) or \
-               partition_name_label_text.strip().lower() == "none" or \
-               not partition_name_label_text.strip():
-                partition_name_label_text = partition_name_default_label
-                if 'logging' in globals(): logging.warning(f"Fallback for lang.{partition_name_label_key}, used default: '{partition_name_default_label}'")
-
-            output_path_label_key = 'output_path'
-            output_path_default_label = "Output Path:"
-            output_path_label_text = getattr(lang, output_path_label_key, output_path_default_label)
-            if not isinstance(output_path_label_text, str) or \
-               output_path_label_text.strip().lower() == "none" or \
-               not output_path_label_text.strip():
-                output_path_label_text = output_path_default_label
-                if 'logging' in globals(): logging.warning(f"Fallback for lang.{output_path_label_key}, used default: '{output_path_default_label}'")
-                
-            run_button_key = 'run'
-            run_button_default_text = "Run"
-            run_button_text = getattr(lang, run_button_key, run_button_default_text)
-            if not isinstance(run_button_text, str) or \
-               run_button_text.strip().lower() == "none" or \
-               not run_button_text.strip():
-                run_button_text = run_button_default_text
-                if 'logging' in globals(): logging.warning(f"Fallback for lang.{run_button_key}, used default: '{run_button_default_text}'")
-
-            ccontrols.filechose(self, self.rawprogram_xml, rawprogram_xml_label_text)
-            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), partition_name_label_text)
-            ccontrols.filechose(self, self.output_path, output_path_label_text, is_folder=True)
-            ttk.Button(self, text=run_button_text, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+            ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
+            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
+            ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
+            ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
             rawprogram_xml = self.rawprogram_xml.get()
             if not os.path.exists(rawprogram_xml):
-                # Используем logging для ошибок, которые видит разработчик,
-                # и print/messagebox для пользователя
-                logging.error(f'Raw Program not exist! Path: {rawprogram_xml}')
-                user_msg_key = 'rawprogram_not_exist_error' # Ключ для локализации
-                user_msg_default = "Error: RawProgram XML file not found at specified path."
-                user_msg = getattr(lang, user_msg_key, user_msg_default)
-                if hasattr(win, 'message_pop') and callable(win.message_pop): # Предполагаем, что win - главное окно
-                    win.message_pop(user_msg, color='red', title="File Error")
-                elif 'tkinter.messagebox' in sys.modules:
-                     tkinter.messagebox.showerror("File Error", user_msg)
-                else: print(user_msg) # Фоллбэк на консоль
-                return 1 # Возвращаем код ошибки
-
+                print(f'Raw Program not exist!{rawprogram_xml}')
+                return 1
             partition_name = self.partition_name.get()
             output_path = self.output_path.get()
-
             if not output_path:
-                logging.warning('Output path not selected for MergeQualcommImage.')
-                user_msg_key = 'output_path_empty_error'
-                user_msg_default = "Please choose an output path."
-                user_msg = getattr(lang, user_msg_key, user_msg_default)
-                if hasattr(win, 'message_pop') and callable(win.message_pop):
-                    win.message_pop(user_msg, color='orange', title="Input Required")
-                elif 'tkinter.messagebox' in sys.modules:
-                     tkinter.messagebox.showwarning("Input Required", user_msg)
-                else: print(user_msg)
-                return 1 # Возвращаем код ошибки
-
+                print('Please Choose OutPut Path.')
+                return 1
             if not os.path.exists(output_path):
-                try:
-                    os.makedirs(output_path, exist_ok=True)
-                except OSError as e:
-                    logging.error(f"Failed to create output directory {output_path}: {e}")
-                    user_msg_key = 'create_output_dir_failed_error'
-                    user_msg_default = f"Error: Could not create output directory:\n{output_path}\n\nDetails: {e}"
-                    user_msg = getattr(lang, user_msg_key, user_msg_default)
-                    if hasattr(win, 'message_pop') and callable(win.message_pop):
-                        win.message_pop(user_msg, color='red', title="Directory Error")
-                    elif 'tkinter.messagebox' in sys.modules:
-                         tkinter.messagebox.showerror("Directory Error", user_msg)
-                    else: print(user_msg)
-                    return 1 # Код ошибки
-            
-            self.destroy() # Закрываем окно настроек перед длительной операцией
-            
+                os.makedirs(output_path, exist_ok=True)
+            self.destroy()
             try:
-                # process_by_xml должен быть доступен
-                if 'process_by_xml' in globals() and callable(globals()['process_by_xml']):
-                     process_by_xml(rawprogram_xml, partition_name, output_path)
-                     # Сообщение об успехе, если нужно
-                else:
-                    logging.error("MergeQualcommImage_old.run: 'process_by_xml' function not found.")
-                    # Сообщить пользователю, если это критично
-                return None 
-            except Exception as e: # Ловим конкретные исключения, если это возможно
-                logging.exception('MergeQC RAWPROGRAM process_by_xml failed')
-                user_msg_key = 'merge_qc_failed_error'
-                user_msg_default = f"Merge Fail!\nAn error occurred during processing.\n\nDetails: {e}"
-                user_msg_details = getattr(lang, user_msg_key, user_msg_default) # В lang можно передать {error_details}
-                
-                # Для пользователя лучше не показывать полный traceback, а общее сообщение + лог
-                user_msg_simple_key = 'merge_qc_failed_simple'
-                user_msg_simple_default = "Merge Fail! An error occurred. Check logs for details."
-                user_msg_simple = getattr(lang, user_msg_simple_key, user_msg_simple_default)
-
-                if hasattr(win, 'message_pop') and callable(win.message_pop):
-                    win.message_pop(user_msg_simple, color='red', title="Processing Error")
-                elif 'tkinter.messagebox' in sys.modules:
-                     tkinter.messagebox.showerror("Processing Error", user_msg_simple)
-                else: print(user_msg_simple)
-                return None # В оригинале было None, хотя можно и код 
+                process_by_xml(rawprogram_xml, partition_name, output_path)
+                return None
+            except (Exception, BaseException) as e:
+                print('Merge Fail!')
+                logging.exception('MergeQC RAWPROGRAM')
+                return None
 
     class MagiskPatcher(Toplevel):
         def __init__(self):
@@ -993,56 +490,56 @@ class ToolBox(ttk.Frame):
         def __init__(self):
             super().__init__()
             self.units = {
-                "B": 1,  # Use 1 instead of 2**0 for simplicity
+                "B": 1,  # Используем 1 вместо 2**0 для простоты
                 "KB": 1024,
                 "MB": 1024**2,
                 "GB": 1024**3,
                 "TB": 1024**4,
-                "PB": 1024**5 # Added PB for completeness
+                "PB": 1024**5 # Добавил PB для полноты
             }
             self.title(lang.t60) # lang.t60 = 'Byte Calculator' (пример)
-            self._is_calculating = False # Flag to prevent recursion
-            self.origin_size_var = tk.StringVar() # Separate variables for Entry
+            self._is_calculating = False # Флаг для предотвращения рекурсии
+            self.origin_size_var = tk.StringVar() # Отдельные переменные для Entry
             self.result_size_var = tk.StringVar()
             self.gui()
-            move_center(self) # Make sure that move_center is defined
+            move_center(self) # Убедись, что move_center определена
 
         def gui(self):
-            self.f_main = Frame(self) # The main frame for widgets
+            self.f_main = Frame(self) # Основной фрейм для виджетов
             self.f_main.pack(pady=5, padx=5, fill=X, expand=True)
 
-            # Left input field
+            # Левое поле ввода
             self.origin_size = ttk.Entry(self.f_main, textvariable=self.origin_size_var)
-            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Binding to the left field
+            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Биндинг на левое поле
             self.origin_size.pack(side='left', padx=5, expand=True, fill=X)
 
-           # Left combobox
+            # Левый комбобокс
             self.h = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.h.current(0)
-            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Binding to the left combobox
+            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Биндинг на левый комбобокс
             self.h.pack(side='left', padx=5)
 
-            # Equal sign
+            # Знак равенства
             Label(self.f_main, text='=').pack(side='left', padx=5)
 
-            # Right input field
+            # Правое поле ввода
             self.result_size = ttk.Entry(self.f_main, textvariable=self.result_size_var)
-            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Binding to the right field
+            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Биндинг на правое поле
             self.result_size.pack(side='left', padx=5, expand=True, fill=X)
 
-            # Right combobox
+            # Правый комбобокс
             self.f_ = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.f_.current(0)
-            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Binding to the right combobox
+            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Биндинг на правый комбобокс
             self.f_.pack(side='left', padx=5)
 
-            # Close button
+            # Кнопка закрытия
             ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5) # lang.text17 = 'Close' (пример)
 
         def calc_forward(self, event=None):
             """Рассчитывает значение справа налево (из левого поля в правое)."""
             if self._is_calculating:
-                return # Prevent recursion
+                return # Предотвращаем рекурсию
 
             self._is_calculating = True
             try:
@@ -1052,71 +549,70 @@ class ToolBox(ttk.Frame):
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # We update only if the value is different to avoid unnecessary events
+                # Обновляем только если значение отличается, чтобы избежать лишних событий
                 if self.result_size_var.get() != result_value_str:
                     self.result_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Dropping the flag
+                self._is_calculating = False # Сбрасываем флаг
 
         def calc_reverse(self, event=None):
             """Рассчитывает значение справа налево (из правого поля в левое)."""
             if self._is_calculating:
-                return # Prevent recursion
+                return # Предотвращаем рекурсию
 
             self._is_calculating = True
             try:
-                # Units are swapped for calculation
-                origin_unit = self.f_.get() # We take a unit from the right combobox
-                target_unit = self.h.get() # The target unit is from the left
-                origin_value_str = self.result_size_var.get() # Value from the right field
+                # Единицы меняются местами для расчета
+                origin_unit = self.f_.get() # Берем единицу из правого комбобокса
+                target_unit = self.h.get()  # Целевая единица - из левого
+                origin_value_str = self.result_size_var.get() # Значение из правого поля
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # Update only if the value is different
+                # Обновляем только если значение отличается
                 if self.origin_size_var.get() != result_value_str:
                     self.origin_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Dropping the flag
+                self._is_calculating = False # Сбрасываем флаг
 
         def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
             """Выполняет конвертацию значения между единицами."""
-            # Removing the spaces
+            # Убираем пробелы
             size_str = size_str.strip()
 
-           # Handling empty input
+            # Обработка пустого ввода
             if not size_str:
-                return "" # We return an empty string if the output is empty
+                return "" # Возвращаем пустую строку, если ввод пуст
 
             try:
-               # Trying to convert to float
+                # Пытаемся преобразовать во float
                 size = float(size_str)
             except ValueError:
-                # If it's not a float, check if it's a partially entered number.
+                 # Если не float, проверяем, не является ли это частично введенным числом
                  if size_str == '.' or size_str == '-' or size_str == '-.' or \
                    (size_str.startswith('-') and size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str[1:])) or \
                    (size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str)):
-                    # If it looks like a number in the input process, we don't return anything yet (or can we return "0"?)
-# We return an empty string so as not to interfere with the input
+                    # Если это похоже на число в процессе ввода, пока ничего не возвращаем (или можно вернуть "0"?)
+                    # Возвращаем пустую строку, чтобы не мешать вводу
                     return ""
                  else:
-                    # If it's not exactly a number, we return "Invalid" or an empty string.
+                    # Если это точно не число, возвращаем "Invalid" или пустую строку
                     return "Invalid"
 
-           # If the units are the same
+            # Если единицы одинаковые
             if origin_unit == target_unit:
-                # We return the number as a string by deleting .0 for integers
+                # Возвращаем число в виде строки, удаляя .0 для целых чисел
                 return str(int(size)) if size.is_integer() else str(size)
 
-           # Performing the calculation
+            # Выполняем расчет
             result = size * self.units[origin_unit] / self.units[target_unit]
 
-            # Format the result: delete it .0 for integers, we limit the precision
+            # Форматируем результат: удаляем .0 для целых чисел, ограничиваем точность
             if result.is_integer():
                 return str(int(result))
             else:
-                # We limit the number of decimal places for readability
+                # Ограничиваем количество знаков после запятой для читаемости
                 return f"{result:.6f}".rstrip('0').rstrip('.')
-                
     class GetFileInfo(Toplevel):
         def __init__(self):
             super().__init__()
@@ -1255,22 +751,24 @@ class ToolBox(ttk.Frame):
 class Tool(Tk):
     def __init__(self):
         super().__init__()
-        self.rotate_angle = 0 # Перемещено из tab4_content, т.к. это состояние окна
+        self.rotate_angle = 0  # Moved from tab4_content as it's a window state
 
-        # Попытка получить текущее значение alpha перед "встряской"
-        # Это может быть важно, если настройки пользователя уже включают прозрачность по умолчанию
+        # Attempt to get the current alpha value before the "shake".
+        # This is important if user settings already include transparency by default.
+        initial_alpha = 1.0  # Default to fully opaque
         try:
-            # Важно: attributes() может быть недоступен, если окно еще не сопоставлено (mapped)
-            # Однако, для __init__ это обычно еще не проблема.
-            # Если это вызывает ошибку, можно предположить initial_alpha = 1.0
-            self.update_idletasks() # Убедимся, что окно готово к запросу атрибутов
+            # Important: attributes() might not be available if the window isn't mapped yet,
+            # though this is usually not an issue in __init__.
+            # If this causes an error, we'll stick with initial_alpha = 1.0.
+            self.update_idletasks()  # Ensure the window is ready for attribute queries
             current_alpha_str = self.attributes("-alpha")
             initial_alpha = float(current_alpha_str)
             if 'logging' in globals(): logging.info(f"Tool.__init__: Initial alpha detected as {initial_alpha}")
         except (tk.TclError, ValueError) as e_alpha_get:
-            initial_alpha = 1.0 # Значение по умолчанию (полностью непрозрачное)
+            # If getting alpha fails, assume it's 1.0 (fully opaque).
             if 'logging' in globals(): logging.warning(f"Tool.__init__: Could not get initial alpha ({e_alpha_get}), assuming {initial_alpha}.")
         
+        # Apply Windows-specific default font settings if available.
         if os.name == 'nt':
             if 'do_set_window_deffont' in globals() and callable(globals()['do_set_window_deffont']):
                 try:
@@ -1278,44 +776,47 @@ class Tool(Tk):
                 except Exception as e_font_fix:
                     if 'logging' in globals(): logging.error(f"Tool.__init__: Error in do_set_window_deffont: {e_font_fix}")
         
+        # Assign the warning window function to a method for easier access.
         self.message_pop = warn_win
         
         self.title('MIO-KITCHEN')
+        # Set application icon, except on POSIX systems (where it might behave differently or not be needed).
         if os.name != "posix" and 'images' in globals() and hasattr(images, 'icon_byte') and 'PhotoImage' in globals():
             try:
                 self.iconphoto(True, PhotoImage(data=images.icon_byte))
             except Exception as e_icon:
                  if 'logging' in globals(): logging.error(f"Failed to set application icon: {e_icon}")
 
-        # --- Предлагаемое исправление для микрофризов на Windows ---
+        # --- Proposed fix for micro-freezes on Windows ---
         if os.name == 'nt':
-            # Эта "встряска" атрибута alpha может помочь DWM Windows
-            # правильно инициализировать композицию окна для плавной отрисовки.
-            # Мы делаем это один раз при инициализации окна.
-            # Значение 0.99 используется, чтобы изменение было минимально заметным,
-            # но достаточным для срабатывания механизма DWM.
+            # This "shake" of the alpha attribute can help the Windows DWM (Desktop Window Manager)
+            # correctly initialize window composition for smoother rendering.
+            # This is done once during window initialization.
+            # A value like 0.99 is used to make the change minimally noticeable,
+            # yet sufficient to trigger the DWM mechanism.
             try:
                 if 'logging' in globals(): logging.info("Tool.__init__: Applying alpha 'shake' fix for Windows.")
                 
-                # Кратковременно устанавливаем альфа чуть меньше 1.0
+                # Briefly set alpha to slightly less than 1.0.
                 self.attributes("-alpha", 0.99) 
                 
-                # Даем Tkinter и системе время обработать это изменение.
-                # self.update() может быть слишком агрессивным здесь и вызвать другие проблемы.
-                # self.update_idletasks() обычно безопаснее.
+                # Allow Tkinter and the system time to process this change.
+                # self.update() can be too aggressive here and might cause other issues.
+                # self.update_idletasks() is generally safer.
                 self.update_idletasks() 
                 
-                # Возвращаем исходное или желаемое значение альфа-канала.
-                # Если initial_alpha было успешно получено и оно не 1.0 (например, из настроек),
-                # то мы вернем его. Иначе, вернем 1.0.
+                # Restore the original or desired alpha value.
+                # If initial_alpha was successfully retrieved and is not 1.0 (e.g., from user settings),
+                # restore it. Otherwise, restore to 1.0.
                 self.attributes("-alpha", initial_alpha) 
-                self.update_idletasks() # Еще раз, чтобы закрепить
+                self.update_idletasks() # Call again to ensure the change is applied.
                 
                 if 'logging' in globals(): logging.info(f"Tool.__init__: Alpha 'shake' fix applied. Alpha restored to {initial_alpha}.")
             except tk.TclError as e_alpha_fix:
-                # Эта ошибка может возникнуть, если окно еще не готово к изменению атрибутов
+                # This error can occur if the window is not yet ready for attribute changes.
                 if 'logging' in globals(): logging.error(f"Tool.__init__: TclError during alpha 'shake' fix: {e_alpha_fix}. Window might not be ready.")
             except Exception as e_generic_alpha_fix:
+                # Catch any other unexpected errors during the fix.
                 if 'logging' in globals(): logging.error(f"Tool.__init__: Generic error during alpha 'shake' fix: {e_generic_alpha_fix}")
 
     def get_time(self):
@@ -1444,7 +945,7 @@ class Tool(Tk):
 
         Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
         Label(self.tab4,
-              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), platform.machine()), # <--- ИЗМЕНЕНИЕ ЗДЕСЬ
+              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
               font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
@@ -1969,301 +1470,121 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini: str = None):
-        # Атрибуты по умолчанию
+    def __init__(self, set_ini: str = None, load=True):
         self.project_struct = 'single'
         self.auto_unpack = '0'
         self.treff = '0'
-        self.plugin_repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
+        if set_ini:
+            self.set_file = set_ini
+        else:
+            self.set_file = os.path.join(cwd_path, "bin", "setting.ini")
+        self.plugin_repo = None
         self.contextpatch = '0'
         self.oobe = '0'
-        self.path = None 
+        self.path = None
         self.bar_level = '0.9'
         self.ai_engine = '0'
-        self.version = 'basic' 
+        self.version = 'basic'
         self.version_old = 'unknown'
-        self.language = 'English' 
+        self.language = 'English'
         self.magisk_not_decompress = '0'
         self.updating = ''
         self.new_tool = ''
         self.cmd_exit = '0'
         self.cmd_invisible = '0'
         self.debug_mode = 'No'
-        self.theme = 'dark' 
+        self.theme = 'dark'
         self.update_url = 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
-        self.custom_system = None 
-        self.tool_bin = None
-
-        # Используем ваш кастомный ConfigParser
-        # Убедитесь, что from ..core.config_parser import ConfigParser сделан до этого
-        if 'ConfigParser' not in globals() or not callable(globals()['ConfigParser']):
-            _msg = "FATAL: Custom ConfigParser class is not available. Application cannot continue."
-            if 'logging' in globals(): logging.critical(_msg)
-            raise RuntimeError(_msg)
         self.config = ConfigParser()
-
-        _cwd_path = os.getcwd() 
-        if 'cwd_path' in globals() and globals()['cwd_path']:
-            _cwd_path = globals()['cwd_path']
-        elif 'logging' in globals():
-            logging.warning("SetUtils.__init__: Global 'cwd_path' not found, using os.getcwd().")
-
-        if set_ini:
-            self.set_file = set_ini
+        if os.access(self.set_file, os.F_OK):
+            if load:
+                self.load()
         else:
-            self.set_file = os.path.join(_cwd_path, "bin", "setting.ini")
-
-    def load_from_file(self):
-        """Загружает настройки из .ini файла в атрибуты экземпляра."""
-        _cwd_path = os.getcwd()
-        if 'cwd_path' in globals() and globals()['cwd_path']:
-            _cwd_path = globals()['cwd_path']
-
-        if not os.access(self.set_file, os.F_OK):
-            if 'logging' in globals():
-                logging.warning(f"Settings file {self.set_file} not found. Using default attribute values.")
+            sv_ttk.set_theme("dark")
+            error(1,
+                  'Some necessary files were lost, please reinstall this software to fix the problem!')
+        if hasattr(self, 'custom_system'):
+            if not self.custom_system.strip():
+                self.custom_system = platform.system()
         else:
-            try:
-                self.config.read(self.set_file) # Ваш ConfigParser.read()
-                
-                if 'setting' in self.config.dict:
-                    for key, value in self.config.items('setting'): 
-                        if key is not None:
-                           setattr(self, key, value)
-                elif 'logging' in globals():
-                    logging.warning(f"Section 'setting' not found in {self.set_file} (custom parser). Defaults will be used.")
-            except Exception as e_read_config:
-                if 'logging' in globals():
-                    logging.error(f"Error reading settings file {self.set_file} with custom parser: {e_read_config}. Using default attribute values.")
-
-        prog_path_fallback = _cwd_path
-        if 'utils' in globals() and hasattr(utils, 'prog_path') and utils.prog_path:
-            prog_path_fallback = utils.prog_path
-
-        current_path_setting = getattr(self, 'path', None)
-        if not current_path_setting:
-            self.path = prog_path_fallback
-        elif not os.path.isdir(current_path_setting):
-             if 'logging' in globals():
-                 logging.warning(f"Path from settings '{current_path_setting}' is not a valid directory. Falling back to '{prog_path_fallback}'.")
-             self.path = prog_path_fallback
-
-        default_attrs = {
-            'language': 'English', 'theme': 'dark', 'oobe': '0', 'treff': '0', 
-            'bar_level': '0.9', 'project_struct': 'single', 'auto_unpack': '0',
-            'plugin_repo': "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
-            'contextpatch': '0', 'ai_engine': '0', 'version': 'basic', 'version_old': 'unknown',
-            'magisk_not_decompress': '0', 'updating': '', 'new_tool': '', 'cmd_exit': '0',
-            'cmd_invisible': '0', 'debug_mode': 'No',
-            'update_url': 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
-        }
-        for attr, default_val in default_attrs.items():
-            if not hasattr(self, attr) or getattr(self, attr, None) is None:
-                setattr(self, attr, default_val)
-                if 'logging' in globals():
-                    logging.debug(f"Attribute '{attr}' not found/None in settings, defaulted to '{default_val}'.")
-        
-        if self.theme not in ['light', 'dark']: self.theme = 'dark'
-
-        current_custom_system = getattr(self, 'custom_system', None)
-        if not (current_custom_system and isinstance(current_custom_system, str) and current_custom_system.strip()):
             self.custom_system = platform.system()
+        self.tool_bin = os.path.join(cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
 
-        self.tool_bin = os.path.join(_cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
-        self.tool_bin = self.tool_bin.replace('\\', '/')
-
-        if 'is_pro' in globals() and is_pro:
-            if 'verify' in globals() and hasattr(verify, 'verify') and callable(verify.verify):
-                active_code_to_verify = getattr(self, 'active_code', 'None')
-                try: verify.verify(active_code_to_verify)
-                except Exception as e_verify:
-                    if 'logging' in globals(): logging.error(f"Error during pro verification: {e_verify}")
-            elif 'logging' in globals():
-                logging.debug("load_from_file: 'verify' module/function not available for pro check.")
-        
-        try: float(self.bar_level)
-        except ValueError:
-            if 'logging' in globals(): logging.warning(f"Invalid bar_level '{self.bar_level}', defaulting to 0.9.")
-            self.bar_level = '0.9'
-
-    def apply_loaded_settings_to_gui(self):
-        if 'lang' in globals() and globals()['lang'] is not None:
-            self.load_language(self.language)
-        elif 'logging' in globals():
-            logging.error("apply_settings_to_gui: Global 'lang' object not available.")
-
-        if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
-            try: globals()['language'].set(self.language)
-            except tk.TclError as e: logging.error(f"TclError setting language StringVar: {e}.")
-        elif 'logging' in globals(): logging.debug("apply_settings_to_gui: tk.StringVar 'language' not available.")
-
-        if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
-            try: globals()['theme'].set(self.theme)
-            except tk.TclError as e: logging.error(f"TclError setting theme StringVar: {e}.")
-        elif 'logging' in globals(): logging.debug("apply_settings_to_gui: tk.StringVar 'theme' not available.")
-        
-        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
-            try: sv_ttk.set_theme(self.theme)
-            except Exception as e: logging.error(f"Error applying sv_ttk theme '{self.theme}': {e}")
-        elif 'logging' in globals(): logging.debug("apply_settings_to_gui: sv_ttk.set_theme not available.")
-
-        if 'win' in globals() and hasattr(win, 'attributes') and hasattr(win, 'winfo_exists') and callable(win.winfo_exists):
-            try:
-                if win.winfo_exists():
-                    if getattr(self, 'treff', '0') == "1":
-                        win.attributes("-alpha", float(getattr(self, 'bar_level', '0.9')))
-                    else:
-                        win.attributes("-alpha", 1.0)
-            except (tk.TclError, ValueError) as e: logging.error(f"Error setting window alpha: {e}")
-        elif 'logging' in globals() and getattr(self, 'treff', '0') == "1":
-             logging.debug("apply_settings_to_gui: 'win' for transparency not ready.")
+    def load(self):
+        self.config.read(self.set_file)
+        for i in self.config.items('setting'):
+            setattr(self, i[0], i[1])
+        if os.path.exists(self.path):
+            if not self.path:
+                self.path = os.getcwd()
+        else:
+            self.path = utils.prog_path
+        language.set(self.language)
+        self.load_language(language.get())
+        theme.set(self.theme)
+        sv_ttk.set_theme(self.theme)
+        if is_pro:
+            if 'active_code' not in self.__dir__():
+                self.active_code = 'None'
+            verify.verify(self.active_code)
+        if self.treff == "1":
+            win.attributes("-alpha", self.bar_level)
+        else:
+            win.attributes("-alpha", 1)
 
     @staticmethod
-    def load_language(name_of_lang):
-        _cwd_path = os.getcwd()
-        if 'cwd_path' in globals() and globals()['cwd_path']: _cwd_path = globals()['cwd_path']
-        
-        _lang_obj = globals().get('lang')
-        if not _lang_obj:
-            if 'logging' in globals(): logging.error("load_language: Global 'lang' object not available.")
-            return
-
-        lang_fp = os.path.join(_cwd_path, 'bin', 'languages', f'{name_of_lang}.json')
-        eng_fp = os.path.join(_cwd_path, 'bin', 'languages', 'English.json')
-        
-        data_to_load: dict = {}
-        json_edit_avail = 'JsonEdit' in globals() and callable(globals()['JsonEdit'])
-
-        def _read_json(fp):
-            d = {}
-            try:
-                if json_edit_avail: d = JsonEdit(fp).read()
-                elif 'json' in globals():
-                    with open(fp, 'r', encoding='utf-8') as f: d = json.load(f)
-                else: logging.error(f"No JSON parser for {fp}.")
-            except Exception as e: logging.error(f"Failed to load/parse {fp}: {e}")
-            return d
-
-        loaded_primary = False
-        if name_of_lang and os.path.exists(lang_fp):
-            data_to_load = _read_json(lang_fp)
-            if data_to_load: loaded_primary = True
-        
-        if not loaded_primary:
-            if 'logging' in globals() and name_of_lang != 'English': 
-                logging.warning(f"Lang '{name_of_lang}' failed/not found. Falling to English.")
-            if os.path.exists(eng_fp): data_to_load = _read_json(eng_fp)
-            if not data_to_load : # Critical if English also fails
-                msg = "Critical: English language file missing or empty."
-                if 'error' in globals() and callable(error): error(1, msg)
-                else: 
-                    logging.critical(msg)
-                    if 'sys' in globals(): sys.exit(msg)
-                return
-        
-        if hasattr(_lang_obj, 'second') and os.path.exists(eng_fp):
-            eng_data_sec = _read_json(eng_fp)
-            if eng_data_sec: _lang_obj.second = eng_data_sec
-            elif 'logging' in globals(): logging.warning("Failed to load English for lang.second.")
-        
-        if data_to_load:
-            for n, v in data_to_load.items(): setattr(_lang_obj, n, v)
-        elif 'logging' in globals(): logging.error("No language data loaded to 'lang' object.")
+    def load_language(name):
+        lang_file = f'{cwd_path}/bin/languages/{name}.json'
+        _lang: dict = {}
+        if not name and not os.path.exists(f'{cwd_path}/bin/languages/English.json'):
+            error(1)
+        elif not os.path.exists(lang_file):
+            _lang = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
+        else:
+            _lang = JsonEdit(lang_file).read()
+        lang.second = JsonEdit(f'{cwd_path}/bin/languages/English.json').read()
+        [setattr(lang, n, v) for n, v in _lang.items()]
 
     def set_value(self, name, value):
-        if not hasattr(self, 'config') or self.config is None:
-            if 'logging' in globals(): logging.error("SetUtils.set_value: self.config (custom) not initialized.")
-            return
-        try:
-            self.config.set("setting", str(name), str(value)) 
-            with open(self.set_file, 'w', encoding='utf-8') as fil: self.config.write(fil)
-            setattr(self, name, value)
-        except Exception as e: logging.error(f"Error in set_value for '{name}' (custom parser): {e}")
-        if name in ['treff', 'bar_level']: self.apply_loaded_settings_to_gui()
+        self.config.read(self.set_file)
+        self.config.set("setting", name, value)
+        with open(self.set_file, 'w', encoding='utf-8') as fil:
+            self.config.write(fil)
+        setattr(self, name, value)
+        if name in ['treff', 'barlevel', 'theme']:
+            self.load()
 
     def set_theme(self):
-        gui_theme_val = getattr(self, 'theme', 'dark') # Fallback
-        if 'theme' in globals() and isinstance(globals()['theme'], tk.StringVar):
-            try: 
-                val = globals()['theme'].get()
-                if val in ['light', 'dark']: gui_theme_val = val
-            except tk.TclError: logging.debug("set_theme: TclError on theme.get().")
-        
-        lang_text100 = getattr(lang, 'text100', 'Theme: ') if 'lang' in globals() else 'Theme: '
-        print(f"{lang_text100}{gui_theme_val}")
-        
-        self.theme = gui_theme_val
-        self.set_value("theme", self.theme)
-
-        if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'): sv_ttk.set_theme(self.theme)
-        
-        if os.name == 'nt' and 'win' in globals() and 'set_title_bar_color' in globals():
-            try:
-                if win.winfo_exists():
-                    if self.theme == 'dark': set_title_bar_color(win)
-                    else: set_title_bar_color(win, 0)
-            except tk.TclError: pass 
-            except Exception as e: logging.warning(f"Title bar color error in set_theme: {e}")
-
-        if 'animation' in globals() and animation and hasattr(animation, 'load_gif') and \
-           'images' in globals() and 'open_img' in globals() and 'BytesIO' in globals():
-            gif_attr = f"loading_{self.theme}_byte"
-            gif_bytes = getattr(images, gif_attr, getattr(images, "loading_dark_byte", None))
-            if gif_bytes:
-                try: animation.load_gif(open_img(BytesIO(gif_bytes)))
-                except Exception as e: logging.error(f"GIF load error in set_theme: {e}")
-            elif 'logging' in globals(): logging.warning(f"GIF bytes for '{gif_attr}' not found.")
-        elif 'logging' in globals(): logging.debug("set_theme: GIF reload dependencies missing.")
+        print(lang.text100 + theme.get())
+        try:
+            self.set_value("theme", theme.get())
+            sv_ttk.set_theme(theme.get())
+            animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
+        except Exception as e:
+            logging.exception('Bugs')
+            win.message_pop(lang.text101 % (theme.get(), e))
 
     def set_language(self):
-        gui_lang_val = getattr(self, 'language', 'English') # Fallback
-        if 'language' in globals() and isinstance(globals()['language'], tk.StringVar):
-            try: gui_lang_val = globals()['language'].get()
-            except tk.TclError: logging.debug("set_language: TclError on language.get().")
-        
-        lang_text129 = getattr(lang, 'text129', 'Language: ') if 'lang' in globals() else 'Language: '
-        print(f"{lang_text129}{gui_lang_val}")
-
-        self.language = gui_lang_val
-        self.set_value("language", self.language)
-        self.load_language(self.language)
-
-        if 'states' in globals() and hasattr(states, 'in_oobe') and not states.in_oobe:
-            lang_t36 = getattr(lang, 't36', 'Restart?') if 'lang' in globals() else 'Restart?'
-            if 'ask_win' in globals() and callable(ask_win):
-                if ask_win(lang_t36):
-                    if 'restart' in globals() and callable(restart): restart()
-                    elif 'logging' in globals(): logging.error("set_language: 'restart' not available.")
-            elif 'logging' in globals(): logging.debug("set_language: 'ask_win' not available.")
-        elif 'logging' in globals(): logging.debug("set_language: No restart prompt (OOBE or states missing).")
+        print(lang.text129 + language.get())
+        try:
+            self.set_value("language", language.get())
+            self.load_language(language.get())
+            if not states.in_oobe:
+                if ask_win(lang.t36):
+                    restart()
+        except Exception as e:
+            logging.exception('Bugs')
+            print(lang.t130, e)
 
     def modpath(self):
-        _fd_module = globals().get('filedialog')
-        if not (_fd_module and hasattr(_fd_module, 'askdirectory')):
-            if os.name == 'nt': from tkinter import filedialog as _fd_module
-            else:
-                try: from ..core import mkc_filedialog as _fd_module
-                except ImportError: 
-                    from tkinter import filedialog as _fd_module
-                    logging.warning("mkc_filedialog not found, using standard filedialog.")
-        
-        if not (_fd_module and hasattr(_fd_module, 'askdirectory')):
-            logging.error("modpath: askdirectory not available.")
+        if not (folder := filedialog.askdirectory()):
             return
-
-        folder = _fd_module.askdirectory()
-        if not folder: return
-            
         self.set_value("path", folder)
-        if 'win' in globals() and hasattr(win, 'show_local') and isinstance(win.show_local, tk.StringVar):
-            try: win.show_local.set(folder)
-            except tk.TclError: pass
-        
-        self.load_from_file() 
-        self.apply_loaded_settings_to_gui()
+        win.show_local.set(folder)
+        self.load()
 
 
-settings = SetUtils()
+settings = SetUtils(load=False)
 
 
 def re_folder(path, quiet=False):
@@ -3309,17 +2630,9 @@ class MpkStore(Toplevel):
         create_thread(self.get_db)
         self.label_frame.update_idletasks()
         self.canvas.bind_all("<MouseWheel>",
-                             lambda event: self._safe_scroll(-1 * (int(event.delta / 120))))
+                             lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
         move_center(self)
-
-    def _safe_scroll(self, delta_units):
-        try:
-            if hasattr(self, 'canvas') and self.canvas and self.canvas.winfo_exists():
-                self.canvas.yview_scroll(delta_units, "units")
-        except tk.TclError:
-            # Игнорируем ошибку, если виджет уже не существует или команда недействительна
-            pass
 
     def init_repo(self):
         if not hasattr(settings, 'plugin_repo'):
@@ -3339,100 +2652,53 @@ class MpkStore(Toplevel):
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def add_app(self, app_dict=None):
-        self.clear() # Предполагается, что self.clear() корректно очищает self.deque и self.app_infos
-        
-        _lang_obj = globals().get('lang') # Получаем lang для локализации
-
+        self.clear()
         if app_dict is None:
-            app_dict = [] # Инициализируем пустым списком, если ничего не передано
-            
+            app_dict = []
         for data in app_dict:
-            if data.get('id') in self.app_infos: # Пропускаем, если информация уже добавлена
+            if data.get('id') in self.app_infos:
                 continue
-            
-            # Получаем локализованный текст для LabelFrame
-            app_name_text = data.get('name', "Unknown App") # Фоллбэк, если имя отсутствует
-            
-            f_labelframe = ttk.LabelFrame(self.label_frame, text=app_name_text, width=590, height=150)
-            f_labelframe.pack_propagate(False) # Чтобы размеры LabelFrame не менялись из-за содержимого
-            self.app_infos[data.get('id')] = f_labelframe # Сохраняем ссылку на LabelFrame
-            self.deque.append(f_labelframe) # Добавляем в список для очистки
-            
-            # Левая часть: Иконка (если есть)
-            # Предполагаем, что self.logo - это PhotoImage для заглушки
-            # В реальном коде здесь должна быть логика загрузки иконки для каждого плагина
-            icon_label = ttk.Label(f_labelframe, image=self.logo) # self.logo должен быть определен
-            icon_label.pack(side=LEFT, padx=5, pady=5)
-
-            # Центральная часть: Информация о приложении (имя, автор, версия, размер, описание)
-            info_frame = ttk.Frame(f_labelframe)
-            
-            # Верхняя строка информации: Автор, Версия, Размер
-            details_frame = ttk.Frame(info_frame)
-            author_text = getattr(_lang_obj, 't21', "Author:") # lang.t21 = "Author:"
-            version_text = getattr(_lang_obj, 't22', "Version:") # lang.t22 = "Version:"
-            size_text = getattr(_lang_obj, 'size', "Size:") # lang.size = "Size" (у вас в JSON)
-            
-            # Формируем строку с деталями
-            details_str = (
-                f"{author_text} {data.get('author', 'N/A')} | "
-                f"{version_text} {data.get('version', 'N/A')} | "
-                f"{size_text} {hum_convert(data.get('size', 0)) if 'hum_convert' in globals() else data.get('size', 0)}"
-            )
-            details_label = ttk.Label(details_frame, text=details_str, wraplength=350) # Увеличил wraplength
-            details_label.pack(side=LEFT, padx=5, pady=2, anchor='w')
-            details_frame.pack(side=TOP, fill=X, anchor='w')
-
-            # Описание
-            desc_text = data.get('desc', 'No Description.')
-            description_label = ttk.Label(info_frame, text=desc_text, wraplength=350) # Увеличил wraplength
-            description_label.pack(side=TOP, padx=5, pady=2, fill=X, expand=True, anchor='w')
-            
-            info_frame.pack(side=LEFT, padx=5, pady=5, fill=BOTH, expand=True)
-
-            # Правая часть: Кнопки "Установить" и "Удалить"
-            buttons_frame = ttk.Frame(f_labelframe)
-            
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=150)
+            f.pack_propagate(False)
+            self.app_infos[data.get('id')] = f
+            self.deque.append(f)
+            ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
+            fb = ttk.Frame(f)
+            f2 = ttk.Frame(fb)
+            ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
+            # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
+            o = ttk.Label(f2,
+                          text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
+                          , wraplength=250)
+            o.pack_propagate(False)
+            o.pack(side=LEFT, padx=5, pady=5)
+            f2.pack(side=TOP)
+            f3 = ttk.Frame(fb)
+            desc = data.get('desc')
+            if not desc:
+                desc = 'No Description.'
+            ttk.Label(f3, text=f"{desc}", wraplength=250).pack(padx=5, pady=5)
+            f3.pack(side=BOTTOM)
+            fb.pack(side=LEFT, padx=5, pady=5)
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
 
-            # Локализация текста кнопок
-            install_button_text = getattr(_lang_obj, 'text21', "Install") # lang.text21 = "Install"
-            if not isinstance(install_button_text, str) or install_button_text.strip().lower() == "none":
-                install_button_text = "Install"
-
-            uninstall_button_text = getattr(_lang_obj, 'text20', "Uninstall") # lang.text20 = "Uninstall"
-            if not isinstance(uninstall_button_text, str) or uninstall_button_text.strip().lower() == "none":
-                uninstall_button_text = "Uninstall"
-
-            # --- ИЗМЕНЕНИЕ: Убираем фиксированную width ---
-            install_btn = ttk.Button(buttons_frame, text=install_button_text,
-                                     command=lambda a=args: create_thread(self.download, *a))
-            
-            uninstall_btn = ttk.Button(buttons_frame, text=uninstall_button_text,
-                                       command=lambda a=data.get('id'): create_thread(self.uninstall, a))
-            # --- КОНЕЦ ИЗМЕНЕНИЯ ---
-
-            # Логика отображения/скрытия кнопок и стилей
-            _module_manager_obj = globals().get('module_manager') # Глобальный объект module_manager
-            if _module_manager_obj and _module_manager_obj.get_installed(data.get('id')):
-                install_btn.config(state='disabled') # Или другой стиль/текст для уже установленного
-                uninstall_btn.config(style="Accent.TButton") # Акцент на удаление
+            bu = ttk.Button(f, text=lang.text21,
+                            command=lambda a=args: create_thread(self.download, *a), width=5)
+            uninstall_button = ttk.Button(f, text=lang.text20,
+                                          command=lambda a=data.get('id'): create_thread(self.uninstall,
+                                                                                         a), width=5)
+            if not module_manager.get_installed(data.get('id')):
+                bu.config(style="Accent.TButton")
+                uninstall_button.config(state='disabled')
             else:
-                install_btn.config(style="Accent.TButton") # Акцент на установку
-                uninstall_btn.config(state='disabled')
-
-            self.control[data.get('id')] = (install_btn, uninstall_btn) # Сохраняем ссылки на кнопки
-
-            # Упаковываем кнопки одну под другой для лучшего использования вертикального пространства
-            install_btn.pack(side=TOP, padx=5, pady=(0, 2), fill=X) # fill=X чтобы растянуть по ширине buttons_frame
-            uninstall_btn.pack(side=TOP, padx=5, pady=(2, 0), fill=X)
-            
-            buttons_frame.pack(side=RIGHT, padx=5, pady=5, fill=Y) # fill=Y чтобы занять высоту f_labelframe
-            
-            f_labelframe.pack(padx=5, pady=5, anchor='nw', fill=X, expand=True) # fill=X для LabelFrame
-
-        self.label_frame.update_idletasks() # Обновляем для корректного scrollregion
-        self.canvas.config(scrollregion=self.canvas.bbox("all"), highlightthickness=0)
+                bu.config(width=5)
+                uninstall_button.config(style="Accent.TButton")
+            self.control[data.get('id')] = bu, uninstall_button
+            uninstall_button.pack(side=RIGHT, padx=5, pady=5)
+            bu.pack(side=RIGHT, padx=5, pady=5)
+            f.pack(padx=5, pady=5, anchor='nw', expand=1)
+        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def uninstall(self, id_):
         bu, uninstall_button = self.control.get(id_)
@@ -3984,242 +3250,43 @@ def download_api(url, path=None, int_=True, size_=0):
 
 
 def download_file():
-    """
-    Handles the process of downloading a file based on a URL provided by the user.
-    Displays progress and status messages, and optionally unpacks the file after download.
-    """
-    unpack_after_finish_var = BooleanVar(value=False) 
-    download_progress_frame = None # Will be initialized if URL is valid
-    # url_input_value will be determined after user interaction with the input_ dialog
-
+    var1 = BooleanVar(value=False)
+    down = win.get_frame(lang.text61)
+    url = input_(title=lang.text60)
+    win.message_pop(lang.text62, "green")
+    progressbar = ttk.Progressbar(down, length=200, mode="determinate")
+    progressbar.pack(padx=10, pady=10)
+    ttk.Label(down, text=os.path.basename(url), justify='left').pack(padx=10, pady=5)
+    ttk.Label(down, text=url, wraplength=200, justify='left').pack(padx=10, pady=5)
+    ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
+    c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=True, offvalue=False)
+    c1.pack(padx=10, pady=10)
+    start_time = time.time()
     try:
-        # Prepare and display the URL input dialog
-        input_dialog_title_key = 'text60' # Localization key for "Enter URL"
-        default_input_title = "Enter URL"
-        input_dialog_title = getattr(lang, input_dialog_title_key, default_input_title)
-        if not isinstance(input_dialog_title, str) or input_dialog_title == "None": 
-            input_dialog_title = default_input_title
-        
-        url_input_raw = input_(title=input_dialog_title) # Can return None (cancel), "" (OK empty), or "text"
-        # For production, debug prints should be removed or conditional
-        # print(f"[DEBUG] input_ returned: {repr(url_input_raw)} (type: {type(url_input_raw)})")
-
-        # Scenario 1: User explicitly cancelled or closed the input dialog
-        if url_input_raw is None:
-            cancel_message_key = 'download_cancelled'
-            default_cancel_message = "Download cancelled by user."
-            cancel_message = getattr(lang, cancel_message_key, default_cancel_message)
-            if not isinstance(cancel_message, str) or cancel_message == "None":
-                cancel_message = default_cancel_message
-            # print(f"[DEBUG] Explicit cancel: '{cancel_message}'") # Debug print removed
-            print(cancel_message)
-            return
-
-        # At this point, url_input_raw is a string (empty or with text)
-        url_input_value = str(url_input_raw)
-
-        # Scenario 2: User pressed OK, but the URL field was empty or contained only whitespace
-        if not url_input_value.strip():
-            empty_url_message_key = 'download_url_empty'
-            default_empty_url_message = "URL cannot be empty. Download aborted."
-            empty_url_message = getattr(lang, empty_url_message_key, default_empty_url_message)
-            if not isinstance(empty_url_message, str) or empty_url_message == "None":
-                empty_url_message = default_empty_url_message
-            # print(f"[DEBUG] Empty URL submitted: '{empty_url_message}'") # Debug print removed
-            print(empty_url_message)
-            
-            popup_parent = win if win and win.winfo_exists() else None
-            try:
-                if hasattr(win, 'message_pop') and callable(win.message_pop):
-                     win.message_pop(empty_url_message, "orange", parent=popup_parent) 
-                else: 
-                     import tkinter.messagebox # Fallback if custom message_pop is not available
-                     tkinter.messagebox.showwarning("Input Error", empty_url_message, parent=popup_parent)
-            except Exception as popup_ex:
-                # print(f"[DEBUG] Exception during popup: {popup_ex}") # Debug print removed
-                logging.exception("Exception during popup in download_file (empty URL)")
-            return
-            
-        # Proceed with download if URL is non-empty
-        # print(f"[DEBUG] URL for download: '{url_input_value}'") # Debug print removed
-
-        download_frame_title_key = 'text61' # Localization key for "Download File"
-        default_download_title = "Download File"
-        download_frame_title = getattr(lang, download_frame_title_key, default_download_title)
-        if not isinstance(download_frame_title, str) or download_frame_title == "None": 
-            download_frame_title = default_download_title
-        
-        download_progress_frame = win.get_frame(download_frame_title) # Create the download progress UI
-
-        start_download_message_key = 'text62' # Localization key for "Starting download..."
-        default_start_message = "Starting download..."
-        start_download_message = getattr(lang, start_download_message_key, default_start_message)
-        if not isinstance(start_download_message, str) or start_download_message == "None": 
-            start_download_message = default_start_message
-        
-        if hasattr(win, 'message_pop') and callable(win.message_pop):
-            win.message_pop(start_download_message, "green") 
-
-        # Setup UI elements for download progress
-        progressbar = ttk.Progressbar(download_progress_frame, length=200, mode="determinate")
-        progressbar.pack(padx=10, pady=10)
-        
-        ttk.Label(download_progress_frame, text=os.path.basename(url_input_value), justify='left').pack(padx=10, pady=5)
-        ttk.Label(download_progress_frame, text=url_input_value, wraplength=300, justify='left').pack(padx=10, pady=5)
-
-        progress_details_var = StringVar(master=download_progress_frame) 
-        ttk.Label(download_progress_frame, textvariable=progress_details_var).pack(padx=10, pady=10)
-
-        unpack_checkbox_text_key = 'text63' # Localization key for "Unpack after download"
-        default_unpack_text = "Unpack after download"
-        unpack_checkbox_text = getattr(lang, unpack_checkbox_text_key, default_unpack_text)
-        if not isinstance(unpack_checkbox_text, str) or unpack_checkbox_text == "None": 
-            unpack_checkbox_text = default_unpack_text
-        
-        unpack_checkbox = ttk.Checkbutton(download_progress_frame, text=unpack_checkbox_text, variable=unpack_after_finish_var, onvalue=True, offvalue=False)
-        unpack_checkbox.pack(padx=10, pady=10)
-        
-        start_time = dti() # Start timing the download
-
-        # Perform the download using download_api
-        for percentage, speed, bytes_downloaded, file_size, _ in download_api(url_input_value):
-            if not (download_progress_frame and download_progress_frame.winfo_exists()):
-                # User closed the download progress window
-                abort_message_key = 'download_window_closed'
-                default_abort_message = "Download window closed, aborting download."
-                abort_message = getattr(lang, abort_message_key, default_abort_message)
-                if not isinstance(abort_message, str) or abort_message == "None": 
-                    abort_message = default_abort_message
-                print(abort_message)
-                return # Exit if the progress window is gone
-
-            if progressbar.winfo_exists():
-                progressbar["value"] = percentage
-                progressbar.update_idletasks() # Ensure immediate UI update
-            
-            # Update progress details text
-            try:
-                downloaded_hr = hum_convert(bytes_downloaded)
-                total_hr = hum_convert(file_size) if file_size > 0 else "N/A"
-                speed_bytes_sec = speed * 1024 if speed is not None else 0 
-                speed_hr = hum_convert(speed_bytes_sec) + "/s" if speed is not None else "N/A"
-                
-                status_format_key = 'download_status_format'
-                default_status_format = "{perc}% | Speed: {spd} | {dl}/{tot}"
-                status_text_format = getattr(lang, status_format_key, default_status_format)
-                if not isinstance(status_text_format, str) or status_text_format == "None": 
-                    status_text_format = default_status_format
-
-                status_text = status_text_format.format(perc=int(percentage), spd=speed_hr, dl=downloaded_hr, tot=total_hr)
-                if progress_details_var.get() != status_text: 
-                    progress_details_var.set(status_text)
-            except Exception as e_status_update:
-                logging.error(f"Error updating download status text: {e_status_update}")
-                current_percentage_text = f"{int(percentage)}%"
-                if progress_details_var.get() != current_percentage_text: 
-                    progress_details_var.set(current_percentage_text)
-
-        # Download completed successfully
-        final_elapsed_time = dti() - start_time
-        success_msg_format_key = 'text65' # Localization key for "File {} downloaded..."
-        default_success_format = "File {} downloaded in {:.2f} seconds"
-        success_msg_format = getattr(lang, success_msg_format_key, default_success_format)
-        if not isinstance(success_msg_format, str) or success_msg_format == "None": 
-            success_msg_format = default_success_format
-        
-        success_msg = success_msg_format.format(os.path.basename(url_input_value), final_elapsed_time)
-        print(success_msg)
-        
-        # Optionally unpack the file
-        if unpack_after_finish_var.get():
-            downloaded_file_path = os.path.join(settings.path, os.path.basename(url_input_value))
-            if os.path.exists(downloaded_file_path):
-                create_thread(unpackrom, downloaded_file_path)
+        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
+            progressbar["value"] = percentage
+            jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
+            progressbar.update()
+        elapsed = time.time() - start_time
+        print(lang.text65.format(os.path.basename(url), str(elapsed)))
+        down.destroy()
+        if var1.get():
+            downloaded_file = settings.path + os.sep + os.path.basename(url)
+            unpackrom(downloaded_file)
+            os.remove(downloaded_file)
+    except Exception as e:
+        print(lang.text66, str(e))
+        try:
+            os.remove(os.path.basename(url))
+        except (Exception, BaseException):
+            if os.access(os.path.basename(url), os.F_OK):
+                print(lang.text67 + os.path.basename(url))
             else:
-                not_found_msg_key = 'downloaded_file_not_found'
-                default_not_found_msg = "Error: Downloaded file {} not found for unpacking."
-                not_found_msg_format = getattr(lang, not_found_msg_key, default_not_found_msg)
-                if not isinstance(not_found_msg_format, str) or not_found_msg_format == "None": 
-                    not_found_msg_format = default_not_found_msg
-                print(not_found_msg_format.format(downloaded_file_path))
-
-    except requests.exceptions.MissingSchema:
-        # Handle invalid URL schema (e.g., no http/https)
-        err_msg_key = 'download_invalid_url_scheme'
-        default_err_msg = "Error: Invalid URL '{}'. No schema (e.g., http://, https://) supplied."
-        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
-        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
-            err_msg_format = default_err_msg
-        
-        url_for_error_msg = repr(url_input_raw) if 'url_input_raw' in locals() else "''"
-        error_msg = err_msg_format.format(url_for_error_msg) 
-        print(error_msg)
-        
-        popup_parent = win if win and win.winfo_exists() else None
-        if not (download_progress_frame and download_progress_frame.winfo_exists()): 
-            import tkinter.messagebox
-            tkinter.messagebox.showerror("Error", error_msg, parent=popup_parent)
-        elif download_progress_frame.winfo_exists():
-             if hasattr(win, 'message_pop') and callable(win.message_pop):
-                win.message_pop(error_msg, "red", parent=popup_parent)
-
-    except requests.exceptions.ConnectionError as e_conn:
-        # Handle network connection errors
-        err_msg_key = 'download_connection_error'
-        default_err_msg = "Download Error: Could not connect. {}"
-        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
-        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
-            err_msg_format = default_err_msg
-        
-        error_msg = err_msg_format.format(str(e_conn))
-        print(error_msg)
-        popup_parent = win if win and win.winfo_exists() else None
-        if not (download_progress_frame and download_progress_frame.winfo_exists()):
-            import tkinter.messagebox
-            tkinter.messagebox.showerror("Connection Error", error_msg, parent=popup_parent)
-        elif download_progress_frame.winfo_exists():
-             if hasattr(win, 'message_pop') and callable(win.message_pop):
-                win.message_pop(error_msg, "red", parent=popup_parent)
-             
-    except Exception as e_general:
-        # Handle other general exceptions during download
-        err_msg_key = 'text66' # Localization key for "Download failed: {}"
-        default_err_msg = "Download failed: {}"
-        err_msg_format = getattr(lang, err_msg_key, default_err_msg)
-        if not isinstance(err_msg_format, str) or err_msg_format == "None": 
-            err_msg_format = default_err_msg
-        
-        error_msg = err_msg_format.format(str(e_general))
-        print(error_msg)
-        logging.exception("Download file general exception") # Log the full traceback
-        
-        # Attempt to clean up partially downloaded file
-        url_val_for_cleanup = url_input_value if 'url_input_value' in locals() and url_input_value else None
-        if url_val_for_cleanup: 
-            failed_download_path = os.path.join(settings.path, os.path.basename(url_val_for_cleanup))
-            if os.path.exists(failed_download_path):
                 try:
-                    os.remove(failed_download_path)
-                    removed_msg_key = 'partially_downloaded_removed'
-                    default_removed_msg = "Partially downloaded file {} removed."
-                    removed_msg_format = getattr(lang, removed_msg_key, default_removed_msg)
-                    if not isinstance(removed_msg_format, str) or removed_msg_format == "None": 
-                        removed_msg_format = default_removed_msg
-                    print(removed_msg_format.format(os.path.basename(url_val_for_cleanup)))
-                except Exception as remove_err:
-                    failed_remove_key = 'text67' # Localization key for "Failed to remove..."
-                    default_failed_remove = "Failed to remove partially downloaded file {}: {}"
-                    failed_remove_format = getattr(lang, failed_remove_key, default_failed_remove)
-                    if not isinstance(failed_remove_format, str) or failed_remove_format == "None": 
-                        failed_remove_format = default_failed_remove
-                    print(failed_remove_format.format(os.path.basename(url_val_for_cleanup), str(remove_err)))
-                
-    finally:
-        # Ensure the download progress frame is destroyed if it was created
-        if download_progress_frame and download_progress_frame.winfo_exists():
-            download_progress_frame.destroy()
-            if hasattr(win, 'update_frame') and callable(win.update_frame):
-                win.update_frame() # Update parent UI if necessary
+                    down.destroy()
+                except Exception as e:
+                    win.message_pop(str(e))
+                win.message_pop(lang.text68, "red")
 
 
 @animation
@@ -4665,90 +3732,19 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "") -> str: 
-    _lang_obj = globals().get('lang')
-    parent_window = globals().get('win')
+def input_(title: str = None, text: str = "") -> str:
+    if not title:
+        title = lang.text76
+    (input_var := StringVar()).set(text)
+    input_frame = ttk.LabelFrame(win, text=title)
+    input_frame.place(relx=0.5, rely=0.5, anchor="center")
+    entry = ttk.Entry(input_frame, textvariable=input_var)
+    entry.pack(pady=5, padx=5, fill=BOTH)
+    entry.bind("<Return>", lambda *x: input_frame.destroy())
+    ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
+    input_frame.wait_window()
+    return input_var.get()
 
-    effective_title_str = title 
-
-    if not title or (isinstance(title, str) and title.strip().lower() == "none"):
-        # Используем ваш ключ text76 ("Enter text") как заголовок по умолчанию
-        default_title_key = 'text76' 
-        fallback_default_text = "Input" # Абсолютный фоллбэк
-        
-        title_from_lang = fallback_default_text 
-        if _lang_obj:
-            title_from_lang = getattr(_lang_obj, default_title_key, fallback_default_text)
-        
-        if not isinstance(title_from_lang, str) or title_from_lang.strip().lower() == "none":
-            effective_title_str = fallback_default_text
-        else:
-            effective_title_str = title_from_lang
-    
-    dialog = Toplevel() 
-    dialog.title(effective_title_str)
-
-    if parent_window and parent_window.winfo_exists():
-        try: 
-            dialog.transient(parent_window)
-        except tk.TclError:
-            if 'logging' in globals(): logging.warning("input_: Failed to set transient, parent might be destroyed.")
-
-    input_var = StringVar(master=dialog)
-    input_var.set(text)
-    result_container = {"value": None} 
-
-    frame_inner = ttk.Frame(dialog)
-    frame_inner.pack(expand=True, fill=BOTH, padx=15, pady=10)
-
-    # Метка внутри диалога. Используем тот же effective_title_str.
-    # Если текст метки должен отличаться от заголовка окна,
-    # потребуется передавать отдельный аргумент 'label_text' в input_()
-    ttk.Label(frame_inner, text=effective_title_str, font=(None, 12)).pack(side=TOP, pady=(0, 10))
-
-    entry = ttk.Entry(frame_inner, textvariable=input_var, font=(None, 10))
-    entry.pack(pady=5, padx=5, fill=X, ipady=4)
-
-    button_frame = ttk.Frame(frame_inner)
-    button_frame.pack(fill=X, pady=(10, 0), side=BOTTOM)
-
-    def on_ok(event=None):
-        result_container["value"] = input_var.get() 
-        if dialog.winfo_exists(): dialog.destroy()
-
-    def on_cancel(event=None):
-        result_container["value"] = None 
-        if dialog.winfo_exists(): dialog.destroy()
-
-    # Используем ваши ключи "ok" и "cancel"
-    ok_button_text = getattr(_lang_obj, 'ok', "OK")
-    if not isinstance(ok_button_text, str) or ok_button_text.strip().lower() == "none": ok_button_text = "OK"
-
-    cancel_button_text = getattr(_lang_obj, 'cancel', "Cancel")
-    if not isinstance(cancel_button_text, str) or cancel_button_text.strip().lower() == "none": cancel_button_text = "Cancel"
-        
-    ok_button = ttk.Button(button_frame, text=ok_button_text, command=on_ok, style="Accent.TButton")
-    ok_button.pack(side=LEFT, padx=(0, 5), expand=True, fill=X)
-
-    cancel_button = ttk.Button(button_frame, text=cancel_button_text, command=on_cancel)
-    cancel_button.pack(side=LEFT, padx=(5, 0), expand=True, fill=X)
-
-    entry.bind("<Return>", on_ok)
-    dialog.bind("<Escape>", on_cancel)
-    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
-
-    _move_center_func = globals().get('move_center')
-    if _move_center_func and callable(_move_center_func):
-        try:
-            _move_center_func(dialog)
-        except Exception as e_mc:
-             if 'logging' in globals(): logging.error(f"Error in move_center for input_ dialog: {e_mc}")
-    
-    dialog.after(10, lambda: entry.focus_set() if entry.winfo_exists() else None) 
-    dialog.grab_set()
-    dialog.wait_window()
-
-    return result_container["value"]
 
 def script2fs(path):
     if os.path.exists(os.path.join(path, "system", "app")):
@@ -5162,108 +4158,53 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text: str = '', ok: str = None, cancel: str = None, wait: bool = True, is_top: bool = False) -> int: # is_top is deprecated
-    if ok is None:
-        ok_text = lang.ok if hasattr(lang, 'ok') else "OK"
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> int:
+    if not ok:
+        ok = lang.ok
+    if not cancel:
+        cancel = lang.cancel
+    value = IntVar()
+    if is_top:
+        ask = Toplevel()
+        move_center(ask)
     else:
-        ok_text = ok
-        
-    if cancel is None:
-        cancel_text = lang.cancel if hasattr(lang, 'cancel') else "Cancel"
-    else:
-        cancel_text = cancel
+        ask = ttk.LabelFrame(win)
+        ask.place(relx=0.5, rely=0.5, anchor="center")
+    frame_inner = ttk.Frame(ask)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
+    frame_button = ttk.Frame(frame_inner)
 
-    parent_window = win
+    ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5, fill=BOTH,
+                                                                             expand=True)
+    ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left', padx=5,
+                                                                                                 pady=5,
+                                                                                                 fill=BOTH,
+                                                                                                 expand=True)
+    frame_button.pack(side=TOP, fill=BOTH)
 
-    dialog = Toplevel()
-    dialog.title(lang.confirm_title if hasattr(lang, 'confirm_title') else "Confirm")
-    
-    if parent_window and parent_window.winfo_exists():
-        dialog.transient(parent_window)
-    
-    # dialog.resizable(False, False) # Опционально
+    def close_ask(value_=1):
+        value.set(value_)
+        ask.destroy()
 
-    result_var = IntVar(master=dialog) 
-
-    frame_inner = ttk.Frame(dialog)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
-
-    ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 15))
-
-    button_frame = ttk.Frame(frame_inner)
-    button_frame.pack(fill=X, pady=(10,0), side=BOTTOM)
-
-    def on_ok(event=None):
-        result_var.set(1)
-        dialog.destroy()
-
-    def on_cancel(event=None):
-        result_var.set(0)
-        dialog.destroy()
-
-    ok_button = ttk.Button(button_frame, text=ok_text, command=on_ok, style="Accent.TButton")
-    ok_button.pack(side=LEFT, padx=(0,5), expand=True, fill=X) 
-    
-    cancel_button = ttk.Button(button_frame, text=cancel_text, command=on_cancel)
-    cancel_button.pack(side=LEFT, padx=(5,0), expand=True, fill=X)
-    
-    dialog.bind("<Return>", on_ok) 
-    dialog.bind("<Escape>", on_cancel)
-
-    # dialog.update_idletasks()
-    move_center(dialog)
-    
-    dialog.after(10, lambda: ok_button.focus_set()) # Фокус на кнопку OK
-
-    dialog.grab_set()
-    
     if wait:
-        dialog.wait_window()
-        
-    return result_var.get()
+        ask.wait_window()
+    return value.get()
 
-def info_win(text: str, ok: str = None, title: str = None):
+
+def info_win(text: str, ok: str = None, master: Toplevel = None):
     if ok is None:
-        ok_text = lang.ok if hasattr(lang, 'ok') else "OK"
-    else:
-        ok_text = ok
-        
-    if title is None:
-        title_text = lang.info_title if hasattr(lang, 'info_title') else "Information"
-    else:
-        title_text = title
-
-    parent_window = win
-
-    dialog = Toplevel()
-    dialog.title(title_text)
-    
-    if parent_window and parent_window.winfo_exists():
-        dialog.transient(parent_window)
-        
-    # dialog.resizable(False, False) # Опционально
-
-    frame_inner = ttk.Frame(dialog)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=15)
-
-    ttk.Label(frame_inner, text=text, font=(None, 12), wraplength=350).pack(side=TOP, pady=(0, 20))
-
-    button_frame = ttk.Frame(frame_inner) 
-    button_frame.pack(fill=X, pady=(0,5), side=BOTTOM)
-
-    ok_button = ttk.Button(button_frame, text=ok_text, command=dialog.destroy, style="Accent.TButton")
-    ok_button.pack(ipadx=10) 
-    
-    dialog.bind("<Return>", lambda event: dialog.destroy())
-    dialog.bind("<Escape>", lambda event: dialog.destroy())
-
-    # dialog.update_idletasks()
-    move_center(dialog)
-    
-    dialog.after(10, lambda: ok_button.focus_set()) # Фокус на кнопку OK
-
-    dialog.grab_set()
-    dialog.wait_window()
+        ok = lang.ok
+    if master is None:
+        master = Toplevel()
+    frame_inner = ttk.Frame(master)
+    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
+    ttk.Button(frame_inner, text=ok, command=master.destroy, style="Accent.TButton").pack(padx=5, pady=5,
+                                                                                          fill=X, side='left',
+                                                                                          expand=True)
+    move_center(master)
+    master.wait_window()
 
 
 class GetFolderSize:
@@ -5536,678 +4477,187 @@ def dndfile(files: list):
 
 
 class ProjectMenuUtils(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs): # Принимаем master
-        # Получаем текст для заголовка из lang или используем дефолт
-        title_text_key = 'text12' 
-        default_title = "Project Management" 
-        title_text = default_title
-
-        # Проверяем наличие lang и ключа, а также что значение не "None" (строка)
-        if 'lang' in globals() and hasattr(lang, title_text_key):
-            lang_val = getattr(lang, title_text_key)
-            if lang_val and isinstance(lang_val, str) and lang_val.lower() != "none":
-                title_text = lang_val
-            elif 'logging' in globals() and lang_val is not None: # Если есть, но не строка или "None"
-                 logging.warning(f"ProjectMenuUtils: lang.{title_text_key} ('{lang_val}') is not a valid title string. Using default.")
-        elif 'logging' in globals():
-            logging.debug(f"ProjectMenuUtils: lang or lang.{title_text_key} not found. Using default title.")
-        
-        super().__init__(master=master, text=title_text, **kwargs) # Передаем master в super
-        
-        self.combobox: ttk.Combobox = None # Только объявление типа для подсказок
-        # Метод gui() будет отвечать за создание виджетов и упаковку самого LabelFrame
+    def __init__(self):
+        super().__init__(master=win.tab2, text=lang.text12)
+        self.combobox: ttk.Combobox
+        self.pack(padx=5, pady=5)
 
     def gui(self):
-        """Создает и размещает виджеты внутри этого LabelFrame, а затем пакует сам LabelFrame."""
-        
-        # --- Создание Combobox для выбора проекта ---
-        # current_project_name (StringVar) должен быть определен глобально
-        _current_project_name_var = None
-        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
-            _current_project_name_var = globals()['current_project_name']
-        else:
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.gui: Global StringVar 'current_project_name' not found.")
-            # Можно создать временный StringVar, чтобы избежать падения, но это не исправит логику
-            _current_project_name_var = tk.StringVar(master=self)
-
-
-        self.combobox = ttk.Combobox(self, textvariable=_current_project_name_var, state='readonly')
-        self.combobox.pack(side="top", padx=10, pady=(10, 5), fill=X, expand=True) # Растягиваем по X
-
-        # Текст для события выбора проекта
-        selected_text_log_key = 'text96'
-        default_selected_text_log = "Selected project (ProjectMenuUtils):"
-        selected_text_log_format = default_selected_text_log
-        if 'lang' in globals() and hasattr(lang, selected_text_log_key):
-            lang_val_log = getattr(lang, selected_text_log_key)
-            if lang_val_log and isinstance(lang_val_log, str) and lang_val_log.lower() != "none":
-                selected_text_log_format = lang_val_log
-        
-        # Используем lambda, чтобы передать актуальное значение current_project_name.get()
-        self.combobox.bind('<<ComboboxSelected>>', 
-                           lambda event: print(f"{selected_text_log_format} {_current_project_name_var.get()}"))
-
-        # --- Создание кнопок управления проектами ---
-        button_frame = ttk.Frame(self)
-        button_frame.pack(side="top", padx=5, pady=(0, 10), fill=X, expand=True)
-
-        # Функции и их тексты (используем getattr для безопасного доступа к lang)
-        # create_thread должен быть доступен глобально
-        _create_thread_func = globals().get('create_thread', lambda func, *args: func(*args)) # Фоллбэк на прямой вызов
-
-        functions_map = [
-            (getattr(lang, 'text23', "Refresh"), self.listdir),
-            (getattr(lang, 'text115', "New"), self.new), # self.new должен быть потокобезопасным или быстрым
-            (getattr(lang, 'text116', "Delete"), lambda: _create_thread_func(self.remove)),
-            (getattr(lang, 'text117', "Rename"), lambda: _create_thread_func(self.rename)),
+        self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
+        self.combobox.pack(side="top", padx=10, pady=10, fill=X)
+        self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
+        functions = [
+            (lang.text23, self.listdir),
+            (lang.text115, self.new),
+            (lang.text116, lambda: create_thread(self.remove)),
+            (lang.text117, lambda: create_thread(self.rename)),
         ]
-        
-        for i, (text, func) in enumerate(functions_map):
-            button_text_str = str(text) if text is not None else f"Action{i+1}"
-            btn = ttk.Button(button_frame, text=button_text_str, command=func)
-            # Размещаем кнопки так, чтобы они делили доступное пространство
-            btn.pack(side="left", padx=5, pady=5, fill=X, expand=True)
-
-        # --- Упаковка самого ProjectMenuUtils (LabelFrame) на его master ---
-        # Это делается в __init__tk, где создается экземпляр ProjectMenuUtils,
-        # например: project_menu.pack(padx=5, pady=5, fill='x', side=TOP, expand=False)
-        # Однако, если вы хотите, чтобы gui() сам себя паковал, можно сделать так:
-        # (но тогда в __init__tk не нужно делать project_menu.pack())
-        # self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) # Пример
-        
-        return self # Для возможного использования в цепочных вызовах
+        for text, func in functions:
+            ttk.Button(self, text=text, command=func).pack(side="left", padx=10, pady=10)
 
     @staticmethod
-    def set_project(name_to_set):
-        """Устанавливает текущий проект, если он существует."""
-        # project_manger и current_project_name (StringVar) должны быть доступны глобально
-        if 'project_manger' not in globals() or not hasattr(project_manger, 'exist'):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.set_project: 'project_manger' not available.")
+    def set_project(name):
+        if not project_manger.exist(name):
             return
-        if not project_manger.exist(name_to_set):
-            if 'logging' in globals(): logging.info(f"ProjectMenuUtils.set_project: Project '{name_to_set}' does not exist or path invalid.")
-            return
-        
-        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
-            globals()['current_project_name'].set(name_to_set)
-        elif 'logging' in globals():
-            logging.error("ProjectMenuUtils.set_project: Global StringVar 'current_project_name' not available.")
+        current_project_name.set(name)
 
     def listdir(self):
-        """Обновляет список проектов в Combobox."""
-        # settings, current_project_name (StringVar), project_manger должны быть доступны глобально
-        if 'settings' not in globals() or not hasattr(settings, 'path') or not settings.path:
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.listdir: settings.path not available.")
-            if hasattr(self, 'combobox') and self.combobox: self.combobox["values"] = []
-            if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], tk.StringVar):
-                globals()['current_project_name'].set('')
-            return
-
-        # Папки, которые не являются проектами
-        system_folders_to_hide = [
-            'bin', 'src', '.git', '.idea', '.vscode', 'dist', 
-            'build_pyinstaller', 'crash_logs', '__pycache__', 'qtui', 'test', # Добавьте другие, если нужно
-            os.path.basename(getattr(sys, 'executable', '')) # Имя исполняемого файла, если в той же папке
-        ] 
-        if getattr(sys, 'frozen', False): # Если скомпилировано
-            exe_name_no_ext, _ = os.path.splitext(os.path.basename(sys.executable))
-            system_folders_to_hide.append(exe_name_no_ext) # Добавляем имя exe без расширения
-
-
-        project_candidates = []
-        try:
-            if os.path.isdir(settings.path):
-                project_candidates = os.listdir(settings.path)
-            elif 'logging' in globals():
-                logging.warning(f"ProjectMenuUtils.listdir: settings.path ('{settings.path}') is not a valid directory.")
-        except Exception as e_listdir:
-            if 'logging' in globals(): logging.error(f"ProjectMenuUtils.listdir: Error listing directory '{settings.path}': {e_listdir}")
-
-        array_of_projects = [
-            folder_name for folder_name in project_candidates
-            if os.path.isdir(os.path.join(settings.path, folder_name)) and \
-               folder_name not in system_folders_to_hide and \
-               not folder_name.startswith('.')
-        ]
-        
-        if 'logging' in globals(): logging.debug(f"[DEBUG] ProjectMenuUtils.listdir: Filtered project folders: {array_of_projects}")
-
-        _current_project_name_var = globals().get('current_project_name')
-        original_project_name = _current_project_name_var.get() if _current_project_name_var and isinstance(_current_project_name_var, tk.StringVar) else ""
-        
-        if not (hasattr(self, 'combobox') and self.combobox):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.listdir: Combobox not initialized.")
-            return
-
-        self.combobox["values"] = array_of_projects
-
-        if not array_of_projects:
-            if _current_project_name_var: _current_project_name_var.set('')
-            self.combobox.set('') 
+        hide_items = ['bin', 'src']
+        array = [f for f in os.listdir(settings.path) if
+                 os.path.isdir(settings.path + os.sep + f) and f not in hide_items and not f.startswith('.')]
+        origin_project = current_project_name.get()
+        self.combobox["value"] = array
+        if not array:
+            current_project_name.set('')
+            self.combobox.current()
         else:
-            if original_project_name and original_project_name in array_of_projects:
-                self.combobox.set(original_project_name)
-                # current_project_name уже установлен, не меняем, если он валиден
-            else: 
-                self.combobox.current(0) # Выбираем первый элемент
-                if _current_project_name_var: _current_project_name_var.set(self.combobox.get())
-
-
-    def new(self):
-        """Создает новый проект."""
-        # input_, lang, settings, win (для message_pop), logging, os, current_project_name (StringVar) должны быть доступны
-        _input_func = globals().get('input_')
-        _win_obj = globals().get('win')
-        
-        if not (_input_func and callable(_input_func) and _win_obj and hasattr(_win_obj, 'message_pop')):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.new: Dependencies (input_, win.message_pop) missing.")
-            return
-
-        title_key = getattr(lang, 'text76', "Enter new project name") if 'lang' in globals() else "Enter new project name"
-        new_name_raw = _input_func(title=title_key)
-
-        if new_name_raw is None: # Пользователь отменил
-             msg_cancelled = getattr(lang, 'action_cancelled', "Action cancelled.") if 'lang' in globals() else "Action cancelled."
-             _win_obj.message_pop(msg_cancelled, "orange")
-             return
-
-        new_name = new_name_raw.strip().replace(' ', '_') # Заменяем пробелы на подчеркивания
-
-        if not new_name:
-            msg_empty = getattr(lang, 'warn12', "Project name cannot be empty.") if 'lang' in globals() else "Project name cannot be empty."
-            _win_obj.message_pop(msg_empty, "orange")
-            return
-        
-        # Проверка на недопустимые символы в имени папки (простая)
-        # Можно расширить список недопустимых символов
-        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
-        if any(char in new_name for char in invalid_chars) or not new_name.isprintable():
-            msg_invalid_name = getattr(lang, 'invalid_project_name_chars', "Invalid characters in project name.") if 'lang' in globals() else "Invalid characters in project name."
-            _win_obj.message_pop(msg_invalid_name, "orange")
-            return
-            
-        new_project_full_path = os.path.join(settings.path, new_name) # settings должен быть доступен
-
-        if os.path.exists(new_project_full_path):
-            msg_exists = getattr(lang, 'project_exists_already', "Project '%s' already exists.") % new_name if 'lang' in globals() else f"Project '{new_name}' already exists."
-            _win_obj.message_pop(msg_exists, "orange")
-            return
-            
-        try:
-            os.makedirs(new_project_full_path) # Используем makedirs для создания, если settings.path не существует (хотя он должен)
-            msg_created = getattr(lang, 'text99', "Created new project: %s") % new_name if 'lang' in globals() else f"Created new project: {new_name}"
-            print(msg_created) # Вывод в консоль/лог
-            if 'logging' in globals(): logging.info(msg_created)
-        except Exception as e_mkdir:
-            msg_fail_create = getattr(lang, 'fail_create_project', "Failed to create project '%s': %s") % (new_name, e_mkdir) if 'lang' in globals() else f"Failed to create project '{new_name}': {e_mkdir}"
-            _win_obj.message_pop(msg_fail_create, "red")
-            if 'logging' in globals(): logging.error(f"Failed to create directory {new_project_full_path}: {e_mkdir}")
-            return
-            
-        self.listdir() # Обновляем список в Combobox
-        
-        # Автоматически выбираем только что созданный проект
-        _cpn_var = globals().get('current_project_name')
-        if _cpn_var and isinstance(_cpn_var, tk.StringVar) and hasattr(self, 'combobox') and self.combobox:
-            if new_name in self.combobox.cget("values"):
-                _cpn_var.set(new_name)
-                self.combobox.set(new_name)
-
-
-    def remove(self):
-        """Удаляет выбранный проект."""
-        _pm = globals().get('project_manger')
-        _cpn_var = globals().get('current_project_name')
-        _win_obj = globals().get('win')
-        _ask_win_func = globals().get('ask_win')
-        _rmdir_func = globals().get('rmdir')
-        _lang_obj = globals().get('lang')
-
-        if not (_pm and _cpn_var and _win_obj and _ask_win_func and _rmdir_func and _lang_obj):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.remove: Missing critical dependencies.")
-            return
-
-        project_to_delete = _cpn_var.get()
-        if not project_to_delete:
-            # Используем warn1: "Please select a project"
-            msg_select = getattr(_lang_obj, 'warn1', "Please select a project to delete.")
-            if not isinstance(msg_select, str) or msg_select.strip().lower() == "none": msg_select = "Please select a project to delete."
-            _win_obj.message_pop(msg_select, "orange")
-            return
-        
-        if not _pm.exist(project_to_delete):
-            # Предлагаю новый ключ
-            msg_not_exist_key = 'delete_error_project_not_exist_format'
-            default_msg_not_exist = "Project '%s' to delete does not exist or path is invalid."
-            msg_not_exist_template = getattr(_lang_obj, msg_not_exist_key, default_msg_not_exist)
-            if not isinstance(msg_not_exist_template, str) or msg_not_exist_template.strip().lower() == "none": msg_not_exist_template = default_msg_not_exist
-            
-            try:
-                msg_not_exist = msg_not_exist_template % project_to_delete.replace('%', '%%')
-            except TypeError:
-                msg_not_exist = default_msg_not_exist.replace('%s', project_to_delete.replace('%', '%%'))
-            _win_obj.message_pop(msg_not_exist, "red")
-            self.listdir()
-            return
-
-        # --- ИЗМЕНЕНИЕ ДЛЯ ЗАДАЧИ 3 (используем ваш ключ t9) ---
-        confirm_text_key = 't9' # Ваш ключ: "Delete {}?"
-        default_confirm_pattern = "Delete project '%s'?" # Альтернативный шаблон с %s для единообразия
-        
-        pattern_from_lang = getattr(_lang_obj, confirm_text_key, default_confirm_pattern)
-        
-        if not isinstance(pattern_from_lang, str) or pattern_from_lang.strip().lower() == "none":
-            pattern_from_lang = default_confirm_pattern # Если t9 пустой, используем наш %s шаблон
-            if 'logging' in globals():
-                logging.warning(f"ProjectMenuUtils.remove: Fallback for lang.{confirm_text_key}. Used default pattern.")
-
-        project_name_for_formatting = str(project_to_delete).replace('%', '%%').replace('{', '{{').replace('}', '}}')
-        
-        message_for_dialog: str
-        try:
-            if '{}' in pattern_from_lang: # Если используется ваш формат с {}
-                message_for_dialog = pattern_from_lang.format(project_name_for_formatting)
-            elif '%s' in pattern_from_lang: # Если используется формат с %s (наш фоллбэк)
-                final_template_pattern = pattern_from_lang.replace('%', '%%').replace('%%s', '%s', 1)
-                message_for_dialog = final_template_pattern % project_name_for_formatting
-            else: # Если нет плейсхолдеров, просто используем строку
-                message_for_dialog = pattern_from_lang.replace('%', '%%')
-        except (IndexError, KeyError, ValueError, TypeError) as e_format_ask:
-            # Фоллбэк, если форматирование не удалось
-            simple_confirm_key = 'delete_confirm_simple' # Новый ключ
-            default_simple_confirm = "Are you sure you want to delete this project?"
-            message_for_dialog = getattr(_lang_obj, simple_confirm_key, default_simple_confirm)
-            if not isinstance(message_for_dialog, str) or message_for_dialog.strip().lower() == "none":
-                message_for_dialog = default_simple_confirm
-            if 'logging' in globals():
-                logging.warning(f"ProjectMenuUtils.remove: Formatting error for confirm message pattern '{pattern_from_lang}' with project '{project_to_delete}'. Error: {e_format_ask}. Using simple confirm: '{message_for_dialog}'")
-        # --- КОНЕЦ ИЗМЕНЕНИЯ ДЛЯ ЗАДАЧИ 3 ---
-            
-        if _ask_win_func(message_for_dialog) == 1: # ask_win должен использовать lang.confirm_title для заголовка
-            project_path_to_delete = _pm.get_work_path(project_to_delete)
-            try:
-                _rmdir_func(project_path_to_delete)
-                # Предлагаю новый ключ
-                msg_deleted_key = 'delete_success_format'
-                default_msg_deleted = "Project '%s' deleted."
-                msg_deleted_template = getattr(_lang_obj, msg_deleted_key, default_msg_deleted)
-                if not isinstance(msg_deleted_template, str) or msg_deleted_template.strip().lower() == "none": msg_deleted_template = default_msg_deleted
-                
-                try:
-                    msg_deleted = msg_deleted_template % project_to_delete.replace('%', '%%')
-                except TypeError:
-                    msg_deleted = default_msg_deleted.replace('%s', project_to_delete.replace('%', '%%'))
-                print(msg_deleted)
-                if 'logging' in globals(): logging.info(msg_deleted)
-
-            except Exception as e_rm:
-                # Предлагаю новый ключ
-                msg_fail_delete_key = 'delete_error_failed_format'
-                default_msg_fail_delete = "Failed to delete project '%s': %s"
-                msg_fail_delete_template = getattr(_lang_obj, msg_fail_delete_key, default_msg_fail_delete)
-                if not isinstance(msg_fail_delete_template, str) or msg_fail_delete_template.strip().lower() == "none": msg_fail_delete_template = default_msg_fail_delete
-                
-                try:
-                    str_e_rm = str(e_rm).replace('%', '%%')
-                    msg_fail_delete = msg_fail_delete_template % (project_to_delete.replace('%', '%%'), str_e_rm)
-                except TypeError:
-                    msg_fail_delete = default_msg_fail_delete.replace('%s', project_to_delete.replace('%', '%%'), 1).replace('%s', str(e_rm).replace('%', '%%'), 1)
-                _win_obj.message_pop(msg_fail_delete, "red")
-                if 'logging' in globals(): logging.error(f"Error deleting project {project_path_to_delete}: {e_rm}")
-            
-            self.listdir()
-
+            if origin_project and project_manger.exist(origin_project):
+                self.set_project(origin_project)
+            else:
+                self.combobox.current(0)
 
     def rename(self) -> bool:
-        """Переименовывает выбранный проект."""
-        _pm = globals().get('project_manger')
-        _cpn_var = globals().get('current_project_name')
-        _input_func = globals().get('input_')
-        _win_obj = globals().get('win')
-        _lang_obj = globals().get('lang') 
-
-        if not (_pm and _cpn_var and _input_func and _win_obj and _lang_obj):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: Missing critical dependencies (project_manger, current_project_name, input_, win, lang).")
+        if not project_manger.exist():
+            print(lang.warn1)
             return False
-        
-        old_name = _cpn_var.get()
-        if not old_name:
-            # Используем существующий warn1, если подходит, или создаем новый более специфичный
-            # msg_select_key = 'warn1_select_project_rename' -> 'warn1' (существующий)
-            # default_msg_select = "Please select a project to rename."
-            msg_select = getattr(_lang_obj, 'warn1', "Please select a project to rename.") # lang.warn1 = "Please select a project"
-            if not isinstance(msg_select, str) or msg_select.strip().lower() == "none": msg_select = "Please select a project to rename."
-            _win_obj.message_pop(msg_select, "orange")
+        if os.path.exists(settings.path + os.sep + (
+                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
+            print(lang.text103)
             return False
-
-        if not _pm.exist(old_name):
-            # Предлагаю новый ключ для большей специфичности
-            msg_not_exist_old_key = 'rename_error_old_project_not_exist'
-            default_msg_not_exist_old = "Selected project '%s' for rename does not exist."
-            msg_not_exist_old_template = getattr(_lang_obj, msg_not_exist_old_key, default_msg_not_exist_old)
-            if not isinstance(msg_not_exist_old_template, str) or msg_not_exist_old_template.strip().lower() == "none": msg_not_exist_old_template = default_msg_not_exist_old
-            
-            try:
-                msg_not_exist_old = msg_not_exist_old_template % old_name.replace('%', '%%')
-            except TypeError:
-                 msg_not_exist_old = default_msg_not_exist_old.replace("%s", old_name.replace('%', '%%'))
-            _win_obj.message_pop(msg_not_exist_old, "red")
+        if inputvar != current_project_name.get():
+            os.rename(settings.path + os.sep + current_project_name.get(), settings.path + os.sep + inputvar)
             self.listdir()
-            return False
-
-        title_rename_key = 'text102' # Ваш ключ: "Rename:"
-        # Поскольку text102 не содержит %s, изменим логику формирования заголовка.
-        # Либо text102 должен быть "Rename Project '%s'"
-        # Либо мы просто используем "Rename: ProjectName"
-        title_base_from_lang = getattr(_lang_obj, title_rename_key, "Rename:")
-        if not isinstance(title_base_from_lang, str) or title_base_from_lang.strip().lower() == "none":
-            title_base_from_lang = "Rename:"
-        
-        # Формируем заголовок: "Rename: ИмяПроекта" или просто "Rename Project", если имя не нужно
-        # Для большей гибкости можно иметь два ключа: один общий "Rename Project" и один с плейсхолдером.
-        # Здесь для простоты будем конкатенировать, если text102 это просто "Rename:".
-        # Если text102 = "Rename Project '%s'", то код из Задачи 2 будет работать.
-        # Предположим, что text102 - это "Rename:"
-        final_title_for_dialog = f"{title_base_from_lang.rstrip()} {old_name}" 
-        # Если text102 = "Rename Project '%s'", то код должен быть как в решении задачи 2:
-        # title_pattern_from_lang = getattr(_lang_obj, title_rename_key, "Rename Project '%s'")
-        # if not isinstance(title_pattern_from_lang, str) or title_pattern_from_lang.strip().lower() == "none":
-        #     title_pattern_from_lang = "Rename Project '%s'"
-        # try:
-        #     final_title_for_dialog = title_pattern_from_lang % str(old_name).replace('%', '%%')
-        # except (TypeError, ValueError):
-        #     final_title_for_dialog = "Rename Project" # Фоллбэк
-
-
-        new_name_raw = _input_func(title=final_title_for_dialog, text=old_name)
-
-        if new_name_raw is None: 
-            # msg_cancelled_key = 'rename_cancelled_by_user' # Новый ключ
-            # default_msg_cancelled = "Rename operation cancelled by user."
-            # msg_cancelled = getattr(_lang_obj, msg_cancelled_key, default_msg_cancelled)
-            # if not isinstance(msg_cancelled, str) or msg_cancelled.strip().lower() == "none": msg_cancelled = default_msg_cancelled
-            # _win_obj.message_pop(msg_cancelled, "orange") # УБРАЛИ ЭТО СООБЩЕНИЕ СОГЛАСНО ЗАДАЧЕ
-            if 'logging' in globals():
-                logging.info(f"User cancelled renaming project '{old_name}'.")
-            return False
-        
-        new_name = new_name_raw.strip().replace(' ', '_')
-
-        if not new_name:
-            # Используем warn12: "Please enter"
-            # Для большей точности можно создать: 'rename_error_new_name_empty': "New project name cannot be empty."
-            msg_empty = getattr(_lang_obj, 'warn12', "New project name cannot be empty.")
-            if not isinstance(msg_empty, str) or msg_empty.strip().lower() == "none": msg_empty = "New project name cannot be empty."
-            _win_obj.message_pop(msg_empty, "orange")
-            return False
-            
-        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
-        if any(char in new_name for char in invalid_chars) or not new_name.isprintable():
-            # Предлагаю новый ключ
-            msg_invalid_chars_key = 'rename_error_invalid_chars'
-            default_msg_invalid_chars = "Invalid characters in new project name."
-            msg_invalid_chars = getattr(_lang_obj, msg_invalid_chars_key, default_msg_invalid_chars)
-            if not isinstance(msg_invalid_chars, str) or msg_invalid_chars.strip().lower() == "none": msg_invalid_chars = default_msg_invalid_chars
-            _win_obj.message_pop(msg_invalid_chars, "orange")
-            return False
-
-        if new_name == old_name:
-            # Используем text104: "The new name is the same as the previous one."
-            msg_same_name = getattr(_lang_obj, 'text104', "The new name is the same as the old one. No changes made.")
-            if not isinstance(msg_same_name, str) or msg_same_name.strip().lower() == "none": msg_same_name = "The new name is the same as the old one. No changes made."
-            _win_obj.message_pop(msg_same_name, "info")
-            return True
-        
-        old_path = _pm.get_work_path(old_name)
-        
-        _settings_obj = globals().get('settings')
-        if not (_settings_obj and hasattr(_settings_obj, 'path') and _settings_obj.path):
-            if 'logging' in globals(): logging.error("ProjectMenuUtils.rename: settings.path not available.")
-            base_path_error_key = 'error_base_path_not_configured' # Новый ключ
-            default_base_path_error = "Error: Base path for projects not configured."
-            base_path_error_msg = getattr(_lang_obj, base_path_error_key, default_base_path_error)
-            if not isinstance(base_path_error_msg, str) or base_path_error_msg.strip().lower() == "none": base_path_error_msg = default_base_path_error
-            _win_obj.message_pop(base_path_error_msg, "red")
-            return False
-        
-        new_path = os.path.join(_settings_obj.path, new_name)
-
-        if os.path.exists(new_path):
-            # Используем text103: "A folder or file with the same name exists!"
-            # Для форматирования с именем нужен другой ключ или изменение text103
-            msg_new_exists_key = 'rename_error_new_name_exists_format' # Новый ключ
-            default_msg_new_exists = "A project with the name '%s' already exists!"
-            msg_new_exists_template = getattr(_lang_obj, msg_new_exists_key, default_msg_new_exists)
-            if not isinstance(msg_new_exists_template, str) or msg_new_exists_template.strip().lower() == "none": msg_new_exists_template = default_msg_new_exists
-            
-            try:
-                msg_new_exists = msg_new_exists_template % new_name.replace('%', '%%')
-            except TypeError:
-                msg_new_exists = default_msg_new_exists.replace("%s", new_name.replace('%', '%%'))
-            _win_obj.message_pop(msg_new_exists, "orange") # Ваш text103 не параметризован
-            return False
-        
-        try:
-            os.rename(old_path, new_path)
-            # Предлагаю новый ключ для сообщения об успехе
-            msg_renamed_ok_key = 'rename_success_format'
-            default_msg_renamed_ok = "Project '%s' renamed to '%s'."
-            msg_renamed_ok_template = getattr(_lang_obj, msg_renamed_ok_key, default_msg_renamed_ok)
-            if not isinstance(msg_renamed_ok_template, str) or msg_renamed_ok_template.strip().lower() == "none": msg_renamed_ok_template = default_msg_renamed_ok
-
-            try:
-                msg_renamed_ok = msg_renamed_ok_template % (old_name.replace('%', '%%'), new_name.replace('%', '%%'))
-            except TypeError:
-                msg_renamed_ok = default_msg_renamed_ok.replace("%s", old_name.replace('%', '%%'), 1).replace("%s", new_name.replace('%', '%%'), 1)
-
-            print(msg_renamed_ok)
-            if 'logging' in globals(): logging.info(msg_renamed_ok)
-            
-            _cpn_var.set(new_name)
-            self.listdir()
-        except Exception as e_rename:
-            # Предлагаю новый ключ
-            msg_fail_rename_key = 'rename_error_failed_format'
-            default_msg_fail_rename = "Failed to rename project '%s' to '%s': %s"
-            msg_fail_rename_template = getattr(_lang_obj, msg_fail_rename_key, default_msg_fail_rename)
-            if not isinstance(msg_fail_rename_template, str) or msg_fail_rename_template.strip().lower() == "none": msg_fail_rename_template = default_msg_fail_rename
-
-            try:
-                str_e_rename = str(e_rename).replace('%', '%%')
-                msg_fail_rename = msg_fail_rename_template % (old_name.replace('%', '%%'), new_name.replace('%', '%%'), str_e_rename)
-            except TypeError:
-                 msg_fail_rename = default_msg_fail_rename.replace("%s", old_name.replace('%', '%%'), 1).replace("%s", new_name.replace('%', '%%'), 1).replace("%s", str(e_rename).replace('%', '%%'), 1)
-
-            _win_obj.message_pop(msg_fail_rename, "red")
-            if 'logging' in globals(): logging.error(f"Failed to rename project from {old_path} to {new_path}: {e_rename}")
-            return False
+        else:
+            print(lang.text104)
         return True
+
+    def remove(self):
+        win.message_pop(lang.warn1) if not project_manger.exist() else rmdir(
+            project_manger.get_work_path(current_project_name.get()))
+        self.listdir()
+
+    def new(self):
+        if not (inputvar := input_()):
+            win.message_pop(lang.warn12)
+        else:
+            inputvar = inputvar.replace(' ', '_')
+            if not inputvar.isprintable():
+                win.message_pop(lang.warn12)
+            print(lang.text99 % inputvar)
+            os.mkdir(settings.path + os.sep + inputvar)
+        self.listdir()
 
 
 class Frame3(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs):
-        title_text_key = 'text112' 
-        default_title = "Other Actions"
-        title_text = getattr(lang, title_text_key, default_title)
-        if not isinstance(title_text, str) or title_text == "None":
-            title_text = default_title
-        super().__init__(master=master, text=title_text, **kwargs)
-        # НЕ ВЫЗЫВАЕМ self.gui() здесь
+    def __init__(self):
+        super().__init__(master=win.tab2, text=lang.text112)
+        self.pack(padx=5, pady=5)
 
     def gui(self):
-        """Creates and arranges widgets, then packs the LabelFrame itself."""
-        
-        functions_map = [
-            (getattr(lang, 'text122', "Pack ZIP"), lambda: create_thread(pack_zip)),
-            (getattr(lang, 'text123', "Pack super"), lambda: create_thread(PackSuper)),
-            (getattr(lang, 'text19', "Plugins"), lambda: win.notepad.select(win.tab7) if hasattr(win, 'notepad') and hasattr(win, 'tab7') else None),
-            (getattr(lang, 't13', "Convert image"), lambda: create_thread(FormatConversion)),
+        row = 0
+        functions = [
+            (lang.text122, lambda: create_thread(pack_zip)),
+            (lang.text123, lambda: create_thread(PackSuper)),
+            (lang.text19, lambda: win.notepad.select(win.tab7)),
+            (lang.t13, lambda: create_thread(FormatConversion)),
+            #("打包 Payload", lambda: create_thread(PackPayload)),
         ]
-
-        # Используем grid для кнопок, чтобы они были в одной строке и растягивались
-        num_buttons = len(functions_map)
-        for index, (text, func) in enumerate(functions_map):
-            button_text_str = str(text) if text is not None else "Action"
-            # width=11 может быть слишком маленьким, если кнопки должны растягиваться
-            btn = ttk.Button(self, text=button_text_str, command=func) 
-            btn.grid(row=0, column=index, padx=5, pady=5, sticky="ew")
-            self.grid_columnconfigure(index, weight=1) # Позволяет колонкам растягиваться
-
-        # Pack the main LabelFrame itself onto its master (win.tab2)
-        # Растягиваем Frame3 по горизонтали, но не по вертикали
-        self.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
-        return self
+        for index, (text, func) in enumerate(functions):
+            column = index % 4
+            if not column:
+                row += 1
+            ttk.Button(self, text=text, command=func, width=11).grid(row=row, column=column, padx=5, pady=5)
 
 
 class UnpackGui(ttk.LabelFrame):
-    def __init__(self, master=None, **kwargs):
-        title_text_key = 't57' 
-        default_title = "Firmware File Types" # Более описательно
-        title_text = getattr(lang, title_text_key, default_title)
-        if not isinstance(title_text, str) or title_text == "None":
-            title_text = default_title
-        
-        super().__init__(master=master, text=title_text, **kwargs)
-        
+    def __init__(self):
+        super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()
-        if 'current_project_name' in globals() and isinstance(globals()['current_project_name'], StringVar):
-            current_project_name.trace_add("write", self._on_project_change)
-        else:
-            logging.error("Global 'current_project_name' not found for UnpackGui trace.")
+        current_project_name.trace_add("write", self._on_project_change)
         
-        self.fm = None # Combobox для типов файлов
-        self.lsg = None # ListBox для файлов
-        self.menu = None
-        # НЕ ВЫЗЫВАЕМ self.gui() здесь
-
+    # Новый метод-обработчик, вызываемый при смене проекта
     def _on_project_change(self, *args):
-        if hasattr(self, 'hd') and callable(self.hd) and self.winfo_exists():
-            if hasattr(self, 'fm') and self.fm is not None:
-                self.hd()
-
+        """Вызывается автоматически при изменении current_project_name."""
+        # Проверяем, существует ли метод hd и сам виджет перед вызовом
+        if hasattr(self, 'hd') and callable(self.hd):
+             if self.winfo_exists():
+                 # Вызов hd() обновит список разделов для нового проекта,
+                 # учитывая текущий режим (Unpack/Pack)
+                 self.hd()
+                 
     def gui(self):
-        """Creates and arranges the widgets within this UnpackGui frame."""
-        # --- Этот метод НЕ вызывает self.pack() для UnpackGui ---
-
-        self.ch.set(True) # По умолчанию "Unpack"
-
-        # --- Верхняя часть: ListBox для файлов и его меню ---
-        self.lsg = ListBox(self) # Твой кастомный ListBox
-        self.lsg.gui() 
-        # Растягиваем ListBox по горизонтали и даем ему занять доступное место по вертикали
-        self.lsg.pack(padx=5, pady=5, fill=BOTH, side=TOP, expand=True) 
-
-        self.menu = Menu(self.lsg.canvas, tearoff=False, borderwidth=0)
-        menu_attr_text = getattr(lang, 'attribute', "Attribute")
-        if not isinstance(menu_attr_text, str) or menu_attr_text == "None": menu_attr_text = "Attribute"
-        self.menu.add_command(label=menu_attr_text, command=self.info)
-        self.lsg.canvas.bind('<Button-3>', self.show_menu)
-
-        # --- Средняя часть: Переключатели Unpack/Pack ---
-        mode_frame = ttk.Frame(self)
-        unpack_text = getattr(lang, 'unpack', "Unpack")
-        if not isinstance(unpack_text, str) or unpack_text == "None": unpack_text = "Unpack"
-        pack_text = getattr(lang, 'pack', "Pack")
-        if not isinstance(pack_text, str) or pack_text == "None": pack_text = "Pack"
-
-        ttk.Radiobutton(mode_frame, text=unpack_text, variable=self.ch, value=True).pack(padx=5, pady=5, side='left')
-        ttk.Radiobutton(mode_frame, text=pack_text, variable=self.ch, value=False).pack(padx=5, pady=5, side='left')
-        mode_frame.pack(padx=5, pady=(5,0), side=TOP, fill=X) # Размещаем под ListBox
-
-        # --- Нижняя часть: Combobox типов и кнопка Run ---
-        bottom_controls_frame = ttk.Frame(self)
-        self.fm = ttk.Combobox(bottom_controls_frame, state="readonly", width=15, # Можно задать ширину
-                               values=('new.dat.br', 'new.dat.xz', "new.dat", 
-                                       'img', 'zst', 'payload', 'super', 'update.app'))
+        self.pack(padx=5, pady=5)
+        self.ch.set(True)
+        self.fm = ttk.Combobox(self, state="readonly",
+                               values=(
+                                   'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
+                                   'update.app'))
+        self.lsg = ListBox(self)
+        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
+        self.menu.add_command(label=lang.attribute, command=self.info)
+        self.lsg.bind('<Button-3>', self.show_menu)
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
-        self.fm.pack(padx=(5,0), pady=5, side='left', fill=X, expand=True) # Растягиваем Combobox
-
-        run_text = getattr(lang, 'run', "Run")
-        if not isinstance(run_text, str) or run_text == "None": run_text = "Run"
-        ttk.Button(bottom_controls_frame, text=run_text, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
-        bottom_controls_frame.pack(padx=5, pady=5, side=TOP, fill=X) # Размещаем под mode_frame
-        
-        self.ch.trace_add("write", lambda *x: self.hd()) 
-        self.refs() 
+        self.lsg.gui()
+        self.lsg.canvas.bind('<Button-3>', self.show_menu)
+        self.lsg.pack(padx=5, pady=5, fill=X, side='top', expand=True)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
+        ff1 = ttk.Frame(self)
+        ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
+                        value=True).pack(padx=5, pady=5, side='left')
+        ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
+                        value=False).pack(padx=5, pady=5, side='left')
+        ff1.pack(padx=5, pady=5, fill=X)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
+        self.fm.pack(padx=5, pady=5, fill=Y, side='left')
+        ttk.Button(self, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
+        self.refs()
+        self.ch.trace("w", lambda *x: self.hd())
 
     def show_menu(self, event):
-        if hasattr(self, 'lsg') and self.lsg and len(self.lsg.selected) == 1 and \
-           hasattr(self, 'fm') and self.fm and self.fm.get() == 'img':
-            if hasattr(self, 'menu') and self.menu:
-                self.menu.post(event.x_root, event.y_root)
+        if len(self.lsg.selected) == 1 and self.fm.get() == 'img':
+            self.menu.post(event.x_root, event.y_root)
 
     def info(self):
-        # ... (код метода info без изменений, но убедись, что Toplevel, lang, gettype, ext4, move_center доступны) ...
-        if not (hasattr(self, 'lsg') and self.lsg): return
-        ck_ = Toplevel() 
+        ck_ = Toplevel()
         move_center(ck_)
-        title_text = getattr(lang, 'attribute', "Attribute")
-        if not isinstance(title_text, str) or title_text == "None": title_text = "Attribute"
-        ck_.title(title_text)
-
+        ck_.title(lang.attribute)
         if not self.lsg.selected:
             ck_.destroy()
             return
-        
-        # Ensure project_manger is accessible
-        if 'project_manger' not in globals() or not hasattr(project_manger, 'current_work_path'):
-            logging.error("project_manger not available for UnpackGui.info()")
-            ck_.destroy()
-            return
-
         f_path = os.path.join(project_manger.current_work_path(), self.lsg.selected[0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
             return
-        
         f_type = gettype(f_path)
-        info_data = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
-        if f_type == 'ext' and 'ext4' in globals() and hasattr(ext4, 'Volume'):
-            try:
-                with open(f_path, 'rb') as e_file:
-                    for item in ext4.Volume(e_file).get_info_list:
-                        info_data.append(item)
-            except Exception as e_ext4:
-                logging.error(f"Error reading EXT4 info: {e_ext4}")
-
+        info = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
+        if f_type == 'ext':
+            with open(f_path, 'rb') as e:
+                for i in ext4.Volume(e).get_info_list:
+                    info.append(i)
         scroll = ttk.Scrollbar(ck_, orient='vertical')
-        col_name_text = getattr(lang, 'name', "Name")
-        if not isinstance(col_name_text, str) or col_name_text == "None": col_name_text = "Name"
-        columns = [col_name_text, 'Value']
-        
+        columns = [lang.name, 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
         for column in columns:
             table.heading(column=column, text=column, anchor=CENTER)
             table.column(column=column, anchor=CENTER)
-        
         scroll.config(command=table.yview)
         scroll.pack(side=RIGHT, fill=Y)
         table.pack(fill=BOTH, expand=True)
-        
-        for data_row in info_data:
-            table.insert('', tk.END, values=data_row)
-            
-        ok_text = getattr(lang, 'ok', "OK")
-        if not isinstance(ok_text, str) or ok_text == "None": ok_text = "OK"
-        ttk.Button(ck_, text=ok_text, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
-
+        for data in info:
+            table.insert('', tk.END, values=data)
+        ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
-        if not (hasattr(self, 'fm') and self.fm and hasattr(self, 'lsg') and self.lsg): 
-            # logging.debug("UnpackGui.hd(): fm or lsg not initialized.")
-            return 
-        if self.ch.get(): # True для Unpack
+        if self.ch.get():
             self.fm.configure(state='readonly')
             self.refs()
-        else: # False для Pack
+        else:
             self.fm.configure(state="disabled")
             self.refs2()
 
     def refs(self, auto: bool = False):
-        if not (hasattr(self, 'lsg') and self.lsg and hasattr(self, 'fm') and self.fm): return False
         self.lsg.clear()
-        # ... (остальной код refs без изменений)
         work = project_manger.current_work_path()
         if not project_manger.exist():
             return False
@@ -6246,13 +4696,10 @@ class UnpackGui(ttk.LabelFrame):
                                     file_name.split(f".{form}")[0])
         return True
 
-
     def refs2(self):
-        if not (hasattr(self, 'lsg') and self.lsg): return False
         self.lsg.clear()
-        # ... (остальной код refs2 без изменений)
         if not os.path.exists(work := project_manger.current_work_path()):
-            if 'win' in globals() and hasattr(win, 'message_pop'): win.message_pop(lang.warn1)
+            win.message_pop(lang.warn1)
             return False
         parts_dict = JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
@@ -6261,134 +4708,14 @@ class UnpackGui(ttk.LabelFrame):
         return True
 
     def close_(self):
-        # --- Получение глобальных зависимостей ---
-        _cpn_var = globals().get('current_project_name')
-        _win_obj = globals().get('win')
-        _lang_obj = globals().get('lang')
-        _logging_obj = globals().get('logging') # Предполагаем, что logging импортирован и доступен
+        lbs = self.lsg.selected.copy()
+        self.hd()
+        if self.ch.get() == 1:
+            unpack(lbs, self.fm.get())
+            self.refs()
+        else:
+            Packxx(lbs)
 
-        # Проверка наличия критических зависимостей
-        if not (_cpn_var and isinstance(_cpn_var, tk.StringVar) and \
-                _win_obj and hasattr(_win_obj, 'message_pop') and callable(_win_obj.message_pop) and \
-                _lang_obj):
-            if _logging_obj:
-                _logging_obj.error("UnpackGui.close_: Critical global dependencies (current_project_name, win.message_pop, lang) are missing or invalid.")
-            # В этом случае можно показать пользователю общее сообщение об ошибке, если _win_obj.message_pop доступен
-            # Например: _win_obj.message_pop("Internal error: Required components missing. Please restart.", "red", "Critical Error")
-            return
-
-        # --- Проверка, выбран ли проект ---
-        if not _cpn_var.get(): # Если имя текущего проекта пустое
-            # Текст предупреждения из локализации
-            warning_text_key = 'warn1' # Используем существующий ключ "Please select a project"
-            default_warning_text = "Please select a project first to proceed."
-            warning_text = getattr(_lang_obj, warning_text_key, default_warning_text)
-            if not isinstance(warning_text, str) or not warning_text.strip() or warning_text.strip().lower() == "none":
-                warning_text = default_warning_text
-                if _logging_obj: _logging_obj.warning(f"UnpackGui.close_: Fallback for lang.{warning_text_key}. Used default: '{default_warning_text}'")
-
-            # Заголовок окна предупреждения из локализации
-            warning_title_key = 'title_warning' # Предлагаемый новый ключ
-            default_warning_title = "Warning" # Текст по умолчанию для английского языка
-            warning_title = getattr(_lang_obj, warning_title_key, default_warning_title)
-            if not isinstance(warning_title, str) or not warning_title.strip() or warning_title.strip().lower() == "none":
-                warning_title = default_warning_title
-                if _logging_obj: _logging_obj.warning(f"UnpackGui.close_: Fallback for lang.{warning_title_key}. Used default: '{default_warning_title}'")
-            
-            # Родительское окно для message_pop (главное окно приложения)
-            parent_for_popup = None
-            if hasattr(_win_obj, 'winfo_exists') and _win_obj.winfo_exists(): # Проверка, что главное окно существует
-                parent_for_popup = _win_obj
-            
-            # Вызов стилизованного предупреждения
-            # win.message_pop является псевдонимом для warn_win, которая по умолчанию использует wait=1500ms
-            _win_obj.message_pop(text=warning_text, color="orange", title=warning_title, parent=parent_for_popup)
-            return # Прерываем выполнение метода, так как проект не выбран
-
-        # --- Основная логика метода, если проект выбран ---
-        # Проверка, что необходимые UI компоненты класса инициализированы
-        if not (hasattr(self, 'lsg') and self.lsg and \
-                hasattr(self, 'fm') and self.fm and \
-                hasattr(self, 'ch') and isinstance(self.ch, tk.BooleanVar)):
-            if _logging_obj:
-                _logging_obj.error("UnpackGui.close_: Internal UI components (lsg, fm, ch) are not properly initialized.")
-            # Можно показать сообщение пользователю о внутренней ошибке UI
-            # _win_obj.message_pop("Internal UI error. Please try restarting the application.", "red", "Error")
-            return
-
-        selected_items = self.lsg.selected.copy() # Копируем список выбранных элементов
-        
-        # Вызываем self.hd() для обновления UI перед основной операцией, если это необходимо
-        # и если метод hd существует и является вызываемым
-        if hasattr(self, 'hd') and callable(self.hd):
-            try:
-                self.hd()
-            except Exception as e_hd_call:
-                 if _logging_obj: _logging_obj.error(f"Error calling self.hd() in UnpackGui.close_: {e_hd_call}")
-        
-        # Получаем глобальные функции/классы для операций
-        _unpack_func = globals().get('unpack')
-        _packxx_class = globals().get('Packxx')
-
-        if self.ch.get(): # Режим "Unpack" (ch.get() вернет True)
-            if not (_unpack_func and callable(_unpack_func)):
-                if _logging_obj: _logging_obj.error("UnpackGui.close_ (Unpack Mode): Global function 'unpack' is not available.")
-                # Информируем пользователя об ошибке
-                unavailable_error_key = 'error_unpack_unavailable'
-                default_unavailable_text = "Error: Unpack functionality is currently unavailable. Please check application setup."
-                unavailable_text = getattr(_lang_obj, unavailable_error_key, default_unavailable_text)
-                if not isinstance(unavailable_text, str) or not unavailable_text.strip() or unavailable_text.strip().lower() == "none": unavailable_text = default_unavailable_text
-                _win_obj.message_pop(unavailable_text, "red", "Operation Error")
-                return
-
-            file_format_to_unpack = self.fm.get() # Получаем выбранный формат файла
-            if not file_format_to_unpack: # Проверка, если формат не выбран
-                if _logging_obj: _logging_obj.warning("UnpackGui.close_ (Unpack Mode): No file format selected for unpacking.")
-                # Информируем пользователя
-                no_format_key = 'unpack_no_format_selected_warn'
-                default_no_format_text = "Please select a file format from the dropdown to unpack."
-                no_format_text = getattr(_lang_obj, no_format_key, default_no_format_text)
-                if not isinstance(no_format_text, str) or not no_format_text.strip() or no_format_text.strip().lower() == "none": no_format_text = default_no_format_text
-                _win_obj.message_pop(no_format_text, "orange", getattr(_lang_obj, 'title_input_needed', "Input Needed"))
-                return
-            
-            if not selected_items: # Проверка, выбраны ли элементы для распаковки
-                 no_items_key = 'unpack_no_items_selected_warn'
-                 default_no_items_text = "Please select items from the list to unpack."
-                 no_items_text = getattr(_lang_obj, no_items_key, default_no_items_text)
-                 if not isinstance(no_items_text, str) or not no_items_text.strip() or no_items_text.strip().lower() == "none": no_items_text = default_no_items_text
-                 _win_obj.message_pop(text=no_items_text, color="orange", title=getattr(_lang_obj, 'title_warning', "Warning"))
-                 return
-
-            _unpack_func(selected_items, file_format_to_unpack) # Выполняем распаковку
-            
-            # Обновляем список файлов после распаковки, если метод refs существует
-            if hasattr(self, 'refs') and callable(self.refs):
-                try:
-                    self.refs() 
-                except Exception as e_refs_call:
-                    if _logging_obj: _logging_obj.error(f"Error calling self.refs() after unpack operation: {e_refs_call}")
-
-        else: # Режим "Pack" (ch.get() вернет False)
-            if not (_packxx_class and callable(_packxx_class)):
-                if _logging_obj: _logging_obj.error("UnpackGui.close_ (Pack Mode): Global class 'Packxx' is not available.")
-                # Информируем пользователя об ошибке
-                unavailable_pack_key = 'error_pack_unavailable'
-                default_pack_unavailable_text = "Error: Pack functionality is currently unavailable. Please check application setup."
-                pack_unavailable_text = getattr(_lang_obj, unavailable_pack_key, default_pack_unavailable_text)
-                if not isinstance(pack_unavailable_text, str) or not pack_unavailable_text.strip() or pack_unavailable_text.strip().lower() == "none": pack_unavailable_text = default_pack_unavailable_text
-                _win_obj.message_pop(pack_unavailable_text, "red", "Operation Error")
-                return
-            
-            if not selected_items: # Проверка, выбраны ли элементы для упаковки
-                 no_items_pack_key = 'pack_no_items_selected_warn'
-                 default_no_items_pack_text = "Please select items from the list to pack."
-                 no_items_pack_text = getattr(_lang_obj, no_items_pack_key, default_no_items_pack_text)
-                 if not isinstance(no_items_pack_text, str) or not no_items_pack_text.strip() or no_items_pack_text.strip().lower() == "none": no_items_pack_text = default_no_items_pack_text
-                 _win_obj.message_pop(text=no_items_pack_text, color="orange", title=getattr(_lang_obj, 'title_warning', "Warning"))
-                 return
-
-            _packxx_class(selected_items) # Создаем экземпляр Packxx и передаем выбранные элементы
 
 def img2simg(path: str):
     call(['img2simg', path, f'{path}s'])
@@ -6689,281 +5016,61 @@ class ParseCmdline:
 
 
 def __init__tk(args: list):
-    # --- Basic Setup: Global Paths and Logging ---
-    _temp_path = globals().get('temp', os.path.join(os.getcwd(), "bin", "temp"))
-    _tool_log_path = globals().get('tool_log', os.path.join(_temp_path, f"mio_kitchen_{time.strftime('%Y%m%d_%H%M%S')}.log"))
-
-    _re_folder_func = globals().get('re_folder')
-    if _re_folder_func and callable(_re_folder_func):
-        if not os.path.exists(_temp_path): _re_folder_func(_temp_path, quiet=True)
-    elif not os.path.exists(_temp_path):
-        try: os.makedirs(_temp_path, exist_ok=True)
-        except OSError as e: print(f"Warning: Could not create temp dir {_temp_path}: {e}")
-
-    log_dir = os.path.dirname(_tool_log_path)
-    if not os.path.exists(log_dir):
-        try: os.makedirs(log_dir, exist_ok=True)
-        except OSError as e: print(f"Warning: Could not create log dir {log_dir}: {e}")
-    
-    try:
-        with open(_tool_log_path, 'a', encoding="utf-8") as f_test_log:
-            f_test_log.write(f"--- Log Start [{time.asctime()}] ---\n")
-    except IOError as e: 
-        print(f"Warning: Could not write to log file {_tool_log_path}: {e}. Logging to console.")
-        _tool_log_path = None
-
-    logging.basicConfig(
-        level=logging.DEBUG, 
-        format='%(levelname)s:%(asctime)s:%(filename)s:%(lineno)d:%(name)s:%(message)s',
-        filename=_tool_log_path if _tool_log_path else None,
-        filemode='a' if _tool_log_path else None,
-        encoding='utf-8' if _tool_log_path else None
-    )
-    if not _tool_log_path:
-        logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
-    logging.info(f"Application MIO-KITCHEN starting with args: {args}")
-    logging.info(f"Python version: {sys.version}")
-    logging.info(f"Platform: {platform.system()} {platform.release()} ({platform.machine()})")
-    logging.info(f"cwd_path: {globals().get('cwd_path', 'Not Set')}")
-    logging.info(f"temp path: {_temp_path}")
-    logging.info(f"Log path: {_tool_log_path if _tool_log_path else 'Console Only'}")
-
-    global win, current_project_name, theme, language, unpackg, project_menu, animation, start, settings
-
-    if 'settings' not in globals() or not isinstance(settings, SetUtils):
-        logging.critical("'settings' object is not initialized or is of wrong type. Attempting to create.")
-        try:
-            settings = SetUtils()
-        except Exception as e_set_init:
-            logging.critical(f"FATAL: Could not create SetUtils instance: {e_set_init}. Application cannot continue.")
-            return
-    
-    try:
-        settings.load_from_file()
-    except Exception as e_load_set:
-        logging.critical(f"FATAL: Error during settings.load_from_file: {e_load_set}. Application may not work correctly.")
-
-    if 'Tool' not in globals() or not callable(Tool):
-        logging.critical("FATAL: Main window class 'Tool' is not defined. Application cannot start.")
-        return
-    win = Tool() 
-    
-    if not isinstance(win, tk.Tk):
-        logging.critical("FATAL: 'win' is not a valid Tkinter window. Application cannot start.")
-        return
-
-    current_project_name = StringVar(master=win, name="mio_current_project_name") 
-    if 'utils' in globals() and hasattr(utils, 'project_name'): utils.project_name = current_project_name 
-    else: logging.warning("__init__tk: utils.project_name link failed.")
-        
-    theme = StringVar(master=win, name="mio_theme_var", value=getattr(settings, 'theme', 'dark'))
-    language = StringVar(master=win, name="mio_language_var", value=getattr(settings, 'language', 'English'))
-    
-    if 'sv_ttk' in globals() and hasattr(sv_ttk, 'set_theme'):
-        try: 
-            sv_ttk.set_theme(settings.theme) 
-            logging.info(f"Theme '{settings.theme}' set via sv_ttk before OOBE.")
-        except Exception as e: logging.error(f"Error setting sv_ttk theme before OOBE: {e}")
-    else: logging.warning("Cannot set theme before OOBE: sv_ttk not available.")
-
-    if os.name == 'nt' and 'set_title_bar_color' in globals() and callable(set_title_bar_color): 
-        try:
-            if settings.theme == 'dark': set_title_bar_color(win)
-            else: set_title_bar_color(win, 0)
-        except Exception as e: logging.warning(f"Could not set Win title bar color before OOBE: {e}")
-
-    if 'lang' in globals() and globals()['lang'] is not None:
-        SetUtils.load_language(settings.language)
-    else:
-        logging.error("Cannot load language for OOBE: global 'lang' object not ready.")
-
-    if hasattr(settings, 'oobe') and int(settings.oobe) < 5:
-        if 'Welcome' in globals() and callable(Welcome): Welcome()
-        else: logging.warning("__init__tk: 'Welcome' class not available.")
-
-    if hasattr(settings, 'updating') and settings.updating in ['1', '2']:
-        if 'Updater' in globals() and callable(Updater): Updater() 
-        else: logging.warning("__init__tk: 'Updater' class not available.")
-    
-    if 'init_verify' in globals() and callable(init_verify): init_verify() 
-    else: logging.warning("__init__tk: 'init_verify' function not available.")
-    
-    try: 
-        if not win.winfo_exists():
-            logging.error("Main window (win) was destroyed before win.gui() call. Aborting UI setup.")
-            return 
-    except tk.TclError:
-        logging.exception("Main window invalid before win.gui() (TclError). Aborting.")
-        return 
-        
-    win.gui()
-
-    if 'LoadAnim' in globals() and callable(LoadAnim):
-        animation = LoadAnim() 
-        animation.set_master(win) 
-        
-        gif_theme_suffix = getattr(settings, 'theme', 'dark')
-        gif_data_attr = f"loading_{gif_theme_suffix}_byte"
-        _images_module = globals().get('images')
-        _open_img_func = globals().get('open_img')
-        _bytes_io_class = globals().get('BytesIO')
-
-        default_gif_bytes = getattr(_images_module, "loading_dark_byte", None) if _images_module else None
-        gif_bytes_to_load = getattr(_images_module, gif_data_attr, default_gif_bytes) if _images_module else None
-
-        if gif_bytes_to_load and _open_img_func and _bytes_io_class:
-            try: animation.load_gif(_open_img_func(_bytes_io_class(gif_bytes_to_load)))
-            except Exception as e: logging.error(f"Failed to load animation GIF in __init__tk: {e}")
-        elif 'logging' in globals(): logging.debug(f"GIF data for '{gif_data_attr}' or image deps missing.")
-    else:
-        logging.warning("__init__tk: 'LoadAnim' not available. Animation disabled.")
-        animation = None 
-
-    if hasattr(settings, 'apply_loaded_settings_to_gui'):
-        settings.apply_loaded_settings_to_gui()
-    else:
-        logging.error("__init__tk: 'settings.apply_loaded_settings_to_gui' not available.")
-
-    if not (hasattr(win, 'tab2') and win.tab2 and isinstance(win.tab2, (tk.Frame, ttk.Frame)) and win.tab2.winfo_exists()):
-        logging.error("CRITICAL: Parent tab (win.tab2) for Project/Unpack/Frame3 not found, not a Frame, or destroyed. UI will be incorrect.")
-    else:
-        if 'ProjectMenuUtils' in globals() and callable(ProjectMenuUtils):
-            project_menu = ProjectMenuUtils(master=win.tab2)
-            if hasattr(project_menu, 'gui'): project_menu.gui()
-            project_menu.pack(padx=5, pady=5, fill='x', side=TOP, expand=False) 
-        else: 
-            logging.error("__init__tk: 'ProjectMenuUtils' class not available.")
-            project_menu = None 
-
-        if 'UnpackGui' in globals() and callable(UnpackGui):
-            unpackg = UnpackGui(master=win.tab2)
-            if hasattr(unpackg, 'gui'): unpackg.gui()
-            unpackg.pack(padx=5, pady=5, fill='both', side=TOP, expand=True)
-        else: 
-            logging.error("__init__tk: 'UnpackGui' class not available.")
-            unpackg = None
-        
-        if 'Frame3' in globals() and callable(Frame3):
-            frame3_instance = Frame3(master=win.tab2)
-            if hasattr(frame3_instance, 'gui') and callable(frame3_instance.gui):
-                frame3_instance.gui()
-                # Убрал pack отсюда, так как он теперь в Frame3.gui()
-        else: 
-            logging.warning("__init__tk: 'Frame3' class not available.")
-        
-        if project_menu and hasattr(project_menu, 'listdir') and callable(project_menu.listdir): 
-            project_menu.listdir() 
-        elif logging: 
-             logging.debug("__init__tk: project_menu.listdir not called (project_menu is None or listdir missing).")
-
-    _is_pro_flag = globals().get('is_pro', False)
-    _lang_obj = globals().get('lang')
-
-    if not _is_pro_flag:
-        lang_txt108 = getattr(_lang_obj, 'text108', "Non-pro version message.") if _lang_obj else "Non-pro version message."
-        print(lang_txt108)
-    elif _is_pro_flag:
-        _verify_obj = globals().get('verify')
-        if _verify_obj and hasattr(_verify_obj, 'state') and not _verify_obj.state:
-            _active_class = globals().get('Active')
-            _images_module = globals().get('images')
-            if _active_class and callable(_active_class) and _images_module and _lang_obj:
-                Active(_verify_obj, settings, win, _images_module, _lang_obj).gui() 
-            else: logging.error("Cannot init Pro 'Active': missing deps (Active, images, lang).")
-    
-    try:
-        win.update() 
-        if 'move_center' in globals() and callable(move_center): move_center(win) 
-        else: logging.warning("__init__tk: 'move_center' function not available.")
-    except tk.TclError as e: logging.error(f"Error win.update/move_center: {e}")
-
-    if hasattr(win, 'get_time') and callable(win.get_time): win.get_time() 
-    
-    _start_time_var = globals().get('start')
-    _dti_func = globals().get('dti')
-    if isinstance(_start_time_var, (int, float)) and callable(_dti_func):
-         try:
-             el_time = _dti_func() - _start_time_var
-             el_time_str_formatted = f"{el_time:.2f}" # Время с двумя знаками после запятой
-             
-             _lang_obj = globals().get('lang')
-             
-             default_format_string = "Startup took: {} seconds"
-             localized_format_str = default_format_string
-
-             if _lang_obj and hasattr(_lang_obj, 'text134'):
-                 lang_val = getattr(_lang_obj, 'text134')
-                 if isinstance(lang_val, str) and lang_val.strip():
-                     localized_format_str = lang_val
-             
-             output_message = ""
-             try:
-                 placeholder_match_curly = None
-                 # Предполагаем, что 're' доступно глобально через from ..core.extra import re
-                 if 're' in globals() and hasattr(re, 'search') and callable(re.search):
-                    placeholder_match_curly = re.search(r"\{[:\w\.\d]*\}", localized_format_str)
-
-                 if placeholder_match_curly:
-                     output_message = localized_format_str.replace(placeholder_match_curly.group(0), el_time_str_formatted, 1)
-                 elif '%s' in localized_format_str:
-                     if localized_format_str.count('%s') == 1 and \
-                        localized_format_str.count('%') == localized_format_str.count('%s'):
-                         output_message = localized_format_str % el_time_str_formatted
-                     else:
-                         output_message = "" 
-                         if not output_message: # Если предыдущие замены не сработали
-                            prefix = localized_format_str.rstrip()
-                            if prefix and not prefix.endswith(' ') and not prefix.endswith(':'):
-                                prefix += " "
-                            elif prefix and prefix.endswith(':') and not prefix.endswith(' '):
-                                prefix += " "
-                            output_message = f"{prefix}{el_time_str_formatted} seconds"
-                 else:
-                     prefix = localized_format_str.rstrip()
-                     if prefix and not prefix.endswith(' ') and not prefix.endswith(':'):
-                         prefix += " "
-                     elif prefix and prefix.endswith(':') and not prefix.endswith(' '):
-                         prefix += " "
-                     output_message = f"{prefix}{el_time_str_formatted} seconds"
-                 
-                 print(output_message)
-
-             except Exception as e_format:
-                 logging.error(f"Error formatting startup time message with string '{localized_format_str}': {e_format}")
-                 print(f"Startup took: {el_time_str_formatted} seconds (Fallback due to formatting error)")
-
-         except Exception as e: 
-             logging.error(f"Error printing startup time: {e}")
-    elif 'logging' in globals(): 
-        logging.debug("__init__tk: Startup time variables ('start', 'dti') or 'lang' object missing.")
-
+    if not os.path.exists(temp):
+        re_folder(temp, quiet=True)
+    if not os.path.exists(tool_log):
+        open(tool_log, 'w', encoding="utf-8", newline="\n").close()
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
+                        filename=tool_log, filemode='w')
+    global win
+    win = Tool()
     if os.name == 'nt':
-        if 'do_override_sv_ttk_fonts' in globals() and callable(do_override_sv_ttk_fonts): 
-            do_override_sv_ttk_fonts()
-        if hasattr(sys, 'getwindowsversion') and callable(sys.getwindowsversion):
-            if sys.getwindowsversion().major <= 6:
-                lang_w20 = getattr(_lang_obj, 'warn20', "Warning for older Windows.") if _lang_obj else "Warning for older Windows."
-                if 'ask_win' in globals() and callable(ask_win): ask_win(lang_w20)
-                elif 'logging' in globals(): logging.debug("ask_win for old Win warning missing.")
-        elif 'logging' in globals(): logging.debug("sys.getwindowsversion missing.")
-            
-    _states_obj = globals().get('states')
-    if _states_obj and hasattr(_states_obj, 'inited'): _states_obj.inited = True 
-    else: logging.warning("__init__tk: 'states.inited' missing.")
+        set_title_bar_color(win)
+    animation.set_master(win)
+    global current_project_name, theme, language
+    current_project_name = utils.project_name = StringVar()
+    theme = StringVar()
+    language = StringVar()
+    settings.load()
+    if settings.updating in ['1', '2']:
+        Updater()
+    if int(settings.oobe) < 5:
+        Welcome()
+    init_verify()
+    try:
+        win.winfo_exists()
+    except TclError:
+        logging.exception('TclError')
+        return
+    win.gui()
+    global unpackg
+    unpackg = UnpackGui()
+    global project_menu
+    project_menu = ProjectMenuUtils()
+    project_menu.gui()
+    project_menu.listdir()
+    unpackg.gui()
+    Frame3().gui()
+    animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
+    animation.init()
+    if not is_pro:
+        print(lang.text108)
+    if is_pro:
+        if not verify.state:
+            Active(verify, settings, win, images, lang).gui()
+    win.update()
 
-    _exit_tool_func = globals().get('exit_tool')
-    if _exit_tool_func and callable(_exit_tool_func):
-        try: win.protocol("WM_DELETE_WINDOW", _exit_tool_func) 
-        except tk.TclError as e: logging.error(f"Error WM_DELETE_WINDOW: {e}")
-    else: logging.warning("__init__tk: 'exit_tool' function missing.")
-    
-    if len(args) > 1 and _is_pro_flag :
-        _parse_cmd_class = globals().get('ParseCmdline')
-        if _parse_cmd_class and callable(_parse_cmd_class):
-             win.after(200, lambda: _parse_cmd_class(args[1:]))
-        elif 'logging' in globals(): logging.debug("ParseCmdline missing.")
-             
+    move_center(win)
+    win.get_time()
+    print(lang.text134 % (dti() - start))
+    if os.name == 'nt':
+        do_override_sv_ttk_fonts()
+        if sys.getwindowsversion().major <= 6:
+            ask_win(lang.warn20)
+    states.inited = True
+    win.protocol("WM_DELETE_WINDOW", exit_tool)
+    if len(args) > 1 and is_pro:
+        win.after(1000, ParseCmdline, args[1:])
     win.mainloop()
 
 
@@ -6975,99 +5082,31 @@ init = lambda args: __init__tk(args)
 
 def restart(er: Toplevel = None):
     try:
-        if 'animation' in globals() and hasattr(animation, 'tasks') and animation.tasks:
-            _ask_win_func = globals().get('ask_win')
-            _lang_obj = globals().get('lang')
-            
-            prompt_text = "Your operation will not be saved. Continue with restart?"
-            if _lang_obj and hasattr(_lang_obj, 'restart_confirm_unsaved'):
-                prompt_text = getattr(_lang_obj, 'restart_confirm_unsaved', prompt_text)
+        if animation.tasks:
+            if not ask_win("Your operation will not be saved.", is_top=True):
+                return
+    except (TclError, ValueError, AttributeError):
+        logging.exception('Restart')
 
-            if _ask_win_func and callable(_ask_win_func):
-                if not _ask_win_func(prompt_text, is_top=True):
-                    if 'logging' in globals(): logging.info("Restart cancelled by user due to active tasks.")
-                    return
-            elif 'logging' in globals():
-                logging.warning("restart: ask_win not available for confirming restart with active tasks.")
-    except (tk.TclError, AttributeError, NameError) as e:
-        if 'logging' in globals(): logging.exception(f'Error checking animation tasks during restart: {e}')
-
-    # --- Закрытие GUI перед запуском нового процесса ---
-    if er and isinstance(er, tk.Toplevel) and er.winfo_exists():
-        try: er.destroy()
-        except tk.TclError: pass
-
-    _main_win_for_cleanup = globals().get('win')
-    if _main_win_for_cleanup and hasattr(_main_win_for_cleanup, 'destroy') and callable(_main_win_for_cleanup.destroy):
-        try:
-            if _main_win_for_cleanup.winfo_exists():
-                # Сначала уничтожаем дочерние элементы, затем главное окно
-                # Это может помочь предотвратить некоторые TclError
-                children = list(_main_win_for_cleanup.winfo_children()) # Копируем список
-                for child in children:
-                    try:
-                        if child.winfo_exists(): # Дополнительная проверка
-                            child.destroy()
-                    except (tk.TclError, AttributeError):
-                        if 'logging' in globals(): logging.debug(f"Minor error destroying child widget {child} during restart.")
-                _main_win_for_cleanup.destroy() # Уничтожаем главное окно
-                # Даем Tkinter шанс обработать события уничтожения
-                _main_win_for_cleanup.update_idletasks() 
-                _main_win_for_cleanup.update()
-
-        except tk.TclError as e_destroy:
-            if 'logging' in globals(): logging.error(f"TclError during main window destroy on restart: {e_destroy}")
-        except Exception as e_generic_destroy: # Ловим другие возможные ошибки
-            if 'logging' in globals(): logging.error(f"Generic error during main window destroy on restart: {e_generic_destroy}")
-
-
-    # --- Логика запуска нового процесса ---
-    _tool_self_path = globals().get('tool_self')
-    if not _tool_self_path:
-        if 'logging' in globals(): logging.critical("restart: 'tool_self' path not defined. Cannot restart.")
-        return
-
-    executable_path = sys.executable
-    argv = [executable_path]
-
-    try:
-        is_same_file = False
-        if os.path.exists(_tool_self_path) and os.path.exists(executable_path):
-            try:
-                is_same_file = os.path.samefile(_tool_self_path, executable_path)
-            except OSError as e_samefile:
-                if 'logging' in globals(): logging.warning(f"restart: OSError in os.path.samefile: {e_samefile}")
-        
-        if not is_same_file and _tool_self_path.endswith(".py"):
-             argv.append(_tool_self_path)
-        # Если tool_self это exe и он же executable_path, то _tool_self_path добавлять не нужно.
-        # Если getattr(sys, 'frozen', False) и пути разные, то argv[0] уже должен быть правильным.
-
-    except Exception as e_path_check:
-        if 'logging' in globals(): logging.error(f"restart: Error checking paths for Popen: {e_path_check}")
-        # Безопасный фоллбэк: если tool_self не совпадает с argv[0], добавляем его
-        if _tool_self_path != argv[0]: # Простая строковая проверка как фоллбэк
-             argv.append(_tool_self_path)
-
-    if len(sys.argv) > 1:
+    def _inner():
+        argv = [sys.executable]
+        if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
+            # only needed when running within a Python intepreter
+            argv.append(tool_self)
         argv.extend(sys.argv[1:])
-    
-    if 'logging' in globals(): logging.info(f"Attempting to restart application with command: {argv}")
-    
-    try:
-        kwargs_popen = {}
-        if os.name == 'nt':
-            kwargs_popen['creationflags'] = subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
-            
-        subprocess.Popen(argv, **kwargs_popen) # Запускаем и не ждем
-        if 'logging' in globals(): logging.info("New process for restart initiated.")
-    except Exception as e_popen:
-        if 'logging' in globals(): logging.critical(f"Failed to start new process for restart: {e_popen}")
-        # Сообщить пользователю, что автоматический перезапуск не удался
-        # Так как GUI уже закрыт, это сообщение может не отобразиться.
-        # Можно попробовать показать его до закрытия GUI, если Popen падает сразу.
-        print(f"ERROR: Automatic restart failed. Please restart the application manually. Details: {e_popen}") # Вывод в консоль
-        return # Не вызываем sys.exit, если не смогли запустить новый процесс
+        p = subprocess.Popen(argv)
+        p.wait()
+        sys.exit(p.returncode)
 
-    if 'logging' in globals(): logging.info("Exiting current process to complete restart.")
-    sys.exit(0) # Выход из текущего процесса
+    if er: er.destroy()
+    try:
+        for i in win.winfo_children():
+            try:
+                i.destroy()
+            except (TclError, ValueError, AttributeError):
+                logging.exception('Restart')
+        win.destroy()
+    except (Exception, BaseException):
+        logging.exception('Restart')
+
+    threading.Thread(target=_inner).start()
