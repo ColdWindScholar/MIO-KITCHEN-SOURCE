@@ -1348,11 +1348,40 @@ def error(code, desc="unknown error"):
 
 class Welcome(ttk.Frame):
     def __init__(self):
-        super().__init__(master=win)
-        self.pack(fill=BOTH, expand=True)
+        # master=win здесь означает, что Welcome будет дочерним виджетом главного окна 'win'
+        _main_app_window = globals().get('win')
+        if not (_main_app_window and isinstance(_main_app_window, tk.Tk)):
+            # Это критическая ситуация, если Welcome ожидает win как master
+            if 'logging' in globals():
+                logging.critical("Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+            # Можно либо упасть, либо создать временный Toplevel, если Welcome должен работать автономно (что маловероятно здесь)
+            # For now, let's assume 'win' is always available as per the original design.
+            # If 'win' is truly missing, the super().__init__ below would likely fail or misbehave.
+            pass # Let it proceed, error might be caught later or if win is not tk.Tk like
 
-        self.oobe = int(settings.oobe)
-        states.in_oobe = True
+        super().__init__(master=_main_app_window) # Explicitly pass master
+        self.pack(fill=BOTH, expand=True) # Welcome frame fills its master (win)
+
+        _settings_obj = globals().get('settings')
+        _states_obj = globals().get('states')
+        _lang_obj = globals().get('lang')
+
+        if not (_settings_obj and _states_obj and _lang_obj):
+            if 'logging' in globals():
+                logging.error("Welcome.__init__: Global objects (settings, states, lang) not fully available.")
+            # Handle missing globals if necessary, e.g., by disabling functionality or using defaults
+
+        self.oobe = 0 # Default value
+        if _settings_obj and hasattr(_settings_obj, 'oobe'):
+            try:
+                self.oobe = int(_settings_obj.oobe)
+            except (ValueError, TypeError):
+                if 'logging' in globals():
+                    logging.warning(f"Welcome.__init__: Invalid value for settings.oobe ('{_settings_obj.oobe}'). Defaulting to 0.")
+                self.oobe = 0
+        
+        if _states_obj:
+            _states_obj.in_oobe = True
 
         self.frames = {
             0: self.hello,
@@ -1362,37 +1391,118 @@ class Welcome(ttk.Frame):
             4: self.private,
             5: self.done
         }
-        self.frame = ttk.Frame(self)
-        self.frame.pack(expand=1, fill=BOTH)
-        self.button_frame = ttk.Frame(self)
-        self.back = ttk.Button(self.button_frame, text=lang.back_step, command=lambda: self.change_page(self.oobe - 1))
-        self.back.pack(fill=X, padx=5, pady=5, side='left', expand=1)
-        self.next = ttk.Button(self.button_frame, text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
-        self.next.pack(fill=X, padx=5, pady=5, side='right', expand=1)
-        self.button_frame.pack(expand=1, fill=X, padx=5, pady=5, side='bottom')
-        self.change_page(self.oobe)
-        move_center(win)
-        self.wait_window()
-        states.in_oobe = False
+        self.frame = ttk.Frame(self) # This is the inner frame that holds the content of each page
+        self.frame.pack(expand=True, fill=BOTH, padx=10, pady=10) # Added padding for aesthetics
 
-    def change_page(self, step: int = None):
-        if not step or step not in self.frames.keys():
-            step = 0
+        self.button_frame = ttk.Frame(self)
+        
+        back_text = "Back"
+        if _lang_obj and hasattr(_lang_obj, 'back_step'):
+            lang_back = getattr(_lang_obj, 'back_step')
+            if isinstance(lang_back, str) and lang_back.strip().lower() != "none":
+                back_text = lang_back
+        
+        next_text = "Next"
+        if _lang_obj and hasattr(_lang_obj, 'text138'):
+            lang_next = getattr(_lang_obj, 'text138')
+            if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
+                next_text = lang_next
+
+        self.back = ttk.Button(self.button_frame, text=back_text, command=lambda: self.change_page(self.oobe - 1))
+        self.back.pack(fill=X, padx=5, pady=5, side='left', expand=True) # expand=True
+        self.next = ttk.Button(self.button_frame, text=next_text, command=lambda: self.change_page(self.oobe + 1))
+        self.next.pack(fill=X, padx=5, pady=5, side='right', expand=True) # expand=True
+        
+        self.button_frame.pack(expand=False, fill=X, padx=5, pady=5, side='bottom') # expand=False for button_frame
+
+        self.change_page(self.oobe) # Initial page load
+        
+        # Centering the main window 'win' after Welcome frame is packed and first page is loaded
+        _move_center_func = globals().get('move_center')
+        if _main_app_window and _move_center_func and callable(_move_center_func):
+            try:
+                # Ensure Welcome frame itself and its content are updated before centering master
+                self.update_idletasks() 
+                _main_app_window.update_idletasks() # Ensure master (win) knows its new size with Welcome packed
+                _move_center_func(_main_app_window)
+            except Exception as e_mc:
+                 if 'logging' in globals(): logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
+        
+        self.wait_window() # This makes the Welcome sequence modal relative to 'win'
+        
+        if _states_obj:
+            _states_obj.in_oobe = False
+
+    def change_page(self, step: int = 0): # Default step to 0 if None
+        _main_app_window = globals().get('win') # The main Tk window
+        _settings_obj = globals().get('settings')
+        _lang_obj = globals().get('lang')
+        _move_center_func = globals().get('move_center')
+
+        if not isinstance(step, int) or step not in self.frames:
+            step = 0 # Default to the first page if step is invalid
+
         self.oobe = step
-        settings.set_value('oobe', step)
-        for i in self.frame.winfo_children():
-            i.destroy()
-        move_center(win)
-        self.frames[step]()
+        if _settings_obj:
+            try:
+                _settings_obj.set_value('oobe', str(step)) # Ensure value is string for set_value
+            except Exception as e_set_oobe:
+                if 'logging' in globals(): logging.error(f"Welcome.change_page: Failed to save OOBE step {step}: {e_set_oobe}")
+
+        # Clear previous page content from the inner frame
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+        
+        # Load the new page content
+        self.frames[step]() # This populates self.frame with new widgets
+
+        # Update the inner frame to get its new size based on content
+        self.frame.update_idletasks()
+        # Update the Welcome frame itself (which contains self.frame and button_frame)
+        self.update_idletasks() 
+        
+        # Center the main application window ('win') after page content has changed
+        if _main_app_window and _move_center_func and callable(_move_center_func):
+            try:
+                _main_app_window.update_idletasks() # Ensure 'win' knows its size with the new Welcome content
+                _move_center_func(_main_app_window)
+            except Exception as e_mc:
+                if 'logging' in globals(): logging.error(f"Welcome.change_page: Error centering main window: {e_mc}")
+        
+        # Update button states and text
+        finish_text = "Finish"
+        if _lang_obj and hasattr(_lang_obj, 'text34'):
+            lang_finish = getattr(_lang_obj, 'text34')
+            if isinstance(lang_finish, str) and lang_finish.strip().lower() != "none":
+                finish_text = lang_finish
+        
+        next_text = "Next" # Default, defined in __init__
+        if _lang_obj and hasattr(_lang_obj, 'text138'):
+            lang_next = getattr(_lang_obj, 'text138')
+            if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
+                next_text = lang_next
+
         if step == min(self.frames.keys()):
             self.back.config(state='disabled')
         else:
             self.back.config(state='normal')
+
         if step == max(self.frames.keys()):
-            self.next.config(text=lang.text34, command=self.destroy)
+            self.next.config(text=finish_text, command=self.destroy_welcome) # Use a new method to destroy
         else:
-            if self.next.cget('text') != lang.text138:
-                self.next.config(text=lang.text138, command=lambda: self.change_page(self.oobe + 1))
+            # Ensure 'Next' button is correctly configured if not on the last page
+            current_next_text = self.next.cget('text')
+            if current_next_text != next_text or self.next.cget('command') == str(self.destroy_welcome): # Compare command carefully
+                self.next.config(text=next_text, command=lambda: self.change_page(self.oobe + 1))
+    
+    def destroy_welcome(self):
+        """ Safely destroys the Welcome frame. """
+        _states_obj = globals().get('states')
+        if _states_obj:
+            _states_obj.in_oobe = False # Set this before destroying, so mainloop doesn't get stuck
+        
+        if self.winfo_exists():
+            self.destroy()
 
     def hello(self):
         ttk.Label(self.frame, text=lang.text135, font=(None, 40)).pack(padx=10, pady=10, fill=X)
