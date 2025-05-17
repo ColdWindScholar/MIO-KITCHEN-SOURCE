@@ -4951,9 +4951,9 @@ class UnpackGui(ttk.LabelFrame):
         
     # Новый метод-обработчик, вызываемый при смене проекта
     def _on_project_change(self, *args):
-        """Вызывается автоматически при изменении current_project_name."""
-        # Проверяем, существует ли метод hd и сам виджет перед вызовом
-        if hasattr(self, 'hd') and callable(self.hd):
+         """Is called automatically when current_project_name is changed."""
+        # Check if the hd method exists and the widget itself before calling
+         if hasattr(self, 'hd') and callable(self.hd):
              if self.winfo_exists():
                  # Вызов hd() обновит список разделов для нового проекта,
                  # учитывая текущий режим (Unpack/Pack)
