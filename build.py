@@ -136,10 +136,10 @@ class Builder:
     def config_folder(self):
         if not os.path.exists('dist/bin'):
             os.makedirs('dist/bin', exist_ok=True)
-        pclist = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'setting.ini', self.ostype,
+        while_list = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'setting.ini', self.ostype,
                   'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json', "exec.sh"]
         for i in os.listdir(self.local + "/bin"):
-            if i in pclist:
+            if i in while_list:
                 if os.path.isdir(f"{self.local}/bin/{i}"):
                     shutil.copytree(f"{self.local}/bin/{i}", f"{self.local}/dist/bin/{i}", dirs_exist_ok=True)
                 else:
