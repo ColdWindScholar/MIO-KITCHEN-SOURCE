@@ -76,7 +76,7 @@ if Tk is None:
     if _tkinterdnd_import_error and hasattr(_tkinterdnd_import_error, '__traceback__'):
         import traceback
         error_message_lines.append("  Traceback of original import error:")
-        tb_lines = traceback.format_exception(type(_tkinterdnd_import_error), _tkinterdnd_import_error, _tkinter_DnD_import_error.__traceback__)
+        tb_lines = traceback.format_exception(type(_tkinterdnd_import_error), _tkinterdnd_import_error, _tkinterdnd_import_error.__traceback__)
         error_message_lines.extend([f"    {line.strip()}" for line in tb_lines])
 
     # Attempt to write to sys.stderr if available, otherwise use sys.__stderr__ or print.
