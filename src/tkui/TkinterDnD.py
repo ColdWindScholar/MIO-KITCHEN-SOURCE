@@ -25,93 +25,140 @@ Tk window and all its descendants.
 """
 
 import tkinter
-import os # os is used for os.path and os.name
-# Assuming TkinterDnD.py is in 'tkui' and utils.py is in 'core' which is one level up from 'tkui'
-from ..core import utils 
-# from ..core.utils import prog_path # This specific import is now covered by 'utils.prog_path'
+import os # Добавлен os для os.path и os.name
+import sys # Добавлен sys для getattr(sys, 'frozen', False) и sys.stderr
+import platform # Используем platform из стандартной библиотеки
+import traceback # Для вывода traceback при неожиданных ошибках
 
-TkdndVersion = None # Stores the loaded tkdnd library version
+# Убедимся, что prog_path импортируется. Если utils.py еще не инициализирован, это может быть проблемой.
+# Предполагаем, что к моменту вызова Tk() -> _require(), utils.prog_path уже установлен.
+try:
+    from ..core.utils import prog_path
+except ImportError:
+    # Фоллбэк, если относительный импорт не сработал (например, если TkinterDnD.py запускается отдельно)
+    # В рабочем приложении это не должно происходить.
+    if getattr(sys, 'frozen', False):
+        prog_path = os.path.dirname(sys.executable)
+    else:
+        prog_path = os.path.dirname(os.path.abspath(__file__)) # Не идеально для структуры проекта
+    sys.stderr.write(f"[TkinterDnD WARNING] Could not import prog_path from ..core.utils. Using fallback: {prog_path}\n")
 
-def _require(tkroot: tkinter.Tk): # Added type hint for tkroot
-    """
-    Loads the platform-specific tkdnd library.
 
-    This internal function determines the correct tkdnd binary to load based on
-    the operating system and architecture, then tells the Tcl interpreter
-    where to find it and requires the 'tkdnd' package.
+TkdndVersion = None
 
-    Args:
-        tkroot: The root Tkinter window instance.
-
-    Returns:
-        str: The version string of the loaded tkdnd package.
-
-    Raises:
-        RuntimeError: If the platform/architecture is unsupported or
-                      if the tkdnd library cannot be loaded by Tcl.
-    """
+def _require(tkroot):
+    """Internal function to load the Tcl tkdnd package."""
     global TkdndVersion
-    if TkdndVersion is not None: # Avoid reloading if already loaded
-        return TkdndVersion
+    
+    # Если версия уже загружена, не делаем ничего
+    # (Это может быть полезно, если _require вызывается несколько раз, хотя обычно не должен)
+    # if TkdndVersion:
+    #     return TkdndVersion
+
+    # --- Determine platform-specific subdirectory name for tkdnd ---
+    current_os = platform.system()
+    current_machine = platform.machine()
+    current_arch_bits = platform.architecture()[0] # '32bit' or '64bit'
+    
+    tkdnd_platform_rep = None
+
+    if current_os == "Darwin": # macOS
+        if current_machine == "arm64":
+            tkdnd_platform_rep = "osx-arm64"
+        elif current_machine == "x86_64":
+            tkdnd_platform_rep = "osx-x64"
+    elif current_os == "Linux":
+        if current_machine == "aarch64":
+            tkdnd_platform_rep = "linux-arm64"
+        elif current_machine == "x86_64":
+            tkdnd_platform_rep = "linux-x64"
+        elif current_machine in ["i386", "i686"]: # For 32-bit Linux
+             tkdnd_platform_rep = "linux-x86" # Assuming this folder name exists
+    elif current_os == "Windows":
+        if current_machine == "AMD64": # Standard 64-bit
+            tkdnd_platform_rep = "win-x64"
+        elif current_machine == "ARM64":
+            tkdnd_platform_rep = "win-arm64"
+        elif current_arch_bits == '32bit' or current_machine.lower() in ['x86', 'i386', 'i686']:
+            tkdnd_platform_rep = "win-x86"
+        else: # Fallback for Windows if architecture is unusual
+            sys.stderr.write(f"[TkinterDnD WARNING] Unknown Windows architecture: {current_machine}. Defaulting based on Python bitness.\n")
+            tkdnd_platform_rep = 'win-x64' if sys.maxsize > 2**32 else 'win-x86'
+    
+    if not tkdnd_platform_rep:
+        # This error should be caught by the caller or logged appropriately.
+        raise RuntimeError(f"TkinterDnD: Platform not supported or architecture undetermined (OS: {current_os}, Arch: {current_machine}).")
+
+    # --- Construct the path to the tkdnd library ---
+    # prog_path should be the root directory of your application bundle (e.g., where MIO-KITCHEN.exe is)
+    # Your build.py copies tkdnd to <app_root>/bin/tkdnd/<platform_rep>/
+    # So, the path should be os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)
+    # If prog_path from utils is already os.path.dirname(sys.executable) for frozen apps, this is correct.
+
+    # Let's determine the base_executable_dir for clarity in frozen state
+    if getattr(sys, 'frozen', False):
+        # For frozen app (PyInstaller bundle)
+        base_executable_dir = os.path.dirname(sys.executable)
+        # In this case, prog_path from utils.py *should* be this base_executable_dir.
+        # If it's not, then utils.prog_path needs to be fixed.
+        # Assuming prog_path is correctly set to the directory containing the .exe
+    else:
+        # For script mode, prog_path from utils.py should point to the project root.
+        base_executable_dir = prog_path # prog_path is project root
+
+    # The tkdnd libraries are expected to be in <base_executable_dir>/bin/tkdnd/<platform_rep>
+    # for a one-dir build, or if manually placed there for a one-file build's runtime extraction.
+    # The key is that 'bin/tkdnd/...' must be relative to where the app *runs* from.
+    # If 'prog_path' from utils.py is always the application's effective root (e.g. dir of .exe),
+    # then this is simpler:
+    tkdnd_lib_path = os.path.join(prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)
+    
+    # --- Debugging Output ---
+    # Use a logger if available, otherwise print to stderr
+    log_func = logging.info if 'logging' in globals() and hasattr(logging, 'info') else lambda msg: sys.stderr.write(f"INFO: {msg}\n")
+    warn_func = logging.warning if 'logging' in globals() and hasattr(logging, 'warning') else lambda msg: sys.stderr.write(f"WARNING: {msg}\n")
+    
+    log_func(f"[TkinterDnD] Determined tkdnd_platform_rep: {tkdnd_platform_rep}")
+    log_func(f"[TkinterDnD] utils.prog_path is: {prog_path}") # Check what utils.prog_path gives
+    log_func(f"[TkinterDnD] Constructed tkdnd_lib_path: {tkdnd_lib_path}")
+
+    if not os.path.isdir(tkdnd_lib_path):
+        warn_func(f"[TkinterDnD] tkdnd library path does not exist or is not a directory: '{tkdnd_lib_path}'")
+        # Check contents of the parent 'bin/tkdnd' directory for diagnostics
+        parent_tkdnd_dir_check = os.path.join(prog_path, 'bin', 'tkdnd')
+        if os.path.isdir(parent_tkdnd_dir_check):
+            log_func(f"[TkinterDnD] Contents of '{parent_tkdnd_dir_check}': {os.listdir(parent_tkdnd_dir_check)}")
+        else:
+            warn_func(f"[TkinterDnD] Parent directory '{parent_tkdnd_dir_check}' also not found.")
+        # This error will likely lead to 'package require tkdnd' failing.
+        # The RuntimeError below will then be more informative.
 
     try:
-        # os.path is implicitly available via 'import os'
-        import platform # Standard library for platform information
-        
-        # Determine the machine architecture string locally without modifying global platform.machine
-        current_machine_arch = platform.machine()
-        system_name = platform.system()
-
-        # Adjust architecture string for specific Windows cases (32-bit Python on 64-bit OS)
-        if system_name == "Windows": # Changed from os.name == "nt" for consistency with platform.system()
-            if platform.architecture()[0] == '32bit' and current_machine_arch == 'AMD64':
-                current_machine_arch = 'x86' 
-        
-        # Determine the tkdnd platform representation string
-        if system_name == "Darwin": # macOS
-            if current_machine_arch == "arm64":
-                tkdnd_platform_rep = "osx-arm64"
-            elif current_machine_arch == "x86_64":
-                tkdnd_platform_rep = "osx-x64"
-            else:
-                raise RuntimeError(f'Unsupported macOS architecture: {current_machine_arch}')
-        elif system_name == "Linux":
-            if current_machine_arch == "aarch64": # ARM64 on Linux
-                tkdnd_platform_rep = "linux-arm64"
-            elif current_machine_arch == "x86_64":
-                tkdnd_platform_rep = "linux-x64"
-            else:
-                raise RuntimeError(f'Unsupported Linux architecture: {current_machine_arch}')
-        elif system_name == "Windows":
-            if current_machine_arch == "ARM64":
-                tkdnd_platform_rep = "win-arm64"
-            elif current_machine_arch == "AMD64": # Standard 64-bit Windows
-                tkdnd_platform_rep = "win-x64"
-            elif current_machine_arch == "x86": # 32-bit Windows
-                tkdnd_platform_rep = "win-x86"
-            else:
-                raise RuntimeError(f'Unsupported Windows architecture: {current_machine_arch}')
-        else:
-            raise RuntimeError(f'Platform not supported by this tkdnd setup: {system_name}')
-
-        # Construct the path to the tkdnd library directory
-        # CRITICAL: utils.prog_path must be correctly set for both dev and bundled environments
-        tkdnd_lib_dir = os.path.join(utils.prog_path, 'bin', 'tkdnd', tkdnd_platform_rep)
-        
-        # Add the library path to Tcl's auto_path and require the package
-        tkroot.tk.call('lappend', 'auto_path', tkdnd_lib_dir)
+        tkroot.tk.call('lappend', 'auto_path', tkdnd_lib_path)
         TkdndVersion = tkroot.tk.call('package', 'require', 'tkdnd')
+        log_func(f"[TkinterDnD] Successfully loaded tkdnd version: {TkdndVersion}")
+    except tkinter.TclError as e_tcl:
+        err_msg = (f"Unable to load tkdnd Tcl package. "
+                   f"Attempted platform: '{tkdnd_platform_rep}'. "
+                   f"Attempted library path: '{tkdnd_lib_path}'. "
+                   f"Original TclError: {e_tcl}")
+        
+        # Log detailed error
+        error_log_func = logging.error if 'logging' in globals() and hasattr(logging, 'error') else lambda msg: sys.stderr.write(f"ERROR: {msg}\n")
+        error_log_func(f"[TkinterDnD] {err_msg}")
+        
+        raise RuntimeError(err_msg) from e_tcl # Re-raise with more context
 
-    except tkinter.TclError as e_tcl: 
-        # This occurs if Tcl fails to load the package (e.g., file not found, wrong architecture)
-        # import logging # Optional: for more detailed logging if available
-        # logging.exception("Failed to load tkdnd Tcl package")
-        raise RuntimeError(f'Unable to load tkdnd Tcl package from {tkdnd_lib_dir}. TclError: {e_tcl}')
-    except Exception as e_general:
-        # Catch other potential errors during platform detection or path construction
-        # import logging
-        # logging.exception("Unexpected error during tkdnd library requirement")
-        raise RuntimeError(f'Unexpected error requiring tkdnd: {e_general}')
+    except Exception as e_unexpected: # Catch any other unexpected errors during Tcl calls
+        err_msg = f"An unexpected error occurred in tkdnd _require: {e_unexpected}"
+        # Log with traceback
+        crit_log_func = logging.critical if 'logging' in globals() and hasattr(logging, 'critical') else lambda msg: sys.stderr.write(f"CRITICAL: {msg}\n")
+        if 'logging' in globals() and hasattr(logging, 'exception'):
+            logging.exception(err_msg)
+        else:
+            crit_log_func(err_msg)
+            traceback.print_exc(file=sys.stderr)
+        raise RuntimeError(err_msg) from e_unexpected
         
     return TkdndVersion
 
@@ -316,19 +363,13 @@ class DnDWrapper:
 # Applications should use this (or a subclass) as their root window to enable
 # DnD functionality for all widgets within the application.
 # ------------------------------------------------------------------------------
-class Tk(tkinter.Tk, DnDWrapper): # Inherits from standard tkinter.Tk and our DnDWrapper
-    """
-    A Tkinter.Tk root window subclass that initializes and enables TkDnD
-    functionality for itself and all its descendant widgets.
-    """
-    def __init__(self, screenName: str = None, baseName: str = None, className: str = 'Tk', useTk: bool = True, sync: bool = False, use: str = None):
-        """
-        Initializes the Tk root window and loads the TkDnD extension.
-        Arguments are the same as for tkinter.Tk.
-        """
-        super().__init__(screenName, baseName, className, useTk, sync, use)
-        try:
-            self.TkdndVersion = _require(self) # Load and initialize TkDnD
+class Tk(tkinter.Tk, DnDWrapper):
+    """Creates a new instance of a tkinter.Tk() window; all methods of the
+    DnDWrapper class apply to this window and all its descendants."""
+    def __init__(self, *args, **kw):
+        tkinter.Tk.__init__(self, *args, **kw)
+        # _require will now raise a more informative RuntimeError if it fails
+        self.TkdndVersion = _require(self)
         except RuntimeError as e:
             # Handle tkdnd loading failure gracefully, e.g., log and disable DnD features.
             # For now, re-raise as it's a critical part of this module.
