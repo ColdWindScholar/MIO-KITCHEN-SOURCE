@@ -3871,28 +3871,81 @@ def call(exe, extra_path=True, out: bool = True):
 
 def download_api(url, path=None, int_=True, size_=0):
     start_time = time.time()
-    response = requests.Session().head(url)
-    file_size = int(response.headers.get("Content-Length", 0))
-    response = requests.Session().get(url, stream=True, verify=False)
+    session = requests.Session() # Создаем сессию один раз
+
+    try:
+        # HEAD-запрос для получения размера файла. verify=True по умолчанию.
+        # Добавим таймаут для предотвращения зависаний
+        response_head = session.head(url, timeout=10) # 10 секунд таймаут
+        response_head.raise_for_status() # Проверка на HTTP ошибки (4xx, 5xx)
+        file_size = int(response_head.headers.get("Content-Length", 0))
+    except requests.exceptions.RequestException as e_head:
+        logging.error(f"Error making HEAD request to {url}: {e_head}")
+        # В случае ошибки HEAD, можно либо прервать, либо попробовать загрузить без известного file_size
+        # Здесь мы продолжим, file_size останется 0, и если size_ передан, он будет использован.
+        file_size = 0 # или можно возбудить исключение и обработать выше
+
+    # GET-запрос для скачивания файла.
+    # Убираем verify=False, чтобы использовалось значение по умолчанию True.
+    try:
+        # Добавим таймаут также и для GET запроса (для установки соединения)
+        response_get = session.get(url, stream=True, timeout=10) 
+        response_get.raise_for_status() # Проверка на HTTP ошибки
+    except requests.exceptions.RequestException as e_get:
+        logging.error(f"Error making GET request to {url}: {e_get}")
+        # Если GET-запрос не удался, нужно прервать генератор
+        # Можно возбудить исключение или вернуть пустой yield
+        yield "Error", 0, 0, 0, 0 # Пример возврата ошибки
+        return
+
+
     last_time = time.time()
-    if file_size == 0 and size_:
+    if file_size == 0 and size_ > 0: # Используем переданный size_, если из хедера не получили
         file_size = size_
-    with open((settings.path if path is None else path) + os.sep + os.path.basename(url), "wb") as f:
-        chunk_size = 2048576
-        chunk_kb = chunk_size / 1024
-        bytes_downloaded = 0
-        for data in response.iter_content(chunk_size=chunk_size):
-            f.write(data)
-            bytes_downloaded += len(data)
-            elapsed = time.time() - start_time
-            # old method
-            # speed = bytes_downloaded / 1024 / elapsed
-            used_time = time.time() - last_time
-            speed = chunk_kb / used_time
-            last_time = time.time()
-            percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
-                                                                                         bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
-            yield percentage, speed, bytes_downloaded, file_size, elapsed
+    
+    file_save_path = os.path.join(settings.path if path is None else path, os.path.basename(url))
+    logging.info(f"Starting download: {url} to {file_save_path}, expected size: {file_size}")
+
+    try:
+        with open(file_save_path, "wb") as f:
+            chunk_size = 2048576 # 2MB
+            chunk_kb = chunk_size / 1024
+            bytes_downloaded = 0
+            for data in response_get.iter_content(chunk_size=chunk_size):
+                if not data: # Проверка на пустые данные, если соединение оборвалось
+                    break
+                f.write(data)
+                bytes_downloaded += len(data)
+                
+                current_time = time.time()
+                elapsed_total = current_time - start_time
+                
+                # Расчет скорости
+                # Чтобы избежать деления на ноль, если время очень мало
+                time_since_last_chunk = current_time - last_time
+                speed = 0
+                if time_since_last_chunk > 0.001: # Избегаем деления на очень маленькое число
+                    speed = (len(data) / 1024) / time_since_last_chunk # Скорость текущего чанка
+                else: # Если время очень мало, используем среднюю скорость
+                    if elapsed_total > 0.001:
+                         speed = (bytes_downloaded / 1024) / elapsed_total
+
+                last_time = current_time
+                
+                percentage = "Unknown" # Если file_size неизвестен
+                if file_size > 0:
+                    percentage_float = (bytes_downloaded / file_size) * 100
+                    percentage = int(percentage_float) if int_ else percentage_float
+                
+                yield percentage, speed, bytes_downloaded, file_size, elapsed_total
+    except IOError as e_io:
+        logging.error(f"IOError during download or saving file {file_save_path}: {e_io}")
+        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time # Возвращаем ошибку
+    except Exception as e_download: # Ловим другие возможные ошибки во время скачивания
+        logging.exception(f"Unexpected error during download of {url}: {e_download}")
+        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time
+    else:
+        logging.info(f"Finished download: {url} to {file_save_path}, total bytes: {bytes_downloaded}")
 
 
 def download_file():
