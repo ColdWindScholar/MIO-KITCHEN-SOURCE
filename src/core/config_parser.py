@@ -72,7 +72,7 @@ class ConfigParser:
             self.dict[main_i] = {}
         self.dict[main_i][n] = v
 
-    def get(self, main_i, n):
+    def get(self, main_i, n, default=''):
         if main_i not in self.dict.keys():
-            return ''
-        return self.dict[main_i][n]
+            return default
+        return self.dict[main_i].get(n, default)
