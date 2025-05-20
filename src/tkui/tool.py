@@ -65,60 +65,6 @@ from ..core.dumper import Dumper
 from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
 
-
-
-# Splash screen handling (e.g., for PyInstaller)
-# This should ideally come after the exception hook is set,
-# but before heavy GUI initializations if pyi_splash itself can fail.
-if platform.system() != 'Darwin':
-    try:
-        import pyi_splash
-        # Check if pyi_splash is active before trying to update or close it
-        if hasattr(pyi_splash, 'is_active') and pyi_splash.is_active():
-            pyi_splash.update_text('Loading ...')
-            pyi_splash.close()
-        elif not hasattr(pyi_splash, 'is_active'): # Older versions might not have is_active
-            # Assuming if it's imported and doesn't have is_active, we can try to use it.
-            # This might be risky if the splash isn't running.
-            pyi_splash.update_text('Loading ...')
-            pyi_splash.close()
-    except ImportError:
-        pass # pyi_splash not available (e.g., running as script)
-    except RuntimeError: 
-        # pyi_splash.close() might raise RuntimeError if splash is already closed
-        # or not active, especially with older pyi_splash versions.
-        pass
-    except Exception: # Catch any other pyi_splash related errors
-        # Log this if logging is already configured, or print to stderr
-        # sys.stderr.write("Warning: Failed to interact with pyi_splash.\n")
-        pass
-
-
-# Local application/library specific imports
-# Relative imports assume this file is part of a package.
-# If 'tool.py' is the main entry point run directly, these might need adjustment
-# or your project structure must support them (e.g., running with 'python -m yourpackage.tool').
-
-from ..core import tarsafe, miside_banner
-from ..core.Magisk import Magisk_patch
-from ..core.addon_register import loader, Entry
-from ..core.cpio import extract as cpio_extract, repack as cpio_repack
-from ..core.qsb_imger import process_by_xml
-from ..core.romfs_parse import RomfsParse
-from ..core.unkdz import KDZFileTools
-
-# Local UI components and helpers
-from .tkinterdnd2_build_in import Tk, DND_FILES # Custom TkinterDnD2. '.tkinterdnd2_build_in'
-
-# Core utilities and data structures
-from ..core.utils import (lang, LogoDumper, States, terminate_process, 
-                          calculate_md5_file, calculate_sha256_file, JsonEdit, 
-                          DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo,
-                          create_thread, move_center, v_code, gettype, 
-                          is_empty_img, findfile, findfolder, Sdat2img, Unxz)
-from ..core import utils # For utils.prog_path and utils.project_name
-
-# Platform-specific imports
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
     from tkinter import filedialog
@@ -1927,8 +1873,9 @@ class ModuleManager:
                     else:
                         print(
                             f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
-                except Exception:
-                    logging.exception('Bugs')
+                except Exception as e:
+                    logging.error(f"Ошибка при загрузке плагина '{self.get_name(i)}' из '{script_path}/main.py': {e}")
+                    logging.exception('Bugs') # Оставляем для полного стека вызовов
 
     def get_info(self, id_: str, item: str, default: str = None) -> str:
         if not default:
@@ -2013,8 +1960,9 @@ class ModuleManager:
             with f.open('info') as info_file:
                 mconf.read_string(info_file.read().decode('utf-8'))
         try:
-            supports = mconf.get('module', 'supports').split()
-            if platform.system() not in supports:
+            supports_str = mconf.get('module', 'supports')
+            supports = supports_str.split() if supports_str else []
+            if supports and platform.system() not in supports:
                 return module_error_codes.PlatformNotSupport, ''
         except (Exception, BaseException):
             logging.exception('Bugs')
@@ -2022,7 +1970,7 @@ class ModuleManager:
             if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
                 return module_error_codes.DependsMissing, dep
         if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
-            shutil.rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
+            rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
         install_dir = mconf.get('module', 'identifier')
         with zipfile.ZipFile(mpk, 'r') as myfile:
             with myfile.open(mconf.get('module', 'resource'), 'r') as inner_file:
@@ -2370,7 +2318,7 @@ class ModuleManager:
                 self.uninstall_b.config(text=lang.text29.format(name if not show_name else show_name))
                 if os.path.exists(module_path):
                     try:
-                        shutil.rmtree(module_path)
+                        rmtree(module_path)
                     except PermissionError as e:
                         logging.exception('Bugs')
                         print(e)
@@ -2426,10 +2374,9 @@ class MpkMan(ttk.Frame):
             if not os.path.isdir(os.path.join(self.moduledir, i)):
                 continue
             if not os.path.exists(os.path.join(self.moduledir, i, "info.json")):
-                try:
-                    shutil.rmtree(os.path.join(self.moduledir, i))
-                except Exception:
-                    logging.error("uninstall plugin")
+                logging.warning(f"Плагин '{i}' в директории '{os.path.join(self.moduledir, i)}' не имеет info.json и не будет загружен.")
+                win.message_pop(f"Плагин '{i}' не может быть загружен: отсутствует info.json.", lang.warn if hasattr(lang, 'warn') else "Предупреждение")
+                continue
             if os.path.isdir(self.moduledir + os.sep + i):
                 self.images_[i] = PhotoImage(
                     open_img(os.path.join(self.moduledir, i, 'icon')).resize((70, 70))) if os.path.exists(
@@ -2786,17 +2733,26 @@ class MpkStore(Toplevel):
         frame.pack(fill='both', padx=10, pady=10, expand=True)
         scrollbar = ttk.Scrollbar(frame, orient='vertical')
         scrollbar.pack(side='right', fill='y', padx=10, pady=10)
-        self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set, width=600)
+        self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set) # Removed width=600
         self.canvas.pack(fill='both', expand=True)
         scrollbar.config(command=self.canvas.yview)
         self.label_frame = ttk.Frame(self.canvas)
-        self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        self.label_frame_id = self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw') # Store the id
+        self.canvas.bind('<Configure>', self._on_canvas_configure) # Bind configure event
         create_thread(self.get_db)
         self.label_frame.update_idletasks()
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
         move_center(self)
+
+    def _on_canvas_configure(self, event):
+        canvas_width = event.width
+        if hasattr(self, 'label_frame_id') and self.label_frame.winfo_exists(): # Check if widget exists
+            self.canvas.itemconfig(self.label_frame_id, width=canvas_width)
+            self.label_frame.configure(width=canvas_width) # Explicitly set label_frame width
+            self.label_frame.update_idletasks()
+            self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def init_repo(self):
         if not hasattr(settings, 'plugin_repo'):
@@ -2822,45 +2778,60 @@ class MpkStore(Toplevel):
         for data in app_dict:
             if data.get('id') in self.app_infos:
                 continue
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'), width=590, height=150)
-            f.pack_propagate(False)
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name')) # Removed fixed width
+            # f.pack_propagate(False) # Allow frame to resize based on content
             self.app_infos[data.get('id')] = f
             self.deque.append(f)
-            ttk.Label(f, image=self.logo).pack(side=LEFT, padx=5, pady=5)
-            fb = ttk.Frame(f)
-            f2 = ttk.Frame(fb)
-            ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5)
-            # ttk.Label(f2, text=f"{data.get('name')[:6]}").pack(side=LEFT, padx=5, pady=5)
+            
+            # Left part: Icon and Description
+            left_pane = ttk.Frame(f)
+            ttk.Label(left_pane, image=self.logo).pack(side=LEFT, padx=5, pady=5, anchor='n') # Anchor icon to top
+            
+            fb = ttk.Frame(left_pane) # Frame for text content (author/version and description)
+            f2 = ttk.Frame(fb) # Frame for author/version line
+            # ttk.Label(f, image=PhotoImage(data=images.none_byte)).pack(side=LEFT, padx=5, pady=5) # Placeholder image, if needed
             o = ttk.Label(f2,
                           text=f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
-                          , wraplength=250)
-            o.pack_propagate(False)
-            o.pack(side=LEFT, padx=5, pady=5)
-            f2.pack(side=TOP)
-            f3 = ttk.Frame(fb)
+                          , wraplength=0) # Wraplength 0 for dynamic wrapping
+            o.pack(side=LEFT, padx=5, pady=5, fill=X, expand=True)
+            f2.pack(side=TOP, fill=X, expand=True)
+            
+            f3 = ttk.Frame(fb) # Frame for description
             desc = data.get('desc')
             if not desc:
                 desc = 'No Description.'
-            ttk.Label(f3, text=f"{desc}", wraplength=250).pack(padx=5, pady=5)
-            f3.pack(side=BOTTOM)
-            fb.pack(side=LEFT, padx=5, pady=5)
+            desc_label = ttk.Label(f3, text=f"{desc}", wraplength=0) # Wraplength 0 for dynamic wrapping
+            desc_label.pack(padx=5, pady=5, fill=BOTH, expand=True) # Fill and expand description
+            f3.pack(side=TOP, fill=BOTH, expand=True) # Description frame fills available space
+            
+            fb.pack(side=LEFT, padx=5, pady=5, fill=BOTH, expand=True)
+            # Right part: Buttons
+            buttons_frame = ttk.Frame(f)
+            buttons_frame.pack(side=RIGHT, fill='y', padx=5, pady=5)
+
+            # Left part: Icon and Description - will take remaining space
+            left_pane.pack(side=LEFT, fill='both', expand=True, padx=5, pady=5)
+            
             args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
 
-            bu = ttk.Button(f, text=lang.text21,
-                            command=lambda a=args: create_thread(self.download, *a), width=5)
-            uninstall_button = ttk.Button(f, text=lang.text20,
+            bu = ttk.Button(buttons_frame, text=lang.text21, # Install button
+                            command=lambda a=args: create_thread(self.download, *a), width=15)
+            uninstall_button = ttk.Button(buttons_frame, text=lang.text20, # Uninstall button
                                           command=lambda a=data.get('id'): create_thread(self.uninstall,
-                                                                                         a), width=5)
+                                                                                         a), width=15)
             if not module_manager.get_installed(data.get('id')):
                 bu.config(style="Accent.TButton")
                 uninstall_button.config(state='disabled')
             else:
-                bu.config(width=5)
+                # bu.config(width=5) # Keep width consistent or manage dynamically
                 uninstall_button.config(style="Accent.TButton")
+            
             self.control[data.get('id')] = bu, uninstall_button
-            uninstall_button.pack(side=RIGHT, padx=5, pady=5)
-            bu.pack(side=RIGHT, padx=5, pady=5)
-            f.pack(padx=5, pady=5, anchor='nw', expand=1)
+            
+            bu.pack(side=TOP, padx=5, pady=(5,2), fill='x') # Install button on top, fill buttons_frame width
+            uninstall_button.pack(side=TOP, padx=5, pady=(2,5), fill='x') # Uninstall button below, fill buttons_frame width
+            
+            f.pack(padx=5, pady=5, anchor='nw', fill=BOTH, expand=True) # Main frame for plugin item, fill BOTH and expand
         self.label_frame.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
@@ -2940,21 +2911,67 @@ class MpkStore(Toplevel):
             self.tasks.remove(id_)
 
     def get_db(self):
-        self.clear()
+        if not self.winfo_exists(): # Check MpkStore frame
+            logging.debug("MpkStore.get_db: Main widget destroyed, exiting thread.")
+            return
+
+        self.clear() # clear() itself checks for self.label_frame existence before acting
+
         try:
+            # Assuming 'requests' can take time, re-check widget existence after.
             url = requests.get(self.repo + 'plugin.json')
             self.data = json.loads(url.text)
-        except (Exception, BaseException):
-            logging.exception('Bugs')
+        except (requests.exceptions.RequestException, json.JSONDecodeError) as e: # More specific exceptions
+            logging.error(f"MpkStore.get_db: Failed to get/parse plugin.json: {e}")
+            if not self.winfo_exists(): return
             self.apps = self.data = []
-        else:
+        except (Exception, BaseException): # Catch-all for other unexpected issues
+            logging.exception('MpkStore.get_db: Unexpected error during data fetch')
+            if not self.winfo_exists(): return
+            self.apps = self.data = []
+        else: # Runs if try block for requests succeeds
+            if not self.winfo_exists(): return
             self.apps = self.data
+        
+        # Ensure label_frame and canvas attributes exist before checking winfo_exists
+        # These should have been created in pack_basic()
+        if not hasattr(self, 'label_frame') or not hasattr(self, 'canvas'):
+            logging.error("MpkStore.get_db: label_frame or canvas not initialized.")
+            return
+
         try:
-            self.add_app(self.apps)
-        except (TclError, Exception, BaseException):
-            if not states.mpk_store:
+            # Check if label_frame (parent of buttons added by add_app) exists
+            if not self.label_frame.winfo_exists():
+                logging.debug("MpkStore.get_db: label_frame destroyed before add_app.")
                 return
+            self.add_app(self.apps) # This method adds buttons to self.label_frame
+        except TclError as e: # Specifically catch TclErrors, often widget-related
+            if "invalid command name" in str(e).lower():
+                logging.warning(f"MpkStore.get_db: TclError in add_app (widget likely destroyed): {e}")
+            else:
+                logging.exception('MpkStore.get_db: TclError in add_app')
+            # Check the global state flag as in original code, regardless of TclError type
+            if hasattr(states, 'mpk_store') and not states.mpk_store:
+                return
+            return # In case of TclError, assume UI is unstable, so exit.
+        except (Exception, BaseException): # Catch other errors from add_app
+            logging.exception('MpkStore.get_db: Error during add_app')
+            # If add_app fails for other reasons, it might leave UI in bad state.
+            # Check the global state flag as in original code
+            if hasattr(states, 'mpk_store') and not states.mpk_store:
+                return
+            return # Be cautious and return if add_app had other issues.
+
+        # Perform final UI updates only if widgets still exist
+        if not hasattr(self, 'label_frame') or not self.label_frame.winfo_exists():
+            logging.debug("MpkStore.get_db: label_frame destroyed before update_idletasks.")
+            return
         self.label_frame.update_idletasks()
+
+        if not hasattr(self, 'canvas') or not self.canvas.winfo_exists():
+            logging.debug("MpkStore.get_db: canvas destroyed before config.")
+            return
+        # The actual problematic call, now guarded
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
 
@@ -4813,6 +4830,11 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
+        if not hasattr(self, 'fm'):
+            # Используем print для отладки, можно заменить на logging
+            print(f"DEBUG: UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update. Current project: {current_project_name.get()}")
+            return
+
         if self.ch.get():
             self.fm.configure(state='readonly')
             self.refs()
