@@ -24,13 +24,13 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 
-from ..core import tarsafe, miside_banner
-from ..core.Magisk import Magisk_patch
-from ..core.addon_register import loader, Entry
-from ..core.cpio import extract as cpio_extract, repack as cpio_repack
-from ..core.qsb_imger import process_by_xml
-from ..core.romfs_parse import RomfsParse
-from ..core.unkdz import KDZFileTools
+from src.core import tarsafe, miside_banner
+from src.core.Magisk import Magisk_patch
+from src.core.addon_register import loader, Entry
+from src.core.cpio import extract as cpio_extract, repack as cpio_repack
+from src.core.qsb_imger import process_by_xml
+from src.core.romfs_parse import RomfsParse
+from src.core.unkdz import KDZFileTools
 
 if platform.system() != 'Darwin':
     try:
@@ -61,58 +61,58 @@ from requests import ConnectTimeout, HTTPError
 import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
-from ..core.dumper import Dumper
-from ..core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
+from src.core.dumper import Dumper
+from src.core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
     from tkinter import filedialog
 else:
-    from ..core import mkc_filedialog as filedialog
+    from src.core import mkc_filedialog as filedialog
 
-from ..core import imgextractor
-from ..core import lpunpack
-from ..core import mkdtboimg
-from ..core import ozipdecrypt
-from ..core import splituapp
-from ..core import ofp_qc_decrypt
-from ..core import ofp_mtk_decrypt
+from src.core import imgextractor
+from src.core import lpunpack
+from src.core import mkdtboimg
+from src.core import ozipdecrypt
+from src.core import splituapp
+from src.core import ofp_qc_decrypt
+from src.core import ofp_mtk_decrypt
 from . import editor
-from ..core import opscrypto
-from ..core import images
-from ..core import extra
+from src.core import opscrypto
+from src.core import images
+from src.core import extra
 from . import AI_engine
-from ..core import ext4
-from ..core.config_parser import ConfigParser
-from ..core import utils
-from ..core.unpac import MODE as PACMODE, unpac
+from src.core import ext4
+from src.core.config_parser import ConfigParser
+from src.core import utils
+from src.core.unpac import MODE as PACMODE, unpac
 
 if os.name == 'nt':
     from .sv_ttk_fixes import *
-from ..core.extra import fspatch, re, contextpatch
-from ..core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
+from src.core.extra import fspatch, re, contextpatch
+from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, Unxz
 from .controls import ListBox, ScrollFrame
-from ..core.undz import DZFileTools
-from ..core.selinux_audit_allow import main as selinux_audit_allow
+from src.core.undz import DZFileTools
+from src.core.selinux_audit_allow import main as selinux_audit_allow
 import logging
 
 is_pro = False
 try:
-    from ..pro.sn import v as verify
+    from src.pro.sn import v as verify
 
     is_pro = True
 except ImportError:
     is_pro = False
 if is_pro:
-    from ..pro.active_ui import Active
+    from src.pro.active_ui import Active
 
 try:
-    from ..core import imp
+    from src.core import imp
 except ImportError:
     imp = None
 try:
-    from ..core.pycase import ensure_dir_case_sensitive
+    from src.core.pycase import ensure_dir_case_sensitive
 except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
@@ -213,14 +213,58 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 1500):
-    ask = ttk.LabelFrame(win)
-    ask.configure(text=title)
-    ask.place(relx=0.5, rely=0.5, anchor="nw")
-    frame_inner = ttk.Frame(ask)
-    frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    ttk.Label(frame_inner, text=text, font=(None, 20), foreground=color).pack(side=TOP)
-    ask.after(wait, ask.destroy)
+def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 3000): # Увеличено время до 3000 мс
+    # Убедимся, что `win` это правильный родитель (главное окно)
+    # Если `win` не всегда доступен или это MpkStore, то нужно передавать master явно.
+    # Для простоты, предполагаем, что `win` это главный Tk объект.
+    parent_for_popup = win 
+    if hasattr(states, 'active_mpk_store_instance') and \
+       states.active_mpk_store_instance and \
+       states.active_mpk_store_instance.winfo_exists():
+        # Если MpkStore активен, делаем попап относительно него, чтобы он был поверх
+        parent_for_popup = states.active_mpk_store_instance
+        # Однако, LabelFrame не может быть дочерним для Toplevel напрямую через place таким способом.
+        # Лучше создать Toplevel для этого сообщения, если parent_for_popup это Toplevel
+        
+    # Если мы хотим, чтобы сообщение было модальным или всегда поверх конкретного окна,
+    # лучше создать новый Toplevel.
+    
+    popup_window = Toplevel() # Создаем новый Toplevel для сообщения
+    popup_window.transient(parent_for_popup) # Делаем его дочерним и поверх родителя
+    popup_window.title(title)
+    # Убираем стандартные кнопки окна (опционально, если не нужно закрывать крестиком)
+    # popup_window.overrideredirect(True) # Это уберет рамку окна полностью
+
+    # Используем ttk.Frame внутри Toplevel вместо LabelFrame для простоты
+    ask_frame = ttk.Frame(popup_window, padding=(20, 10)) # Добавляем padding
+    ask_frame.pack(expand=True, fill=BOTH)
+    
+    # Сообщение
+    msg_label = ttk.Label(ask_frame, text=text, font=(None, 14), foreground=color, wraplength=350, justify=CENTER) # Уменьшил шрифт, добавил justify
+    msg_label.pack(pady=(10, 20), expand=True, fill=X)
+
+    # Кнопка OK (опционально, если нужно закрывать по кнопке, а не только по таймеру)
+    # ttk.Button(ask_frame, text=getattr(lang, 'ok', "OK"), command=popup_window.destroy, style="Accent.TButton").pack(pady=(0,10))
+
+    popup_window.update_idletasks() # Обновить размеры перед центрированием
+
+    # Центрирование относительно родительского окна
+    parent_width = parent_for_popup.winfo_width()
+    parent_height = parent_for_popup.winfo_height()
+    parent_x = parent_for_popup.winfo_x()
+    parent_y = parent_for_popup.winfo_y()
+
+    popup_width = popup_window.winfo_reqwidth() # Используем reqwidth для начального размера
+    popup_height = popup_window.winfo_reqheight()
+
+    x_pos = parent_x + (parent_width // 2) - (popup_width // 2)
+    y_pos = parent_y + (parent_height // 2) - (popup_height // 2)
+    
+    popup_window.geometry(f"+{x_pos}+{y_pos}")
+    popup_window.lift() # Поднять над другими окнами
+    popup_window.focus_force() # Передать фокус
+
+    popup_window.after(wait, popup_window.destroy)
 
 
 class Toplevel(TkToplevel):
@@ -1785,88 +1829,121 @@ def logo_pack(origin_logo=None) -> int:
 class IconGrid(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
-        self.master = master # master - это родительский виджет, например, win.tab7
+        self.master = master 
         self.icons = []
         self.apps = {}
 
         self.canvas = tk.Canvas(self, highlightthickness=0, bd=0)
+        # Скроллбар теперь создается здесь же, рядом с canvas
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         
-        self.scrollable_frame = ttk.Frame(self.canvas) # Фрейм внутри Canvas для иконок
+        self.scrollable_frame = ttk.Frame(self.canvas)
 
-        # Порядок pack важен: сначала scrollbar, потом canvas
-        self.scrollbar.pack(side="right", fill="y", pady=(0,1))
+        # Pack order: canvas слева, scrollbar справа (если нужен)
         self.canvas.pack(side="left", fill="both", expand=True)
-        
+        # self.scrollbar.pack(side="right", fill="y") # Pack позже, по условию
+
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        
-        # Добавляем scrollable_frame на Canvas
         self.scrollable_frame_id = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        # Привязка к изменению размеров содержимого (scrollable_frame)
         self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
-        # Привязка к изменению размеров самого Canvas (например, при ресайзе окна)
-        self.canvas.bind("<Configure>", self.on_frame_configure) # Используем тот же обработчик
+        self.canvas.bind("<Configure>", self.on_canvas_configure) # Отдельный обработчик для canvas
 
-        # Привязка колесика мыши к РОДИТЕЛЬСКОМУ виджету IconGrid (master).
-        # Это похоже на то, как было сделано в ToolBox.
-        # Важно: убедитесь, что master (win.tab7) не имеет других конфликтующих биндингов.
-        # Если это вызывает проблемы, можно привязать к self.canvas,
-        # но тогда нужно убедиться, что Canvas получает фокус.
-        if self.master: # Проверяем, что master существует
-            # Используем lambda, чтобы передать event в обработчик
-            self.master.bind_all("<MouseWheel>", lambda event: self._on_mousewheel(event, self.canvas))
-            self.master.bind_all("<Button-4>", lambda event: self._on_mousewheel(event, self.canvas))
-            self.master.bind_all("<Button-5>", lambda event: self._on_mousewheel(event, self.canvas))
-            # Примечание: bind_all на self.master может быть слишком широким.
-            # Если это вызывает проблемы, можно попробовать self.bind ("<MouseWheel>", ...)
-            # или self.canvas.bind ("<MouseWheel>", ...)
+        # --- ИЗМЕНЕНИЕ: Привязываем прокрутку к самому Canvas ---
+        # Это гарантирует, что прокрутка сработает только тогда,
+        # когда курсор находится над этим конкретным Canvas.
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)    # Для Windows и macOS
+        self.canvas.bind("<Button-4>", self._on_mousewheel)      # Для Linux (прокрутка вверх)
+        self.canvas.bind("<Button-5>", self._on_mousewheel)      # Для Linux (прокрутка вниз)
 
-    def _on_mousewheel(self, event, target_canvas):
-        """Обрабатывает события колесика мыши для указанного Canvas."""
-        # Проверяем, имеет ли Canvas фокус или является ли он/его дочерние элементы местом события
-        # Это очень упрощенная проверка. В сложных UI может потребоваться более точное определение.
-        # if str(event.widget).startswith(str(target_canvas)): # Проверяем, что событие произошло на target_canvas или его дочерних элементах
-        # На практике, если биндинг на master, то событие будет срабатывать всегда.
-        # Главное, чтобы scrollregion был правильным, тогда canvas.yview_scroll не сделает ничего, если не нужно.
+        # Явно останавливаем события колеса мыши на самой полосе прокрутки,
+        # чтобы предотвратить ее стандартное поведение, если оно конфликтует.
+        self.scrollbar.bind("<MouseWheel>", lambda e: "break")
+        self.scrollbar.bind("<Button-4>", lambda e: "break")
+        self.scrollbar.bind("<Button-5>", lambda e: "break")
 
-        if event.num == 4: # Прокрутка вверх на Linux
-            target_canvas.yview_scroll(-1, "units")
-        elif event.num == 5: # Прокрутка вниз на Linux
-            target_canvas.yview_scroll(1, "units")
-        elif hasattr(event, 'delta') and event.delta != 0: # Для Windows/MacOS
-            target_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        # Для того чтобы Canvas мог принимать события клавиатуры/мыши, ему может понадобиться фокус.
+        # Обычно Canvas и так его получает, когда над ним курсор.
+        # Если нет, можно добавить self.canvas.focus_set() при определенных условиях,
+        # или убедиться, что он может получать фокус через takefocus=1 (хотя для Canvas это обычно не нужно).
+
+    def _on_mousewheel(self, event):
+        if not self.canvas.winfo_exists() or \
+           not self.scrollable_frame.winfo_exists() or \
+           not self.scrollbar.winfo_exists():
+            return
+
+        # Если событие пришло от самого виджета scrollbar, то этот обработчик (для canvas)
+        # не должен ничего делать. У scrollbar есть своя привязка lambda e: "break".
+        if hasattr(event, 'widget') and event.widget == self.scrollbar:
+            return "break"
+
+        # Проверяем, находится ли курсор над видимым скроллбаром
+        if self.scrollbar.winfo_ismapped():
+            sb_x_abs = self.scrollbar.winfo_rootx()
+            sb_y_abs = self.scrollbar.winfo_rooty()
+            sb_w = self.scrollbar.winfo_width()
+            sb_h = self.scrollbar.winfo_height()
+
+            if (sb_x_abs <= event.x_root < sb_x_abs + sb_w and
+                    sb_y_abs <= event.y_root < sb_y_abs + sb_h):
+                # Курсор над скроллбаром. Останавливаем событие, чтобы canvas не прокручивался.
+                return "break"
+
+        # Если мы здесь, значит курсор НЕ над скроллбаром (или скроллбар не виден).
+        # Выполняем логику прокрутки канваса, только если скроллбар видим (т.е. есть что скроллить)
+        if self.scrollbar.winfo_ismapped():
+            content_h = self.scrollable_frame.winfo_reqheight()
+            canvas_h = self.canvas.winfo_height()
+
+            if content_h > canvas_h:
+                delta = 0
+                if event.num == 4:  # Linux scroll up
+                    delta = -1
+                elif event.num == 5:  # Linux scroll down
+                    delta = 1
+                elif hasattr(event, 'delta') and event.delta != 0:  # Windows/macOS
+                    delta = int(-1 * (event.delta / 120))
+                
+                if delta != 0:
+                    self.canvas.yview_scroll(delta, "units")
+                    return "break" # Останавливаем событие после нашей прокрутки канваса
+        return # Если не было прокрутки канваса (например, скроллбар не виден или контент не превышает канвас)
+
+    def on_canvas_configure(self, event=None):
+        """Обновляет ширину scrollable_frame при изменении размера canvas."""
+        if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists() and hasattr(self, 'scrollable_frame_id')):
+            return
+        
+        canvas_width = self.canvas.winfo_width()
+        self.canvas.itemconfig(self.scrollable_frame_id, width=canvas_width)
+        if self.scrollable_frame.winfo_exists(): # Убедимся, что frame еще существует
+            self.scrollable_frame.configure(width=canvas_width) 
+            self.scrollable_frame.update_idletasks()
+        
+        self.on_frame_configure() # Вызываем для обновления scrollregion и scrollbar
 
     def on_frame_configure(self, event=None):
-        """Обновляет scrollregion Canvas."""
-        # Устанавливаем ширину scrollable_frame равной ширине видимой части Canvas
-        canvas_width = self.canvas.winfo_width()
-        if self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists(): # Доп. проверки
-            self.canvas.itemconfig(self.scrollable_frame_id, width=canvas_width)
+        """Обновляет scrollregion Canvas и управляет видимостью скроллбара."""
+        if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists()):
+            return
+            
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
         
-        # Обновляем scrollregion Canvas
-        # bbox("all") вернет кортеж (x1, y1, x2, y2) границ всего содержимого
-        # self.scrollable_frame.update_idletasks() # Убедимся, что размеры scrollable_frame посчитаны
-        # Вместо update_idletasks здесь, лучше делать это после изменения контента (add/remove)
+        # Управление видимостью скроллбара
+        self.scrollable_frame.update_idletasks() 
+        self.canvas.update_idletasks() # Гарантируем актуальность высоты канваса
         
-        # Оборачиваем bbox в try-except, т.к. он может падать, если виджеты еще не полностью созданы
-        try:
-            if self.canvas.winfo_exists():
-                scroll_region = self.canvas.bbox("all")
-                self.canvas.config(scrollregion=scroll_region)
-        except tk.TclError:
-            # Может произойти, если canvas или его содержимое еще не готовы
-            # logging.debug("IconGrid.on_frame_configure: TclError getting bbox, canvas/content may not be ready.")
-            pass # Просто пропускаем обновление, оно произойдет при следующем Configure
+        canvas_height = self.canvas.winfo_height()
+        # Используем reqheight, так как он отражает запрошенную высоту содержимого
+        content_height = self.scrollable_frame.winfo_reqheight() 
 
-        # Управление видимостью скроллбара (опционально, ttk.Scrollbar должен сам становиться неактивным)
-        # self.scrollable_frame.update_idletasks()
-        # canvas_height = self.canvas.winfo_height()
-        # content_height = self.scrollable_frame.winfo_reqheight()
-        # if content_height > canvas_height:
-        #     self.scrollbar.pack(side="right", fill="y", pady=(0,1)) # Показываем, если еще не показан
-        # else:
-        #     self.scrollbar.pack_forget() # Прячем
+        if content_height > canvas_height + 2: # Добавлен небольшой порог
+            if not self.scrollbar.winfo_ismapped(): # Если скроллбар еще не показан
+                self.scrollbar.pack(side="right", fill="y")
+        else:
+            if self.scrollbar.winfo_ismapped(): # Если скроллбар показан, но не нужен
+                self.scrollbar.pack_forget()
 
     def add_icon(self, icon_widget, id_, num_columns=4):
         if id_ in self.apps:
@@ -1878,40 +1955,47 @@ class IconGrid(tk.Frame):
         row = (len(self.icons) - 1) // num_columns
         col = (len(self.icons) - 1) % num_columns
         
+        # Используем grid внутри self.scrollable_frame
         icon_widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
         
-        # После добавления элемента важно обновить scrollable_frame, чтобы его размеры пересчитались,
-        # что вызовет событие <Configure> и обновит scrollregion.
-        self.scrollable_frame.update_idletasks()
-        # self.on_frame_configure() # Можно вызвать и явно, если <Configure> не всегда срабатывает вовремя
+        # После добавления элемента, обновляем scrollable_frame и вызываем on_frame_configure
+        if self.scrollable_frame.winfo_exists():
+            self.scrollable_frame.update_idletasks()
+            self.on_frame_configure() # Обновить scrollregion и видимость скроллбара
 
     def remove_icon(self, id_):
         if id_ in self.apps:
             widget_to_remove = self.apps.pop(id_)
             if widget_to_remove in self.icons:
                 self.icons.remove(widget_to_remove)
-            widget_to_remove.destroy()
-            self._rebuild_grid()
-            self.scrollable_frame.update_idletasks()
-            # self.on_frame_configure()
+            if widget_to_remove.winfo_exists(): # Проверка перед destroy
+                widget_to_remove.destroy()
+            self._rebuild_grid() # Перестраиваем сетку
+            if self.scrollable_frame.winfo_exists():
+                 self.scrollable_frame.update_idletasks()
+                 self.on_frame_configure()
 
     def clean(self):
         ids_to_remove = list(self.apps.keys())
         for id_ in ids_to_remove:
             self.remove_icon(id_) 
-        # self.scrollable_frame.update_idletasks() # Уже вызывается в remove_icon
-        # self.on_frame_configure() # Также
+        # on_frame_configure вызовется из remove_icon
 
     def _rebuild_grid(self, num_columns=4):
+        if not self.scrollable_frame.winfo_exists(): return
+
         for widget in self.scrollable_frame.winfo_children():
-            widget.grid_forget()
+            widget.grid_forget() # Сначала убираем все виджеты из сетки
         
+        # Затем добавляем их заново в правильном порядке
         for i, widget in enumerate(self.icons):
-            row = i // num_columns
-            col = i % num_columns
-            widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
+            if widget.winfo_exists(): # Убедимся, что виджет не был уничтожен ранее
+                row = i // num_columns
+                col = i % num_columns
+                widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
         
-        self.scrollable_frame.update_idletasks() # Важно для пересчета размеров
+        self.scrollable_frame.update_idletasks() # Обновляем размеры после перестройки
+        self.on_frame_configure() # Обновляем scrollregion
 
 
 module_error_codes = ModuleErrorCodes
@@ -1922,10 +2006,9 @@ class ModuleManager:
         sys.stdout_origin = sys.stdout
         sys.stdout = DevNull()
         self.module_dir = os.path.join(cwd_path, "bin", "module")
-        self.uninstall_gui = self.UninstallMpk
+        self.uninstall_gui = self.UninstallMpk 
         self.new = self.New
         self.new.module_dir = self.module_dir
-        self.uninstall_gui.module_dir = self.module_dir
         self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.addon_loader = loader
         self.addon_entries = Entry
@@ -1941,8 +2024,10 @@ class ModuleManager:
 
     def list_packages(self):
         for i in os.listdir(self.module_dir):
-            if self.get_installed(i):
-                yield i
+            if self.get_installed(i): 
+                if os.path.isdir(os.path.join(self.module_dir, i)): 
+                    yield i
+
 
     def load_plugins(self):
         if not os.path.exists(self.module_dir) or not os.path.isdir(self.module_dir):
@@ -1962,7 +2047,7 @@ class ModuleManager:
                             f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
                 except Exception as e:
                     logging.error(f"Ошибка при загрузке плагина '{self.get_name(i)}' из '{script_path}/main.py': {e}")
-                    logging.exception('Bugs') # Оставляем для полного стека вызовов
+                    logging.exception('Bugs') 
 
     def get_info(self, id_: str, item: str, default: str = None) -> str:
         if not default:
@@ -1970,8 +2055,16 @@ class ModuleManager:
         info_file = f'{self.module_dir}/{id_}/info.json'
         if not os.path.exists(info_file):
             return default
-        with open(info_file, 'r', encoding='UTF-8') as f:
-            return json.load(f).get(item, default)
+        try:
+            with open(info_file, 'r', encoding='UTF-8') as f:
+                return json.load(f).get(item, default)
+        except json.JSONDecodeError:
+            logging.error(f"Error decoding JSON from {info_file} for plugin {id_}")
+            return default
+        except Exception as e:
+            logging.error(f"Error reading info file {info_file} for plugin {id_}: {e}")
+            return default
+
 
     @animation
     def run(self, id_) -> int:
@@ -1983,117 +2076,233 @@ class ModuleManager:
         else:
             print(lang.warn2)
             return 1
-        script_path = self.module_dir + f"/{value}/"
+        script_path = os.path.join(self.module_dir, value) 
+        
         if not self.is_virtual(id_):
             name = self.get_name(id_)
-            with open(os.path.join(script_path, "info.json"), 'r', encoding='UTF-8') as f:
-                data = json.load(f)
-                for n in data['depend'].split():
-                    if not os.path.exists(os.path.join(self.module_dir, n)):
-                        print(lang.text36 % (name, n, n))
-                        return 2
-        if os.path.exists(f"{script_path}/main.json"):
-            values = self.Parse(f"{script_path}/main.json")
-            if values.cancel:
+            info_json_path = os.path.join(script_path, "info.json")
+            if not os.path.exists(info_json_path):
+                 logging.error(f"run: info.json not found for plugin {id_} at {info_json_path}")
+                 print(f"Plugin {name} configuration is missing.")
+                 return 3 
+
+            try:
+                with open(info_json_path, 'r', encoding='UTF-8') as f:
+                    data = json.load(f)
+            except json.JSONDecodeError:
+                logging.error(f"run: Could not decode info.json for plugin {id_}")
+                print(f"Plugin {name} configuration is corrupted.")
+                return 4 
+            except Exception as e:
+                logging.error(f"run: Error reading info.json for plugin {id_}: {e}")
+                print(f"Error accessing plugin {name} configuration.")
+                return 5
+
+            dependencies = data.get('depend', '') 
+            for n in dependencies.split():
+                if n and not os.path.exists(os.path.join(self.module_dir, n)): 
+                    print(lang.text36 % (name, n, n))
+                    return 2
+        
+        main_json_path = os.path.join(script_path, "main.json")
+        if os.path.exists(main_json_path):
+            values_parser = self.Parse(main_json_path) 
+            if values_parser.cancel: 
                 return 1
-            values = values.gavs
+            values = values_parser.gavs 
         else:
             values = {}
-        if os.path.exists(script_path + "main.sh"):
+
+        main_sh_path = os.path.join(script_path, "main.sh")
+        main_py_path = os.path.join(script_path, "main.py")
+
+        if os.path.exists(main_sh_path):
             if not os.path.exists(temp):
                 re_folder(temp)
             exports = ''
-            if os.path.exists(script_path + "main.sh"):
-                if values:
-                    for va in values.keys():
-                        if gva := values[va].get():
-                            exports += f"export {va}='{gva}';"
-                    values.clear()
-                exports += f"export tool_bin='{settings.tool_bin.replace(os.sep, '/')}';export version='{settings.version}';export language='{settings.language}';export bin='{script_path.replace(os.sep, '/')}';"
-                exports += f"export moddir='{self.module_dir.replace(os.sep, '/')}';export project_output='{project_manger.current_work_output_path()}';export project='{project_manger.current_work_path()}';"
+            if values: 
+                for va, string_var in values.items(): 
+                    gva = string_var.get()
+                    if gva: 
+                        exports += f"export {va}='{gva}';"
+            
+            norm_tool_bin = os.path.normpath(settings.tool_bin).replace(os.sep, '/')
+            norm_script_path = os.path.normpath(script_path).replace(os.sep, '/')
+            norm_module_dir = os.path.normpath(self.module_dir).replace(os.sep, '/')
+            norm_project_output = os.path.normpath(project_manger.current_work_output_path()).replace(os.sep, '/')
+            norm_project_work = os.path.normpath(project_manger.current_work_path()).replace(os.sep, '/')
+            norm_module_exec = os.path.normpath(module_exec).replace(os.sep, '/')
+            norm_main_sh_path = os.path.normpath(main_sh_path).replace(os.sep, '/')
 
-            if os.path.exists(script_path + "main.sh"):
-                shell = 'ash' if os.name == 'posix' else 'bash'
-                call(['busybox', shell, '-c',
-                      f"{exports}exec {module_exec} {(script_path + 'main.sh').replace(os.sep, '/')}"])
-            del exports
-        elif os.path.exists(script_path + "main.py") and imp:
+
+            exports += f"export tool_bin='{norm_tool_bin}';"
+            exports += f"export version='{settings.version}';"
+            exports += f"export language='{settings.language}';"
+            exports += f"export bin='{norm_script_path}';" 
+            exports += f"export moddir='{norm_module_dir}';"
+            exports += f"export project_output='{norm_project_output}';"
+            exports += f"export project='{norm_project_work}';"
+            
+            shell_command_prefix = 'ash' if os.name == 'posix' else 'bash'
+            full_shell_command = f"{exports} exec {norm_module_exec} {norm_main_sh_path}"
+            
+            call_result = call([shell_command_prefix, '-c', full_shell_command], extra_path=False) 
+            return call_result 
+
+        elif os.path.exists(main_py_path) and imp:
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
-        elif self.is_virtual(id_):
+        elif self.is_virtual(id_): 
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
-        elif not os.path.exists(self.module_dir + os.sep + value):
+        elif not os.path.exists(os.path.join(self.module_dir, value)): 
             win.message_pop(lang.warn7.format(value))
-            list_pls_plugin()
-            win.tab7.lift()
-        else:
-            print(lang.warn8)
-        return 0
+            if callable(list_pls_plugin):
+                list_pls_plugin()
+            if hasattr(win, 'tab7') and hasattr(win.tab7, 'lift'): win.tab7.lift()
+        else: 
+            print(lang.warn8.format(self.get_name(id_))) 
+        return 0 
 
     @staticmethod
     def check_mpk(mpk):
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return module_error_codes.IsBroken, ''
-        with zipfile.ZipFile(mpk) as f:
-            if 'info' not in f.namelist():
-                return module_error_codes.IsBroken, ''
+        try:
+            with zipfile.ZipFile(mpk) as f:
+                if 'info' not in f.namelist(): 
+                    return module_error_codes.IsBroken, 'Missing info file'
+        except zipfile.BadZipFile:
+             return module_error_codes.IsBroken, 'Corrupted MPK archive'
         return module_error_codes.Normal, ''
 
-    def install(self, mpk):
-        check_mpk_result = self.check_mpk(mpk)
-        if check_mpk_result[0] != module_error_codes.Normal:
-            return check_mpk_result
-        mconf = ConfigParser()
-        with zipfile.ZipFile(mpk) as f:
-            with f.open('info') as info_file:
-                mconf.read_string(info_file.read().decode('utf-8'))
+
+    def install(self, mpk_path):
+        logging.info(f"ModuleManager.install: Starting installation from MPK: {mpk_path}")
+        check_mpk_result, reason = self.check_mpk(mpk_path)
+        if check_mpk_result != module_error_codes.Normal:
+            logging.error(f"ModuleManager.install: MPK check failed for '{mpk_path}'. Result: {check_mpk_result}, Reason: '{reason}'")
+            return check_mpk_result, reason
+
+        mconf = ConfigParser() # Используем ваш ConfigParser
         try:
-            supports_str = mconf.get('module', 'supports')
+            with zipfile.ZipFile(mpk_path) as f:
+                with f.open('info') as info_file: 
+                    mconf.read_string(info_file.read().decode('utf-8'))
+            logging.debug(f"ModuleManager.install: Successfully read 'info' from MPK '{mpk_path}'.")
+        except Exception as e:
+            logging.exception(f"ModuleManager.install: Error reading 'info' from MPK '{mpk_path}': {e}")
+            return module_error_codes.IsBroken, "Error reading MPK info file"
+        
+        install_id = mconf.get('module', 'identifier', None) 
+        
+        if not install_id:
+            logging.error(f"ModuleManager.install: Plugin identifier missing in 'info' of MPK '{mpk_path}'.")
+            return module_error_codes.IsBroken, "Missing identifier in plugin info"
+        logging.debug(f"ModuleManager.install: Plugin ID: '{install_id}'.")
+        
+        try:
+            supports_str = mconf.get('module', 'supports', '')
             supports = supports_str.split() if supports_str else []
             if supports and platform.system() not in supports:
-                return module_error_codes.PlatformNotSupport, ''
-        except (Exception, BaseException):
-            logging.exception('Bugs')
-        for dep in mconf.get('module', 'depend').split():
-            if not os.path.isdir(os.path.join(cwd_path, "bin", "module", dep)):
-                return module_error_codes.DependsMissing, dep
-        if os.path.exists(os.path.join(self.module_dir, mconf.get('module', 'identifier'))):
-            rmtree(os.path.join(self.module_dir, mconf.get('module', 'identifier')))
-        install_dir = mconf.get('module', 'identifier')
-        with zipfile.ZipFile(mpk, 'r') as myfile:
-            with myfile.open(mconf.get('module', 'resource'), 'r') as inner_file:
-                fz = zipfile.ZipFile(inner_file, 'r')
-                extracted_size = 0
-                for file in fz.namelist():
-                    try:
-                        file = str(file).encode('cp437').decode('gbk')
-                    except (Exception, BaseException):
-                        file = str(file).encode('utf-8').decode('utf-8')
-                    info = fz.getinfo(file)
-                    extracted_size += info.file_size
-                    fz.extract(file, str(os.path.join(cwd_path, "bin", "module", install_dir)))
-        try:
-            depends = mconf.get('module', 'depend')
-        except (Exception, BaseException):
-            depends = ''
-        minfo = {}
-        for n, v in mconf.items('module'):
-            minfo[n] = v
-        minfo['depend'] = depends
-        with open(os.path.join(cwd_path, "bin", "module", mconf.get('module', 'identifier'), "info.json"),
-                  'w', encoding='utf-8') as f:
-            json.dump(minfo, f, indent=2, ensure_ascii=False)
-        with zipfile.ZipFile(mpk) as mpk_f:
-            if 'icon' in mpk_f.namelist():
-                with open(os.path.join(self.module_dir, mconf.get('module', 'identifier'), "icon"),
-                          'wb') as f:
-                    with mpk_f.open('icon') as i:
-                        f.write(i.read())
+                logging.warning(f"ModuleManager.install: Platform not supported for plugin '{install_id}'. Required: {supports}, Current: {platform.system()}")
+                return module_error_codes.PlatformNotSupport, f"Unsupported platform: {platform.system()}"
+        except Exception as e: 
+            logging.exception(f"ModuleManager.install: Error checking platform support for '{install_id}': {e}")
 
-        list_pls_plugin()
-        return module_error_codes.Normal, ''
+        depend_str = mconf.get('module', 'depend', '') 
+        logging.debug(f"ModuleManager.install: Dependencies for '{install_id}': '{depend_str}'")
+        for dep_id_str in depend_str.split(): 
+            if dep_id_str and not os.path.isdir(os.path.join(self.module_dir, dep_id_str)): 
+                logging.warning(f"ModuleManager.install: Dependency '{dep_id_str}' for plugin '{install_id}' is missing.")
+                return module_error_codes.DependsMissing, dep_id_str
+        
+        install_target_path = os.path.join(self.module_dir, install_id)
+        logging.info(f"ModuleManager.install: Target install path for '{install_id}': '{install_target_path}'")
+
+        if os.path.exists(install_target_path):
+            logging.info(f"ModuleManager.install: Existing installation found at '{install_target_path}'. Removing it.")
+            try:
+                rmtree(install_target_path) 
+                if os.path.exists(install_target_path):
+                     logging.error(f"ModuleManager.install: Failed to remove existing directory '{install_target_path}'.")
+                     return module_error_codes.GenericError, "Failed to remove old version"
+            except Exception as e_rm:
+                logging.exception(f"ModuleManager.install: Error removing existing directory '{install_target_path}': {e_rm}")
+                return module_error_codes.GenericError, "Error removing old version"
+
+        resource_file_name_in_mpk = mconf.get('module', 'resource', None) 
+        if not resource_file_name_in_mpk:
+            logging.error(f"ModuleManager.install: 'resource' field missing in 'info' for plugin '{install_id}'.")
+            return module_error_codes.IsBroken, "Missing resource field in plugin info"
+        logging.debug(f"ModuleManager.install: Resource file name: '{resource_file_name_in_mpk}'.")
+
+        try:
+            with zipfile.ZipFile(mpk_path, 'r') as mpk_zip_file_obj: 
+                if resource_file_name_in_mpk not in mpk_zip_file_obj.namelist():
+                    logging.error(f"ModuleManager.install: Resource file '{resource_file_name_in_mpk}' not found in MPK '{mpk_path}' for plugin '{install_id}'. Namelist: {mpk_zip_file_obj.namelist()}")
+                    return module_error_codes.IsBroken, "Resource file specified in info not found in MPK"
+
+                logging.debug(f"ModuleManager.install: Extracting resource '{resource_file_name_in_mpk}' for plugin '{install_id}'.")
+                with mpk_zip_file_obj.open(resource_file_name_in_mpk, 'r') as inner_resource_zip_stream:
+                    with zipfile.ZipFile(inner_resource_zip_stream, 'r') as resource_content_zip_obj: 
+                        os.makedirs(install_target_path, exist_ok=True)
+                        logging.debug(f"ModuleManager.install: Contents of resource zip '{resource_file_name_in_mpk}': {resource_content_zip_obj.namelist()}")
+                        resource_content_zip_obj.extractall(install_target_path)
+                        logging.info(f"ModuleManager.install: Successfully extracted all contents of '{resource_file_name_in_mpk}' to '{install_target_path}'.")
+                        # Логирование извлеченных файлов
+                        if logging.getLogger().isEnabledFor(logging.DEBUG):
+                            extracted_items = []
+                            for root_dir, _, files_in_dir in os.walk(install_target_path):
+                                for file_item in files_in_dir:
+                                    extracted_items.append(os.path.join(root_dir, file_item))
+                            logging.debug(f"ModuleManager.install: Verifying extracted files in '{install_target_path}': {extracted_items if extracted_items else 'No files found (or directory is empty after extraction).'}")
+
+
+                plugin_info_data = {n: v for n, v in mconf.items('module')}
+                plugin_info_data['depend'] = depend_str 
+                
+                info_json_target_path = os.path.join(install_target_path, "info.json")
+                with open(info_json_target_path, 'w', encoding='utf-8') as f_json:
+                    json.dump(plugin_info_data, f_json, indent=2, ensure_ascii=False)
+                logging.debug(f"ModuleManager.install: Created info.json at '{info_json_target_path}'")
+
+                if 'icon' in mpk_zip_file_obj.namelist():
+                    icon_target_path = os.path.join(install_target_path, "icon")
+                    with open(icon_target_path, 'wb') as f_icon:
+                        with mpk_zip_file_obj.open('icon') as icon_stream:
+                            f_icon.write(icon_stream.read())
+                    logging.debug(f"ModuleManager.install: Extracted icon to '{icon_target_path}'")
+
+        except zipfile.BadZipFile as e_zip:
+            logging.exception(f"ModuleManager.install: Bad ZIP file encountered (MPK or resource) for '{install_id}': {e_zip}")
+            return module_error_codes.IsBroken, "Corrupted archive"
+        except IOError as e_io: 
+            logging.exception(f"ModuleManager.install: IOError during extraction for '{install_id}': {e_io}")
+            if os.path.exists(install_target_path): 
+                try: rmtree(install_target_path)
+                except: pass
+            return module_error_codes.GenericError, f"IO Error: {e_io}"
+        except Exception as e_extract: 
+            logging.exception(f"ModuleManager.install: Error during extraction or file operations for '{install_id}': {e_extract}")
+            if os.path.exists(install_target_path): 
+                try: rmtree(install_target_path)
+                except: pass
+            return module_error_codes.GenericError, f"Extraction error: {e_extract}"
+
+        if callable(list_pls_plugin):
+             list_pls_plugin()
+        
+        if hasattr(states, 'active_mpk_store_instance') and \
+           states.active_mpk_store_instance and \
+           states.active_mpk_store_instance.winfo_exists():
+            logging.debug(f"ModuleManager.install: MpkStore is open. Calling update_plugin_state for installed plugin_id: '{install_id}'")
+            states.active_mpk_store_instance.update_plugin_state(install_id)
+        
+        logging.info(f"ModuleManager.install: Successfully installed plugin '{install_id}' to '{install_target_path}'.")
+        return module_error_codes.Normal, ""
 
     @animation
     def export(self, id_: str):
+        # ... (код без изменений, как в предыдущем ответе)
         name: str = self.get_name(id_)
         if self.is_virtual(id_):
             print(f"{name} is a virtual plugin!")
@@ -2101,45 +2310,66 @@ class ModuleManager:
         if not id_:
             win.message_pop(lang.warn2)
             return 1
-        with open(os.path.join(self.module_dir, (value := id_), "info.json"), 'r',
-                  encoding='UTF-8') as f:
+        
+        plugin_dir_path = os.path.join(self.module_dir, id_)
+        info_json_path = os.path.join(plugin_dir_path, "info.json")
+
+        if not os.path.exists(info_json_path):
+            print(f"Error: info.json not found for plugin {id_}")
+            return 2
+            
+        with open(info_json_path, 'r', encoding='UTF-8') as f:
             data: dict = json.load(f)
-            data.setdefault('resource', "main.zip")
-            (info_ := ConfigParser())['module'] = data
-            info_.write(buffer2 := StringIO())
-        with zipfile.ZipFile((buffer := BytesIO()), 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk:
-            for i in utils.get_all_file_paths(self.module_dir + os.sep + value):
-                arch_name = str(i).replace(self.module_dir + os.sep + value, '')
-                if os.path.basename(i) in ['info.json', 'icon']:
+            data.setdefault('resource', "main.zip") 
+            (info_ := ConfigParser())['module'] = data # Используем ваш ConfigParser
+            
+            buffer_info_ini = StringIO()
+            info_.write(buffer_info_ini)
+            info_ini_content = buffer_info_ini.getvalue()
+            buffer_info_ini.close()
+
+        buffer_resource_zip = BytesIO()
+        with zipfile.ZipFile(buffer_resource_zip, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as resource_zip_file:
+            for item_path_abs in utils.get_all_file_paths(plugin_dir_path):
+                if os.path.basename(item_path_abs) in ['info.json', 'icon']:
                     continue
-                print(f"{lang.text1}:{arch_name}")
+                
+                arcname = os.path.relpath(item_path_abs, plugin_dir_path)
+                print(f"{lang.text1}:{arcname}")
                 try:
-                    mpk.write(str(i), arcname=arch_name)
+                    resource_zip_file.write(str(item_path_abs), arcname=arcname)
                 except Exception as e:
-                    logging.exception('Bugs')
-                    print(lang.text2.format(i, e))
-        with zipfile.ZipFile(os.path.join(settings.path, str(name) + ".mpk"), 'w',
-                             compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk2:
-            mpk2.writestr('main.zip', buffer.getvalue())
-            mpk2.writestr('info', buffer2.getvalue())
-            if os.path.exists(os.path.join(self.module_dir, value, 'icon')):
-                mpk2.write(os.path.join(self.module_dir, value, 'icon'), 'icon')
-            del buffer2, buffer
-        print(lang.t15 % f"{settings.path}/{name}.mpk") if os.path.exists(f"{settings.path}/{name}.mpk") else print(
-            lang.t16 % f"{settings.path}/{name}.mpk")
+                    logging.exception(f'Error writing {item_path_abs} to resource zip')
+                    print(lang.text2.format(item_path_abs, e))
+        
+        resource_zip_content = buffer_resource_zip.getvalue()
+        buffer_resource_zip.close()
+
+        output_mpk_path = os.path.join(settings.path, f"{name}.mpk")
+        with zipfile.ZipFile(output_mpk_path, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk_final_file:
+            mpk_final_file.writestr(data['resource'], resource_zip_content) 
+            mpk_final_file.writestr('info', info_ini_content) 
+            
+            icon_path = os.path.join(plugin_dir_path, 'icon')
+            if os.path.exists(icon_path):
+                mpk_final_file.write(icon_path, 'icon')
+        
+        if os.path.exists(output_mpk_path):
+            print(lang.t15 % output_mpk_path)
+        else:
+            print(lang.t16 % output_mpk_path)
 
     class New(Toplevel):
-        def __init__(self, create_gui_on_init=True): # <--- ИЗМЕНЕНИЕ ЗДЕСЬ
+        # ... (код без изменений, как в предыдущем ответе)
+        def __init__(self, create_gui_on_init=True):
             super().__init__()
-            # Устанавливаем заголовок и module_dir ДО вызова gui
             self.title(lang.text115) 
-            if not hasattr(self, 'module_dir'): # Проверка, чтобы не перезаписывать, если уже установлено
+            if not hasattr(self, 'module_dir'): 
                 self.module_dir = os.path.join(cwd_path, "bin", "module")
             
             if create_gui_on_init:
-                self.gui() # Этот метод строит интерфейс окна
-                move_center(self) # Центрируем, если GUI создается
-            # else: # Если GUI не создается, Toplevel и так не будет виден без содержимого
+                self.gui()
+                move_center(self)
         @staticmethod
         def label_entry(master, text, side, value: str = ''):
             frame = Frame(master)
@@ -2154,7 +2384,7 @@ class ModuleManager:
             if not id_:
                 win.message_pop(lang.warn2)
                 return False
-            if module_manager.is_virtual(id_):
+            if module_manager.is_virtual(id_): 
                 print(f"{id_} is a virtual plugin.")
                 return False
             path = os.path.join(self.module_dir, id_)
@@ -2190,7 +2420,7 @@ class ModuleManager:
         def create(self):
             if not self.identifier.get():
                 return
-            if module_manager.get_installed(self.identifier.get()):
+            if module_manager.get_installed(self.identifier.get()): 
                 info_win(lang.warn19 % self.identifier.get())
                 return
             data = {
@@ -2208,11 +2438,12 @@ class ModuleManager:
             with open(self.module_dir + f"/{iden}/info.json", 'w+', encoding='utf-8',
                       newline='\n') as js:
                 json.dump(data, js, ensure_ascii=False, indent=4)
-            list_pls_plugin()
+            if callable(list_pls_plugin): 
+                list_pls_plugin()
             self.editor_(iden)
 
-    # fixme:Rewrite it!!!
     class Parse(Toplevel):
+        # ... (код без изменений, как в предыдущем ответе)
         gavs = {}
         cancel = False
 
@@ -2328,35 +2559,28 @@ class ModuleManager:
             self.destroy()
 
     class UninstallMpk(Toplevel):
+        # ... (код без изменений, как в предыдущем ответе)
         def __init__(self, id_: str, wait=False):
             super().__init__()
-            self.arr = {} # Зависимые плагины: {id: name}
-            self.uninstall_b = None # Кнопка "ОК/Удалить"
-            self.wait = wait # Флаг ожидания закрытия окна
+            self.arr = {} 
+            self.uninstall_b = None 
+            self.wait = wait 
             
-            self.value = id_ # ID удаляемого плагина (может быть None, если id_ пуст)
-            self.value2 = None # Отображаемое имя удаляемого плагина
-            self.check_pass = False # Флаг, что плагин найден и может быть удален
+            self.value = id_ 
+            self.value2 = None 
+            self.check_pass = False 
 
-            # Убедимся, что module_dir доступен. В вашем коде он был атрибутом класса,
-            # но для экземпляра лучше инициализировать его здесь, если он не унаследован.
-            if hasattr(module_manager, 'module_dir'): # Предполагаем, что module_manager - это экземпляр ModuleManager
-                self.module_dir = module_manager.module_dir
-            else: # Резервный вариант, если module_manager.module_dir недоступен
-                self.module_dir = os.path.join(cwd_path, "bin", "module")
-                logging.warning(f"UninstallMpk: module_manager.module_dir not found, using default: {self.module_dir}")
+            self.module_dir = module_manager.module_dir 
 
             if id_ and module_manager.get_installed(id_):
                 self.check_pass = True
-                # self.value уже установлен
-                self.value2 = module_manager.get_name(id_) # Получаем имя плагина
-                self.lsdep() # Заполняем self.arr зависимыми плагинами
-            elif id_: # ID передан, но плагин не найден
-                self.value2 = id_ # Используем ID как имя для сообщения
+                self.value2 = module_manager.get_name(id_) 
+                self.lsdep() 
+            elif id_: 
+                self.value2 = id_ 
                 logging.warning(f"UninstallMpk init: Plugin with ID '{id_}' not found by module_manager.get_installed.")
-            # else: id_ пуст, self.value будет None
             
-            self.ask() # Строим и показываем диалоговое окно
+            self.ask()
 
         def ask(self):
             try:
@@ -2374,67 +2598,38 @@ class ModuleManager:
             message_text = "" 
             plugin_display_name_for_message = self.value2 if self.value2 else self.value 
             if plugin_display_name_for_message is None:
-                plugin_display_name_for_message = getattr(lang, "unknown_plugin_name", "Unknown Plugin") # Добавляем ключ для неизвестного плагина
-
-            logging.debug(f"DEBUG: UninstallMpk.ask - Preparing message. Plugin ID: '{self.value}', Display Name: '{plugin_display_name_for_message}', CheckPass: {self.check_pass}")
+                plugin_display_name_for_message = getattr(lang, "unknown_plugin_name", "Unknown Plugin")
 
             if not self.value: 
                  message_text = getattr(lang, "warn2", "Please select a plugin!")
-                 logging.debug(f"DEBUG: UninstallMpk.ask - Case: No plugin value. Message: '{message_text}'")
             elif not self.check_pass: 
                 msg_template = getattr(lang, "plugin_not_found_for_uninstall", "Plugin '{plugin_id}' not found or cannot be uninstalled.")
                 message_text = msg_template.format(plugin_id=plugin_display_name_for_message) 
-                logging.debug(f"DEBUG: UninstallMpk.ask - Case: Plugin not found (check_pass=False). Template: '{msg_template}', Final Message: '{message_text}'")
             elif module_manager.is_virtual(self.value): 
                 msg_template = getattr(lang, "plugin_virtual_cannot_uninstall", "Plugin '{plugin_name}' is virtual and cannot be uninstalled this way.")
                 message_text = msg_template.format(plugin_name=plugin_display_name_for_message)
-                logging.debug(f"DEBUG: UninstallMpk.ask - Case: Virtual plugin. Template: '{msg_template}', Final Message: '{message_text}'")
             else: 
-                # Обычный физический плагин, используем lang.t7
-                msg_template = getattr(lang, "t7", "Are you sure you want to uninstall plugin '%s'?") # Дефолтное значение содержит %s
-                logging.debug(f"DEBUG: UninstallMpk.ask - Case: Physical plugin. Template (lang.t7): '{msg_template}'")
-                
-                # --- ПРОВЕРКА И ФОРМАТИРОВАНИЕ ---
-                name_to_format = plugin_display_name_for_message # Это имя должно быть строкой
-                if not isinstance(name_to_format, str): # Дополнительная проверка типа
-                    logging.warning(f"DEBUG: UninstallMpk.ask - plugin_display_name_for_message is not a string: {type(name_to_format)}. Converting to string.")
-                    name_to_format = str(name_to_format)
-
-                if "%s" in msg_template or "%S" in msg_template: 
-                    logging.debug(f"DEBUG: UninstallMpk.ask - Using C-style formatting for t7 with value: '{name_to_format}'")
-                    try:
-                        message_text = msg_template % (name_to_format,) # Передаем как кортеж из одного элемента
-                    except TypeError as e_format_c: 
-                        logging.error(f"DEBUG: UninstallMpk.ask - TypeError formatting C-style string for t7: {e_format_c}. Template: '{msg_template}', Value: '{name_to_format}'")
-                        # Простая замена как запасной вариант, если форматирование не удалось
-                        message_text = msg_template.replace("%s", name_to_format).replace("%S", name_to_format)
-                elif "{0}" in msg_template: 
-                    logging.debug(f"DEBUG: UninstallMpk.ask - Using .format() positional style for t7 with value: '{name_to_format}'")
-                    try:
+                msg_template = getattr(lang, "t7", "Are you sure you want to uninstall plugin '%s'?")
+                name_to_format = str(plugin_display_name_for_message) 
+                try:
+                    if "%s" in msg_template or "%S" in msg_template: 
+                        message_text = msg_template % (name_to_format,)
+                    elif "{0}" in msg_template:
                         message_text = msg_template.format(name_to_format)
-                    except IndexError as e_format_pos:
-                        logging.error(f"DEBUG: UninstallMpk.ask - IndexError formatting string for t7 (style {{0}}): {e_format_pos}. Template: '{msg_template}', Value: '{name_to_format}'")
-                        message_text = msg_template 
-                elif "{plugin_name}" in msg_template or "{name}" in msg_template: 
-                    logging.debug(f"DEBUG: UninstallMpk.ask - Using .format() named style for t7 with value: '{name_to_format}'")
-                    try:
-                        # Предоставляем оба возможных имени ключа
-                        format_dict = {'plugin_name': name_to_format, 'name': name_to_format}
-                        message_text = msg_template.format(**format_dict)
-                    except KeyError as e_format_named:
-                        logging.error(f"DEBUG: UninstallMpk.ask - KeyError formatting string for t7 (style {{name}}): {e_format_named}. Template: '{msg_template}', Value: '{name_to_format}'")
-                        message_text = msg_template
-                else: 
-                    logging.warning(f"DEBUG: UninstallMpk.ask - No known placeholder in t7 template ('{msg_template}'). Appending name manually.")
-                    message_text = msg_template + f" ({name_to_format})" 
-                logging.debug(f"DEBUG: UninstallMpk.ask - Final message for physical plugin: '{message_text}'")
+                    elif "{plugin_name}" in msg_template or "{name}" in msg_template:
+                        message_text = msg_template.format(plugin_name=name_to_format, name=name_to_format)
+                    else: 
+                        message_text = msg_template + f" ({name_to_format})"
+                except Exception as e_format:
+                    logging.error(f"Error formatting message for t7: {e_format}. Template: '{msg_template}', Value: '{name_to_format}'")
+                    message_text = msg_template 
             
             ttk.Label(content_frame, text=message_text, font=(None, 14), wraplength=380, justify=CENTER).pack(pady=(5,15), fill=X)
 
             if self.arr: 
                 ttk.Separator(content_frame, orient=HORIZONTAL).pack(fill=X, pady=5)
                 ttk.Label(content_frame, text=getattr(lang, "t8", "The following dependent plugins will also be removed:"), 
-                          font=(None, 12, 'bold')).pack(pady=(5,2), anchor=NW, fill=X)
+                          font=(None, 12, 'bold')).pack(pady=(5,2), anchor='nw', fill=X) 
                 
                 dependent_text_frame = ttk.Frame(content_frame, relief="groove", borderwidth=1)
                 dependent_text_frame.pack(fill=BOTH, expand=True, pady=5)
@@ -2467,17 +2662,17 @@ class ModuleManager:
                 try:
                     self.wait_window() 
                 except tk.TclError: 
-                    logging.warning("DEBUG: UninstallMpk.ask - TclError during wait_window.") 
+                    logging.warning("DEBUG: UninstallMpk.ask - TclError during wait_window.")
 
         def lsdep(self, name_to_check_deps_for=None):
             if not name_to_check_deps_for:
                 name_to_check_deps_for = self.value
             
-            if not name_to_check_deps_for: return # Нечего проверять
+            if not name_to_check_deps_for: return
 
             for installed_plugin_id in module_manager.list_packages():
-                if installed_plugin_id == name_to_check_deps_for: continue # Сам на себя не ссылается
-                if installed_plugin_id in self.arr: continue # Уже добавлен
+                if installed_plugin_id == name_to_check_deps_for: continue
+                if installed_plugin_id in self.arr: continue
 
                 dependencies_str = module_manager.get_info(installed_plugin_id, 'depend', '')
                 dependencies_list = dependencies_str.split()
@@ -2488,129 +2683,102 @@ class ModuleManager:
                     self.lsdep(installed_plugin_id) 
 
         def uninstall(self):
-            logging.debug(f"DEBUG: UninstallMpk.uninstall - ENTERED for plugin ID: '{self.value}'")
-            
-            # Проверяем, существует ли кнопка удаления и окно
             if not (self.uninstall_b and self.uninstall_b.winfo_exists()):
-                logging.warning("DEBUG: UninstallMpk.uninstall - Uninstall button or window does not exist. Aborting uninstall.")
-                if self.winfo_exists(): # Если окно еще есть, но кнопки нет (например, для виртуального плагина)
-                    self.destroy() 
+                if self.winfo_exists(): self.destroy() 
                 return
             
-            # Блокируем кнопку на время операций
             self.uninstall_b.config(state='disabled') 
-            if self.winfo_exists(): self.update_idletasks() # Чтобы пользователь увидел заблокированную кнопку
+            if self.winfo_exists(): self.update_idletasks()
 
-            # Сохраняем ID и имя основного плагина до начала цикла удаления зависимостей,
-            # так как они могут понадобиться для сообщений.
             plugin_id_to_remove = self.value 
             plugin_show_name_to_remove = self.value2 if self.value2 else self.value
 
-            # 1. Удаляем зависимые плагины (из self.arr)
-            # Итерируемся по копии ключей, так как self.arr теоретически может быть изменен
-            # (хотя в текущей реализации self.remove его не меняет).
             dependent_ids = list(self.arr.keys())
-            logging.debug(f"DEBUG: UninstallMpk.uninstall - Dependent plugins to remove: {dependent_ids}")
             for dep_id in dependent_ids: 
-                dep_name = self.arr.get(dep_id, dep_id) # Используем имя из self.arr или ID, если имя не найдено
-                logging.info(f"DEBUG: UninstallMpk.uninstall - Removing dependent plugin: ID='{dep_id}', Name='{dep_name}'")
-                self.remove(dep_id, dep_name) # self.remove вызовет обновление GUI для каждого удаленного зависимого плагина
+                dep_name = self.arr.get(dep_id, dep_id)
+                self.remove(dep_id, dep_name)
             
-            # 2. Затем удаляем основной плагин
-            logging.info(f"DEBUG: UninstallMpk.uninstall - Removing main plugin: ID='{plugin_id_to_remove}', Name='{plugin_show_name_to_remove}'")
             self.remove(plugin_id_to_remove, plugin_show_name_to_remove) 
             
-            # 3. Уничтожаем диалоговое окно UninstallMpk ПОСЛЕ всех операций remove.
-            #    Таймеры .after(), запланированные в self.remove через win.after(), сработают независимо.
             if self.winfo_exists(): 
                 self.destroy()
-            logging.debug(f"DEBUG: UninstallMpk.uninstall - Dialog for '{plugin_id_to_remove}' destroyed. Uninstall process complete.")
 
         def remove(self, name=None, show_name=''):
-            logging.debug(f"DEBUG: UninstallMpk.remove - ENTERED. name='{name}', show_name='{show_name}'")
-            
-            if not name: # Проверка, что 'name' не None и не пустая строка
-                logging.warning("DEBUG: UninstallMpk.remove - 'name' is None or empty, cannot proceed with removal.")
-                if hasattr(win, 'message_pop') and callable(win.message_pop): # Сообщаем пользователю, если есть такая функция
-                     win.message_pop(getattr(lang, "internal_error_plugin_id_missing", "Internal error: Plugin ID missing for removal."), 
-                                     title=getattr(lang, "error_title", "Error"), color="red")
+            logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
+            if not name:
+                logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
+                if hasattr(win, 'message_pop') and callable(win.message_pop):
+                    win.message_pop(
+                        getattr(lang, "internal_error_plugin_id_missing", "Internal error: Plugin ID missing for removal."),
+                        title=getattr(lang, "error_title", "Error"), color="red"
+                    )
                 return
 
             module_path = os.path.join(self.module_dir, str(name))
-            plugin_successfully_removed_fs = False 
+            plugin_successfully_removed_fs = False
 
-            status_message_template = getattr(lang, "text29", "Uninstalling {0}...")
-            status_message = status_message_template.format(show_name if show_name else name)
-            
-            # Обновляем текст кнопки удаления, если она существует и видима
             if self.uninstall_b and self.uninstall_b.winfo_exists():
-                try: 
-                     self.uninstall_b.config(text=status_message)
-                     # update_idletasks() здесь может быть не нужен, если окно скоро закроется,
-                     # но если процесс удаления долгий, он может быть полезен.
-                     if self.winfo_exists(): self.update_idletasks() 
-                except tk.TclError: 
-                     logging.warning(f"DEBUG: UninstallMpk.remove - TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
-                     pass 
-
-            logging.info(f"Attempting to remove plugin: ID='{name}', DisplayName='{show_name}', Path='{module_path}'")
-            print(status_message) # Вывод в консоль/лог приложения
-
-            original_path_exists = os.path.exists(module_path)
-            logging.debug(f"DEBUG: UninstallMpk.remove - Path '{module_path}' exists before rmtree: {original_path_exists}")
-
-            if original_path_exists:
                 try:
-                    rmtree(module_path) # Ваша функция rmtree
-                    path_exists_after_rmtree = os.path.exists(module_path)
-                    logging.debug(f"DEBUG: UninstallMpk.remove - Path '{module_path}' exists after rmtree: {path_exists_after_rmtree}")
-                    if not path_exists_after_rmtree:
+                    self.uninstall_b.config(text=lang.text29.format(show_name if show_name else name))
+                    if self.winfo_exists(): self.update_idletasks()
+                except tk.TclError: 
+                    logging.warning(f"TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
+                    pass 
+
+            print(lang.text29.format(show_name if show_name else name)) 
+
+            if os.path.exists(module_path):
+                try:
+                    rmtree(module_path) 
+                    if not os.path.exists(module_path):
                         plugin_successfully_removed_fs = True
                         logging.info(f"Successfully removed directory: {module_path}")
                     else:
                         logging.warning(f"Directory {module_path} reported as existing after rmtree call for plugin '{name}', though no exception was raised.")
-                        # Дополнительная проверка может быть полезна, если rmtree иногда "обманывает"
                         if not os.path.exists(module_path): 
                             plugin_successfully_removed_fs = True
                             logging.info(f"Re-check confirms directory {module_path} is actually gone.")
+
                 except PermissionError as e_perm:
-                    logging.exception(f"DEBUG: PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
+                    logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
                     msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
                     win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange', title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-                except Exception as e_generic:
-                    logging.exception(f"DEBUG: Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
+                except Exception as e_generic: 
+                    logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
                     msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
                     win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange', title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-            else: 
-                plugin_successfully_removed_fs = True 
+            else:
+                plugin_successfully_removed_fs = True
                 logging.info(f"Module path '{module_path}' did not exist for plugin '{name}'. Assumed removed or not present on filesystem.")
 
-            # Проверка результата и обновление GUI
+
             if not plugin_successfully_removed_fs and os.path.exists(module_path): 
-                msg_template_fail = getattr(lang, "warn9", "Failed to completely remove plugin {0}.")
-                win.message_pop(msg_template_fail.format(show_name if show_name else name), 'orange', title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-                logging.warning(f"DEBUG: UninstallMpk.remove - Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
-            elif plugin_successfully_removed_fs: 
-                success_message_template = getattr(lang, "text30", "Successfully removed {0}")
-                success_message = success_message_template.format(show_name if show_name else name)
+                win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange', title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+                logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
+            elif plugin_successfully_removed_fs:
                 if self.uninstall_b and self.uninstall_b.winfo_exists():
-                    try: self.uninstall_b.config(text=success_message)
-                    except tk.TclError: pass
-                print(success_message)
-                logging.info(f"DEBUG: UninstallMpk.remove - Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
-                
-                # Планирование обновления глобального списка плагинов через главное окно 'win'
+                    try:
+                        self.uninstall_b.config(text=lang.text30.format(show_name if show_name else name))
+                    except tk.TclError: pass 
+                print(lang.text30.format(show_name if show_name else name))
+                logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
+
                 if callable(list_pls_plugin):
                     if hasattr(win, 'after') and callable(win.after):
-                        logging.debug(f"DEBUG: UninstallMpk.remove - Scheduling list_pls_plugin for plugin '{name}' via win.after(10, ...)")
-                        win.after(10, list_pls_plugin) # Задержка 10 мс
-                    else:
-                        # Это критическая ситуация, если win.after недоступен
-                        logging.error("DEBUG: UninstallMpk.remove - CRITICAL: Main window 'win' or 'win.after' is not available. Cannot schedule GUI update for MpkMan.")
+                         win.after(10, list_pls_plugin) 
+                    else: 
+                        logging.error("CRITICAL: Main window 'win' or 'win.after' is not available. Cannot schedule GUI update for MpkMan.")
                 else:
-                    logging.warning("DEBUG: UninstallMpk.remove - list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
-            
-            logging.debug(f"DEBUG: UninstallMpk.remove - EXITED for plugin '{name}'.")
+                    logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
+
+                if hasattr(states, 'active_mpk_store_instance') and \
+                   states.active_mpk_store_instance and \
+                   states.active_mpk_store_instance.winfo_exists():
+                    logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
+                    states.active_mpk_store_instance.update_plugin_state(name) 
+                else:
+                    logging.debug(f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
+            logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 module_manager = ModuleManager()
 
@@ -3153,291 +3321,599 @@ class Debugger(Toplevel):
 
 class MpkStore(Toplevel):
     def __init__(self):
-        if states.mpk_store:
-            return
-        states.mpk_store = True
+        if hasattr(states, 'active_mpk_store_instance') and \
+           states.active_mpk_store_instance and \
+           states.active_mpk_store_instance.winfo_exists():
+            states.active_mpk_store_instance.lift()
+            states.active_mpk_store_instance.focus_force()
+            return 
+
         super().__init__()
+        if hasattr(states, 'mpk_store'):
+            states.mpk_store = True
+        
+        states.active_mpk_store_instance = self 
+
         self.title('Mpk Store')
+        self.minsize(500, 400) 
+
         self.data = []
         self.tasks = []
-        self.apps = []
-        self.app_infos = {}
-        self.protocol("WM_DELETE_WINDOW", lambda: setattr(states, 'mpk_store', False) == self.destroy())
+        self.apps = [] 
+        self.app_infos = {} 
+        self.protocol("WM_DELETE_WINDOW", self._on_close_window)
         self.repo = ''
         self.init_repo()
-        ff = ttk.Frame(self)
-        ttk.Label(ff, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
-        ttk.Button(ff, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
-        ttk.Button(ff, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
-        ff.pack(padx=10, pady=10, fill=BOTH)
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        
+        header_frame = ttk.Frame(self)
+        ttk.Label(header_frame, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
+        ttk.Button(header_frame, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
+        ttk.Button(header_frame, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
+        header_frame.pack(padx=10, pady=10, fill=X) 
+        
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X) 
+        
         self.search = ttk.Entry(self)
-        self.search.pack(fill=X, padx=5, pady=5)
-        self.search.bind("<Return>",
-                         lambda *x: self.search_apps())
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-        self.logo = PhotoImage(data=images.none_byte)
-        self.deque = []
-        self.control = {}
-        frame = tk.Frame(self)
-        frame.pack(fill='both', padx=10, pady=10, expand=True)
-        scrollbar = ttk.Scrollbar(frame, orient='vertical')
-        scrollbar.pack(side='right', fill='y', padx=10, pady=10)
-        self.canvas = tk.Canvas(frame, yscrollcommand=scrollbar.set) # Removed width=600
-        self.canvas.pack(fill='both', expand=True)
-        scrollbar.config(command=self.canvas.yview)
-        self.label_frame = ttk.Frame(self.canvas)
-        self.label_frame_id = self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw') # Store the id
-        self.canvas.bind('<Configure>', self._on_canvas_configure) # Bind configure event
+        self.search.pack(fill=X, padx=10, pady=5) 
+        self.search.bind("<Return>", lambda *x: self.search_apps())
+        
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X)
+        
+        self.logo = PhotoImage(data=images.none_byte) 
+        self.control = {} 
+        
+        scrollable_area_frame = tk.Frame(self)
+        scrollable_area_frame.pack(fill='both', padx=10, pady=(0,10), expand=True) 
+        
+        self.scrollbar = ttk.Scrollbar(scrollable_area_frame, orient='vertical')
+
+        self.canvas = tk.Canvas(scrollable_area_frame, yscrollcommand=self.scrollbar.set, highlightthickness=0, bd=0)
+        self.canvas.pack(side='left', fill='both', expand=True)
+        self.scrollbar.config(command=self.canvas.yview)
+        
+        self.label_frame = ttk.Frame(self.canvas) 
+        self.label_frame_id = self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        
+        self.label_frame.bind("<Configure>", self._on_label_frame_configure)
+        self.canvas.bind('<Configure>', self._on_canvas_configure)
+
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel_canvas)
+        self.canvas.bind("<Button-4>", self._on_mousewheel_canvas)
+        self.canvas.bind("<Button-5>", self._on_mousewheel_canvas)
+        
         create_thread(self.get_db)
-        self.label_frame.update_idletasks()
-        self.canvas.bind_all("<MouseWheel>",
-                             lambda event: self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units"))
-        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
         move_center(self)
 
+    def _on_mousewheel_canvas(self, event):
+        if not self.canvas.winfo_exists(): return
+        if event.num == 4: 
+            self.canvas.yview_scroll(-1, "units")
+        elif event.num == 5: 
+            self.canvas.yview_scroll(1, "units")
+        elif hasattr(event, 'delta') and event.delta != 0: 
+            self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def _on_label_frame_configure(self, event=None):
+        if not (self.canvas.winfo_exists() and self.label_frame.winfo_exists()): return
+        
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+        self.label_frame.update_idletasks()
+        canvas_height = self.canvas.winfo_height()
+        content_height = self.label_frame.winfo_reqheight()
+
+        if content_height > canvas_height:
+            if not self.scrollbar.winfo_ismapped():
+                self.scrollbar.pack(side="right", fill="y", pady=(0,0), padx=(0,0))
+        else:
+            if self.scrollbar.winfo_ismapped():
+                self.scrollbar.pack_forget()
+
     def _on_canvas_configure(self, event):
+        if not (self.canvas.winfo_exists() and self.label_frame.winfo_exists() and hasattr(self, 'label_frame_id')): return
+        
         canvas_width = event.width
-        if hasattr(self, 'label_frame_id') and self.label_frame.winfo_exists(): # Check if widget exists
-            self.canvas.itemconfig(self.label_frame_id, width=canvas_width)
-            self.label_frame.configure(width=canvas_width) # Explicitly set label_frame width
-            self.label_frame.update_idletasks()
-            self.canvas.config(scrollregion=self.canvas.bbox("all"))
+        self.canvas.itemconfig(self.label_frame_id, width=canvas_width)
+        if self.label_frame.winfo_exists():
+             self.label_frame.config(width=canvas_width)
+             self.label_frame.update_idletasks()
+
+        self._on_label_frame_configure()
+
+    def _on_close_window(self):
+        if hasattr(states, 'active_mpk_store_instance') and states.active_mpk_store_instance == self:
+            states.active_mpk_store_instance = None
+        if hasattr(states, 'mpk_store'):
+            states.mpk_store = False
+        
+        if hasattr(self, 'canvas') and self.canvas.winfo_exists():
+            self.canvas.unbind("<MouseWheel>") 
+            self.canvas.unbind("<Button-4>")
+            self.canvas.unbind("<Button-5>")
+        
+        self.destroy()
+
+    def update_plugin_state(self, plugin_id: str):
+        logging.debug(f"MpkStore.update_plugin_state called for plugin_id: {plugin_id}")
+        if not self.winfo_exists():
+            logging.warning(f"MpkStore.update_plugin_state: MpkStore window no longer exists. Aborting update for {plugin_id}.")
+            return
+
+        if plugin_id in self.control:
+            install_button, uninstall_button = self.control[plugin_id]
+            
+            buttons_valid = True
+            if not (install_button and install_button.winfo_exists()):
+                logging.warning(f"MpkStore.update_plugin_state: Install button for '{plugin_id}' does not exist.")
+                buttons_valid = False
+            if not (uninstall_button and uninstall_button.winfo_exists()):
+                logging.warning(f"MpkStore.update_plugin_state: Uninstall button for '{plugin_id}' does not exist.")
+                buttons_valid = False
+
+            if not buttons_valid:
+                return
+
+            is_installed = module_manager.get_installed(plugin_id)
+            logging.debug(f"MpkStore.update_plugin_state: Plugin '{plugin_id}' is_installed: {is_installed}")
+
+            if not is_installed:
+                install_button.config(text=lang.text21, state='normal', style="Accent.TButton") 
+                uninstall_button.config(text=lang.text20, state='disabled', style="") 
+            else:
+                install_button.config(text=getattr(lang, 'plugin_installed_button', lang.text21), state='disabled', style="") 
+                uninstall_button.config(text=lang.text20, state='normal', style="Accent.TButton")
+        else:
+            logging.debug(f"MpkStore.update_plugin_state: plugin_id '{plugin_id}' not found in self.control. No UI elements to update for this ID.")
+
 
     def init_repo(self):
-        if not hasattr(settings, 'plugin_repo'):
+        if not hasattr(settings, 'plugin_repo') or not settings.plugin_repo:
             self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
         else:
-            if not settings.plugin_repo:
-                self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
-            else:
-                self.repo = settings.plugin_repo
+            self.repo = settings.plugin_repo
+        logging.info(f"MpkStore: Repository initialized to: {self.repo}")
+
 
     def search_apps(self):
-        for i in self.data:
-            self.app_infos.get(i.get('id')).pack_forget() if self.search.get() not in i.get(
-                'name') else self.app_infos.get(i.get('id')).pack(padx=5, pady=5, anchor='nw')
-        self.canvas.yview_moveto(0.0)
-        self.label_frame.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+        if not self.winfo_exists(): return
+        search_term = self.search.get().lower() 
+        
+        for plugin_id_key in self.app_infos: 
+            app_frame = self.app_infos[plugin_id_key]
+            if not app_frame.winfo_exists(): continue
+
+            plugin_data_entry = next((item for item in self.data if item.get('id') == plugin_id_key), None)
+            plugin_name_lower = plugin_data_entry.get('name', '').lower() if plugin_data_entry else ""
+            
+            should_be_visible = not search_term or search_term in plugin_name_lower
+
+            if should_be_visible:
+                if not app_frame.winfo_ismapped():
+                     app_frame.pack(padx=5, pady=5, fill=X, expand=True) 
+            else:
+                if app_frame.winfo_ismapped():
+                     app_frame.pack_forget()
+        
+        if self.label_frame.winfo_exists(): self.label_frame.update_idletasks()
+        if self.canvas.winfo_exists(): 
+            self.canvas.yview_moveto(0.0) 
+            self._on_label_frame_configure() 
+
 
     def add_app(self, app_dict=None):
-        self.clear()
+        # ... (код без изменений, как в предыдущем ответе) ...
+        if not self.winfo_exists():
+            logging.warning("MpkStore.add_app: Window destroyed, cannot add apps.")
+            return
+
         if app_dict is None:
             app_dict = []
         
-        for data in app_dict:
-            if data.get('id') in self.app_infos:
+        logging.info(f"MpkStore.add_app: Attempting to add/update {len(app_dict)} plugin UI elements.")
+        new_items_added_count = 0
+        for index, data in enumerate(app_dict):
+            plugin_id = data.get('id')
+            plugin_name_for_log = data.get('name', 'Unnamed Plugin')
+            logging.debug(f"MpkStore.add_app: Processing item {index + 1}/{len(app_dict)} - ID: '{plugin_id}', Name: '{plugin_name_for_log}'")
+
+            if not plugin_id:
+                logging.warning(f"MpkStore.add_app: Skipping plugin data at index {index} due to missing ID: {data}")
                 continue
+
+            if plugin_id in self.app_infos and self.app_infos[plugin_id].winfo_exists():
+                logging.debug(f"MpkStore.add_app: Plugin UI for ID '{plugin_id}' already exists. Skipping.")
+                continue 
             
-            # Основной фрейм для одного плагина
-            f = ttk.LabelFrame(self.label_frame, text=data.get('name'))
-            self.app_infos[data.get('id')] = f
-            self.deque.append(f)
-
-            # --- Используем grid для компоновки внутри f ---
-            # Конфигурация колонок: 
-            # колонка 0 для иконки, 
-            # колонка 1 для текстовой информации (займет большую часть места),
-            # колонка 2 для кнопок.
-            f.columnconfigure(0, weight=0) # Иконка - фиксированная ширина
-            f.columnconfigure(1, weight=1) # Текстовая информация - растягивается
-            f.columnconfigure(2, weight=0) # Кнопки - по содержимому
-
-            # Иконка
-            icon_label = ttk.Label(f, image=self.logo)
-            icon_label.grid(row=0, column=0, rowspan=2, sticky="ns", padx=5, pady=5)
-
-            # Фрейм для текстовой информации (автор, версия, описание)
-            info_frame = ttk.Frame(f)
-            info_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=5, pady=5)
-            info_frame.columnconfigure(0, weight=1) # Чтобы метки внутри растягивались
-
-            # Автор, версия, размер
-            info_text = f"{lang.t21}{data.get('author')} {lang.t22}{data.get('version')} {lang.size}:{hum_convert(data.get('size'))}"
-            author_version_label = ttk.Label(info_frame, text=info_text, wraplength=350) 
-            author_version_label.grid(row=0, column=0, sticky="ew", pady=(0, 5))
-
-            # Описание
-            desc_text = data.get('desc')
-            if not desc_text:
-                 # Вместо 'No Description.' лучше использовать строку из lang, если она есть, например:
-                 # desc_text = getattr(lang, 'no_description_available', 'No Description.') 
-                 desc_text = 'No Description.' 
-            description_label = ttk.Label(info_frame, text=desc_text, wraplength=350)
-            description_label.grid(row=1, column=0, sticky="ew")
+            new_items_added_count += 1
             
-            # Фрейм для кнопок (чтобы они были вместе и выровнены)
+            f = ttk.LabelFrame(self.label_frame, text=data.get('name', plugin_id))
+            self.app_infos[plugin_id] = f
+            
+            f.columnconfigure(0, weight=0, minsize=70)
+            f.columnconfigure(1, weight=1)            
+            f.columnconfigure(2, weight=0, minsize=100)
+            
+            icon_label = ttk.Label(f, image=self.logo) 
+            icon_label.grid(row=0, column=0, sticky="nw", padx=(5,10), pady=5) 
+
+            info_container_frame = ttk.Frame(f)
+            info_container_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+            info_container_frame.columnconfigure(0, weight=1) 
+
+            author_text = data.get('author', getattr(lang, 'unknown_author', 'Unknown'))
+            version_text = data.get('version', getattr(lang, 'unknown_version', 'N/A'))
+            size_bytes = data.get('size', 0)
+            size_hum = hum_convert(size_bytes) if callable(hum_convert) else f"{size_bytes} B"
+            
+            ttk.Label(info_container_frame, text=f"{getattr(lang, 't21', 'Author:')} {author_text}", anchor="w").grid(row=0, column=0, sticky="ew", pady=(0,1))
+            ttk.Label(info_container_frame, text=f"{getattr(lang, 't22', 'Version:')} {version_text}", anchor="w").grid(row=1, column=0, sticky="ew", pady=(0,1))
+            ttk.Label(info_container_frame, text=f"{getattr(lang, 'size', 'Size:')} {size_hum}", anchor="w").grid(row=2, column=0, sticky="ew", pady=(0,5))
+
+            desc_text_content = data.get('desc', getattr(lang, 'no_description_available', 'No Description.'))
+            
+            desc_outer_frame = ttk.Frame(info_container_frame) 
+            desc_outer_frame.grid(row=3, column=0, sticky="nsew", pady=(2,0))
+            info_container_frame.rowconfigure(3, weight=1) 
+            desc_outer_frame.columnconfigure(0, weight=1)   
+            desc_outer_frame.rowconfigure(0, weight=1)      
+
+            desc_text_widget = tk.Text(desc_outer_frame, wrap=tk.WORD, height=5, relief=tk.SOLID, borderwidth=1,
+                                       font=("TkDefaultFont",), takefocus=False) 
+            desc_text_widget.insert(tk.END, desc_text_content)
+            desc_text_widget.config(state=tk.DISABLED) 
+            
+            desc_scrollbar = ttk.Scrollbar(desc_outer_frame, orient=tk.VERTICAL, command=desc_text_widget.yview)
+            desc_text_widget.config(yscrollcommand=desc_scrollbar.set)
+
+            desc_text_widget.grid(row=0, column=0, sticky="nsew")
+            desc_scrollbar.grid(row=0, column=1, sticky="ns") 
+
             buttons_frame = ttk.Frame(f)
-            buttons_frame.grid(row=0, column=2, rowspan=2, sticky="ne", padx=5, pady=5)
+            buttons_frame.grid(row=0, column=2, sticky="ne", padx=5, pady=5) 
 
-            args = data.get('files'), data.get('size'), data.get('id'), data.get('depend')
-            MIN_BUTTON_WIDTH_CHARS = 10 
+            files_data = data.get('files')
+            if isinstance(files_data, str): files_list = [files_data]
+            elif isinstance(files_data, list): files_list = files_data
+            else: files_list = []
 
-            bu = ttk.Button(buttons_frame, text=lang.text21,
-                            command=lambda a=args: create_thread(self.download, *a),
+            depends_data = data.get('depend')
+            if isinstance(depends_data, str): depends_list = depends_data.split()
+            elif isinstance(depends_data, list): depends_list = depends_data
+            else: depends_list = []
+
+            download_args = (files_list, size_bytes, plugin_id, depends_list)
+            
+            button_width_from_lang = getattr(lang, 'mpk_store_button_min_width', 12)
+            try:
+                MIN_BUTTON_WIDTH_CHARS = int(button_width_from_lang)
+            except (ValueError, TypeError):
+                MIN_BUTTON_WIDTH_CHARS = 12 
+                logging.warning(
+                    f"MpkStore.add_app: Could not parse 'mpk_store_button_min_width' "
+                    f"from lang (value: '{button_width_from_lang}'). Using default width: {MIN_BUTTON_WIDTH_CHARS}."
+                )
+
+            bu = ttk.Button(buttons_frame, text=lang.text21, 
+                            command=lambda a=download_args: create_thread(self.download, *a),
                             width=MIN_BUTTON_WIDTH_CHARS)
-            bu.pack(side=TOP, fill=X, pady=(0, 2)) 
+            bu.pack(side=TOP, fill=X, pady=(0, 3)) 
 
-            uninstall_button = ttk.Button(buttons_frame, text=lang.text20,
-                                          command=lambda a=data.get('id'): create_thread(self.uninstall, a),
+            uninstall_button = ttk.Button(buttons_frame, text=lang.text20, 
+                                          command=lambda current_id=plugin_id: create_thread(self.uninstall, current_id),
                                           width=MIN_BUTTON_WIDTH_CHARS)
-            uninstall_button.pack(side=TOP, fill=X, pady=(2, 0))
+            uninstall_button.pack(side=TOP, fill=X, pady=(3, 0))
 
-            if not module_manager.get_installed(data.get('id')):
+            if not module_manager.get_installed(plugin_id):
                 bu.config(style="Accent.TButton")
                 uninstall_button.config(state='disabled')
             else:
-                uninstall_button.config(style="Accent.TButton")
-                # Пример, если нужно изменить состояние кнопки "Установить"
-                # bu.config(state='disabled', text=getattr(lang, 'plugin_already_installed_short', 'Установлено'))
+                bu.config(state='disabled', text=getattr(lang, 'plugin_installed_button', lang.text21))
+                uninstall_button.config(style="Accent.TButton", state='normal')
 
+            self.control[plugin_id] = bu, uninstall_button
+            f.pack(padx=5, pady=5, fill=X, expand=False) 
+            logging.debug(f"MpkStore.add_app: Successfully created UI for '{plugin_id}'.")
 
-            self.control[data.get('id')] = bu, uninstall_button
-            
-            f.pack(padx=5, pady=5, fill=X, expand=True)
+        logging.info(f"MpkStore.add_app: Finished processing. Added {new_items_added_count} new UI elements.")
+        if new_items_added_count > 0 or not app_dict : 
+            if self.label_frame.winfo_exists(): self.label_frame.update_idletasks()
+            if self.canvas.winfo_exists(): self._on_label_frame_configure() 
 
-        self.label_frame.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
     def uninstall(self, id_):
-        bu, uninstall_button = self.control.get(id_)
-        module_manager.uninstall_gui(id_, wait=True)
-        if not module_manager.get_installed(id_):
-            bu.config(style="Accent.TButton")
-            uninstall_button.config(state='disabled')
-        else:
-            bu.config(width=5)
-            uninstall_button.config(style="Accent.TButton")
+        # ... (без изменений) ...
+        module_manager.uninstall_gui(id_, wait=True) 
+
+        if self.winfo_exists() and id_ in self.control:
+            install_button, uninstall_button = self.control[id_]
+            is_installed_after_attempt = module_manager.get_installed(id_)
+
+            if not is_installed_after_attempt:
+                install_button.config(text=lang.text21, style="Accent.TButton", state='normal')
+                uninstall_button.config(text=lang.text20, style="", state='disabled')
+            else:
+                install_button.config(text=getattr(lang, 'plugin_installed_button', lang.text21), style="", state='disabled') 
+                uninstall_button.config(text=lang.text20, style="Accent.TButton", state='normal')
+
 
     def clear(self):
-        for i in self.deque:
-            try:
-                i.destroy()
-            except (TclError, ValueError):
-                logging.exception('Bugs')
+        # ... (без изменений) ...
+        if hasattr(self, 'label_frame') and self.label_frame.winfo_exists():
+            for widget in self.label_frame.winfo_children():
+                widget.destroy()
+        
+        self.app_infos.clear()
+        self.control.clear()
+        
+        if hasattr(self, 'canvas') and self.canvas.winfo_exists():
+            self._on_label_frame_configure() 
+
 
     def modify_repo(self):
-        (input_var := StringVar()).set(settings.plugin_repo)
+        # ... (без изменений) ...
+        input_var = StringVar()
+        current_repo_val = getattr(settings, 'plugin_repo', self.repo) 
+        input_var.set(current_repo_val)
+
         a = Toplevel()
         a.title(lang.t58)
-        ttk.Entry(a, textvariable=input_var, width=60).pack(pady=5, padx=5, fill=BOTH)
-        ttk.Button(a, text=lang.ok,
-                   command=lambda: settings.set_value('plugin_repo', input_var.get()) == a.destroy()).pack(pady=5,
-                                                                                                           padx=5,
-                                                                                                           fill=BOTH)
-        move_center(a)
-        a.wait_window()
-        if settings.plugin_repo != self.repo:
-            self.init_repo()
-            create_thread(self.get_db)
+        a.transient(self) 
+        a.grab_set()      
+
+        ttk.Entry(a, textvariable=input_var, width=60).pack(pady=10, padx=10, fill=X)
+        
+        button_frame_repo = ttk.Frame(a)
+        button_frame_repo.pack(pady=5, padx=10, fill=X)
+
+        def on_ok_repo():
+            new_repo_val = input_var.get()
+            if hasattr(settings, 'set_value'):
+                settings.set_value('plugin_repo', new_repo_val)
+             
+            a.destroy() 
+            
+            if new_repo_val != current_repo_val: 
+                self.init_repo() 
+                create_thread(self.get_db)
+
+        def on_cancel_repo():
+            a.destroy()
+
+        ttk.Button(button_frame_repo, text=getattr(lang, 'cancel', "Cancel"), command=on_cancel_repo).pack(side=LEFT, padx=(0,5), expand=True, fill=X)
+        ttk.Button(button_frame_repo, text=getattr(lang, 'ok', "OK"), command=on_ok_repo, style="Accent.TButton").pack(side=LEFT, padx=(5,0), expand=True, fill=X)
+        
+        move_center(a, master_window=self)
 
     def download(self, files, size, id_, depends):
-        if id_ not in self.tasks:
-            self.tasks.append(id_)
-        else:
+        if not self.winfo_exists():
+            logging.warning(f"MpkStore.download: Window destroyed before download/install for '{id_}' could start.")
+            if id_ in self.tasks: self.tasks.remove(id_)
             return
-        if id_ in self.control.keys():
-            control = self.control.get(id_)[0]
-            control.config(state='disabled')
-        else:
-            control = None
-        if depends:
-            for i in depends:
-                for i_ in self.data:
-                    if i == i_.get('id') and not module_manager.get_installed(i):
-                        self.download(i_.get('files'), i_.get('size'), i_.get('id'), i_.get('depend'))
-        try:
-            for i in files:
-                info = {}
-                for data in self.data:
-                    if id_ == data.get('id'):
-                        info = data
-                        break
-                if os.path.exists(os.path.join(temp, i)) and os.path.isfile(os.path.join(temp, i)) and os.path.getsize(
-                        os.path.join(temp, i)) == info.get('size', -1):
-                    logging.info('Using Cached Package.')
-                else:
-                    for percentage, _, _, _, _ in download_api(self.repo + i, temp, size_=size):
-                        if control and states.mpk_store:
-                            control.config(text=f"{percentage} %")
-                        else:
-                            return False
 
-                create_thread(module_manager.install, os.path.join(temp, i), join=True)
-        except (ConnectTimeout, HTTPError, BaseException, Exception, TclError):
-            logging.exception('Bugs')
-            return
-        control.config(state='normal', text=lang.text21)
-        if module_manager.get_installed(id_):
-            control.config(style="")
-            self.control.get(id_)[1].config(state='normal', style="Accent.TButton")
+        logging.info(f"MpkStore.download: Initiating download for plugin ID '{id_}'. Files: {files}, Size: {size}, Depends: {depends}")
         if id_ in self.tasks:
-            self.tasks.remove(id_)
+            logging.info(f"MpkStore.download: Plugin '{id_}' download already in progress or queued.")
+            return
+        self.tasks.append(id_)
+
+        install_button, uninstall_button = None, None
+        current_plugin_info_for_name = next((item for item in self.data if item.get('id') == id_), None)
+        plugin_display_name = current_plugin_info_for_name.get('name', id_) if current_plugin_info_for_name else id_
+
+        if id_ in self.control:
+            if self.control[id_] and len(self.control[id_]) == 2:
+                install_button, uninstall_button = self.control[id_]
+                if install_button and install_button.winfo_exists():
+                    install_button.config(state='disabled', text=lang.text40) 
+            else:
+                logging.error(f"MpkStore.download: Control entry for plugin '{id_}' is malformed.")
+        else:
+            logging.warning(f"MpkStore.download: Control buttons for plugin ID '{id_}' not found.")
+        
+        dependencies_ok = True
+        if depends and isinstance(depends, list): 
+            for dep_id_str in depends: 
+                if not self.winfo_exists(): dependencies_ok = False; break
+                if not dep_id_str: continue 
+                
+                if module_manager.get_installed(dep_id_str):
+                    logging.info(f"MpkStore.download: Dependency '{dep_id_str}' for plugin '{id_}' is already installed. Skipping.")
+                    continue
+
+                dep_info = next((item for item in self.data if item.get('id') == dep_id_str), None)
+                dep_name_display = dep_info.get('name', dep_id_str) if dep_info else dep_id_str
+
+                if dep_info:
+                    logging.info(f"MpkStore.download: Attempting to install dependency '{dep_name_display}' (ID: {dep_id_str}) for plugin '{plugin_display_name}'.")
+                    # Синхронный вызов для установки зависимости в том же потоке
+                    self.download(
+                        dep_info.get('files'), 
+                        dep_info.get('size'), 
+                        dep_id_str, 
+                        dep_info.get('depend')
+                    )
+                    
+                    if not module_manager.get_installed(dep_id_str):
+                        logging.error(f"MpkStore.download: Dependency '{dep_name_display}' for plugin '{plugin_display_name}' failed to install.")
+                        if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                            # --- ИСПОЛЬЗУЕМ win.message_pop ---
+                            msg_template = getattr(lang, "dependency_installation_failed_msg", 
+                                                  "Installation of plugin '{plugin_name}' aborted because dependency '{dep_name}' failed to install.")
+                            win.message_pop(
+                                text=msg_template.format(plugin_name=plugin_display_name, dep_name=dep_name_display),
+                                color='orange', # Оранжевый для предупреждения
+                                title=getattr(lang, "dependency_error_title", "Dependency Error")
+                            )
+                            # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                        dependencies_ok = False
+                        break 
+                else: 
+                    logging.warning(f"MpkStore.download: Info for dependency '{dep_id_str}' not found in self.data. Cannot install for '{plugin_display_name}'.")
+                    if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                        # --- ИСПОЛЬЗУЕМ win.message_pop ---
+                        msg = getattr(lang, "dependency_not_in_repo_msg", 
+                                      "Cannot install '{plugin_name}'. Required dependency '{dep_name}' not found in the repository.")
+                        win.message_pop(
+                            text=msg.format(plugin_name=plugin_display_name, dep_name=dep_name_display),
+                            color='orange',
+                            title=getattr(lang, "dependency_error_title", "Dependency Error")
+                        )
+                        # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                    dependencies_ok = False
+                    break 
+            
+            if not dependencies_ok:
+                if id_ in self.tasks: self.tasks.remove(id_)
+                if install_button and install_button.winfo_exists():
+                     install_button.config(text=lang.text21, state='normal', style="Accent.TButton")
+                return 
+        
+        download_successful_for_all_files = True
+        installation_successful_for_all_files = True
+
+        try:
+            files_to_download_list = [files] if isinstance(files, str) else (files if isinstance(files, list) else [])
+            logging.info(f"MpkStore.download: For plugin '{id_}', files to download: {files_to_download_list}")
+            
+            if not files_to_download_list:
+                logging.warning(f"MpkStore.download: No files specified for download for plugin ID '{id_}'.")
+                download_successful_for_all_files = False
+
+            for file_index, file_name_in_list in enumerate(files_to_download_list):
+                if not self.winfo_exists(): download_successful_for_all_files=False; break 
+                if not file_name_in_list:
+                    logging.warning(f"MpkStore.download: Empty file name at index {file_index} for plugin '{id_}'. Skipping.")
+                    continue
+
+                mpk_file_path_in_temp = os.path.join(temp, file_name_in_list)
+                logging.debug(f"MpkStore.download: Processing file '{file_name_in_list}' for plugin '{id_}'. Target path: '{mpk_file_path_in_temp}'")
+                
+                file_downloaded_this_iteration = False
+                expected_file_size_from_data = size 
+                
+                if os.path.exists(mpk_file_path_in_temp) and os.path.isfile(mpk_file_path_in_temp) and \
+                   (expected_file_size_from_data <= 0 or os.path.getsize(mpk_file_path_in_temp) == expected_file_size_from_data):
+                    logging.info(f'MpkStore.download: Using cached package: {mpk_file_path_in_temp} for plugin {id_}.')
+                    file_downloaded_this_iteration = True
+                else:
+                    if os.path.exists(mpk_file_path_in_temp):
+                        logging.info(f"MpkStore.download: Cached file '{mpk_file_path_in_temp}' exists but size mismatch or expected size unknown/zero. Re-downloading.")
+                    
+                    logging.info(f"MpkStore.download: Downloading: {self.repo + file_name_in_list} to {mpk_file_path_in_temp}")
+                    download_generator = download_api(self.repo + file_name_in_list, temp, size_=expected_file_size_from_data) 
+                    for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
+                        if not self.winfo_exists(): 
+                            download_successful_for_all_files = False; break
+                        if percentage == "Error":
+                            logging.error(f"MpkStore.download: download_api reported an error for {file_name_in_list} (plugin {id_}).")
+                            download_successful_for_all_files = False
+                            break 
+
+                        if install_button and install_button.winfo_exists():
+                            try: install_button.config(text=f"{percentage} %")
+                            except tk.TclError: download_successful_for_all_files = False; break 
+                        elif not self.winfo_exists():
+                            download_successful_for_all_files = False; break
+                    if not download_successful_for_all_files: break 
+                    file_downloaded_this_iteration = True
+                
+                if file_downloaded_this_iteration:
+                    logging.info(f"MpkStore.download: Attempting to install plugin '{id_}' from file: '{mpk_file_path_in_temp}'")
+                    install_result, reason_text = module_manager.install(mpk_file_path_in_temp) 
+                    if install_result != module_error_codes.Normal:
+                        logging.error(f"MpkStore.download: Failed to install plugin '{id_}' from '{file_name_in_list}'. Reason: '{reason_text}', Code: {install_result}")
+                        if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                            msg_template_key = "plugin_install_failed_dependency_mpkstore" if install_result == module_error_codes.DependsMissing else "plugin_install_failed_mpkstore"
+                            error_msg_template = getattr(lang, msg_template_key, "Failed to install plugin {plugin_name}: {reason_text}")
+                            
+                            dep_name_to_show = reason_text if install_result == module_error_codes.DependsMissing else str(reason_text)
+                            
+                            if install_result == module_error_codes.DependsMissing:
+                                final_reason = getattr(lang, "dependency_missing_for_plugin_install", 
+                                                      "Missing dependency: '{dependency_name}'.").format(dependency_name=dep_name_to_show)
+                            else:
+                                final_reason = str(reason_text)
+                            # --- ИСПОЛЬЗУЕМ win.message_pop ---
+                            win.message_pop(
+                                text=error_msg_template.format(plugin_name=plugin_display_name, reason_text=final_reason), 
+                                color='orange',
+                                title=getattr(lang, "dependency_error_title", "Installation Error") # Или более общий заголовок
+                            )
+                            # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                        installation_successful_for_all_files = False
+                        break 
+                    else:
+                        logging.info(f"MpkStore.download: Successfully installed components from '{file_name_in_list}' for plugin '{id_}'.")
+                else: 
+                    installation_successful_for_all_files = False; break
+
+            if not download_successful_for_all_files or not installation_successful_for_all_files:
+                logging.warning(f"MpkStore.download: Plugin installation process for '{id_}' was not fully successful. Download success: {download_successful_for_all_files}, Install success: {installation_successful_for_all_files}")
+
+        except (ConnectTimeout, HTTPError) as e_conn: 
+            logging.exception(f'MpkStore.download: Connection/HTTP error during download for plugin {id_}: {e_conn}')
+            if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                 win.message_pop(
+                     text=f"{getattr(lang, 'download_failed', 'Download failed')}: {e_conn}", 
+                     color='orange',
+                     title=getattr(lang, "download_error_title", "Download Error") # Новый ключ для заголовка
+                 )
+        except Exception as e_generic: 
+            logging.exception(f'MpkStore.download: Generic error during download/install process for plugin {id_}: {e_generic}')
+        finally:
+            if self.winfo_exists() and id_ in self.control: 
+                install_button_final, uninstall_button_final = self.control[id_]
+                buttons_exist_final = install_button_final and install_button_final.winfo_exists() and \
+                                      uninstall_button_final and uninstall_button_final.winfo_exists()
+
+                if buttons_exist_final:
+                    is_installed_final = module_manager.get_installed(id_)
+                    if is_installed_final:
+                        install_button_final.config(text=getattr(lang, 'plugin_installed_button', lang.text21), state='disabled', style="")
+                        uninstall_button_final.config(text=lang.text20, state='normal', style="Accent.TButton")
+                    else: 
+                        install_button_final.config(text=lang.text21, state='normal', style="Accent.TButton")
+                        uninstall_button_final.config(text=lang.text20, state='disabled', style="")
+            
+            if id_ in self.tasks:
+                try: self.tasks.remove(id_)
+                except ValueError: pass
+            logging.info(f"MpkStore.download: Download/install process finished for plugin '{id_}'.")
+        # --- КОНЕЦ ИЗМЕНЕНИЙ ---
 
     def get_db(self):
-        if not self.winfo_exists(): # Check MpkStore frame
+        # ... (код без изменений, как в предыдущем ответе) ...
+        if not self.winfo_exists():
             logging.debug("MpkStore.get_db: Main widget destroyed, exiting thread.")
             return
 
-        self.clear() # clear() itself checks for self.label_frame existence before acting
+        self.clear() 
+        logging.info("MpkStore.get_db: Cleared existing plugin UI elements.")
 
         try:
-            # Assuming 'requests' can take time, re-check widget existence after.
-            url = requests.get(self.repo + 'plugin.json')
-            self.data = json.loads(url.text)
-        except (requests.exceptions.RequestException, json.JSONDecodeError) as e: # More specific exceptions
-            logging.error(f"MpkStore.get_db: Failed to get/parse plugin.json: {e}")
-            if not self.winfo_exists(): return
-            self.apps = self.data = []
-        except (Exception, BaseException): # Catch-all for other unexpected issues
-            logging.exception('MpkStore.get_db: Unexpected error during data fetch')
-            if not self.winfo_exists(): return
-            self.apps = self.data = []
-        else: # Runs if try block for requests succeeds
-            if not self.winfo_exists(): return
-            self.apps = self.data
+            url_response = requests.get(self.repo + 'plugin.json', timeout=10)
+            url_response.raise_for_status()
+            self.data = url_response.json()
+            self.apps = self.data 
+            logging.info(f"MpkStore.get_db: Successfully loaded {len(self.data)} plugin entries from {self.repo + 'plugin.json'}")
+        except requests.exceptions.RequestException as e_req:
+            logging.error(f"MpkStore.get_db: Failed to get plugin.json due to network error: {e_req}")
+            self.data = self.apps = []
+            if hasattr(win, 'message_pop') and callable(win.message_pop):
+                win.message_pop(f"{getattr(lang, 'repo_fetch_error', 'Error fetching plugin list')}:\n{e_req}", color="orange", title="Repository Error")
+        except json.JSONDecodeError as e_json:
+            logging.error(f"MpkStore.get_db: Failed to parse plugin.json: {e_json}")
+            self.data = self.apps = []
+            if hasattr(win, 'message_pop') and callable(win.message_pop):
+                 win.message_pop(getattr(lang, 'repo_parse_error', 'Error parsing plugin list.'), color="orange", title="Repository Error")
+        except Exception as e_unexp: 
+            logging.exception(f'MpkStore.get_db: Unexpected error during data fetch: {e_unexp}')
+            self.data = self.apps = []
         
-        # Ensure label_frame and canvas attributes exist before checking winfo_exists
-        # These should have been created in pack_basic()
-        if not hasattr(self, 'label_frame') or not hasattr(self, 'canvas'):
-            logging.error("MpkStore.get_db: label_frame or canvas not initialized.")
-            return
-
-        try:
-            # Check if label_frame (parent of buttons added by add_app) exists
-            if not self.label_frame.winfo_exists():
-                logging.debug("MpkStore.get_db: label_frame destroyed before add_app.")
-                return
-            self.add_app(self.apps) # This method adds buttons to self.label_frame
-        except TclError as e: # Specifically catch TclErrors, often widget-related
-            if "invalid command name" in str(e).lower():
-                logging.warning(f"MpkStore.get_db: TclError in add_app (widget likely destroyed): {e}")
-            else:
-                logging.exception('MpkStore.get_db: TclError in add_app')
-            # Check the global state flag as in original code, regardless of TclError type
-            if hasattr(states, 'mpk_store') and not states.mpk_store:
-                return
-            return # In case of TclError, assume UI is unstable, so exit.
-        except (Exception, BaseException): # Catch other errors from add_app
-            logging.exception('MpkStore.get_db: Error during add_app')
-            # If add_app fails for other reasons, it might leave UI in bad state.
-            # Check the global state flag as in original code
-            if hasattr(states, 'mpk_store') and not states.mpk_store:
-                return
-            return # Be cautious and return if add_app had other issues.
-
-        # Perform final UI updates only if widgets still exist
-        if not hasattr(self, 'label_frame') or not self.label_frame.winfo_exists():
-            logging.debug("MpkStore.get_db: label_frame destroyed before update_idletasks.")
-            return
-        self.label_frame.update_idletasks()
-
-        if not hasattr(self, 'canvas') or not self.canvas.winfo_exists():
-            logging.debug("MpkStore.get_db: canvas destroyed before config.")
-            return
-        # The actual problematic call, now guarded
-        self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+        if self.winfo_exists():
+            logging.debug(f"MpkStore.get_db: Calling add_app with {len(self.apps if self.apps else [])} items.")
+            self.add_app(self.apps if self.apps else []) 
+        else:
+            logging.warning("MpkStore.get_db: Window was destroyed before UI update could be completed.")
 
 
 @animation
