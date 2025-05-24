@@ -119,8 +119,15 @@ except ImportError:
 cwd_path = utils.prog_path
 
 if os.name == 'nt':
-    # Copy From https://github.com/littlewhitecloud/CustomTkinterTitlebar/
     def set_title_bar_color(window, dark_value: int = 20):
+        """Adjusts Windows title bar theme color.
+
+        Args:
+            window: Tkinter root window object
+            dark_value: Intensity level for dark mode (0-255)
+
+        Uses Windows DWMWA API to force dark/light titlebar theming.
+        """
         window.update()
         set_window_attribute = windll.dwmapi.DwmSetWindowAttribute
         get_parent = windll.user32.GetParent
@@ -132,80 +139,146 @@ if os.name == 'nt':
 
 
 class LoadAnim:
+    """Manages animated loading indicators for background tasks.
+
+    Attributes:
+        gifs (list): Track active animation frames to prevent memory leaks
+        tasks (dict): Map task IDs to their animation states
+        task_num_index (int): Cyclic counter for task identification
+
+    Methods handle animation lifecycle including start/stop operations
+    with thread-safe task tracking.
+    """
     gifs = []
 
     def __init__(self, master=None):
-        self.master = master
-        self.frames = []
-        self.hide_gif = False
-        self.frame = None
-        self.tasks = {}
-        self.task_num_index = 0
-        self.task_num_max = 100
+        """Initializes the LoadAnim instance.
+
+        Args:
+            master: The parent Tkinter widget (optional).
+        """
+        self.master = master  # The parent widget where the GIF label will be displayed.
+        self.frames = []  # Stores individual frames of the GIF.
+        self.hide_gif = False  # Flag to control GIF visibility.
+        self.frame = None  # The current GIF frame being displayed.
+        self.tasks = {}  # Dictionary to keep track of running tasks associated with the animation.
+        self.task_num_index = 0  # Index for assigning unique task numbers.
+        self.task_num_max = 100  # Maximum number of concurrent tasks (for task_num_index cycling).
 
     def set_master(self, master):
+        """Sets or updates the master widget for the animation.
+
+        Args:
+            master: The new parent Tkinter widget.
+        """
         self.master = master
 
     def run(self, ind: int = 0):
+        """Cycles through GIF frames to create the animation.
+
+        This method is called recursively using `after` to display the next frame.
+
+        Args:
+            ind: The index of the current frame to display.
+        """
         self.hide_gif = False
         if not self.hide_gif:
             self.master.gif_label.pack(padx=10, pady=10)
         self.frame = self.frames[ind]
         ind += 1
         if ind == len(self.frames):
-            ind = 0
+            ind = 0  # Loop back to the first frame.
         self.master.gif_label.configure(image=self.frame)
         self.gifs.append(self.master.gif_label.after(30, self.run, ind))
 
     def get_task_num(self):
+        """Generates a unique task number for tracking.
+
+        Returns:
+            An integer representing the task number.
+        """
         self.task_num_index = (self.task_num_index + 1) % self.task_num_max
         return self.task_num_index
 
     def stop(self):
+        """Stops the animation and hides the GIF.
+
+        Cancels all scheduled frame updates and hides the label.
+        """
         for i in self.gifs:
             try:
                 self.master.gif_label.after_cancel(i)
             except (Exception, BaseException):
-                logging.exception('Bugs')
+                # Log any exceptions during cancellation, as it might indicate a minor issue.
+                logging.exception('Error stopping GIF animation')
         self.master.gif_label.pack_forget()
         self.hide_gif = True
 
     def init(self):
+        """Initializes and immediately stops the animation.
+
+        Used for pre-loading or setup purposes if needed,
+        though its current implementation just runs and stops.
+        """
         self.run()
         self.stop()
 
     def load_gif(self, gif):
+        """Loads frames from a GIF image.
+
+        Args:
+            gif: An opened PIL.Image object representing the GIF.
+        """
         self.frames.clear()
         while True:
+            # Append each frame of the GIF to the internal list.
             self.frames.append(PhotoImage(gif))
             try:
-                gif.seek(len(self.frames))
+                gif.seek(len(self.frames))  # Move to the next frame.
             except EOFError:
-                break
+                break  # Reached the end of the GIF.
 
     def __call__(self, func):
+        """Makes the LoadAnim instance callable, acting as a decorator.
+
+        Allows wrapping functions to automatically show the loading
+        animation while the function executes in a separate thread.
+
+        Args:
+            func: The function to be decorated.
+
+        Returns:
+            The wrapper function.
+        """
         @wraps(func)
         def call_func(*args, **kwargs):
+            """The wrapper function that manages the animation and task execution."""
             return_value = None
 
             def wrapper(*a, **k):
+                # This inner wrapper executes the original function.
                 nonlocal return_value
                 return_value = func(*a, **k)
 
+            # Start the animation in a new thread to avoid blocking the UI.
             create_thread(self.run())
             task_num = self.get_task_num()
+            # The actual function execution also happens in a separate thread.
             task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
-                print(f"The Same task_num {task_num} was used by {task_real.native_id} with args {info[2]}...\n")
-                return None
-            else:
-                self.tasks[task_num] = info
+                # Handle cases where a task number might be reused, though it's unlikely with task_num_max.
+                print(f"Warning: Task number {task_num} reused by {task_real.native_id} for {info[0]}.")
+                # Not returning None here, as the task should still proceed.
+            self.tasks[task_num] = info
             task_real.start()
-            task_real.join()
+            task_real.join()  # Wait for the task to complete.
+
             if task_num in self.tasks:
                 del self.tasks[task_num]
-            del info, task_num
+            # 'info' or 'task_num' go out of scope automatically.
+
+            # If no other tasks are running, stop the animation.
             if not self.tasks:
                 self.stop()
             return return_value
@@ -213,88 +286,133 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 3000): # Увеличено время до 3000 мс
-    # Убедимся, что `win` это правильный родитель (главное окно)
-    # Если `win` не всегда доступен или это MpkStore, то нужно передавать master явно.
-    # Для простоты, предполагаем, что `win` это главный Tk объект.
-    parent_for_popup = win 
+def warn_win(text: str = '', color: str = 'orange', title: str = "Warn", wait: int = 3000): # Increased wait time to 3000 ms
+    # Ensure `win` is the correct parent (main window).
+    # If `win` isn't always available or if it's an MpkStore instance, `master` should be passed explicitly.
+    # For simplicity, we assume `win` is the main Tk object.
+    parent_for_popup = win
     if hasattr(states, 'active_mpk_store_instance') and \
        states.active_mpk_store_instance and \
        states.active_mpk_store_instance.winfo_exists():
-        # Если MpkStore активен, делаем попап относительно него, чтобы он был поверх
+        # If MpkStore is active, make the popup relative to it to ensure it's on top.
         parent_for_popup = states.active_mpk_store_instance
-        # Однако, LabelFrame не может быть дочерним для Toplevel напрямую через place таким способом.
-        # Лучше создать Toplevel для этого сообщения, если parent_for_popup это Toplevel
-        
-    # Если мы хотим, чтобы сообщение было модальным или всегда поверх конкретного окна,
-    # лучше создать новый Toplevel.
-    
-    popup_window = Toplevel() # Создаем новый Toplevel для сообщения
-    popup_window.transient(parent_for_popup) # Делаем его дочерним и поверх родителя
-    popup_window.title(title)
-    # Убираем стандартные кнопки окна (опционально, если не нужно закрывать крестиком)
-    # popup_window.overrideredirect(True) # Это уберет рамку окна полностью
+        # However, a LabelFrame cannot be a direct child of a Toplevel using `place` in this manner.
+        # It's better to create a new Toplevel for this message if `parent_for_popup` is already a Toplevel.
 
-    # Используем ttk.Frame внутри Toplevel вместо LabelFrame для простоты
-    ask_frame = ttk.Frame(popup_window, padding=(20, 10)) # Добавляем padding
+    # If we want the message to be modal or always on top of a specific window,
+    # it's better to create a new Toplevel.
+
+    popup_window = Toplevel() # Create a new Toplevel for the message.
+    popup_window.transient(parent_for_popup) # Make it a transient window, child of and displayed on top of the parent.
+    popup_window.title(title)
+    # Remove standard window decorations (optional, if closing via the 'X' button isn't desired).
+    # popup_window.overrideredirect(True) # This will remove the window frame and decorations entirely.
+
+    # Use ttk.Frame inside Toplevel instead of LabelFrame for simplicity.
+    ask_frame = ttk.Frame(popup_window, padding=(20, 10)) # Add padding.
     ask_frame.pack(expand=True, fill=BOTH)
-    
-    # Сообщение
-    msg_label = ttk.Label(ask_frame, text=text, font=(None, 14), foreground=color, wraplength=350, justify=CENTER) # Уменьшил шрифт, добавил justify
+
+    # Message content.
+    msg_label = ttk.Label(ask_frame, text=text, font=(None, 14), foreground=color, wraplength=350, justify=CENTER) # Reduced font size, added text justification.
     msg_label.pack(pady=(10, 20), expand=True, fill=X)
 
-    # Кнопка OK (опционально, если нужно закрывать по кнопке, а не только по таймеру)
+    # OK button (optional, if closing via a button is needed, not just by timer).
     # ttk.Button(ask_frame, text=getattr(lang, 'ok', "OK"), command=popup_window.destroy, style="Accent.TButton").pack(pady=(0,10))
 
-    popup_window.update_idletasks() # Обновить размеры перед центрированием
+    popup_window.update_idletasks() # Update dimensions before centering.
 
-    # Центрирование относительно родительского окна
+    # Center the popup relative to the parent window.
     parent_width = parent_for_popup.winfo_width()
     parent_height = parent_for_popup.winfo_height()
     parent_x = parent_for_popup.winfo_x()
     parent_y = parent_for_popup.winfo_y()
 
-    popup_width = popup_window.winfo_reqwidth() # Используем reqwidth для начального размера
-    popup_height = popup_window.winfo_reqheight()
+    popup_width = popup_window.winfo_reqwidth() # Use `winfo_reqwidth()` for the initial requested width.
+    popup_height = popup_window.winfo_reqheight() # Use `winfo_reqheight()` for the initial requested height.
 
     x_pos = parent_x + (parent_width // 2) - (popup_width // 2)
     y_pos = parent_y + (parent_height // 2) - (popup_height // 2)
-    
+
     popup_window.geometry(f"+{x_pos}+{y_pos}")
-    popup_window.lift() # Поднять над другими окнами
-    popup_window.focus_force() # Передать фокус
+    popup_window.lift() # Lift the window above others.
+    popup_window.focus_force() # Force focus onto the popup.
 
     popup_window.after(wait, popup_window.destroy)
 
 
 class Toplevel(TkToplevel):
+    """Custom Toplevel window with Windows-specific title bar color theming.
+
+    Ensures that new windows in the application consistently
+    apply the dark/light theme to their title bars on Windows.
+    """
     def __init__(self):
+        """Initializes the custom Toplevel window.
+
+        Calls the parent TkToplevel constructor and then applies
+        the title bar color if the OS is Windows and a theme is set.
+        """
         super().__init__()
-        if os.name == 'nt':
+        if os.name == 'nt':  # Only apply this on Windows.
             if settings.theme == 'dark':
+                # For a dark theme, set the title bar to a dark color.
                 set_title_bar_color(self)
             else:
+                # For other themes (presumably light), set a default light title bar color.
                 set_title_bar_color(self, 0)
 
 
 class CustomControls:
+    """Provides static methods for creating common custom UI control groups.
+
+    Encapsulates the creation of frequently used compound widgets,
+    like a label, entry, and button for file selection, to reduce
+    boilerplate code in the main UI construction.
+    """
     def __init__(self):
+        """Initializes the CustomControls instance.
+
+        This class currently only contains static methods, so the constructor is empty.
+        """
         pass
 
     @staticmethod
-    def filechose(master, textvariable: tk.Variable, text, is_folder: bool = False):
+    def filechose(master, textvariable: tk.Variable, text: str, is_folder: bool = False):
+        """Creates a file/folder selection widget group.
+
+        This group consists of a label, an entry to display the path,
+        and a button to open a file/folder dialog.
+
+        Args:
+            master: The parent Tkinter widget.
+            textvariable: A tk.Variable to store the selected path.
+            text: The text for the label.
+            is_folder: If True, opens a directory chooser; otherwise, a file chooser.
+        """
         ft = ttk.Frame(master)
         ft.pack(fill=X)
         ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
         ttk.Entry(ft, textvariable=textvariable).pack(side='left', padx=5, pady=5)
-        ttk.Button(ft, text=lang.text28,
+        # Use a lambda to decide whether to ask for a file or directory.
+        ttk.Button(ft, text=lang.text28,  # Assuming lang.text28 is 'Browse' or similar
                    command=lambda: textvariable.set(
                        filedialog.askopenfilename() if not is_folder else filedialog.askdirectory())).pack(side='left',
                                                                                                            padx=10,
                                                                                                            pady=10)
 
     @staticmethod
-    def combobox(master, textvariable: tk.Variable, values, text, state: str = 'normal'):
+    def combobox(master, textvariable: tk.Variable, values: list, text: str, state: str = 'normal'):
+        """Creates a labeled combobox widget group.
+
+        This group consists of a label and a combobox.
+
+        Args:
+            master: The parent Tkinter widget.
+            textvariable: A tk.Variable to store the selected value.
+            values: A list of values for the combobox dropdown.
+            text: The text for the label.
+            state: The state of the combobox (e.g., 'normal', 'readonly').
+        """
         ft = ttk.Frame(master)
         ft.pack(fill=X)
         ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
@@ -306,188 +424,300 @@ ccontrols = CustomControls()
 
 
 class ToolBox(ttk.Frame):
+    """A ttk.Frame subclass serving as a container for various tool buttons.
+
+    Designed to group utility functions, each launched by a button,
+    within a scrollable area. Each tool often opens its own Toplevel window for interaction.
+    """
     def __init__(self, master):
+        """Initializes the ToolBox frame.
+
+        Args:
+            master: The parent Tkinter widget.
+        """
         super().__init__(master=master)
+        # Use a lambda for the mouse wheel scroll event for conciseness.
         self.__on_mouse = lambda event: self.canvas.yview_scroll(-1 * int(event.delta / 120), "units")
 
     def pack_basic(self):
+        """Sets up the basic scrollable canvas structure for the toolbox.
+
+        Creates a Canvas with a vertical Scrollbar and a Frame inside the Canvas
+        to hold the actual content (buttons).
+        """
         scrollbar = Scrollbar(self, orient='vertical')
         scrollbar.pack(side='right', fill='y', padx=10, pady=10)
         self.canvas = Canvas(self, yscrollcommand=scrollbar.set)
-        self.canvas.pack_propagate(False)
+        self.canvas.pack_propagate(False)  # Prevents the canvas from shrinking to fit its content.
         self.canvas.pack(fill='both', expand=True)
         scrollbar.config(command=self.canvas.yview)
-        self.label_frame = Frame(self.canvas)
+        self.label_frame = Frame(self.canvas)  # This frame will contain the tool buttons.
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
+        # Bind the mouse wheel event to the canvas for scrolling.
         self.canvas.bind_all("<MouseWheel>",
                              lambda event: self.__on_mouse(event))
 
     def gui(self):
+        """Populates the toolbox with buttons for different tools.
+
+        Defines a list of tool names (from `lang` for localization) and their
+        corresponding callback functions, then arranges them in a grid.
+        """
         self.pack_basic()
         functions = [
-            (lang.text114, lambda: create_thread(download_file)),
-            (lang.t59, self.GetFileInfo),
-            (lang.t60, self.FileBytes),
-            (lang.audit_allow, self.SelinuxAuditAllow),
-            (lang.trim_image, self.TrimImage),
-            (lang.magisk_patch, self.MagiskPatcher),
-            (lang.mergequalcommimage, self.MergeQualcommImage_old)
+            (lang.text114, lambda: create_thread(download_file)), # Download File
+            (lang.t59, self.GetFileInfo), # Get File Info
+            (lang.t60, self.FileBytes), # File Bytes Operations
+            (lang.audit_allow, self.SelinuxAuditAllow), # Selinux Audit Allow
+            (lang.trim_image, self.TrimImage), # Trim Image
+            (lang.magisk_patch, self.MagiskPatcher), # Magisk Patcher
+            (lang.mergequalcommimage, self.MergeQualcommImage_old) # Merge Qualcomm Image (Legacy)
         ]
-        width_controls = 3
-        #
+        width_controls = 3  # Number of buttons per row.
         index_row = 0
         index_column = 0
         for text, func in functions:
             ttk.Button(self.label_frame, text=text, command=func, width=17).grid(row=index_row, column=index_column,
                                                                                  padx=5, pady=5)
             index_column = (index_column + 1) % width_controls
-            if not index_column:
+            if not index_column:  # Move to the next row if the current one is full.
                 index_row += 1
-        self.update_ui()
+        self.update_ui()  # Adjusts the scroll region after adding buttons.
 
     def update_ui(self):
-        self.label_frame.update_idletasks()
+        """Updates the canvas scroll region to fit its content.
+
+        I call this after adding or removing widgets from `label_frame`
+        to ensure the scrollbar behaves correctly.
+        """
+        self.label_frame.update_idletasks() # Ensure all pending geometry changes are processed.
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+        
 
     class MergeQualcommImage_old(Toplevel):
+        """A Toplevel window for merging Qualcomm sparse images using rawprogram.xml (Legacy version).
+
+        I created this to provide a UI for an older method of merging Qualcomm firmware images.
+        It takes a rawprogram.xml, partition name, and output path.
+        """
         def __init__(self):
+            """Initializes the MergeQualcommImage_old window."""
             super().__init__()
             self.title(lang.mergequalcommimage)
-            self.rawprogram_xml = StringVar()
-            self.partition_name = StringVar()
-            self.output_path = StringVar()
+            self.rawprogram_xml = StringVar() # Path to the rawprogram.xml file.
+            self.partition_name = StringVar() # Name of the partition to merge (e.g., 'system').
+            self.output_path = StringVar()    # Directory to save the merged image.
             self.gui()
-            move_center(self)
+            move_center(self) # Centers the window on the screen.
 
         def gui(self):
+            """Creates the GUI elements for the MergeQualcommImage_old window."""
             ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
             ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
             ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
             ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
+            """Executes the image merging process in a separate thread."""
             rawprogram_xml = self.rawprogram_xml.get()
             if not os.path.exists(rawprogram_xml):
-                print(f'Raw Program not exist!{rawprogram_xml}')
+                # I inform the user if the XML file is not found.
+                print(f'Raw Program XML not found: {rawprogram_xml}')
+                warn_win(f'Raw Program XML not found: {rawprogram_xml}')
                 return 1
             partition_name = self.partition_name.get()
             output_path = self.output_path.get()
             if not output_path:
-                print('Please Choose OutPut Path.')
+                # I inform the user if the output path is not selected.
+                print('Output path not selected.')
+                warn_win('Please choose an output path.')
                 return 1
             if not os.path.exists(output_path):
                 os.makedirs(output_path, exist_ok=True)
-            self.destroy()
+            
+            self.destroy() # I close the dialog before starting the potentially long process.
             try:
                 process_by_xml(rawprogram_xml, partition_name, output_path)
-                return None
-            except (Exception, BaseException) as e:
-                print('Merge Fail!')
-                logging.exception('MergeQC RAWPROGRAM')
-                return None
+                # I inform the user of success.
+                info_win('Image merging completed successfully!')
+            except Exception as e:
+                # I log the error and inform the user of failure.
+                print(f'Merge failed: {e}')
+                logging.exception('MergeQC RAWPROGRAM error')
+                warn_win(f'Image merging failed: {str(e)}') # Displaying the error message to the user.
+            # No explicit return None needed here as the function naturally returns None if no other return is hit.
+                
 
     class MagiskPatcher(Toplevel):
+        """A Toplevel window for patching boot images with Magisk.
+
+        I designed this to provide a user interface for selecting a boot image,
+        a Magisk APK, and various patching options, then initiating the patch process.
+        """
         def __init__(self):
+            """Initializes the MagiskPatcher window."""
             super().__init__()
-            self.magisk_apk = None
-            self.boot_file = None
+            # I initialize StringVars for APK and boot file paths here for clarity,
+            # even if they are fully defined in gui().
+            self.magisk_apk = StringVar() # Stores the path to the selected Magisk APK.
+            self.boot_file = StringVar()  # Stores the path to the selected boot image file.
             self.title(lang.magisk_patch)
             self.gui()
             move_center(self)
 
-        def get_arch(self, apk=None) -> list:
-            if not apk:
-                apk = self.magisk_apk.get()
-            if not apk or not os.path.exists(apk):
+        def get_arch(self, apk_path=None) -> list:
+            """Retrieves supported architectures from a Magisk APK.
+
+            Args:
+                apk_path: Path to the Magisk APK. If None, uses self.magisk_apk.get().
+
+            Returns:
+                A list of supported architectures (e.g., ["arm64-v8a"]), or a default if APK is invalid.
+            """
+            if not apk_path:
+                apk_path = self.magisk_apk.get() # Use the instance's Magisk APK path if none provided.
+            if not apk_path or not os.path.exists(apk_path):
+                # I return a default architecture if the APK path is invalid or doesn't exist.
                 return ["arm64-v8a"]
-            with Magisk_patch(None, None, None, None, MAGISAPK=apk) as m:
-                return m.get_arch()
+            try:
+                # I use the Magisk_patch utility to extract architecture information.
+                with Magisk_patch(None, None, None, None, MAGISAPK=apk_path) as m:
+                    return m.get_arch()
+            except Exception as e:
+                # I log the error and return a default if Magisk_patch fails, also warning the user.
+                logging.error(f"Failed to get arch from Magisk APK {apk_path}: {e}")
+                warn_win(f"Could not read architectures from {os.path.basename(apk_path)}.")
+                return ["arm64-v8a"]
 
         def chose_file_refresh(self):
-            file = filedialog.askopenfilename()
-            self.magisk_apk.set(
-                file)
-            self.archs.configure(value=self.get_arch(file))
-            self.lift()
-            self.focus_force()
+            """Handles Magisk APK file selection and refreshes the architecture combobox.
+            I open a file dialog for the user to select an APK, then update the UI.
+            """
+            file_path = filedialog.askopenfilename(title="Select Magisk APK", filetypes=(("APK files", "*.apk"), ("All files", "*.*")))
+            if file_path: # I only proceed if a file was actually selected by the user.
+                self.magisk_apk.set(file_path)
+                # I update the architectures combobox based on the newly selected APK.
+                self.archs.configure(value=self.get_arch(file_path))
+            self.lift() # I ensure the window remains on top after the dialog closes.
+            self.focus_force() # And give it focus.
 
         def patch(self):
-            self.patch_bu.configure(state="disabled", text=lang.running)
-            local_path = str(os.path.join(temp, v_code()))
-            re_folder(local_path)
-            with Magisk_patch(self.boot_file.get(), None, f"{settings.tool_bin}/magiskboot", local_path,
-                              self.IS64BIT.get(),
-                              self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
-                              self.RECOVERYMODE.get(), self.magisk_apk.get(), self.magisk_arch.get()
-                              ) as m:
-                m.auto_patch()
-                if m.output:
-                    output_file = os.path.join(cwd_path,
-                                               os.path.basename(self.boot_file.get()[:-4]) + "_magisk_patched.img")
-                    if os.path.exists(output_file):
+            """Performs the Magisk patching operation in a separate thread.
+            I disable the patch button, prepare paths, validate inputs, and then run the patcher.
+            """
+            self.patch_bu.configure(state="disabled", text=lang.running) # I disable the button during patching.
+            local_path = str(os.path.join(temp, v_code())) # Generate a unique temporary working directory.
+            re_folder(local_path) # I ensure the temporary folder is clean or created.
+
+            boot_file_path = self.boot_file.get()
+            magisk_apk_path = self.magisk_apk.get()
+
+            # Input validation before proceeding with patching.
+            if not boot_file_path or not os.path.exists(boot_file_path):
+                warn_win("Boot image not selected or not found.")
+                self.patch_bu.configure(state="normal", text=lang.patch) # Re-enable button.
+                return
+
+            if not magisk_apk_path or not os.path.exists(magisk_apk_path):
+                warn_win("Magisk APK not selected or not found.")
+                self.patch_bu.configure(state="normal", text=lang.patch) # Re-enable button.
+                return
+
+            try:
+                # I pass all necessary parameters to the Magisk_patch utility.
+                with Magisk_patch(boot_file_path, None, f"{settings.tool_bin}/magiskboot", local_path,
+                                  self.IS64BIT.get(),
+                                  self.KEEPVERITY.get(), self.KEEPFORCEENCRYPT.get(),
+                                  self.RECOVERYMODE.get(), magisk_apk_path, self.magisk_arch.get()
+                                  ) as m:
+                    m.auto_patch() # Perform the automated patching process.
+                    if m.output:
+                        # I construct a unique output file name to avoid overwriting existing files.
+                        base_name = os.path.basename(boot_file_path)
+                        # Handle common image extensions like .img and .bin for name stripping.
+                        name_part = base_name
+                        for ext in ('.img', '.bin'): # I check for common extensions.
+                            if base_name.lower().endswith(ext):
+                                name_part = base_name[:-len(ext)]
+                                break
                         output_file = os.path.join(cwd_path,
-                                                   os.path.basename(
-                                                       self.boot_file.get()[:-4]) + v_code() + "_magisk_patched.img")
-                    os.rename(m.output, output_file)
-                    print(f"Done!Patched Boot:{output_file}")
-                    info_win(f"Patched Boot:\n{output_file}")
-            self.patch_bu.configure(state="normal", text=lang.patch)
+                                                   f"{name_part}_magisk_patched.img")
+                        if os.path.exists(output_file):
+                            # If the default patched name exists, I add a unique code to the new one.
+                            output_file = os.path.join(cwd_path,
+                                                       f"{name_part}_{v_code()}_magisk_patched.img")
+                        os.rename(m.output, output_file) # Move the patched file to the final destination.
+                        print(f"Done! Patched Boot: {output_file}")
+                        info_win(f"Patched Boot:\n{output_file}") # Inform the user of success.
+                    else:
+                        warn_win("Magisk patching process did not produce an output file.")
+            except Exception as e:
+                # I log any exceptions during patching and inform the user.
+                logging.exception("Magisk patching error")
+                warn_win(f"Magisk patching failed: {str(e)}")
+            finally:
+                # I always re-enable the patch button, regardless of success or failure.
+                self.patch_bu.configure(state="normal", text=lang.patch)
 
         def gui(self):
-            ttk.Label(self, text=lang.magisk_patch).pack()
-            ft = ttk.Frame(self)
-            ft.pack(fill=X)
-
-            self.boot_file = StringVar()
-            ttk.Label(ft, text=lang.boot_file).pack(side='left', padx=10, pady=10)
-            ttk.Entry(ft, textvariable=self.boot_file).pack(side='left', padx=5, pady=5)
-            ttk.Button(ft, text=lang.text28,
+            """Creates the GUI elements for the MagiskPatcher window.
+            I set up labels, entries, buttons, and checkboxes for user interaction.
+            """
+            ttk.Label(self, text=lang.magisk_patch).pack(pady=(5,10)) # Add some padding to the title label.
+            
+            # Boot file selection section
+            ft_boot = ttk.Frame(self)
+            ft_boot.pack(fill=X, padx=5, pady=2)
+            ttk.Label(ft_boot, text=lang.boot_file, width=12).pack(side='left', padx=(0,5), pady=5) # Standardized label width.
+            ttk.Entry(ft_boot, textvariable=self.boot_file).pack(side='left', padx=5, pady=5, expand=True, fill=X)
+            ttk.Button(ft_boot, text=lang.text28, # Assuming lang.text28 is 'Browse' or similar.
                        command=lambda: self.boot_file.set(
-                           filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+                           filedialog.askopenfilename(title="Select Boot Image", filetypes=(("Image files", "*.img *.bin"), ("All files", "*.*"))))).pack(side='left', padx=(5,0), pady=5)
 
-            ft = ttk.Frame(self)
-            ft.pack(fill=BOTH)
-
-            self.magisk_apk = StringVar()
-            ttk.Label(ft, text=lang.magisk_apk).pack(side='left', padx=10, pady=10)
-            ttk.Entry(ft, textvariable=self.magisk_apk).pack(side='left', padx=5, pady=5)
-            ttk.Button(ft, text=lang.text28,
-                       command=lambda: self.chose_file_refresh()).pack(side='left', padx=10, pady=10)
-            ft = ttk.Frame(self)
-            ft.pack(fill=X)
-
-            self.magisk_arch = StringVar(value='arm64-v8a')
-            ttk.Label(ft, text=lang.arch).pack(side='left', padx=10, pady=10)
-            self.archs = ttk.Combobox(ft, state='readonly', textvariable=self.magisk_arch,
-                                      values=["arm64-v8a"])
-            self.archs.pack(side='left', padx=5, pady=5)
-            ttk.Button(ft, text=lang.text23,
-                       command=lambda: self.archs.configure(value=self.get_arch())).pack(side='left', padx=10, pady=10)
-            # Options
-            # IS64BIT=True, KEEPVERITY=False, KEEPFORCEENCRYPT=False, RECOVERYMODE=False
+            # Magisk APK selection section
+            ft_apk = ttk.Frame(self)
+            ft_apk.pack(fill=X, padx=5, pady=2)
+            ttk.Label(ft_apk, text=lang.magisk_apk, width=12).pack(side='left', padx=(0,5), pady=5) # Standardized label width.
+            ttk.Entry(ft_apk, textvariable=self.magisk_apk).pack(side='left', padx=5, pady=5, expand=True, fill=X)
+            ttk.Button(ft_apk, text=lang.text28, # Assuming lang.text28 is 'Browse'.
+                       command=self.chose_file_refresh).pack(side='left', padx=(5,0), pady=5) # No lambda needed here.
+            
+            # Architecture selection section
+            ft_arch = ttk.Frame(self)
+            ft_arch.pack(fill=X, padx=5, pady=2)
+            self.magisk_arch = StringVar(value='arm64-v8a') # Default architecture.
+            ttk.Label(ft_arch, text=lang.arch, width=12).pack(side='left', padx=(0,5), pady=5) # Standardized label width.
+            self.archs = ttk.Combobox(ft_arch, state='readonly', textvariable=self.magisk_arch,
+                                      values=self.get_arch()) # Initialize with current APK's archs if available, or default.
+            self.archs.pack(side='left', padx=5, pady=5, expand=True, fill=X)
+            # I removed the refresh button for architectures as it's automatically updated when a new APK is selected.
+            # I also removed the commented out options as they are not used.
+            
+            # Patching options checkboxes
+            # I group these BooleanVars together for better readability and logical grouping in the UI.
             self.IS64BIT = BooleanVar(value=True)
             self.KEEPVERITY = BooleanVar(value=False)
             self.KEEPFORCEENCRYPT = BooleanVar(value=False)
             self.RECOVERYMODE = BooleanVar(value=False)
-            ft = ttk.Frame(self)
-            ft.pack(fill=X)
-            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='IS64BIT', variable=self.IS64BIT).pack(fill=X,
-                                                                                                          padx=5,
-                                                                                                          pady=5,
-                                                                                                          side=LEFT)
-            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='KEEPVERITY', variable=self.KEEPVERITY).pack(fill=X,
-                                                                                                                padx=5,
-                                                                                                                pady=5,
-                                                                                                                side=LEFT)
-            ft = ttk.Frame(self)
-            ft.pack(fill=X)
-            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='KEEPFORCEENCRYPT',
-                            variable=self.KEEPFORCEENCRYPT).pack(fill=X, padx=5, pady=5, side=LEFT)
-            ttk.Checkbutton(ft, onvalue=True, offvalue=False, text='RECOVERYMODE', variable=self.RECOVERYMODE).pack(
-                fill=X, padx=5, pady=5, side=LEFT)
+            
+            # I use two frames to better organize the checkboxes if there are many.
+            ft_options_row1 = ttk.Frame(self)
+            ft_options_row1.pack(fill=X, padx=5, pady=2)
+            ttk.Checkbutton(ft_options_row1, onvalue=True, offvalue=False, text='IS64BIT', variable=self.IS64BIT).pack(padx=5, pady=2, side=LEFT)
+            ttk.Checkbutton(ft_options_row1, onvalue=True, offvalue=False, text='KEEPVERITY', variable=self.KEEPVERITY).pack(padx=5, pady=2, side=LEFT)
+            
+            ft_options_row2 = ttk.Frame(self) # Renamed for clarity
+            ft_options_row2.pack(fill=X, padx=5, pady=2)
+            ttk.Checkbutton(ft_options_row2, onvalue=True, offvalue=False, text='KEEPFORCEENCRYPT',
+                            variable=self.KEEPFORCEENCRYPT).pack(padx=5, pady=2, side=LEFT)
+            ttk.Checkbutton(ft_options_row2, onvalue=True, offvalue=False, text='RECOVERYMODE', variable=self.RECOVERYMODE).pack(
+                padx=5, pady=2, side=LEFT)
+            
+            # Patch button, styled for emphasis.
             self.patch_bu = ttk.Button(self, text=lang.patch, style='Accent.TButton',
                                        command=lambda: create_thread(self.patch))
-            self.patch_bu.pack(fill=X, padx=5, pady=5)
+            self.patch_bu.pack(fill=X, padx=5, pady=(10,5)) # Added more vertical padding for better spacing.
+            
 
     class SelinuxAuditAllow(Toplevel):
         def __init__(self):
@@ -529,61 +759,62 @@ class ToolBox(ttk.Frame):
                 self.button.configure(text=lang.running, state='disabled')
                 create_thread(selinux_audit_allow, self.choose_file.get(), self.output_dir.get())
                 self.button.configure(text=lang.done, state='normal', style='')
+                
 
     class FileBytes(Toplevel):
         def __init__(self):
             super().__init__()
             self.units = {
-                "B": 1,  # Используем 1 вместо 2**0 для простоты
+                "B": 1,  # Using 1 instead of 2**0 for simplicity
                 "KB": 1024,
                 "MB": 1024**2,
                 "GB": 1024**3,
                 "TB": 1024**4,
-                "PB": 1024**5 # Добавил PB для полноты
+                "PB": 1024**5 # Added PB for completeness
             }
-            self.title(lang.t60) # lang.t60 = 'Byte Calculator' (пример)
-            self._is_calculating = False # Флаг для предотвращения рекурсии
-            self.origin_size_var = tk.StringVar() # Отдельные переменные для Entry
+            self.title(lang.t60) # lang.t60 = 'Byte Calculator' (example)
+            self._is_calculating = False # Flag to prevent recursion
+            self.origin_size_var = tk.StringVar() # Separate StringVars for the Entry widgets
             self.result_size_var = tk.StringVar()
             self.gui()
-            move_center(self) # Убедись, что move_center определена
+            move_center(self) # Assumes move_center is defined and available
 
         def gui(self):
-            self.f_main = Frame(self) # Основной фрейм для виджетов
+            self.f_main = Frame(self) # Main frame for widgets
             self.f_main.pack(pady=5, padx=5, fill=X, expand=True)
 
-            # Левое поле ввода
+            # Left input field
             self.origin_size = ttk.Entry(self.f_main, textvariable=self.origin_size_var)
-            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Биндинг на левое поле
+            self.origin_size.bind("<KeyRelease>", self.calc_forward) # Binding for the left field
             self.origin_size.pack(side='left', padx=5, expand=True, fill=X)
 
-            # Левый комбобокс
+            # Left combobox
             self.h = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.h.current(0)
-            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Биндинг на левый комбобокс
+            self.h.bind("<<ComboboxSelected>>", self.calc_forward) # Binding for the left combobox
             self.h.pack(side='left', padx=5)
 
-            # Знак равенства
+            # Equals sign label
             Label(self.f_main, text='=').pack(side='left', padx=5)
 
-            # Правое поле ввода
+            # Right input field
             self.result_size = ttk.Entry(self.f_main, textvariable=self.result_size_var)
-            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Биндинг на правое поле
+            self.result_size.bind("<KeyRelease>", self.calc_reverse) # Binding for the right field
             self.result_size.pack(side='left', padx=5, expand=True, fill=X)
 
-            # Правый комбобокс
+            # Right combobox
             self.f_ = ttk.Combobox(self.f_main, values=list(self.units.keys()), state='readonly', width=4)
             self.f_.current(0)
-            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Биндинг на правый комбобокс
+            self.f_.bind("<<ComboboxSelected>>", self.calc_reverse) # Binding for the right combobox
             self.f_.pack(side='left', padx=5)
 
-            # Кнопка закрытия
-            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5) # lang.text17 = 'Close' (пример)
+            # Close button
+            ttk.Button(self, text=lang.text17, command=self.destroy).pack(fill=X, padx=5, pady=5) # lang.text17 = 'Close' (example)
 
         def calc_forward(self, event=None):
-            """Рассчитывает значение справа налево (из левого поля в правое)."""
+            """Calculates the value from left to right (from the left field to the right field)."""
             if self._is_calculating:
-                return # Предотвращаем рекурсию
+                return # Prevent recursion
 
             self._is_calculating = True
             try:
@@ -593,70 +824,72 @@ class ToolBox(ttk.Frame):
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # Обновляем только если значение отличается, чтобы избежать лишних событий
+                # Update only if the value differs, to avoid redundant events
                 if self.result_size_var.get() != result_value_str:
                     self.result_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Сбрасываем флаг
+                self._is_calculating = False # Reset the flag
 
         def calc_reverse(self, event=None):
-            """Рассчитывает значение справа налево (из правого поля в левое)."""
+            """Calculates the value from right to left (from the right field to the left field)."""
             if self._is_calculating:
-                return # Предотвращаем рекурсию
+                return # Prevent recursion
 
             self._is_calculating = True
             try:
-                # Единицы меняются местами для расчета
-                origin_unit = self.f_.get() # Берем единицу из правого комбобокса
-                target_unit = self.h.get()  # Целевая единица - из левого
-                origin_value_str = self.result_size_var.get() # Значение из правого поля
+                # Units are swapped for calculation
+                origin_unit = self.f_.get() # Get the unit from the right combobox
+                target_unit = self.h.get()  # Target unit is from the left combobox
+                origin_value_str = self.result_size_var.get() # Value from the right field
 
                 result_value_str = self.__calc(origin_unit, target_unit, origin_value_str)
 
-                # Обновляем только если значение отличается
+                # Update only if the value differs
                 if self.origin_size_var.get() != result_value_str:
                     self.origin_size_var.set(result_value_str)
             finally:
-                self._is_calculating = False # Сбрасываем флаг
+                self._is_calculating = False # Reset the flag
 
         def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
-            """Выполняет конвертацию значения между единицами."""
-            # Убираем пробелы
+            """Performs the value conversion between units."""
+            # Remove whitespace
             size_str = size_str.strip()
 
-            # Обработка пустого ввода
+            # Handle empty input
             if not size_str:
-                return "" # Возвращаем пустую строку, если ввод пуст
+                return "" # Return an empty string if input is empty
 
             try:
-                # Пытаемся преобразовать во float
+                # Try to convert to float
                 size = float(size_str)
             except ValueError:
-                 # Если не float, проверяем, не является ли это частично введенным числом
+                 # If not a float, check if it's a partially entered number
                  if size_str == '.' or size_str == '-' or size_str == '-.' or \
                    (size_str.startswith('-') and size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str[1:])) or \
                    (size_str.count('.') <= 1 and all(c.isdigit() or c == '.' for c in size_str)):
-                    # Если это похоже на число в процессе ввода, пока ничего не возвращаем (или можно вернуть "0"?)
-                    # Возвращаем пустую строку, чтобы не мешать вводу
+                    # If it looks like a number being typed, don't return anything yet.
+                    # Return an empty string to avoid interfering with input.
                     return ""
                  else:
-                    # Если это точно не число, возвращаем "Invalid" или пустую строку
+                    # If it's definitely not a number, return "Invalid".
                     return "Invalid"
 
-            # Если единицы одинаковые
+            # If units are the same
             if origin_unit == target_unit:
-                # Возвращаем число в виде строки, удаляя .0 для целых чисел
+                # Return the number as a string, removing .0 for integers.
                 return str(int(size)) if size.is_integer() else str(size)
 
-            # Выполняем расчет
+            # Perform the calculation
             result = size * self.units[origin_unit] / self.units[target_unit]
 
-            # Форматируем результат: удаляем .0 для целых чисел, ограничиваем точность
+            # Format the result: remove .0 for integers, limit precision.
             if result.is_integer():
                 return str(int(result))
             else:
-                # Ограничиваем количество знаков после запятой для читаемости
+                # Limit the number of decimal places for readability.
                 return f"{result:.6f}".rstrip('0').rstrip('.')
+                
+                
     class GetFileInfo(Toplevel):
         def __init__(self):
             super().__init__()
@@ -1109,9 +1342,6 @@ states = States()
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 
 
-# Some Functions for Upgrade
-
-
 class Updater(Toplevel):
 
     def __init__(self):
@@ -1392,19 +1622,20 @@ def error(code, desc="unknown error"):
 
 class Welcome(ttk.Frame):
     def __init__(self):
-        # master=win здесь означает, что Welcome будет дочерним виджетом главного окна 'win'
+        # master=win specifies that Welcome will be a child widget of the main window 'win'.
         _main_app_window = globals().get('win')
         if not (_main_app_window and isinstance(_main_app_window, tk.Tk)):
-            # Это критическая ситуация, если Welcome ожидает win как master
+            # This is a critical situation if Welcome expects 'win' to be its master.
             if 'logging' in globals():
                 logging.critical("Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
-            # Можно либо упасть, либо создать временный Toplevel, если Welcome должен работать автономно (что маловероятно здесь)
+            # The application could either fail or a temporary Toplevel could be created
+            # if Welcome were intended to run standalone (which is unlikely here).
             # For now, let's assume 'win' is always available as per the original design.
             # If 'win' is truly missing, the super().__init__ below would likely fail or misbehave.
-            pass # Let it proceed, error might be caught later or if win is not tk.Tk like
+            pass # Allowing execution to continue; an error might occur later if 'win' is not a tk.Tk instance.
 
-        super().__init__(master=_main_app_window) # Explicitly pass master
-        self.pack(fill=BOTH, expand=True) # Welcome frame fills its master (win)
+        super().__init__(master=_main_app_window) # Explicitly pass master.
+        self.pack(fill=BOTH, expand=True) # Welcome frame fills its master (win).
 
         _settings_obj = globals().get('settings')
         _states_obj = globals().get('states')
@@ -1413,9 +1644,9 @@ class Welcome(ttk.Frame):
         if not (_settings_obj and _states_obj and _lang_obj):
             if 'logging' in globals():
                 logging.error("Welcome.__init__: Global objects (settings, states, lang) not fully available.")
-            # Handle missing globals if necessary, e.g., by disabling functionality or using defaults
+            # Handle missing globals if necessary, e.g., by disabling functionality or using defaults.
 
-        self.oobe = 0 # Default value
+        self.oobe = 0 # Default value.
         if _settings_obj and hasattr(_settings_obj, 'oobe'):
             try:
                 self.oobe = int(_settings_obj.oobe)
@@ -1423,7 +1654,7 @@ class Welcome(ttk.Frame):
                 if 'logging' in globals():
                     logging.warning(f"Welcome.__init__: Invalid value for settings.oobe ('{_settings_obj.oobe}'). Defaulting to 0.")
                 self.oobe = 0
-        
+
         if _states_obj:
             _states_obj.in_oobe = True
 
@@ -1435,17 +1666,17 @@ class Welcome(ttk.Frame):
             4: self.private,
             5: self.done
         }
-        self.frame = ttk.Frame(self) # This is the inner frame that holds the content of each page
-        self.frame.pack(expand=True, fill=BOTH, padx=10, pady=10) # Added padding for aesthetics
+        self.frame = ttk.Frame(self) # This is the inner frame that holds the content of each page.
+        self.frame.pack(expand=True, fill=BOTH, padx=10, pady=10) # Added padding for aesthetics.
 
         self.button_frame = ttk.Frame(self)
-        
+
         back_text = "Back"
         if _lang_obj and hasattr(_lang_obj, 'back_step'):
             lang_back = getattr(_lang_obj, 'back_step')
             if isinstance(lang_back, str) and lang_back.strip().lower() != "none":
                 back_text = lang_back
-        
+
         next_text = "Next"
         if _lang_obj and hasattr(_lang_obj, 'text138'):
             lang_next = getattr(_lang_obj, 'text138')
@@ -1456,24 +1687,24 @@ class Welcome(ttk.Frame):
         self.back.pack(fill=X, padx=5, pady=5, side='left', expand=True) # expand=True
         self.next = ttk.Button(self.button_frame, text=next_text, command=lambda: self.change_page(self.oobe + 1))
         self.next.pack(fill=X, padx=5, pady=5, side='right', expand=True) # expand=True
-        
-        self.button_frame.pack(expand=False, fill=X, padx=5, pady=5, side='bottom') # expand=False for button_frame
 
-        self.change_page(self.oobe) # Initial page load
-        
-        # Centering the main window 'win' after Welcome frame is packed and first page is loaded
+        self.button_frame.pack(expand=False, fill=X, padx=5, pady=5, side='bottom') # expand=False for button_frame.
+
+        self.change_page(self.oobe) # Initial page load.
+
+        # Centering the main window 'win' after the Welcome frame is packed and the first page is loaded.
         _move_center_func = globals().get('move_center')
         if _main_app_window and _move_center_func and callable(_move_center_func):
             try:
-                # Ensure Welcome frame itself and its content are updated before centering master
-                self.update_idletasks() 
-                _main_app_window.update_idletasks() # Ensure master (win) knows its new size with Welcome packed
+                # Ensure the Welcome frame itself and its content are updated before centering the master window.
+                self.update_idletasks()
+                _main_app_window.update_idletasks() # Ensure the master (win) knows its new size with Welcome packed.
                 _move_center_func(_main_app_window)
             except Exception as e_mc:
                  if 'logging' in globals(): logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
-        
-        self.wait_window() # This makes the Welcome sequence modal relative to 'win'
-        
+
+        self.wait_window() # This makes the Welcome sequence modal relative to 'win'.
+
         if _states_obj:
             _states_obj.in_oobe = False
 
@@ -1829,43 +2060,43 @@ def logo_pack(origin_logo=None) -> int:
 class IconGrid(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
-        self.master = master 
+        self.master = master
         self.icons = []
         self.apps = {}
 
         self.canvas = tk.Canvas(self, highlightthickness=0, bd=0)
-        # Скроллбар теперь создается здесь же, рядом с canvas
+        # The scrollbar is now created here, alongside the canvas.
         self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        
+
         self.scrollable_frame = ttk.Frame(self.canvas)
 
-        # Pack order: canvas слева, scrollbar справа (если нужен)
+        # Packing order: canvas on the left, scrollbar on the right (if needed).
         self.canvas.pack(side="left", fill="both", expand=True)
-        # self.scrollbar.pack(side="right", fill="y") # Pack позже, по условию
+        # self.scrollbar.pack(side="right", fill="y") # Packed later, conditionally.
 
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollable_frame_id = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
         self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
-        self.canvas.bind("<Configure>", self.on_canvas_configure) # Отдельный обработчик для canvas
+        self.canvas.bind("<Configure>", self.on_canvas_configure) # Separate handler for the canvas.
 
-        # --- ИЗМЕНЕНИЕ: Привязываем прокрутку к самому Canvas ---
-        # Это гарантирует, что прокрутка сработает только тогда,
-        # когда курсор находится над этим конкретным Canvas.
-        self.canvas.bind("<MouseWheel>", self._on_mousewheel)    # Для Windows и macOS
-        self.canvas.bind("<Button-4>", self._on_mousewheel)      # Для Linux (прокрутка вверх)
-        self.canvas.bind("<Button-5>", self._on_mousewheel)      # Для Linux (прокрутка вниз)
+        # --- MODIFICATION: Bind scrolling directly to the Canvas ---
+        # This ensures that scrolling only triggers when
+        # the cursor is over this specific Canvas.
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)    # For Windows and macOS
+        self.canvas.bind("<Button-4>", self._on_mousewheel)      # For Linux (scroll up)
+        self.canvas.bind("<Button-5>", self._on_mousewheel)      # For Linux (scroll down)
 
-        # Явно останавливаем события колеса мыши на самой полосе прокрутки,
-        # чтобы предотвратить ее стандартное поведение, если оно конфликтует.
+        # Explicitly stop mouse wheel events on the scrollbar itself
+        # to prevent its default behavior, which might conflict.
         self.scrollbar.bind("<MouseWheel>", lambda e: "break")
         self.scrollbar.bind("<Button-4>", lambda e: "break")
         self.scrollbar.bind("<Button-5>", lambda e: "break")
 
-        # Для того чтобы Canvas мог принимать события клавиатуры/мыши, ему может понадобиться фокус.
-        # Обычно Canvas и так его получает, когда над ним курсор.
-        # Если нет, можно добавить self.canvas.focus_set() при определенных условиях,
-        # или убедиться, что он может получать фокус через takefocus=1 (хотя для Canvas это обычно не нужно).
+        # For the Canvas to receive keyboard/mouse events, it might need to have focus.
+        # Typically, the Canvas gets focus when the cursor is over it.
+        # If not, self.canvas.focus_set() could be called under specific conditions,
+        # or one could ensure it can receive focus via takefocus=1 (though this is usually not needed for a Canvas).
 
     def _on_mousewheel(self, event):
         if not self.canvas.winfo_exists() or \
@@ -1873,12 +2104,12 @@ class IconGrid(tk.Frame):
            not self.scrollbar.winfo_exists():
             return
 
-        # Если событие пришло от самого виджета scrollbar, то этот обработчик (для canvas)
-        # не должен ничего делать. У scrollbar есть своя привязка lambda e: "break".
+        # If the event originated from the scrollbar widget itself, this handler (for the canvas)
+        # should do nothing. The scrollbar has its own binding (lambda e: "break") to handle this.
         if hasattr(event, 'widget') and event.widget == self.scrollbar:
             return "break"
 
-        # Проверяем, находится ли курсор над видимым скроллбаром
+        # Check if the cursor is over the visible scrollbar.
         if self.scrollbar.winfo_ismapped():
             sb_x_abs = self.scrollbar.winfo_rootx()
             sb_y_abs = self.scrollbar.winfo_rooty()
@@ -1887,11 +2118,11 @@ class IconGrid(tk.Frame):
 
             if (sb_x_abs <= event.x_root < sb_x_abs + sb_w and
                     sb_y_abs <= event.y_root < sb_y_abs + sb_h):
-                # Курсор над скроллбаром. Останавливаем событие, чтобы canvas не прокручивался.
+                # Cursor is over the scrollbar. Stop the event to prevent the canvas from scrolling.
                 return "break"
 
-        # Если мы здесь, значит курсор НЕ над скроллбаром (или скроллбар не виден).
-        # Выполняем логику прокрутки канваса, только если скроллбар видим (т.е. есть что скроллить)
+        # If we're here, the cursor is NOT over the scrollbar (or the scrollbar isn't visible).
+        # Execute canvas scrolling logic only if the scrollbar is visible (i.e., there's content to scroll).
         if self.scrollbar.winfo_ismapped():
             content_h = self.scrollable_frame.winfo_reqheight()
             canvas_h = self.canvas.winfo_height()
@@ -1904,73 +2135,73 @@ class IconGrid(tk.Frame):
                     delta = 1
                 elif hasattr(event, 'delta') and event.delta != 0:  # Windows/macOS
                     delta = int(-1 * (event.delta / 120))
-                
+
                 if delta != 0:
                     self.canvas.yview_scroll(delta, "units")
-                    return "break" # Останавливаем событие после нашей прокрутки канваса
-        return # Если не было прокрутки канваса (например, скроллбар не виден или контент не превышает канвас)
+                    return "break" # Stop event propagation after our canvas scroll.
+        return # If no canvas scrolling occurred (e.g., scrollbar is not visible or content fits within the canvas).
 
     def on_canvas_configure(self, event=None):
-        """Обновляет ширину scrollable_frame при изменении размера canvas."""
+        """Updates the width of the scrollable_frame when the canvas is resized."""
         if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists() and hasattr(self, 'scrollable_frame_id')):
             return
-        
+
         canvas_width = self.canvas.winfo_width()
         self.canvas.itemconfig(self.scrollable_frame_id, width=canvas_width)
-        if self.scrollable_frame.winfo_exists(): # Убедимся, что frame еще существует
-            self.scrollable_frame.configure(width=canvas_width) 
+        if self.scrollable_frame.winfo_exists(): # Ensure the frame still exists.
+            self.scrollable_frame.configure(width=canvas_width)
             self.scrollable_frame.update_idletasks()
-        
-        self.on_frame_configure() # Вызываем для обновления scrollregion и scrollbar
+
+        self.on_frame_configure() # Call to update the scrollregion and scrollbar visibility.
 
     def on_frame_configure(self, event=None):
-        """Обновляет scrollregion Canvas и управляет видимостью скроллбара."""
+        """Updates the Canvas scrollregion and manages the scrollbar's visibility."""
         if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists()):
             return
-            
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-        
-        # Управление видимостью скроллбара
-        self.scrollable_frame.update_idletasks() 
-        self.canvas.update_idletasks() # Гарантируем актуальность высоты канваса
-        
-        canvas_height = self.canvas.winfo_height()
-        # Используем reqheight, так как он отражает запрошенную высоту содержимого
-        content_height = self.scrollable_frame.winfo_reqheight() 
 
-        if content_height > canvas_height + 2: # Добавлен небольшой порог
-            if not self.scrollbar.winfo_ismapped(): # Если скроллбар еще не показан
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+        # Manage scrollbar visibility.
+        self.scrollable_frame.update_idletasks()
+        self.canvas.update_idletasks() # Ensure the canvas height is current.
+
+        canvas_height = self.canvas.winfo_height()
+        # Use `winfo_reqheight()` as it reflects the requested height of the content.
+        content_height = self.scrollable_frame.winfo_reqheight()
+
+        if content_height > canvas_height + 2: # Added a small threshold to prevent flickering.
+            if not self.scrollbar.winfo_ismapped(): # If the scrollbar is not yet visible.
                 self.scrollbar.pack(side="right", fill="y")
         else:
-            if self.scrollbar.winfo_ismapped(): # Если скроллбар показан, но не нужен
+            if self.scrollbar.winfo_ismapped(): # If the scrollbar is visible but no longer needed.
                 self.scrollbar.pack_forget()
 
     def add_icon(self, icon_widget, id_, num_columns=4):
         if id_ in self.apps:
             self.remove_icon(id_)
-        
+
         self.icons.append(icon_widget)
         self.apps[id_] = icon_widget
-        
+
         row = (len(self.icons) - 1) // num_columns
         col = (len(self.icons) - 1) % num_columns
-        
-        # Используем grid внутри self.scrollable_frame
+
+        # Use grid layout within `self.scrollable_frame`.
         icon_widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
-        
-        # После добавления элемента, обновляем scrollable_frame и вызываем on_frame_configure
+
+        # After adding an item, update `scrollable_frame` and call `on_frame_configure`.
         if self.scrollable_frame.winfo_exists():
             self.scrollable_frame.update_idletasks()
-            self.on_frame_configure() # Обновить scrollregion и видимость скроллбара
+            self.on_frame_configure() # To update the scrollregion and scrollbar visibility.
 
     def remove_icon(self, id_):
         if id_ in self.apps:
             widget_to_remove = self.apps.pop(id_)
             if widget_to_remove in self.icons:
                 self.icons.remove(widget_to_remove)
-            if widget_to_remove.winfo_exists(): # Проверка перед destroy
+            if widget_to_remove.winfo_exists(): # Check if the widget still exists before calling destroy.
                 widget_to_remove.destroy()
-            self._rebuild_grid() # Перестраиваем сетку
+            self._rebuild_grid() # Rebuild the grid layout.
             if self.scrollable_frame.winfo_exists():
                  self.scrollable_frame.update_idletasks()
                  self.on_frame_configure()
@@ -1978,24 +2209,24 @@ class IconGrid(tk.Frame):
     def clean(self):
         ids_to_remove = list(self.apps.keys())
         for id_ in ids_to_remove:
-            self.remove_icon(id_) 
-        # on_frame_configure вызовется из remove_icon
+            self.remove_icon(id_)
+        # `on_frame_configure` will be called by `remove_icon`.
 
     def _rebuild_grid(self, num_columns=4):
         if not self.scrollable_frame.winfo_exists(): return
 
         for widget in self.scrollable_frame.winfo_children():
-            widget.grid_forget() # Сначала убираем все виджеты из сетки
-        
-        # Затем добавляем их заново в правильном порядке
+            widget.grid_forget() # First, remove all widgets from the grid layout.
+
+        # Then, re-add them in the correct order.
         for i, widget in enumerate(self.icons):
-            if widget.winfo_exists(): # Убедимся, что виджет не был уничтожен ранее
+            if widget.winfo_exists(): # Ensure the widget hasn't been destroyed previously.
                 row = i // num_columns
                 col = i % num_columns
                 widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
-        
-        self.scrollable_frame.update_idletasks() # Обновляем размеры после перестройки
-        self.on_frame_configure() # Обновляем scrollregion
+
+        self.scrollable_frame.update_idletasks() # Update dimensions after rebuilding the grid.
+        self.on_frame_configure() # Update the scrollregion.
 
 
 module_error_codes = ModuleErrorCodes
@@ -2182,7 +2413,7 @@ class ModuleManager:
             logging.error(f"ModuleManager.install: MPK check failed for '{mpk_path}'. Result: {check_mpk_result}, Reason: '{reason}'")
             return check_mpk_result, reason
 
-        mconf = ConfigParser() # Используем ваш ConfigParser
+        mconf = ConfigParser() # Используем ConfigParser
         try:
             with zipfile.ZipFile(mpk_path) as f:
                 with f.open('info') as info_file: 
@@ -2302,7 +2533,7 @@ class ModuleManager:
 
     @animation
     def export(self, id_: str):
-        # ... (код без изменений, как в предыдущем ответе)
+        
         name: str = self.get_name(id_)
         if self.is_virtual(id_):
             print(f"{name} is a virtual plugin!")
@@ -2321,7 +2552,7 @@ class ModuleManager:
         with open(info_json_path, 'r', encoding='UTF-8') as f:
             data: dict = json.load(f)
             data.setdefault('resource', "main.zip") 
-            (info_ := ConfigParser())['module'] = data # Используем ваш ConfigParser
+            (info_ := ConfigParser())['module'] = data # Используем ConfigParser
             
             buffer_info_ini = StringIO()
             info_.write(buffer_info_ini)
@@ -2360,7 +2591,7 @@ class ModuleManager:
             print(lang.t16 % output_mpk_path)
 
     class New(Toplevel):
-        # ... (код без изменений, как в предыдущем ответе)
+        
         def __init__(self, create_gui_on_init=True):
             super().__init__()
             self.title(lang.text115) 
@@ -2443,7 +2674,7 @@ class ModuleManager:
             self.editor_(iden)
 
     class Parse(Toplevel):
-        # ... (код без изменений, как в предыдущем ответе)
+
         gavs = {}
         cancel = False
 
@@ -2559,7 +2790,7 @@ class ModuleManager:
             self.destroy()
 
     class UninstallMpk(Toplevel):
-        # ... (код без изменений, как в предыдущем ответе)
+        
         def __init__(self, id_: str, wait=False):
             super().__init__()
             self.arr = {} 
@@ -2783,12 +3014,10 @@ class ModuleManager:
 module_manager = ModuleManager()
 
 
-# ... (другой код tool.py) ...
-
 class MpkMan(ttk.Frame):
     def __init__(self):
-        super().__init__(master=win.tab7) # win.tab7 - родительский виджет
-        self.pack(padx=10, pady=10, fill=BOTH, expand=True) # expand=True, чтобы MpkMan занимал доступное место
+        super().__init__(master=win.tab7) # win.tab7 is the parent widget
+        self.pack(padx=10, pady=10, fill=BOTH, expand=True) # expand=True, so MpkMan fills the available space
         self.chosen = StringVar(value='')
         self.moduledir = module_manager.module_dir
         if not os.path.exists(self.moduledir):
@@ -2801,45 +3030,45 @@ class MpkMan(ttk.Frame):
             logging.error("DEBUG: MpkMan.list_pls - IconGrid (self.pls) does not exist or has been destroyed. Aborting.")
             return
 
-        # --- Фаза 1: Удаление иконок для плагинов, которые больше не установлены или не являются виртуальными ---
-        current_displayed_ids = list(self.pls.apps.keys()) # Копируем ключи, так как словарь может меняться
+        # --- Phase 1: Remove icons for plugins that are no longer installed or are not virtual ---
+        current_displayed_ids = list(self.pls.apps.keys()) # Copy keys as the dictionary might change during iteration
         logging.debug(f"DEBUG: MpkMan.list_pls - Phase 1: Currently displayed plugin IDs: {current_displayed_ids}")
-        
+
         for displayed_id in current_displayed_ids:
             is_physical_installed = module_manager.get_installed(displayed_id)
             is_virtual = module_manager.is_virtual(displayed_id)
             logging.debug(f"DEBUG: MpkMan.list_pls - Checking ID '{displayed_id}': physical_installed={is_physical_installed}, virtual={is_virtual}")
-            
+
             if not is_physical_installed and not is_virtual:
                 logging.info(f"DEBUG: MpkMan.list_pls - Removing icon for '{displayed_id}' as it's no longer installed or virtual.")
-                self.pls.remove_icon(displayed_id) # IconGrid.remove_icon должен обновить и self.pls.apps, и self.pls.icons
+                self.pls.remove_icon(displayed_id) # IconGrid.remove_icon should update both self.pls.apps and self.pls.icons
                 if displayed_id in self.images_:
-                    del self.images_[displayed_id] # Удаляем PhotoImage, если он больше не нужен
+                    del self.images_[displayed_id] # Delete the PhotoImage if it's no longer needed
                     logging.debug(f"DEBUG: MpkMan.list_pls - Removed PhotoImage for '{displayed_id}'.")
 
-        # --- Фаза 2: Добавление/Обновление иконок для виртуальных плагинов ---
+        # --- Phase 2: Add/Update icons for virtual plugins ---
         logging.debug(f"DEBUG: MpkMan.list_pls - Phase 2: Processing virtual plugins. Found: {list(module_manager.addon_loader.virtual.keys())}")
         for virtual_id in module_manager.addon_loader.virtual.keys():
             plugin_data = module_manager.addon_loader.virtual[virtual_id]
             display_name = plugin_data.get('name', virtual_id)
-            
-            # Используем иконку по умолчанию для виртуальных плагинов
-            # Убедимся, что PhotoImage создается только один раз или обновляется правильно
-            if virtual_id not in self.images_ or not self.images_[virtual_id]: # Если нет PhotoImage или он None
+
+            # Use a default icon for virtual plugins
+            # Ensure PhotoImage is created only once or updated correctly
+            if virtual_id not in self.images_ or not self.images_[virtual_id]: # If PhotoImage doesn't exist or is None
                 self.images_[virtual_id] = PhotoImage(data=images.none_byte)
             current_photo_image = self.images_[virtual_id]
 
-            if virtual_id in self.pls.apps: 
+            if virtual_id in self.pls.apps:
                 existing_label_widget = self.pls.apps[virtual_id]
                 if existing_label_widget.winfo_exists():
                     existing_label_widget.configure(image=current_photo_image, text=display_name)
                     logging.debug(f"DEBUG: MpkMan.list_pls - Updated virtual plugin widget for '{virtual_id}'.")
-            else: 
+            else:
                 icon_label_widget = tk.Label(self.pls.scrollable_frame,
                                             image=current_photo_image,
                                             compound="center",
                                             text=display_name,
-                                            bg="#4682B4", 
+                                            bg="#4682B4",
                                             wraplength=70,
                                             justify='center')
                 icon_label_widget.bind('<Double-Button-1>', lambda e, ar=virtual_id: create_thread(module_manager.run, ar))
@@ -2847,11 +3076,11 @@ class MpkMan(ttk.Frame):
                 self.pls.add_icon(icon_label_widget, virtual_id)
                 logging.debug(f"DEBUG: MpkMan.list_pls - Added new virtual plugin widget for '{virtual_id}'.")
 
-        # --- Фаза 3: Добавление/Обновление иконок для физических плагинов из module_dir ---
+        # --- Phase 3: Add/Update icons for physical plugins from module_dir ---
         logging.debug(f"DEBUG: MpkMan.list_pls - Phase 3: Processing physical plugins from '{self.moduledir}'.")
         if not os.path.exists(self.moduledir) or not os.path.isdir(self.moduledir):
             logging.warning(f"MpkMan.list_pls: Module directory '{self.moduledir}' does not exist.")
-            if hasattr(self.pls, 'on_frame_configure'): self.pls.on_frame_configure() 
+            if hasattr(self.pls, 'on_frame_configure'): self.pls.on_frame_configure()
             logging.debug("DEBUG: MpkMan.list_pls - EXITED early due to missing module directory.")
             return
 
@@ -2865,43 +3094,43 @@ class MpkMan(ttk.Frame):
             if not os.path.exists(info_json_path):
                 logging.warning(f"Plugin '{plugin_id}' in '{plugin_path}' is missing info.json and will be skipped.")
                 continue
-            
+
             try:
                 plugin_metadata = JsonEdit(info_json_path).read()
-                display_name = plugin_metadata.get('name', plugin_id) 
+                display_name = plugin_metadata.get('name', plugin_id)
             except Exception as e:
                 logging.error(f"Error reading info.json for plugin '{plugin_id}': {e}. Using ID as name.")
                 display_name = plugin_id
 
             icon_file_path = os.path.join(plugin_path, 'icon')
-            loaded_photo_image = None 
+            loaded_photo_image = None
 
             if os.path.exists(icon_file_path):
                 try:
-                    pil_image = open_img(icon_file_path) 
+                    pil_image = open_img(icon_file_path)
                     if pil_image:
-                        resized_pil_image = pil_image.resize((70, 70)) # Убедимся, что размер корректен
+                        resized_pil_image = pil_image.resize((70, 70)) # Ensure the size is correct
                         loaded_photo_image = PhotoImage(resized_pil_image)
                     else:
                         logging.warning(f"Failed to open icon file (open_img returned None) for plugin '{plugin_id}' at '{icon_file_path}'.")
                 except Exception as e:
                     logging.error(f"Error processing icon for plugin '{plugin_id}' at '{icon_file_path}': {e}")
-            
-            if loaded_photo_image is None: # Если иконка не загрузилась, используем стандартную
-                 if plugin_id not in self.images_ or not self.images_[plugin_id]: # Создаем если нет
-                    self.images_[plugin_id] = PhotoImage(data=images.none_byte)
-                 loaded_photo_image = self.images_[plugin_id] # Используем существующую или новую по умолчанию
-            else: # Если успешно загрузили новую иконку, сохраняем ее
-                self.images_[plugin_id] = loaded_photo_image
-            
-            current_photo_image = self.images_[plugin_id] # Итоговая PhotoImage для этого плагина
 
-            if plugin_id in self.pls.apps: # Если виджет уже существует
+            if loaded_photo_image is None: # If the icon failed to load, use the default one
+                 if plugin_id not in self.images_ or not self.images_[plugin_id]: # Create if it doesn't exist
+                    self.images_[plugin_id] = PhotoImage(data=images.none_byte)
+                 loaded_photo_image = self.images_[plugin_id] # Use the existing or new default icon
+            else: # If a new icon was loaded successfully, save it
+                self.images_[plugin_id] = loaded_photo_image
+
+            current_photo_image = self.images_[plugin_id] # The final PhotoImage for this plugin
+
+            if plugin_id in self.pls.apps: # If the widget already exists
                 existing_label_widget = self.pls.apps[plugin_id]
                 if existing_label_widget.winfo_exists():
                     existing_label_widget.configure(image=current_photo_image, text=display_name)
                     logging.debug(f"DEBUG: MpkMan.list_pls - Updated physical plugin widget for '{plugin_id}'.")
-            else: # Создаем новый виджет
+            else: # Create a new widget
                 icon_label_widget = tk.Label(self.pls.scrollable_frame,
                                             image=current_photo_image,
                                             compound="center",
@@ -2913,11 +3142,11 @@ class MpkMan(ttk.Frame):
                 icon_label_widget.bind('<Button-3>', lambda event, ar=plugin_id: self.popup(ar, event))
                 self.pls.add_icon(icon_label_widget, plugin_id)
                 logging.debug(f"DEBUG: MpkMan.list_pls - Added new physical plugin widget for '{plugin_id}'.")
-        
-        # Обновление конфигурации IconGrid (например, scrollregion)
+
+        # Update IconGrid configuration (e.g., scrollregion)
         if hasattr(self.pls, 'on_frame_configure') and callable(self.pls.on_frame_configure):
-             self.pls.on_frame_configure() 
-        
+             self.pls.on_frame_configure()
+
         logging.debug(f"DEBUG: MpkMan.list_pls - EXITED. Final apps count in IconGrid: {len(self.pls.apps)}")
 
     def refresh(self):
@@ -2926,29 +3155,29 @@ class MpkMan(ttk.Frame):
             logging.error("DEBUG: MpkMan.refresh - IconGrid (self.pls) does not exist or has been destroyed. Aborting refresh.")
             return
 
-        # Для полной уверенности в чистоте состояния перед полной перерисовкой:
+        # To be absolutely sure of a clean state before a full redraw:
         if hasattr(self.pls, 'clean') and callable(self.pls.clean):
              logging.debug("DEBUG: MpkMan.refresh - Calling self.pls.clean()")
-             self.pls.clean() # IconGrid.clean должен уничтожить старые виджеты и очистить self.pls.icons
-        
+             self.pls.clean() # IconGrid.clean should destroy old widgets and clear self.pls.icons
+
         if hasattr(self.pls, 'apps') and isinstance(self.pls.apps, dict):
              logging.debug("DEBUG: MpkMan.refresh - Clearing self.pls.apps")
-             self.pls.apps.clear() # Очищаем словарь ID -> виджет в IconGrid
-        
-        # Очистка словаря self.images_ здесь может быть рискованной,
-        # если PhotoImage используются где-то еще или если list_pls ожидает их найти.
-        # Лучше, чтобы list_pls сам управлял добавлением/удалением из self.images_.
-        # Если list_pls полностью пересоздает все, то можно и очистить:
+             self.pls.apps.clear() # Clear the ID -> widget dictionary in IconGrid
+
+        # Clearing the self.images_ dictionary here could be risky
+        # if PhotoImages are used elsewhere or if list_pls expects to find them.
+        # It's better for list_pls to manage additions/deletions from self.images_ itself.
+        # If list_pls completely recreates everything, then it can be cleared:
         # self.images_.clear()
         # logging.debug("DEBUG: MpkMan.refresh - Cleared self.images_")
 
         logging.debug("DEBUG: MpkMan.refresh - Calling self.list_pls() to rebuild.")
-        self.list_pls() # list_pls заново построит все иконки на основе текущего состояния
+        self.list_pls() # list_pls will rebuild all icons based on the current state
         logging.debug("DEBUG: MpkMan.refresh - EXITED")
 
     def popup(self, name, event):
         self.chosen.set(name)
-        if hasattr(self, 'rmenu2') and self.rmenu2: # Проверка существования меню
+        if hasattr(self, 'rmenu2') and self.rmenu2: # Check if the menu exists
             self.rmenu2.post(event.x_root, event.y_root)
 
     def _prepare_and_launch_editor(self, plugin_id_to_edit: str):
@@ -2957,7 +3186,7 @@ class MpkMan(ttk.Frame):
             if hasattr(win, 'message_pop') and callable(win.message_pop) and hasattr(lang, 'editor_no_plugin_selected_warn'):
                 win.message_pop(
                     lang.editor_no_plugin_selected_warn,
-                    title=getattr(lang, "editor_warn_title", "Editor Warning"), 
+                    title=getattr(lang, "editor_warn_title", "Editor Warning"),
                     color="orange"
                 )
             return
@@ -2984,72 +3213,72 @@ class MpkMan(ttk.Frame):
                     logging.warning(f"Could not format localized error message '{message_key}': {format_error}")
                     if "{plugin_id}" in message_template or "{error}" in message_template:
                         final_message = f"{message_template} (plugin: {plugin_id_to_edit}, raw error: {str(e)})"
-                    else: 
+                    else:
                         final_message = message_template + f"\n(Plugin: {plugin_id_to_edit}, Error: {str(e)})"
                  win.message_pop(final_message, title=title_text, color="red")
 
     def _handle_uninstall_plugin(self, plugin_id_to_uninstall):
         if not plugin_id_to_uninstall:
             logging.warning("MpkMan._handle_uninstall_plugin: plugin_id_to_uninstall is empty.")
-            # Можно добавить уведомление пользователю
+            # A user notification could be added here
             return
 
-        current_plugin_id = plugin_id_to_uninstall 
+        current_plugin_id = plugin_id_to_uninstall
 
         def uninstall_thread_target():
-            # Этот код выполняется в отдельном потоке
+            # This code runs in a separate thread
             module_manager.uninstall_gui(current_plugin_id, wait=True)
-            # После того, как uninstall_gui завершился (окно UninstallMpk закрыто),
-            # планируем вызов self.refresh() в основном потоке GUI.
-            # Используем self.after, так как MpkMan это ttk.Frame.
-            self.after(0, self.refresh) 
+            # After uninstall_gui has finished (the UninstallMpk window is closed),
+            # schedule a call to self.refresh() in the main GUI thread.
+            # Use self.after because MpkMan is a ttk.Frame.
+            self.after(0, self.refresh)
 
         create_thread(uninstall_thread_target)
 
     def gui(self):
         global list_pls_plugin
-        list_pls_plugin = self.list_pls 
+        list_pls_plugin = self.list_pls
 
-        # Фрейм для заголовка и кнопки MpkStore
+        # Frame for the header and MpkStore button
         header_frame = ttk.Frame(self)
-        header_frame.pack(fill=X, padx=0, pady=0) # Убираем лишние отступы, если они не нужны
+        header_frame.pack(fill=X, padx=0, pady=0) # Remove extra padding if not needed
 
         ttk.Label(header_frame, text=lang.text19, font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
         ttk.Button(header_frame, text='Mpk Store', command=lambda: create_thread(MpkStore)).pack(side="right", padx=10, pady=10)
-        
-        # Сепаратор под заголовком, если он был в win.tab7, теперь он должен быть в MpkMan
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=(0, 5), fill=X) # Отступ снизу поменьше
 
-        # Метка "Доступные плагины"
-        # Label - из tkinter, а не ttk.Label, чтобы соответствовать старому коду, если это важно
-        plugins_label = Label(self, text=lang.text24) 
-        plugins_label.pack(padx=5, pady=(5,0), anchor='nw') # Отступ сверху поменьше, выравнивание по северо-западу
+        # Separator below the header; if it was in win.tab7, it should now be in MpkMan
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=(0, 5), fill=X) # Smaller bottom padding
 
-        # IconGrid теперь дочерний для self (MpkMan)
-        self.pls = IconGrid(self) 
-        self.pls.pack(padx=5, pady=5, fill=BOTH, expand=True) # expand=True, чтобы IconGrid занимал место
+        # "Available plugins" label
+        # Label - from tkinter, not ttk.Label, to match old code if important
+        plugins_label = Label(self, text=lang.text24)
+        plugins_label.pack(padx=5, pady=(5,0), anchor='nw') # Smaller top padding, align to northwest
 
-        # Привязываем контекстное меню к метке "Доступные плагины" и к самому IconGrid/Canvas
-        rmenu = Menu(self, tearoff=False, borderwidth=0) # Родитель меню - self (MpkMan)
+        # IconGrid is now a child of self (MpkMan)
+        self.pls = IconGrid(self)
+        self.pls.pack(padx=5, pady=5, fill=BOTH, expand=True) # expand=True, so IconGrid fills the space
+
+        # Bind context menu to the "Available plugins" label and to IconGrid/Canvas itself
+        rmenu = Menu(self, tearoff=False, borderwidth=0) # Menu parent is self (MpkMan)
         rmenu.add_command(label=lang.text21, command=lambda: InstallMpk(
-            filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls()) 
-        rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh)) 
+            filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
+        rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh))
         rmenu.add_command(label=lang.text115, command=lambda: create_thread(module_manager.new))
 
         plugins_label.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
         self.pls.canvas.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
-        # self.pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root)) # На сам IconGrid (Frame)
+        # self.pls.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root)) # On IconGrid (Frame) itself
 
-        self.rmenu2 = Menu(self, tearoff=False, borderwidth=0) # Родитель меню - self (MpkMan)
-        self.rmenu2.add_command(label=lang.text20, # Удалить
+        self.rmenu2 = Menu(self, tearoff=False, borderwidth=0) # Menu parent is self (MpkMan)
+        self.rmenu2.add_command(label=lang.text20, # Delete
                                 command=lambda: self._handle_uninstall_plugin(self.chosen.get()))
-        self.rmenu2.add_command(label=lang.text22, # Запустить
+        self.rmenu2.add_command(label=lang.text22, # Run
                                 command=lambda: create_thread(module_manager.run, self.chosen.get()))
-        self.rmenu2.add_command(label=lang.t14, # Экспорт
+        self.rmenu2.add_command(label=lang.t14, # Export
                                 command=lambda: create_thread(module_manager.export, self.chosen.get()))
-        self.rmenu2.add_command(label=lang.t17, # Редактировать
+        self.rmenu2.add_command(label=lang.t17, # Edit
                                 command=lambda: self._prepare_and_launch_editor(self.chosen.get()))
-                                
+
         self.list_pls()
         
 
@@ -3320,50 +3549,66 @@ class Debugger(Toplevel):
 
 
 class MpkStore(Toplevel):
+    """A Toplevel window for managing and installing MPK (MIO Package) files.
+
+    Provides a user interface for browsing, selecting, downloading, and installing
+    custom packages or modules (plugins) from a remote repository or local source.
+    Handles listing available MPKs, showing their details, managing their state (installed/uninstalled),
+    and triggering the installation/uninstallation process.
+    """
     def __init__(self):
+        """Initializes the MpkStore window.
+
+        Ensures only one instance of MpkStore is active. Sets up the UI,
+        initializes data structures for managing plugins, and loads the plugin database.
+        """
+        # Ensure only one instance of MpkStore is active.
+        # If an instance already exists, bring it to front and focus.
         if hasattr(states, 'active_mpk_store_instance') and \
            states.active_mpk_store_instance and \
            states.active_mpk_store_instance.winfo_exists():
             states.active_mpk_store_instance.lift()
             states.active_mpk_store_instance.focus_force()
-            return 
+            return
 
         super().__init__()
-        if hasattr(states, 'mpk_store'):
+        if hasattr(states, 'mpk_store'): # Global state flag for MpkStore presence.
             states.mpk_store = True
         
-        states.active_mpk_store_instance = self 
+        states.active_mpk_store_instance = self # Register this instance as active.
 
-        self.title('Mpk Store')
-        self.minsize(500, 400) 
+        self.title('Mpk Store') # Window title.
+        self.minsize(500, 400) # Minimum window size.
 
-        self.data = []
-        self.tasks = []
-        self.apps = [] 
-        self.app_infos = {} 
-        self.protocol("WM_DELETE_WINDOW", self._on_close_window)
-        self.repo = ''
-        self.init_repo()
+        self.data = [] # Holds raw data for plugins from the repository.
+        self.tasks = [] # Potentially for managing download/install tasks (currently unused based on snippet).
+        self.apps = [] # Potentially for storing app/plugin objects (currently unused based on snippet).
+        self.app_infos = {} # Dictionary to store UI frames associated with plugin IDs.
+        self.protocol("WM_DELETE_WINDOW", self._on_close_window) # Handle window close event.
+        self.repo = '' # URL of the plugin repository.
+        self.init_repo() # Initialize repository URL from settings or defaults.
         
+        # --- UI Setup --- 
         header_frame = ttk.Frame(self)
         ttk.Label(header_frame, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
-        ttk.Button(header_frame, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT)
-        ttk.Button(header_frame, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10, side=RIGHT)
-        header_frame.pack(padx=10, pady=10, fill=X) 
-        
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X) 
-        
-        self.search = ttk.Entry(self)
-        self.search.pack(fill=X, padx=10, pady=5) 
-        self.search.bind("<Return>", lambda *x: self.search_apps())
+        ttk.Button(header_frame, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10, side=RIGHT) # Button to modify repository URL.
+        ttk.Button(header_frame, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10, side=RIGHT) # Button to refresh plugin database.
+        header_frame.pack(padx=10, pady=10, fill=X)
         
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X)
         
-        self.logo = PhotoImage(data=images.none_byte) 
-        self.control = {} 
+        self.search = ttk.Entry(self) # Search bar for plugins.
+        self.search.pack(fill=X, padx=10, pady=5)
+        self.search.bind("<Return>", lambda *x: self.search_apps()) # Trigger search on Enter key.
         
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X)
+        
+        self.logo = PhotoImage(data=images.none_byte) # Placeholder for plugin icons.
+        self.control = {} # Dictionary to store install/uninstall buttons for each plugin ID.
+        
+        # Scrollable area for plugin listings.
         scrollable_area_frame = tk.Frame(self)
-        scrollable_area_frame.pack(fill='both', padx=10, pady=(0,10), expand=True) 
+        scrollable_area_frame.pack(fill='both', padx=10, pady=(0,10), expand=True)
         
         self.scrollbar = ttk.Scrollbar(scrollable_area_frame, orient='vertical')
 
@@ -3371,77 +3616,117 @@ class MpkStore(Toplevel):
         self.canvas.pack(side='left', fill='both', expand=True)
         self.scrollbar.config(command=self.canvas.yview)
         
-        self.label_frame = ttk.Frame(self.canvas) 
+        self.label_frame = ttk.Frame(self.canvas) # Frame inside canvas to hold plugin UI elements.
         self.label_frame_id = self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
         
+        # Bind events for dynamic resizing and scrolling.
         self.label_frame.bind("<Configure>", self._on_label_frame_configure)
         self.canvas.bind('<Configure>', self._on_canvas_configure)
 
-        self.canvas.bind("<MouseWheel>", self._on_mousewheel_canvas)
-        self.canvas.bind("<Button-4>", self._on_mousewheel_canvas)
-        self.canvas.bind("<Button-5>", self._on_mousewheel_canvas)
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel_canvas) # For Windows/macOS mouse wheel.
+        self.canvas.bind("<Button-4>", self._on_mousewheel_canvas)   # For Linux mouse wheel (scroll up).
+        self.canvas.bind("<Button-5>", self._on_mousewheel_canvas)   # For Linux mouse wheel (scroll down).
         
-        create_thread(self.get_db)
-        move_center(self)
+        create_thread(self.get_db) # Load plugin database in a background thread.
+        move_center(self) # Center the window on screen.
 
     def _on_mousewheel_canvas(self, event):
+        """Handles mouse wheel scrolling for the plugin list canvas.
+
+        Args:
+            event: The mouse wheel event.
+        """
         if not self.canvas.winfo_exists(): return
-        if event.num == 4: 
+        # Handle Linux mouse wheel events (Button-4 and Button-5)
+        if event.num == 4:
             self.canvas.yview_scroll(-1, "units")
-        elif event.num == 5: 
+        elif event.num == 5:
             self.canvas.yview_scroll(1, "units")
-        elif hasattr(event, 'delta') and event.delta != 0: 
+        # Handle Windows/macOS mouse wheel events (delta)
+        elif hasattr(event, 'delta') and event.delta != 0:
             self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _on_label_frame_configure(self, event=None):
+        """Adjusts the scrollregion of the canvas and visibility of the scrollbar
+        when the content frame (label_frame) inside the canvas is reconfigured (e.g., resized).
+
+        Args:
+            event: The configure event (optional).
+        """
         if not (self.canvas.winfo_exists() and self.label_frame.winfo_exists()): return
         
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-        self.label_frame.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox("all")) # Update scrollable region to encompass all content.
+        self.label_frame.update_idletasks() # Ensure dimensions are up-to-date.
+        
         canvas_height = self.canvas.winfo_height()
         content_height = self.label_frame.winfo_reqheight()
 
+        # Show scrollbar only if content height exceeds canvas height.
         if content_height > canvas_height:
-            if not self.scrollbar.winfo_ismapped():
+            if not self.scrollbar.winfo_ismapped(): # Check if scrollbar is not already visible.
                 self.scrollbar.pack(side="right", fill="y", pady=(0,0), padx=(0,0))
         else:
-            if self.scrollbar.winfo_ismapped():
+            if self.scrollbar.winfo_ismapped(): # Check if scrollbar is currently visible.
                 self.scrollbar.pack_forget()
 
     def _on_canvas_configure(self, event):
+        """Adjusts the width of the content frame (label_frame) to match the canvas width
+        when the canvas itself is reconfigured (e.g., resized).
+
+        Args:
+            event: The configure event, providing the new width.
+        """
         if not (self.canvas.winfo_exists() and self.label_frame.winfo_exists() and hasattr(self, 'label_frame_id')): return
         
         canvas_width = event.width
+        # Set the width of the window item within the canvas (which is the label_frame).
         self.canvas.itemconfig(self.label_frame_id, width=canvas_width)
         if self.label_frame.winfo_exists():
+             # Also configure the label_frame's width directly to ensure consistency.
              self.label_frame.config(width=canvas_width)
              self.label_frame.update_idletasks()
 
+        # After adjusting width, re-evaluate scrollbar visibility.
         self._on_label_frame_configure()
 
     def _on_close_window(self):
+        """Handles the window close event.
+
+        Cleans up global state references and unbinds events before destroying the window.
+        """
+        # Clear global references to this MpkStore instance.
         if hasattr(states, 'active_mpk_store_instance') and states.active_mpk_store_instance == self:
             states.active_mpk_store_instance = None
-        if hasattr(states, 'mpk_store'):
+        if hasattr(states, 'mpk_store'): # Global state flag for MpkStore presence.
             states.mpk_store = False
         
+        # Unbind mouse wheel events from the canvas to prevent errors after destruction.
         if hasattr(self, 'canvas') and self.canvas.winfo_exists():
-            self.canvas.unbind("<MouseWheel>") 
+            self.canvas.unbind("<MouseWheel>")
             self.canvas.unbind("<Button-4>")
             self.canvas.unbind("<Button-5>")
         
-        self.destroy()
+        self.destroy() # Destroy the Toplevel window.
 
     def update_plugin_state(self, plugin_id: str):
+        """Updates the install/uninstall button states for a given plugin ID.
+
+        Reflects whether the plugin is currently installed by enabling/disabling
+        and styling the respective buttons.
+
+        Args:
+            plugin_id: The unique identifier of the plugin whose UI state needs updating.
+        """
         logging.debug(f"MpkStore.update_plugin_state called for plugin_id: {plugin_id}")
-        if not self.winfo_exists():
+        if not self.winfo_exists(): # Ensure window still exists before UI operations.
             logging.warning(f"MpkStore.update_plugin_state: MpkStore window no longer exists. Aborting update for {plugin_id}.")
             return
 
-        if plugin_id in self.control:
+        if plugin_id in self.control: # Check if UI controls exist for this plugin.
             install_button, uninstall_button = self.control[plugin_id]
             
             buttons_valid = True
+            # Verify that button widgets still exist.
             if not (install_button and install_button.winfo_exists()):
                 logging.warning(f"MpkStore.update_plugin_state: Install button for '{plugin_id}' does not exist.")
                 buttons_valid = False
@@ -3452,21 +3737,28 @@ class MpkStore(Toplevel):
             if not buttons_valid:
                 return
 
-            is_installed = module_manager.get_installed(plugin_id)
+            is_installed = module_manager.get_installed(plugin_id) # Check installation status.
             logging.debug(f"MpkStore.update_plugin_state: Plugin '{plugin_id}' is_installed: {is_installed}")
 
+            # Configure buttons based on installation status.
             if not is_installed:
-                install_button.config(text=lang.text21, state='normal', style="Accent.TButton") 
-                uninstall_button.config(text=lang.text20, state='disabled', style="") 
+                install_button.config(text=lang.text21, state='normal', style="Accent.TButton") # Install button active.
+                uninstall_button.config(text=lang.text20, state='disabled', style="") # Uninstall button inactive.
             else:
-                install_button.config(text=getattr(lang, 'plugin_installed_button', lang.text21), state='disabled', style="") 
-                uninstall_button.config(text=lang.text20, state='normal', style="Accent.TButton")
+                install_button.config(text=getattr(lang, 'plugin_installed_button', lang.text21), state='disabled', style="") # Install button inactive (already installed).
+                uninstall_button.config(text=lang.text20, state='normal', style="Accent.TButton") # Uninstall button active.
         else:
             logging.debug(f"MpkStore.update_plugin_state: plugin_id '{plugin_id}' not found in self.control. No UI elements to update for this ID.")
 
 
     def init_repo(self):
+        """Initializes the plugin repository URL.
+        
+        Reads the repository URL from settings. If not found or empty,
+        it defaults to a predefined URL.
+        """
         if not hasattr(settings, 'plugin_repo') or not settings.plugin_repo:
+            # Default repository URL if not configured in settings.
             self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
         else:
             self.repo = settings.plugin_repo
@@ -3474,34 +3766,52 @@ class MpkStore(Toplevel):
 
 
     def search_apps(self):
-        if not self.winfo_exists(): return
-        search_term = self.search.get().lower() 
+        """Filters the displayed plugin list based on the search term entered by the user.
         
-        for plugin_id_key in self.app_infos: 
+        Hides or shows plugin frames in the UI according to whether their names match
+        the search term (case-insensitive).
+        """
+        if not self.winfo_exists(): return # Ensure window exists.
+        search_term = self.search.get().lower() # Get search term from entry widget.
+        
+        # Iterate through all plugin UI frames.
+        for plugin_id_key in self.app_infos:
             app_frame = self.app_infos[plugin_id_key]
-            if not app_frame.winfo_exists(): continue
+            if not app_frame.winfo_exists(): continue # Skip if frame is destroyed.
 
+            # Find the corresponding plugin data to get its name.
             plugin_data_entry = next((item for item in self.data if item.get('id') == plugin_id_key), None)
             plugin_name_lower = plugin_data_entry.get('name', '').lower() if plugin_data_entry else ""
             
+            # Determine visibility based on search term.
             should_be_visible = not search_term or search_term in plugin_name_lower
 
             if should_be_visible:
-                if not app_frame.winfo_ismapped():
-                     app_frame.pack(padx=5, pady=5, fill=X, expand=True) 
+                if not app_frame.winfo_ismapped(): # Show if not already visible.
+                     app_frame.pack(padx=5, pady=5, fill=X, expand=True)
             else:
-                if app_frame.winfo_ismapped():
+                if app_frame.winfo_ismapped(): # Hide if currently visible and doesn't match.
                      app_frame.pack_forget()
         
+        # Update layout and scroll position after filtering.
         if self.label_frame.winfo_exists(): self.label_frame.update_idletasks()
-        if self.canvas.winfo_exists(): 
-            self.canvas.yview_moveto(0.0) 
-            self._on_label_frame_configure() 
+        if self.canvas.winfo_exists():
+            self.canvas.yview_moveto(0.0) # Scroll to top.
+            self._on_label_frame_configure() # Re-evaluate scrollbar. 
 
 
     def add_app(self, app_dict=None):
-        # ... (код без изменений, как в предыдущем ответе) ...
-        if not self.winfo_exists():
+        """Dynamically creates and adds UI elements for each plugin to the scrollable list.
+
+        For each plugin in `app_dict`, if a UI representation doesn't already exist,
+        this method constructs a LabelFrame containing plugin information (icon, name, author,
+        version, size, description) and action buttons (install/uninstall).
+
+        Args:
+            app_dict (list, optional): A list of dictionaries, where each dictionary
+                                       contains metadata for a plugin. Defaults to None (empty list).
+        """
+        if not self.winfo_exists(): # Ensure window is still active.
             logging.warning("MpkStore.add_app: Window destroyed, cannot add apps.")
             return
 
@@ -3515,34 +3825,39 @@ class MpkStore(Toplevel):
             plugin_name_for_log = data.get('name', 'Unnamed Plugin')
             logging.debug(f"MpkStore.add_app: Processing item {index + 1}/{len(app_dict)} - ID: '{plugin_id}', Name: '{plugin_name_for_log}'")
 
-            if not plugin_id:
+            if not plugin_id: # Skip if plugin ID is missing.
                 logging.warning(f"MpkStore.add_app: Skipping plugin data at index {index} due to missing ID: {data}")
                 continue
 
+            # Skip if UI for this plugin ID already exists and is valid.
             if plugin_id in self.app_infos and self.app_infos[plugin_id].winfo_exists():
                 logging.debug(f"MpkStore.add_app: Plugin UI for ID '{plugin_id}' already exists. Skipping.")
-                continue 
+                continue
             
             new_items_added_count += 1
             
+            # Main frame for each plugin entry.
             f = ttk.LabelFrame(self.label_frame, text=data.get('name', plugin_id))
-            self.app_infos[plugin_id] = f
+            self.app_infos[plugin_id] = f # Store frame reference.
             
-            f.columnconfigure(0, weight=0, minsize=70)
-            f.columnconfigure(1, weight=1)            
-            f.columnconfigure(2, weight=0, minsize=100)
+            # Configure column weights for layout within the plugin frame.
+            f.columnconfigure(0, weight=0, minsize=70)  # Icon column (fixed size).
+            f.columnconfigure(1, weight=1)             # Info column (flexible).
+            f.columnconfigure(2, weight=0, minsize=100) # Buttons column (fixed size).
             
-            icon_label = ttk.Label(f, image=self.logo) 
-            icon_label.grid(row=0, column=0, sticky="nw", padx=(5,10), pady=5) 
+            icon_label = ttk.Label(f, image=self.logo) # Placeholder icon.
+            icon_label.grid(row=0, column=0, sticky="nw", padx=(5,10), pady=5)
 
+            # Frame to hold textual information (author, version, size, description).
             info_container_frame = ttk.Frame(f)
             info_container_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
-            info_container_frame.columnconfigure(0, weight=1) 
+            info_container_frame.columnconfigure(0, weight=1)
 
+            # Extract and display plugin metadata.
             author_text = data.get('author', getattr(lang, 'unknown_author', 'Unknown'))
             version_text = data.get('version', getattr(lang, 'unknown_version', 'N/A'))
             size_bytes = data.get('size', 0)
-            size_hum = hum_convert(size_bytes) if callable(hum_convert) else f"{size_bytes} B"
+            size_hum = hum_convert(size_bytes) if callable(hum_convert) else f"{size_bytes} B" # Human-readable size.
             
             ttk.Label(info_container_frame, text=f"{getattr(lang, 't21', 'Author:')} {author_text}", anchor="w").grid(row=0, column=0, sticky="ew", pady=(0,1))
             ttk.Label(info_container_frame, text=f"{getattr(lang, 't22', 'Version:')} {version_text}", anchor="w").grid(row=1, column=0, sticky="ew", pady=(0,1))
@@ -3550,26 +3865,29 @@ class MpkStore(Toplevel):
 
             desc_text_content = data.get('desc', getattr(lang, 'no_description_available', 'No Description.'))
             
-            desc_outer_frame = ttk.Frame(info_container_frame) 
+            # Frame for description text (to allow for a scrollbar if needed).
+            desc_outer_frame = ttk.Frame(info_container_frame)
             desc_outer_frame.grid(row=3, column=0, sticky="nsew", pady=(2,0))
-            info_container_frame.rowconfigure(3, weight=1) 
-            desc_outer_frame.columnconfigure(0, weight=1)   
-            desc_outer_frame.rowconfigure(0, weight=1)      
+            info_container_frame.rowconfigure(3, weight=1) # Allow description area to expand.
+            desc_outer_frame.columnconfigure(0, weight=1)
+            desc_outer_frame.rowconfigure(0, weight=1)
 
             desc_text_widget = tk.Text(desc_outer_frame, wrap=tk.WORD, height=5, relief=tk.SOLID, borderwidth=1,
-                                       font=("TkDefaultFont",), takefocus=False) 
+                                       font=("TkDefaultFont",), takefocus=False) # Read-only description.
             desc_text_widget.insert(tk.END, desc_text_content)
-            desc_text_widget.config(state=tk.DISABLED) 
+            desc_text_widget.config(state=tk.DISABLED)
             
             desc_scrollbar = ttk.Scrollbar(desc_outer_frame, orient=tk.VERTICAL, command=desc_text_widget.yview)
             desc_text_widget.config(yscrollcommand=desc_scrollbar.set)
 
             desc_text_widget.grid(row=0, column=0, sticky="nsew")
-            desc_scrollbar.grid(row=0, column=1, sticky="ns") 
+            desc_scrollbar.grid(row=0, column=1, sticky="ns") # Show scrollbar only if text overflows.
 
+            # Frame for Install/Uninstall buttons.
             buttons_frame = ttk.Frame(f)
-            buttons_frame.grid(row=0, column=2, sticky="ne", padx=5, pady=5) 
+            buttons_frame.grid(row=0, column=2, sticky="ne", padx=5, pady=5)
 
+            # Prepare arguments for download/install/uninstall actions.
             files_data = data.get('files')
             if isinstance(files_data, str): files_list = [files_data]
             elif isinstance(files_data, list): files_list = files_data
@@ -3582,26 +3900,28 @@ class MpkStore(Toplevel):
 
             download_args = (files_list, size_bytes, plugin_id, depends_list)
             
+            # Determine button width, allowing for localization.
             button_width_from_lang = getattr(lang, 'mpk_store_button_min_width', 12)
             try:
                 MIN_BUTTON_WIDTH_CHARS = int(button_width_from_lang)
             except (ValueError, TypeError):
-                MIN_BUTTON_WIDTH_CHARS = 12 
+                MIN_BUTTON_WIDTH_CHARS = 12
                 logging.warning(
                     f"MpkStore.add_app: Could not parse 'mpk_store_button_min_width' "
                     f"from lang (value: '{button_width_from_lang}'). Using default width: {MIN_BUTTON_WIDTH_CHARS}."
                 )
-
+            # Install button.
             bu = ttk.Button(buttons_frame, text=lang.text21, 
                             command=lambda a=download_args: create_thread(self.download, *a),
                             width=MIN_BUTTON_WIDTH_CHARS)
-            bu.pack(side=TOP, fill=X, pady=(0, 3)) 
-
+            bu.pack(side=TOP, fill=X, pady=(0, 3))
+            # Uninstall button.
             uninstall_button = ttk.Button(buttons_frame, text=lang.text20, 
                                           command=lambda current_id=plugin_id: create_thread(self.uninstall, current_id),
                                           width=MIN_BUTTON_WIDTH_CHARS)
             uninstall_button.pack(side=TOP, fill=X, pady=(3, 0))
 
+            # Set initial state of buttons based on whether the plugin is installed.
             if not module_manager.get_installed(plugin_id):
                 bu.config(style="Accent.TButton")
                 uninstall_button.config(state='disabled')
@@ -3609,7 +3929,7 @@ class MpkStore(Toplevel):
                 bu.config(state='disabled', text=getattr(lang, 'plugin_installed_button', lang.text21))
                 uninstall_button.config(style="Accent.TButton", state='normal')
 
-            self.control[plugin_id] = bu, uninstall_button
+            self.control[plugin_id] = bu, uninstall_button # Store button references.
             f.pack(padx=5, pady=5, fill=X, expand=False) 
             logging.debug(f"MpkStore.add_app: Successfully created UI for '{plugin_id}'.")
 
@@ -3620,7 +3940,7 @@ class MpkStore(Toplevel):
 
 
     def uninstall(self, id_):
-        # ... (без изменений) ...
+        
         module_manager.uninstall_gui(id_, wait=True) 
 
         if self.winfo_exists() and id_ in self.control:
@@ -3636,7 +3956,7 @@ class MpkStore(Toplevel):
 
 
     def clear(self):
-        # ... (без изменений) ...
+        
         if hasattr(self, 'label_frame') and self.label_frame.winfo_exists():
             for widget in self.label_frame.winfo_children():
                 widget.destroy()
@@ -3649,15 +3969,21 @@ class MpkStore(Toplevel):
 
 
     def modify_repo(self):
-        # ... (без изменений) ...
+        """Allows the user to modify the plugin repository URL.
+
+        Opens a dialog asking for a new repository URL. If a new URL is provided
+        and it's different from the current one, it updates the internal `repo` attribute,
+        saves it to settings, and refreshes the plugin database from the new URL.
+        """
         input_var = StringVar()
-        current_repo_val = getattr(settings, 'plugin_repo', self.repo) 
+        current_repo_val = getattr(settings, 'plugin_repo', self.repo) # Get current repo URL from settings or default.
         input_var.set(current_repo_val)
 
+        # Create a Toplevel window for repository URL input.
         a = Toplevel()
-        a.title(lang.t58)
-        a.transient(self) 
-        a.grab_set()      
+        a.title(lang.t58) # Set window title (e.g., "Modify Repository").
+        a.transient(self) # Make it a child of the MpkStore window.
+        a.grab_set()      # Make the dialog modal.
 
         ttk.Entry(a, textvariable=input_var, width=60).pack(pady=10, padx=10, fill=X)
         
@@ -3665,23 +3991,25 @@ class MpkStore(Toplevel):
         button_frame_repo.pack(pady=5, padx=10, fill=X)
 
         def on_ok_repo():
+            """Handles the OK button click in the repository modification dialog."""
             new_repo_val = input_var.get()
-            if hasattr(settings, 'set_value'):
+            if hasattr(settings, 'set_value'): # Save the new repository URL to settings.
                 settings.set_value('plugin_repo', new_repo_val)
              
-            a.destroy() 
+            a.destroy() # Close the dialog.
             
-            if new_repo_val != current_repo_val: 
-                self.init_repo() 
-                create_thread(self.get_db)
+            if new_repo_val != current_repo_val: # If the URL changed.
+                self.init_repo() # Re-initialize repository related settings.
+                create_thread(self.get_db) # Refresh database from the new repository in a separate thread.
 
         def on_cancel_repo():
-            a.destroy()
+            """Handles the Cancel button click in the repository modification dialog."""
+            a.destroy() # Close the dialog.
 
         ttk.Button(button_frame_repo, text=getattr(lang, 'cancel', "Cancel"), command=on_cancel_repo).pack(side=LEFT, padx=(0,5), expand=True, fill=X)
         ttk.Button(button_frame_repo, text=getattr(lang, 'ok', "OK"), command=on_ok_repo, style="Accent.TButton").pack(side=LEFT, padx=(5,0), expand=True, fill=X)
         
-        move_center(a, master_window=self)
+        move_center(a, master_window=self) # Center the dialog relative to the MpkStore window.
 
     def download(self, files, size, id_, depends):
         if not self.winfo_exists():
@@ -3703,18 +4031,18 @@ class MpkStore(Toplevel):
             if self.control[id_] and len(self.control[id_]) == 2:
                 install_button, uninstall_button = self.control[id_]
                 if install_button and install_button.winfo_exists():
-                    install_button.config(state='disabled', text=lang.text40) 
+                    install_button.config(state='disabled', text=lang.text40) # lang.text40 likely means "Downloading..." or "Installing..."
             else:
                 logging.error(f"MpkStore.download: Control entry for plugin '{id_}' is malformed.")
         else:
             logging.warning(f"MpkStore.download: Control buttons for plugin ID '{id_}' not found.")
-        
+
         dependencies_ok = True
-        if depends and isinstance(depends, list): 
-            for dep_id_str in depends: 
+        if depends and isinstance(depends, list):
+            for dep_id_str in depends:
                 if not self.winfo_exists(): dependencies_ok = False; break
-                if not dep_id_str: continue 
-                
+                if not dep_id_str: continue
+
                 if module_manager.get_installed(dep_id_str):
                     logging.info(f"MpkStore.download: Dependency '{dep_id_str}' for plugin '{id_}' is already installed. Skipping.")
                     continue
@@ -3724,48 +4052,48 @@ class MpkStore(Toplevel):
 
                 if dep_info:
                     logging.info(f"MpkStore.download: Attempting to install dependency '{dep_name_display}' (ID: {dep_id_str}) for plugin '{plugin_display_name}'.")
-                    # Синхронный вызов для установки зависимости в том же потоке
+                    # Synchronous call to install the dependency in the same thread.
                     self.download(
-                        dep_info.get('files'), 
-                        dep_info.get('size'), 
-                        dep_id_str, 
+                        dep_info.get('files'),
+                        dep_info.get('size'),
+                        dep_id_str,
                         dep_info.get('depend')
                     )
-                    
+
                     if not module_manager.get_installed(dep_id_str):
                         logging.error(f"MpkStore.download: Dependency '{dep_name_display}' for plugin '{plugin_display_name}' failed to install.")
                         if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
-                            # --- ИСПОЛЬЗУЕМ win.message_pop ---
-                            msg_template = getattr(lang, "dependency_installation_failed_msg", 
+                            # --- USING win.message_pop ---
+                            msg_template = getattr(lang, "dependency_installation_failed_msg",
                                                   "Installation of plugin '{plugin_name}' aborted because dependency '{dep_name}' failed to install.")
                             win.message_pop(
                                 text=msg_template.format(plugin_name=plugin_display_name, dep_name=dep_name_display),
-                                color='orange', # Оранжевый для предупреждения
+                                color='orange', # Orange for a warning.
                                 title=getattr(lang, "dependency_error_title", "Dependency Error")
                             )
-                            # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                            # --- END OF USING win.message_pop ---
                         dependencies_ok = False
-                        break 
-                else: 
+                        break
+                else:
                     logging.warning(f"MpkStore.download: Info for dependency '{dep_id_str}' not found in self.data. Cannot install for '{plugin_display_name}'.")
                     if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
-                        # --- ИСПОЛЬЗУЕМ win.message_pop ---
-                        msg = getattr(lang, "dependency_not_in_repo_msg", 
+                        # --- USING win.message_pop ---
+                        msg = getattr(lang, "dependency_not_in_repo_msg",
                                       "Cannot install '{plugin_name}'. Required dependency '{dep_name}' not found in the repository.")
                         win.message_pop(
                             text=msg.format(plugin_name=plugin_display_name, dep_name=dep_name_display),
                             color='orange',
                             title=getattr(lang, "dependency_error_title", "Dependency Error")
                         )
-                        # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                        # --- END OF USING win.message_pop ---
                     dependencies_ok = False
-                    break 
-            
+                    break
+
             if not dependencies_ok:
                 if id_ in self.tasks: self.tasks.remove(id_)
                 if install_button and install_button.winfo_exists():
-                     install_button.config(text=lang.text21, state='normal', style="Accent.TButton")
-                return 
+                     install_button.config(text=lang.text21, state='normal', style="Accent.TButton") # lang.text21 likely means "Install"
+                return
         
         download_successful_for_all_files = True
         installation_successful_for_all_files = True
@@ -3832,30 +4160,30 @@ class MpkStore(Toplevel):
                                                       "Missing dependency: '{dependency_name}'.").format(dependency_name=dep_name_to_show)
                             else:
                                 final_reason = str(reason_text)
-                            # --- ИСПОЛЬЗУЕМ win.message_pop ---
+                            # --- USING win.message_pop ---
                             win.message_pop(
-                                text=error_msg_template.format(plugin_name=plugin_display_name, reason_text=final_reason), 
+                                text=error_msg_template.format(plugin_name=plugin_display_name, reason_text=final_reason),
                                 color='orange',
-                                title=getattr(lang, "dependency_error_title", "Installation Error") # Или более общий заголовок
+                                title=getattr(lang, "dependency_error_title", "Installation Error") # Or a more general title
                             )
-                            # --- КОНЕЦ ИСПОЛЬЗОВАНИЯ win.message_pop ---
+                            # --- END OF USING win.message_pop ---
                         installation_successful_for_all_files = False
-                        break 
+                        break
                     else:
                         logging.info(f"MpkStore.download: Successfully installed components from '{file_name_in_list}' for plugin '{id_}'.")
-                else: 
+                else:
                     installation_successful_for_all_files = False; break
 
             if not download_successful_for_all_files or not installation_successful_for_all_files:
                 logging.warning(f"MpkStore.download: Plugin installation process for '{id_}' was not fully successful. Download success: {download_successful_for_all_files}, Install success: {installation_successful_for_all_files}")
 
-        except (ConnectTimeout, HTTPError) as e_conn: 
+        except (ConnectTimeout, HTTPError) as e_conn:
             logging.exception(f'MpkStore.download: Connection/HTTP error during download for plugin {id_}: {e_conn}')
             if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
                  win.message_pop(
-                     text=f"{getattr(lang, 'download_failed', 'Download failed')}: {e_conn}", 
+                     text=f"{getattr(lang, 'download_failed', 'Download failed')}: {e_conn}",
                      color='orange',
-                     title=getattr(lang, "download_error_title", "Download Error") # Новый ключ для заголовка
+                     title=getattr(lang, "download_error_title", "Download Error") # New key for the title
                  )
         except Exception as e_generic: 
             logging.exception(f'MpkStore.download: Generic error during download/install process for plugin {id_}: {e_generic}')
@@ -3878,40 +4206,46 @@ class MpkStore(Toplevel):
                 try: self.tasks.remove(id_)
                 except ValueError: pass
             logging.info(f"MpkStore.download: Download/install process finished for plugin '{id_}'.")
-        # --- КОНЕЦ ИЗМЕНЕНИЙ ---
+      
 
     def get_db(self):
-        # ... (код без изменений, как в предыдущем ответе) ...
-        if not self.winfo_exists():
+        """Fetches the plugin database from the repository and populates the UI.
+
+        Clears existing plugin listings, downloads 'plugin.json' from the configured
+        repository URL, parses it, and then calls `add_app` to create UI elements
+        for each plugin. Handles potential network errors and invalid data.
+        """
+        if not self.winfo_exists(): # Ensure window is still active.
             logging.debug("MpkStore.get_db: Main widget destroyed, exiting thread.")
             return
 
-        self.clear() 
+        self.clear() # Clear existing UI elements and internal data structures.
         logging.info("MpkStore.get_db: Cleared existing plugin UI elements.")
 
         try:
+            # Fetch plugin database (plugin.json).
             url_response = requests.get(self.repo + 'plugin.json', timeout=10)
-            url_response.raise_for_status()
-            self.data = url_response.json()
-            self.apps = self.data 
+            url_response.raise_for_status() # Raise an exception for bad status codes (4xx or 5xx).
+            self.data = url_response.json() # Parse JSON response.
+            self.apps = self.data # Store parsed data for app population.
             logging.info(f"MpkStore.get_db: Successfully loaded {len(self.data)} plugin entries from {self.repo + 'plugin.json'}")
-        except requests.exceptions.RequestException as e_req:
+        except requests.exceptions.RequestException as e_req: # Handle network-related errors.
             logging.error(f"MpkStore.get_db: Failed to get plugin.json due to network error: {e_req}")
-            self.data = self.apps = []
+            self.data = self.apps = [] # Reset data on error.
             if hasattr(win, 'message_pop') and callable(win.message_pop):
                 win.message_pop(f"{getattr(lang, 'repo_fetch_error', 'Error fetching plugin list')}:\n{e_req}", color="orange", title="Repository Error")
-        except json.JSONDecodeError as e_json:
+        except json.JSONDecodeError as e_json: # Handle errors parsing JSON.
             logging.error(f"MpkStore.get_db: Failed to parse plugin.json: {e_json}")
-            self.data = self.apps = []
+            self.data = self.apps = [] # Reset data on error.
             if hasattr(win, 'message_pop') and callable(win.message_pop):
                  win.message_pop(getattr(lang, 'repo_parse_error', 'Error parsing plugin list.'), color="orange", title="Repository Error")
-        except Exception as e_unexp: 
+        except Exception as e_unexp: # Catch other unexpected errors.
             logging.exception(f'MpkStore.get_db: Unexpected error during data fetch: {e_unexp}')
-            self.data = self.apps = []
+            self.data = self.apps = [] # Reset data on error.
         
-        if self.winfo_exists():
+        if self.winfo_exists(): # Check if window still exists before UI update.
             logging.debug(f"MpkStore.get_db: Calling add_app with {len(self.apps if self.apps else [])} items.")
-            self.add_app(self.apps if self.apps else []) 
+            self.add_app(self.apps if self.apps else []) # Populate UI with plugins.
         else:
             logging.warning("MpkStore.get_db: Window was destroyed before UI update could be completed.")
 
@@ -4347,38 +4681,38 @@ def call(exe, extra_path=True, out: bool = True):
 
 def download_api(url, path=None, int_=True, size_=0):
     start_time = time.time()
-    session = requests.Session() # Создаем сессию один раз
+    session = requests.Session() # Create a session once
 
     try:
-        # HEAD-запрос для получения размера файла. verify=True по умолчанию.
-        # Добавим таймаут для предотвращения зависаний
-        response_head = session.head(url, timeout=10) # 10 секунд таймаут
-        response_head.raise_for_status() # Проверка на HTTP ошибки (4xx, 5xx)
+        # HEAD request to get the file size. verify=True by default.
+        # Add a timeout to prevent hanging
+        response_head = session.head(url, timeout=10) # 10-second timeout
+        response_head.raise_for_status() # Check for HTTP errors (4xx, 5xx)
         file_size = int(response_head.headers.get("Content-Length", 0))
     except requests.exceptions.RequestException as e_head:
         logging.error(f"Error making HEAD request to {url}: {e_head}")
-        # В случае ошибки HEAD, можно либо прервать, либо попробовать загрузить без известного file_size
-        # Здесь мы продолжим, file_size останется 0, и если size_ передан, он будет использован.
-        file_size = 0 # или можно возбудить исключение и обработать выше
+        # In case of a HEAD error, we can either abort or try to download without a known file_size.
+        # Here, we will continue; file_size will remain 0, and if size_ is provided, it will be used.
+        file_size = 0 # or an exception could be raised and handled further up
 
-    # GET-запрос для скачивания файла.
-    # Убираем verify=False, чтобы использовалось значение по умолчанию True.
+    # GET request to download the file.
+    # Removed verify=False, so the default True is used.
     try:
-        # Добавим таймаут также и для GET запроса (для установки соединения)
-        response_get = session.get(url, stream=True, timeout=10) 
-        response_get.raise_for_status() # Проверка на HTTP ошибки
+        # Add a timeout for the GET request as well (for establishing the connection)
+        response_get = session.get(url, stream=True, timeout=10)
+        response_get.raise_for_status() # Check for HTTP errors
     except requests.exceptions.RequestException as e_get:
         logging.error(f"Error making GET request to {url}: {e_get}")
-        # Если GET-запрос не удался, нужно прервать генератор
-        # Можно возбудить исключение или вернуть пустой yield
-        yield "Error", 0, 0, 0, 0 # Пример возврата ошибки
+        # If the GET request fails, the generator needs to be interrupted.
+        # An exception can be raised, or an empty yield can be returned.
+        yield "Error", 0, 0, 0, 0 # Example of returning an error
         return
 
 
     last_time = time.time()
-    if file_size == 0 and size_ > 0: # Используем переданный size_, если из хедера не получили
+    if file_size == 0 and size_ > 0: # Use the provided size_ if not obtained from the header
         file_size = size_
-    
+
     file_save_path = os.path.join(settings.path if path is None else path, os.path.basename(url))
     logging.info(f"Starting download: {url} to {file_save_path}, expected size: {file_size}")
 
@@ -4388,36 +4722,36 @@ def download_api(url, path=None, int_=True, size_=0):
             chunk_kb = chunk_size / 1024
             bytes_downloaded = 0
             for data in response_get.iter_content(chunk_size=chunk_size):
-                if not data: # Проверка на пустые данные, если соединение оборвалось
+                if not data: # Check for empty data if the connection was dropped
                     break
                 f.write(data)
                 bytes_downloaded += len(data)
-                
+
                 current_time = time.time()
                 elapsed_total = current_time - start_time
-                
-                # Расчет скорости
-                # Чтобы избежать деления на ноль, если время очень мало
+
+                # Speed calculation
+                # To avoid division by zero if the time interval is very small
                 time_since_last_chunk = current_time - last_time
                 speed = 0
-                if time_since_last_chunk > 0.001: # Избегаем деления на очень маленькое число
-                    speed = (len(data) / 1024) / time_since_last_chunk # Скорость текущего чанка
-                else: # Если время очень мало, используем среднюю скорость
+                if time_since_last_chunk > 0.001: # Avoid division by a very small number
+                    speed = (len(data) / 1024) / time_since_last_chunk # Speed of the current chunk
+                else: # If the time interval is very small, use the average speed
                     if elapsed_total > 0.001:
                          speed = (bytes_downloaded / 1024) / elapsed_total
 
                 last_time = current_time
-                
-                percentage = "Unknown" # Если file_size неизвестен
+
+                percentage = "Unknown" # If file_size is unknown
                 if file_size > 0:
                     percentage_float = (bytes_downloaded / file_size) * 100
                     percentage = int(percentage_float) if int_ else percentage_float
-                
+
                 yield percentage, speed, bytes_downloaded, file_size, elapsed_total
     except IOError as e_io:
         logging.error(f"IOError during download or saving file {file_save_path}: {e_io}")
-        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time # Возвращаем ошибку
-    except Exception as e_download: # Ловим другие возможные ошибки во время скачивания
+        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time # Return an error
+    except Exception as e_download: # Catch other potential errors during download
         logging.exception(f"Unexpected error during download of {url}: {e_download}")
         yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time
     else:
@@ -4935,7 +5269,6 @@ def script2fs(path):
         json_.write(parts)
 
 
-# fixme:Rewrite it.
 @animation
 def unpackrom(ifile) -> None:
     print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
@@ -5749,15 +6082,15 @@ class UnpackGui(ttk.LabelFrame):
         super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()
         current_project_name.trace_add("write", self._on_project_change)
-        
-    # Новый метод-обработчик, вызываемый при смене проекта
+
+    # New handler method, invoked when the project changes.
     def _on_project_change(self, *args):
-        """Вызывается автоматически при изменении current_project_name."""
-        # Проверяем, существует ли метод hd и сам виджет перед вызовом
+        """Automatically called when `current_project_name` changes."""
+        # Check if the `hd` method exists and the widget itself is still valid before calling.
         if hasattr(self, 'hd') and callable(self.hd):
              if self.winfo_exists():
-                 # Вызов hd() обновит список разделов для нового проекта,
-                 # учитывая текущий режим (Unpack/Pack)
+                 # Calling `hd()` will update the list of sections for the new project,
+                 # taking into account the current mode (Unpack/Pack).
                  self.hd()
                  
     def gui(self):
@@ -5825,7 +6158,7 @@ class UnpackGui(ttk.LabelFrame):
 
     def hd(self):
         if not hasattr(self, 'fm'):
-            # Используем print для отладки, можно заменить на logging
+            # Using print for debugging, can be replaced with logging.
             print(f"DEBUG: UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update. Current project: {current_project_name.get()}")
             return
 
