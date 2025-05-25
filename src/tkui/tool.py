@@ -4031,7 +4031,7 @@ class MpkStore(Toplevel):
             if self.control[id_] and len(self.control[id_]) == 2:
                 install_button, uninstall_button = self.control[id_]
                 if install_button and install_button.winfo_exists():
-                    install_button.config(state='disabled', text=lang.text40) # lang.text40 likely means "Downloading..." or "Installing..."
+                    install_button.config(state='disabled', text=lang.text40) 
             else:
                 logging.error(f"MpkStore.download: Control entry for plugin '{id_}' is malformed.")
         else:
@@ -4762,6 +4762,9 @@ def download_file():
     var1 = BooleanVar(value=False)
     down = win.get_frame(lang.text61)
     url = input_(title=lang.text60)
+    if not url:
+        win.message_pop(lang.warn_empty_url, "red") # used  a new key
+        return
     win.message_pop(lang.text62, "green")
     progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
