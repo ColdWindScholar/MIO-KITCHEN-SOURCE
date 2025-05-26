@@ -4031,7 +4031,7 @@ class MpkStore(Toplevel):
             if self.control[id_] and len(self.control[id_]) == 2:
                 install_button, uninstall_button = self.control[id_]
                 if install_button and install_button.winfo_exists():
-                    install_button.config(state='disabled', text=lang.text40) # lang.text40 likely means "Downloading..." or "Installing..."
+                    install_button.config(state='disabled', text=lang.text40) 
             else:
                 logging.error(f"MpkStore.download: Control entry for plugin '{id_}' is malformed.")
         else:
@@ -4762,6 +4762,9 @@ def download_file():
     var1 = BooleanVar(value=False)
     down = win.get_frame(lang.text61)
     url = input_(title=lang.text60)
+    if not url:
+        win.message_pop(lang.warn_empty_url, "red") # used  a new key
+        return
     win.message_pop(lang.text62, "green")
     progressbar = ttk.Progressbar(down, length=200, mode="determinate")
     progressbar.pack(padx=10, pady=10)
@@ -5866,10 +5869,25 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
              '-O',
              'compression', '-f']) != 0:
         return 1
-    # todo:Its A Stupid method, we need a new!
-    with open(f'{work}/config/{name}_file_contexts', 'a+', encoding='utf-8') as f:
-        if not [i for i in f.readlines() if f'/{name}/{name} u' in i]:
-            f.write(f'/{name}/{name} u:object_r:system_file:s0\n')
+    # The efficiency of verifying and adding file contexts has been improved.
+    # Let's confirm that the basic context for the partition is present.
+    line_to_ensure = f'/{name}/{name} u:object_r:system_file:s0\n'
+    file_contexts_path = f'{work}/config/{name}_file_contexts'
+    
+    found = False
+    try:
+        with open(file_contexts_path, 'r', encoding='utf-8') as f_read:
+            for line in f_read:
+                if line.strip() == line_to_ensure.strip():
+                    found = True
+                    break
+    except FileNotFoundError:
+        # If the file doesn't exist, the 'a' mode used below will create it.
+        pass
+
+    if not found:
+        with open(file_contexts_path, 'a', encoding='utf-8') as f_append:
+            f_append.write(line_to_ensure)
     return call(
         ['sload.f2fs', '-f', work + name, '-C', f'{work}/config/{name}_fs_config', '-T', f'{UTC}', '-s',
          f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
