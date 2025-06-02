@@ -6188,22 +6188,23 @@ class UnpackGui(ttk.LabelFrame):
             self.refs2()
 
     def refs(self, auto:bool = False):
-        create_thread(self.__refs, auto)
-
-    @animation
-    def __refs(self, auto: bool = False):
-        self.lsg.clear()
-        work = project_manger.current_work_path()
-        if not project_manger.exist():
-            return False
         if auto:
             for index, value in enumerate(self.fm.cget("values")):
                 self.fm.current(index)
-                self.refs()
+                self.__refs()
                 if len(self.lsg.vars):
                     return True
             self.fm.current(0)
             return True
+        create_thread(self.__refs)
+
+    @animation
+    def __refs(self):
+        self.lsg.clear()
+        work = project_manger.current_work_path()
+        if not project_manger.exist():
+            return False
+
         form = self.fm.get()
         if form == 'payload':
             if os.path.exists(f"{work}/payload.bin"):
