@@ -6187,7 +6187,11 @@ class UnpackGui(ttk.LabelFrame):
             self.fm.configure(state="disabled")
             self.refs2()
 
-    def refs(self, auto: bool = False):
+    def refs(self, auto:bool = False):
+        create_thread(self.__refs, auto)
+
+    @animation
+    def __refs(self, auto: bool = False):
         self.lsg.clear()
         work = project_manger.current_work_path()
         if not project_manger.exist():
@@ -6210,7 +6214,7 @@ class UnpackGui(ttk.LabelFrame):
         elif form == 'super':
             if os.path.exists(f"{work}/super.img"):
                 if gettype(f"{work}/super.img") == 'sparse':
-                    create_thread(utils.simg2img, f"{work}/super.img", join=True)
+                    utils.simg2img(f"{work}/super.img")
                 for i in lpunpack.get_parts(f"{work}/super.img"):
                     self.lsg.insert(i, i)
         elif form == 'update.app':
@@ -6420,7 +6424,6 @@ class FormatConversion(ttk.LabelFrame):
                         except Exception:
                             logging.exception('Bugs')
         print(lang.text8)
-
 
 def init_verify():
     if not os.path.exists(settings.tool_bin):
