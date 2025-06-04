@@ -1117,8 +1117,8 @@ class Tool(Tk):
             print(lang.warn13)
         self.sub_win2 = ttk.Frame(self)
         self.sub_win3 = ttk.Frame(self)
-        self.sub_win3.pack(fill=BOTH, side=LEFT, expand=True)
-        self.sub_win2.pack(fill=BOTH, side=LEFT, expand=True)
+        self.sub_win2.pack(fill=BOTH, side=RIGHT, expand=True)
+        self.sub_win3.pack(fill=BOTH, side=RIGHT, expand=True)
         self.notepad = ttk.Notebook(self.sub_win2)
         if not is_pro:
             self.tab = ttk.Frame(self.notepad)
@@ -1152,16 +1152,16 @@ class Tool(Tk):
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
         self.tsk.pack(padx=10, pady=10, side='top')
+
         tr = ttk.LabelFrame(self.sub_win3, text=lang.text131)
         tr2 = Label(tr, text=lang.text132 + '\n(pac ozip zip tar.md5 tar tar.gz kdz dz ops ofp ext4 erofs boot img)')
-        tr2.pack(padx=10, pady=10, side='bottom')
         tr.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
-        tr.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
+        tr.pack(padx=5, pady=5, side='top', fill=X)
         tr2.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
-        tr2.pack(padx=5, pady=5, side='top', expand=True, fill=BOTH)
+        tr2.pack(padx=5, pady=5, side='top', fill=X)
+
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
-        self.show.pack(side=LEFT, fill=BOTH, expand=True)
         data: str = sys.stdout.data
         sys.stdout = StdoutRedirector(self.show)
         sys.stdout.write(data)
@@ -1171,13 +1171,19 @@ class Tool(Tk):
         tr.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
         tr2.drop_target_register(DND_FILES)
         tr2.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
-        self.scroll.pack(side=LEFT, fill=BOTH)
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
-        self.rzf.pack(padx=5, pady=5, fill=BOTH, side='bottom')
-        self.gif_label = Label(self.rzf)
-        self.gif_label.pack(padx=10, pady=10)
-        ttk.Button(self.rzf, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(padx=10, pady=10)
+
+        self.rzf.pack(padx=5, pady=5, fill=BOTH, side=TOP)
+        self.Clear_Load_canvas = Canvas(self.rzf)
+        self.Clear_Load_canvas.config(highlightthickness=0)
+        ttk.Button(self.Clear_Load_canvas, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(padx=10, pady=10, side=TOP)
+        self.gif_label = Label(self.Clear_Load_canvas)
+        self.gif_label.pack(padx=10, pady=10, side=TOP)
+        self.Clear_Load_canvas.pack(side=RIGHT, anchor='ne')
+        self.scroll.pack(side=RIGHT, fill=BOTH)
+        self.show.pack(side=RIGHT, fill=BOTH, expand=True)
+
         MpkMan().gui()
 
     def tab_content(self):
@@ -3235,6 +3241,14 @@ class MpkMan(ttk.Frame):
 
         create_thread(uninstall_thread_target)
 
+    def install_mpk_wrapper(self):
+        file_path = filedialog.askopenfilename(
+            title=lang.text25,
+            filetypes=((lang.text26, "*.mpk"),)
+        )
+        if file_path:  # 检查路径是否有效
+            InstallMpk(file_path)
+
     def gui(self):
         global list_pls_plugin
         list_pls_plugin = self.list_pls
@@ -3260,8 +3274,7 @@ class MpkMan(ttk.Frame):
 
         # Bind context menu to the "Available plugins" label and to IconGrid/Canvas itself
         rmenu = Menu(self, tearoff=False, borderwidth=0) # Menu parent is self (MpkMan)
-        rmenu.add_command(label=lang.text21, command=lambda: InstallMpk(
-            filedialog.askopenfilename(title=lang.text25, filetypes=((lang.text26, "*.mpk"),))) == self.list_pls())
+        rmenu.add_command(label=lang.text21, command=self.install_mpk_wrapper)
         rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh))
         rmenu.add_command(label=lang.text115, command=lambda: create_thread(module_manager.new))
 
@@ -6114,7 +6127,9 @@ class UnpackGui(ttk.LabelFrame):
     def gui(self):
         self.pack(padx=5, pady=5)
         self.ch.set(True)
-        self.fm = ttk.Combobox(self, state="readonly",
+        run_Select_canvas = Canvas(self)
+        run_Select_canvas.config(highlightthickness=0)
+        self.fm = ttk.Combobox(run_Select_canvas, state="readonly",
                                values=(
                                    'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                    'update.app'))
@@ -6126,17 +6141,22 @@ class UnpackGui(ttk.LabelFrame):
         self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
         self.lsg.gui()
         self.lsg.canvas.bind('<Button-3>', self.show_menu)
-        self.lsg.pack(padx=5, pady=5, fill=X, side='top', expand=True)
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
+
         ff1 = ttk.Frame(self)
         ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
                         value=True).pack(padx=5, pady=5, side='left')
         ttk.Radiobutton(ff1, text=lang.pack, variable=self.ch,
                         value=False).pack(padx=5, pady=5, side='left')
-        ff1.pack(padx=5, pady=5, fill=X)
-        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, fill=X)
-        self.fm.pack(padx=5, pady=5, fill=Y, side='left')
-        ttk.Button(self, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side='left')
+
+        self.fm.pack(padx=5, pady=5, fill=Y, side=LEFT)
+        ttk.Button(run_Select_canvas, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5, side=LEFT)
+
+        run_Select_canvas.pack(side=BOTTOM, fill=X)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
+        ff1.pack(padx=5, pady=5, fill=X, side=BOTTOM)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
+        self.lsg.pack(padx=5, pady=5, fill=Y, side=BOTTOM, expand=True)
+
         self.refs()
         self.ch.trace("w", lambda *x: self.hd())
 

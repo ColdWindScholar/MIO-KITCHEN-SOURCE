@@ -43,21 +43,23 @@ class ListBox(Frame):
     def gui(self):
         self.var = BooleanVar(value=False)
         scrollbar = Scrollbar(self, orient='vertical')
-        scrollbar.pack(side='right', fill='y', padx=10, pady=10)
         self.canvas = Canvas(self, yscrollcommand=scrollbar.set, width=250, height=150)
         self.canvas.pack_propagate(False)
-        self.canvas.pack(fill='both', expand=True)
         scrollbar.config(command=self.canvas.yview)
         self.label_frame = Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
         self.canvas.bind("<MouseWheel>",
                              lambda event: self.__on_mouse(event))
-        Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
         self.set_all = Checkbutton(self, text=lang.set_all, variable=self.var, onvalue=True, offvalue=False,
                                    command=lambda *x, var_=self.var: [i.set(True) for i in
                                                                       self.vars] if var_.get() else [i.set(False) for i
                                                                                                      in self.vars])
-        self.set_all.pack(padx=5, pady=5, anchor='nw')
+
+        self.set_all.pack(padx=5, pady=5, anchor='sw', side='bottom')
+        Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X, side='bottom')
+        scrollbar.pack(side='right', fill='y', padx=10, pady=10)
+        self.canvas.pack(fill='both', expand=True)
+
         self.update_ui()
 
     def update_ui(self):
