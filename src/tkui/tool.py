@@ -3246,7 +3246,8 @@ class MpkMan(ttk.Frame):
             title=lang.text25,
             filetypes=((lang.text26, "*.mpk"),)
         )
-        if file_path:  # 检查路径是否有效
+        check_mpk_result, reason = module_manager.check_mpk(file_path)
+        if check_mpk_result == module_error_codes.Normal: # 检查路径是否有效
             InstallMpk(file_path)
 
     def gui(self):
