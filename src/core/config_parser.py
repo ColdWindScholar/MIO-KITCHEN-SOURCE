@@ -189,13 +189,13 @@ class ConfigParser:
         A blank line is added after each written section for readability.
 
         Args:
-            file_object: An open, writable text file-like object (e.g., opened with open(path, 'w')).
+            file_object: An open, writable text file-like object (e.g., opened with open (path, 'w')).
         """
         first_section = True
         for section_name, section_data in self.sections.items():
             if section_data:  # Only write the section if it contains key-value pairs
                 if not first_section:
-                    file_object.write("\n") # Add a blank line before subsequent sections
+                    file_object.write("\n") # Add a blank line before the following sections
                 file_object.write(f"[{section_name}]\n")
                 for key, value in section_data.items():
                     file_object.write(f"{key} = {value}\n")
