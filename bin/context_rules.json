@@ -1,1 +1,20 @@
-{"/lost\\+found": "u:object_r:rootfs:s0"}
+{
+  "//": "MIO-KITCHEN SELinux Context Fix Rules. Keys are Python-style RegEx. More specific rules should come first.",
+
+  "__comment_critical__": "CRITICAL FILES: These need specific contexts to be executable or usable by the system.",
+  "^/(system|vendor|product|system_ext)/app/.*\\.apk$": "u:object_r:system_app_file:s0",
+  "^/(system|vendor|product|system_ext)/priv-app/.*\\.apk$": "u:object_r:system_app_file:s0",
+  "^/(system|vendor|product|system_ext)/overlay/.*\\.apk$": "u:object_r:system_overlay_file:s0",
+  "^/(system|vendor|product|system_ext)/lib(64)?/.*\\.so$": "u:object_r:system_lib_file:s0",
+  "^/(system|vendor|system_ext)/bin/.*": "u:object_r:system_bin_file:s0",
+  "^/(system|vendor|system_ext)/xbin/.*": "u:object_r:shell_exec:s0",
+  "^/(system|vendor|product|system_ext)/etc/init/.*\\.rc$": "u:object_r:system_file:s0",
+  "^/(system|vendor|product|system_ext)/etc/firmware/.*": "u:object_r:firmware_file:s0",
+  
+  "__comment_directories__": "Rules for common directories to ensure they get a base context.",
+  "^/(system|vendor|product|system_ext)/lost\\+found(/.*)?$": "u:object_r:system_file:s0",
+  "^/(system|vendor|product|system_ext|odm)/.*/$": "u:object_r:system_file:s0",
+
+  "__comment_fallback__": "FALLBACK FOR EVERYTHING ELSE: This is a safe 'catch-all' rule for any other new file.",
+  "^/(system|vendor|product|system_ext|odm)/.+": "u:object_r:system_file:s0"
+}
