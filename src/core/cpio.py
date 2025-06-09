@@ -142,7 +142,7 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
             header.unpack(header_bytes)
 
             # 2. Check for padding (all nulls) at the end of some archives
-            if header.c_magic == b'\x00\x00\x00\x00\x00\x00':
+            if header.c_magic == b'\x00' * 6:
                 continue
                 
             # 3. Safely parse namesize
