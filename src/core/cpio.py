@@ -132,44 +132,94 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
         while True:
             header = CpioHeader()
             header_size = len(header)
-            header.unpack(f.read(header_size))
-            namesize = int(header.c_namesize, 16)
-            name = f.read(namesize)[:-1].decode('utf-8')
-            if not name in info.keys():
+            
+            # 1. Read header bytes safely
+            header_bytes = f.read(header_size)
+            if len(header_bytes) < header_size:
+                # Reached end of file, stop processing
+                break
+                
+            header.unpack(header_bytes)
+
+            # 2. Check for padding (all nulls) at the end of some archives
+            if header.c_magic == b'\x00\x00\x00\x00\x00\x00':
+                continue
+                
+            # 3. Safely parse namesize
+            try:
+                namesize = int(header.c_namesize, 16)
+            except (ValueError, TypeError):
+                # If namesize is invalid, we can't proceed with this entry
+                continue
+
+            name_bytes = f.read(namesize)
+            # The last byte should be a null terminator
+            name = name_bytes[:-1].decode('utf-8', errors='ignore')
+            
+            # If name is empty, it could be a padding block. Let's check.
+            if not name:
+                # If it's not the official trailer, it's likely garbage/padding.
+                if namesize > 1 or int(header.c_filesize, 16) > 0:
+                    f.seek(int(header.c_filesize, 16), os.SEEK_CUR) # Skip potential data
+                continue
+
+            if name not in info:
                 info[name] = {}
-            # If In The End
+
+            # 4. Safely parse all numeric fields from header
             for i in ['c_ino', 'c_uid', 'c_gid', 'c_nlink', 'c_mtime', 'c_dev_maj', 'c_dev_min',
                       'c_rdev_maj', 'c_rdev_min']:
-                # To Recover it, hex(data) to 8 bytes
-                info[name][i] = int(getattr(header, i), 16)
+                field_value = getattr(header, i)
+                # Safely convert to int, default to 0 if field is empty or invalid
+                info[name][i] = int(field_value, 16) if field_value else 0
+
+            # 5. Check for the official CPIO trailer
             if name == CPIO_TRAILER_NAME:
-                info[name]['c_mode'] = int(header.c_mode, 16)
-                break
+                c_mode_val = getattr(header, 'c_mode')
+                info[name]['c_mode'] = int(c_mode_val, 16) if c_mode_val else 0
+                break # This is the end of the archive
+
+            # Continue processing a normal entry
             file_type, file_mode = parser_c_mode(header.c_mode)
             info[name]['file_type'] = file_type.value
-            # Repack just int(file_mode, 8)
             info[name]['file_mode'] = oct(file_mode)
-            if (namesize + header_size) % 4:
-                f.read(4 - ((namesize + header_size) % 4))
+
+            # Align to 4-byte boundary after header + name
+            if (len(header_bytes) + len(name_bytes)) % 4:
+                f.read(4 - ((len(header_bytes) + len(name_bytes)) % 4))
+
             file_size = int(header.c_filesize, 16)
             output_file = os.path.join(outputdir, name)
+            
+            # Create parent directories if they don't exist
             if not os.path.exists(os.path.dirname(output_file)):
-                os.makedirs(os.path.dirname(output_file))
+                os.makedirs(os.path.dirname(output_file), exist_ok=True)
+                
             file_content = f.read(file_size)
+            
             if (header.c_magic == CpioMagicFormat.Crc.value) and check_crc:
-                print(f"CRC State:{calc_crc(file_content) == int(header.c_chksum.decode('utf-8'), 16)}")
+                try:
+                    checksum_val = int(header.c_chksum.decode('utf-8'), 16)
+                    print(f"CRC State: {calc_crc(file_content) == checksum_val}")
+                except (ValueError, TypeError):
+                    print("CRC Checksum is invalid.")
+
             if file_type == CpioModes.C_ISREG:
                 with open(output_file, 'wb') as o:
                     o.write(file_content)
             elif file_type == CpioModes.C_ISDIR:
                 os.makedirs(output_file, exist_ok=True)
             elif file_type == CpioModes.C_ISLNK:
-                symlink(file_content.decode('utf-8'), output_file)
+                symlink(file_content.decode('utf-8', errors='ignore'), output_file)
             else:
-                print(f"Unsupported Type:{file_type}")
-            print(f"Extracted:{name}")
+                print(f"Unsupported Type: {file_type}")
+                
+            print(f"Extracted: {name}")
+
+            # Align to 4-byte boundary after file content
             if file_size % 4:
                 f.read(4 - (file_size % 4))
+                
         with open(output_info, 'w', encoding='utf-8', newline='\n') as con:
             dump(info, con)
 
