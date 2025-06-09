@@ -1973,8 +1973,22 @@ settings = SetUtils(load=False)
 
 
 def re_folder(path, quiet=False):
-    if os.path.exists(path): rmdir(path, quiet)
+    if os.path.exists(path):
+        rmdir(path, quiet)
     os.makedirs(path, exist_ok=True)
+    if os.name == 'nt':
+        try:
+            # This function must be called on an empty directory.
+            # We wrap it in try-except to handle cases where the user might not have
+            # admin rights or WSL is not configured, preventing a crash.
+            if windll.shell32.IsUserAnAdmin():
+                ensure_dir_case_sensitive(path)
+                print(f"set case sensitive state for '{path}'")
+        except Exception as e:
+            logging.warning(
+                f"Could not set case sensitivity on '{path}'. "
+                f"It might not be empty or WSL is not configured. Error: {e}"
+            )
 
 
 @animation
@@ -4497,28 +4511,26 @@ class PackSuper(Toplevel):
         if os.path.exists(parts_info):
             try:
                 data: dict = JsonEdit(parts_info).read().get('super_info')
-                if data is None:
-                    raise AttributeError("super_info is not dict")
+                if data is not None:
+                    # get block device name
+                    for i in data.get('block_devices', []):
+                        self.block_device_name.set(i.get('name', 'super'))
+                        if isinstance(i.get('size'), int):
+                            self.super_size.set(i.get('size', self.super_size.get()))
+
+                    for i in data.get('group_table', []):
+                        name = i.get('name')
+                        if isinstance(name, str) and name != 'default':
+                            self.group_name.set(name)
+
+                    selected = []
+                    for i in data.get('partition_table', []):
+                        name = i.get('name')
+                        if isinstance(name, str) and name not in selected:
+                            selected.append(name)
+                    self.selected = selected
             except (Exception, BaseException, AttributeError):
                 logging.exception('PackSupper:read_parts_info')
-            else:
-                # get block device name
-                for i in data.get('block_devices', []):
-                    self.block_device_name.set(i.get('name', 'super'))
-                    if isinstance(i.get('size'), int):
-                        self.super_size.set(i.get('size', self.super_size.get()))
-
-                for i in data.get('group_table', []):
-                    name = i.get('name')
-                    if isinstance(name, str) and name != 'default':
-                        self.group_name.set(name)
-
-                selected = []
-                for i in data.get('partition_table', []):
-                    name = i.get('name')
-                    if isinstance(name, str) and name not in selected:
-                        selected.append(name)
-                self.selected = selected
 
         #Read dynamic_partitions_op_list
         list_file = f"{self.work}/dynamic_partitions_op_list"
@@ -4620,18 +4632,45 @@ class StdoutRedirector:
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
-        self.flush = lambda: error(1, self.error_info) if self.error_info else ...
+        # Store the main thread's identifier to check for thread safety
+        self.main_thread_id = threading.get_ident()
+        self.flush = lambda: self.safe_error_flush()
+
+    def safe_error_flush(self):
+        if self.error_info:
+            if threading.get_ident() != self.main_thread_id:
+                self.text_space.after(0, error, 1, self.error_info)
+            else:
+                error(1, self.error_info)
 
     def write(self, string):
         if self.error:
             self.error_info += string
             logging.error(string)
             return
-        self.text_space.insert(tk.END, string)
-        logging.debug(string)
-        self.text_space.see('end')
-        if settings.ai_engine == '1':
-            AI_engine.suggest(string, language=settings.language, ok=lang.ok)
+
+        # Check if we are in the main GUI thread
+        if threading.get_ident() != self.main_thread_id:
+            # If not, schedule the update to be run in the main thread
+            if self.text_space.winfo_exists():
+                self.text_space.after(0, self.thread_safe_insert, string)
+        else:
+            # If we are in the main thread, update directly
+            self.thread_safe_insert(string)
+
+    def thread_safe_insert(self, string):
+        """This method should only be called from the main GUI thread."""
+        try:
+            if not self.text_space.winfo_exists():
+                return
+            self.text_space.insert(tk.END, string)
+            logging.debug(string)
+            self.text_space.see('end')
+            if settings.ai_engine == '1':
+                AI_engine.suggest(string, language=settings.language, ok=lang.ok)
+        except Exception as e:
+            # Log errors happening even within the main thread, e.g., if the widget is destroyed between checks
+            logging.error(f"Error in thread_safe_insert: {e}")
 
 
 def call(exe, extra_path=True, out: bool = True):
@@ -4818,7 +4857,10 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
             return
     re_folder(work + name)
     os.chdir(work + name)
-    if call(['magiskboot', 'unpack', '-h', '-n' if settings.magisk_not_decompress == '1' else '', boot]) != 0:
+    # The -n flag is for not decompressing kernel, it doesn't affect ramdisk.
+    # The check for magisk_not_decompress was incorrect here.
+    # We always want to unpack ramdisk if possible.
+    if call(['magiskboot', 'unpack', '-h', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cwd_path)
         rmtree(work + name)
@@ -4833,6 +4875,7 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
             if call(["magiskboot", "decompress", f'{work}/{name}/ramdisk.cpio.comp',
                      f'{work}/{name}/ramdisk.cpio']) != 0:
                 print("Failed to decompress Ramdisk...")
+                os.chdir(cwd_path) # Change back before returning
                 return
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
@@ -4842,7 +4885,6 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
     else:
         print("Unpack Done!")
     os.chdir(cwd_path)
-
 
 @animation
 def dboot(name: str = 'boot', source: str = None, boot: str = None):
@@ -5475,18 +5517,13 @@ project_manger = ProjectManager()
 
 @animation
 def unpack(chose, form: str = '') -> bool:
-    if os.name == 'nt':
-        if windll.shell32.IsUserAnAdmin():
-            try:
-                ensure_dir_case_sensitive(project_manger.current_work_path())
-            except (Exception, BaseException):
-                logging.exception('Bugs')
     if not project_manger.exist():
         win.message_pop(lang.warn1)
         return False
     elif not os.path.exists(project_manger.current_work_path()):
         win.message_pop(lang.warn1, "red")
         return False
+
     json_ = JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
     parts = json_.read()
     if not chose:
@@ -5561,10 +5598,8 @@ def unpack(chose, form: str = '') -> bool:
                 else:
                     print("transferfile" + lang.text84)
         if os.access(f"{work}/{i}.img", os.F_OK):
-            try:
-                parts.pop(i)
-            except KeyError:
-                logging.exception('Key')
+            # Safely remove the key from parts if it exists.
+            parts.pop(i, None)
             if gettype(f"{work}/{i}.img") != 'sparse':
                 parts[i] = gettype(f"{work}/{i}.img")
             if gettype(f"{work}/{i}.img") == 'dtbo':
@@ -5590,6 +5625,7 @@ def unpack(chose, form: str = '') -> bool:
                     win.message_pop(lang.warn11.format(f"{i}.img"))
             if i not in parts.keys():
                 parts[i] = gettype(f"{work}/{i}.img")
+            # This print was causing the RuntimeError. It is now thread-safe.
             print(lang.text79 + i + f".img[{file_type}]")
             if gettype(f"{work}/{i}.img") == 'super':
                 parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
