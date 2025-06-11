@@ -19,6 +19,7 @@ import os
 import os.path
 import platform
 import struct
+import subprocess
 import sys
 import tempfile
 import traceback
@@ -98,6 +99,50 @@ if os.name == 'nt':
 else:
     def terminate_process(pid):
         os.kill(pid, 9)
+tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
+def call(exe, extra_path=True, out: bool = True):
+    logging.info(exe)
+    if isinstance(exe, list):
+        cmd = exe
+        if extra_path:
+            cmd[0] = f"{tool_bin}{exe[0]}"
+        cmd = [i for i in cmd if i]
+    else:
+        cmd = f'{tool_bin}{exe}' if extra_path else exe
+        if os.name == 'posix':
+            cmd = cmd.split()
+    conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
+    try:
+        ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, creationflags=conf)
+        pid = ret.pid
+        states.open_pids.append(pid)
+        for i in iter(ret.stdout.readline, b""):
+            try:
+                out_put = i.decode("utf-8").strip()
+            except (Exception, BaseException):
+                out_put = i.decode("gbk").strip()
+            if out:
+                print(out_put)
+            else:
+                logging.info(out_put)
+        states.open_pids.remove(pid)
+    except subprocess.CalledProcessError as e:
+        for i in iter(e.stdout.readline, b""):
+            try:
+                out_put = i.decode("utf-8").strip()
+            except (Exception, BaseException):
+                out_put = i.decode("gbk").strip()
+            if out:
+                print(out_put)
+            else:
+                logging.info(out_put)
+        return 2
+    except FileNotFoundError:
+        logging.exception('Bugs')
+        return 2
+    ret.wait()
+    return ret.returncode
 
 class GuoKeLogo:
     def __init__(self):
@@ -680,7 +725,7 @@ class States:
     development = False
     inited = False
     open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
-
+states = States()
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):
         print(f"Warn, The algorithm {method} not exist in hashlib!")

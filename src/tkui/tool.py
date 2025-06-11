@@ -1344,7 +1344,7 @@ tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
 context_rule_file = os.path.join(cwd_path, 'bin', "context_rules.json")
-states = States()
+from src.core.utils import states, call
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 
 
@@ -1894,12 +1894,8 @@ class SetUtils:
             sv_ttk.set_theme("dark")
             error(1,
                   'Some necessary files were lost, please reinstall this software to fix the problem!')
-        if hasattr(self, 'custom_system'):
-            if not self.custom_system.strip():
-                self.custom_system = platform.system()
-        else:
-            self.custom_system = platform.system()
-        self.tool_bin = os.path.join(cwd_path, 'bin', self.custom_system, platform.machine()) + os.sep
+
+        self.tool_bin = os.path.join(cwd_path, 'bin', platform.system(), platform.machine()) + os.sep
 
     def load(self):
         self.config.read(self.set_file)
@@ -1979,7 +1975,8 @@ settings = SetUtils(load=False)
 
 
 def re_folder(path, quiet=False):
-    if os.path.exists(path): rmdir(path, quiet)
+    if os.path.exists(path):
+        rmdir(path, quiet)
     os.makedirs(path, exist_ok=True)
 
 
@@ -2383,7 +2380,7 @@ class ModuleManager:
             shell_command_prefix = 'ash' if os.name == 'posix' else 'bash'
             full_shell_command = f"{exports} exec {norm_module_exec} {norm_main_sh_path}"
             
-            call_result = call([shell_command_prefix, '-c', full_shell_command], extra_path=False) 
+            call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command], extra_path=False)
             return call_result 
 
         elif os.path.exists(main_py_path) and imp:
@@ -4648,49 +4645,7 @@ class StdoutRedirector:
             AI_engine.suggest(string, language=settings.language, ok=lang.ok)
 
 
-def call(exe, extra_path=True, out: bool = True):
-    logging.info(exe)
-    if isinstance(exe, list):
-        cmd = exe
-        if extra_path:
-            cmd[0] = f"{settings.tool_bin}{exe[0]}"
-        cmd = [i for i in cmd if i]
-    else:
-        cmd = f'{settings.tool_bin}{exe}' if extra_path else exe
-        if os.name == 'posix':
-            cmd = cmd.split()
-    conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
-    try:
-        ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, creationflags=conf)
-        pid = ret.pid
-        states.open_pids.append(pid)
-        for i in iter(ret.stdout.readline, b""):
-            try:
-                out_put = i.decode("utf-8").strip()
-            except (Exception, BaseException):
-                out_put = i.decode("gbk").strip()
-            if out:
-                print(out_put)
-            else:
-                logging.info(out_put)
-        states.open_pids.remove(pid)
-    except subprocess.CalledProcessError as e:
-        for i in iter(e.stdout.readline, b""):
-            try:
-                out_put = i.decode("utf-8").strip()
-            except (Exception, BaseException):
-                out_put = i.decode("gbk").strip()
-            if out:
-                print(out_put)
-            else:
-                logging.info(out_put)
-        return 2
-    except FileNotFoundError:
-        logging.exception('Bugs')
-        return 2
-    ret.wait()
-    return ret.returncode
+
 
 
 def download_api(url, path=None, int_=True, size_=0):
