@@ -6153,7 +6153,7 @@ class UnpackGui(ttk.LabelFrame):
     def hd(self):
         if not hasattr(self, 'fm'):
             # Using print for debugging, can be replaced with logging.
-            print(f"DEBUG: UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update. Current project: {current_project_name.get()}")
+            logging.debug(f"UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update. Current project: {current_project_name.get()}")
             return
 
         if self.ch.get():
