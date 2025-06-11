@@ -5,7 +5,6 @@
   "pack": "Empacotar",
   "name": "Nome",
   "unpack": "Desempacotar",
-  "not_active": "Este programa não está ativado. Por favor, ative antes de usar!",
   "attribute": "Atributos",
   "set_all": "Selecionar tudo",
   "toolbox": "Caixa de ferramentas",
