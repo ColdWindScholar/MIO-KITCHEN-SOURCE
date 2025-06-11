@@ -5932,12 +5932,43 @@ def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False
     if output_zip is None:
         output_zip = f"{settings.path}/{current_project_name.get()}.zip"
     if not silent:
-        if ask_win(lang.t53) != 1:
+        ok = lang.ok
+        cancel = lang.cancel
+        value = IntVar()
+        pack_hybrid_rom = BooleanVar()
+        pack_hybrid_rom.set(False)
+
+        ask = ttk.LabelFrame(win, text=lang.text122)
+        ask.place(relx=0.5, rely=0.5, anchor="center")
+        frame_inner = ttk.Frame(ask)
+        frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+        ttk.Label(frame_inner, text=lang.t53, font=(None, 15), wraplength=400).pack(side=TOP)
+        ttk.Checkbutton(frame_inner, text=lang.t25, variable=pack_hybrid_rom, onvalue=True, offvalue=False).pack(side=TOP)
+
+        frame_button = ttk.Frame(frame_inner)
+
+        ttk.Button(frame_button, text=cancel, command=lambda: close_ask(0)).pack(side='left', padx=5, pady=5,
+                                                                                 fill=BOTH,
+                                                                                 expand=True)
+        ttk.Button(frame_button, text=ok, command=lambda: close_ask(1), style="Accent.TButton").pack(side='left',
+                                                                                                     padx=5,
+                                                                                                     pady=5,
+                                                                                                     fill=BOTH,
+                                                                                                     expand=True)
+        frame_button.pack(fill=BOTH)
+
+
+
+        def close_ask(value_=1):
+            value.set(value_)
+            ask.destroy()
+        ask.wait_window()
+        if value.get() != 1:
             return
-    print(lang.text91 % current_project_name.get())
-    if not silent:
-        if ask_win(lang.t25) == 1:
+        if pack_hybrid_rom:
             PackHybridRom()
+
+    print(lang.text91 % current_project_name.get())
     with zipfile.ZipFile(output_zip, 'w',
                          compression=zipfile.ZIP_DEFLATED) as zip_:
         for file in utils.get_all_file_paths(input_dir):

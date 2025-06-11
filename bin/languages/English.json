@@ -1,5 +1,7 @@
 {
   "language_file_by": "ColdWindScholar",
+  "yes": "Yes",
+  "no": "No",
   "ok": "OK",
   "cancel": "Cancel",
   "pack": "Pack",
@@ -236,7 +238,7 @@
   "t22": "Version:",
   "t23": "Required libraries:",
   "t24": "Description：",
-  "t25": "Add tools to the ZIP archive so that the firmware can be flashed through fastboot using a PC and through recovery?",
+  "t25": "Add tools to the ZIP archive so that the firmware can be flashed through fastboot using a PC and through recovery",
   "t26": "Please enter your device codename",
   "t27": "Generate list",
   "t28": "Working",
