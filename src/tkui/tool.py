@@ -471,7 +471,7 @@ class ToolBox(ttk.Frame):
             (lang.audit_allow, self.SelinuxAuditAllow), # Selinux Audit Allow
             (lang.trim_image, self.TrimImage), # Trim Image
             (lang.magisk_patch, self.MagiskPatcher), # Magisk Patcher
-            (lang.mergequalcommimage, self.MergeQualcommImage_old) # Merge Qualcomm Image (Legacy)
+            (lang.mergequalcommimage, self.MergequalcommimageOld) # Merge Qualcomm Image (Legacy)
         ]
         width_controls = 3  # Number of buttons per row.
         index_row = 0
@@ -494,7 +494,7 @@ class ToolBox(ttk.Frame):
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
         
 
-    class MergeQualcommImage_old(Toplevel):
+    class MergequalcommimageOld(Toplevel):
         """A Toplevel window for merging Qualcomm sparse images using rawprogram.xml (Legacy version).
 
         I created this to provide a UI for an older method of merging Qualcomm firmware images.
