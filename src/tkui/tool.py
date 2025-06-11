@@ -2283,9 +2283,9 @@ class ModuleManager:
                     logging.error(f"Ошибка при загрузке плагина '{self.get_name(i)}' из '{script_path}/main.py': {e}")
                     logging.exception('Bugs') 
 
-    def get_info(self, id_: str, item: str, default: str = None) -> str:
+    def get_info(self, id_: str, item: str, default: str = None) -> dict:
         if not default:
-            default = ''
+            default = {}
         info_file = f'{self.module_dir}/{id_}/info.json'
         if not os.path.exists(info_file):
             return default
@@ -4262,14 +4262,14 @@ class PackHybridRom:
     def __init__(self):
         if not project_manger.exist():
             win.message_pop(lang.warn1)
-            return
+            return False
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
             os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
         if not os.path.exists(f"{dir_}/images"):
             os.makedirs(f'{dir_}/images')
         if os.path.exists(os.path.join(project_manger.current_work_output_path(), 'payload.bin')):
             print("Found payload.bin ,Stop!")
-            return
+            return False
         if os.path.exists(f'{dir_}/META-INF'):
             rmdir(f'{dir_}/META-INF')
         shutil.copytree(f"{cwd_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
@@ -5962,7 +5962,8 @@ def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False
         if value.get() != 1:
             return
         if pack_hybrid_rom:
-            PackHybridRom()
+            if PackHybridRom() == False:
+                return
 
     print(lang.text91 % current_project_name.get())
     with zipfile.ZipFile(output_zip, 'w',
