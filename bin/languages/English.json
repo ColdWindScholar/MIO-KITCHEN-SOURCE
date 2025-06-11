@@ -274,7 +274,7 @@
   "t61": "Transparent effect",
   "t62": "Wechat Pay",
   "t63": "Open Source, free, faster",
-  "t64": "You are running the source code\\nPlease Use \"git pull\" to update",
+  "t64": "You are running the source code\nPlease Use \"git pull\" to update",
   "mpk_store_button_min_width": "12",
   "dependency_error_title": "Dependency Error",
   "dependency_missing_for_plugin_install": "Cannot install '{plugin_name}'. Missing dependency: '{dependency_name}'. Please install '{dependency_name}' first.",
