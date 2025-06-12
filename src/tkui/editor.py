@@ -25,7 +25,7 @@ from ..core.utils import create_thread, gettype, lang
 
 class PythonEditor(tk.Frame):
     def __init__(self, parent, path, file_name, lexer=pygments.lexers.BashLexer):
-        tk.Frame.__init__(self, parent)
+        super().__init__(parent)
         self.file_name = file_name
         self.path = path
         if not os.path.exists(self.path):
