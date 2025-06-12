@@ -2951,7 +2951,7 @@ class ModuleManager:
                 try:
                     self.wait_window()
                 except tk.TclError:
-                    logging.warning("DEBUG: UninstallMpk.ask - TclError during wait_window.")
+                    logging.exception("UninstallMpk.ask")
 
         def lsdep(self, name_to_check_deps_for=None):
             if not name_to_check_deps_for:
