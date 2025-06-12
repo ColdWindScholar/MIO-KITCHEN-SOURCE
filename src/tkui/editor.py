@@ -20,7 +20,8 @@ from tkinter.ttk import Button
 
 import pygments.lexers
 from chlorophyll import CodeView
-from ..core.utils import create_thread, gettype, lang
+
+from ..core.utils import create_thread, lang
 
 
 class PythonEditor(tk.Frame):
@@ -86,7 +87,7 @@ class PythonEditor(tk.Frame):
                     try:
                         data = f.read().decode("utf-8")
                     except:
-                        data = f.read().decode("gbk")
+                        logging.exception('read license')
                     self.text.insert(tk.END, data)
             except Exception as e:
                 logging.debug(e)
