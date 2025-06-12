@@ -52,17 +52,23 @@ class PythonEditor(tk.Frame):
             file = self.show.get(self.show.curselection())
         except:
             file = ""
+        if file == '..':
+            self.path = os.path.dirname(self.path)
+            self.refs()
+            return
         var = os.path.abspath(os.path.join(self.path, file))
-        if os.path.isfile(var):
+        if os.path.isdir(var):
+            self.path = var
+            self.refs()
+        elif os.path.isfile(var):
             self.file_name = os.path.basename(var)
             self.load()
 
     def refs(self):
         self.show.delete(0, END)
+        self.show.insert(END, "..")
         for f in os.listdir(self.path):
-            if os.path.isfile(os.path.join(self.path, f)):
-                if gettype(os.path.join(self.path, f)) == 'unknown':
-                    self.show.insert(END, f)
+            self.show.insert(END, f)
         self.load()
 
     def save(self):
