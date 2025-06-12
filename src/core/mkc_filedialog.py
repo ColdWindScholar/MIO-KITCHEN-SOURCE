@@ -45,7 +45,7 @@ class askopenfilenames(Toplevel):
         self.path = StringVar()
         self.paths = Entry(self, textvariable=self.path)
         self.paths.bind("<Return>", lambda x:self.p_bind())
-        self.path.set(os.path.abspath("/"))
+        self.path.set(os.path.abspath(os.getcwd()))
         self.paths.pack(fill=X, padx=5, pady=5)
         self.show = Listbox(self, activestyle='dotbox', highlightthickness=0)
         self.show.bind("<Double-Button-1>", lambda x:self.p_bind())
@@ -64,6 +64,8 @@ class askopenfilenames(Toplevel):
             file = self.show.get(self.show.curselection())
         except:
             file = ""
+        if not file:
+            return
         var = os.path.abspath(os.path.join(self.path.get(), file))
         if file == '..':
             var = os.path.join(os.path.dirname(self.path.get()))
@@ -76,7 +78,7 @@ class askopenfilenames(Toplevel):
     def refs(self):
         self.show.delete(0, END)
         if not self.path.get():
-            self.path.set(os.path.abspath("/"))
+            self.path.set(os.path.abspath(os.getcwd()))
         self.show.insert(END, '..')
         f, e = self.type.get().replace("*", "").split(".")
         try:
@@ -110,7 +112,7 @@ class askdirectorys(Toplevel):
         self.path = StringVar()
         self.paths = Entry(self, textvariable=self.path)
         self.paths.bind("<Return>", self.p_bind)
-        self.path.set(os.path.abspath("/"))
+        self.path.set(os.path.abspath(os.getcwd()))
         self.paths.pack(fill=X, padx=5, pady=5)
         self.show = Listbox(self, activestyle='dotbox', highlightthickness=0)
         self.show.bind("<Double-Button-1>", self.p_bind)

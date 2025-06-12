@@ -63,7 +63,7 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.dumper import Dumper
 from src.core.utils import lang, LogoDumper, States, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -6027,7 +6027,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
     def listdir(self):
         hide_items = ['bin', 'src']
         array = [f for f in os.listdir(settings.path) if
-                 os.path.isdir(settings.path + os.sep + f) and f not in hide_items and not f.startswith('.')]
+                 os.path.isdir(f'{settings.path}/{f}') and f not in hide_items and not f.startswith('.')]
         origin_project = current_project_name.get()
         self.combobox["value"] = array
         if not array:
@@ -6257,14 +6257,7 @@ class UnpackGui(ttk.LabelFrame):
             Packxx(lbs)
 
 
-def img2simg(path: str):
-    call(['img2simg', path, f'{path}s'])
-    if os.path.exists(path + 's'):
-        try:
-            os.remove(path)
-            os.rename(path + 's', path)
-        except Exception:
-            logging.exception('Bugs')
+
 
 
 class FormatConversion(ttk.LabelFrame):

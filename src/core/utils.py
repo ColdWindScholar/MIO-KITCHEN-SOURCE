@@ -580,6 +580,14 @@ def payload_reader(payloadfile):
     dam.ParseFromString(manifest)
     return dam
 
+def img2simg(path: str):
+    call(['img2simg', path, f'{path}s'])
+    if os.path.exists(path + 's'):
+        try:
+            os.remove(path)
+            os.rename(path + 's', path)
+        except Exception:
+            logging.exception('Bugs')
 
 class Vbpatch:
     def __init__(self, file_):
