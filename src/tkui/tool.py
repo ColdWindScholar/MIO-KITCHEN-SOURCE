@@ -2271,10 +2271,16 @@ class ModuleManager:
         self.uninstall_gui = self.UninstallMpk
         self.new = self.New
         self.new.module_dir = self.module_dir
-        self.get_installed = lambda id_: os.path.exists(os.path.join(self.module_dir, id_))
         self.addon_loader = loader
         self.addon_entries = Entry
         create_thread(self.load_plugins)
+
+    def get_installed(self, id_):
+        path = os.path.join(self.module_dir, id_)
+        if os.path.exists(path) and os.path.isdir(path):
+            if os.path.exists(os.path.join(path, 'info.json')):
+                return True
+        return False
 
     def is_virtual(self, id_):
         return id_ in self.addon_loader.virtual.keys()
@@ -4391,7 +4397,7 @@ class PackHybridRom:
     def __init__(self):
         if not project_manger.exist():
             win.message_pop(lang.warn1)
-            return False
+            return
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
             os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
         if not os.path.exists(f"{dir_}/images"):
@@ -4771,11 +4777,14 @@ class StdoutRedirector:
 
 
 def download_api(url, path=None, int_=True, size_=0):
+    """
+    return percentage, speed, bytes_downloaded, file_size, elapsed
+    """
     start_time = time.time()
     session = requests.Session()  # Create a session once
 
     try:
-        # HEAD request to get the file size. verify=True by default.
+        # HEAD request to get the file size. Verify=True by default.
         # Add a timeout to prevent hanging
         response_head = session.head(url, timeout=10)  # 10-second timeout
         response_head.raise_for_status()  # Check for HTTP errors (4xx, 5xx)
@@ -4977,7 +4986,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         print("Failed to Pack boot...")
     else:
         os.remove(boot)
-        os.rename(source + "/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
+        os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
         os.chdir(cwd_path)
         try:
             rmdir(source)
