@@ -2275,24 +2275,24 @@ class ModuleManager:
         self.addon_entries = Entry
         create_thread(self.load_plugins)
 
-    def get_installed(self, id_):
+    def is_installed(self, id_) -> bool:
         path = os.path.join(self.module_dir, id_)
         if os.path.exists(path) and os.path.isdir(path):
             if os.path.exists(os.path.join(path, 'info.json')):
                 return True
         return False
 
-    def is_virtual(self, id_):
+    def is_virtual(self, id_) -> bool:
         return id_ in self.addon_loader.virtual.keys()
 
-    def get_name(self, id_):
+    def get_name(self, id_) -> str:
         if self.is_virtual(id_):
             return self.addon_loader.virtual[id_].get("name", id_)
         return name if (name := self.get_info(id_, 'name')) else id_
 
     def list_packages(self):
         for i in os.listdir(self.module_dir):
-            if self.get_installed(i):
+            if self.is_installed(i):
                 if os.path.isdir(os.path.join(self.module_dir, i)):
                     yield i
 
@@ -2435,6 +2435,8 @@ class ModuleManager:
             with zipfile.ZipFile(mpk) as f:
                 if 'info' not in f.namelist():
                     return module_error_codes.IsBroken, 'Missing info file'
+                if 'icon' not in f.namelist():
+                    return module_error_codes.Normal, 'Missing icon file'
         except zipfile.BadZipFile:
             return module_error_codes.IsBroken, 'Corrupted MPK archive'
         return module_error_codes.Normal, ''
@@ -2702,7 +2704,7 @@ class ModuleManager:
         def create(self):
             if not self.identifier.get():
                 return
-            if module_manager.get_installed(self.identifier.get()):
+            if module_manager.is_installed(self.identifier.get()):
                 info_win(lang.warn19 % self.identifier.get())
                 return
             data = {
@@ -2850,7 +2852,7 @@ class ModuleManager:
 
             self.module_dir = module_manager.module_dir
 
-            if id_ and module_manager.get_installed(id_):
+            if id_ and module_manager.is_installed(id_):
                 self.check_pass = True
                 self.value2 = module_manager.get_name(id_)
                 self.lsdep()
@@ -3102,7 +3104,7 @@ class MpkMan(ttk.Frame):
         logging.debug(f"DEBUG: MpkMan.list_pls - Phase 1: Currently displayed plugin IDs: {current_displayed_ids}")
 
         for displayed_id in current_displayed_ids:
-            is_physical_installed = module_manager.get_installed(displayed_id)
+            is_physical_installed = module_manager.is_installed(displayed_id)
             is_virtual = module_manager.is_virtual(displayed_id)
             logging.debug(
                 f"DEBUG: MpkMan.list_pls - Checking ID '{displayed_id}': physical_installed={is_physical_installed}, virtual={is_virtual}")
@@ -3828,7 +3830,7 @@ class MpkStore(Toplevel):
             if not buttons_valid:
                 return
 
-            is_installed = module_manager.get_installed(plugin_id)  # Check installation status.
+            is_installed = module_manager.is_installed(plugin_id)  # Check installation status.
             logging.debug(f"MpkStore.update_plugin_state: Plugin '{plugin_id}' is_installed: {is_installed}")
 
             # Configure buttons based on installation status.
@@ -4029,7 +4031,7 @@ class MpkStore(Toplevel):
             uninstall_button.pack(side=TOP, fill=X, pady=(3, 0))
 
             # Set initial state of buttons based on whether the plugin is installed.
-            if not module_manager.get_installed(plugin_id):
+            if not module_manager.is_installed(plugin_id):
                 bu.config(style="Accent.TButton")
                 uninstall_button.config(state='disabled')
             else:
@@ -4051,7 +4053,7 @@ class MpkStore(Toplevel):
 
         if self.winfo_exists() and id_ in self.control:
             install_button, uninstall_button = self.control[id_]
-            is_installed_after_attempt = module_manager.get_installed(id_)
+            is_installed_after_attempt = module_manager.is_installed(id_)
 
             if not is_installed_after_attempt:
                 install_button.config(text=lang.text21, style="Accent.TButton", state='normal')
@@ -4153,7 +4155,7 @@ class MpkStore(Toplevel):
                 if not self.winfo_exists(): dependencies_ok = False; break
                 if not dep_id_str: continue
 
-                if module_manager.get_installed(dep_id_str):
+                if module_manager.is_installed(dep_id_str):
                     logging.info(
                         f"MpkStore.download: Dependency '{dep_id_str}' for plugin '{id_}' is already installed. Skipping.")
                     continue
@@ -4172,7 +4174,7 @@ class MpkStore(Toplevel):
                         dep_info.get('depend')
                     )
 
-                    if not module_manager.get_installed(dep_id_str):
+                    if not module_manager.is_installed(dep_id_str):
                         logging.error(
                             f"MpkStore.download: Dependency '{dep_name_display}' for plugin '{plugin_display_name}' failed to install.")
                         if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
@@ -4331,7 +4333,7 @@ class MpkStore(Toplevel):
                                       uninstall_button_final and uninstall_button_final.winfo_exists()
 
                 if buttons_exist_final:
-                    is_installed_final = module_manager.get_installed(id_)
+                    is_installed_final = module_manager.is_installed(id_)
                     if is_installed_final:
                         install_button_final.config(text=getattr(lang, 'plugin_installed_button', lang.text21),
                                                     state='disabled', style="")
