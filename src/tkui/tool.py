@@ -2867,8 +2867,7 @@ class ModuleManager:
                 if self.winfo_exists():
                     self.attributes('-topmost', 'true')
             except tk.TclError:
-                logging.warning("DEBUG: UninstallMpk.ask - TclError setting -topmost.")
-                pass
+                logging.exception('Uninstall Mpk')
 
             self.title(getattr(lang, "t6", "Uninstall Plugin"))
 
