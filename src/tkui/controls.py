@@ -13,7 +13,7 @@
 # limitations under the License.
 from tkinter.ttk import Frame, Scrollbar, Checkbutton, Separator
 from tkinter import Canvas, Tk, X, BooleanVar, HORIZONTAL, TclError
-from ..core.utils import lang
+from src.core.utils import lang
 
 
 class ListBox(Frame):
@@ -127,8 +127,10 @@ class ScrollFrame(Frame):
 
 
 if __name__ == '__main__':
+    from sv_ttk import use_dark_theme
     a = Tk()
     b = ListBox(a)
+    use_dark_theme()
     b.gui()
     b.insert('nb', 'n')
     b.insert('nb', 'n')
