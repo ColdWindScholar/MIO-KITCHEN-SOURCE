@@ -728,11 +728,13 @@ class States:
     donate_window = False
     mpk_store = False
     open_pids = []
-    run_source = gettype(sys.argv[0]) == "unknown"
+    run_source = gettype(sys.argv[0]) == "unknown" and os.path.isdir(os.path.join(prog_path, '.git'))
     in_oobe = False
     development = False
     inited = False
     open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
+    if os.name == 'posix':
+        root = os.getuid() == 0
 states = States()
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):

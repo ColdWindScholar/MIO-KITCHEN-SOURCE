@@ -282,5 +282,6 @@
   "dependency_installation_failed_msg": "Installation of plugin '{plugin_name}' aborted because dependency '{dep_name}' failed to install.",
   "plugin_installed_button": "Installed",
   "plugin_install_failed_mpkstore": "Failed to install plugin {plugin_name}: {reason_text}",
-  "warn_empty_url": "Please enter a firmware link."
+  "warn_empty_url": "Please enter a firmware link.",
+  "git_not_installed": "git not installed so that we cannot update code."
 }
