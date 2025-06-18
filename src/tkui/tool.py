@@ -1394,15 +1394,15 @@ class Updater(Toplevel):
         self.notice = ttk.Label(f2, text=lang.t42)
         self.notice.pack(padx=5, pady=5)
         if states.run_source:
-            ttk.Label(self, text=lang.t64, foreground='gray',
-                      justify='center').pack(fill=X, pady=10,
-                                             padx=10, anchor='center')
-            move_center(self)
-            return
+            if not shutil.which('git'):
+                ttk.Label(self, text=lang.git_not_installed, foreground='orange', font=(None, 12)).pack(padx=5, pady=5)
+
+                move_center(self)
+                return
         self.change_log = Text(f2, width=50, height=15)
         self.change_log.pack(padx=5, pady=5)
         f2.pack(fill=BOTH, padx=5, pady=5)
-        self.progressbar = ttk.Progressbar(self, length=200, mode='determinate', orient=tkinter.HORIZONTAL, maximum=100
+        self.progressbar = ttk.Progressbar(self, length=200, mode='determinate', orient='horizontal', maximum=100
                                            )
         self.progressbar.pack(padx=5, pady=10)
         f3 = ttk.Frame(self)
@@ -1427,15 +1427,28 @@ class Updater(Toplevel):
     def get_update(self):
         if self.update_button.cget('text') == lang.t40:
             self.update_button.configure(state='disabled', text=lang.t43)
-            try:
-                self.download()
-                self.update_process()
-            except (Exception, BaseException):
+            if not states.run_source:
+                try:
+                    self.download()
+                    self.update_process()
+                except (Exception, BaseException):
+                    self.notice.configure(text=lang.t44, foreground='red')
+                    self.update_button.configure(state='normal', text=lang.text37)
+                    self.progressbar.stop()
+                    logging.exception("Upgrade")
+                    return
+            elif shutil.which('git'):
+                os.chdir(cwd_path)
+                self.progressbar.configure(mode='indeterminate')
+                self.progressbar.start()
+                call(['git', 'pull'], extra_path=False)
+                self.update_button.configure(state='normal', text=lang.t38)
+                self.progressbar.stop()
+            else:
                 self.notice.configure(text=lang.t44, foreground='red')
                 self.update_button.configure(state='normal', text=lang.text37)
+                self.progressbar['value'] = 0
                 self.progressbar.stop()
-                logging.exception("Upgrade")
-                return
             return
         self.notice.configure(text=lang.t45, foreground='')
         self.change_log.delete(1.0, tk.END)
@@ -6687,8 +6700,11 @@ def __init__tk(args: list):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
         open(tool_log, 'w', encoding="utf-8", newline="\n").close()
-    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
+    if not states.development:
+        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
+    else:
+        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
     global win
     win = Tool()
     if os.name == 'nt':

@@ -730,11 +730,15 @@ class States:
     open_pids = []
     run_source = gettype(sys.argv[0]) == "unknown" and os.path.isdir(os.path.join(prog_path, '.git'))
     in_oobe = False
-    development = False
+    development = True
     inited = False
     open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
     if os.name == 'posix':
         root = os.getuid() == 0
+    elif os.name == 'nt':
+        root = windll.shell32.IsUserAnAdmin()
+    else:
+        root = None
 states = States()
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):
