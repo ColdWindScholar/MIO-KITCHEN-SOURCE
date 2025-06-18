@@ -730,7 +730,7 @@ class States:
     open_pids = []
     run_source = gettype(sys.argv[0]) == "unknown" and os.path.isdir(os.path.join(prog_path, '.git'))
     in_oobe = False
-    development = True
+    development = False
     inited = False
     open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
     if os.name == 'posix':
