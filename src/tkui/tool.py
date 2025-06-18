@@ -2424,7 +2424,7 @@ class ModuleManager:
             shell_command_prefix = 'ash' if os.name == 'posix' else 'bash'
             full_shell_command = f"{exports} exec {norm_module_exec} {norm_main_sh_path}"
 
-            call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command], extra_path=False)
+            call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command])
             return call_result
 
         elif os.path.exists(main_py_path) and imp:
