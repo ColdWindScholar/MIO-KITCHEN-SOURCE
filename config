@@ -193,7 +193,7 @@ def check_supported(args):
         file_list.append('cygwin1.dll')
         file_list.append('mv.exe')
     if os.path.exists(tool_bin):
-        LOGS("Your Device was Supported!")
+        LOGS("Your Device was Supported Fully!")
         lost_binary = [i for i in file_list if not os.path.exists(os.path.join(tool_bin, i))]
         if lost_binary:
             LOGE(f"But The Following Binary Were Lost:{lost_binary}")
@@ -205,7 +205,7 @@ if __name__ == '__main__':
                                            description='Valid subcommands')
     unpack_rom_parser = subparser.add_parser('upbin', help="update binary")
     unpack_rom_parser.set_defaults(func=update)
-    check_support = subparser.add_parser('chksupd', help='check if supported this machine')
+    check_support = subparser.add_parser('check', help='check if supported this machine')
     check_support.set_defaults(func=check_supported)
     subcmd, subcmd_args = parser.parse_known_args()
     if not hasattr(subcmd, 'func'):
