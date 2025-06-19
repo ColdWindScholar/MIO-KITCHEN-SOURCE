@@ -5815,8 +5815,7 @@ def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> i
 
 
 def info_win(text: str, ok: str = None, master: Toplevel = None):
-    if ok is None:
-        ok = lang.ok
+    ok = ok or lang.ok
     if master is None:
         master = Toplevel()
     frame_inner = ttk.Frame(master)
