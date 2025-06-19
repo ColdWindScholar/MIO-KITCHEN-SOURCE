@@ -3921,8 +3921,7 @@ class MpkStore(Toplevel):
             logging.warning("MpkStore.add_app: Window destroyed, cannot add apps.")
             return
 
-        if app_dict is None:
-            app_dict = []
+        app_dict = app_dict or []
 
         logging.info(f"MpkStore.add_app: Attempting to add/update {len(app_dict)} plugin UI elements.")
         new_items_added_count = 0
