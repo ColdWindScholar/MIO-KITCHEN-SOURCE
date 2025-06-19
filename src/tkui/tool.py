@@ -4824,8 +4824,7 @@ def download_api(url, path=None, int_=True, size_=0):
     last_time = time.time()
     if file_size == 0 and size_ > 0:  # Use the provided size_ if not obtained from the header
         file_size = size_
-
-    file_save_path = os.path.join(settings.path if path is None else path, os.path.basename(url))
+    file_save_path = os.path.join(path or settings.path, os.path.basename(url))
     logging.info(f"Starting download: {url} to {file_save_path}, expected size: {file_size}")
 
     try:
