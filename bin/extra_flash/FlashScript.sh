@@ -42,16 +42,16 @@ function start_flash() {
       [ "$img" == "preloader_raw.img" ] && continue
       if [ "$(basename "$img" .img.zst)" != "$(basename "$img")" ];then
         echo "Uncompressing $(basename "$img")"
-        $zstd --rm -d "$img" -o images/"$(basename "$img" .zst)"
-        img=images/"$(basename "$img" .zst)"
+        $zstd --rm -d images/"$img" -o images/"$(basename "$img" .zst)"
+        img=$(basename "$img" .zst)
       fi
       part=$(basename "$part" .img)
       echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$part]\e[0m"
       if [ "$isab" == 'true' ];then
-        flash "$part"_a "$img"
-        flash "$part"_b "$img"
+        flash "$part"_a images/"$img"
+        flash "$part"_b images/"$img"
       else
-        flash "$part" "$img"
+        flash "$part" images/"$img"
       fi
     done
     [ -e images/cust.img ] && flash cust images/cust.img
