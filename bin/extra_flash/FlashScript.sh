@@ -45,7 +45,7 @@ function start_flash() {
         $zstd --rm -d images/"$img" -o images/"$(basename "$img" .zst)"
         img=$(basename "$img" .zst)
       fi
-      part=$(basename "$part" .img)
+      part=$(basename "$img" .img)
       echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$part]\e[0m"
       if [ "$isab" == 'true' ];then
         flash "$part"_a images/"$img"
