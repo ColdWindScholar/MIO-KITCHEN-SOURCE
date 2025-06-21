@@ -70,7 +70,7 @@ function home() {
   echo -e "\e[1;36m[1]\e[0m\e[1;33m Keep all data and flash it in\e[0m"
   echo -e "\e[1;36m[2]\e[0m\e[1;33m Erase Userdata and flash in\e[0m"
   if [ ! -z "$right_device" ]; then
-    echo -e "\e[1;31mAttention: This ROM is specifically made for [$right_device!], and cannot be flashed on other models.\e[0m"
+    echo -e "\e[1;31mAttention: This ROM is specifically made for [$right_device], and cannot be flashed on other models.\e[0m"
   else
     echo -e "\e[1;31mAttention: Please ensure the rom is for your device before flashing.\e[0m"
   fi
