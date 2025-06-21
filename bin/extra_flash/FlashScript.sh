@@ -37,15 +37,15 @@ function start_flash() {
     fi
     for img in $(ls images)
     do
-      [ "$img" == "super.img" ] && continue
-      [ "$img" == "cust.img" ] && continue
-      [ "$img" == "preloader_raw.img" ] && continue
       if [ "$(basename "$img" .img.zst)" != "$(basename "$img")" ];then
         echo "Uncompressing $(basename "$img")"
         $zstd --rm -d images/"$img" -o images/"$(basename "$img" .zst)"
         img=$(basename "$img" .zst)
       fi
       part=$(basename "$img" .img)
+      [ "$part" == "super" ] && continue
+      [ "$part" == "cust" ] && continue
+      [ "$part" == "preloader_raw" ] && continue
       echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$part]\e[0m"
       if [ "$isab" == 'true' ];then
         flash "$part"_a images/"$img"
@@ -55,7 +55,7 @@ function start_flash() {
       fi
     done
     [ -e images/cust.img ] && flash cust images/cust.img
-    [ -e images/super.img ] && flash cust images/super.img
+    [ -e images/super.img ] && flash super images/super.img
     if [ -e images/preloader_raw.img ]; then
       flash preloader_a images/preloader_raw.img
       flash preloader_b images/preloader_raw.img
