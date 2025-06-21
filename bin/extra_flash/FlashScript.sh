@@ -40,6 +40,11 @@ function start_flash() {
       [ "$img" == "super.img" ] && continue
       [ "$img" == "cust.img" ] && continue
       [ "$img" == "preloader_raw.img" ] && continue
+      if [ "$(basename "$img" .img.zst)" != "$(basename "$img")" ];then
+        echo "Uncompressing $(basename "$img")"
+        $zstd --rm -d "$img" -o images/"$(basename "$img" .zst)"
+        img=images/"$(basename "$img" .zst)"
+      fi
       part=$(basename "$part" .img)
       echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$part]\e[0m"
       if [ "$isab" == 'true' ];then
@@ -50,27 +55,14 @@ function start_flash() {
       fi
     done
     [ -e images/cust.img ] && flash cust images/cust.img
+    [ -e images/super.img ] && flash cust images/super.img
     if [ -e images/preloader_raw.img ]; then
       flash preloader_a images/preloader_raw.img
       flash preloader_b images/preloader_raw.img
       flash preloader1 images/preloader_raw.img
       flash preloader2 images/preloader_raw.img
     fi
-    """
-for /f "delims=" %%a in ('dir /b "images\*.zst"')do (
-echo.正在转换 %%~na
-!zstd! --rm -d images/%%~nxa -o images/%%~na
-echo 开始刷入 %%~na
-set name=%%~na
-!fastboot! flash !name:~0,-4! images\%%~na
-)
-if "!xz!" == "1" %e% {0A}已保留全部数据,准备重启！{#}{\n}
-if "!xz!" == "2" (echo 正在格式化DATA
-!fastboot! erase userdata
-!fastboot! erase metadata)
-if "!fqlx!"=="AB" (!fastboot! set_active a %sg%)
-!fastboot! reboot
-    """
+    [ "$isab" == 'true' ]&& $fastboot set_active a
 }
 function home() {
   echo -e "\e[1;34mMio-kitchen Flash Script\e[0m"
@@ -84,6 +76,13 @@ function home() {
   fi
   read -p "Please select:" flash_type
   start_flash
-
+  if [ "$flash_type" == "2" ]; then
+    echo "Formatting Userdata"
+    $fastboot erase userdata
+    $fastboot erase metadata
+  fi
+  echo  -e "\e[1;32mFlash completed\e[0m"
+  read -p "Reboot The Device?[y/n]" if_reboot
+  [ "$if_reboot" == "y" ] && $fastboot reboot
 }
 home
