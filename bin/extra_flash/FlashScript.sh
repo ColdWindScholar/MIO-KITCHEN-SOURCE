@@ -27,7 +27,7 @@ function flash() {
   fi
 }
 function start_flash() {
-    echo -e "\e[1;30mYour phone must be in Bootloader mode, waiting for the device.\e[0m"
+    echo -e "\e[1;40mYour phone must be in Bootloader mode, waiting for the device.\e[0m"
     device_code=$($fastboot getvar product 2>&1 | grep "^product: " | sed s/"product: "//g)
     slots=$($fastboot getvar slot-count 2>&1 | grep "^slot-count: " | sed s/"slot-count: "//g)
     echo -e "\e[1;32mDevice detected:[$device_code]; Slots:$slots\e[0m"
