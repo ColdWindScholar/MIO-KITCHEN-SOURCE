@@ -18,6 +18,7 @@ function check_fastboot() {
 fi
 }
 function flash() {
+  echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$1]\e[0m"
   $fastboot flash "$1" "$2"
   if [ "$?" == 0 ];then
     echo -e "\e[1;32mFlashing $1 completed\e[0m"
@@ -46,7 +47,6 @@ function start_flash() {
       [ "$part" == "super" ] && continue
       [ "$part" == "cust" ] && continue
       [ "$part" == "preloader_raw" ] && continue
-      echo -e "\e[1;33mFlashing\e[0m \e[1;36m[$part]\e[0m"
       if [ "$isab" == 'true' ];then
         flash "$part"_a images/"$img"
         flash "$part"_b images/"$img"
