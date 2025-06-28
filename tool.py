@@ -21,7 +21,8 @@ if sys.version_info.major == 3:
 try:
     from src.tkui.tool import *
 except Exception as e:
-    input(f"Sorry! We cannot init the tool.\nPlease clone source again!\n{e}")
+    print(e)
+    input(f"Sorry! We cannot init the tool.\nPlease clone source again!")
     sys.exit(1)
 
 if __name__ == "__main__":
