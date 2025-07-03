@@ -17,13 +17,16 @@ import argparse
 import gzip
 import json
 import platform
+import re
 import shutil
 import subprocess
 import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-
+from src.core.avb_disabler import process_fstab
+from src.core.encryption_disabler import process_fstab_for_encryption
+from src.core import merge_sparse 
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
@@ -472,13 +475,16 @@ class ToolBox(ttk.Frame):
         """
         self.pack_basic()
         functions = [
-            (lang.text114, lambda: create_thread(download_file)),  # Download File
-            (lang.t59, self.GetFileInfo),  # Get File Info
-            (lang.t60, self.FileBytes),  # File Bytes Operations
-            (lang.audit_allow, self.SelinuxAuditAllow),  # Selinux Audit Allow
-            (lang.trim_image, self.TrimImage),  # Trim Image
-            (lang.magisk_patch, self.MagiskPatcher),  # Magisk Patcher
-            (lang.mergequalcommimage, self.MergequalcommimageOld)  # Merge Qualcomm Image (Legacy)
+            (lang.text114, lambda: create_thread(download_file)), # Download File
+            (lang.t59, self.GetFileInfo), # Get File Info
+            (lang.t60, self.FileBytes), # File Bytes Operations
+            (lang.audit_allow, self.SelinuxAuditAllow), # Selinux Audit Allow
+            (lang.disable_avb, self.DisableAVB),
+            (lang.disable_encryption, self.DisableEncryption),
+            (lang.trim_image, self.TrimImage), # Trim Image
+            (lang.magisk_patch, self.MagiskPatcher), # Magisk Patcher
+            (lang.mergequalcommimage, self.MergequalcommimageOld), # Merge Qualcomm Image (Legacy)
+            (lang.merge_file_segments, self.MergeSparseImage)
         ]
         width_controls = 3  # Number of buttons per row.
         index_row = 0
@@ -1039,6 +1045,404 @@ class ToolBox(ttk.Frame):
             self.choose_button.configure(state='disabled')
             self.do_trim()
             self.button.configure(text=lang.done, state='normal', style='')
+
+    class DisableAVB(Toplevel):
+        """A Toplevel window for disabling AVB by patching fstab files in the current project."""
+        def __init__(self):
+            super().__init__()
+            self.title(lang.disable_avb)
+            self.minsize(450, 350)
+            # A dictionary to store {partition_name: [list_of_fstab_paths]}
+            self.partitions_with_fstab = {}
+            self.gui()
+            move_center(self)
+            create_thread(self.scan_partitions)
+
+        def gui(self):
+            """Creates the graphical user interface for the window."""
+            info_frame = ttk.Frame(self)
+            info_frame.pack(padx=10, pady=(10, 5), fill=X)
+            ttk.Label(info_frame, text=lang.disable_avb_info, wraplength=400).pack(fill=X)
+
+            main_frame = ttk.LabelFrame(self, text=lang.available_partitions)
+            main_frame.pack(padx=10, pady=5, fill=BOTH, expand=True)
+
+            self.list_box = ListBox(main_frame)
+            self.list_box.gui()
+            self.list_box.pack(padx=5, pady=5, fill=BOTH, expand=True)
+
+            button_frame = ttk.Frame(self)
+            button_frame.pack(padx=10, pady=(5, 10), fill=X, side=BOTTOM)
+
+            ttk.Button(button_frame, text=lang.refresh, command=self.scan_partitions).pack(side=LEFT, padx=(0, 5))
+
+            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton", command=self.run_disable_avb)
+            self.run_button.pack(side=RIGHT, fill=X, expand=True)
+
+        def scan_partitions(self):
+            """Scans the project for partitions containing fstab files and displays them."""
+            self.list_box.clear()
+            self.partitions_with_fstab.clear()
+
+            if not project_manger.exist():
+                print(lang.project_not_selected)
+                self.run_button.config(state='disabled')
+                return
+
+            work_path = project_manger.current_work_path()
+            parts_info_path = os.path.join(work_path, 'config', 'parts_info')
+            parts_dict = {}
+            if os.path.exists(parts_info_path):
+                parts_dict = JsonEdit(parts_info_path).read()
+
+            # Scan and group fstab files by their parent partition
+            for item_name in sorted(os.listdir(work_path)):
+                item_path = os.path.join(work_path, item_name)
+                if os.path.isdir(item_path):
+                    for root, _, files in os.walk(item_path):
+                        for file in files:
+                            if 'fstab' in file.lower():
+                                if item_name not in self.partitions_with_fstab:
+                                    self.partitions_with_fstab[item_name] = []
+                                self.partitions_with_fstab[item_name].append(os.path.join(root, file))
+
+            # Populate the ListBox with unique partitions
+            if not self.partitions_with_fstab:
+                print(lang.no_fstab_partitions_found)
+                self.run_button.config(state='disabled')
+            else:
+                for partition_name in self.partitions_with_fstab.keys():
+                    fs_type = parts_dict.get(partition_name, 'unknown')
+                    display_text = f"{partition_name} [{fs_type}]"
+                    self.list_box.insert(display_text, partition_name)
+                self.run_button.config(state='normal')
+
+        def run_disable_avb(self):
+            """Starts the process to disable AVB."""
+            selected_partitions = self.list_box.selected
+            if not selected_partitions:
+                warn_win(lang.select_partition_to_disable_avb)
+                return
+
+            self.run_button.config(state='disabled', text=lang.running)
+            create_thread(self._process_in_thread, selected_partitions)
+
+        def _process_in_thread(self, selected_partitions):
+            """Background thread for processing."""
+            processed_count = 0
+            for partition_name in selected_partitions:
+                if partition_name in self.partitions_with_fstab:
+                    print(f"--- {lang.processing_partition.format(partition=partition_name)} ---")
+                    # Process all fstab files found in this partition
+                    for fstab_path in self.partitions_with_fstab[partition_name]:
+                        process_fstab(fstab_path) # Call the AVB patcher
+                    processed_count += 1
+
+            def final_actions():
+                """Safely update the GUI from the main thread."""
+                if self.winfo_exists():
+                    self.run_button.config(state='normal', text=lang.run)
+                    info_win(lang.disable_avb_completed.format(processed_count=processed_count))
+                    self.destroy()
+
+            self.after(0, final_actions)
+
+
+    class DisableEncryption(Toplevel):
+        """A Toplevel window for disabling forced encryption by patching fstab files."""
+        def __init__(self):
+            super().__init__()
+            self.title(lang.disable_encryption)
+            self.minsize(450, 350)
+            self.partitions_with_fstab = {}
+            self.gui()
+            move_center(self)
+            create_thread(self.scan_partitions)
+
+        def gui(self):
+            """Creates the graphical user interface for the window."""
+            info_frame = ttk.Frame(self)
+            info_frame.pack(padx=10, pady=(10, 5), fill=X)
+            ttk.Label(info_frame, text=lang.disable_encryption_info, wraplength=400).pack(fill=X)
+
+            main_frame = ttk.LabelFrame(self, text=lang.available_partitions)
+            main_frame.pack(padx=10, pady=5, fill=BOTH, expand=True)
+
+            self.list_box = ListBox(main_frame)
+            self.list_box.gui()
+            self.list_box.pack(padx=5, pady=5, fill=BOTH, expand=True)
+
+            button_frame = ttk.Frame(self)
+            button_frame.pack(padx=10, pady=(5, 10), fill=X, side=BOTTOM)
+
+            ttk.Button(button_frame, text=lang.refresh, command=self.scan_partitions).pack(side=LEFT, padx=(0, 5))
+
+            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton", command=self.run_disable_encryption)
+            self.run_button.pack(side=RIGHT, fill=X, expand=True)
+
+        def scan_partitions(self):
+            """Scans the current project for all partitions containing fstab files."""
+            self.list_box.clear()
+            self.partitions_with_fstab.clear()
+
+            if not project_manger.exist():
+                print(lang.project_not_selected)
+                self.run_button.config(state='disabled')
+                return
+
+            work_path = project_manger.current_work_path()
+            parts_info_path = os.path.join(work_path, 'config', 'parts_info')
+            parts_dict = {}
+            if os.path.exists(parts_info_path):
+                parts_dict = JsonEdit(parts_info_path).read()
+
+            for item_name in sorted(os.listdir(work_path)):
+                item_path = os.path.join(work_path, item_name)
+                if os.path.isdir(item_path):
+                    for root, _, files in os.walk(item_path):
+                        for file in files:
+                            if 'fstab' in file.lower():
+                                if item_name not in self.partitions_with_fstab:
+                                    self.partitions_with_fstab[item_name] = []
+                                self.partitions_with_fstab[item_name].append(os.path.join(root, file))
+
+            if not self.partitions_with_fstab:
+                print(lang.no_fstab_partitions_found)
+                self.run_button.config(state='disabled')
+            else:
+                for partition_name in self.partitions_with_fstab.keys():
+                    fs_type = parts_dict.get(partition_name, 'unknown')
+                    display_text = f"{partition_name} [{fs_type}]"
+                    self.list_box.insert(display_text, partition_name)
+                self.run_button.config(state='normal')
+
+        def run_disable_encryption(self):
+            """Starts the process to disable encryption for selected partitions."""
+            selected_partitions = self.list_box.selected
+            if not selected_partitions:
+                warn_win(lang.select_partition_to_disable_avb)
+                return
+
+            self.run_button.config(state='disabled', text=lang.running)
+            create_thread(self._process_in_thread, selected_partitions)
+
+        def _process_in_thread(self, selected_partitions):
+            """Internal method for execution in a separate thread."""
+            modified_count = 0
+            for partition_name in selected_partitions:
+                if partition_name in self.partitions_with_fstab:
+                    print(f"--- {lang.processing_partition.format(partition=partition_name)} ---")
+                    for fstab_path in self.partitions_with_fstab[partition_name]:
+                        process_fstab_for_encryption(fstab_path)
+                    modified_count += 1
+
+            def final_actions():
+                """This function is executed in the main GUI thread for safe UI updates."""
+                if not self.winfo_exists():
+                    return
+
+                self.run_button.config(state='normal', text=lang.run)
+                info_win(lang.disable_encryption_completed.format(modified_count=modified_count))
+                self.destroy()
+
+            self.after(0, final_actions)
+            
+
+    class MergeSparseImage(Toplevel):
+        """
+        A Toplevel window for merging segmented Android sparse image files.
+
+        This class provides a user-friendly interface for finding, combining, and
+        processing sparse image chunks (e.g., `super.img.0`, `super.img.1`)
+        into a single, complete raw image file. It features real-time progress
+        reporting and options for managing source files.
+        """
+        def __init__(self) -> None:
+            """
+            Initializes the MergeSparseImage window and its state variables.
+            """
+            super().__init__()
+            self.title(lang.merge_segments_title)
+            self.minsize(420, 240)
+
+            # --- State Variables ---
+            # Holds the desired name for the final output image file.
+            self.output_filename: StringVar = StringVar(value="super.img")
+            # Determines whether to delete the source chunks after a successful merge.
+            self.delete_source: BooleanVar = BooleanVar(value=False)
+            
+            # --- Widget References ---
+            # These will be initialized in the `gui` method.
+            self.run_button: Optional[ttk.Button] = None
+            self.progressbar: Optional[ttk.Progressbar] = None
+            self.progress_label: Optional[ttk.Label] = None 
+
+            self.gui()
+            move_center(self)
+
+        def gui(self) -> None:
+            """
+            Builds and lays out the graphical user interface for the window.
+            """
+            main_frame = ttk.Frame(self, padding=10)
+            main_frame.pack(fill=BOTH, expand=True, padx=5, pady=5)
+
+            # Informational label explaining the tool's purpose.
+            ttk.Label(main_frame, text=lang.merge_segments_info, wraplength=400, justify=LEFT).pack(pady=(0, 10), fill=X)
+            
+            # Display the current project path or a message if none is selected.
+            is_project_selected = project_manger.exist()
+            if is_project_selected:
+                project_path_text = f"{lang.project_path_label} {project_manger.current_work_path()}"
+            else:
+                project_path_text = lang.no_project_selected_label
+            
+            ttk.Label(main_frame, text=project_path_text, foreground="gray", wraplength=380, justify=LEFT).pack(pady=(0, 10), fill=X, anchor='w')
+            
+            # --- Output Filename Configuration ---
+            output_frame = ttk.Frame(main_frame)
+            output_frame.pack(fill=X, pady=5)
+            ttk.Label(output_frame, text=lang.output_filename_label, width=22).pack(side=LEFT)
+            ttk.Entry(output_frame, textvariable=self.output_filename).pack(side=LEFT, expand=True, fill=X)
+            
+            # --- Options ---
+            options_frame = ttk.Frame(main_frame)
+            options_frame.pack(fill=X, pady=5)
+            ttk.Checkbutton(options_frame, text=lang.delete_source_segments_checkbox, variable=self.delete_source, style="Switch.TCheckbutton").pack(side=LEFT, pady=5)
+            
+            # --- Action Button ---
+            self.run_button = ttk.Button(main_frame, text=lang.create_super_image_button, style="Accent.TButton", command=self.start_merge)
+            self.run_button.pack(fill=X, pady=(10, 5), ipady=4)
+            
+            # --- Progress Reporting Widgets (initially hidden) ---
+            self.progress_label = ttk.Label(main_frame, text="")
+            self.progressbar = ttk.Progressbar(main_frame, mode='determinate', maximum=100)
+            
+            # Disable the run button if no project is active.
+            if not is_project_selected:
+                self.run_button.config(state='disabled')
+                ttk.Label(main_frame, text=lang.select_project_to_enable, foreground="orange").pack(pady=(5,0))
+
+        def start_merge(self) -> None:
+            """
+            Initiates the merge process.
+
+            This method validates that a project is selected, displays the progress
+            widgets, and spawns a new thread to handle the heavy lifting, keeping
+            the GUI responsive.
+            """
+            if not project_manger.exist():
+                warn_win(lang.project_not_selected) 
+                return
+
+            # Make the progress bar and label visible before starting the task.
+            self.progress_label.pack(pady=(5, 0))
+            self.progressbar.pack(fill=X, pady=(2, 0), expand=True)
+            self.update_progress(0)
+
+            # Retrieve user-configured settings from the GUI.
+            project_path = project_manger.current_work_path()
+            output_name = self.output_filename.get()
+            delete_source_files = self.delete_source.get()
+
+            # Offload the main work to a background thread.
+            create_thread(self._process_in_thread, project_path, output_name, delete_source_files)
+
+        def update_progress(self, percentage: int) -> None:
+            """
+            Updates the progress bar and status text based on the merge progress.
+            This method is designed to be called safely from the main GUI thread.
+
+            Args:
+                percentage: The current progress, from 0 to 100. A value of -1
+                            indicates that the merge has failed.
+            """
+            # Gracefully do nothing if the window has been closed.
+            if not self.winfo_exists():
+                return
+            
+            self.run_button.config(state='disabled')
+
+            if percentage == -1: 
+                # Handle the failure case.
+                self.run_button.config(text=lang.merge_failed_label)
+                self.progressbar['value'] = 0
+                # Schedule the UI to be reset after a short delay.
+                self.after(2000, self.finish_merge)
+                return
+
+            # Update the progress bar and button text for normal progress.
+            self.progressbar['value'] = percentage
+            button_text = f"{lang.running} {percentage}%"
+            self.run_button.config(text=button_text)
+
+        def _process_in_thread(self, project_path: str, output_name: str, delete_source: bool) -> None:
+            """
+            The core logic that runs in a background thread to prevent GUI freezes.
+            It calls the main merging function and handles the results.
+
+            Args:
+                project_path: The absolute path to the project directory.
+                output_name: The desired name for the merged output file.
+                delete_source: A boolean indicating if source files should be deleted.
+            """
+            try:
+                # This flag helps determine if the merge process actually started
+                # or if it exited early (e.g., no segments found).
+                result_status = "PENDING"
+
+                def progress_callback(percentage: int) -> None:
+                    """A callback function passed to the merge logic to report progress."""
+                    nonlocal result_status
+                    if self.winfo_exists():
+                        # Once we get a progress update > 0, we know the work has begun.
+                        if percentage > 0 and result_status == "PENDING":
+                            result_status = "PROCESSING"
+                        # Schedule the GUI update on the main thread.
+                        self.after(0, self.update_progress, percentage)
+
+                # Call the main merging function from the `merge_sparse` module,
+                # injecting all necessary dependencies.
+                merge_sparse.main(
+                    project_path=project_path,
+                    output_name=output_name,
+                    delete_source=delete_source,
+                    progress_callback=progress_callback,
+                    # --- Injected Dependencies ---
+                    lang=lang,
+                    tool_bin_path=settings.tool_bin,
+                    call_func=utils.call,
+                    info_func=info_win,
+                    warn_func=warn_win
+                )
+                
+                if result_status == "PENDING":
+                    # If the status is still pending, it means the merge function
+                    # finished without processing any files (e.g., no segments found).
+                    if self.winfo_exists():
+                        self.after(0, lambda: info_win(lang.no_segments_to_merge_in_project))
+
+            except Exception as e:
+                logging.exception("Error in MergeSparseImage thread")
+                error_msg = getattr(lang, 'unexpected_merge_error', 'An unexpected error occurred during merge: {error}').format(error=e)
+                if self.winfo_exists():
+                    self.after(0, lambda: warn_win(error_msg))
+            finally:
+                # Always schedule the final UI cleanup.
+                if self.winfo_exists():
+                    # Wait a moment so the user can see the final status (e.g., 100% or "Failed").
+                    self.after(1500, self.finish_merge)
+
+        def finish_merge(self) -> None:
+            """
+            Resets the GUI to its initial state after the merge process is
+            complete or has failed.
+            """
+            if self.winfo_exists():
+                # Hide the progress widgets and re-enable the run button.
+                self.progressbar.pack_forget()
+                self.progress_label.pack_forget()
+                self.run_button.config(state='normal', text=lang.create_super_image_button)
 
 
 class Tool(Tk):
