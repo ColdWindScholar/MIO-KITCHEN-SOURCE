@@ -134,7 +134,22 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
             header_size = len(header)
             header.unpack(f.read(header_size))
             namesize = int(header.c_namesize, 16)
-            name = f.read(namesize)[:-1].decode('utf-8')
+            name_bytes_with_null = f.read(namesize)
+            
+            try:
+                name = name_bytes_with_null[:-1].decode('utf-8')
+            except UnicodeDecodeError:
+                problematic_bytes = name_bytes_with_null[:-1]
+                hex_representation = problematic_bytes.hex(' ')
+                
+                print("\n--- DECODING ERROR ---")
+                print("Failed to decode a filename as UTF-8.")
+                print(f"Problematic bytes in HEX format: {hex_representation}")
+                print("Use an online converter to determine the correct encoding.")
+                print("----------------------\n")
+                
+                raise
+
             if not name in info.keys():
                 info[name] = {}
             # If In The End
