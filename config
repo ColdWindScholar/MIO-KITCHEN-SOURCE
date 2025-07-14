@@ -161,7 +161,7 @@ def update(args):
                 downloaded_file = os.path.join(temp, name)
                 version, gitid, system, arch = re.search(content.get('name_pattern', "*$"), name).groups()
                 system = system_list.get(system, system)
-                if os.name == 'nt' and arch == 'x86_64':
+                if system == 'Windows' and arch == 'x86_64':
                     arch = "AMD64"
                 if system == 'Darwin' and arch == 'aarch64':
                     arch = 'arm64'
