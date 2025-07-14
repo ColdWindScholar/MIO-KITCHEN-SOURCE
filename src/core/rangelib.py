@@ -12,291 +12,408 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 from heapq import merge
 from itertools import cycle
+from typing import (List, Tuple, Union, Iterator, Optional, overload, TypeVar,
+                    Type)
 
 __all__ = ["RangeSet"]
 
+# A TypeVar for class methods that return an instance of the class,
+# allowing for correct type inference with subclasses.
+_RS = TypeVar('_RS', bound='RangeSet')
+
 
 class RangeSet:
-    """A RangeSet represents a set of non-overlapping ranges on the
-  integers (ie, a set of integers, but efficient when the set contains
-  lots of runs.)"""
+    """Represents a set of non-overlapping integer ranges.
 
-    def __init__(self, data=None):
-        self.monotonic = False
+    This class is useful for representing sets of integers that form long,
+    contiguous runs. It provides methods for standard set operations like
+    union, intersection, and subtraction.
+
+    Internally, the ranges are stored as a sorted tuple of integers, where each
+    pair of integers represents a half-open interval `[start, end)`.
+    For example, the tuple `(10, 20, 30, 35)` represents the integer ranges
+    [10, 19] and [30, 34].
+    """
+
+    def __init__(
+        self,
+        data: Optional[Union[str, Tuple[int, ...], List[int]]] = None
+    ) -> None:
+        """Initializes a RangeSet.
+
+        Args:
+            data: The data to initialize the set. Can be one of:
+                - A string of space-separated numbers and ranges, e.g.,
+                  "10-19 30". Ranges are inclusive.
+                - A tuple or list of integers representing pre-sorted,
+                  non-overlapping `[start, end)` boundaries, e.g., `(10, 20, 30, 31)`.
+                  Input is normalized, so overlapping or unsorted data like
+                  `(30, 40, 10, 20)` will be handled correctly.
+                - None, to create an empty RangeSet.
+        """
+        self.data: Tuple[int, ...]
+        self.monotonic: bool
+
         if isinstance(data, str):
             self._parse_internal(data)
         elif data:
-            assert len(data) % 2 == 0
-            self.data = tuple(self._remove_pairs(data))
-            self.monotonic = all(x < y for x, y in zip(self.data, self.data[1:]))
-        else:
+            if not isinstance(data, (list, tuple)):
+                raise TypeError("Input must be a string, tuple, list, or None.")
+            if len(data) % 2 != 0:
+                raise ValueError(
+                    "Input tuple/list must have an even number of elements.")
+            # The 'monotonic' flag is only meaningful when parsing a string,
+            # as it relates to the order of tokens in the text.
+            self.monotonic = False
+            # Normalize the input by sorting all boundary points and then
+            # merging any overlapping or adjacent ranges.
+            sorted_data = sorted(data)
+            self.data = tuple(self._remove_pairs(sorted_data))
+        else:  # data is None or empty
             self.data = ()
+            self.monotonic = True  # An empty set is considered monotonic.
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Tuple[int, int]]:
+        """Iterates over the [start, end) tuples of the ranges."""
         for i in range(0, len(self.data), 2):
-            yield self.data[i:i + 2]
+            yield (self.data[i], self.data[i + 1])
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RangeSet):
+            return NotImplemented
         return self.data == other.data
 
-    def __ne__(self, other):
-        return self.data != other.data
-
-    def __nonzero__(self):
+    def __bool__(self) -> bool:
+        """Returns True if the RangeSet is not empty."""
         return bool(self.data)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Returns a compact, human-readable string representation."""
         if not self.data:
             return "empty"
-        else:
-            return self.to_string()
+        return self.to_string()
 
-    def __repr__(self):
-        return '<RangeSet("' + self.to_string() + '")>'
+    def __repr__(self) -> str:
+        return f'<RangeSet("{self.to_string()}")>'
 
     @classmethod
-    def parse(cls, text):
-        """Parse a text string consisting of a space-separated list of
-    blocks and ranges, eg "10-20 30 35-40".  Ranges are interpreted to
-    include both their ends (so the above example represents 18
-    individual blocks.  Returns a RangeSet object.)
+    def parse(cls: Type[_RS], text: str) -> _RS:
+        """Parses a string to create a RangeSet.
 
-    If the input has all its blocks in increasing order, then returned
-    RangeSet will have an extra attribute 'monotonic' that is set to
-    True.  For example the input "10-20 30" is monotonic, but the input
-    "15-20 30 10-14" is not, even though they represent the same set
-    of blocks (and the two RangeSets will compare equal with ==).
-    """
+        The string should be a space-separated list of integers or inclusive
+        ranges (e.g., "10-20 30 35-40").
+
+        If all tokens in the string are in increasing order, the `monotonic`
+        attribute of the returned RangeSet will be True.
+
+        Args:
+            text: The string to parse.
+
+        Returns:
+            A new RangeSet instance.
+        """
         return cls(text)
 
-    def _parse_internal(self, text):
-        data = []
-        last = -1
-        monotonic = True
-        for p in text.split():
-            if "-" in p:
-                s, e = (int(x) for x in p.split("-"))
-                data.append(s)
-                data.append(e + 1)
-                if last <= s <= e:
-                    last = e
+    def _parse_internal(self, text: str) -> None:
+        """Parses a string and initializes instance attributes."""
+        if not text.strip():
+            self.data = ()
+            self.monotonic = True
+            return
+
+        points = []
+        last_block_val = -1
+        self.monotonic = True
+
+        for part in text.split():
+            try:
+                if "-" in part:
+                    s, e = (int(x) for x in part.split("-", 1))
+                    if s > e:
+                        raise ValueError(f"Range start > end: {part}")
+                    points.extend((s, e + 1))
+                    if self.monotonic and s <= last_block_val:
+                        self.monotonic = False
+                    last_block_val = e
                 else:
-                    monotonic = False
-            else:
-                s = int(p)
-                data.append(s)
-                data.append(s + 1)
-                if last <= s:
-                    last = s + 1
-                else:
-                    monotonic = False
-        data.sort()
-        self.data = tuple(self._remove_pairs(data))
-        self.monotonic = monotonic
+                    s = int(part)
+                    points.extend((s, s + 1))
+                    if self.monotonic and s <= last_block_val:
+                        self.monotonic = False
+                    last_block_val = s
+            except ValueError as e:
+                raise ValueError(f"Invalid token '{part}': {e}") from e
+
+        points.sort()
+        self.data = tuple(self._remove_pairs(points))
 
     @staticmethod
-    def _remove_pairs(source):
-        """Remove consecutive duplicate items to simplify the result.
+    def _remove_pairs(source: List[int]) -> Iterator[int]:
+        """Merges overlapping/adjacent ranges from a sorted list of boundaries.
 
-    [1, 2, 2, 5, 5, 10] will become [1, 10]."""
-        last = None
-        for i in source:
-            if i == last:
-                last = None
+        This function implements a sweep-line algorithm using an XOR-like rule.
+        Given a sorted list of range boundaries, it "flips" a state from
+        "outside" a range to "inside" and vice-versa at each point.
+        If two identical points appear consecutively (e.g., `..., 20, 20, ...`),
+        they cancel each other out. This correctly merges adjacent ranges
+        like `[10, 20)` and `[20, 30)` into `[10, 30)`.
+
+        Example:
+            _remove_pairs([10, 20, 20, 30]) yields 10, 30.
+            _remove_pairs([10, 15, 20, 25]) yields 10, 15, 20, 25.
+        """
+        last_val = None
+        for i_val in source:
+            if i_val == last_val:
+                # This boundary is cancelled out (e.g., an end point
+                # immediately followed by a start point).
+                last_val = None
             else:
-                if last is not None:
-                    yield last
-                last = i
-        if last is not None:
-            yield last
+                if last_val is not None:
+                    yield last_val
+                last_val = i_val
+        if last_val is not None:
+            yield last_val
 
-    def to_string(self):
+    def to_string(self) -> str:
+        """Converts the RangeSet to a human-readable string like "10-19 30".
+
+        Single-integer ranges are represented as one number, while multi-integer
+        ranges are represented with an inclusive hyphenated format.
+        """
         out = []
-        for i in range(0, len(self.data), 2):
-            s, e = self.data[i:i + 2]
+        for s, e in self:
             if e == s + 1:
                 out.append(str(s))
             else:
-                out.append(str(s) + "-" + str(e - 1))
+                out.append(f"{s}-{e-1}")
         return " ".join(out)
 
-    def to_string_raw(self):
-        assert self.data
-        return str(len(self.data)) + "," + ",".join(str(i) for i in self.data)
+    def to_string_raw(self) -> str:
+        """Converts the RangeSet to "count,s1,e1,s2,e2,..." format.
 
-    def union(self, other):
-        """Return a new RangeSet representing the union of this RangeSet
-    with the argument.
+        This format is used by Android's OTA update scripts. The first number
+        is the count of subsequent integers in the list. An empty set is
+        represented as "0,".
+        """
+        if not self.data:
+            return "0,"
+        return str(len(self.data)) + "," + ",".join(map(str, self.data))
 
-    >>> RangeSet("10-19 30-34").union(RangeSet("18-29"))
-    <RangeSet("10-34")>
-    >>> RangeSet("10-19 30-34").union(RangeSet("22 32"))
-    <RangeSet("10-19 22 30-34")>
-    """
-        out = []
+    def _set_op(self, other: 'RangeSet',
+                start_z: int, end_z: int) -> 'RangeSet':
+        """Generic sweep-line algorithm for set operations."""
+        out_data = []
         z = 0
-        for p, d in merge(zip(self.data, cycle((+1, -1))),
-                          zip(other.data, cycle((+1, -1)))):
-            if (z == 0 and d == 1) or (z == 1 and d == -1):
-                out.append(p)
-            z += d
-        return RangeSet(data=out)
+        # Create iterators of (point, delta) tuples for the sweep-line.
+        # Delta is +1 for a start point and -1 for an end point.
+        self_events = zip(self.data, cycle((+1, -1)))
+        other_events = zip(other.data, cycle((+1, -1)))
 
-    def intersect(self, other):
-        """Return a new RangeSet representing the intersection of this
-    RangeSet with the argument.
+        for point, delta in merge(self_events, other_events):
+            z_before = z
+            z += delta
+            if z_before == start_z and z > start_z:
+                out_data.append(point)
+            elif z_before == end_z and z < end_z:
+                out_data.append(point)
+        return self.__class__(data=tuple(out_data))
 
-    >>> RangeSet("10-19 30-34").intersect(RangeSet("18-32"))
-    <RangeSet("18-19 30-32")>
-    >>> RangeSet("10-19 30-34").intersect(RangeSet("22-28"))
-    <RangeSet("")>
-    """
-        out = []
+    def union(self: _RS, other: _RS) -> _RS:
+        """Returns the union of this set and another.
+
+        A new range in the union starts when the number of active ranges goes
+        from 0 to 1, and ends when it goes from 1 to 0.
+        """
+        out_data = []
         z = 0
-        for p, d in merge(zip(self.data, cycle((+1, -1))),
-                          zip(other.data, cycle((+1, -1)))):
-            if (z == 1 and d == 1) or (z == 2 and d == -1):
-                out.append(p)
-            z += d
-        return RangeSet(data=out)
+        self_events = zip(self.data, cycle((+1, -1)))
+        other_events = zip(other.data, cycle((+1, -1)))
 
-    def subtract(self, other):
-        """Return a new RangeSet representing subtracting the argument
-    from this RangeSet.
+        for point, delta in merge(self_events, other_events):
+            if z == 0 and delta == +1:  # A new range begins
+                out_data.append(point)
+            elif z == 1 and delta == -1:  # A combined range ends
+                out_data.append(point)
+            z += delta
+        return self.__class__(data=tuple(out_data))
 
-    >>> RangeSet("10-19 30-34").subtract(RangeSet("18-32"))
-    <RangeSet("10-17 33-34")>
-    >>> RangeSet("10-19 30-34").subtract(RangeSet("22-28"))
-    <RangeSet("10-19 30-34")>
-    """
+    def intersect(self: _RS, other: _RS) -> _RS:
+        """Returns the intersection of this set and another.
 
-        out = []
+        A new range in the intersection starts when the number of active ranges
+        goes from 1 to 2, and ends when it goes from 2 to 1.
+        """
+        out_data = []
         z = 0
-        for p, d in merge(zip(self.data, cycle((+1, -1))),
-                          zip(other.data, cycle((-1, +1)))):
-            if (z == 0 and d == 1) or (z == 1 and d == -1):
-                out.append(p)
-            z += d
-        return RangeSet(data=out)
+        self_events = zip(self.data, cycle((+1, -1)))
+        other_events = zip(other.data, cycle((+1, -1)))
 
-    def overlaps(self, other):
-        """Returns true if the argument has a nonempty overlap with this
-    RangeSet.
+        for point, delta in merge(self_events, other_events):
+            if z == 1 and delta == +1:  # Overlap begins
+                out_data.append(point)
+            elif z == 2 and delta == -1:  # Overlap ends
+                out_data.append(point)
+            z += delta
+        return self.__class__(data=tuple(out_data))
 
-    >>> RangeSet("10-19 30-34").overlaps(RangeSet("18-32"))
-    True
-    >>> RangeSet("10-19 30-34").overlaps(RangeSet("22-28"))
-    False
-    """
+    def subtract(self: _RS, other: _RS) -> _RS:
+        """Returns the set of integers in `self` but not in `other`.
 
-        # This is like intersect, but we can stop as soon as we discover the
-        # output is going to be nonempty.
+        This is implemented by inverting the effect of `other`'s ranges on
+        the sweep-line counter. A range starts when `self` starts while not
+        inside `other`, and ends when `self` ends.
+        """
+        out_data = []
         z = 0
-        for _, d in merge(zip(self.data, cycle((+1, -1))),
-                          zip(other.data, cycle((+1, -1)))):
-            if (z == 1 and d == 1) or (z == 2 and d == -1):
+        # Invert the delta for `other`: a start point decreases z, an end
+        # point increases it. This effectively subtracts `other`'s regions.
+        self_events = zip(self.data, cycle((+1, -1)))
+        other_events = zip(other.data, cycle((-1, +1)))
+
+        for point, delta in merge(self_events, other_events):
+            if z == 0 and delta == +1:  # Start of a self-range, outside other
+                out_data.append(point)
+            elif z == 1 and delta == -1:  # End of a self-range
+                out_data.append(point)
+            z += delta
+        return self.__class__(data=tuple(out_data))
+
+    def overlaps(self, other: 'RangeSet') -> bool:
+        """Returns True if the sets have any integers in common."""
+        z = 0
+        self_events = zip(self.data, cycle((+1, -1)))
+        other_events = zip(other.data, cycle((+1, -1)))
+
+        for _, delta in merge(self_events, other_events):
+            z += delta
+            # If z reaches 2, it means a point is covered by ranges from
+            # both sets, so an overlap exists.
+            if z == 2:
                 return True
-            z += d
         return False
 
-    def size(self):
-        """Returns the total size of the RangeSet (ie, how many integers
-    are in the set).
+    def size(self) -> int:
+        """Returns the total number of integers in all ranges."""
+        return sum(e - s for s, e in self)
 
-    >>> RangeSet("10-19 30-34").size()
-    15
-    """
+    def map_within(self: _RS, other: _RS) -> _RS:
+        """Maps ranges from `other` into the contiguous space of `self`.
 
-        total = 0
-        for i, p in enumerate(self.data):
-            if i % 2:
-                total += p
-            else:
-                total -= p
-        return total
+        This method requires that `other` is a subset of `self`. It returns a
+        new RangeSet where the ranges of `other` are re-calculated as offsets
+        within `self`, as if `self` were a single contiguous range starting at 0.
 
-    def map_within(self, other):
-        """'other' should be a subset of 'self'.  Returns a RangeSet
-    representing what 'other' would get translated to if the integers
-    of 'self' were translated down to be contiguous starting at zero.
+        Example:
+            self = RangeSet("10-19 30-39")  # size=20. space is [0,20)
+            other = RangeSet("17-19 30-32")
+            map_within(other) -> RangeSet("7-12")
 
-    >>> RangeSet("0-9").map_within(RangeSet("3-4"))
-    <RangeSet("3-4")>
-    >>> RangeSet("10-19").map_within(RangeSet("13-14"))
-    <RangeSet("3-4")>
-    >>> RangeSet("10-19 30-39").map_within(RangeSet("17-19 30-32"))
-    <RangeSet("7-12")>
-    >>> RangeSet("10-19 30-39").map_within(RangeSet("12-13 17-19 30-32"))
-    <RangeSet("2-3 7-12")>
-    """
+            Mapping:
+            - "17-19" is at offset 7 from self's start (17-10=7) -> maps to [7,10)
+            - "30-32" is in self's second part. The first part had 10 integers.
+              The offset from the start of the second part is (30-30)=0.
+              Total mapped offset = 10 + 0 = 10. -> maps to [10,13)
+            - Result is [7,10) U [10,13), which normalizes to [7,13) or "7-12".
 
-        out = []
-        offset = 0
-        start = None
-        for p, d in merge(zip(self.data, cycle((-5, +5))),
-                          zip(other.data, cycle((-1, +1)))):
-            if d == -5:
-                start = p
-            elif d == +5:
-                offset += p - start
-                start = None
-            else:
-                out.append(offset + p - start)
-        return RangeSet(data=out)
+        Args:
+            other: A RangeSet that is a subset of `self`.
 
-    def extend(self, n):
-        """Extend the RangeSet by 'n' blocks.
+        Returns:
+            A new RangeSet with the mapped ranges.
 
-    The lower bound is guaranteed to be non-negative.
+        Raises:
+            ValueError: If `other` is not a subset of `self`.
+        """
+        if not self.intersect(other) == other:
+            raise ValueError("'other' must be a subset of 'self'")
 
-    >>> RangeSet("0-9").extend(1)
-    <RangeSet("0-10")>
-    >>> RangeSet("10-19").extend(15)
-    <RangeSet("0-34")>
-    >>> RangeSet("10-19 30-39").extend(4)
-    <RangeSet("6-23 26-43")>
-    >>> RangeSet("10-19 30-39").extend(10)
-    <RangeSet("0-49")>
-    """
-        out = self
-        for i in range(0, len(self.data), 2):
-            s, e = self.data[i:i + 2]
-            s1 = max(0, s - n)
-            e1 = e + n
-            out = out.union(RangeSet(str(s1) + "-" + str(e1 - 1)))
-        return out
+        out_data = []
+        self_offset = 0
+        self_active_start = 0
 
-    def first(self, n):
-        """Return the RangeSet that contains at most the first 'n' integers.
+        # Event types for the sweep-line:
+        # -5: self range starts
+        # +5: self range ends
+        # -1: other range starts
+        # +1: other range ends
+        self_events = zip(self.data, cycle((-5, +5)))
+        other_events = zip(other.data, cycle((-1, +1)))
 
-    >>> RangeSet("0-9").first(1)
-    <RangeSet("0")>
-    >>> RangeSet("10-19").first(5)
-    <RangeSet("10-14")>
-    >>> RangeSet("10-19").first(15)
-    <RangeSet("10-19")>
-    >>> RangeSet("10-19 30-39").first(3)
-    <RangeSet("10-12")>
-    >>> RangeSet("10-19 30-39").first(15)
-    <RangeSet("10-19 30-34")>
-    >>> RangeSet("10-19 30-39").first(30)
-    <RangeSet("10-19 30-39")>
-    >>> RangeSet("0-9").first(0)
-    <RangeSet("")>
-    """
+        for point, event in merge(self_events, other_events):
+            if event == -5:  # self range starts
+                self_active_start = point
+            elif event == +5:  # self range ends
+                self_offset += (point - self_active_start)
+            else:  # an 'other' event
+                # Map the point from `other` into the 0-based contiguous space of `self`.
+                mapped_point = self_offset + (point - self_active_start)
+                out_data.append(mapped_point)
 
-        if self.size() <= n:
-            return self
+        return self.__class__(data=tuple(out_data))
 
-        out = []
+    def extend(self: _RS, n: int) -> _RS:
+        """Returns a new set with each range extended by `n` on both sides.
+
+        Extended ranges are clipped at 0 on the lower bound. Any resulting
+        overlapping ranges are merged.
+
+        Args:
+            n: The non-negative number of integers to extend by.
+
+        Returns:
+            A new, extended RangeSet.
+        """
+        if n < 0:
+            raise ValueError("Cannot extend by a negative value.")
+        if n == 0 or not self.data:
+            return self.__class__(data=self.data)
+
+        # Create a string representation of all the extended ranges.
+        # This is an efficient way to leverage the robust parsing and merging
+        # logic in the constructor.
+        extended_ranges = []
         for s, e in self:
-            if e - s >= n:
-                out += (s, s + n)
+            s_ext = max(0, s - n)
+            e_ext = e + n
+            # to_string expects inclusive end, so e_ext-1
+            extended_ranges.append(f"{s_ext}-{e_ext-1}")
+
+        return self.parse(" ".join(extended_ranges))
+
+    def first(self: _RS, n: int) -> _RS:
+        """Returns a new set containing the first `n` integers from this set.
+
+        If the set contains fewer than `n` integers, a copy of the original
+        set is returned.
+
+        Args:
+            n: The non-negative number of integers to retrieve.
+
+        Returns:
+            A new RangeSet containing at most the first `n` integers.
+        """
+        if n < 0:
+            raise ValueError("Number of integers 'n' cannot be negative.")
+        if n == 0:
+            return self.__class__(data=())
+        if self.size() <= n:
+            return self.__class__(data=self.data)
+
+        out_data = []
+        count = 0
+        for s, e in self:
+            size = e - s
+            if count + size >= n:
+                # This range contains the nth integer. Take a partial slice and stop.
+                needed = n - count
+                out_data.extend((s, s + needed))
                 break
             else:
-                out += (s, e)
-                n -= e - s
-        return RangeSet(data=out)
+                # Take the whole range and continue.
+                out_data.extend((s, e))
+                count += size
+
+        return self.__class__(data=tuple(out_data))
