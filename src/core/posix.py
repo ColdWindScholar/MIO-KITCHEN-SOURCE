@@ -1,4 +1,5 @@
 import os
+
 # Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 #
 # Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
@@ -18,9 +19,11 @@ if os.name == 'nt':
     from ctypes import windll
 
 from logging import exception
+
+
 def symlink(link_target, target):
     if not os.path.exists(os.path.dirname(target)):
-        os.makedirs(os.path.dirname(target) ,exist_ok=True)
+        os.makedirs(os.path.dirname(target), exist_ok=True)
     if os.name == 'posix':
         os.symlink(link_target, target)
     elif os.name == 'nt':
