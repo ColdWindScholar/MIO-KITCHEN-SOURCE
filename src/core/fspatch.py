@@ -44,7 +44,7 @@ def scanfs(file: str) -> dict:
     return filesystem_config
 
 
-def scan_dir(folder: str) -> list:
+def scan_dir(folder: str):
     """
     Scan Folder , Return A path One By One
     :param folder:
