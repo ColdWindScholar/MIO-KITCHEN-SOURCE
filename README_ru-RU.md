@@ -10,32 +10,32 @@
 ***
 ## Используемые проекты
 
-|                         Название                      | Назначение                                                     | Ссылка                                                             |       Разработчик |
-|:-----------------------------------------------------:|----------------------------------------------------------------|--------------------------------------------------------------------|----------------:|
-|                       unpac_py                        | Распаковка файлов sprd pac                                     | [Клик](https://github.com/affggh/unpac_py)                         |          Affggh |
-|                        fspatch                        | Применение патчей к file_config перед распаковкой              | [Клик](https://github.com/affggh/fspatch)                          |          Affggh |
-|                      Logo_dumper                      | Распаковка и упаковка Xiaomi lOGO.IMG                          | [Клик](https://github.com/affggh/logo_dumper)                      |          Affggh |
-|                 mtk-garbage-porttool                  | Поддержка перепаковки папок старых версий Android в .img       | [Клик](https://github.com/ColdWindScholar/mtk-garbage-porttool)    |          Affggh |
-|                    context_pacther                    | Применение патчей к file_context перед перепаковкой            | [Клик](https://github.com/ColdWindScholar/context_patch)           | ColdWindScholar |
-|                       lpunpack                        | Распаковка и анализ Android Super Image                        | [Клик](https://github.com/unix3dgforce/lpunpack)                   |    unix3dgforce |
-|                     android-tools                     | Перепаковка образов Ext4, конвертация Sparse, lpmake           | [Клик](https://github.com/nmeum/android-tools)                     |           nmeum |
-|                        cpio_py                        | Распаковка и перепаковка cpio                                  | [Клик](https://github.com/ColdWindScholar/cpio_py)                 | ColdWindScholar |
-|                      erofs-utils                      | Распаковка и перепаковка образов Erofs                         | [Клик](https://github.com/sekaiacg/erofs-utils)                    |        sekaiacg |
-|                      make_ext4fs                      | Перепаковка образов ext4 для старых устройств                  | [Клик](https://github.com/anpaza/make_ext4fs)                      |          anpaza |
-|                         ext4                          | Анализ и распаковка образов Ext4                               | [Клик](https://github.com/cubinator/ext4)                          |       cubinator |
-|                      Busybox_w64                      | Поддержка плагинов                                             | [Клик](https://frippery.org/busybox/)                              |     Ron Yorston |
-|                        Busybox                        | Поддержка плагинов                                             | [Клик](http://busybox.net/)                                        |   Erik Andersen |
-|                        brotli                         | Распаковка и перепаковка .br файлов                            | [Клик](https://github.com/google/brotli)                           |          Google |
-|                       sdat2img                        | Конвертация dat в img                                          | [Клик](https://github.com/xpirt/sdat2img)                          |           xpirt |
-|                       img2sdat                        | Конвертация img в sparse dat                                   | [Клик](https://github.com/xpirt/img2sdat)                          |           xpirt |
-|                       kdztools                        | Распаковка файлов kdz и dz                                     | [Клик](https://github.com/ehem/kdztools)                           |            ehem |
-|                          dtc                          | Декомпиляция и компиляция файлов дерева устройств (dt)         | [Клик](https://android.googlesource.com/platform/external/dtc/)    |    David Gibson |
-|                     oppo_decrypt                      | Расшифровка ozip и ofp                                         | [Клик](https://github.com/bkerler/oppo_decrypt)                    |         bkerler |
-|                       splituapp                       | Анализ и распаковка файла UPDATE.APP                           | [Клик](https://github.com/superr/splituapp)                        |          Superr |
-|                        libufdt                        | Анализ, распаковка и перепаковка образов Dtbo                  | [Клик](https://android.googlesource.com/platform/system/libufdt/)  |          Google |
-|                     ROMFS_PARSER                      | Распаковка файлов Romfs                                        | [Клик](https://github.com/ddddhm1234/ROMFS_PARSER/tree/main)       |       ddddhm123 |
-|                      Nh4RomTools                      | Код для отключения vbmeta/AVB                                  | [Клик](https://github.com/affggh/NH4RomTool)                       |          Affggh |
-|                         zstd                          | Распаковка и перепаковка zstd файлов                           | [Клик](https://github.com/facebook/zstd)                           |        facebook |
+|       Название       | Назначение                                               | Ссылка                                                            |     Разработчик |
+|:--------------------:|----------------------------------------------------------|-------------------------------------------------------------------|----------------:|
+|       unpac_py       | Распаковка файлов sprd pac                               | [Клик](https://github.com/affggh/unpac_py)                        |          Affggh |
+|       fspatch        | Применение патчей к file_config перед распаковкой        | [Клик](https://github.com/affggh/fspatch)                         |          Affggh |
+|     Logo_dumper      | Распаковка и упаковка Xiaomi lOGO.IMG                    | [Клик](https://github.com/affggh/logo_dumper)                     |          Affggh |
+| mtk-garbage-porttool | Поддержка перепаковки папок старых версий Android в .img | [Клик](https://github.com/ColdWindScholar/mtk-garbage-porttool)   |          Affggh |
+|   context_pacther    | Применение патчей к file_context перед перепаковкой      | [Клик](https://github.com/ColdWindScholar/context_patch)          | ColdWindScholar |
+|       lpunpack       | Распаковка и анализ Android Super Image                  | [Клик](https://github.com/unix3dgforce/lpunpack)                  |    unix3dgforce |
+|    android-tools     | Перепаковка образов Ext4, конвертация Sparse, lpmake     | [Клик](https://github.com/nmeum/android-tools)                    |           nmeum |
+|       cpio_py        | Распаковка и перепаковка cpio                            | [Клик](https://github.com/ColdWindScholar/cpio_py)                | ColdWindScholar |
+|     erofs-utils      | Распаковка и перепаковка образов Erofs                   | [Клик](https://github.com/sekaiacg/erofs-utils)                   |        sekaiacg |
+|     make_ext4fs      | Перепаковка образов ext4 для старых устройств            | [Клик](https://github.com/anpaza/make_ext4fs)                     |          anpaza |
+|         ext4         | Анализ и распаковка образов Ext4                         | [Клик](https://github.com/cubinator/ext4)                         |       cubinator |
+|     Busybox_w64      | Поддержка плагинов                                       | [Клик](https://frippery.org/busybox/)                             |     Ron Yorston |
+|       Busybox        | Поддержка плагинов                                       | [Клик](http://busybox.net/)                                       |   Erik Andersen |
+|        brotli        | Распаковка и перепаковка .br файлов                      | [Клик](https://github.com/google/brotli)                          |          Google |
+|       sdat2img       | Конвертация dat в img                                    | [Клик](https://github.com/xpirt/sdat2img)                         |           xpirt |
+|       img2sdat       | Конвертация img в sparse dat                             | [Клик](https://github.com/xpirt/img2sdat)                         |           xpirt |
+|       kdztools       | Распаковка файлов kdz и dz                               | [Клик](https://github.com/ehem/kdztools)                          |            ehem |
+|         dtc          | Декомпиляция и компиляция файлов дерева устройств (dt)   | [Клик](https://android.googlesource.com/platform/external/dtc/)   |    David Gibson |
+|     oppo_decrypt     | Расшифровка ozip и ofp                                   | [Клик](https://github.com/bkerler/oppo_decrypt)                   |         bkerler |
+|      splituapp       | Анализ и распаковка файла UPDATE.APP                     | [Клик](https://github.com/superr/splituapp)                       |          Superr |
+|       libufdt        | Анализ, распаковка и перепаковка образов Dtbo            | [Клик](https://android.googlesource.com/platform/system/libufdt/) |          Google |
+|     ROMFS_PARSER     | Распаковка файлов Romfs                                  | [Клик](https://github.com/ddddhm1234/ROMFS_PARSER/tree/main)      |       ddddhm123 |
+|     Nh4RomTools      | Код для отключения vbmeta/AVB                            | [Клик](https://github.com/affggh/NH4RomTool)                      |          Affggh |
+|         zstd         | Распаковка и перепаковка zstd файлов                     | [Клик](https://github.com/facebook/zstd)                          |        facebook |
 * И многие другие проекты! Огромное спасибо разработчикам!
 
 ***
@@ -64,16 +64,16 @@
 |  Macos  | Arm64  X86                                |
 
 ## Поддерживаемые типы образов
-| Поддерживаемые типы образов     |
-|---------------------------------|
-| Android Boot Image              |
-| Android Recovery Image          |
-| Android Vendor_boot Image       |
-| Erofs                           |
-| Ext4                            |
-| F2fs (только в версии для Linux)|
-| Romfs                           |
-| Payload                         |
+| Поддерживаемые типы образов      |
+|----------------------------------|
+| Android Boot Image               |
+| Android Recovery Image           |
+| Android Vendor_boot Image        |
+| Erofs                            |
+| Ext4                             |
+| F2fs (только в версии для Linux) |
+| Romfs                            |
+| Payload                          |
 ## Поддерживаемые типы файлов
 | Поддерживаемые типы файлов |
 |----------------------------|

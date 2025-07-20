@@ -6512,7 +6512,7 @@ def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False
         if value.get() != 1:
             return
         if pack_hybrid_rom:
-            if PackHybridRom() == False:
+            if not PackHybridRom():
                 return
 
     print(lang.text91 % current_project_name.get())

@@ -78,7 +78,7 @@ class RangeSet:
     def __iter__(self) -> Iterator[Tuple[int, int]]:
         """Iterates over the [start, end) tuples of the ranges."""
         for i in range(0, len(self.data), 2):
-            yield (self.data[i], self.data[i + 1])
+            yield self.data[i], self.data[i + 1]
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, RangeSet):

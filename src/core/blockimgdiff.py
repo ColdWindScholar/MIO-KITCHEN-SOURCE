@@ -13,22 +13,20 @@
 # limitations under the License.
 #
 # pylint: disable=line-too-long
+import hashlib
 import logging
 import os
 import subprocess
 import tempfile
-import hashlib
 from array import array
+from collections import deque, OrderedDict
+from concurrent.futures import ThreadPoolExecutor, as_completed  # For improved threading
 from functools import total_ordering
 from heapq import heappop, heappush, heapify
-from itertools import chain
 from multiprocessing import cpu_count
 from re import sub
-from threading import Lock
-from collections import deque, OrderedDict
-from concurrent.futures import ThreadPoolExecutor, as_completed # For improved threading
 
-from .rangelib import RangeSet # Assuming rangelib is in the same package directory
+from .rangelib import RangeSet  # Assuming rangelib is in the same package directory
 
 __all__ = ["EmptyImage", "DataImage", "BlockImageDiff"]
 
@@ -1227,7 +1225,7 @@ class BlockImageDiff:
             current_tgt_ranges = tgt_ranges 
             current_src_ranges = src_ranges
 
-            while (current_tgt_ranges.size() > split_threshold_blocks and \
+            while (current_tgt_ranges.size() > split_threshold_blocks and
                    current_src_ranges.size() > split_threshold_blocks):
                 
                 tgt_piece = current_tgt_ranges.first(split_threshold_blocks)

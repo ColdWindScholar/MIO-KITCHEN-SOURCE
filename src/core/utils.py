@@ -28,6 +28,7 @@ from enum import IntEnum
 from os import getcwd
 from os.path import exists
 from random import randint, choice
+from subprocess import Popen
 from threading import Thread
 from lzma import LZMADecompressor
 import tarfile
@@ -78,14 +79,16 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b']\x00\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff', 'lzma'], [b'\x02!L\x18', 'lz4_lg'],
            [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'],
            [b'(\x05\x00\x00$8"%', 'kdz'], [b"\x32\x96\x18\x74", 'dz'], [b'\xcf\xfa\xed\xfe', 'macos_bin'],
-           [b'\xfa\xff\xfa\xff','pac',2116],
-           [b"-rom1fs-", 'romfs'], [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P', 'guoke_logo']
+           [b'\xfa\xff\xfa\xff', 'pac', 2116],
+           [b"-rom1fs-", 'romfs'],
+           [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P',
+            'guoke_logo']
            )
-
 
 # ----DEFS
 if os.name == 'nt':
     from ctypes import windll
+
     kernel32 = windll.kernel32
 
 
@@ -100,7 +103,19 @@ else:
     def terminate_process(pid):
         os.kill(pid, 9)
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
+
+
 def call(exe, extra_path=True, out: bool = True):
+    def output(inp: subprocess.CalledProcessError | Popen[bytes]):
+        for i in iter(inp.stdout.readline, b""):
+            try:
+                out_put = i.decode("utf-8").strip()
+            except (Exception, BaseException):
+                out_put = i.decode("gbk").strip()
+            if out:
+                print(out_put)
+            else:
+                logging.info(out_put)
     logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
@@ -117,26 +132,10 @@ def call(exe, extra_path=True, out: bool = True):
                                stderr=subprocess.STDOUT, creationflags=conf)
         pid = ret.pid
         states.open_pids.append(pid)
-        for i in iter(ret.stdout.readline, b""):
-            try:
-                out_put = i.decode("utf-8").strip()
-            except (Exception, BaseException):
-                out_put = i.decode("gbk").strip()
-            if out:
-                print(out_put)
-            else:
-                logging.info(out_put)
+        output(ret)
         states.open_pids.remove(pid)
     except subprocess.CalledProcessError as e:
-        for i in iter(e.stdout.readline, b""):
-            try:
-                out_put = i.decode("utf-8").strip()
-            except (Exception, BaseException):
-                out_put = i.decode("gbk").strip()
-            if out:
-                print(out_put)
-            else:
-                logging.info(out_put)
+        output(e)
         return 2
     except FileNotFoundError:
         logging.exception('Bugs')
@@ -144,18 +143,19 @@ def call(exe, extra_path=True, out: bool = True):
     ret.wait()
     return ret.returncode
 
+
 class GuoKeLogo:
     def __init__(self):
         self.offset = 8192
         self.header_size = 128
 
-    def unpack(self, file:str, output_dir:str):
+    def unpack(self, file: str, output_dir: str):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
         with open(file, 'rb') as f:
             with open(os.path.join(output_dir, 'header'), 'wb') as header:
                 header.write(f.read(self.header_size))
-            with open(os.path.join(output_dir,'image.jpg'),'wb') as image:
+            with open(os.path.join(output_dir, 'image.jpg'), 'wb') as image:
                 f.seek(self.offset)
                 image.write(f.read())
         print("Unpack Done!")
@@ -163,13 +163,14 @@ class GuoKeLogo:
     def pack(self, output_dir, file):
         if os.path.exists(file):
             os.remove(file)
-        if not os.path.exists(os.path.join(output_dir, 'header')) or not os.path.exists(os.path.join(output_dir, 'image.jpg')):
+        if not os.path.exists(os.path.join(output_dir, 'header')) or not os.path.exists(
+                os.path.join(output_dir, 'image.jpg')):
             print('Cannot Pack The logo!:sth losing.')
-        with open(file,'wb') as f:
+        with open(file, 'wb') as f:
             with open(os.path.join(output_dir, 'header'), 'rb') as header:
                 f.write(header.read())
             with open(os.path.join(output_dir, 'image.jpg'), 'rb') as image:
-                f.write((self.offset - self.header_size)*b'\x00')
+                f.write((self.offset - self.header_size) * b'\x00')
                 f.write(image.read())
         print('Pack Done!')
 
@@ -203,7 +204,6 @@ class Unxz:
                     os.remove(self.file_path)
                 except:
                     ...
-
 
     def do_unxz(self):
         dec = LZMADecompressor()
@@ -309,10 +309,13 @@ class Sdat2img:
                         print(f'Command "{cmd}" is not valid.')
                         return
 
+
 def get_all_file_paths(directory):
     for root, _, files in os.walk(directory):
         for filename in files:
             yield os.path.join(root, filename)
+
+
 def zero_start(file: str, c: int, buff_size: int = 8192) -> bool:
     with open(file, 'rb') as f:
         zeros_ = bytearray(buff_size)
@@ -326,7 +329,11 @@ def zero_start(file: str, c: int, buff_size: int = 8192) -> bool:
                 return False
             c -= n
     return True
+
+
 is_empty_img = lambda file: zero_start(file, os.path.getsize(file))
+
+
 def gettype(file) -> str:
     """
     Return File Type:str
@@ -392,8 +399,7 @@ def dynamic_list_reader(path):
     return data
 
 
-
-def generate_dynamic_list(group_name:str, size:int, super_type:int, part_list:list, work):
+def generate_dynamic_list(group_name: str, size: int, super_type: int, part_list: list, work):
     data = ['# Remove all existing dynamic partitions and groups before applying full OTA', 'remove_all_groups']
     with open(f"{work}/dynamic_partitions_op_list", 'w', encoding='utf-8', newline='\n') as d_list:
         if super_type == 1:
@@ -457,7 +463,8 @@ def qc(file_) -> None:
         f.writelines(data)
     del data
 
-def create_thread(func, *args, join=False, deamon:bool=True):
+
+def create_thread(func, *args, join=False, deamon: bool = True):
     """
     Multithreaded running tasks
     :param deamon:
@@ -552,13 +559,14 @@ class LangUtils:
     def __getattr__(self, item):
         try:
             return self.__getattribute__(item)
-        except (AttributeError, ):
+        except (AttributeError,):
             return self.second.get(item, 'None')
 
 
 lang = LangUtils()
 
-u64 = lambda x:struct.unpack('>Q', x)[0]
+u64 = lambda x: struct.unpack('>Q', x)[0]
+
 
 def payload_reader(payloadfile):
     """
@@ -580,6 +588,7 @@ def payload_reader(payloadfile):
     dam.ParseFromString(manifest)
     return dam
 
+
 def img2simg(path: str):
     call(['img2simg', path, f'{path}s'])
     if os.path.exists(path + 's'):
@@ -588,6 +597,7 @@ def img2simg(path: str):
             os.rename(path + 's', path)
         except Exception:
             logging.exception('Bugs')
+
 
 class Vbpatch:
     def __init__(self, file_):
@@ -723,6 +733,7 @@ class LogoDumper:
                 o.write(struct.pack("<I", self.cfg.imgblkszs[i]))
             print("\tDone!")
 
+
 class States:
     update_window = False
     donate_window = False
@@ -739,7 +750,11 @@ class States:
         root = windll.shell32.IsUserAnAdmin()
     else:
         root = None
+
+
 states = States()
+
+
 def hashlib_calculate(file_path, method: str):
     if not hasattr(hashlib, method):
         print(f"Warn, The algorithm {method} not exist in hashlib!")
@@ -756,6 +771,7 @@ def hashlib_calculate(file_path, method: str):
 
 calculate_sha256_file = lambda file_path: hashlib_calculate(file_path, 'sha256')
 calculate_md5_file = lambda file_path: hashlib_calculate(file_path, 'md5')
+
 
 class JsonEdit:
     def __init__(self, file_path):
@@ -783,8 +799,9 @@ class JsonEdit:
         data[name] = value
         self.write(data)
 
+
 class MkcSugges:
-    def __init__(self, help_file:str = 'None'):
+    def __init__(self, help_file: str = 'None'):
         if not help_file:
             self.help_file = os.path.join(prog_path, 'bin', 'help_document.json')
         else:
@@ -830,6 +847,7 @@ class MkcSugges:
             return
         return catch_error
 
+
 class DevNull:
     def __init__(self):
         self.data = ''
@@ -840,6 +858,7 @@ class DevNull:
     def flush(self):
         ...
 
+
 def hum_convert(value):
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     size = 1024.0
@@ -848,6 +867,7 @@ def hum_convert(value):
             return f"{value:.2f}{units[i]}"
         value = value / size
     return f'{value} B'
+
 
 class ModuleErrorCodes(IntEnum):
     Normal = 0
