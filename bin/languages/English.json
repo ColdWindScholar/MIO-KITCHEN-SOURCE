@@ -347,7 +347,7 @@
   "no_segments_to_merge_in_project": "No file segments (e.g., super.img.0) to merge were found in the selected project.",
   "output_filename_label": "Output File Name:",
   "select_project_to_enable": "Please select a project to enable this feature.",
-  "running": "Merging files",
+  "running_merge": "Merging files",
   "delete_source_segments_checkbox": "Delete source segments after merging",
   "create_super_image_button": "Create Super Image",
   "processing_segment": "Processing segment: {filename}",

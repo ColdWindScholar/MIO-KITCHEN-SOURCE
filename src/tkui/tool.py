@@ -17,20 +17,21 @@ import argparse
 import gzip
 import json
 import platform
-import re
 import shutil
 import subprocess
 import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-from src.core.avb_disabler import process_fstab
-from src.core.encryption_disabler import process_fstab_for_encryption
-from src.core import merge_sparse 
+from typing import Optional
+
+from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
+from src.core.avb_disabler import process_fstab
 from src.core.cpio import extract as cpio_extract, repack as cpio_repack
+from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
 from src.core.unkdz import KDZFileTools
@@ -4367,7 +4368,7 @@ class MpkStore(Toplevel):
             author_text = data.get('author', getattr(lang, 'unknown_author', 'Unknown'))
             version_text = data.get('version', getattr(lang, 'unknown_version', 'N/A'))
             size_bytes = data.get('size', 0)
-            size_hum = hum_convert(size_bytes) if callable(hum_convert) else f"{size_bytes} B"  # Human-readable size.
+            size_hum = hum_convert(size_bytes) # the hum_convert must be callable
 
             ttk.Label(info_container_frame, text=f"{getattr(lang, 't21', 'Author:')} {author_text}", anchor="w").grid(
                 row=0, column=0, sticky="ew", pady=(0, 1))
@@ -4668,7 +4669,7 @@ class MpkStore(Toplevel):
                                                       size_=expected_file_size_from_data)
                     for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                         if not self.winfo_exists():
-                            download_successful_for_all_files = False;
+                            download_successful_for_all_files = False
                             break
                         if percentage == "Error":
                             logging.error(
@@ -4682,7 +4683,7 @@ class MpkStore(Toplevel):
                             except tk.TclError:
                                 download_successful_for_all_files = False; break
                         elif not self.winfo_exists():
-                            download_successful_for_all_files = False;
+                            download_successful_for_all_files = False
                             break
                     if not download_successful_for_all_files: break
                     file_downloaded_this_iteration = True
@@ -4723,7 +4724,7 @@ class MpkStore(Toplevel):
                         logging.info(
                             f"MpkStore.download: Successfully installed components from '{file_name_in_list}' for plugin '{id_}'.")
                 else:
-                    installation_successful_for_all_files = False;
+                    installation_successful_for_all_files = False
                     break
 
             if not download_successful_for_all_files or not installation_successful_for_all_files:
@@ -4814,14 +4815,14 @@ class PackHybridRom:
     def __init__(self):
         if not project_manger.exist():
             win.message_pop(lang.warn1)
-            return
+            return None
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
             os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
         if not os.path.exists(f"{dir_}/images"):
             os.makedirs(f'{dir_}/images')
         if os.path.exists(os.path.join(project_manger.current_work_output_path(), 'payload.bin')):
             print("Found payload.bin ,Stop!")
-            return False
+            return None
         if os.path.exists(f'{dir_}/META-INF'):
             rmdir(f'{dir_}/META-INF')
         shutil.copytree(f"{cwd_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
@@ -6301,7 +6302,7 @@ class GetFolderSize:
 
 
 @animation
-def datbr(work, name, brl: any, dat_ver=4):
+def datbr(work, name, brl: str | int, dat_ver=4):
     """
 
     :param work: working dir
