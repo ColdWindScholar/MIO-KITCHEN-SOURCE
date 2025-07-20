@@ -175,7 +175,7 @@ class ConfigParser:
             An iterator of (key, value) string tuples.
         """
         section_data = self.sections.get(str(section_name))
-        if section_data is not None:
+        if section_data:
             yield from section_data.items()
 
     def write(self, file_object: TextIO) -> None:
