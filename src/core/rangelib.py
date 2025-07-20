@@ -14,7 +14,7 @@
 
 from heapq import merge
 from itertools import cycle
-from typing import (List, Tuple, Union, Iterator, Optional, overload, TypeVar,
+from typing import (List, Tuple, Union, Iterator, Optional, TypeVar,
                     Type)
 
 __all__ = ["RangeSet"]
