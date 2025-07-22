@@ -1,0 +1,10 @@
+virtual_ab=true
+super_partition_size=17179869184
+super_qti_dynamic_partitions_group_size=17175674880
+super_partition_groups=qti_dynamic_partitions
+super_qti_dynamic_partitions_partition_list=my_company my_preload vbmeta
+
+#virtual_ab_compression=false
+#virtual_ab_compression_method=gz
+#virtual_ab_cow_version=2
+#virtual_ab_compression_factor=4096

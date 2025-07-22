@@ -1,0 +1,9 @@
+default_system_dev_certificate=key/testkey
+recovery_api_version=3
+fstab_version=2
+ab_update=true
+
+# A-only
+#blockimgdiff_versions=1,2,3,4
+#cache_size=536870912
+#cache_fs_type=ext4

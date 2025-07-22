@@ -1,0 +1,9 @@
+RUN_POSTINSTALL_my_preload=true
+POSTINSTALL_PATH_my_preload=bin/checkpoint_gc
+#FILESYSTEM_TYPE_my_preload=ext4
+#POSTINSTALL_OPTIONAL_my_preload=true
+
+#RUN_POSTINSTALL_[part_name]=true
+#POSTINSTALL_PATH_[part_name]=bin/checkpoint_gc
+#FILESYSTEM_TYPE_[part_name]=ext4
+#POSTINSTALL_OPTIONAL_[part_name]=true
