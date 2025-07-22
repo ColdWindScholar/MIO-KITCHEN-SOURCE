@@ -22,7 +22,7 @@ try:
     from src.tkui.tool import *
 except Exception as e:
     print(e)
-    input(f"Sorry! We cannot init the tool.\nPlease clone source again!")
+    input(f"Sorry! We cannot init the tool.\nPlease report this error to developers.!")
     sys.exit(1)
 
 if __name__ == "__main__":
