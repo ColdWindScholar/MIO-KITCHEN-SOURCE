@@ -76,8 +76,9 @@ class PythonEditor(tk.Frame):
         self.save_b.configure(text=lang.t55, state='disabled')
         with open(os.path.join(self.path, self.file_name), 'w+', encoding='utf-8', newline='\n') as txt:
             txt.write(self.text.get(1.0, tk.END))
-        time.sleep(1)
-        self.save_b.configure(text=lang.t54, state='normal')
+        time.sleep(0.1)
+        if self.winfo_exists():
+            self.save_b.configure(text=lang.t54, state='normal')
 
     def load(self):
         if self.file_name:
