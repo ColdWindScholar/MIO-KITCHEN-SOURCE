@@ -67,7 +67,7 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.dumper import Dumper
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -476,15 +476,15 @@ class ToolBox(ttk.Frame):
         """
         self.pack_basic()
         functions = [
-            (lang.text114, lambda: create_thread(download_file)), # Download File
-            (lang.t59, self.GetFileInfo), # Get File Info
-            (lang.t60, self.FileBytes), # File Bytes Operations
-            (lang.audit_allow, self.SelinuxAuditAllow), # Selinux Audit Allow
+            (lang.text114, lambda: create_thread(download_file)),  # Download File
+            (lang.t59, self.GetFileInfo),  # Get File Info
+            (lang.t60, self.FileBytes),  # File Bytes Operations
+            (lang.audit_allow, self.SelinuxAuditAllow),  # Selinux Audit Allow
             (lang.disable_avb, self.DisableAVB),
             (lang.disable_encryption, self.DisableEncryption),
-            (lang.trim_image, self.TrimImage), # Trim Image
-            (lang.magisk_patch, self.MagiskPatcher), # Magisk Patcher
-            (lang.mergequalcommimage, self.MergequalcommimageOld), # Merge Qualcomm Image (Legacy)
+            (lang.trim_image, self.TrimImage),  # Trim Image
+            (lang.magisk_patch, self.MagiskPatcher),  # Magisk Patcher
+            (lang.mergequalcommimage, self.MergequalcommimageOld),  # Merge Qualcomm Image (Legacy)
             (lang.merge_file_segments, self.MergeSparseImage)
         ]
         width_controls = 3  # Number of buttons per row.
@@ -1049,6 +1049,7 @@ class ToolBox(ttk.Frame):
 
     class DisableAVB(Toplevel):
         """A Toplevel window for disabling AVB by patching fstab files in the current project."""
+
         def __init__(self):
             super().__init__()
             self.title(lang.disable_avb)
@@ -1077,7 +1078,8 @@ class ToolBox(ttk.Frame):
 
             ttk.Button(button_frame, text=lang.refresh, command=self.scan_partitions).pack(side=LEFT, padx=(0, 5))
 
-            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton", command=self.run_disable_avb)
+            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton",
+                                         command=self.run_disable_avb)
             self.run_button.pack(side=RIGHT, fill=X, expand=True)
 
         def scan_partitions(self):
@@ -1136,7 +1138,7 @@ class ToolBox(ttk.Frame):
                     print(f"--- {lang.processing_partition.format(partition=partition_name)} ---")
                     # Process all fstab files found in this partition
                     for fstab_path in self.partitions_with_fstab[partition_name]:
-                        process_fstab(fstab_path) # Call the AVB patcher
+                        process_fstab(fstab_path)  # Call the AVB patcher
                     processed_count += 1
 
             def final_actions():
@@ -1148,9 +1150,9 @@ class ToolBox(ttk.Frame):
 
             self.after(0, final_actions)
 
-
     class DisableEncryption(Toplevel):
         """A Toplevel window for disabling forced encryption by patching fstab files."""
+
         def __init__(self):
             super().__init__()
             self.title(lang.disable_encryption)
@@ -1178,7 +1180,8 @@ class ToolBox(ttk.Frame):
 
             ttk.Button(button_frame, text=lang.refresh, command=self.scan_partitions).pack(side=LEFT, padx=(0, 5))
 
-            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton", command=self.run_disable_encryption)
+            self.run_button = ttk.Button(button_frame, text=lang.run, style="Accent.TButton",
+                                         command=self.run_disable_encryption)
             self.run_button.pack(side=RIGHT, fill=X, expand=True)
 
         def scan_partitions(self):
@@ -1247,7 +1250,6 @@ class ToolBox(ttk.Frame):
                 self.destroy()
 
             self.after(0, final_actions)
-            
 
     class MergeSparseImage(Toplevel):
         """
@@ -1258,6 +1260,7 @@ class ToolBox(ttk.Frame):
         into a single, complete raw image file. It features real-time progress
         reporting and options for managing source files.
         """
+
         def __init__(self) -> None:
             """
             Initializes the MergeSparseImage window and its state variables.
@@ -1271,12 +1274,12 @@ class ToolBox(ttk.Frame):
             self.output_filename: StringVar = StringVar(value="super.img")
             # Determines whether to delete the source chunks after a successful merge.
             self.delete_source: BooleanVar = BooleanVar(value=False)
-            
+
             # --- Widget References ---
             # These will be initialized in the `gui` method.
             self.run_button: Optional[ttk.Button] = None
             self.progressbar: Optional[ttk.Progressbar] = None
-            self.progress_label: Optional[ttk.Label] = None 
+            self.progress_label: Optional[ttk.Label] = None
 
             self.gui()
             move_center(self)
@@ -1289,40 +1292,44 @@ class ToolBox(ttk.Frame):
             main_frame.pack(fill=BOTH, expand=True, padx=5, pady=5)
 
             # Informational label explaining the tool's purpose.
-            ttk.Label(main_frame, text=lang.merge_segments_info, wraplength=400, justify=LEFT).pack(pady=(0, 10), fill=X)
-            
+            ttk.Label(main_frame, text=lang.merge_segments_info, wraplength=400, justify=LEFT).pack(pady=(0, 10),
+                                                                                                    fill=X)
+
             # Display the current project path or a message if none is selected.
             is_project_selected = project_manger.exist()
             if is_project_selected:
                 project_path_text = f"{lang.project_path_label} {project_manger.current_work_path()}"
             else:
                 project_path_text = lang.no_project_selected_label
-            
-            ttk.Label(main_frame, text=project_path_text, foreground="gray", wraplength=380, justify=LEFT).pack(pady=(0, 10), fill=X, anchor='w')
-            
+
+            ttk.Label(main_frame, text=project_path_text, foreground="gray", wraplength=380, justify=LEFT).pack(
+                pady=(0, 10), fill=X, anchor='w')
+
             # --- Output Filename Configuration ---
             output_frame = ttk.Frame(main_frame)
             output_frame.pack(fill=X, pady=5)
             ttk.Label(output_frame, text=lang.output_filename_label, width=22).pack(side=LEFT)
             ttk.Entry(output_frame, textvariable=self.output_filename).pack(side=LEFT, expand=True, fill=X)
-            
+
             # --- Options ---
             options_frame = ttk.Frame(main_frame)
             options_frame.pack(fill=X, pady=5)
-            ttk.Checkbutton(options_frame, text=lang.delete_source_segments_checkbox, variable=self.delete_source, style="Switch.TCheckbutton").pack(side=LEFT, pady=5)
-            
+            ttk.Checkbutton(options_frame, text=lang.delete_source_segments_checkbox, variable=self.delete_source,
+                            style="Switch.TCheckbutton").pack(side=LEFT, pady=5)
+
             # --- Action Button ---
-            self.run_button = ttk.Button(main_frame, text=lang.create_super_image_button, style="Accent.TButton", command=self.start_merge)
+            self.run_button = ttk.Button(main_frame, text=lang.create_super_image_button, style="Accent.TButton",
+                                         command=self.start_merge)
             self.run_button.pack(fill=X, pady=(10, 5), ipady=4)
-            
+
             # --- Progress Reporting Widgets (initially hidden) ---
             self.progress_label = ttk.Label(main_frame, text="")
             self.progressbar = ttk.Progressbar(main_frame, mode='determinate', maximum=100)
-            
+
             # Disable the run button if no project is active.
             if not is_project_selected:
                 self.run_button.config(state='disabled')
-                ttk.Label(main_frame, text=lang.select_project_to_enable, foreground="orange").pack(pady=(5,0))
+                ttk.Label(main_frame, text=lang.select_project_to_enable, foreground="orange").pack(pady=(5, 0))
 
         def start_merge(self) -> None:
             """
@@ -1333,7 +1340,7 @@ class ToolBox(ttk.Frame):
             the GUI responsive.
             """
             if not project_manger.exist():
-                warn_win(lang.project_not_selected) 
+                warn_win(lang.project_not_selected)
                 return
 
             # Make the progress bar and label visible before starting the task.
@@ -1361,10 +1368,10 @@ class ToolBox(ttk.Frame):
             # Gracefully do nothing if the window has been closed.
             if not self.winfo_exists():
                 return
-            
+
             self.run_button.config(state='disabled')
 
-            if percentage == -1: 
+            if percentage == -1:
                 # Handle the failure case.
                 self.run_button.config(text=lang.merge_failed_label)
                 self.progressbar['value'] = 0
@@ -1416,7 +1423,7 @@ class ToolBox(ttk.Frame):
                     info_func=info_win,
                     warn_func=warn_win
                 )
-                
+
                 if result_status == "PENDING":
                     # If the status is still pending, it means the merge function
                     # finished without processing any files (e.g., no segments found).
@@ -1425,7 +1432,8 @@ class ToolBox(ttk.Frame):
 
             except Exception as e:
                 logging.exception("Error in MergeSparseImage thread")
-                error_msg = getattr(lang, 'unexpected_merge_error', 'An unexpected error occurred during merge: {error}').format(error=e)
+                error_msg = getattr(lang, 'unexpected_merge_error',
+                                    'An unexpected error occurred during merge: {error}').format(error=e)
                 if self.winfo_exists():
                     self.after(0, lambda: warn_win(error_msg))
             finally:
@@ -4368,7 +4376,7 @@ class MpkStore(Toplevel):
             author_text = data.get('author', getattr(lang, 'unknown_author', 'Unknown'))
             version_text = data.get('version', getattr(lang, 'unknown_version', 'N/A'))
             size_bytes = data.get('size', 0)
-            size_hum = hum_convert(size_bytes) # the hum_convert must be callable
+            size_hum = hum_convert(size_bytes)  # the hum_convert must be callable
 
             ttk.Label(info_container_frame, text=f"{getattr(lang, 't21', 'Author:')} {author_text}", anchor="w").grid(
                 row=0, column=0, sticky="ew", pady=(0, 1))
@@ -4681,7 +4689,8 @@ class MpkStore(Toplevel):
                             try:
                                 install_button.config(text=f"{percentage} %")
                             except tk.TclError:
-                                download_successful_for_all_files = False; break
+                                download_successful_for_all_files = False;
+                                break
                         elif not self.winfo_exists():
                             download_successful_for_all_files = False
                             break
@@ -4882,43 +4891,155 @@ class PackHybridRom:
                 print(f"[Fail] Compress {basename} Fail:{e}")
 
 
+# multi group_size must 4194304 less than super
+# new_postinstall_config_file config
+class NewPostInstallConfig(Toplevel):
+    """
+    #The Config Like it.
+    RUN_POSTINSTALL_[part_name]=true
+    POSTINSTALL_PATH_[part_name]=bin/checkpoint_gc
+    FILESYSTEM_TYPE_[part_name]=ext4
+    POSTINSTALL_OPTIONAL_[part_name]=true
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.title("New Postinstall Config")
+        self.data = {}
+        self.selected = []
+        self.post_install_path = StringVar(value="")
+        self.filesystem_type = StringVar(value="")
+        self.run_postinstall = BooleanVar(value=False)
+        self.postinstall_optional = BooleanVar(value=False)
+        self.config_file = os.path.join(prog_path, 'bin', 'config', 'postinstall_config.txt')
+        self.read_config()
+        self.gui()
+        self.read_value()
+        move_center(self)
+
+    def read_config(self):
+        if self.data:
+            self.data.clear()
+        if os.path.exists(self.config_file):
+            with open(self.config_file, 'r', encoding='utf-8') as f:
+                for i in f.readlines():
+                    if not i:
+                        continue
+                    if i[0] == "#":
+                        continue
+                    if not "=" in i:
+                        continue
+                    i = i.strip("\n")
+                    name, value = i.split("=")
+                    attrib_name1, attrib_name2, part_name = name.split("_", 2)
+                    attrib_name = f"{attrib_name1}_{attrib_name2}"
+                    if not part_name in self.data:
+                        self.data[part_name] = {}
+                    self.data[part_name][attrib_name] = value
+
+    def read_value(self):
+        part_name = self.combox.get()
+        if part_name not in self.data:
+            return None
+        data: dict = self.data[part_name]
+        self.run_postinstall.set(data["RUN_POSTINSTALL"] == 'true')
+        self.post_install_path.set(data["POSTINSTALL_PATH"])
+        if 'FILESYSTEM_TYPE' in data.keys():
+            self.filesystem_type.set(data['FILESYSTEM_TYPE'])
+        else:
+            self.filesystem_type.set("")
+        if 'POSTINSTALL_OPTIONAL' in data.keys():
+            self.postinstall_optional.set(data['POSTINSTALL_OPTIONAL'] == 'true')
+        else:
+            self.postinstall_optional.set(False)
+
+    def save_value(self):
+        part_name = self.combox.get()
+        if part_name not in self.data:
+            return None
+        self.data[part_name]["RUN_POSTINSTALL"] = str(self.run_postinstall.get()).lower()
+        self.data[part_name]["POSTINSTALL_PATH"] = self.post_install_path.get()
+        self.data[part_name]["FILESYSTEM_TYPE"] = self.filesystem_type.get()
+        self.data[part_name]["POSTINSTALL_OPTIONAL"] = str(self.postinstall_optional.get()).lower()
+
+    def add_new_part(self):
+        part_name = input_("New partition name", master=self)
+        if part_name.strip() != part_name:
+            warn_win("The name is invalid!")
+            return
+        if not part_name:
+            return
+        self.data[part_name] = {"RUN_POSTINSTALL": "false", "POSTINSTALL_PATH": ""}
+        self.combox.config(values=list(self.data.keys()))
+        self.combox.set(part_name)
+        self.read_value()
+    def save_data(self):
+        if os.path.exists(self.config_file):
+            with open(self.config_file, 'w', encoding='utf-8') as f:
+                for i in self.data:
+                    for name in ['RUN_POSTINSTALL',"POSTINSTALL_PATH", "FILESYSTEM_TYPE", "POSTINSTALL_OPTIONAL"]:
+                        value = self.data[i].get(name)
+                        if value:
+                            f.write(f"{name}_{i}={value}\n")
+
+    def gui(self):
+        self.frame_up = Frame(self)
+        self.combox = ttk.Combobox(self.frame_up)
+        self.combox.config(values=list(self.data.keys()))
+        self.combox.bind('<<ComboboxSelected>>', lambda *x: self.read_value())
+        if self.data:
+            self.combox.current(0)
+        self.combox.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        self.add_button = ttk.Button(self.frame_up, text="+", command=lambda: create_thread(self.add_new_part()))
+        self.add_button.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        self.apply_button = ttk.Button(self.frame_up, text="apply", command=lambda: create_thread(self.save_value()))
+        self.apply_button.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        self.frame_down = ttk.LabelFrame(self, text='config')
+        frame = Frame(self.frame_down)
+        ttk.Label(frame, text='RUN_POSTINSTALL').pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        self.run_postinstall_checkbutton = ttk.Checkbutton(frame, variable=self.run_postinstall, onvalue=True,
+                                                           offvalue=False, style="Switch.TCheckbutton")
+        self.run_postinstall_checkbutton.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        frame.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        frame = Frame(self.frame_down)
+        ttk.Label(frame, text='POSTINSTALL_PATH').pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        self.post_install_path_entry = ttk.Entry(frame, textvariable=self.post_install_path)
+        self.post_install_path_entry.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        frame.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        #
+        frame = Frame(self.frame_down)
+        ttk.Label(frame, text='FILESYSTEM_TYPE').pack(padx=7, pady=5, side='left', expand=True, fill=X)
+        self.filesystem_type_combobox = ttk.Combobox(frame, textvariable=self.filesystem_type, values=('ext4', "erofs"),
+                                                     width=14)
+        self.filesystem_type_combobox.current(0)
+        self.filesystem_type_combobox.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        frame.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        #
+        frame = Frame(self.frame_down)
+        ttk.Label(frame, text='POSTINSTALL_OPTIONAL').pack(padx=1, pady=5, side='left', expand=True, fill=X)
+        self.postinstall_optional_checkbobox = ttk.Checkbutton(frame, variable=self.postinstall_optional, onvalue=True,
+                                                               offvalue=False, style="Switch.TCheckbutton")
+        self.postinstall_optional_checkbobox.pack(padx=5, pady=5, side='left', expand=True, fill=X)
+        frame.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        self.frame_down.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        self.frame_up.pack(padx=5, pady=5, expand=True, side='top', fill=X)
+        ttk.Button(self, text="Save", command=lambda: create_thread(self.save_data()), style="Accent.TButton").pack(padx=5, pady=5, expand=True, side='bottom', fill=X)
+
+
 class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
-        self.title("打包Payload")
-        self.overhead = 4194304
-        # multi group_size must 4194304 less than super
-        self.super_size = IntVar(value=17179869184)
-        self.group_size = IntVar(value=17175674880)
-        self.group_name = StringVar(value="qti_dynamic_partitions")
-        self.virtual_ab = BooleanVar(value=True)
-        self.part_list = []
-        self.gui()
-        move_center(self)
+        self.title("Repack Payload")
+        # variables
+        self.new_postinstall_config_file = StringVar()  # file
+        self.dynamic_partition_info_file = StringVar()  # file
+        self.sign_key = StringVar()  # file default : testkey from google
+        self.partition_names = []
+        self.new_partitions = []  # file
 
     def gui(self):
-        """Group Name"""
-        group_name_frame = ttk.Frame(self)
-        Label(group_name_frame, text="Group Name:").pack(padx=3, pady=5, side='left')
-        ttk.Combobox(group_name_frame, textvariable=self.group_name,
-                     values=("qti_dynamic_partitions", "main", "mot_dp_group")).pack(side='left', padx=10, pady=10,
-                                                                                     fill='both')
-        group_name_frame.pack(padx=5, pady=5, fill='both')
-        """Super Size"""
-        super_size_frame = ttk.Frame(self)
-        Label(super_size_frame, text="Super Size:").pack(padx=3, pady=5, side='left')
-        super_size_entry = ttk.Entry(super_size_frame, textvariable=self.super_size)
-        super_size_entry.pack(side='left', padx=10, pady=10)
-        super_size_entry.bind("<KeyRelease>",
-                              lambda *x: super_size_entry.state(
-                                  ["!invalid" if super_size_entry.get().isdigit() else "invalid"]))
-        super_size_frame.pack(padx=5, pady=5, fill='both')
-        """Group size"""
-        group_size_frame = Frame(self)
-        Label(group_size_frame, text="Group Size:").pack(padx=3, pady=5, side='left')
-        group_size_entry = ttk.Entry(group_size_frame, textvariable=self.group_size)
-        group_size_entry.pack(padx=5, pady=5, fill='both')
-        group_size_frame.pack(padx=5, pady=5, fill=BOTH)
+        ...
+        # For Config new_postinstall_config_file
 
 
 class PackSuper(Toplevel):
@@ -5760,11 +5881,13 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "") -> str:
+def input_(title: str = None, text: str = "", master: Tk | Toplevel = None) -> str:
     if not title:
         title = lang.text76
     (input_var := StringVar()).set(text)
-    input_frame = ttk.LabelFrame(win, text=title)
+    if not master:
+        master = win
+    input_frame = ttk.LabelFrame(master, text=title)
     input_frame.place(relx=0.5, rely=0.5, anchor="center")
     entry = ttk.Entry(input_frame, textvariable=input_var)
     entry.pack(pady=5, padx=5, fill=BOTH)
@@ -6633,7 +6756,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            # ("打包 Payload", lambda: create_thread(PackPayload)),
+            #("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
@@ -7104,7 +7227,7 @@ def __init__tk(args: list):
         open(tool_log, 'w', encoding="utf-8", newline="\n").close()
     if not states.development:
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
-                        filename=tool_log, filemode='w')
+                            filename=tool_log, filemode='w')
     else:
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
     global win
