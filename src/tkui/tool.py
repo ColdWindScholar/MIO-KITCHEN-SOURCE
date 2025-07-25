@@ -5025,7 +5025,18 @@ class NewPostInstallConfig(Toplevel):
         self.frame_up.pack(padx=5, pady=5, expand=True, side='top', fill=X)
         ttk.Button(self, text="Save", command=lambda: create_thread(self.save_data()), style="Accent.TButton").pack(padx=5, pady=5, expand=True, side='bottom', fill=X)
 
-
+#dynamic_partitions_info config
+class DynamicPartitionsInfo(Toplevel):
+    """
+    #The Config File Like following.
+    virtual_ab=true
+super_partition_size=17179869184
+super_{group_name}_group_size=17175674880
+super_partition_groups={group_name}
+super_{group_name}_partition_list=my_company my_preload vbmeta
+    """
+    def __init__(self):
+        super().__init__()
 class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
@@ -5487,6 +5498,9 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
     flag = ''
     if boot is None:
         boot = findfile(f"{name}.img", work)
+        if not boot:
+            print("Origin boot is lost.Cannot repack boot.img.")
+            return
     if source is None:
         source = work + name
     if not os.path.exists(source):
@@ -6756,7 +6770,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            #("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
+            ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
