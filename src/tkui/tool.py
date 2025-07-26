@@ -3870,7 +3870,7 @@ class InstallMpk(Toplevel):
                 with myfile.open('icon') as myfi:
                     self.icon = myfi.read()
                     try:
-                        self.pyt = PhotoImage(data=self.icon)
+                        self.pyt = PhotoImage(open_img(BytesIO(self.icon)).resize((128, 128)))
                     except Exception:
                         logging.exception('Bugs')
                         self.pyt = PhotoImage(data=images.none_byte)
