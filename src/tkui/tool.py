@@ -3389,7 +3389,7 @@ class ModuleManager:
                 if installed_plugin_id == name_to_check_deps_for: continue
                 if installed_plugin_id in self.arr: continue
 
-                dependencies_str = module_manager.get_info(installed_plugin_id, 'depend', '')
+                dependencies_str: str = module_manager.get_info(installed_plugin_id, 'depend', '')
                 dependencies_list = dependencies_str.split()
 
                 if name_to_check_deps_for in dependencies_list:
