@@ -3189,7 +3189,7 @@ class ModuleManager:
 
         def _input(self, master, set, text):
             input_frame = Frame(master)
-            input_frame.pack(fill=X)
+            input_frame.pack(fill=X, padx=5, pady=5)
             self.gavs[set] = StringVar()
             if text != 'None':
                 ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
@@ -3258,7 +3258,7 @@ class ModuleManager:
                             logging.exception('V!')
                             print(con, args, varnames)
             ttk.Button(self, text=lang.ok,
-                       command=lambda: self.destroy).pack(
+                       command=lambda: self.destroy()).pack(
                 fill=X,
                 side='bottom')
             move_center(self)
