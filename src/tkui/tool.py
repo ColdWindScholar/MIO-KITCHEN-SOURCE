@@ -6770,7 +6770,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
+            #("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
