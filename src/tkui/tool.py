@@ -4544,7 +4544,7 @@ class MpkStore(Toplevel):
         ttk.Button(button_frame_repo, text=getattr(lang, 'ok', "OK"), command=on_ok_repo, style="Accent.TButton").pack(
             side=LEFT, padx=(5, 0), expand=True, fill=X)
 
-        move_center(a, master_window=self)  # Center the dialog relative to the MpkStore window.
+        move_center(a)  # Center the dialog relative to the MpkStore window.
 
     def download(self, files, size, id_, depends):
         if not self.winfo_exists():
