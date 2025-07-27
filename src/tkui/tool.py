@@ -6358,8 +6358,7 @@ def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> i
 
 def info_win(text: str, ok: str = None, master: Toplevel = None):
     ok = ok or lang.ok
-    if master is None:
-        master = Toplevel()
+    master = master or Toplevel()
     frame_inner = ttk.Frame(master)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
