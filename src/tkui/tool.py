@@ -2060,7 +2060,7 @@ def error(code, desc="unknown error"):
                                             padx=10,
                                             pady=10, expand=True, fill=BOTH)
     ttk.Button(er, text="Generate Bug Report",
-               command=lambda: create_thread(Generate_Bug_Report),
+               command=lambda: create_thread(generate_bug_report),
                style="Accent.TButton").pack(side=LEFT,
                                             padx=10,
                                             pady=10, expand=True, fill=BOTH)
@@ -3894,7 +3894,7 @@ class InstallMpk(Toplevel):
         self.installb.config(state=DISABLED)
 
 
-def Generate_Bug_Report():
+def generate_bug_report():
     if os.name == 'nt':
         output = filedialog.askdirectory(title="Path To Save Bug Report")
     else:
@@ -3948,7 +3948,7 @@ class Debugger(Toplevel):
             ('Info', self.show_info),
             ('Crash it!', self.crash),
             ('Hacker panel', lambda: openurl('https://vdse.bdstatic.com/192d9a98d782d9c74c96f09db9378d93.mp4')),
-            ('Generate Bug Report', lambda: create_thread(Generate_Bug_Report)),
+            ('Generate Bug Report', lambda: create_thread(generate_bug_report)),
             ('米塔 MiSide', lambda: openurl('https://store.steampowered.com/app/2527500/')),
             ('米塔 MiSide(Demo)', lambda: openurl('steam://install/2527520')),
             ('No More Room in Hell', lambda: openurl('steam://install/224260')),
@@ -4689,7 +4689,7 @@ class MpkStore(Toplevel):
                             try:
                                 install_button.config(text=f"{percentage} %")
                             except tk.TclError:
-                                download_successful_for_all_files = False;
+                                download_successful_for_all_files = False
                                 break
                         elif not self.winfo_exists():
                             download_successful_for_all_files = False
@@ -6798,9 +6798,9 @@ class UnpackGui(ttk.LabelFrame):
     def gui(self):
         self.pack(padx=5, pady=5)
         self.ch.set(True)
-        run_Select_canvas = Canvas(self)
-        run_Select_canvas.config(highlightthickness=0)
-        self.fm = ttk.Combobox(run_Select_canvas, state="readonly",
+        run_select_canvas = Canvas(self)
+        run_select_canvas.config(highlightthickness=0)
+        self.fm = ttk.Combobox(run_select_canvas, state="readonly",
                                values=(
                                    'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                    'update.app'))
@@ -6820,10 +6820,10 @@ class UnpackGui(ttk.LabelFrame):
                         value=False).pack(padx=5, pady=5, side='left')
 
         self.fm.pack(padx=5, pady=5, fill=Y, side=LEFT)
-        ttk.Button(run_Select_canvas, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5,
+        ttk.Button(run_select_canvas, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5,
                                                                                                       side=LEFT)
 
-        run_Select_canvas.pack(side=BOTTOM, fill=X)
+        run_select_canvas.pack(side=BOTTOM, fill=X)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
         ff1.pack(padx=5, pady=5, fill=X, side=BOTTOM)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
