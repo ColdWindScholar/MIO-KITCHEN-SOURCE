@@ -874,3 +874,4 @@ class ModuleErrorCodes(IntEnum):
     PlatformNotSupport = 1
     DependsMissing = 2
     IsBroken = 3
+    GenericError = 4

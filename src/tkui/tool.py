@@ -2854,7 +2854,7 @@ class ModuleManager:
         return 0
 
     @staticmethod
-    def check_mpk(mpk):
+    def check_mpk(mpk): # Move check progress from InstallMpk to this
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return module_error_codes.IsBroken, ''
         try:
