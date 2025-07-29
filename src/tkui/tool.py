@@ -24,7 +24,9 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional
-
+from src.core.verify_payload import verify_payload
+from src.core.verify_payload.error import VerificationError
+from src.core.img2payload import create_payload_image_compressed
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -292,60 +294,59 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'orange', title: str = "Warn",
-             wait: int = 3000):  # Increased wait time to 3000 ms
-    # Ensure `win` is the correct parent (main window).
-    # If `win` isn't always available or if it's an MpkStore instance, `master` should be passed explicitly.
-    # For simplicity, we assume `win` is the main Tk object.
-    parent_for_popup = win
-    if hasattr(states, 'active_mpk_store_instance') and \
-            states.active_mpk_store_instance and \
-            states.active_mpk_store_instance.winfo_exists():
-        # If MpkStore is active, make the popup relative to it to ensure it's on top.
-        parent_for_popup = states.active_mpk_store_instance
-        # However, a LabelFrame cannot be a direct child of a Toplevel using `place` in this manner.
-        # It's better to create a new Toplevel for this message if `parent_for_popup` is already a Toplevel.
+def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master: Optional[tk.Wm] = None) -> None:
+    """
+    Displays a modal warning/error window that stays until the user closes it.
 
-    # If we want the message to be modal or always on top of a specific window,
-    # it's better to create a new Toplevel.
+    This function creates a modal dialog that remains on top of its parent
+    window. It is designed for displaying critical errors or warnings that
+    require user acknowledgment. The window is automatically centered.
 
-    popup_window = Toplevel()  # Create a new Toplevel for the message.
-    popup_window.transient(parent_for_popup)  # Make it a transient window, child of and displayed on top of the parent.
+    Args:
+        text: The message to be displayed in the window.
+        color: The color of the message text. Defaults to 'red' for errors.
+        title: The title of the dialog window.
+        master: The parent widget for this dialog. If None, the main application
+                window (`win`) is used as the parent.
+    """
+    # Determine the parent window; default to the main app window if not specified.
+    parent = master if master and master.winfo_exists() else win
+
+    popup_window = Toplevel()  # Use the custom Toplevel for theme consistency.
     popup_window.title(title)
-    # Remove standard window decorations (optional, if closing via the 'X' button isn't desired).
-    # popup_window.overrideredirect(True) # This will remove the window frame and decorations entirely.
+    
+    # 1. Make the window "transient" to its parent. This ensures it always
+    #    stays on top of the parent window.
+    popup_window.transient(parent)
+    
+    # 2. Set a "grab". This makes the window modal, preventing any interaction
+    #    with the parent window until this dialog is closed.
+    popup_window.grab_set()
+    
 
-    # Use ttk.Frame inside Toplevel instead of LabelFrame for simplicity.
-    ask_frame = ttk.Frame(popup_window, padding=(20, 10))  # Add padding.
+    ask_frame = ttk.Frame(popup_window, padding=(20, 10))
     ask_frame.pack(expand=True, fill=BOTH)
 
-    # Message content.
     msg_label = ttk.Label(ask_frame, text=text, font=(None, 14), foreground=color, wraplength=350,
-                          justify=CENTER)  # Reduced font size, added text justification.
+                          justify=CENTER)
     msg_label.pack(pady=(10, 20), expand=True, fill=X)
 
-    # OK button (optional, if closing via a button is needed, not just by timer).
-    # ttk.Button(ask_frame, text=getattr(lang, 'ok', "OK"), command=popup_window.destroy, style="Accent.TButton").pack(pady=(0,10))
+    def close_popup() -> None:
+        """Releases the modal grab and destroys the popup window."""
+        popup_window.grab_release()
+        popup_window.destroy()
 
-    popup_window.update_idletasks()  # Update dimensions before centering.
+    # Add an "OK" button that the user must click to close the window.
+    ok_text = getattr(lang, 'ok', 'OK')  # Use localized text for the button.
+    ok_button = ttk.Button(ask_frame, text=ok_text, command=close_popup, style="Accent.TButton")
+    ok_button.pack(pady=(0, 10), padx=20, fill=X, ipady=4) # ipady adds vertical padding inside the button.
 
-    # Center the popup relative to the parent window.
-    parent_width = parent_for_popup.winfo_width()
-    parent_height = parent_for_popup.winfo_height()
-    parent_x = parent_for_popup.winfo_x()
-    parent_y = parent_for_popup.winfo_y()
+    popup_window.update_idletasks()
+    move_center(popup_window)  # Center the dialog on the screen.
 
-    popup_width = popup_window.winfo_reqwidth()  # Use `winfo_reqwidth()` for the initial requested width.
-    popup_height = popup_window.winfo_reqheight()  # Use `winfo_reqheight()` for the initial requested height.
-
-    x_pos = parent_x + (parent_width // 2) - (popup_width // 2)
-    y_pos = parent_y + (parent_height // 2) - (popup_height // 2)
-
-    popup_window.geometry(f"+{x_pos}+{y_pos}")
-    popup_window.lift()  # Lift the window above others.
-    popup_window.focus_force()  # Force focus onto the popup.
-
-    popup_window.after(wait, popup_window.destroy)
+    # This crucial line pauses the execution of the calling code until the
+    # popup_window is destroyed, enforcing the modal behavior.
+    parent.wait_window(popup_window)
 
 
 class Toplevel(TkToplevel):
@@ -6356,17 +6357,47 @@ def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> i
     return value.get()
 
 
-def info_win(text: str, ok: str = None, master: Toplevel = None):
-    ok = ok or lang.ok
-    master = master or Toplevel()
-    frame_inner = ttk.Frame(master)
+def info_win(text: str, ok: Optional[str] = None, master: Optional[tk.Wm] = None) -> None:
+    """
+    Displays a modal informational window that stays until the user clicks "OK".
+
+    Similar to `warn_win` but intended for general information (e.g., success
+    messages). It creates a modal dialog that remains on top of its parent.
+
+    Args:
+        text: The message to be displayed.
+        ok: The text for the confirmation button. Defaults to a localized "OK".
+        master: The parent widget for this dialog. If None, the main application
+                window (`win`) is used.
+    """
+    ok_text = ok or getattr(lang, 'ok', 'OK')
+    
+    parent = master if master and master.winfo_exists() else win
+    
+    dialog = Toplevel()
+    dialog.title("")  # A clean, title-less dialog window.
+    
+    # Make the dialog transient and modal.
+    dialog.transient(parent)
+    dialog.grab_set()
+    
+    frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
+    
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    ttk.Button(frame_inner, text=ok, command=master.destroy, style="Accent.TButton").pack(padx=5, pady=5,
-                                                                                          fill=X, side='left',
-                                                                                          expand=True)
-    move_center(master)
-    master.wait_window()
+    
+    def close_dialog() -> None:
+        """Releases the grab and destroys the dialog."""
+        dialog.grab_release()
+        dialog.destroy()
+        
+    ttk.Button(frame_inner, text=ok_text, command=close_dialog, style="Accent.TButton").pack(padx=5, pady=5,
+                                                                                            fill=X, side=LEFT,
+                                                                                            expand=True)
+    dialog.update_idletasks()
+    move_center(dialog)
+    
+    parent.wait_window(dialog)
 
 
 class GetFolderSize:
@@ -6779,14 +6810,21 @@ class Frame3(ttk.LabelFrame):
 
 
 class UnpackGui(ttk.LabelFrame):
+    """
+    A GUI component for selecting partitions to pack or unpack.
+    It provides controls to switch between pack/unpack modes, select file formats,
+    and lists the available items for the selected operation.
+    """
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
-        self.ch = BooleanVar()
+        self.ch = BooleanVar()  # Variable to toggle between Pack (False) and Unpack (True) modes.
         current_project_name.trace_add("write", self._on_project_change)
 
-    # New handler method, invoked when the project changes.
     def _on_project_change(self, *args):
-        """Automatically called when `current_project_name` changes."""
+        """
+        Callback method that is automatically invoked when `current_project_name` changes.
+        It refreshes the list of items to reflect the contents of the new project.
+        """
         # Check if the `hd` method exists and the widget itself is still valid before calling.
         if hasattr(self, 'hd') and callable(self.hd):
             if self.winfo_exists():
@@ -6795,23 +6833,29 @@ class UnpackGui(ttk.LabelFrame):
                 self.hd()
 
     def gui(self):
+        """Builds the graphical user interface for this component."""
         self.pack(padx=5, pady=5)
-        self.ch.set(True)
-        run_select_canvas = Canvas(self)
-        run_select_canvas.config(highlightthickness=0)
-        self.fm = ttk.Combobox(run_select_canvas, state="readonly",
+        self.ch.set(True)  # Default to Unpack mode.
+        run_Select_canvas = Canvas(self)
+        run_Select_canvas.config(highlightthickness=0)
+
+        # Combobox for selecting the file format to unpack.
+        self.fm = ttk.Combobox(run_Select_canvas, state="readonly",
                                values=(
                                    'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                    'update.app'))
-        self.lsg = ListBox(self)
-        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)
+
+        self.lsg = ListBox(self) # The listbox for displaying items.
+        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0) # Context menu for listbox items.
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
+
         self.fm.current(0)
         self.fm.bind("<<ComboboxSelected>>", lambda *x: self.refs())
         self.lsg.gui()
         self.lsg.canvas.bind('<Button-3>', self.show_menu)
 
+        # Frame for Pack/Unpack radio buttons.
         ff1 = ttk.Frame(self)
         ttk.Radiobutton(ff1, text=lang.unpack, variable=self.ch,
                         value=True).pack(padx=5, pady=5, side='left')
@@ -6819,39 +6863,46 @@ class UnpackGui(ttk.LabelFrame):
                         value=False).pack(padx=5, pady=5, side='left')
 
         self.fm.pack(padx=5, pady=5, fill=Y, side=LEFT)
-        ttk.Button(run_select_canvas, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5,
+        ttk.Button(run_Select_canvas, text=lang.run, command=lambda: create_thread(self.close_)).pack(padx=5, pady=5,
                                                                                                       side=LEFT)
 
-        run_select_canvas.pack(side=BOTTOM, fill=X)
+        # Layout the components.
+        run_Select_canvas.pack(side=BOTTOM, fill=X)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
         ff1.pack(padx=5, pady=5, fill=X, side=BOTTOM)
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
         self.lsg.pack(padx=5, pady=5, fill=Y, side=BOTTOM, expand=True)
 
-        self.refs()
-        self.ch.trace("w", lambda *x: self.hd())
+        self.refs() # Initial population of the listbox.
+        self.ch.trace("w", lambda *x: self.hd()) # Add trace to update UI on mode change.
 
     def show_menu(self, event):
+        """Displays the context menu if a single image item is selected."""
         if len(self.lsg.selected) == 1 and self.fm.get() == 'img':
             self.menu.post(event.x_root, event.y_root)
 
     def info(self):
+        """Displays detailed information about the selected image file."""
         ck_ = Toplevel()
         move_center(ck_)
         ck_.title(lang.attribute)
         if not self.lsg.selected:
             ck_.destroy()
             return
+
         f_path = os.path.join(project_manger.current_work_path(), self.lsg.selected[0] + ".img")
         if not os.path.exists(f_path):
             ck_.destroy()
             return
+
         f_type = gettype(f_path)
         info = [["Path", f_path], ['Type', f_type], ["Size", os.path.getsize(f_path)]]
+
         if f_type == 'ext':
             with open(f_path, 'rb') as e:
                 for i in ext4.Volume(e).get_info_list:
                     info.append(i)
+
         scroll = ttk.Scrollbar(ck_, orient='vertical')
         columns = [lang.name, 'Value']
         table = ttk.Treeview(master=ck_, height=10, columns=columns, show='headings', yscrollcommand=scroll.set)
@@ -6866,20 +6917,59 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
+        """
+        Handler for mode change (Pack/Unpack). Updates the UI accordingly.
+        """
         if not hasattr(self, 'fm'):
-            # Using print for debugging, can be replaced with logging.
-            logging.debug(
-                f"UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update. Current project: {current_project_name.get()}")
+            logging.debug("UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update.")
             return
 
-        if self.ch.get():
+        if self.ch.get():  # True = Unpack mode
             self.fm.configure(state='readonly')
             self.refs()
-        else:
+        else:  # False = Pack mode
             self.fm.configure(state="disabled")
-            self.refs2()
+            # Special handling for payload in pack mode
+            if self.fm.get() == 'payload':
+                self.refs_payload_pack()
+            else:
+                self.refs2()
+
+    def refs_payload_pack(self):
+        """
+        Displays images available for packing into a payload.bin.
+        """
+        self.lsg.clear()
+        work = project_manger.current_work_path()
+        if not os.path.exists(work):
+            win.message_pop(lang.warn1)
+            return False
+
+        parts_dict = JsonEdit(f"{work}/config/parts_info").read()
+
+        # Find .img files in the working directory to be packed into the payload.
+        for file_name in os.listdir(work):
+            if file_name.endswith('.img'):
+                partition_name = file_name.split('.img')[0]
+                img_path = os.path.join(work, file_name)
+                # Skip empty images.
+                if os.path.getsize(img_path) == 0:
+                    continue
+                f_type = gettype(img_path)
+                if f_type == 'unknown':
+                    f_type = 'img'
+
+                # Check if a corresponding folder type exists in parts_info.
+                folder_type = parts_dict.get(partition_name, f_type)
+
+                self.lsg.insert(f'{partition_name} [{folder_type}] ({hum_convert(os.path.getsize(img_path))})', partition_name)
+
+        return True
 
     def refs(self, auto: bool = False):
+        """
+        Refreshes the list of items available for unpacking based on the selected format.
+        """
         if auto:
             for index, value in enumerate(self.fm.cget("values")):
                 self.fm.current(index)
@@ -6892,6 +6982,7 @@ class UnpackGui(ttk.LabelFrame):
 
     @animation
     def __refs(self):
+        """The actual logic for refreshing the unpack list, runs in a separate thread."""
         self.lsg.clear()
         work = project_manger.current_work_path()
         if not project_manger.exist():
@@ -6925,8 +7016,10 @@ class UnpackGui(ttk.LabelFrame):
         return True
 
     def refs2(self):
+        """Refreshes the list of items available for packing (e.g., unpacked directories)."""
         self.lsg.clear()
-        if not os.path.exists(work := project_manger.current_work_path()):
+        work = project_manger.current_work_path()
+        if not os.path.exists(work):
             win.message_pop(lang.warn1)
             return False
         parts_dict = JsonEdit(f"{work}/config/parts_info").read()
@@ -6936,13 +7029,177 @@ class UnpackGui(ttk.LabelFrame):
         return True
 
     def close_(self):
+        """
+        Initiates the pack or unpack operation based on the current mode and user selection.
+        """
         lbs = self.lsg.selected.copy()
-        self.hd()
-        if self.ch.get() == 1:
+
+        # Update the UI before starting a potentially long operation.
+        if self.winfo_exists():
+            self.update_idletasks()
+
+        if self.ch.get():  # Unpack mode (True)
             unpack(lbs, self.fm.get())
             self.refs()
-        else:
-            Packxx(lbs)
+        else:  # Pack mode (False)
+            if self.fm.get() == 'payload':
+                if not lbs:
+                    # Show a warning if no partitions are selected.
+                    warn_win(text=lang.payload_no_partitions_selected, color="orange")
+                    return
+                # Open a new window for compression selection and packing.
+                PackPayloadBin(lbs)
+            else:
+                Packxx(lbs)
+                
+
+class PackPayloadBin(Toplevel):
+    """
+    A Toplevel window for configuring and packing a payload.bin file.
+    
+    This class provides the UI for selecting a compression method and initiating
+    the payload packing process. After packing, it can optionally trigger a
+    verification of the newly created payload.
+    """
+    def __init__(self, partitions_to_pack: list[str]) -> None:
+        """
+        Initializes the PackPayloadBin window.
+
+        Args:
+            partitions_to_pack: A list of partition names (e.g., ['system', 'vendor'])
+                                to be included in the payload.
+        """
+        super().__init__()
+        self.partitions = partitions_to_pack
+        self.compression_type = tk.StringVar()
+        self.should_verify = tk.BooleanVar(value=True)
+
+        self.title(lang.pack_payload_title)
+        
+        # Make this window transient to and modal over the main application window.
+        self.transient(win)
+        self.grab_set()
+
+        self.gui()
+        move_center(self)
+
+    def gui(self) -> None:
+        """Builds and lays out the graphical user interface for the window."""
+        main_frame = ttk.Frame(self, padding=15)
+        main_frame.pack(fill=BOTH, expand=True)
+        
+        ttk.Label(main_frame, text=lang.select_compression_method, font=(None, 12)).pack(pady=(0, 10))
+
+        # Map display names (from localization) to the actual compression keys.
+        self.compression_options = {
+            lang.compression_xz_desc: "xz",
+            lang.compression_bz2_desc: "bz2",
+            lang.compression_zstd_desc: "zstd",
+            lang.compression_none_desc: "none",
+        }
+        
+        self.combo = ttk.Combobox(main_frame, textvariable=self.compression_type, 
+                                  values=list(self.compression_options.keys()), state='readonly',
+                                  width=40)
+        self.combo.pack(pady=5, fill=X)
+        self.combo.current(0)  # Default to the first compression option.
+
+        # A toggle switch for enabling/disabling post-packing verification.
+        verify_switch = ttk.Checkbutton(main_frame, text=lang.verify_after_packing, 
+                                        variable=self.should_verify, style="Switch.TCheckbutton")
+        verify_switch.pack(pady=(10, 0), anchor='w')
+
+        button_frame = ttk.Frame(main_frame)
+        button_frame.pack(fill=X, pady=(15, 0))
+
+        ttk.Button(button_frame, text=lang.cancel, command=self.destroy).pack(side=LEFT, expand=True, padx=(0, 5))
+        self.pack_button = ttk.Button(button_frame, text=lang.pack_button_text, style="Accent.TButton", 
+                                      command=lambda: create_thread(self._start_packing))
+        self.pack_button.pack(side=RIGHT, expand=True, padx=(5, 0))
+
+    def _start_packing(self) -> None:
+        """
+        Handles the payload packing process in a background thread.
+        
+        This method disables the UI, prepares temporary directories, calls the
+        core packing function, and then handles the result by showing a success
+        or failure dialog via the main GUI thread. It also triggers verification
+        if requested.
+        """
+        self.pack_button.config(state='disabled', text=lang.packing_in_progress)
+        self.update_idletasks()
+        
+        selected_display_name = self.compression_type.get()
+        compression_key = self.compression_options.get(selected_display_name, "xz")
+
+        work_path = project_manger.current_work_path()
+        output_payload_path = os.path.join(project_manger.current_work_output_path(), 'payload.bin')
+
+        # Create a unique temporary directory to stage images for packing.
+        temp_images_dir = os.path.join(temp, f"payload_pack_{v_code()}")
+        re_folder(temp_images_dir)
+        
+        try:
+            # Find the private key for signing.
+            private_key_path = os.path.join(cwd_path, "bin", "payload-test-key.pem")
+            if not os.path.exists(private_key_path):
+                key_path_pk8 = os.path.join(cwd_path, "bin", "testkey.pk8")
+                private_key_path = key_path_pk8 if os.path.exists(key_path_pk8) else None
+            
+            # Copy selected partition images to the temporary directory.
+            for partition_name in self.partitions:
+                src_img_path = os.path.join(work_path, f"{partition_name}.img")
+                if os.path.exists(src_img_path):
+                    shutil.copy2(src_img_path, temp_images_dir)
+            
+            # Call the core payload creation function.
+            packing_successful = create_payload_image_compressed(
+                img_dir=temp_images_dir,
+                output_path=output_payload_path,
+                compression_type=compression_key,
+                private_key_path=private_key_path,
+                lang_code=settings.language
+            ) 
+            
+            if not packing_successful:
+                # If create_payload_image_compressed returns False, it has already
+                # printed a detailed error. We just show a generic failure dialog.
+                self.after(0, lambda: warn_win(lang.packing_failed, color="red", master=self))
+                return
+
+            # If packing was successful, proceed to verification if requested.
+            if self.should_verify.get():
+                public_key_path = os.path.join(cwd_path, "src", "core", "verify_payload", "payload-test-key.pub.pem")
+                
+                try:
+                    # The verify_payload function will raise VerificationError on failure.
+                    verify_payload(output_payload_path, public_key_path, lang_code=settings.language)
+                    # If no exception, show a success dialog.
+                    self.after(0, lambda: info_win(lang.return_summary_success_full, master=self))
+                
+                except VerificationError as e:
+                    # If verification fails, show a warning dialog with the error message.
+                    # The detailed error is already printed to the console by the verifier.
+                    self.after(0, lambda: warn_win(f"{lang.ui_verification_failed}\n{e}", color="red", master=self))
+            
+            else: # Packing was successful, but verification was not requested.
+                self.after(0, lambda: info_win(lang.packing_success, master=self))
+
+        except Exception as e:
+            # Catch any other unexpected errors during the entire process.
+            logging.exception("Error during payload packing process")
+            self.after(0, lambda: warn_win(f"{lang.packing_failed}\n{e}", color="red", master=self))
+        finally:
+            # Always clean up the temporary directory.
+            try:
+                shutil.rmtree(temp_images_dir)
+            except Exception as e:
+                logging.warning(f"Failed to cleanup temp payload packing directory: {e}")
+            
+            # Close this configuration window after showing the result dialog.
+            # The wait_window in info_win/warn_win ensures this happens after the user
+            # has acknowledged the result.
+            self.after(0, self.destroy)
 
 
 class FormatConversion(ttk.LabelFrame):
