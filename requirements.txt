@@ -12,6 +12,7 @@ zstandard
 asn1crypto
 lxml
 wmi
+six
 httpx
 cryptography
 toml

@@ -17,6 +17,7 @@ import lzma
 import struct
 import sys
 import threading
+import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
@@ -25,14 +26,12 @@ import zstandard
 from . import update_metadata_pb2 as um
 
 flatten = lambda l: [item for sublist in l for item in sublist]
-
 u32 = lambda x:struct.unpack(">I", x)[0]
 u64 = lambda x:struct.unpack(">Q", x)[0]
 
-
 class Dumper:
     def __init__(
-            self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), buffsize=8192
+        self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), buffsize=8192
     ):
         self.payloadpath = payloadfile
         payloadfile = self.open_payloadfile()
@@ -47,7 +46,14 @@ class Dumper:
         self.validate_magic()
 
     def open_payloadfile(self):
-        return open(self.payloadpath, 'rb')
+        if zipfile.is_zipfile(self.payloadpath):
+            zf = zipfile.ZipFile(self.payloadpath)
+            if "payload.bin" in zf.namelist():
+                return zf.open("payload.bin")
+            else:
+                raise ValueError("payload.bin not found in zip file")
+        else:
+            return open(self.payloadpath, 'rb')
 
     def run(self, slow=False) -> bool:
         if self.images == "":
@@ -130,77 +136,106 @@ class Dumper:
         data_length = operation["data_length"]
         op = operation["operation"]
 
-        # assert hashlib.sha256(data).digest() == op.data_sha256_hash, 'operation data hash mismatch'
+        ZSTD_TYPE = getattr(um.InstallOperation, 'ZSTD', -1)
+        REPLACE_ZSTD_TYPE = getattr(um.InstallOperation, 'REPLACE_ZSTD', -2)
         op_type = op.type
-        if op.type == op.REPLACE_ZSTD:
-            if payloadfile.read(4) != b'(\xb5/\xfd':
-                op_type = op.REPLACE
-            payloadfile.seek(payloadfile.tell() - 4)
-        if op_type == op.REPLACE_ZSTD:
+
+        if op_type in (ZSTD_TYPE, REPLACE_ZSTD_TYPE):
+            if data_length >= 4:
+                magic_bytes = payloadfile.read(4)
+                if magic_bytes != b'(\xb5/\xfd':
+                    op_type = um.InstallOperation.REPLACE
+                payloadfile.seek(payloadfile.tell() - 4)
+            else:
+                op_type = um.InstallOperation.REPLACE
+
+        if op_type in (ZSTD_TYPE, REPLACE_ZSTD_TYPE):
             dec = zstandard.ZstdDecompressor().decompressobj()
+            out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
-                data = payloadfile.read(buffsize)
+                chunk_to_read = min(buffsize, data_length - processed_len)
+                data = payloadfile.read(chunk_to_read)
+                if not data: break
                 processed_len += len(data)
-                data = dec.decompress(data)
-                out_file.write(data)
-                out_file.write(dec.flush())
-        elif op_type == op.REPLACE_XZ:
+                decompressed_data = dec.decompress(data)
+                out_file.write(decompressed_data)
+            remaining_data = dec.flush()
+            if remaining_data:
+                out_file.write(remaining_data)
+
+        elif op_type == um.InstallOperation.REPLACE_XZ:
             dec = lzma.LZMADecompressor()
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
-                data = payloadfile.read(buffsize)
+                chunk_to_read = min(buffsize, data_length - processed_len)
+                data = payloadfile.read(chunk_to_read)
+                if not data: break
                 processed_len += len(data)
                 while True:
-                    data = dec.decompress(data, max_length=buffsize)
-                    out_file.write(data)
-                    if dec.needs_input or dec.eof:
+                    try:
+                        out_file.write(dec.decompress(data, max_length=buffsize))
+                        if dec.needs_input:
+                            break
+                        if dec.eof:
+                            break
+                        data = b''
+                    except lzma.LZMAError:
+                        print("LZMA Error: Corrupted data or invalid format.")
                         break
-                    data = b''
-        elif op_type == op.REPLACE_BZ:
+        
+        elif op_type == um.InstallOperation.REPLACE_BZ:
             dec = bz2.BZ2Decompressor()
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
-                data = payloadfile.read(buffsize)
+                chunk_to_read = min(buffsize, data_length - processed_len)
+                data = payloadfile.read(chunk_to_read)
+                if not data: break
                 processed_len += len(data)
-                while True:
-                    data = dec.decompress(data, max_length=buffsize)
-                    out_file.write(data)
-                    if dec.needs_input or dec.eof:
-                        break
-                    data = b''
-        elif op_type == op.REPLACE:
+                try:
+                    out_file.write(dec.decompress(data))
+                except EOFError:
+                    break
+        
+        elif op_type == um.InstallOperation.REPLACE:
             out_file.seek(op.dst_extents[0].start_block * self.block_size)
             while processed_len < data_length:
-                data = payloadfile.read(buffsize)
+                chunk_to_read = min(buffsize, data_length - processed_len)
+                data = payloadfile.read(chunk_to_read)
+                if not data: break
                 processed_len += len(data)
                 out_file.write(data)
 
-        elif op_type == op.SOURCE_COPY:
+        elif op_type == um.InstallOperation.SOURCE_COPY:
             if not self.diff:
                 print("SOURCE_COPY supported only for differential OTA")
                 sys.exit(-2)
-            out_file.seek(op.dst_extents[0].start_block * self.block_size)
-            for ext in op.src_extents:
-                old_file.seek(ext.start_block * self.block_size)
-                data_length = ext.num_blocks * self.block_size
-                while processed_len < data_length:
-                    data = old_file.read(buffsize)
-                    processed_len += len(data)
-                    out_file.write(data)
-                processed_len = 0
-        elif op_type == op.ZERO:
+            for i, ext in enumerate(op.dst_extents):
+                 out_file.seek(ext.start_block * self.block_size)
+                 src_ext = op.src_extents[i]
+                 old_file.seek(src_ext.start_block * self.block_size)
+                 copy_data_length = src_ext.num_blocks * self.block_size
+                 copied_len = 0
+                 while copied_len < copy_data_length:
+                     chunk_to_read = min(buffsize, copy_data_length - copied_len)
+                     data = old_file.read(chunk_to_read)
+                     if not data: break
+                     copied_len += len(data)
+                     out_file.write(data)
+
+        elif op_type == um.InstallOperation.ZERO:
+            zero_chunk = bytes(buffsize)
             for ext in op.dst_extents:
                 out_file.seek(ext.start_block * self.block_size)
-                data_length = ext.num_blocks * self.block_size
-                while processed_len < data_length:
-                    data = bytes(min(data_length - processed_len, buffsize))
-                    out_file.write(data)
-                    processed_len += len(data)
-                processed_len = 0
+                zero_data_length = ext.num_blocks * self.block_size
+                zeroed_len = 0
+                while zeroed_len < zero_data_length:
+                    chunk_to_write = min(buffsize, zero_data_length - zeroed_len)
+                    out_file.write(zero_chunk[:chunk_to_write])
+                    zeroed_len += chunk_to_write
+                    
         else:
             print(f"Unsupported type = {op.type:d}")
             sys.exit(-1)
-        del data
 
     def dump_part(self, part):
         name = part["partition"].partition_name
