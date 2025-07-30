@@ -6953,7 +6953,7 @@ class UnpackGui(ttk.LabelFrame):
                 partition_name = file_name.split('.img')[0]
                 img_path = os.path.join(work, file_name)
                 # Skip empty images.
-                if os.path.getsize(img_path) == 0:
+                if not os.path.getsize(img_path):
                     continue
                 f_type = gettype(img_path)
                 if f_type == 'unknown':
