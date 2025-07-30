@@ -17,3 +17,6 @@ httpx
 cryptography
 toml
 pyqt5
+#sudo apt install liblzo2-dev
+python-lzo>=1.11
+crcmod>=1.7
