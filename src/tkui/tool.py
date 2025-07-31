@@ -6998,7 +6998,8 @@ class UnpackGui(ttk.LabelFrame):
         elif form == 'super':
             if os.path.exists(f"{work}/super.img"):
                 if gettype(f"{work}/super.img") == 'sparse':
-                    utils.simg2img(f"{work}/super.img")
+                    print("The image is sparse, pls convert it to raw first.")
+                    return False
                 for i in lpunpack.get_parts(f"{work}/super.img"):
                     self.lsg.insert(i, i)
         elif form == 'update.app':
