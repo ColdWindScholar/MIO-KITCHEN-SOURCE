@@ -5310,14 +5310,17 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
 
 
 class StdoutRedirector:
-    def __init__(self, text_widget, error_=False):
+    def __init__(self, text_widget : Text, error_=False):
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
+        self.w = 0
         self.flush = lambda: error(1, self.error_info) if self.error_info else ...
         create_thread(self.loop)
+        create_thread(self.loop2)
 
     def write(self, string):
+        self.w = 1
         if self.error:
             self.error_info += string
             logging.error(string)
@@ -5329,8 +5332,23 @@ class StdoutRedirector:
 
     def loop(self):
         while True:
-            self.text_space.see('end')
-            time.sleep(0.02)
+            if self.w:
+                self.text_space.see('end')
+            time.sleep(0.01)
+
+    def loop2(self):
+        i = 0
+        line_first = None
+        while True:
+            if not line_first:
+                line_first = self.text_space.get("end-1c linestart", "end-1c")
+            if line_first == self.text_space.get("end-1c linestart", "end-1c"):
+                i += 1
+                i = i % 1
+            line_first = None
+            if not i:
+                self.w = 0
+            time.sleep(0.5)
 
 
 def download_api(url, path=None, int_=True, size_=0):
