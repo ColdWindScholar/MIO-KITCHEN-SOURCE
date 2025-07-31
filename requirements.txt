@@ -16,4 +16,3 @@ six
 httpx
 cryptography
 toml
-pyqt5
