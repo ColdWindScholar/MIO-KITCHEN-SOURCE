@@ -24,16 +24,17 @@ import json
 import requests
 import warnings
 import re
-warnings.warn = lambda *args:...
+
+warnings.warn = lambda *args: ...
 temp = 'bin/temp'
 tool_bin = os.path.join('bin', platform.system(), platform.machine())
 update_info = 'bin/update.json'
 LOGE = lambda info: print('[%s] \033[91m[ERROR]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
 LOGS = lambda info: print('[%s] \033[92m[SUCCESS]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
 green = lambda info: print(f"\033[32m[{strftime('%H:%M:%S')}]{info}\033[0m")
-#青
-green_1:print = lambda info, end=None: print(f"\033[36m[{strftime('%H:%M:%S')}]{info}\033[0m", end=end)
-log:print = lambda info, end=None: print(f"[{strftime('%H:%M:%S')}]{info}", end=end)
+# 青
+green_1: print = lambda info, end=None: print(f"\033[36m[{strftime('%H:%M:%S')}]{info}\033[0m", end=end)
+log: print = lambda info, end=None: print(f"[{strftime('%H:%M:%S')}]{info}", end=end)
 red = lambda info: print(f"\033[31m{info}\033[0m")
 yellow = lambda info: print(f"\033[33m{info}\033[0m")
 blue = lambda info: print(f"\033[34m{info}\033[0m")
@@ -61,17 +62,20 @@ class JsonEdit:
         data = self.read()
         data[name] = value
         self.write(data)
+
+
 # Links
 links = {
-    "erofs_utils":{
-        "link":"https://api.github.com/repos/sekaiacg/erofs-utils/releases/latest",
-        "github_json":True,
+    "erofs_utils": {
+        "link": "https://api.github.com/repos/sekaiacg/erofs-utils/releases/latest",
+        "github_json": True,
         # erofs-utils-v1.8.4-gc9629116-Android_arm64-v8a-2501262050.zip
-        "name_pattern":r"erofs-utils-(.*?)-(.*?)-(\D+?)_(.*)-\d+(?:-\d+)?.zip$"
+        "name_pattern": r"erofs-utils-(.*?)-(.*?)-(\D+?)_(.*)-\d+(?:-\d+)?.zip$"
     }
 }
 
-def download_api(url, path=None, int_=True, size_=0, name:str=None):
+
+def download_api(url, path=None, int_=True, size_=0, name: str = None):
     if url is None:
         LOGE("URL not valid.")
         return 1
@@ -102,12 +106,14 @@ def download_api(url, path=None, int_=True, size_=0, name:str=None):
             speed = chunk_kb / used_time
             last_time = time()
             percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
-                                                                                             bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
+                                                                                         bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
+
 
 class Caller:
     def __init__(self, ):
         ...
+
     @staticmethod
     def verity() -> bool:
         if not os.path.exists(temp):
@@ -126,16 +132,20 @@ class Caller:
                 return lambda *args: ...
             green(f"Start: [{func.__name__}]")
             func(*args, **kwargs)
+
         return call_func
+
 
 caller = Caller()
 arch_list = {
-    "arm64-v8a":"aarch64",
-    "armeabi-v7a":"aarch"
+    "arm64-v8a": "aarch64",
+    "armeabi-v7a": "aarch"
 }
 system_list = {
-    "Cygwin":"Windows"
+    "Cygwin": "Windows"
 }
+
+
 @caller
 def update(args):
     for name, content in links.items():
@@ -143,7 +153,7 @@ def update(args):
         origin_info = JsonEdit(update_info).read()
         if content.get('github_json', False):
             url = requests.get(content.get('link'))
-            json_:dict = json.loads(url.text)
+            json_: dict = json.loads(url.text)
             green_1(f"Found {name}{json_.get('tag_name')}")
             if JsonEdit(update_info).read().get(name) == json_.get('tag_name'):
                 yellow(f"{name} was latest already!")
@@ -181,6 +191,8 @@ def update(args):
                             z.extract(z_name, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
                 JsonEdit(update_info).write(origin_info)
+
+
 @caller
 def check_supported(args):
     file_list = ['brotli', 'busybox', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
@@ -199,10 +211,13 @@ def check_supported(args):
             LOGE(f"But The Following Binary Were Lost:{lost_binary}")
     else:
         LOGE("Your Device Was Not supported Yet.")
+
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN/TIK', exit_on_error=False)
+    parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN/TIK',
+                                     exit_on_error=False)
     subparser = parser.add_subparsers(title='Supported subcommands',
-                                           description='Valid subcommands')
+                                      description='Valid subcommands')
     unpack_rom_parser = subparser.add_parser('upbin', help="update binary")
     unpack_rom_parser.set_defaults(func=update)
     check_support = subparser.add_parser('check', help='check if supported this machine')
