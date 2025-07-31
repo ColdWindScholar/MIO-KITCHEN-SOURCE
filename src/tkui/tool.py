@@ -24,9 +24,6 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional
-from src.core.verify_payload import verify_payload
-from src.core.verify_payload.error import VerificationError
-from src.core.img2payload import create_payload_image_compressed
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
