@@ -5316,6 +5316,7 @@ class StdoutRedirector:
         self.error_info = ''
         self.flush = lambda: error(1, self.error_info) if self.error_info else ...
         create_thread(self.loop)
+
     def write(self, string):
         if self.error:
             self.error_info += string
