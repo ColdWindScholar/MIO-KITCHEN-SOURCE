@@ -20,6 +20,8 @@ import zipfile
 from platform import system
 
 from pip._internal.cli.main import main as _main
+
+
 class Builder:
     def __init__(self):
         ostype = system()
@@ -40,6 +42,7 @@ class Builder:
         self.local = os.getcwd()
         self.ostype = ostype
         self.dndplat = None
+
     def build(self):
         print('Building...')
         self.install_package()
@@ -47,16 +50,19 @@ class Builder:
         self.pyinstaller_build()
         self.config_folder()
         self.pack_zip(f'{self.local}/dist', self.name)
+
     def unit_test(self):
         from src.tool_tester import test_main, Test
 
         if Test:
             test_main(exit=False)
+
     def install_package(self):
         with open('requirements.txt', 'r', encoding='utf-8') as l:
             for i in l.read().split("\n"):
                 print(f"Installing {i}")
                 _main(['install', i])
+
     def pyinstaller_build(self):
         import PyInstaller.__main__
         dndplat = self.dndplat
@@ -133,11 +139,12 @@ class Builder:
                 'splash.png'
             ])
         self.dndplat = dndplat
+
     def config_folder(self):
         if not os.path.exists('dist/bin'):
             os.makedirs('dist/bin', exist_ok=True)
         while_list = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'setting.ini', self.ostype,
-                  'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json', "exec.sh"]
+                      'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json', "exec.sh"]
         for i in os.listdir(self.local + "/bin"):
             if i in while_list:
                 if os.path.isdir(f"{self.local}/bin/{i}"):
@@ -166,24 +173,26 @@ class Builder:
                 for i in files:
                     print(f"Chmod {os.path.join(root, i)}")
                     os.chmod(os.path.join(root, i), 0o7777, follow_symlinks=False)
+
     def pack_zip(self, source, name):
-            # 获取文件夹的绝对路径和文件夹名称
-            abs_folder_path = os.path.abspath(source)
-            # 创建一个同名的zip文件
-            zip_file_path = os.path.join(self.local, name)
-            with zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED) as archive:
-                # 遍历文件夹中的所有文件和子文件夹
-                for root, _, files in os.walk(abs_folder_path):
-                    for file in files:
-                        if file == name:
-                            continue
-                        file_path = os.path.join(root, file)
-                        if ".git" in file_path:
-                            continue
-                        print(f"Adding: {file_path}")
-                        # 将文件添加到zip文件中
-                        archive.write(file_path, os.path.relpath(file_path, abs_folder_path))
-            print("Pack Zip Done!")
+        # 获取文件夹的绝对路径和文件夹名称
+        abs_folder_path = os.path.abspath(source)
+        # 创建一个同名的zip文件
+        zip_file_path = os.path.join(self.local, name)
+        with zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED) as archive:
+            # 遍历文件夹中的所有文件和子文件夹
+            for root, _, files in os.walk(abs_folder_path):
+                for file in files:
+                    if file == name:
+                        continue
+                    file_path = os.path.join(root, file)
+                    if ".git" in file_path:
+                        continue
+                    print(f"Adding: {file_path}")
+                    # 将文件添加到zip文件中
+                    archive.write(file_path, os.path.relpath(file_path, abs_folder_path))
+        print("Pack Zip Done!")
+
 
 if __name__ == '__main__':
     builder = Builder()
