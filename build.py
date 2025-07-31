@@ -25,6 +25,10 @@ from pip._internal.cli.main import main as _main
 class Builder:
     def __init__(self):
         ostype = system()
+        try:
+            from tkinter import END
+        except:
+            raise FileNotFoundError("Tkinter IS not exist!\nThe Build may not Work!")
         if ostype == 'Linux':
             name = 'MIO-KITCHEN-linux.zip'
         elif ostype == 'Darwin':
@@ -32,10 +36,6 @@ class Builder:
                 name = 'MIO-KITCHEN-macos-intel.zip'
             else:
                 name = 'MIO-KITCHEN-macos.zip'
-            try:
-                from tkinter import END
-            except:
-                raise FileNotFoundError("Tkinter IS not exist!\nThe Build may not Work!")
         else:
             name = 'MIO-KITCHEN-win.zip'
         self.name = name
