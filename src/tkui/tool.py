@@ -5315,17 +5315,21 @@ class StdoutRedirector:
         self.error = error_
         self.error_info = ''
         self.flush = lambda: error(1, self.error_info) if self.error_info else ...
-
+        create_thread(self.loop)
     def write(self, string):
         if self.error:
             self.error_info += string
             logging.error(string)
             return
         self.text_space.insert(tk.END, string)
-        logging.debug(string)
-        self.text_space.see('end')
+        create_thread(logging.debug, string)
         if settings.ai_engine == '1':
             AI_engine.suggest(string, language=settings.language, ok=lang.ok)
+
+    def loop(self):
+        while True:
+            self.text_space.see('end')
+            time.sleep(0.01)
 
 
 def download_api(url, path=None, int_=True, size_=0):
