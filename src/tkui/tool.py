@@ -5177,6 +5177,10 @@ class PackSuper(Toplevel):
         self.tl.clear()
         for file_name in os.listdir(self.work):
             if file_name.endswith(".img"):
+                if is_empty_img(self.work + file_name):
+                    name = file_name[:-4]
+                    self.tl.insert(f"{name} [empty]", name, name in self.selected)
+                    continue
                 if (file_type := gettype(self.work + file_name)) in ["ext", "erofs", 'f2fs', 'sparse']:
                     name = file_name[:-4]
                     self.tl.insert(f"{name} [{file_type}]", name, name in self.selected)

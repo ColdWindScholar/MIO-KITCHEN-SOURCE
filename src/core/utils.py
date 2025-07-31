@@ -345,7 +345,7 @@ def gettype(file) -> str:
     if not os.path.exists(file):
         return "fne"
 
-    def is_super(fil) -> any:
+    def is_super(fil) -> bool:
         with open(fil, 'rb') as file_:
             try:
                 file_.seek(4096, 0)
