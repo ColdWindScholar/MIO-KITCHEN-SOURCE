@@ -69,8 +69,8 @@ class PluginLoader(object):
         if mapped_args:
             func = self.plugins[id_][entry]
             varnames = func.__code__.co_varnames[:func.__code__.co_argcount]
-            args = [mapped_args.get(i).get() for i in varnames]
-            return func(*args)
+            args_mapped = [mapped_args.get(i).get() for i in varnames]
+            return func(*args_mapped)
         try:
             return self.plugins[id_][entry](*args, **kwargs)
         except TypeError:

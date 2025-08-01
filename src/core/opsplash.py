@@ -7,23 +7,15 @@ SPLASH_HDR_METADATA_DONE_OFFSET = SPLASH_HDR_METADATA_OFFSET + (0x40 * 4)
 SPLASH_METADATA_OFFSET = SPLASH_HDR_OFFSET + 0x120
 SPLASH_METADATA_BLOCK = 0x80
 DATA_OFFSET = 0x8000
-
+class DataInfo:
+    offset:int
+    realsz:int
+    compsz:int
+    name:str
+    def gen(self):
+        buffer = bytearray(SPLASH_METADATA_BLOCK)
+        view = memoryview(buffer)
 """
-import * as pako from 'pako';
-
-const DDPH_MAGIC = 0x48504444;
-const DDPH_HDR_OFFSET = 0x0;
-
-const SPLASH_HDR_MAGIC = "SPLASH LOGO!";
-const SPLASH_HDR_OFFSET = 0x4000;
-const SPLASH_HDR_METADATA_OFFSET = SPLASH_HDR_OFFSET + 12;
-const SPLASH_HDR_METADATA_DONE_OFFSET = SPLASH_HDR_METADATA_OFFSET + (0x40 * 4);
-
-const SPLASH_METADATA_OFFSET = SPLASH_HDR_OFFSET + 0x120;
-const SPLASH_METADATA_BLOCK = 0x80;
-
-const DATA_OFFSET = 0x8000;
-
 export class DataInfo {
     constructor(
         public offset: number,
