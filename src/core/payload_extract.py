@@ -1,30 +1,26 @@
 import argparse
 import bz2
+import gc
+import lzma
+import mmap
+import os
+import queue
+import struct
+import threading
+import time
+import zipfile
 from concurrent.futures import Future, ThreadPoolExecutor
 from io import (
     SEEK_CUR,
     SEEK_SET,
     BufferedWriter,
 )
-import lzma
-import mmap
-import os
 from queue import Queue
-import queue
-import shutil
-import struct
-import threading
-import time
 from typing import IO, List
-import gc
-import zipfile
 
 import requests
 
-
 from . import update_metadata_pb2
-
-
 
 
 class BadPayload(Exception):
