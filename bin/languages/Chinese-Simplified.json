@@ -274,5 +274,6 @@
   "t62": "微信支付",
   "t63": "开源, 自由, 极速",
   "t64": "您正在运行源代码\n请使用 \"git pull\" 以更新",
-  "git_not_installed": "git未安装， 无法更新代码"
+  "git_not_installed": "git未安装， 无法更新代码",
+  "decrypt_xtc_xml":"解密小天才Xml"
  }

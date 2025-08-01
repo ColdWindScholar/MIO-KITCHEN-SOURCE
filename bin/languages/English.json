@@ -457,5 +457,6 @@
   "err_sig_is_last_op": "❌✍️ The digital signature block is defined incorrectly.",
   "err_metadata_size_mismatch": "❌⚖️ Metadata size in file ({payload_size}) does not match expected size ({given_size}).",
   "err_unknown_payload_version": "❌🔢 Unsupported update file format version ({version}).",
-  "err_payload_size_mismatch": "❌⚖️ The actual file size ({file_size}) does not match the size declared in the header ({used_size})."
+  "err_payload_size_mismatch": "❌⚖️ The actual file size ({file_size}) does not match the size declared in the header ({used_size}).",
+  "decrypt_xtc_xml":"Decrypt Xtc Xml"
 }

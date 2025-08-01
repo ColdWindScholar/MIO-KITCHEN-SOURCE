@@ -36,6 +36,7 @@ from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
 from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
+from ..core.xtc_recovery_helper import Xor_file
 
 if platform.system() != 'Darwin':
     try:
@@ -484,7 +485,8 @@ class ToolBox(ttk.Frame):
             (lang.trim_image, self.TrimImage),  # Trim Image
             (lang.magisk_patch, self.MagiskPatcher),  # Magisk Patcher
             (lang.mergequalcommimage, self.MergequalcommimageOld),  # Merge Qualcomm Image (Legacy)
-            (lang.merge_file_segments, self.MergeSparseImage)
+            (lang.merge_file_segments, self.MergeSparseImage),
+            (lang.decrypt_xtc_xml, self.DecryptXtcXml)
         ]
         width_controls = 3  # Number of buttons per row.
         index_row = 0
@@ -505,6 +507,28 @@ class ToolBox(ttk.Frame):
         """
         self.label_frame.update_idletasks()  # Ensure all pending geometry changes are processed.
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class DecryptXtcXml(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title(lang.decrypt_xtc_xml)
+            self.path = StringVar()
+            self.gui()
+            move_center(self)
+
+        def gui(self):
+            ccontrols.filechose(self, self.path, lang.path, is_folder=True)
+            ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+        def run(self):
+            if not self.path.get() or not os.path.exists(self.path.get()):
+                warn_win('Please choose a path.')
+                return
+            self.destroy()
+            for root, _, files in os.walk(dir_, topdown=True):
+                for f in files:
+                    if f.endswith('.xml'):
+                        print(f"Decrypting {f}")
+                        Xor_file(os.path.join(root, f))
 
     class MergequalcommimageOld(Toplevel):
         """A Toplevel window for merging Qualcomm sparse images using rawprogram.xml (Legacy version).
