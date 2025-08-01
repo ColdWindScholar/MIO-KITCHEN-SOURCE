@@ -24,6 +24,7 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional
+
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -34,6 +35,7 @@ from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
 from src.core.unkdz import KDZFileTools
+from ..core.payload_extract import extract_partitions_from_payload
 
 if platform.system() != 'Darwin':
     try:
@@ -64,7 +66,6 @@ from requests import ConnectTimeout, HTTPError
 import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
-from src.core.dumper import Dumper
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
 
@@ -6170,12 +6171,19 @@ def unpack(chose, form: str = '') -> bool:
     if not chose:
         return False
     if form == 'payload':
+        time_start = time.time()
         print(lang.text79 + "payload")
-        dumper = Dumper(f"{work}/payload.bin", work, diff=False, old='old', images=chose)
-        try:
-            dumper.run()
-        except RuntimeError:
-            dumper.run(slow=True)
+        with open(f"{work}/payload.bin", "rb") as f:
+            extract_partitions_from_payload(
+                f,
+                (
+                    chose
+                ),
+                work,
+                os.cpu_count() or 2,
+            )
+        tooks = time.time() - time_start
+        print("Done! tooks: %.2f" % tooks)
         return True
     elif form == 'super':
         print(lang.text79 + "Super")
