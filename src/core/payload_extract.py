@@ -15,6 +15,7 @@ from io import (
     SEEK_SET,
     BufferedWriter,
 )
+import zstandard
 from queue import Queue
 from typing import IO, List
 
@@ -141,15 +142,17 @@ def _extract_operation_to_file(
                 # else:
                 #    out_file.seek(out_seek, SEEK_SET)
                 #    out_file.seek(num_blocks, SEEK_CUR)
-
         case (
             update_metadata_pb2.InstallOperation.REPLACE_BZ
             | update_metadata_pb2.InstallOperation.REPLACE_XZ
+            | update_metadata_pb2.InstallOperation.REPLACE_ZSTD
         ):
             if operation.type == update_metadata_pb2.InstallOperation.REPLACE_BZ:
                 decompressed_data = bz2.decompress(data)
             elif operation.type == update_metadata_pb2.InstallOperation.REPLACE_XZ:
                 decompressed_data = lzma.decompress(data)
+            elif operation.type == update_metadata_pb2.InstallOperation.REPLACE_ZSTD:
+                decompressed_data = zstandard.decompress(data)
 
             # if writer:
             writer.write(out_offset, decompressed_data)
