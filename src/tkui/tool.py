@@ -524,7 +524,7 @@ class ToolBox(ttk.Frame):
                 warn_win('Please choose a path.')
                 return
             self.destroy()
-            for root, _, files in os.walk(dir_, topdown=True):
+            for root, _, files in os.walk(self.path.get(), topdown=True):
                 for f in files:
                     if f.endswith('.xml'):
                         print(f"Decrypting {f}")
