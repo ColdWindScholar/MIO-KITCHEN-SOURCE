@@ -48,7 +48,7 @@ class FileChooser(Toplevel):
             frame = ttk.Frame(self)
             self.frame.append([frame, ttk.Label(frame, text=__match.get(index, ''), width=16),
                                ttk.Entry(frame, textvariable=current, width=40),
-                               ttk.Button(frame, text="选择文件", command=lambda x=current: __choose_file(x))])
+                               ttk.Button(frame, text="Choose...", command=lambda x=current: __choose_file(x))])
         for i in self.frame:
             for index, widget in enumerate(i):
                 if index == 0:  # frame
@@ -58,7 +58,7 @@ class FileChooser(Toplevel):
                 else:
                     widget.pack(side='left', padx=5, pady=5)
         bottom_frame = ttk.Frame(self)
-        ttk.Button(bottom_frame, text='确定', command=self.destroy).pack(side='right', padx=5, pady=5)
+        ttk.Button(bottom_frame, text='OK', command=self.destroy).pack(side='right', padx=5, pady=5)
         bottom_frame.pack(side='bottom', fill='x', padx=5, pady=5)
 
     def get(self) -> list:
@@ -152,7 +152,7 @@ class MyUI(ttk.Labelframe):
         optframe = ttk.Frame(self)
         optlabel = ttk.Label(optframe)
 
-        ttk.Label(optlabel, text="芯片类型", anchor='e').pack(side='left', padx=5, pady=5, expand=False)
+        ttk.Label(optlabel, text="SOC Type", anchor='e').pack(side='left', padx=5, pady=5, expand=False)
         ttk.OptionMenu(optlabel, self.chipset_select, support_chipset[0], *support_chipset,
                        command=__load_port_item).pack(side='left', fill='x', padx=5, pady=5, expand=False)
         optlabel.pack(side='top', fill='x')
@@ -175,7 +175,7 @@ class MyUI(ttk.Labelframe):
 
         # label of buttons
         buttonlabel = ttk.Label(optframe)
-        ttk.Button(optframe, text="一键移植", command=self.__start_port).pack(side='top', fill='both', padx=5, pady=5,
+        ttk.Button(optframe, text="Port", command=self.__start_port).pack(side='top', fill='both', padx=5, pady=5,
                                                                               expand=True)
         ttk.Radiobutton(buttonlabel, text="输出为zip卡刷包", variable=self.pack_type, value='zip',
                         ).grid(column=0, row=0, padx=5, pady=5)
@@ -188,7 +188,7 @@ class MyUI(ttk.Labelframe):
         magiskapkentry = ttk.Entry(buttonlabel, textvariable=self.magisk_apk)
         magiskapkentry.bind("<Button-1>", lambda x: self.magisk_apk.set(askopenfilename()))
 
-        ttk.Checkbutton(buttonlabel, text="修补magisk", variable=self.patch_magisk, onvalue=True,
+        ttk.Checkbutton(buttonlabel, text="Patch magisk", variable=self.patch_magisk, onvalue=True,
                         offvalue=False, command=lambda: (
                 magiskapkentry.grid_forget(),
                 magiskarch.grid_forget(),
