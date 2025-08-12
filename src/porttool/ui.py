@@ -16,7 +16,7 @@ from .utils import portutils
 class FileChooser(Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.title("请选择底包的boot, system和要移植的zip卡刷包")
+        self.title("Please choose boot, system from device and the port rom")
 
         self.portzip = StringVar()
         self.basesys = StringVar()
@@ -35,9 +35,9 @@ class FileChooser(Toplevel):
 
     def __setup_widgets(self):
         __match = {
-            0: "移植包路径",
-            1: "此设备boot镜像",
-            2: "此设备system镜像"
+            0: "Port Rom",
+            1: "Boot from device",
+            2: "System from device",
         }
 
         def __choose_file(val: StringVar):
@@ -177,9 +177,9 @@ class MyUI(ttk.Labelframe):
         buttonlabel = ttk.Label(optframe)
         ttk.Button(optframe, text="Port", command=self.__start_port).pack(side='top', fill='both', padx=5, pady=5,
                                                                               expand=True)
-        ttk.Radiobutton(buttonlabel, text="输出为zip卡刷包", variable=self.pack_type, value='zip',
+        ttk.Radiobutton(buttonlabel, text="Output to a zip rom", variable=self.pack_type, value='zip',
                         ).grid(column=0, row=0, padx=5, pady=5)
-        ttk.Radiobutton(buttonlabel, text="输出为img镜像", variable=self.pack_type, value='img',
+        ttk.Radiobutton(buttonlabel, text="Output to a image", variable=self.pack_type, value='img',
                         ).grid(column=1, row=0, padx=5, pady=5)
 
         magiskarch = ttk.OptionMenu(buttonlabel, self.target_arch, "arm64-v8a",
