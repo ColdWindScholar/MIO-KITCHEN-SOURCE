@@ -76,7 +76,7 @@ class FileChooser(Toplevel):
 
 class MyUI(ttk.Labelframe):
     def __init__(self, parent):
-        super().__init__(parent, text="MTK 低端机移植工具")
+        super().__init__(parent, text="MTK LowLevel Machines Port Tool")
         self.chipset_select = StringVar(value='mt65')
         self.pack_type = StringVar(value='zip')
         self.item = []
@@ -95,11 +95,11 @@ class MyUI(ttk.Labelframe):
         files = boot, system, portzip = FileChooser(self).get()
         for i in boot, system, portzip:
             if not Path(i).exists() or not i:
-                print(f"文件{i}未选择或不存在")
+                print(f"File{i} Not chosen or not exists")
                 return
-        print(f"底包boot路径为：{boot}\n"
-              f"底包system镜像路径为：{system}\n"
-              f"移植包路径为：{portzip}")
+        print(f"Boot from baserom：{boot}\n"
+              f"System from baserom：{system}\n"
+              f"Port Rom：{portzip}")
         # config items
         newdict = support_chipset_portstep[self.chipset_select.get()]
         for key, tkbool in self.item:
@@ -158,7 +158,7 @@ class MyUI(ttk.Labelframe):
         optlabel.pack(side='top', fill='x')
 
         # Frame of support action
-        actframe = ttk.Labelframe(optframe, text="支持的移植条目", height=180)
+        actframe = ttk.Labelframe(optframe, text="Supported port item", height=180)
 
         actcanvas = Canvas(actframe)
         actscroll = ttk.Scrollbar(actframe, orient='vertical', command=actcanvas.yview)
