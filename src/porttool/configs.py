@@ -2,7 +2,7 @@ import json
 import os
 import os.path as op
 
-from src.core.utils import tool_bin
+from src.core.utils import tool_bin, prog_path
 
 # configs for porttool
 support_chipset_portstep = {
@@ -209,12 +209,12 @@ support_chipset_portstep = {
         },
     },
 }
-
-if op.isfile("configs.json"):
-    with open("configs.json", 'r') as c:
+configs = os.path.join(prog_path, 'bin', 'configs.json')
+if op.isfile(configs):
+    with open(configs, 'r') as c:
         support_chipset_portstep = json.load(c)
 else:
-    with open("configs.json", 'w') as c:
+    with open(configs, 'w') as c:
         json.dump(support_chipset_portstep, c, indent=4)
 
 support_chipset = list(support_chipset_portstep.keys())
