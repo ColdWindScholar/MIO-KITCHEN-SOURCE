@@ -23,7 +23,6 @@ if sys.version_info.major == 3:
 try:
     from src.tkui.tool import *
 except Exception as e:
-    raise e
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
     print(e)
