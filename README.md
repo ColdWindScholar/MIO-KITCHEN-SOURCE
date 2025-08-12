@@ -40,7 +40,7 @@
 
 ***
 ## Localization
-### [日本語](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ja-JP.md) | [中文](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_zh-CN.md) | [Português brasileiro](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_pt-BR.md) | [Deutsch](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_de-DE.md) | [Русский язык](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_ru-RU.md) | [Indonesian](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_id-ID.md) | [Tiếng Việt](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/README_vi-VN.md)
+### [日本語](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_ja-JP.md) | [中文](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_zh-CN.md) | [Português brasileiro](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_pt-BR.md) | [Deutsch](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_de-DE.md) | [Русский язык](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_ru-RU.md) | [Indonesian](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_id-ID.md) | [Tiếng Việt](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/readmes/README_vi-VN.md)
 ***
 ## Features
 * Unpack `boot, dtbo, ext4, erofs, payload, logo` and so on
