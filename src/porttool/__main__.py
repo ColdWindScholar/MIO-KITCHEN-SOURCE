@@ -14,6 +14,7 @@ class Main(Toplevel):
     def __init__(self):
         super().__init__()
         self.title("MTK Port Tool")
+        self.resizable(False, False)
         self.gui()
         self.mainloop()
 
