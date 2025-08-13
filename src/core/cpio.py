@@ -110,10 +110,11 @@ def parser_c_mode(data: str) -> tuple[CpioModes, int]:
     return CpioModes(file_type), file_mode
 
 
-def pack_c_mode(file_type: int, file_mode: [int, str]) -> str:
+def pack_c_mode(file_type: int, file_mode: int | str) -> str:
     if isinstance(file_mode, str):
         file_mode = int(file_mode, 8)
     return f"{file_mode | file_type:08x}"
+
 
 def calc_crc(data):
     crc = sum(data)
@@ -121,7 +122,8 @@ def calc_crc(data):
         crc = crc & 0xffffffff
     return crc
 
-def extract(filename, outputdir, output_info, check_crc:bool=False):
+
+def extract(filename, outputdir, output_info, check_crc: bool = False):
     info = {}
     if not os.path.exists(outputdir):
         os.makedirs(outputdir, exist_ok=True)
@@ -135,19 +137,19 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
             header.unpack(f.read(header_size))
             namesize = int(header.c_namesize, 16)
             name_bytes_with_null = f.read(namesize)
-            
+
             try:
                 name = name_bytes_with_null[:-1].decode('utf-8')
             except UnicodeDecodeError:
                 problematic_bytes = name_bytes_with_null[:-1]
                 hex_representation = problematic_bytes.hex(' ')
-                
+
                 print("\n--- DECODING ERROR ---")
                 print("Failed to decode a filename as UTF-8.")
                 print(f"Problematic bytes in HEX format: {hex_representation}")
                 print("Use an online converter to determine the correct encoding.")
                 print("----------------------\n")
-                
+
                 raise
 
             if not name in info.keys():
@@ -188,7 +190,8 @@ def extract(filename, outputdir, output_info, check_crc:bool=False):
         with open(output_info, 'w', encoding='utf-8', newline='\n') as con:
             dump(info, con)
 
-def scan_dir(folder: str, return_trailer:bool=True):
+
+def scan_dir(folder: str, return_trailer: bool = True):
     if os.name == 'nt':
         yield os.path.basename(folder).replace('\\', '')
     elif os.name == 'posix':
@@ -204,7 +207,7 @@ def scan_dir(folder: str, return_trailer:bool=True):
         yield CPIO_TRAILER_NAME
 
 
-def repack(input_dir, config_file, output_file: str, magic_type:CpioMagicFormat=None):
+def repack(input_dir, config_file, output_file: str, magic_type: CpioMagicFormat = None):
     # Fixme:We not allow folder or file that using same inode.So may cause bugs.will fix.lol
     ino_sum = 0
     if not magic_type:
@@ -233,7 +236,7 @@ def repack(input_dir, config_file, output_file: str, magic_type:CpioMagicFormat=
                 elif readlink(os.path.join(input_dir, entry)):
                     file_type = CpioModes.C_ISLNK.value
                     file_mode = "0o777"
-                value = {'file_type':file_type, 'file_mode':file_mode}
+                value = {'file_type': file_type, 'file_mode': file_mode}
             ino_sum += 1
             ino_ran = max(value.get('c_ino', 0), ino_sum)
             if ino_ran == ino_sum:
