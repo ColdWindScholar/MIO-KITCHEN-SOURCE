@@ -22,8 +22,6 @@ class BasicStruct(LittleEndianStructure):
         return string_at(addressof(self), sizeof(self))
 
 
-
-
 class nb0_header_item(BasicStruct):
     _fields_ = [
         ("offset", c_long),
@@ -32,8 +30,9 @@ class nb0_header_item(BasicStruct):
         ("nb0_file_offset", c_long)
     ]
 
-nb0_count : int
-nb0_headers  = {}
+
+nb0_count: int
+nb0_headers = {}
 
 
 def read_dword(fd):
@@ -44,13 +43,15 @@ def read_dword(fd):
     result = int.from_bytes(a) | int.from_bytes(b) << 8 | int.from_bytes(c) << 16 | int.from_bytes(d) << 24
     return result
 
+
 def write_dword(fd, l):
     fd.write(chr(l & 0xff).encode())
     fd.write(chr((l >> 8) & 0xff).encode())
     fd.write(chr((l >> 16) & 0xff).encode())
     fd.write(chr((l >> 24) & 0xff).encode())
 
-def read_header(header:nb0_header_item, fd):
+
+def read_header(header: nb0_header_item, fd):
     header.offset = read_dword(fd)
     header.size = read_dword(fd)
     read_dword(fd)
@@ -63,8 +64,12 @@ def read_header(header:nb0_header_item, fd):
             header.name = b'\0'
         else:
             break
+
+
 buffer_size = 1024 ** 2
-def extract_nb0(file_name:str, extract_to:str) -> int:
+
+
+def extract_nb0(file_name: str, extract_to: str) -> int:
     if extract_to:
         with open(f'{extract_to}/list', 'w'):
             ...
@@ -73,7 +78,7 @@ def extract_nb0(file_name:str, extract_to:str) -> int:
         fsize = f.tell()
         f.seek(0, 0)
         size = read_dword(f)
-        if size > (fsize/64):
+        if size > (fsize / 64):
             print("ERROR invalid nb0 file")
             return 1
         print(f"File count: {size}")
@@ -90,7 +95,7 @@ def extract_nb0(file_name:str, extract_to:str) -> int:
                 return -1
             print(f"offset = {nb.offset:08x} size = {nb.size:08x} name: '{nb.name}'\n")
             i += 1
-        f.seek(64*size + 4, SEEK_SET)
+        f.seek(64 * size + 4, SEEK_SET)
         print(f"fileops {f.tell()}")
         i = 0
         while i < size:
@@ -102,7 +107,7 @@ def extract_nb0(file_name:str, extract_to:str) -> int:
                 with open(f'{extract_to}/list', 'a') as list_file:
                     list_file.write(f"{nb.name}\n")
                 sz = nb.size
-                while  sz > 0:
+                while sz > 0:
                     feof = not len(f.read(1))
                     f.seek(f.tell() - 1)
                     if feof:
@@ -120,4 +125,5 @@ def extract_nb0(file_name:str, extract_to:str) -> int:
                     if extract_to:
                         with open(buf, 'wb') as out:
                             out.write(buffer)
-            i+=1
+            i += 1
+    return 0
