@@ -7,7 +7,6 @@ from tkinter import (
     Canvas, )
 from tkinter.filedialog import askopenfilename
 
-from src.core.utils import prog_path
 from .configs import *
 from .pathlib import Path
 from .utils import portutils
