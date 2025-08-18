@@ -11,10 +11,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import tkinter
+from tkinter import Canvas, X, BooleanVar, HORIZONTAL, TclError, Tk, Toplevel, StringVar, ttk, BOTH
 from tkinter.ttk import Frame, Scrollbar, Checkbutton, Separator
-from tkinter import Canvas, Tk, X, BooleanVar, HORIZONTAL, TclError
+
 from src.core.utils import lang
 
+
+def input_(title: str = None, text: str = "", master: Tk | Toplevel | tkinter.Frame = None) -> str:
+    if not master:
+        master = Toplevel()
+    if not title:
+        title = lang.text76
+    (input_var := StringVar()).set(text)
+    input_frame = ttk.LabelFrame(master, text=title)
+    input_frame.place(relx=0.5, rely=0.5, anchor="center")
+    entry = ttk.Entry(input_frame, textvariable=input_var)
+    entry.pack(pady=5, padx=5, fill=BOTH)
+    entry.bind("<Return>", lambda *x: input_frame.destroy())
+    ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
+    input_frame.wait_window()
+    return input_var.get()
 
 class ListBox(Frame):
     def __init__(self, master):

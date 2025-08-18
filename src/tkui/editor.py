@@ -13,6 +13,7 @@
 # limitations under the License.
 import logging
 import os
+import shutil
 import time
 import tkinter as tk
 from tkinter import ttk, END, X, LEFT
@@ -22,7 +23,7 @@ import pygments.lexers
 from chlorophyll import CodeView
 
 from ..core.utils import create_thread, lang
-
+from ..tkui.controls import input_
 
 class PythonEditor(tk.Frame):
     def __init__(self, parent, path, file_name, lexer=pygments.lexers.BashLexer):
@@ -45,8 +46,37 @@ class PythonEditor(tk.Frame):
         self.show.pack(fill=tk.BOTH, padx=5, pady=5, expand=True)
         ff = ttk.Frame(self)
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
+        Button(ff, text=lang.text115, command=self.new).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
+        Button(ff, text=lang.text116, command=self.delete).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         ff.pack(padx=5, pady=5, fill=X, expand=True)
         self.refs()
+
+    def delete(self):
+        try:
+            file = self.show.get(self.show.curselection())
+        except Exception:
+            logging.exception("delete editor")
+            return
+        if file in ['.', '..']:
+            return
+        file_path = os.path.join(self.path, file)
+        if os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+        self.refs()
+
+    def new(self):
+        new_name = input_('Enter New File Name', "new.txt", master=self)
+        if not new_name:
+            return
+        os.makedirs(self.path, exist_ok=True)
+        with open(os.path.join(self.path, new_name), 'w', encoding='utf-8'):
+            pass
+        self.file_name = new_name
+        self.refs()
+        self.load()
+
 
     def p_bind(self):
         try:

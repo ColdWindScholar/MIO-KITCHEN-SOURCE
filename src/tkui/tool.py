@@ -98,7 +98,7 @@ if os.name == 'nt':
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
-from .controls import ListBox, ScrollFrame
+from .controls import ListBox, ScrollFrame, input_
 from src.core.undz import DZFileTools
 from src.core.selinux_audit_allow import main as selinux_audit_allow
 import logging
@@ -4859,7 +4859,7 @@ class PackHybridRom:
         if os.path.exists(f'{dir_}/META-INF'):
             rmdir(f'{dir_}/META-INF')
         shutil.copytree(f"{cwd_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
-        right_device = input_(lang.t26, 'olive')
+        right_device = input_(lang.t26, 'olive', master=win)
         with open(f"{dir_}/bin/right_device", 'w', encoding='gbk') as rd:
             rd.write(right_device + "\n")
         with open(
@@ -5460,7 +5460,7 @@ def download_api(url, path=None, int_=True, size_=0):
 def download_file():
     var1 = BooleanVar(value=False)
     down = win.get_frame(lang.text61)
-    url = input_(title=lang.text60)
+    url = input_(title=lang.text60, master=win)
     if not url:
         win.message_pop(lang.warn_empty_url, "red")  # used  a new key
         return
@@ -5946,20 +5946,6 @@ def rdi(work, part_name) -> bool:
         win.message_pop(lang.text75 % part_name, "red")
 
 
-def input_(title: str = None, text: str = "", master: Tk | Toplevel = None) -> str:
-    if not title:
-        title = lang.text76
-    (input_var := StringVar()).set(text)
-    if not master:
-        master = win
-    input_frame = ttk.LabelFrame(master, text=title)
-    input_frame.place(relx=0.5, rely=0.5, anchor="center")
-    entry = ttk.Entry(input_frame, textvariable=input_var)
-    entry.pack(pady=5, padx=5, fill=BOTH)
-    entry.bind("<Return>", lambda *x: input_frame.destroy())
-    ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
-    input_frame.wait_window()
-    return input_var.get()
 
 
 def script2fs(path):
@@ -6818,7 +6804,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
             print(lang.warn1)
             return False
         if os.path.exists(settings.path + os.sep + (
-                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get()))):
+                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get(), master=win))):
             print(lang.text103)
             return False
         if inputvar != current_project_name.get():
@@ -6834,7 +6820,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.listdir()
 
     def new(self):
-        if not (inputvar := input_()):
+        if not (inputvar := input_(master=win)):
             win.message_pop(lang.warn12)
         else:
             inputvar = inputvar.replace(' ', '_')
