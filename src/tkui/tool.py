@@ -487,7 +487,7 @@ class ToolBox(ttk.Frame):
             (lang.mergequalcommimage, self.MergequalcommimageOld),  # Merge Qualcomm Image (Legacy)
             (lang.merge_file_segments, self.MergeSparseImage),
             (lang.decrypt_xtc_xml, self.DecryptXtcXml),
-            ("Mtk Port Tool", MtkPortTool),
+            (lang.mtk_port_tool, MtkPortTool),
         ]
         width_controls = 3  # Number of buttons per row.
         index_row = 0
