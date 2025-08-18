@@ -94,6 +94,9 @@ class PythonEditor(tk.Frame):
         if not new_name:
             return
         os.makedirs(self.path, exist_ok=True)
+        if os.path.exists(os.path.join(self.path, new_name)):
+            print(os.path.join(self.path, new_name), 'is exists already.')
+            return
         with open(os.path.join(self.path, new_name), 'w', encoding='utf-8'):
             pass
         self.file_name = new_name
