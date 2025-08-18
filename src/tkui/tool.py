@@ -6799,7 +6799,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         current_project_name.set(name)
 
     def listdir(self):
-        hide_items = ['bin', 'src']
+        hide_items = ['bin', 'src', 'readmes']
         array = [f for f in os.listdir(settings.path) if
                  os.path.isdir(f'{settings.path}/{f}') and f not in hide_items and not f.startswith('.')]
         origin_project = current_project_name.get()
