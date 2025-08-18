@@ -48,8 +48,31 @@ class PythonEditor(tk.Frame):
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         Button(ff, text=lang.text115, command=self.new).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         Button(ff, text=lang.text116, command=self.delete).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
+        Button(ff, text=lang.text117, command=self.rename).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         ff.pack(padx=5, pady=5, fill=X, expand=True)
         self.refs()
+
+    def rename(self):
+        try:
+            file = self.show.get(self.show.curselection())
+        except Exception:
+            logging.exception("delete editor")
+            return
+        if file in ['.', '..']:
+            return
+        is_current_file =  file == self.file_name
+        if is_current_file:
+            self.save()
+        new_name = input_('Enter New Name', file, master=self)
+        if not new_name:
+            return
+        if os.path.exists(os.path.join(self.path, new_name)):
+            print(f"{new_name} is exists already.")
+            return
+        os.rename(os.path.join(self.path, file), os.path.join(self.path, new_name))
+        self.file_name = new_name
+        self.refs()
+        self.load()
 
     def delete(self):
         try:
