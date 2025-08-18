@@ -109,6 +109,7 @@ try:
 
     is_pro = True
 except ImportError:
+    verify = None
     is_pro = False
 if is_pro:
     from src.pro.active_ui import Active
@@ -293,7 +294,7 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master: Optional[tk.Wm] = None) -> None:
+def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master: Optional[tk.Toplevel] = None) -> None:
     """
     Displays a modal warning/error window that stays until the user closes it.
 
