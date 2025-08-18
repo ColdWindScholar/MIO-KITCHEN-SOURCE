@@ -1696,7 +1696,8 @@ class Tool(Tk):
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
                          style="Link.TLabel")
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
-        link.pack()
+        if not is_pro:
+            link.pack()
 
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0'):
