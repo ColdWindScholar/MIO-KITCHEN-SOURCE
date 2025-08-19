@@ -1,1 +1,0 @@
-gcc -shared -o my_module.so -fPIC $(python3-config --cflags) my_module.c $(python3-config --ldflags)
