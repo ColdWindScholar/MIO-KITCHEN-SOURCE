@@ -19,5 +19,3 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LD_FLAGS}")
 add_library(utils utils.c)
 
 target_include_directories(utils PUBLIC include)
-
-set_target_properties(utils PROPERTIES VERSION 1.0 SOVERSION 1)
