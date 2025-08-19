@@ -1,0 +1,27 @@
+# Note: use "git ls-files -i --exclude-standard" to make sure
+# no tracked files are ignored as a result of any changes.
+
+# Object files
+*.o
+*.lo
+*.so
+*.so.[0-9]
+*.a
+*.s
+*.mo
+*.pc
+
+# Misc
+*.patch
+*.gz
+*~
+*.orig
+*.rej
+*.pyc
+*.pyo
+cscope.*
+.#*
+\#*
+.*.swp
+# Failsafes
+!.gitignore

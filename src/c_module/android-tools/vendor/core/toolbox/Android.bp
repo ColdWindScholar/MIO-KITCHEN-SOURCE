@@ -1,0 +1,80 @@
+package {
+    default_applicable_licenses: ["system_core_toolbox_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_core_toolbox_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "toolbox_defaults",
+    cflags: [
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-Wno-unused-const-variable",
+        "-D_FILE_OFFSET_BITS=64",
+    ],
+}
+
+genrule {
+    name: "toolbox_input_labels",
+    tool_files: ["generate-input.h-labels.py"],
+    cmd: "$(location) $(in) >$(out)",
+    srcs: [":kernel_input_headers"],
+    out: ["input.h-labels.h"],
+}
+
+cc_defaults {
+    name: "toolbox_binary_defaults",
+    defaults: ["toolbox_defaults"],
+    srcs: [
+        "toolbox.c",
+        "getevent.c",
+        "getprop.cpp",
+        "modprobe.cpp",
+        "setprop.cpp",
+        "start.cpp",
+    ],
+    generated_headers: [
+        "toolbox_input_labels",
+    ],
+    shared_libs: [
+        "libbase",
+    ],
+    static_libs: [
+        "libmodprobe",
+        "libpropertyinfoparser",
+    ],
+
+    symlinks: [
+        "getevent",
+        "getprop",
+        "modprobe",
+        "setprop",
+        "start",
+        "stop",
+    ],
+}
+
+cc_binary {
+    name: "toolbox",
+    defaults: ["toolbox_binary_defaults"],
+    recovery_available: true,
+    vendor_ramdisk_available: true,
+}
+
+cc_binary {
+    name: "toolbox_vendor",
+    stem: "toolbox",
+    vendor: true,
+    defaults: ["toolbox_binary_defaults"],
+}

@@ -1,0 +1,25 @@
+LIBCGROUPRC { # introduced=29
+  global:
+    ACgroupFile_getVersion; # llndk systemapi
+    ACgroupFile_getControllerCount; # llndk systemapi
+    ACgroupFile_getController; # llndk systemapi
+    ACgroupController_getVersion; # llndk systemapi
+    ACgroupController_getName; # llndk systemapi
+    ACgroupController_getPath; # llndk systemapi
+  local:
+    *;
+};
+
+LIBCGROUPRC_30 { # introduced=30
+  global:
+    ACgroupController_getFlags; # llndk systemapi
+  local:
+    *;
+};
+
+LIBCGROUPRC_36 { # introduced=36
+  global:
+    ACgroupController_getMaxActivationDepth; # llndk=202504 systemapi
+  local:
+    *;
+};

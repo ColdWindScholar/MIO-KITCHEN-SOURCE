@@ -1,0 +1,9 @@
+# Not a service because services can only be stopped with SIGKILL
+# (or SIGTERM+200ms+SIGKILL with gentle_kill), and simpleperf
+# needs more than 200ms to clean up.
+
+on early-init && property:ro.boot.simpleperf.boot_record=*
+  exec_background u:r:su:s0 root root -- /system/bin/simpleperf record -a -g --exclude-perf -o /tmp/boot_perf.data
+
+on property:sys.boot_completed=1 && property:ro.boot.simpleperf.boot_record=*
+  exec u:r:su:s0 root root -- /system/bin/killall simpleperf

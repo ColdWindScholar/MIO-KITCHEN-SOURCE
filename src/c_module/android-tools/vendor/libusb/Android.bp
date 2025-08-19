@@ -1,0 +1,143 @@
+package {
+    default_applicable_licenses: ["external_libusb_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+//
+// large-scale-change included anything that looked like it might be a license
+// text as a license_text. e.g. LICENSE, NOTICE, COPYING etc.
+//
+// Please consider removing redundant or irrelevant files from 'license_text:'.
+// See: http://go/android-license-faq
+license {
+    name: "external_libusb_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-GPL",
+        "SPDX-license-identifier-LGPL",
+        "SPDX-license-identifier-LGPL-2.1",
+        "SPDX-license-identifier-LGPL-3.0",
+        "SPDX-license-identifier-MIT",
+    ],
+    license_text: [
+        "COPYING",
+        "NOTICE",
+    ],
+}
+
+cc_library {
+    name: "libusb",
+    host_supported: true,
+    vendor_available: true,
+
+    srcs: [
+        "libusb/core.c",
+        "libusb/descriptor.c",
+        "libusb/hotplug.c",
+        "libusb/io.c",
+        "libusb/sync.c",
+        "libusb/strerror.c",
+    ],
+
+    local_include_dirs: [
+        "libusb",
+        "libusb/os",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Wno-error=sign-compare",
+        "-Wno-error=switch",
+        "-Wno-error=unused-function",
+        "-Wno-unused-parameter",
+"-DENABLE_LOGGING=1",
+    ],
+
+    target: {
+        linux: {
+            srcs: [
+                "libusb/os/events_posix.c",
+                "libusb/os/linux_usbfs.c",
+                "libusb/os/threads_posix.c",
+                "libusb/os/linux_netlink.c",
+            ],
+        },
+
+        android: {
+            local_include_dirs: [
+                "android",
+            ],
+
+            cflags: ["-Werror"],
+        },
+
+        darwin: {
+            srcs: [
+                "libusb/os/events_posix.c",
+                "libusb/os/darwin_usb.c",
+                "libusb/os/threads_posix.c",
+            ],
+
+            local_include_dirs: [
+                "darwin",
+            ],
+
+            host_ldlibs: [
+                "-framework CoreFoundation",
+                "-framework IOKit",
+                "-framework Security",
+                "-lobjc"
+            ],
+
+            cflags: [
+                "-Wno-deprecated-declarations",
+                "-Wno-unguarded-availability",
+            ],
+        },
+
+        host_linux: {
+            local_include_dirs: [
+                "linux",
+            ],
+
+            cflags: ["-Werror"],
+        },
+
+        windows: {
+            srcs: [
+                "libusb/os/events_windows.c",
+                "libusb/os/threads_windows.c",
+                "libusb/os/windows_common.c",
+                "libusb/os/windows_usbdk.c",
+                "libusb/os/windows_winusb.c",
+            ],
+
+            local_include_dirs: [
+                "windows",
+            ],
+
+            cflags: [
+                "-Wno-error=pragma-pack",
+                "-Wno-error=missing-field-initializers",
+                "-Wno-error=ignored-attributes",
+            ],
+
+            enabled: true,
+        },
+    },
+
+    shared_libs: ["liblog"],
+    export_include_dirs: ["include"],
+}

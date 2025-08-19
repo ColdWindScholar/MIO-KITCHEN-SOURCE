@@ -1,0 +1,184 @@
+# Geert Warrink <geert.warrink@onsnet.nu>, 2018. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-18 11:57+0100\n"
+"PO-Revision-Date: 2018-07-16 03:02-0400\n"
+"Last-Translator: Geert Warrink <geert.warrink@onsnet.nu>\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Zanata 4.6.2\n"
+
+#: ../sandbox:120
+#, python-format
+msgid "Do you want to save changes to '%s' (Y/N): "
+msgstr "Wil je de veranderingen  opslaan naar '%s' (J/N): "
+
+#: ../sandbox:121
+msgid "Sandbox Message"
+msgstr "Sandbox boodschap"
+
+#: ../sandbox:133
+#, python-format
+msgid "Do you want to save changes to '%s' (y/N): "
+msgstr "Wil je de veranderingen  opslaan naar '%s' (j/N): "
+
+#: ../sandbox:134
+msgid "[yY]"
+msgstr "[jJ]"
+
+#: ../sandbox:157
+msgid "User account must be setup with an MCS Range"
+msgstr "Gebruikersaccount moet ingesteld worden met een MCS reeks"
+
+#: ../sandbox:185
+msgid ""
+"Failed to find any unused category sets.  Consider a larger MCS range for "
+"this user."
+msgstr ""
+"Het vinden van ongebruikte categoriereeksen is mislukt.  Overweeg een "
+"grotere MCS reeks voor deze gebruiker."
+
+#: ../sandbox:217
+msgid "Homedir and tempdir required for level mounts"
+msgstr "Homedir en tempdir zijn vereist voor level aankoppelingen"
+
+#: ../sandbox:220 ../sandbox:231 ../sandbox:236
+#, python-format
+msgid ""
+"\n"
+"%s is required for the action you want to perform.\n"
+msgstr ""
+"\n"
+"%s is vereist voor de actie die je wilt uitvoeren.\n"
+
+#: ../sandbox:307
+#, python-format
+msgid ""
+"\n"
+"Policy defines the following types for use with the -t:\n"
+"\t%s\n"
+msgstr ""
+"\n"
+"Taktiek definieert de volgende types voor het gebruik met -t:\n"
+"\t%s\n"
+
+#: ../sandbox:314
+#, python-format
+msgid ""
+"\n"
+"sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I "
+"includefile ] [-W windowmanager ] [ -w windowsize ] [[-i file ] ...] [ -t "
+"type ] command\n"
+"\n"
+"sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I "
+"includefile ] [-W windowmanager ] [ -w windowsize ] [[-i file ] ...] [ -t "
+"type ] -S\n"
+"%s\n"
+msgstr ""
+"\n"
+"sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I "
+"includefile ] [-W windowmanager ] [ -w windowsize ] [[-i file ] ...] [ -t "
+"type ] command\n"
+"\n"
+"sandbox [-h] [-l level ] [-[X|M] [-H homedir] [-T tempdir]] [-I "
+"includefile ] [-W windowmanager ] [ -w windowsize ] [[-i file ] ...] [ -t "
+"type ] -S\n"
+"%s\n"
+
+#: ../sandbox:326
+msgid "include file in sandbox"
+msgstr "bestand insluiten in sandbox"
+
+#: ../sandbox:329
+msgid "read list of files to include in sandbox from INCLUDEFILE"
+msgstr "lees lijst van bestanden om in te sluiten in sandbox uit INCLUDEFILE"
+
+#: ../sandbox:331
+msgid "run sandbox with SELinux type"
+msgstr "voer sandbox uit met SELinux type"
+
+#: ../sandbox:334
+msgid "mount new home and/or tmp directory"
+msgstr "koppel nieuwe home en/of tmp map aan"
+
+#: ../sandbox:338
+msgid "dots per inch for X display"
+msgstr "punten per inch voor X display"
+
+#: ../sandbox:341
+msgid "run complete desktop session within sandbox"
+msgstr "Voer complete desktopsessie uit binnen sandbox"
+
+#: ../sandbox:344
+#, fuzzy
+#| msgid "Shred content before tempory directories are removed"
+msgid "Shred content before temporary directories are removed"
+msgstr "Verwijder inhoud voordat tijdelijke mappen verwijderd worden"
+
+#: ../sandbox:348
+msgid "run X application within a sandbox"
+msgstr "voer X toepasing uit binnen een sandbox"
+
+#: ../sandbox:354
+msgid "alternate home directory to use for mounting"
+msgstr "alternatieve home map te gebruiken voor aankoppelen"
+
+#: ../sandbox:359
+msgid "alternate /tmp directory to use for mounting"
+msgstr "alternatieve /tmp map te gebruiken voor aankoppelen"
+
+#: ../sandbox:364
+#, fuzzy
+#| msgid "alternate home directory to use for mounting"
+msgid ""
+"alternate XDG_RUNTIME_DIR - /run/user/$UID - directory to use for mounting"
+msgstr "alternatieve home map te gebruiken voor aankoppelen"
+
+#: ../sandbox:373
+msgid "alternate window manager"
+msgstr "alternatieve vensterbeheerder"
+
+#: ../sandbox:376
+msgid "MCS/MLS level for the sandbox"
+msgstr "MCS/MLS level voor de sandbox"
+
+#: ../sandbox:392
+msgid ""
+"Sandbox Policy is not currently installed.\n"
+"You need to install the selinux-policy-sandbox package in order to run this "
+"command"
+msgstr ""
+"Sandbox beleid is op dit moment niet geïnstalleerd.\n"
+"Je moet het selinux-policy-sandbox pakket installeren om dit commando uit te "
+"voeren"
+
+#: ../sandbox:404
+msgid ""
+"You must specify a Homedir and tempdir when setting up a session sandbox"
+msgstr ""
+"Jen moet een Homedir en tempdir specificeren bij het opzetten van een sessie "
+"sandbox"
+
+#: ../sandbox:406
+msgid "Commands are not allowed in a session sandbox"
+msgstr "Commando's zijn niet toegestaan in  een sessie sandbox"
+
+#: ../sandbox:418
+msgid "Command required"
+msgstr "Commando vereist"
+
+#: ../sandbox:421
+#, python-format
+msgid "%s is not an executable"
+msgstr "%s is geen uitvoerbaar bestand"
+
+#: ../sandbox:549
+#, python-format
+msgid "Invalid value %s"
+msgstr "Ongeldige waarde %s"

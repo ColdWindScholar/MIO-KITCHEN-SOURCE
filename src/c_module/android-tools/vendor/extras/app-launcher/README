@@ -1,0 +1,87 @@
+		Instructions to Run (and modify) app-launcher script
+		----------------------------------------------------
+
+Introduction: app-launcher is a script that launches apps many times,
+measures various system metrics, computes basic stats for the metrics
+and reports that stats.
+
+Setup:
+1) Make sure the device is seen via 'adb devices' and authorize adb via the
+popup dialog.
+2) Clear the setup wizard.
+3) Login to an android user test account.
+4) Clear the first time user dialogs on supported apps for your device (see
+below).
+5) Enable wifi and connect to a network (ex. GoogleGuest).
+
+Launching app-launcher :
+app-launcher -a|-b|-u [-c|-v|-s <serial number>] num-iterations
+-a:Run on all cores
+-b:Run only big cores
+-c:pagecached. Don't drop pagecache before each launch (not default)
+-h:Dump help menu'
+-u:user experience, no change to cpu/gpu frequencies or governors'
+-v:Optional, Verbose mode, prints stats on a lot of metrics.
+-s <serial number>:Optional, specify serial number if multiple devices are
+                   attached to host
+num-iterations : Must be >= 100 to get statistically valid data.
+
+Note, under -a|-b, we lock the CPU and GPU frequencies.
+
+Apps Supported :
+On phone, these 4 apps are launched
+Chrome
+Camera
+Maps
+Youtube
+
+On Fugu (Google TV), these 3 apps are launched
+YouTube
+Games
+Music
+
+To add new apps, launch app manually and grep for package name +
+activity name in logcat and add these to the launch_phone_apps()
+function.
+
+Adding support for new Devices to app-launcher :
+There are a few bits of code needed to do this.
+1) Add a new cpufreq_<device> routine to fix the CPU/GPU frequencies
+as desired.
+2) Add logic that checks the $model obtained and check against your device.
+   (a) Then add code to call your cpufreq_<device> routine there
+   (b) (Optional) Add code to get the /system block device pathname. This is
+   only needed if you wan to get storage block device (/system) data.
+
+Adding new Metrics to app-launcher :
+You can modify the way simpleperf is used in the script to collect
+different metrics, but that will require a change to getstats() to
+parse the output as necessary. Adding new storage stats or other stats
+collected from /proc (or /sys) is definitely possible, but code needs
+to be written for that - modeled after the disk_stats_before/after
+functions.
+
+Notes :
+
+Here are the commands to launch/stop the various Apps of interest. The
+way to find the package and activity for the app of interest is to
+launch the app and then grep for it in logcat to find the
+package+activity and use that in am start.
+
+Chrome :
+adb shell 'simpleperf stat -a am start -W -n com.android.chrome/com.google.android.apps.chrome.Main'
+adb shell 'am force-stop com.android.chrome'
+
+Camera :
+adb shell 'simpleperf stat -a am start -W -n com.google.android.GoogleCamera/com.android.camera.CameraActivity'
+adb shell 'am force-stop com.google.android.GoogleCamera'
+
+Maps :
+adb shell 'simpleperf stat -a am start -W -n com.google.android.apps.maps/com.google.android.maps.MapsActivity'
+adb shell 'am force-stop com.google.android.apps.maps'
+
+Youtube :
+adb shell 'am start -W -n com.google.android.youtube/com.google.android.apps.youtube.app.WatchWhileActivity'
+adb shell 'am force-stop com.google.android.youtube'
+
+

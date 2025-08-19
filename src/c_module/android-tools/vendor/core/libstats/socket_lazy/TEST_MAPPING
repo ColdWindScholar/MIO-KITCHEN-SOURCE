@@ -1,0 +1,12 @@
+{
+  "presubmit" : [
+    {
+      "name" : "libstatssocket_lazy_test"
+    }
+  ],
+  "hwasan-presubmit" : [
+    {
+      "name" : "libstatssocket_lazy_test"
+    }
+  ]
+}

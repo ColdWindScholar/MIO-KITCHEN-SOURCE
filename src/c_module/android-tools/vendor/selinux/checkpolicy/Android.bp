@@ -1,0 +1,58 @@
+package {
+    default_applicable_licenses: ["external_selinux_checkpolicy_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'filegroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+// http://go/android-license-faq
+license {
+    name: "external_selinux_checkpolicy_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-GPL",
+        "SPDX-license-identifier-GPL-2.0",
+        "SPDX-license-identifier-LGPL",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+common_CFLAGS = [
+    "-Wall",
+    "-Werror",
+    "-Wshadow",
+]
+
+cc_binary_host {
+    name: "checkpolicy",
+    cflags: common_CFLAGS,
+    srcs: [
+        "policy_parse.y",
+        "policy_scan.l",
+        "queue.c",
+        "module_compiler.c",
+        "parse_util.c",
+        "policy_define.c",
+        "checkpolicy.c",
+    ],
+    static_libs: ["libsepol"],
+}
+
+cc_binary_host {
+    name: "dispol",
+    cflags: common_CFLAGS,
+    srcs: ["test/dispol.c"],
+    static_libs: ["libsepol"],
+}

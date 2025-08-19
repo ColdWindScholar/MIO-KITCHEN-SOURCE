@@ -1,0 +1,10 @@
+{
+  "presubmit": [
+    {
+      "name": "libutils_test"
+    },
+    {
+      "name": "libutils_binder_test"
+    }
+  ]
+}

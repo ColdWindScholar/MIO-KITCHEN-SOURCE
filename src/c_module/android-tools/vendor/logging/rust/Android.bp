@@ -1,0 +1,136 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+rust_library {
+    name: "liblogger",
+    host_supported: true,
+    crate_name: "logger",
+    srcs: ["logger.rs"],
+    rustlibs: [
+        "libenv_logger",
+        "liblog_rust",
+    ],
+    vendor_available: true,
+    product_available: true,
+    target: {
+        android: {
+            rustlibs: [
+                "libandroid_logger",
+            ],
+        },
+    },
+    apex_available: [
+        "//apex_available:anyapex",
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    min_sdk_version: "29",
+}
+
+rust_library {
+    name: "liblog_event_list",
+    crate_name: "log_event_list",
+    srcs: ["liblog_event_list.rs"],
+    rustlibs: ["liblog_event_list_bindgen"],
+    shared_libs: ["liblog"],
+    vendor_available: true,
+    product_available: true,
+}
+
+rust_defaults {
+    name: "liblogger_test_defaults",
+    crate_name: "logger",
+    test_suites: ["general-tests"],
+    auto_gen_config: true,
+    rustlibs: [
+        "liblogger",
+        "liblog_rust",
+    ],
+}
+
+rust_library {
+    name: "libstructured_log",
+    crate_name: "structured_log",
+    srcs: [
+        "structured_logger.rs",
+    ],
+    rustlibs: [
+        "liblog_event_list",
+        "liblog_event_list_bindgen",
+    ],
+
+    vendor_available: true,
+    product_available: true,
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+}
+
+rust_defaults {
+    name: "structured_log_rust_defaults",
+    rustlibs: [
+        "libstructured_log",
+        "liblog_event_list",
+    ],
+}
+
+rust_test {
+    name: "logger_device_unit_tests",
+    defaults: ["liblogger_test_defaults"],
+    srcs: ["logger.rs"],
+    rustlibs: [
+        "libenv_logger",
+        "libandroid_logger",
+    ],
+}
+
+rust_test_host {
+    name: "logger_host_unit_tests",
+    defaults: ["liblogger_test_defaults"],
+    srcs: ["logger.rs"],
+    rustlibs: ["libenv_logger"],
+}
+
+// The following tests are each run as separate targets because they all require a clean init state.
+rust_test {
+    name: "logger_test_default_init",
+    defaults: ["liblogger_test_defaults"],
+    host_supported: true,
+    srcs: ["tests/default_init.rs"],
+}
+
+rust_test {
+    name: "logger_test_env_log_level",
+    defaults: ["liblogger_test_defaults"],
+    host_supported: true,
+    srcs: ["tests/env_log_level.rs"],
+}
+
+rust_test {
+    name: "logger_test_config_log_level",
+    defaults: ["liblogger_test_defaults"],
+    host_supported: true,
+    srcs: ["tests/config_log_level.rs"],
+}
+
+rust_test {
+    name: "logger_test_multiple_init",
+    defaults: ["liblogger_test_defaults"],
+    host_supported: true,
+    srcs: ["tests/multiple_init.rs"],
+}
+
+rust_test {
+    name: "structured_logging_tests",
+    srcs: [
+        "tests/structured_logging_tests.rs",
+    ],
+    test_suites: [
+        "general-tests",
+    ],
+    defaults: [
+        "structured_log_rust_defaults",
+    ],
+}

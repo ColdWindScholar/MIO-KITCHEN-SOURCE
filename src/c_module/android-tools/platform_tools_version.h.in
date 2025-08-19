@@ -1,0 +1,3 @@
+// SPDX-License-Identifier: Apache-2.0
+
+#define PLATFORM_TOOLS_VERSION "@ANDROID_VERSION@"

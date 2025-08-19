@@ -1,0 +1,117 @@
+//
+// Copyright (C) 2015 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_defaults {
+    name: "gatekeeperd_defaults",
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wunused",
+    ],
+    srcs: [
+        "gatekeeperd.cpp",
+    ],
+    defaults: [
+        "keymint_use_latest_hal_aidl_ndk_shared",
+    ],
+    shared_libs: [
+        "libbinder",
+        "libbinder_ndk",
+        "libgatekeeper",
+        "libgsi",
+        "liblog",
+        "libhardware",
+        "libbase",
+        "libutils",
+        "libcrypto",
+        "libhidlbase",
+        "lib_android_keymaster_keymint_utils",
+        "android.hardware.gatekeeper-V1-ndk",
+        "android.hardware.gatekeeper@1.0",
+        "libgatekeeper_aidl",
+        "android.security.authorization-ndk",
+    ],
+
+    static_libs: ["libscrypt_static"],
+    include_dirs: ["external/scrypt/lib/crypto"],
+}
+
+cc_binary {
+    name: "gatekeeperd",
+    defaults: [
+        "gatekeeperd_defaults",
+    ],
+    srcs: [
+        "main.cpp",
+    ],
+    init_rc: ["gatekeeperd.rc"],
+}
+
+filegroup {
+    name: "gatekeeper_aidl",
+    srcs: [
+        "binder/android/service/gatekeeper/IGateKeeperService.aidl",
+    ],
+    path: "binder",
+}
+
+cc_library_shared {
+    name: "libgatekeeper_aidl",
+    srcs: [
+        ":gatekeeper_aidl",
+        "GateKeeperResponse.cpp",
+    ],
+    aidl: {
+        export_aidl_headers: true,
+        include_dirs: [
+            "system/core/gatekeeperd/binder",
+            "frameworks/base/core/java/",
+        ],
+    },
+    export_include_dirs: ["include"],
+    shared_libs: [
+        "libbase",
+        "libbinder",
+        "libcutils",
+        "liblog",
+        "libutils",
+    ],
+    export_shared_lib_headers: [
+        "libbinder",
+    ],
+}
+
+cc_fuzz {
+    name: "gatekeeperd_service_fuzzer",
+    defaults: [
+        "gatekeeperd_defaults",
+        "service_fuzzer_defaults"
+    ],
+    srcs: [
+        "fuzzer/GateKeeperServiceFuzzer.cpp",
+    ],
+    fuzz_config: {
+        cc: [
+            "subrahmanyaman@google.com",
+            "swillden@google.com",
+        ],
+    },
+}

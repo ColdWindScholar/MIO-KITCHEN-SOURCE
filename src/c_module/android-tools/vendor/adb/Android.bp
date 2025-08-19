@@ -1,0 +1,1064 @@
+// Copyright (C) 2017 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package {
+    default_team: "trendy_team_native_tools_libraries",
+    default_applicable_licenses: ["packages_modules_adb_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "packages_modules_adb_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+tidy_errors = [
+    "-*",
+    "bugprone-inaccurate-erase",
+    "bugprone-use-after-move",
+]
+
+cc_defaults {
+    name: "adb_defaults",
+
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wexit-time-destructors",
+        "-Wno-non-virtual-dtor",
+        "-Wno-unused-parameter",
+        "-Wno-missing-field-initializers",
+        "-Wthread-safety",
+        "-Wvla",
+        "-DADB_HOST=1", // overridden by adbd_defaults
+        "-DANDROID_BASE_UNIQUE_FD_DISABLE_IMPLICIT_CONVERSION=1",
+    ],
+    cpp_std: "experimental",
+
+    use_version_lib: true,
+    compile_multilib: "first",
+
+    target: {
+        darwin: {
+            host_ldlibs: [
+                "-lpthread",
+                "-framework CoreFoundation",
+                "-framework IOKit",
+                "-framework Security",
+                "-lobjc",
+            ],
+            cflags: [
+                // Required, to use the new IPv6 Sockets options introduced by RFC 3542.
+                "-D__APPLE_USE_RFC_3542",
+            ],
+        },
+
+        windows: {
+            cflags: [
+                // Define windows.h and tchar.h Unicode preprocessor symbols so that
+                // CreateFile(), _tfopen(), etc. map to versions that take wchar_t*, breaking the
+                // build if you accidentally pass char*. Fix by calling like:
+                //   std::wstring path_wide;
+                //   if (!android::base::UTF8ToWide(path_utf8, &path_wide)) { /* error handling */ }
+                //   CreateFileW(path_wide.c_str());
+                "-DUNICODE=1",
+                "-D_UNICODE=1",
+
+                // Unlike on Linux, -std=gnu++ doesn't set _GNU_SOURCE on Windows.
+                "-D_GNU_SOURCE",
+
+                // MinGW hides some things behind _POSIX_SOURCE.
+                "-D_POSIX_SOURCE",
+
+                // libusb uses __stdcall on a variadic function, which gets ignored.
+                "-Wno-ignored-attributes",
+
+                // Not supported yet.
+                "-Wno-thread-safety",
+            ],
+
+            host_ldlibs: [
+                "-lws2_32",
+                "-lgdi32",
+                "-luserenv",
+                "-liphlpapi",
+            ],
+        },
+    },
+
+    tidy: true,
+    tidy_checks: tidy_errors,
+    tidy_checks_as_errors: tidy_errors,
+}
+
+cc_defaults {
+    name: "adbd_defaults",
+    defaults: ["adb_defaults"],
+
+    cflags: [
+        "-UADB_HOST",
+        "-DADB_HOST=0",
+    ],
+}
+
+cc_defaults {
+    name: "host_adbd_supported",
+
+    host_supported: true,
+    target: {
+        linux: {
+            enabled: true,
+            host_ldlibs: [
+                "-lresolv", // b64_pton
+                "-lutil", // forkpty
+            ],
+        },
+        darwin: {
+            enabled: false,
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+soong_config_module_type_import {
+    from: "system/apex/Android.bp",
+    module_types: ["library_linking_strategy_cc_defaults"],
+}
+
+library_linking_strategy_cc_defaults {
+    name: "libadbd_binary_dependencies",
+    static_libs: [
+        "libadb_crypto",
+        "libadb_pairing_connection",
+        "libadb_protos",
+        "libadb_sysdeps",
+        "libadb_tls_connection",
+        "libadbconnection_server",
+        "libadbd",
+        "libadbd_core",
+        "libapp_processes_protos_lite",
+        "libasyncio",
+        "libbrotli",
+        "libcrypto_utils",
+        "libcutils_sockets",
+        "libdiagnose_usb",
+        "libmdnssd",
+        "libprotobuf-cpp-lite",
+        "libzstd",
+    ],
+
+    shared_libs: [
+        "libadbd_auth",
+        "libadbd_fs",
+        "liblog",
+        "libselinux",
+    ],
+
+    soong_config_variables: {
+        library_linking_strategy: {
+            prefer_static: {
+                static_libs: [
+                    "libbase",
+                ],
+            },
+            conditions_default: {
+                shared_libs: [
+                    "libbase",
+                ],
+            },
+        },
+    },
+
+    target: {
+        android: {
+            shared_libs: ["libcrypto"],
+        },
+        host_linux: {
+            static_libs: ["libcrypto_static"],
+        },
+        recovery: {
+            exclude_static_libs: [
+                "libadb_pairing_auth",
+                "libadb_pairing_connection",
+            ],
+        },
+    },
+}
+
+// libadb
+// =========================================================
+// These files are compiled for both the host and the device.
+libadb_srcs = [
+    "adb.cpp",
+    "adb_io.cpp",
+    "adb_listeners.cpp",
+    "adb_mdns.cpp",
+    "adb_trace.cpp",
+    "adb_unique_fd.cpp",
+    "adb_utils.cpp",
+    "fdevent/fdevent.cpp",
+    "services.cpp",
+    "sockets.cpp",
+    "socket_spec.cpp",
+    "sysdeps/env.cpp",
+    "sysdeps/errno.cpp",
+    "transport.cpp",
+    "transport_fd.cpp",
+    "types.cpp",
+]
+
+libadb_darwin_srcs = [
+    "fdevent/fdevent_poll.cpp",
+]
+
+libadb_windows_srcs = [
+    "fdevent/fdevent_poll.cpp",
+    "sysdeps_win32.cpp",
+    "sysdeps/win32/errno.cpp",
+    "sysdeps/win32/stat.cpp",
+]
+
+libadb_posix_srcs = [
+    "sysdeps_unix.cpp",
+    "sysdeps/posix/network.cpp",
+]
+
+libadb_linux_srcs = [
+    "fdevent/fdevent_epoll.cpp",
+]
+
+libadb_test_srcs = [
+    "adb_io_test.cpp",
+    "adb_listeners_test.cpp",
+    "adb_utils_test.cpp",
+    "fdevent/fdevent_test.cpp",
+    "shell_service_protocol.cpp",
+    "socket_spec_test.cpp",
+    "socket_test.cpp",
+    "sysdeps_test.cpp",
+    "sysdeps/stat_test.cpp",
+    "transport_test.cpp",
+    "types_test.cpp",
+]
+
+cc_library_host_static {
+    name: "libadb_host",
+    defaults: ["adb_defaults"],
+
+    srcs: libadb_srcs + [
+        "client/openscreen/mdns_service_info.cpp",
+        "client/openscreen/mdns_service_watcher.cpp",
+        "client/openscreen/platform/logging.cpp",
+        "client/openscreen/platform/task_runner.cpp",
+        "client/openscreen/platform/udp_socket.cpp",
+        "client/auth.cpp",
+        "client/adb_wifi.cpp",
+        "client/usb_libusb.cpp",
+        "client/transport_local.cpp",
+        "client/mdnsresponder_client.cpp",
+        "client/mdns_utils.cpp",
+        "client/transport_mdns.cpp",
+        "client/transport_usb.cpp",
+        "client/pairing/pairing_client.cpp",
+    ],
+
+    generated_headers: ["platform_tools_version"],
+
+    target: {
+        linux: {
+            srcs: ["client/usb_linux.cpp"] + libadb_linux_srcs,
+        },
+        darwin: {
+            srcs: ["client/usb_osx.cpp"] + libadb_darwin_srcs,
+        },
+        not_windows: {
+            srcs: libadb_posix_srcs,
+        },
+        windows: {
+            enabled: true,
+            srcs: [
+                "client/usb_windows.cpp",
+            ] + libadb_windows_srcs,
+            shared_libs: ["AdbWinApi"],
+        },
+    },
+
+    static_libs: [
+        "libadb_crypto",
+        "libadb_host_protos",
+        "libadb_pairing_connection",
+        "libadb_protos",
+        "libadb_tls_connection",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
+        "liblog",
+        "libmdnssd",
+        "libopenscreen-discovery",
+        "libopenscreen-platform-impl",
+        "libprotobuf-cpp-lite",
+        "libusb",
+        "libutils",
+    ],
+}
+
+cc_library {
+    name: "libadb_sysdeps",
+    defaults: ["adb_defaults"],
+    recovery_available: true,
+    host_supported: true,
+    compile_multilib: "both",
+    min_sdk_version: "apex_inherit",
+    // This library doesn't use build::GetBuildNumber()
+    use_version_lib: false,
+
+    srcs: [
+        "sysdeps/env.cpp",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "liblog",
+    ],
+
+    target: {
+        windows: {
+            enabled: true,
+            ldflags: ["-municode"],
+        },
+    },
+
+    export_include_dirs: ["."],
+
+    visibility: [
+        "//bootable/recovery/minadbd:__subpackages__",
+        "//packages/modules/adb:__subpackages__",
+    ],
+
+    apex_available: [
+        "com.android.adbd",
+        "test_com.android.adbd",
+    ],
+}
+
+cc_test_host {
+    name: "adb_test",
+    defaults: ["adb_defaults"],
+    srcs: libadb_test_srcs + [
+        "client/mdns_utils_test.cpp",
+        "test_utils/test_utils.cpp",
+    ],
+
+    static_libs: [
+        "libadb_crypto_static",
+        "libadb_host",
+        "libadb_host_protos",
+        "libadb_pairing_auth_static",
+        "libadb_pairing_connection_static",
+        "libadb_protos_static",
+        "libadb_sysdeps",
+        "libadb_tls_connection_static",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
+        "liblog",
+        "libmdnssd",
+        "libopenscreen-discovery",
+        "libopenscreen-platform-impl",
+        "libprotobuf-cpp-full",
+        "libssl",
+        "libusb",
+    ],
+
+    target: {
+        windows: {
+            enabled: true,
+            ldflags: ["-municode"],
+            shared_libs: ["AdbWinApi"],
+        },
+    },
+
+    test_options: {
+        // TODO(b/247985207) remove "no-remote" tag when b/247985207 is fixed.
+        tags: ["no-remote"],
+    },
+}
+
+cc_defaults {
+    name: "adb_binary_host_defaults",
+
+    stl: "libc++_static",
+    defaults: ["adb_defaults"],
+
+    srcs: [
+        "client/adb_client.cpp",
+        "client/bugreport.cpp",
+        "client/commandline.cpp",
+        "client/file_sync_client.cpp",
+        "client/main.cpp",
+        "client/console.cpp",
+        "client/adb_install.cpp",
+        "client/line_printer.cpp",
+        "client/fastdeploy.cpp",
+        "client/fastdeploycallbacks.cpp",
+        "client/incremental.cpp",
+        "client/incremental_server.cpp",
+        "client/incremental_utils.cpp",
+        "shell_service_protocol.cpp",
+    ],
+
+    generated_headers: [
+        "bin2c_fastdeployagent",
+        "bin2c_fastdeployagentscript",
+    ],
+
+    static_libs: [
+        "libadb_crypto",
+        "libadb_host",
+        "libadb_host_protos",
+        "libadb_pairing_auth",
+        "libadb_pairing_connection",
+        "libadb_protos",
+        "libadb_sysdeps",
+        "libadb_tls_connection",
+        "libandroidfw",
+        "libapp_processes_protos_full",
+        "libbase",
+        "libbrotli",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
+        "libfastdeploy_host",
+        "liblog",
+        "liblog",
+        "liblz4",
+        "libmdnssd",
+        "libopenscreen-discovery",
+        "libopenscreen-platform-impl",
+        "libprotobuf-cpp-full",
+        "libssl",
+        "libusb",
+        "libutils",
+        "libz",
+        "libziparchive",
+        "libzstd",
+    ],
+
+    // Don't add anything here, we don't want additional shared dependencies
+    // on the host adb tool, and shared libraries that link against libc++
+    // will violate ODR
+    shared_libs: [],
+
+    // Archive adb, adb.exe.
+    dist: {
+        targets: [
+            "dist_files",
+            "sdk",
+            "sdk-repo-platform-tools",
+            "sdk_repo",
+            "win_sdk",
+        ],
+    },
+
+    target: {
+        darwin: {
+            cflags: [
+                "-Wno-sizeof-pointer-memaccess",
+            ],
+        },
+        windows: {
+            enabled: true,
+            ldflags: ["-municode"],
+            shared_libs: ["AdbWinApi"],
+            required: [
+                "AdbWinUsbApi",
+            ],
+        },
+    },
+}
+
+cc_binary_host {
+    name: "adb",
+    defaults: ["adb_binary_host_defaults"],
+}
+
+cc_binary_host {
+    name: "adb_asan",
+    defaults: ["adb_binary_host_defaults"],
+    target: {
+            darwin: {
+                sanitize: { address: true, },
+                strip: {  none: true },
+            },
+            linux: {
+                sanitize: { address: true, },
+                strip: {  none: true },
+            },
+            // Not supported on Windows yet...
+            windows: {
+                enabled: false,
+            }
+    },
+}
+
+// libadbd_core contains the common sources to build libadbd and libadbd_services.
+cc_library_static {
+    name: "libadbd_core",
+    defaults: [
+        "adbd_defaults",
+        "host_adbd_supported",
+    ],
+    recovery_available: true,
+
+    // libminadbd wants both, as it's used to build native tests.
+    compile_multilib: "both",
+
+    srcs: libadb_srcs + libadb_linux_srcs + libadb_posix_srcs + [
+        "daemon/adb_wifi.cpp",
+        "daemon/auth.cpp",
+        "daemon/jdwp_service.cpp",
+        "daemon/logging.cpp",
+        "daemon/transport_local.cpp",
+    ],
+
+    generated_headers: ["platform_tools_version"],
+
+    static_libs: [
+        "libdiagnose_usb",
+    ],
+
+    shared_libs: [
+        "libadb_crypto",
+        "libadb_pairing_connection",
+        "libadb_protos",
+        "libadb_tls_connection",
+        "libadbconnection_server",
+        "libadbd_auth",
+        "libapp_processes_protos_lite",
+        "libasyncio",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils_sockets",
+        "liblog",
+    ],
+
+    proto: {
+        type: "lite",
+        static: true,
+        export_proto_headers: true,
+    },
+
+    target: {
+        android: {
+            srcs: [
+                "daemon/property_monitor.cpp",
+                "daemon/usb.cpp",
+                "daemon/usb_ffs.cpp",
+                "daemon/watchdog.cpp",
+            ],
+        },
+        recovery: {
+            exclude_shared_libs: [
+                "libadb_pairing_auth",
+                "libadb_pairing_connection",
+                "libapp_processes_protos_lite",
+            ],
+        },
+    },
+
+    min_sdk_version: "30",
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.adbd",
+    ],
+    visibility: [
+        "//bootable/recovery/minadbd",
+        "//packages/modules/adb:__subpackages__",
+    ],
+}
+
+cc_library {
+    name: "libadbd_services",
+    defaults: [
+        "adbd_defaults",
+        "host_adbd_supported",
+    ],
+    recovery_available: true,
+    compile_multilib: "both",
+
+    // avoid getting duplicate symbol of android::build::getbuildnumber().
+    use_version_lib: false,
+
+    srcs: [
+        "daemon/file_sync_service.cpp",
+        "daemon/services.cpp",
+        "daemon/shell_service.cpp",
+        "shell_service_protocol.cpp",
+    ],
+
+    cflags: [
+        "-D_GNU_SOURCE",
+        "-Wno-deprecated-declarations",
+    ],
+
+    static_libs: [
+        "libadbconnection_server",
+        "libadbd_core",
+        "libbrotli",
+        "libdiagnose_usb",
+        "liblz4",
+        "libprotobuf-cpp-lite",
+        "libzstd",
+    ],
+
+    shared_libs: [
+        "libadb_crypto",
+        "libadb_pairing_connection",
+        "libadb_protos",
+        "libadb_tls_connection",
+        "libapp_processes_protos_lite",
+        "libasyncio",
+        "libbase",
+        "libcrypto_utils",
+        "libcutils_sockets",
+
+        // APEX dependencies.
+        "libadbd_auth",
+        "libadbd_fs",
+        "libcrypto",
+        "liblog",
+    ],
+
+    target: {
+        android: {
+            srcs: [
+                "daemon/abb_service.cpp",
+                "daemon/framebuffer_service.cpp",
+                "daemon/mdns.cpp",
+                "daemon/restart_service.cpp",
+            ],
+            shared_libs: [
+                "libmdnssd",
+                "libselinux",
+            ],
+        },
+        recovery: {
+            exclude_srcs: [
+                "daemon/abb_service.cpp",
+            ],
+            exclude_shared_libs: [
+                "libadb_pairing_auth",
+                "libadb_pairing_connection",
+            ],
+        },
+    },
+
+    min_sdk_version: "30",
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.adbd",
+    ],
+    visibility: [
+        "//packages/modules/adb",
+    ],
+
+}
+
+cc_library {
+    name: "libadbd",
+    defaults: [
+        "adbd_defaults",
+        "host_adbd_supported",
+    ],
+    recovery_available: true,
+    min_sdk_version: "30",
+    apex_available: ["com.android.adbd"],
+
+    // avoid getting duplicate symbol of android::build::getbuildnumber().
+    use_version_lib: false,
+
+    // libminadbd wants both, as it's used to build native tests.
+    compile_multilib: "both",
+
+    static_libs: [
+        "libadbd_core",
+        "libadbd_services",
+        "libbrotli",
+        "libcutils_sockets",
+        "libdiagnose_usb",
+        "liblz4",
+        "libmdnssd",
+        "libprotobuf-cpp-lite",
+        "libzstd",
+    ],
+
+    shared_libs: [
+        "libadbconnection_server",
+        "libapp_processes_protos_lite",
+        "libadb_crypto",
+        "libadb_pairing_connection",
+        "libadb_tls_connection",
+        "libasyncio",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "liblog",
+        "libselinux",
+
+        // APEX dependencies on the system image.
+        "libadbd_auth",
+        "libadbd_fs",
+    ],
+
+    target: {
+        recovery: {
+            exclude_shared_libs: [
+                "libadb_pairing_auth",
+                "libadb_pairing_connection",
+            ],
+        },
+    },
+
+    visibility: [
+        "//bootable/recovery/minadbd",
+        "//packages/modules/adb",
+    ],
+}
+
+cc_binary {
+    name: "adbd",
+    defaults: [
+        "adbd_defaults",
+        "host_adbd_supported",
+        "libadbd_binary_dependencies",
+    ],
+    recovery_available: true,
+    min_sdk_version: "30",
+    apex_available: ["com.android.adbd"],
+
+    srcs: [
+        "daemon/main.cpp",
+    ],
+
+    cflags: [
+        "-D_GNU_SOURCE",
+        "-Wno-deprecated-declarations",
+    ],
+
+    strip: {
+        keep_symbols: true,
+    },
+
+    static_libs: [
+        "libadb_protos",
+        "libadbd",
+        "libadbd_services",
+        "libasyncio",
+        "libcap",
+        "liblz4",
+        "libminijail",
+        "libssl",
+    ],
+
+    shared_libs: [
+        "libadbd_auth",
+    ],
+
+    target: {
+        recovery: {
+            exclude_shared_libs: [
+                "libadb_pairing_auth",
+                "libadb_pairing_connection",
+            ],
+        },
+    },
+}
+
+phony {
+    // Interface between adbd in a module and the system.
+    name: "adbd_system_api",
+    required: [
+        "libadbd_auth",
+        "libadbd_fs",
+        "abb",
+        "reboot",
+    ],
+    product_variables: {
+        debuggable: {
+            required: [
+                "remount",
+            ],
+        },
+    },
+}
+
+phony {
+    name: "adbd_system_api_recovery",
+    required: [
+        "libadbd_auth.recovery",
+        "libadbd_fs.recovery",
+        "reboot.recovery",
+    ],
+}
+
+cc_binary {
+    name: "abb",
+
+    defaults: ["adbd_defaults"],
+    stl: "libc++",
+    recovery_available: false,
+
+    srcs: [
+        "daemon/abb.cpp",
+    ],
+
+    cflags: [
+        "-D_GNU_SOURCE",
+        "-Wno-deprecated-declarations",
+    ],
+
+    strip: {
+        keep_symbols: true,
+    },
+
+    static_libs: [
+        "libadbd_core",
+        "libadbd_services",
+        "libcmd",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "libbinder",
+        "liblog",
+        "libutils",
+        "libselinux",
+    ],
+}
+
+ADBD_TEST_LIBS = [
+    "libadbd",
+    "libadbd_auth",
+    "libbase",
+    "libusb",
+]
+
+cc_test {
+    name: "adbd_test",
+
+    defaults: [
+        "adbd_defaults",
+        "libadbd_binary_dependencies",
+    ],
+
+    recovery_available: false,
+    srcs: libadb_test_srcs + [
+        "daemon/restart_service.cpp",
+        "daemon/restart_service_test.cpp",
+        "daemon/services.cpp",
+        "daemon/shell_service.cpp",
+        "daemon/shell_service_test.cpp",
+        "test_utils/test_utils.cpp",
+        "shell_service_protocol_test.cpp",
+        "mdns_test.cpp",
+    ],
+
+    test_config: "adbd_test.xml",
+
+    target: {
+        android: {
+            srcs: [
+                "daemon/property_monitor_test.cpp",
+            ],
+        },
+    },
+
+    shared_libs: [
+        "liblog",
+    ],
+
+    version_script: "adbd_test.map",
+    stl: "libc++_static",
+    static_libs: ADBD_TEST_LIBS,
+
+    // Shared lib versions of static libs can potentially come from
+    // libadbd_binary_dependencies (e.g. libbase as a shared_lib, depending on
+    // library_linking_strategy), which will cause both shared/static versions of
+    // the same library to be in the link action.
+    //
+    // adbd_test uses the static version of these libraries above, so exclude them here.
+    exclude_shared_libs: ADBD_TEST_LIBS,
+
+    test_suites: [
+        "general-tests",
+        "mts-adbd",
+    ],
+    require_root: true,
+}
+
+python_test_host {
+    name: "adb_integration_test_adb",
+    main: "test_adb.py",
+    srcs: [
+        "test_adb.py",
+    ],
+    test_config: "adb_integration_test_adb.xml",
+    test_suites: ["general-tests"],
+    test_options: {
+        unit_test: false,
+    },
+}
+
+python_test_host {
+    name: "adb_integration_test_device",
+    main: "test_device.py",
+    srcs: [
+        "proto/app_processes.proto",
+        "proto/adb_host.proto",
+        "test_device.py",
+    ],
+    proto: {
+        canonical_path_from_root: false,
+    },
+    libs: [
+        "adb_py",
+        "libprotobuf-python",
+    ],
+    test_config: "adb_integration_test_device.xml",
+    test_suites: ["general-tests"],
+    test_options: {
+        unit_test: false,
+    },
+    data: [
+        ":adb_test_app1",
+        ":adb_test_app2",
+    ],
+}
+
+// Note: using pipe for xxd to control the variable name generated
+// the default name used by xxd is the path to the input file.
+java_genrule {
+    name: "bin2c_fastdeployagent",
+    out: ["deployagent.inc"],
+    srcs: [":deployagent"],
+    cmd: "(echo 'unsigned char kDeployAgent[] = {' && xxd -i <$(in) && echo '};') > $(out)",
+}
+
+genrule {
+    name: "bin2c_fastdeployagentscript",
+    out: ["deployagentscript.inc"],
+    srcs: ["fastdeploy/deployagent/deployagent.sh"],
+    cmd: "(echo 'unsigned char kDeployAgentScript[] = {' && xxd -i <$(in) && echo '};') > $(out)",
+}
+
+cc_library_host_static {
+    name: "libfastdeploy_host",
+    defaults: ["adb_defaults"],
+    srcs: [
+        "fastdeploy/deploypatchgenerator/apk_archive.cpp",
+        "fastdeploy/deploypatchgenerator/deploy_patch_generator.cpp",
+        "fastdeploy/deploypatchgenerator/patch_utils.cpp",
+        "fastdeploy/proto/ApkEntry.proto",
+    ],
+    static_libs: [
+        "libadb_host",
+        "libandroidfw",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
+        "liblog",
+        "libmdnssd",
+        "libusb",
+        "libutils",
+        "libz",
+        "libziparchive",
+    ],
+    proto: {
+        type: "lite",
+        export_proto_headers: true,
+    },
+    target: {
+        windows: {
+            enabled: true,
+            shared_libs: ["AdbWinApi"],
+        },
+    },
+}
+
+cc_test_host {
+    name: "fastdeploy_test",
+    defaults: ["adb_defaults"],
+    srcs: [
+        "fastdeploy/deploypatchgenerator/apk_archive_test.cpp",
+        "fastdeploy/deploypatchgenerator/deploy_patch_generator_test.cpp",
+        "fastdeploy/deploypatchgenerator/patch_utils_test.cpp",
+    ],
+    static_libs: [
+        "libadb_crypto_static",
+        "libadb_host",
+        "libadb_host_protos",
+        "libadb_pairing_auth_static",
+        "libadb_pairing_connection_static",
+        "libadb_protos_static",
+        "libadb_sysdeps",
+        "libadb_tls_connection_static",
+        "libandroidfw",
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libdiagnose_usb",
+        "libfastdeploy_host",
+        "liblog",
+        "libmdnssd",
+        "libopenscreen-discovery",
+        "libopenscreen-platform-impl",
+        "libprotobuf-cpp-full",
+        "libssl",
+        "libusb",
+        "libutils",
+        "libz",
+        "libziparchive",
+    ],
+    target: {
+        windows: {
+            enabled: true,
+            shared_libs: ["AdbWinApi"],
+        },
+    },
+    data: [
+        "fastdeploy/testdata/rotating_cube-metadata-release.data",
+        "fastdeploy/testdata/rotating_cube-release.apk",
+        "fastdeploy/testdata/sample.apk",
+        "fastdeploy/testdata/sample.cd",
+    ],
+}

@@ -1,0 +1,105 @@
+#!/bin/bash
+
+#
+# Copyright (C) 2016 The Android Open Source Project
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use, copy,
+# modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+# This shell-script generates libavb_cert test data in the working directory.
+# An avbtool executable is assumed to reside in the parent directory
+# of this script.
+#
+# The *cert* test data in the test/data/ directory was generated with
+# this script. It is consistent with the expectations of avbtool unit
+# tests and avb_cert unit tests. This script exists as a record of how the
+# data was generated and as a convenience if it ever needs to be
+# generated again.
+#
+# Typical usage:
+#
+#  $ cd test/data; ../avb_cert_generate_test_data
+
+set -e
+
+TMP_FILE=$(mktemp /tmp/cert_generator.XXXXXXXXXX)
+trap "rm -f '${TMP_FILE}'" EXIT
+
+AVBTOOL=$(dirname "$0")/../avbtool.py
+
+echo AVBTOOL = ${AVBTOOL}
+
+# Get a zero product ID.
+echo 00000000000000000000000000000000 | xxd -r -p - cert_product_id.bin
+
+# Generate key pairs.
+if [ ! -f testkey_cert_prk.pem ]; then
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -outform PEM \
+    -out testkey_cert_prk.pem
+fi
+if [ ! -f testkey_cert_pik.pem ]; then
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -outform PEM \
+    -out testkey_cert_pik.pem
+fi
+if [ ! -f testkey_cert_psk.pem ]; then
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -outform PEM \
+    -out testkey_cert_psk.pem
+fi
+if [ ! -f testkey_cert_puk.pem ]; then
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -outform PEM \
+    -out testkey_cert_puk.pem
+fi
+
+# Construct permanent attributes.
+${AVBTOOL} make_cert_permanent_attributes --output=cert_permanent_attributes.bin \
+  --product_id=cert_product_id.bin --root_authority_key=testkey_cert_prk.pem
+
+# Construct a PIK certificate.
+echo -n "fake PIK subject" > ${TMP_FILE}
+${AVBTOOL} make_certificate --output=cert_pik_certificate.bin \
+  --subject=${TMP_FILE} --subject_key=testkey_cert_pik.pem \
+  --subject_is_intermediate_authority --subject_key_version 42 \
+  --authority_key=testkey_cert_prk.pem
+
+# Construct a PSK certificate.
+${AVBTOOL} make_certificate --output=cert_psk_certificate.bin \
+  --subject=cert_product_id.bin --subject_key=testkey_cert_psk.pem \
+  --subject_key_version 42 --authority_key=testkey_cert_pik.pem
+
+# Construct metadata.
+${AVBTOOL} make_cert_metadata --output=cert_metadata.bin \
+  --intermediate_key_certificate=cert_pik_certificate.bin \
+  --product_key_certificate=cert_psk_certificate.bin
+
+# Generate a random unlock challenge.
+head -c 16 /dev/urandom > cert_unlock_challenge.bin
+
+# Construct a PUK certificate.
+${AVBTOOL} make_certificate --output=cert_puk_certificate.bin \
+  --subject=cert_product_id.bin --subject_key=testkey_cert_puk.pem \
+  --usage_for_unlock --subject_key_version 42 \
+  --authority_key=testkey_cert_pik.pem
+
+# Construct an unlock credential.
+${AVBTOOL} make_cert_unlock_credential --output=cert_unlock_credential.bin \
+  --intermediate_key_certificate=cert_pik_certificate.bin \
+  --unlock_key_certificate=cert_puk_certificate.bin \
+  --challenge=cert_unlock_challenge.bin --unlock_key=testkey_cert_puk.pem

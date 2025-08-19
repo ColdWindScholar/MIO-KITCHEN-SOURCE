@@ -1,0 +1,20 @@
+# This project was upgraded with external_updater.
+# Usage: tools/external_updater/updater.sh update external/libusb
+# For more info, check https://cs.android.com/android/platform/superproject/+/main:tools/external_updater/README.md
+
+name: "libusb"
+description: "libusb is a library for USB device access from Linux, macOS, Windows, OpenBSD/NetBSD and Haiku userspace."
+third_party {
+  license_type: RESTRICTED
+  last_upgrade_date {
+    year: 2024
+    month: 5
+    day: 28
+  }
+  homepage: "https://libusb.info/"
+  identifier {
+    type: "Git"
+    value: "https://github.com/libusb/libusb"
+    version: "2a138c6f12988c42eaa9dd663581faa700c44abe"
+  }
+}

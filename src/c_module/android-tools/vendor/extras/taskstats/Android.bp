@@ -1,0 +1,31 @@
+// Copyright 2013 The Android Open Source Project
+
+package {
+    default_applicable_licenses: ["system_extras_taskstats_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_extras_taskstats_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_binary {
+    name: "taskstats",
+
+    srcs: ["taskstats.c"],
+
+    shared_libs: ["libnl"],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}

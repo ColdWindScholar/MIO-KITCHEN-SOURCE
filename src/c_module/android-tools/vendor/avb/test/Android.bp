@@ -1,0 +1,115 @@
+//
+// Copyright (C) 2018 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "external_avb_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    //   SPDX-license-identifier-MIT
+    default_applicable_licenses: ["external_avb_license"],
+}
+
+python_test_host {
+    name: "at_auth_unlock_unittest",
+    main: "at_auth_unlock_unittest.py",
+    srcs: [
+        "at_auth_unlock_unittest.py",
+    ],
+    libs: [
+        "at_auth_unlock",
+    ],
+    data: [
+        "data/cert_pik_certificate.bin",
+        "data/cert_puk_certificate.bin",
+        "data/cert_unlock_challenge.bin",
+        "data/cert_unlock_credential.bin",
+        "data/testkey_cert_puk.pem",
+    ],
+    test_config: "at_auth_unlock_unittest.xml",
+}
+
+filegroup {
+    name: "avb_testkey_rsa8192",
+    srcs: ["data/testkey_rsa8192.pem"],
+}
+
+filegroup {
+    name: "avb_testkey_rsa4096",
+    srcs: ["data/testkey_rsa4096.pem"],
+}
+
+filegroup {
+    name: "avb_testkey_rsa2048",
+    srcs: ["data/testkey_rsa2048.pem"],
+}
+
+// libavb_cert test public key.
+filegroup {
+    name: "avb_cert_testkey_psk",
+    srcs: ["data/testkey_cert_psk.pem"],
+}
+
+// libavb_cert test public key metadata. PSK and PIK versions are both set to 42.
+filegroup {
+    name: "avb_cert_test_metadata",
+    srcs: ["data/cert_metadata.bin"],
+}
+
+// libavb_cert test permanent attributes for the above public key.
+filegroup {
+    name: "avb_cert_test_permanent_attributes",
+    srcs: ["data/cert_permanent_attributes.bin"],
+}
+
+// libavb_cert test RNG for an unlock challenge.
+// Note: this is only the 16-byte randomization, not a full
+// `AvbCertUnlockChallenge`.
+filegroup {
+    name: "avb_cert_test_unlock_challenge",
+    srcs: ["data/cert_unlock_challenge.bin"],
+}
+
+// libavb_cert test unlock credential signing `avb_cert_test_unlock_challenge`.
+filegroup {
+    name: "avb_cert_test_unlock_credential",
+    srcs: ["data/cert_unlock_credential.bin"],
+}
+
+genrule {
+    name: "avb_testkey_rsa2048_pub_bin",
+    tools: ["avbtool"],
+    srcs: [":avb_testkey_rsa2048"],
+    out: ["data/testkey_rsa2048_pub.bin"],
+    cmd: "$(location avbtool) extract_public_key --key $(in) --output $(out)",
+}
+
+genrule {
+    name: "avb_testkey_rsa4096_pub_bin",
+    tools: ["avbtool"],
+    srcs: [":avb_testkey_rsa4096"],
+    out: ["data/testkey_rsa4096_pub.bin"],
+    cmd: "$(location avbtool) extract_public_key --key $(in) --output $(out)",
+}
+
+genrule {
+    name: "avb_testkey_rsa8192_pub_bin",
+    tools: ["avbtool"],
+    srcs: [":avb_testkey_rsa8192"],
+    out: ["data/testkey_rsa8192_pub.bin"],
+    cmd: "$(location avbtool) extract_public_key --key $(in) --output $(out)",
+}

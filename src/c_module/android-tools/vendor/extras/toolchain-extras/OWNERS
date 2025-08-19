@@ -1,0 +1,3 @@
+include platform/prebuilts/clang/host/linux-x86:/OWNERS
+
+allenhair@google.com

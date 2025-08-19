@@ -1,0 +1,70 @@
+/*
+ * Copyright (C) 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+
+package android;
+
+// Keep in sync with proto files on EDI backend. Otherwise, new fields will
+// go ignored.
+
+// Next: 7
+message DynamicPartitionsDeviceInfoProto {
+    bool enabled = 1;
+    bool retrofit = 2;
+
+    // Next: 8
+    message Partition {
+        string name = 1;
+        string group_name = 2 [json_name = "group_name"];
+        bool is_dynamic = 3 [json_name = "is_dynamic"];
+        /** Total size of all extents on super partition */
+        uint64 size = 4;
+        /** Total size of the filesystem. */
+        uint64 fs_size = 5 [json_name = "fs_size"];
+        /** Used space of the filesystem. */
+        uint64 fs_used = 6 [json_name = "fs_used"];
+        /**  Name of the filesystem. */
+        string fs_type = 7 [json_name = "fs_type"];
+    }
+    repeated Partition partitions = 3;
+
+    // Next: 3
+    message Group {
+        string name = 1;
+        uint64 maximum_size = 2 [json_name = "maximum_size"];
+    }
+    repeated Group groups = 4;
+
+    // Next: 6
+    message BlockDevice {
+        string name = 1;
+        uint64 size = 2;
+        uint64 block_size = 3 [json_name = "block_size"];
+        uint64 alignment = 4;
+        uint64 alignment_offset = 5 [json_name = "alignment_offset"];
+    }
+    repeated BlockDevice block_devices = 5 [json_name = "block_devices"];
+
+    // Next: 4
+    message SuperDevice {
+        string name = 1;
+        /** Used space in bytes */
+        uint64 used_size = 2 [json_name = "used_size"];
+        /** Total size of the super in bytes */
+        uint64 total_size = 3 [json_name = "total_size"];
+    }
+    SuperDevice super_device = 6 [json_name = "super_device"];
+}

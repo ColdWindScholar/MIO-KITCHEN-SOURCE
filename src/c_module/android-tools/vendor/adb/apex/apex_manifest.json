@@ -1,0 +1,7 @@
+{
+  "name": "com.android.adbd",
+
+  // Placeholder module version to be replaced during build.
+  // Do not change!
+  "version": 0
+}

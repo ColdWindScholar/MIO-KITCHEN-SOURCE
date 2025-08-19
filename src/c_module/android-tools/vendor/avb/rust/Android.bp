@@ -1,0 +1,520 @@
+// Copyright 2023, The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Rust bindgen wrappers to allow calling into libavb from Rust.
+//
+// The auto-generated wrappers are Rust unsafe and somewhat difficult to work
+// with so are not exposed outside of this directory; instead we will provide
+// a safe higher-level Rust API.
+rust_defaults {
+    name: "libavb_bindgen.common.defaults",
+    wrapper_src: "bindgen/avb.h",
+    crate_name: "avb_bindgen",
+    edition: "2021",
+    visibility: [
+        ":__subpackages__",
+        // TODO(b/290110273): add the Rust public API layer here and adjust
+        // Virtualization packages to depend on it instead of the raw bindgen.
+        "//packages/modules/Virtualization:__subpackages__",
+    ],
+    source_stem: "bindings",
+    bindgen_flags: [
+        "--constified-enum-module=AvbDescriptorTag",
+        "--bitfield-enum=Avb.*Flags",
+        "--default-enum-style rust",
+        "--with-derive-default",
+        "--with-derive-custom=Avb.*Descriptor=FromZeroes,FromBytes",
+        "--with-derive-custom=AvbCertPermanentAttributes=FromZeroes,FromBytes,AsBytes",
+        "--with-derive-custom=AvbCertCertificate.*=FromZeroes,FromBytes,AsBytes",
+        "--with-derive-custom=AvbCertUnlock.*=FromZeroes,FromBytes,AsBytes",
+        "--allowlist-type=AvbDescriptorTag",
+        "--allowlist-type=Avb.*Flags",
+        "--allowlist-function=.*",
+        "--allowlist-var=AVB.*",
+        "--use-core",
+        "--raw-line=#![no_std]",
+        "--raw-line=use zerocopy::{AsBytes, FromBytes, FromZeroes};",
+        "--ctypes-prefix=core::ffi",
+    ],
+    cflags: ["-DBORINGSSL_NO_CXX"],
+}
+
+// Full bindgen defaults for std targets.
+rust_defaults {
+    name: "libavb_bindgen.std.defaults",
+    defaults: ["libavb_bindgen.common.defaults"],
+    host_supported: true,
+    static_libs: ["libavb_cert"],
+    shared_libs: ["libcrypto"],
+    rustlibs: ["libzerocopy"],
+    apex_available: ["com.android.virt"],
+}
+
+// Full bindgen default for nostd targets.
+rust_defaults {
+    name: "libavb_bindgen.nostd.defaults",
+    defaults: ["libavb_bindgen.common.defaults"],
+    static_libs: [
+        "libavb_cert_baremetal",
+        "libcrypto_baremetal",
+    ],
+    rustlibs: ["libzerocopy_nostd_noalloc"],
+}
+
+// Internal source-only bindgen with std.
+//
+// This target should only be used as `srcs`, not `rustlibs` or `rlibs`. This
+// is because the `rust_bindgen` rule intentionally only generates rlibs
+// (b/166332519), and also forces its dependencies to use rlibs. However, this
+// can create mismatched library types if the depenency is also used elsewhere
+// in a build rule as a dylib. In particular for us, libzerocopy and its own
+// dependency libbyteorder trigger this problem like so:
+//
+//              build target (prefer dylib)
+//                  /                 \
+//          libavb_rs (dylib)          \
+//               /                      \
+//       libavb_bindgen (rlib)    ... arbitrary dependency chain (dylib) ...
+//            /                             \
+//     libzerocopy (rlib)                    \
+//         /                                  \
+//   libbyteorder (rlib)               libbyteorder (dylib)
+//
+// By using it as a `srcs` instead, we can wrap it in a `rust_library` which
+// allows selecting either library type and fixes the conflict:
+//
+//              build target (prefer dylib)
+//                  /                 \
+//          libavb_rs (dylib)          \
+//               /                      \
+//       libavb_bindgen (dylib)    ... arbitrary dependency chain (dylib) ...
+//            /                         /
+//     libzerocopy (dylib)             /
+//                 \                  /
+//                  libbyteorder (dylib)
+//
+rust_bindgen {
+    name: "libavb_bindgen_for_srcs_only",
+    defaults: ["libavb_bindgen.std.defaults"],
+}
+
+// Bindgen with std.
+//
+// See above for why we need a `rust_library` wrapper here.
+rust_library {
+    name: "libavb_bindgen",
+    defaults: ["libavb_bindgen.std.defaults"],
+    srcs: [":libavb_bindgen_for_srcs_only"],
+}
+
+// Bindgen nostd.
+//
+// Nostd targets always use rlibs, so we don't need a `rust_library` wrapper in
+// this case; the rlib-only bindgen target is sufficient.
+rust_bindgen {
+    name: "libavb_bindgen_nostd",
+    defaults: ["libavb_bindgen.nostd.defaults"],
+}
+
+// Bindgen auto-generated tests.
+rust_test {
+    name: "libavb_bindgen_test",
+    srcs: [":libavb_bindgen_for_srcs_only"],
+    crate_name: "avb_bindgen_test",
+    edition: "2021",
+    test_suites: ["general-tests"],
+    auto_gen_config: true,
+    clippy_lints: "none",
+    lints: "none",
+    rustlibs: ["libzerocopy"],
+}
+
+// Rust library wrapping libavb C implementation.
+
+// Common defaults for all variations.
+rust_defaults {
+    name: "libavb_rs_common.defaults",
+    crate_name: "avb",
+    srcs: ["src/lib.rs"],
+    clippy_lints: "android",
+    lints: "android",
+}
+
+// No std, no features.
+rust_defaults {
+    name: "libavb_rs_nostd.defaults",
+    defaults: ["libavb_rs_common.defaults"],
+    // Only rlib can build without the required nostd hooks (eh_personality,
+    // panic_handler, etc) to defer them for the final binary to implement.
+    prefer_rlib: true,
+    no_stdlibs: true,
+    rustlibs: [
+        "libavb_bindgen_nostd",
+        "libzerocopy_nostd_noalloc",
+    ],
+    whole_static_libs: [
+        "libavb_cert_baremetal",
+    ],
+    stdlibs: [
+        "libcore.rust_sysroot",
+    ],
+}
+
+// Std, no features.
+rust_defaults {
+    name: "libavb_rs.defaults",
+    defaults: ["libavb_rs_common.defaults"],
+    host_supported: true,
+    rustlibs: [
+        "libavb_bindgen",
+        "libzerocopy",
+    ],
+    whole_static_libs: [
+        "libavb_cert",
+    ],
+}
+
+// Adds UUID feature for nostd.
+rust_defaults {
+    name: "libavb_rs_nostd.uuid.defaults",
+    features: [
+        "uuid",
+    ],
+    rustlibs: [
+        "libuuid_nostd",
+    ],
+}
+
+// Adds UUID feature for std.
+rust_defaults {
+    name: "libavb_rs.uuid.defaults",
+    features: [
+        "uuid",
+    ],
+    rustlibs: [
+        "libuuid",
+    ],
+}
+
+// lib: no std, no features.
+rust_library_rlib {
+    name: "libavb_rs_nostd",
+    defaults: ["libavb_rs_nostd.defaults"],
+}
+
+// lib: no std, UUID feature.
+rust_library_rlib {
+    name: "libavb_rs_nostd_uuid",
+    defaults: [
+        "libavb_rs_nostd.defaults",
+        "libavb_rs_nostd.uuid.defaults",
+    ],
+}
+
+// lib: std, no features.
+rust_library {
+    name: "libavb_rs",
+    defaults: ["libavb_rs.defaults"],
+}
+
+// lib: std, UUID feature.
+rust_library {
+    name: "libavb_rs_uuid",
+    defaults: [
+        "libavb_rs.defaults",
+        "libavb_rs.uuid.defaults",
+    ],
+}
+
+// TestOps lib: std
+rust_library {
+    crate_name: "avb_test",
+    name: "libavb_test_rs_testops",
+    srcs: ["tests/test_ops.rs"],
+    clippy_lints: "android",
+    lints: "android",
+    host_supported: true,
+    rustlibs: [
+        "libavb_rs",
+    ],
+    whole_static_libs: [
+        "libavb_cert",
+    ],
+}
+
+// "libavb_rs.defaults" plus additional unit test defaults.
+rust_defaults {
+    name: "libavb_rs_unittest.defaults",
+    defaults: ["libavb_rs.defaults"],
+    data: [":libavb_rs_example_descriptors"],
+    test_suites: ["general-tests"],
+}
+
+// Unit tests: std, no features.
+rust_test {
+    name: "libavb_rs_unittest",
+    defaults: ["libavb_rs_unittest.defaults"],
+}
+
+// Unit tests: std, UUID feature.
+rust_test {
+    name: "libavb_rs_uuid_unittest",
+    defaults: [
+        "libavb_rs_unittest.defaults",
+        "libavb_rs.uuid.defaults",
+    ],
+}
+
+// Example descriptors in binary format.
+filegroup {
+    name: "libavb_rs_example_descriptors",
+    srcs: [
+        "testdata/chain_partition_descriptor.bin",
+        "testdata/hash_descriptor.bin",
+        "testdata/hashtree_descriptor.bin",
+        "testdata/kernel_commandline_descriptor.bin",
+        "testdata/property_descriptor.bin",
+    ],
+}
+
+// Integration test defaults.
+rust_defaults {
+    name: "libavb_rs_test.defaults",
+    srcs: ["tests/tests.rs"],
+    data: [
+        ":avb_cert_test_permanent_attributes",
+        ":avb_cert_test_unlock_challenge",
+        ":avb_cert_test_unlock_credential",
+        ":avb_testkey_rsa4096_pub_bin",
+        ":avb_testkey_rsa8192_pub_bin",
+        ":avbrs_test_image",
+        ":avbrs_test_image_with_vbmeta_footer",
+        ":avbrs_test_image_with_vbmeta_footer_for_boot",
+        ":avbrs_test_image_with_vbmeta_footer_for_test_part_2",
+        ":avbrs_test_vbmeta",
+        ":avbrs_test_vbmeta_2_parts",
+        ":avbrs_test_vbmeta_cert",
+        ":avbrs_test_vbmeta_persistent_digest",
+        ":avbrs_test_vbmeta_with_chained_partition",
+        ":avbrs_test_vbmeta_with_commandline",
+        ":avbrs_test_vbmeta_with_hashtree",
+        ":avbrs_test_vbmeta_with_property",
+    ],
+    rustlibs: [
+        "libhex",
+        "libzerocopy",
+    ],
+    test_suites: ["general-tests"],
+    clippy_lints: "android",
+    lints: "android",
+}
+
+// Integration test: no features.
+rust_test {
+    name: "libavb_rs_test",
+    defaults: ["libavb_rs_test.defaults"],
+    rustlibs: ["libavb_rs"],
+}
+
+// Integration test: UUID feature.
+rust_test {
+    name: "libavb_rs_uuid_test",
+    defaults: [
+        "libavb_rs.uuid.defaults",
+        "libavb_rs_test.defaults",
+    ],
+    rustlibs: ["libavb_rs_uuid"],
+}
+
+// Test images for verification.
+
+// Unsigned 16KiB test image.
+genrule {
+    name: "avbrs_test_image",
+    tools: ["avbtool"],
+    out: ["test_image.img"],
+    cmd: "$(location avbtool) generate_test_image --image_size 16384 --output $(out)",
+}
+
+// Unsigned vbmeta blob containing the test image descriptor for partition name "test_part".
+avb_gen_vbmeta_image {
+    name: "avbrs_test_image_descriptor",
+    src: ":avbrs_test_image",
+    partition_name: "test_part",
+    salt: "1000",
+}
+
+// Unsigned vbmeta blob containing the test image descriptor for partition name "test_part_2".
+avb_gen_vbmeta_image {
+    name: "avbrs_test_image_descriptor_2",
+    src: ":avbrs_test_image",
+    partition_name: "test_part_2",
+    salt: "1001",
+}
+
+// Unsigned vbmeta blob containing a persistent digest descriptor for partition name
+// "test_part_persistent_digest".
+//
+// Currently this is the only in-tree usage of persistent digests, but if anyone else needs it
+// later on it may be worth folding support for this into the `avb_gen_vbmeta_image` rule.
+genrule {
+    name: "avbrs_test_image_descriptor_persistent_digest",
+    tools: ["avbtool"],
+    srcs: [":avbrs_test_image"],
+    out: ["avbrs_test_image_descriptor_persistent_digest.img"],
+    cmd: "$(location avbtool) add_hash_footer --image $(location :avbrs_test_image) --partition_name test_part_persistent_digest --dynamic_partition_size --do_not_append_vbmeta_image --use_persistent_digest --output_vbmeta_image $(out)",
+}
+
+// Unsigned vbmeta blob containing a hastree descriptor for partition name
+// "test_part_hashtree".
+genrule {
+    name: "avbrs_test_image_descriptor_hashtree",
+    tools: ["avbtool"],
+    srcs: [":avbrs_test_image"],
+    out: ["avbrs_test_image_descriptor_hashtree.img"],
+    // Generating FEC values requires the `fec` tool to be on $PATH, which does
+    // not seems to be possible here. For now pass `--do_not_generate_fec`.
+    cmd: "$(location avbtool) add_hashtree_footer --image $(location :avbrs_test_image) --partition_name test_part_hashtree --partition_size 0 --salt B000 --do_not_append_vbmeta_image --output_vbmeta_image $(out) --do_not_generate_fec",
+}
+
+// Standalone vbmeta image signing the test image descriptor.
+genrule {
+    name: "avbrs_test_vbmeta",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --output $(out)",
+}
+
+// Standalone vbmeta image signing the test image descriptor with
+// `avb_cert_testkey_psk` and `avb_cert_test_metadata`.
+genrule {
+    name: "avbrs_test_vbmeta_cert",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avb_cert_test_metadata",
+        ":avb_cert_testkey_psk",
+    ],
+    out: ["test_vbmeta_cert.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --key $(location :avb_cert_testkey_psk) --public_key_metadata $(location :avb_cert_test_metadata) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --output $(out)",
+}
+
+// Standalone vbmeta image signing the test image descriptors for "test_part" and "test_part_2".
+genrule {
+    name: "avbrs_test_vbmeta_2_parts",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avbrs_test_image_descriptor_2",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta_2_parts.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --include_descriptors_from_image $(location :avbrs_test_image_descriptor_2) --output $(out)",
+}
+
+// Standalone vbmeta image signing the test image persistent digest descriptor.
+genrule {
+    name: "avbrs_test_vbmeta_persistent_digest",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor_persistent_digest",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta_persistent_digest.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor_persistent_digest) --output $(out)",
+}
+
+// Standalone vbmeta image with property descriptor "test_prop_key" = "test_prop_value".
+genrule {
+    name: "avbrs_test_vbmeta_with_property",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta_with_property.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --prop test_prop_key:test_prop_value --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --output $(out)",
+}
+
+// Standalone vbmeta image with the test image hashtree descriptor.
+genrule {
+    name: "avbrs_test_vbmeta_with_hashtree",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor_hashtree",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta_with_hashtree.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor_hashtree) --output $(out)",
+}
+
+// Standalone vbmeta image with kernel commandline "test_cmdline_key=test_cmdline_value".
+genrule {
+    name: "avbrs_test_vbmeta_with_commandline",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avb_testkey_rsa4096",
+    ],
+    out: ["test_vbmeta_with_commandline.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --kernel_cmdline test_cmdline_key=test_cmdline_value --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --output $(out)",
+}
+
+// Standalone vbmeta image with chain descriptor to "test_part_2" with rollback
+// index 4, signed by avb_testkey_rsa8192.
+genrule {
+    name: "avbrs_test_vbmeta_with_chained_partition",
+    tools: ["avbtool"],
+    srcs: [
+        ":avbrs_test_image_descriptor",
+        ":avb_testkey_rsa4096",
+        ":avb_testkey_rsa8192_pub_bin",
+    ],
+    out: ["test_vbmeta_with_chained_partition.img"],
+    cmd: "$(location avbtool) make_vbmeta_image --chain_partition test_part_2:4:$(location :avb_testkey_rsa8192_pub_bin) --key $(location :avb_testkey_rsa4096) --algorithm SHA512_RSA4096 --include_descriptors_from_image $(location :avbrs_test_image_descriptor) --output $(out)",
+}
+
+// Combined test image + signed vbmeta footer for "test_part".
+avb_add_hash_footer {
+    name: "avbrs_test_image_with_vbmeta_footer",
+    src: ":avbrs_test_image",
+    partition_name: "test_part",
+    private_key: ":avb_testkey_rsa4096",
+    salt: "A000",
+}
+
+// Combined test image + signed vbmeta footer for "boot".
+avb_add_hash_footer {
+    name: "avbrs_test_image_with_vbmeta_footer_for_boot",
+    src: ":avbrs_test_image",
+    partition_name: "boot",
+    private_key: ":avb_testkey_rsa4096",
+    salt: "A001",
+}
+
+// Combined test image + signed vbmeta footer for "test_part_2" signed by
+// avb_testkey_rsa8192 with rollback index = 7.
+avb_add_hash_footer {
+    name: "avbrs_test_image_with_vbmeta_footer_for_test_part_2",
+    src: ":avbrs_test_image",
+    partition_name: "test_part_2",
+    private_key: ":avb_testkey_rsa8192",
+    algorithm: "SHA256_RSA8192",
+    salt: "A002",
+    rollback_index: 7,
+}

@@ -1,0 +1,26 @@
+add_library(libsparse STATIC
+	core/libsparse/backed_block.cpp
+	core/libsparse/output_file.cpp
+	core/libsparse/sparse.cpp
+	core/libsparse/sparse_crc32.cpp
+	core/libsparse/sparse_err.cpp
+	core/libsparse/sparse_read.cpp)
+
+target_include_directories(libsparse PUBLIC
+	core/libsparse/include libbase/include)
+target_link_libraries(libsparse PRIVATE libbase)
+
+add_executable(simg2img
+	core/libsparse/simg2img.cpp)
+target_link_libraries(simg2img
+	libsparse z libbase)
+
+add_executable(img2simg
+	core/libsparse/img2simg.cpp)
+target_link_libraries(img2simg
+	libsparse z libbase)
+
+add_executable(append2simg
+	core/libsparse/append2simg.cpp)
+target_link_libraries(append2simg
+	libsparse z libbase)

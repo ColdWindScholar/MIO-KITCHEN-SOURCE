@@ -1,0 +1,20 @@
+{
+  "presubmit": [
+    {
+      "name": "libcutils_test"
+    }
+  ],
+  "hwasan-presubmit": [
+    {
+      "name": "libcutils_test"
+    }
+  ],
+  "kernel-presubmit": [
+    {
+      "name": "libcutils_test"
+    },
+    {
+      "name": "KernelLibcutilsTest"
+    }
+  ]
+}

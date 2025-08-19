@@ -1,0 +1,66 @@
+//
+// Copyright (C) 2020 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "system_extras_profcollectd_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["system_extras_profcollectd_license"],
+}
+
+aidl_interface {
+    name: "profcollectd_aidl_interface",
+    unstable: true,
+    srcs: [":profcollectd_aidl"],
+    backend: {
+        rust: {
+            enabled: true,
+        },
+    },
+}
+
+rust_library {
+    name: "libprofcollectd",
+    stem: "liblibprofcollectd",
+    crate_name: "libprofcollectd",
+    srcs: ["lib.rs"],
+    rustlibs: [
+        "profcollectd_aidl_interface-rust", // Move to rlib once b/179041242 is fixed.
+        "libandroid_logger",
+        "libanyhow",
+        "libbinder_rs",
+        "libchrono",
+        "liblog_rust",
+        "libmacaddr",
+        "libonce_cell",
+        "librand",
+        "librustutils",
+        "libserde",
+        "libserde_json",
+        "libuuid",
+        "libzip",
+    ],
+    rlibs: [
+        "libflags_rust",
+        "libsimpleperf_profcollect_rust",
+    ],
+    shared_libs: ["libsimpleperf_profcollect"],
+
+    // Enable 'test' feature for more verbose logging and the logging trace provider.
+    // features: ["test"],
+}

@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: Apache-2.0
+# CMakeLists.f2fstools.txt: CMake file for f2fs-tools directory
+
+set(f2fs_tools_defaults
+	-DF2FS_MAJOR_VERSION=1
+	-DF2FS_MINOR_VERSION=16
+	-DF2FS_TOOLS_VERSION="1.16.0"
+	-DF2FS_TOOLS_DATE="2023-04-11"
+	-DWITH_ANDROID)
+
+add_library(libf2fs STATIC
+	f2fs-tools/lib/libf2fs.c
+	f2fs-tools/mkfs/f2fs_format.c
+	f2fs-tools/mkfs/f2fs_format_utils.c
+	f2fs-tools/lib/libf2fs_zoned.c
+	f2fs-tools/lib/nls_utf8.c)
+
+target_compile_definitions(libf2fs PUBLIC
+	${f2fs_tools_defaults}
+	-DWITH_BLKDISCARD)
+
+target_include_directories(libf2fs PUBLIC
+	core/libsparse/include
+	f2fs-tools/include)
+
+target_link_libraries(libf2fs PUBLIC
+	libext2_uuid)
+
+add_executable(make_f2fs
+	f2fs-tools/lib/libf2fs_io.c
+	f2fs-tools/mkfs/f2fs_format_main.c)
+
+target_link_libraries(make_f2fs PRIVATE
+	libf2fs libsparse z)
+
+set(fsck_main_src_files
+	f2fs-tools/fsck/dir.c
+	f2fs-tools/fsck/dict.c
+	f2fs-tools/fsck/mkquota.c
+	f2fs-tools/fsck/quotaio.c
+	f2fs-tools/fsck/quotaio_tree.c
+	f2fs-tools/fsck/quotaio_v2.c
+	f2fs-tools/fsck/node.c
+	f2fs-tools/fsck/segment.c
+	f2fs-tools/fsck/xattr.c
+	f2fs-tools/fsck/main.c
+	f2fs-tools/fsck/mount.c
+	f2fs-tools/lib/libf2fs.c
+	f2fs-tools/lib/libf2fs_io.c
+	f2fs-tools/lib/libf2fs_zoned.c
+	f2fs-tools/lib/nls_utf8.c
+	f2fs-tools/fsck/dump.c)
+
+add_executable(sload_f2fs
+	${fsck_main_src_files}
+	f2fs-tools/fsck/fsck.c
+	f2fs-tools/fsck/sload.c
+	f2fs-tools/fsck/compress.c)
+
+target_compile_definitions(sload_f2fs PRIVATE
+	${f2fs_tools_defaults}
+	-DWITH_SLOAD)
+
+target_include_directories(sload_f2fs PRIVATE
+	f2fs-tools/include
+	selinux/libselinux/include
+	core/libsparse/include
+	core/libcutils/include)
+
+target_link_libraries(sload_f2fs PRIVATE
+	libext2_uuid libsparse libselinux libcutils z
+	pcre2-8
+	lz4 -static)

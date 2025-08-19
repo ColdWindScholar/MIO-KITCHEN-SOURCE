@@ -1,0 +1,24 @@
+{
+  "presubmit": [
+    {
+      "name": "CtsInitTestCases"
+    },
+    {
+      "name": "init_kill_services_test"
+    },
+    {
+      "name": "MicrodroidHostTestCases"
+    }
+  ],
+  "hwasan-presubmit": [
+    {
+      "name": "CtsInitTestCases"
+    },
+    {
+      "name": "init_kill_services_test"
+    },
+    {
+      "name": "MicrodroidHostTestCases"
+    }
+  ]
+}

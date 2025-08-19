@@ -1,0 +1,28 @@
+// Copyright 2007 The Android Open Source Project
+
+package {
+    default_applicable_licenses: ["system_extras_showslab_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_extras_showslab_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_binary {
+    name: "showslab",
+
+    srcs: ["showslab.c"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}

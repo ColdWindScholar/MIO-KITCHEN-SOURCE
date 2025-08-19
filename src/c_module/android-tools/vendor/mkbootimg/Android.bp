@@ -1,0 +1,99 @@
+// Copyright 2012 The Android Open Source Project
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_library_headers {
+    name: "bootimg_headers",
+    vendor_available: true,
+    recovery_available: true,
+    export_include_dirs: ["include/bootimg"],
+    host_supported: true,
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.virt",
+    ],
+}
+
+python_defaults {
+    name: "mkbootimg_defaults",
+    version: {
+        py3: {
+            embedded_launcher: true,
+        },
+    },
+}
+
+python_binary_host {
+    name: "mkbootimg",
+    defaults: ["mkbootimg_defaults"],
+    main: "mkbootimg.py",
+    srcs: [
+        "mkbootimg.py",
+        "gki/generate_gki_certificate.py",
+    ],
+    required: [
+        "avbtool",
+    ],
+}
+
+python_binary_host {
+    name: "unpack_bootimg",
+    defaults: ["mkbootimg_defaults"],
+    srcs: [
+        "unpack_bootimg.py",
+    ],
+}
+
+python_binary_host {
+    name: "repack_bootimg",
+    defaults: ["mkbootimg_defaults"],
+    srcs: [
+        "repack_bootimg.py",
+    ],
+    required: [
+        "lz4",
+        "mkbootfs",
+        "mkbootimg",
+        "toybox",
+        "unpack_bootimg",
+    ],
+}
+
+python_binary_host {
+    name: "certify_bootimg",
+    defaults: ["mkbootimg_defaults"],
+    main: "gki/certify_bootimg.py",
+    srcs: [
+        "gki/certify_bootimg.py",
+        "gki/generate_gki_certificate.py",
+        "unpack_bootimg.py",
+    ],
+    required: [
+        "avbtool",
+    ],
+}
+
+python_test_host {
+    name: "mkbootimg_test",
+    defaults: ["mkbootimg_defaults"],
+    main: "tests/mkbootimg_test.py",
+    srcs: [
+        "tests/mkbootimg_test.py",
+    ],
+    data: [
+        ":avbtool",
+        ":mkbootimg",
+        ":unpack_bootimg",
+        "tests/data/*",
+    ],
+    test_options: {
+        unit_test: true,
+    },
+}

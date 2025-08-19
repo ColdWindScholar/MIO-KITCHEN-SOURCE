@@ -1,0 +1,15 @@
+# This file is used to store the keywords to be extracted
+# from the logcat.
+---
+- boot_progress_start
+- boot_progress_preload_start
+- boot_progress_preload_end
+- boot_progress_system_run
+- boot_progress_pms_start
+- boot_progress_pms_system_scan_start
+- boot_progress_pms_data_scan_start
+- boot_progress_pms_scan_end
+- boot_progress_pms_ready
+- boot_progress_ams_ready
+- boot_progress_enable_screen
+- car_helper_boot_phase

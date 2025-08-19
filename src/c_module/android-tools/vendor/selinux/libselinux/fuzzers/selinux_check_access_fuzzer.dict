@@ -1,0 +1,2 @@
+scon="u:r:shell:s0"
+tcon="u:object_r:metadata_file:s0"

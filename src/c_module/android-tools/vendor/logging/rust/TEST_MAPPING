@@ -1,0 +1,21 @@
+// Host tests are run automatically in presubmit.
+// This file includes all device tests, as they test different behavior.
+{
+  "presubmit": [
+    {
+      "name": "logger_device_unit_tests"
+    },
+    {
+      "name": "logger_test_default_init"
+    },
+    {
+      "name": "logger_test_env_log_level"
+    },
+    {
+      "name": "logger_test_config_log_level"
+    },
+    {
+      "name": "logger_test_multiple_init"
+    }
+  ]
+}

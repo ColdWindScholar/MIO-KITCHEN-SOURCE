@@ -1,0 +1,29 @@
+package {
+    default_applicable_licenses: ["system_extras_runconuid_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_extras_runconuid_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_binary {
+    name: "runconuid",
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+
+    srcs: ["runconuid.cpp"],
+
+    shared_libs: ["libselinux"],
+}

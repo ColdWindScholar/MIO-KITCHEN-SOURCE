@@ -1,0 +1,376 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_defaults {
+    name: "libbatterymonitor_defaults",
+    cflags: ["-Wall", "-Werror"],
+    vendor_available: true,
+    recovery_available: true,
+    export_include_dirs: ["include"],
+    shared_libs: [
+        "libutils",
+        "libbase",
+
+        // Need HealthInfo definition from headers of these shared
+        // libraries. Clients don't need to link to these.
+        "android.hardware.health@2.1",
+    ],
+    header_libs: ["libhealthd_headers"],
+    export_header_lib_headers: ["libhealthd_headers"],
+}
+
+cc_defaults {
+    name: "libhealthd_charger_ui_defaults",
+    vendor_available: true,
+    export_include_dirs: [
+        "include",
+        "include_charger",
+    ],
+
+    static_libs: [
+        "libcharger_sysprop",
+        "libhealthd_draw",
+        "libhealthloop",
+        "libminui",
+    ],
+
+    shared_libs: [
+        "libbase",
+        "libcutils",
+        "liblog",
+        "libpng",
+        "libsuspend",
+        "libutils",
+    ],
+
+    header_libs: [
+        "libhealthd_headers",
+    ],
+
+    srcs: [
+        "healthd_mode_charger.cpp",
+        "AnimationParser.cpp",
+    ],
+
+    target: {
+        vendor: {
+            exclude_static_libs: [
+                "libcharger_sysprop",
+            ],
+        },
+    },
+}
+
+cc_library_headers {
+    name: "libhealthd_headers",
+    vendor_available: true,
+    recovery_available: true,
+    export_include_dirs: ["include"],
+    header_libs: ["libbatteryservice_headers"],
+    export_header_lib_headers: ["libbatteryservice_headers"],
+}
+
+cc_library_static {
+    name: "libbatterymonitor",
+    defaults: ["libbatterymonitor_defaults"],
+    srcs: ["BatteryMonitor.cpp"],
+    static_libs: [
+        "android.hardware.health-V3-ndk",
+    ],
+    whole_static_libs: [
+        // Need to translate HIDL to AIDL to support legacy APIs in
+        // BatteryMonitor.
+        "android.hardware.health-translate-ndk",
+    ],
+}
+
+// TODO(b/251425963): remove when android.hardware.health is upgraded to V2.
+cc_library_static {
+    name: "libbatterymonitor-V1",
+    defaults: ["libbatterymonitor_defaults"],
+    srcs: ["BatteryMonitor_v1.cpp"],
+    static_libs: [
+        "android.hardware.health-V1-ndk",
+    ],
+    whole_static_libs: [
+        // Need to translate HIDL to AIDL to support legacy APIs in
+        // BatteryMonitor.
+        "android.hardware.health-translate-V1-ndk",
+    ],
+}
+
+cc_library_static {
+    name: "libhealthd_charger_nops",
+    recovery_available: true,
+
+    srcs: [
+        "healthd_mode_charger_nops.cpp",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+
+    header_libs: [
+        "libhealthd_headers",
+    ],
+
+    static_libs: [
+        "libhealthloop",
+        "libhealth2impl",
+    ],
+
+    shared_libs: [
+        "android.hardware.health@2.1",
+        "libutils",
+    ],
+}
+
+sysprop_library {
+    name: "charger_sysprop",
+    recovery_available: true,
+    srcs: ["charger.sysprop"],
+    property_owner: "Platform",
+    api_packages: ["android.sysprop"],
+}
+
+cc_library_static {
+    name: "libhealthd_draw",
+    vendor_available: true,
+    export_include_dirs: ["."],
+    static_libs: [
+        "libcharger_sysprop",
+        "libminui",
+    ],
+    shared_libs: [
+        "libbase",
+    ],
+    header_libs: ["libbatteryservice_headers"],
+
+    srcs: ["healthd_draw.cpp"],
+
+    target: {
+        vendor: {
+            exclude_static_libs: [
+                "libcharger_sysprop",
+            ],
+        },
+    },
+}
+
+cc_library_static {
+    name: "libhealthd_charger_ui",
+    defaults: ["libhealthd_charger_ui_defaults"],
+
+    static_libs: [
+        "android.hardware.health-V3-ndk",
+        "android.hardware.health-translate-ndk",
+    ],
+
+    export_static_lib_headers: [
+        "android.hardware.health-V3-ndk",
+    ],
+}
+
+// TODO(b/251425963): remove when android.hardware.health is upgraded to V2.
+cc_library_static {
+    name: "libhealthd_charger_ui-V1",
+    defaults: ["libhealthd_charger_ui_defaults"],
+
+    static_libs: [
+        "android.hardware.health-V1-ndk",
+        "android.hardware.health-translate-V1-ndk",
+    ],
+
+    export_static_lib_headers: [
+        "android.hardware.health-V1-ndk",
+    ],
+}
+
+cc_library_static {
+    name: "libhealthd_charger",
+    export_include_dirs: [
+        "include",
+        "include_charger",
+    ],
+
+    static_libs: [
+        "android.hardware.health@1.0-convert",
+        "libcharger_sysprop",
+        "libhealth2impl",
+        "libhealthd_charger_ui",
+    ],
+
+    shared_libs: [
+        "android.hardware.health@2.1",
+        "libbase",
+        "libcutils",
+        "liblog",
+        "libutils",
+    ],
+
+    srcs: [
+        "healthd_mode_charger_hidl.cpp",
+    ],
+}
+
+cc_defaults {
+    name: "charger_defaults",
+    local_include_dirs: [
+        "include_charger",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+
+    shared_libs: [
+        // common
+        "libbase",
+        "libcutils",
+        "libhidlbase",
+        "liblog",
+        "libutils",
+
+        // system charger only
+        "libpng",
+    ],
+
+    static_libs: [
+        // common
+        "android.hardware.health@1.0-convert",
+        "android.hardware.health-V3-ndk",
+        "libbatterymonitor",
+        "libcharger_sysprop",
+        "libhealthd_charger_nops",
+        "libhealthloop",
+        "libhealth2impl",
+
+        // system charger only
+        "libhealthd_draw",
+        "libhealthd_charger",
+        "libhealthd_charger_ui",
+        "libminui",
+        "libsuspend",
+    ],
+}
+
+cc_binary {
+    name: "charger",
+    defaults: ["charger_defaults"],
+    recovery_available: true,
+    srcs: [
+        "charger.cpp",
+        "charger_utils.cpp",
+    ],
+    shared_libs: [
+        "android.hardware.health@2.0",
+        "android.hardware.health@2.1",
+    ],
+
+    target: {
+        recovery: {
+            // No UI and libsuspend for recovery charger.
+            cflags: [
+                "-DCHARGER_FORCE_NO_UI=1",
+            ],
+            exclude_shared_libs: [
+                "libpng",
+            ],
+            exclude_static_libs: [
+                "libhealthd_draw",
+                "libhealthd_charger",
+                "libhealthd_charger_ui",
+                "libminui",
+                "libsuspend",
+            ],
+        }
+    }
+}
+
+cc_test {
+    name: "charger_test",
+    defaults: ["charger_defaults"],
+    srcs: ["charger_test.cpp"],
+    static_libs: [
+        "android.hardware.health@1.0",
+        "android.hardware.health@2.0",
+        "android.hardware.health@2.1",
+    ],
+}
+
+cc_test {
+    name: "libhealthd_charger_test",
+    defaults: ["charger_defaults"],
+    srcs: [
+        "AnimationParser_test.cpp",
+        "healthd_mode_charger_test.cpp"
+    ],
+    static_libs: [
+        "android.hardware.health@1.0",
+        "android.hardware.health@2.0",
+        "android.hardware.health@2.1",
+        "libgmock",
+    ],
+    test_suites: [
+        "general-tests",
+        "device-tests",
+    ],
+    data: [
+        ":libhealthd_charger_test_data",
+    ],
+    require_root: true,
+}
+
+// /system/etc/res/images/charger/battery_fail.png
+prebuilt_etc {
+    name: "system_core_charger_res_images_battery_fail.png",
+    src: "images/battery_fail.png",
+    relative_install_path: "res/images/charger",
+    filename: "battery_fail.png",
+}
+
+// /system/etc/res/images/charger/battery_scale.png
+prebuilt_etc {
+    name: "system_core_charger_res_images_battery_scale.png",
+    src: "images/battery_scale.png",
+    relative_install_path: "res/images/charger",
+    filename: "battery_scale.png",
+}
+
+phony {
+    name: "charger_res_images",
+    required: [
+        "system_core_charger_res_images_battery_fail.png",
+        "system_core_charger_res_images_battery_scale.png",
+    ],
+}
+
+// /vendor/etc/res/images/default/charger/battery_fail.png
+prebuilt_etc {
+    name: "system_core_charger_res_images_battery_fail.png_default_vendor",
+    src: "images/battery_fail.png",
+    relative_install_path: "res/images/default/charger",
+    vendor: true,
+    filename: "battery_fail.png",
+}
+
+// /vendor/etc/res/images/default/charger/battery_scale.png
+prebuilt_etc {
+    name: "system_core_charger_res_images_battery_scale.png_default_vendor",
+    src: "images/battery_scale.png",
+    relative_install_path: "res/images/default/charger",
+    vendor: true,
+    filename: "battery_scale.png",
+}
+
+phony {
+    name: "charger_res_images_vendor",
+    required: [
+        "system_core_charger_res_images_battery_fail.png_default_vendor",
+        "system_core_charger_res_images_battery_scale.png_default_vendor",
+    ],
+}

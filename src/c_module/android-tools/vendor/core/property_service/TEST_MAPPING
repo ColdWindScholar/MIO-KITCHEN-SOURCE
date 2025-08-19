@@ -1,0 +1,12 @@
+{
+  "presubmit": [
+    {
+      "name": "propertyinfoserializer_tests"
+    }
+  ],
+  "hwasan-presubmit": [
+    {
+      "name": "propertyinfoserializer_tests"
+    }
+  ]
+}

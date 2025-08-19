@@ -1,0 +1,10 @@
+{
+  "presubmit": [
+    {
+      "name": "libavb_host_unittest"
+    },
+    {
+      "name": "libavb_host_unittest_sha"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+build
+tmp
+*.bak
+sepolicy.egg-info/

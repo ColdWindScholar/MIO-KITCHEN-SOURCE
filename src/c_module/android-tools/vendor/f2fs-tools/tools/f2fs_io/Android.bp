@@ -1,0 +1,31 @@
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "external_f2fs-tools_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-GPL
+    //   SPDX-license-identifier-GPL-2.0
+    //   SPDX-license-identifier-LGPL
+    //   SPDX-license-identifier-LGPL-2.1
+    default_applicable_licenses: ["external_f2fs-tools_license"],
+}
+
+cc_defaults {
+    name: "f2fs-io-defaults",
+    cflags: [
+        "-D_FILE_OFFSET_BITS=64",
+        "-Wno-unused-function",
+    ],
+    include_dirs: [
+       "external/f2fs-tools/include/",
+    ],
+}
+
+cc_binary {
+    name: "f2fs_io",
+    defaults: [ "f2fs-io-defaults" ],
+    srcs: [
+        "f2fs_io.c",
+    ],
+    product_specific: true,
+}

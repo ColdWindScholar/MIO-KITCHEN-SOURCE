@@ -1,0 +1,24 @@
+{
+  "postsubmit": [
+    {
+      "name": "fmtlib_test_1"
+    },
+    {
+      "name": "fmtlib_test_2"
+    },
+    {
+      "name": "fmtlib_test_3"
+    }
+  ],
+  "hwasan-postsubmit": [
+    {
+      "name": "fmtlib_test_1"
+    },
+    {
+      "name": "fmtlib_test_2"
+    },
+    {
+      "name": "fmtlib_test_3"
+    }
+  ]
+}

@@ -1,0 +1,328 @@
+adbd is already running as root
+Found aosp_gobo Device
+Starting: Intent { cmp=com.google.android.gm/.ConversationListActivityGmail }
+Status: ok
+Activity: com.google.android.gm/.ConversationListActivityGmail
+ThisTime: 2067
+TotalTime: 2067
+WaitTime: 2084
+Complete
+Killing adb shell cat /sys/kernel/debug/tracing/trace_pipe
+ioblame.sh: line 179: 70891 Terminated              adb shell cat /sys/kernel/debug/tracing/trace_pipe > trace_saved
+
+READS :
+_______
+
+FILE VIEW:
+File: /
+            ogle.android.gm Reads: 4 KB
+            Total Reads: 4 KB i_size: 163840 KB
+File: /app/Gmail2Light/Gmail2Light.apk
+            AsyncTask_#2 Reads: 24 KB
+            ogle.android.gm Reads: 1076 KB
+            Total Reads: 1100 KB i_size: 9736 KB
+File: /bin/am
+            sh Reads: 4 KB
+            Total Reads: 4 KB i_size: 207 bytes
+File: /bin/cmd
+            am Reads: 16 KB
+            cmd Reads: 48 KB
+            Total Reads: 64 KB i_size: 44 KB
+File: /bin/toybox
+            cat Reads: 304 KB
+            sh Reads: 16 KB
+            Total Reads: 320 KB i_size: 319 KB
+File: /data/com.google.android.gm/files/deviceName
+            AsyncTask_#3 Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 bytes
+File: /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 2 KB
+File: /data/com.google.android.gm/shared_prefs/AndroidMail.Main.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 206 bytes
+File: /data/com.google.android.gm/shared_prefs/c9edm_account-1303398453.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 254 bytes
+File: /data/com.google.android.gm/shared_prefs/c9edm_account-2137146394.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 167 bytes
+File: /data/com.google.android.gm/shared_prefs/G6yPrefs.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 191 bytes
+File: /data/com.google.android.gm/shared_prefs/Gmail.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 1 KB
+File: /data/com.google.android.gm/shared_prefs/_has_set_default_values.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 130 bytes
+File: /data/com.google.android.gm/shared_prefs/UnifiedEmail.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 935 bytes
+File: /fonts/Roboto-Medium.ttf
+            ogle.android.gm Reads: 176 KB
+            Total Reads: 176 KB i_size: 299 KB
+File: /framework/arm/boot-android.hidl.base-V1.0-java.vdex
+            ogle.android.gm Reads: 12 KB
+            Total Reads: 12 KB i_size: 11 KB
+File: /framework/arm/boot.art
+            ogle.android.gm Reads: 16 KB
+            Total Reads: 16 KB i_size: 1956 KB
+File: /framework/arm/boot-core-libart.oat
+            ogle.android.gm Reads: 536 KB
+            Total Reads: 536 KB i_size: 3076 KB
+File: /framework/arm/boot-core-libart.vdex
+            ogle.android.gm Reads: 868 KB
+            Total Reads: 868 KB i_size: 3080 KB
+File: /framework/arm/boot-framework.oat
+            AsyncTask_#2 Reads: 24 KB
+            HeapTaskDaemon Reads: 76 KB
+            Jit_thread_pool Reads: 12 KB
+            ogle.android.gm Reads: 1808 KB
+            Total Reads: 1920 KB i_size: 21357 KB
+File: /framework/arm/boot-framework.vdex
+            AsyncTask_#2 Reads: 36 KB
+            EGL_Init Reads: 116 KB
+            Jit_thread_pool Reads: 196 KB
+            ogle.android.gm Reads: 1284 KB
+            Total Reads: 1632 KB i_size: 19304 KB
+File: /framework/arm/boot.oat
+            AsyncTask_#1 Reads: 36 KB
+            ogle.android.gm Reads: 116 KB
+            Total Reads: 152 KB i_size: 7511 KB
+File: /framework/arm/boot-okhttp.oat
+            ogle.android.gm Reads: 108 KB
+            Total Reads: 108 KB i_size: 545 KB
+File: /framework/arm/boot-okhttp.vdex
+            ogle.android.gm Reads: 244 KB
+            Total Reads: 244 KB i_size: 412 KB
+File: /framework/arm/boot-org.apache.http.legacy.boot.vdex
+            AsyncTask_#2 Reads: 88 KB
+            Total Reads: 88 KB i_size: 509 KB
+File: /framework/com.android.location.provider.jar
+            AsyncTask_#3 Reads: 16 KB
+            Total Reads: 16 KB i_size: 12 KB
+File: /framework/com.android.media.remotedisplay.jar
+            AsyncTask_#3 Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /framework/framework-res.apk
+            android.anim Reads: 24 KB
+            ogle.android.gm Reads: 416 KB
+            Total Reads: 440 KB i_size: 18923 KB
+File: /framework/oat/arm/com.android.location.provider.odex
+            AsyncTask_#3 Reads: 12 KB
+            Total Reads: 12 KB i_size: 20 KB
+File: /framework/oat/arm/com.android.media.remotedisplay.odex
+            AsyncTask_#3 Reads: 12 KB
+            Total Reads: 12 KB i_size: 20 KB
+File: /lib/hw/gralloc.mt6737m.so
+            ogle.android.gm Reads: 12 KB
+            Total Reads: 12 KB i_size: 40 KB
+File: /lib/libbacktrace.so
+            cmd Reads: 68 KB
+            Total Reads: 68 KB i_size: 85 KB
+File: /lib/libbase.so
+            cmd Reads: 12 KB
+            Total Reads: 12 KB i_size: 61 KB
+File: /lib/libbinder.so
+            cmd Reads: 240 KB
+            Total Reads: 240 KB i_size: 407 KB
+File: /lib/libcrypto.so
+            cat Reads: 112 KB
+            Total Reads: 112 KB i_size: 689 KB
+File: /lib/liblzma.so
+            cmd Reads: 76 KB
+            Total Reads: 76 KB i_size: 93 KB
+File: /lib/libpackagelistparser.so
+            cat Reads: 8 KB
+            Total Reads: 8 KB i_size: 15 KB
+File: /lib/libpcre2.so
+            cat Reads: 48 KB
+            Total Reads: 48 KB i_size: 92 KB
+File: /lib/libselinux.so
+            cat Reads: 12 KB
+            Total Reads: 12 KB i_size: 75 KB
+File: /lib/libskia.so
+            ogle.android.gm Reads: 116 KB
+            Total Reads: 116 KB i_size: 5578 KB
+File: /lib/libunwind.so
+            cmd Reads: 68 KB
+            Total Reads: 68 KB i_size: 85 KB
+File: /lib/libutils.so
+            cmd Reads: 16 KB
+            Total Reads: 16 KB i_size: 94 KB
+File: /lib/libvndksupport.so
+            cmd Reads: 4 KB
+            Total Reads: 4 KB i_size: 15 KB
+File: /lib/libz.so
+            cat Reads: 20 KB
+            Total Reads: 20 KB i_size: 95 KB
+File: /priv-app/GmsCore/GmsCore.apk
+            AsyncTask_#3 Reads: 148 KB
+            Total Reads: 148 KB i_size: 37870 KB
+File: /user/0
+            ogle.android.gm Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 bytes
+File: /usr/icu/icudt58l.dat
+            ogle.android.gm Reads: 828 KB
+            Total Reads: 828 KB i_size: 22774 KB
+Grand Total File DATA KB Reads 9560
+PID VIEW:
+PID: am
+            /bin/cmd Reads: 16 KB i_size: 44 KB
+            /bin/am Reads: 4 KB i_size: 207 bytes
+            Total Reads: 20 KB
+PID: android.anim
+            /framework/framework-res.apk Reads: 24 KB i_size: 18923 KB
+            Total Reads: 24 KB
+PID: AsyncTask_#1
+            /framework/arm/boot.oat Reads: 36 KB i_size: 7511 KB
+            Total Reads: 36 KB
+PID: AsyncTask_#2
+            /app/Gmail2Light/Gmail2Light.apk Reads: 24 KB i_size: 9736 KB
+            /framework/arm/boot-framework.oat Reads: 24 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 36 KB i_size: 19304 KB
+            /framework/arm/boot-org.apache.http.legacy.boot.vdex Reads: 88 KB i_size: 509 KB
+            Total Reads: 172 KB
+PID: AsyncTask_#3
+            /data/com.google.android.gm/files/deviceName Reads: 4 KB i_size: 17 bytes
+            /framework/com.android.location.provider.jar Reads: 16 KB i_size: 12 KB
+            /framework/com.android.media.remotedisplay.jar Reads: 8 KB i_size: 4 KB
+            /framework/oat/arm/com.android.location.provider.odex Reads: 12 KB i_size: 20 KB
+            /framework/oat/arm/com.android.media.remotedisplay.odex Reads: 12 KB i_size: 20 KB
+            /priv-app/GmsCore/GmsCore.apk Reads: 148 KB i_size: 37870 KB
+            Total Reads: 200 KB
+PID: cat
+            /bin/toybox Reads: 304 KB i_size: 319 KB
+            /lib/libcrypto.so Reads: 112 KB i_size: 689 KB
+            /lib/libpackagelistparser.so Reads: 8 KB i_size: 15 KB
+            /lib/libpcre2.so Reads: 48 KB i_size: 92 KB
+            /lib/libselinux.so Reads: 12 KB i_size: 75 KB
+            /lib/libz.so Reads: 20 KB i_size: 95 KB
+            Total Reads: 504 KB
+PID: cmd
+            /bin/cmd Reads: 48 KB i_size: 44 KB
+            /lib/libbacktrace.so Reads: 68 KB i_size: 85 KB
+            /lib/libbase.so Reads: 12 KB i_size: 61 KB
+            /lib/libbinder.so Reads: 240 KB i_size: 407 KB
+            /lib/liblzma.so Reads: 76 KB i_size: 93 KB
+            /lib/libunwind.so Reads: 68 KB i_size: 85 KB
+            /lib/libutils.so Reads: 16 KB i_size: 94 KB
+            /lib/libvndksupport.so Reads: 4 KB i_size: 15 KB
+            Total Reads: 532 KB
+PID: EGL_Init
+            /framework/arm/boot-framework.vdex Reads: 116 KB i_size: 19304 KB
+            Total Reads: 116 KB
+PID: HeapTaskDaemon
+            /framework/arm/boot-framework.oat Reads: 76 KB i_size: 21357 KB
+            Total Reads: 76 KB
+PID: Jit_thread_pool
+            /framework/arm/boot-framework.oat Reads: 12 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 196 KB i_size: 19304 KB
+            Total Reads: 208 KB
+PID: ogle.android.gm
+            / Reads: 4 KB i_size: 163840 KB
+            /app/Gmail2Light/Gmail2Light.apk Reads: 1076 KB i_size: 9736 KB
+            /fonts/Roboto-Medium.ttf Reads: 176 KB i_size: 299 KB
+            /framework/arm/boot-android.hidl.base-V1.0-java.vdex Reads: 12 KB i_size: 11 KB
+            /framework/arm/boot.art Reads: 16 KB i_size: 1956 KB
+            /framework/arm/boot-core-libart.oat Reads: 536 KB i_size: 3076 KB
+            /framework/arm/boot-core-libart.vdex Reads: 868 KB i_size: 3080 KB
+            /framework/arm/boot-framework.oat Reads: 1808 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 1284 KB i_size: 19304 KB
+            /framework/arm/boot.oat Reads: 116 KB i_size: 7511 KB
+            /framework/arm/boot-okhttp.oat Reads: 108 KB i_size: 545 KB
+            /framework/arm/boot-okhttp.vdex Reads: 244 KB i_size: 412 KB
+            /framework/framework-res.apk Reads: 416 KB i_size: 18923 KB
+            /lib/hw/gralloc.mt6737m.so Reads: 12 KB i_size: 40 KB
+            /lib/libskia.so Reads: 116 KB i_size: 5578 KB
+            /user/0 Reads: 4 KB i_size: 10 bytes
+            /usr/icu/icudt58l.dat Reads: 828 KB i_size: 22774 KB
+            Total Reads: 7624 KB
+PID: sh
+            /bin/am Reads: 4 KB i_size: 207 bytes
+            /bin/toybox Reads: 16 KB i_size: 319 KB
+            Total Reads: 20 KB
+PID: SharedPreferenc
+            /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml Reads: 4 KB i_size: 2 KB
+            /data/com.google.android.gm/shared_prefs/AndroidMail.Main.xml Reads: 4 KB i_size: 206 bytes
+            /data/com.google.android.gm/shared_prefs/c9edm_account-1303398453.xml Reads: 4 KB i_size: 254 bytes
+            /data/com.google.android.gm/shared_prefs/c9edm_account-2137146394.xml Reads: 4 KB i_size: 167 bytes
+            /data/com.google.android.gm/shared_prefs/G6yPrefs.xml Reads: 4 KB i_size: 191 bytes
+            /data/com.google.android.gm/shared_prefs/Gmail.xml Reads: 4 KB i_size: 1 KB
+            /data/com.google.android.gm/shared_prefs/_has_set_default_values.xml Reads: 4 KB i_size: 130 bytes
+            /data/com.google.android.gm/shared_prefs/UnifiedEmail.xml Reads: 4 KB i_size: 935 bytes
+            Total Reads: 32 KB
+Grand Total File DATA KB Reads 9564
+Total (ALL) Read KB mmcblk0 = 23092
+READ DELTA: Total Blockdev Reads KB - Total File Data Reads KB = 13528 KB
+Total (ALL) Read IOs mmcblk0 = 876
+Debug Grand Total KB READ 9544
+
+Writes :
+_______
+
+FILE VIEW:
+File: /data/com.google.android.gm/databases/EmailProvider.db
+            AsyncTask_#2 Writes: 49 KB
+            Total Writes: 49 KB i_size: 8 KB
+File: /data/com.google.android.gm/databases/EmailProvider.db-journal
+            AsyncTask_#2 Writes: 25 KB
+            Total Writes: 25 KB i_size: 8 KB
+File: /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-shm
+            AsyncTask_#2 Writes: 0 KB
+            Total Writes: 0 KB i_size: 4 KB
+File: /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal
+            AsyncTask_#2 Writes: 4 KB
+            SyncAdapterThre Writes: 32 KB
+            Total Writes: 36 KB i_size: 512 KB
+File: /data/com.google.android.gms/databases/playlog.db-wal
+            lowpool[12] Writes: 16 KB
+            Total Writes: 16 KB i_size: 426 KB
+File: /data/com.google.android.gm/shared_prefs/G6yPrefs.xml
+            queued-work-loo Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /data/com.google.android.gm/shared_prefs/MailAppProvider.xml
+            ogle.android.gm Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml
+            ogle.android.gm Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /system/dropbox/drop52.tmp
+            Binder580_3 Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /system/users/0/settings_secure.xml
+            SettingsProvide Writes: 12 KB
+            Total Writes: 12 KB i_size: 8 KB
+Grand Total File DATA KB Writes 143
+PID VIEW:
+PID: AsyncTask_#2
+            /data/com.google.android.gm/databases/EmailProvider.db Writes: 49 KB i_size: 8 KB
+            /data/com.google.android.gm/databases/EmailProvider.db-journal Writes: 25 KB i_size: 8 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-shm Writes: 0 KB i_size: 4 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 4 KB i_size: 512 KB
+            Total Writes: 78 KB
+PID: Binder580_3
+            /system/dropbox/drop52.tmp Writes: 0 KB i_size: 0 bytes
+            Total Writes: 0 KB
+PID: lowpool[12]
+            /data/com.google.android.gms/databases/playlog.db-wal Writes: 16 KB i_size: 426 KB
+            Total Writes: 16 KB
+PID: ogle.android.gm
+            /data/com.google.android.gm/shared_prefs/MailAppProvider.xml Writes: 5 KB i_size: 4 KB
+            /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml Writes: 0 KB i_size: 0 bytes
+            Total Writes: 5 KB
+PID: queued-work-loo
+            /data/com.google.android.gm/shared_prefs/G6yPrefs.xml Writes: 0 KB i_size: 0 bytes
+            Total Writes: 0 KB
+PID: SettingsProvide
+            /system/users/0/settings_secure.xml Writes: 12 KB i_size: 8 KB
+            Total Writes: 12 KB
+PID: SyncAdapterThre
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 32 KB i_size: 512 KB
+            Total Writes: 32 KB
+Grand Total File DATA KB Writes 143
+Total (ALL) Write KB mmcblk0 = 128
+WRITE DELTA: Total Blockdev Writes KB - Total File Data Writes KB = -15 KB
+Total (ALL) Write IOs mmcblk0 = 37
+Debug Grand Total KB WRITTEN 120

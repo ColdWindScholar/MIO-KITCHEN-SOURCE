@@ -1,0 +1,330 @@
+// Copyright 2017 The Android Open Source Project
+
+package {
+    default_applicable_licenses: ["external_f2fs-tools_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+//
+// large-scale-change included anything that looked like it might be a license
+// text as a license_text. e.g. LICENSE, NOTICE, COPYING etc.
+//
+// Please consider removing redundant or irrelevant files from 'license_text:'.
+// See: http://go/android-license-faq
+license {
+    name: "external_f2fs-tools_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-BSD",
+        "SPDX-license-identifier-GPL",
+        "SPDX-license-identifier-GPL-2.0",
+        "SPDX-license-identifier-LGPL",
+        "SPDX-license-identifier-LGPL-2.1",
+    ],
+    license_text: [
+        "COPYING",
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "f2fs-tools-defaults",
+    cflags: [
+        "-DF2FS_MAJOR_VERSION=1",
+        "-DF2FS_MINOR_VERSION=16",
+        "-DF2FS_TOOLS_VERSION=\"1.16.0\"",
+        "-DF2FS_TOOLS_DATE=\"2023-04-11\"",
+        "-DWITH_ANDROID",
+        "-D_FILE_OFFSET_BITS=64",
+        "-Wall",
+        "-Werror",
+        "-Wno-macro-redefined",
+        "-Wno-missing-field-initializers",
+        "-Wno-pointer-arith",
+        "-Wno-sign-compare",
+    ],
+    local_include_dirs: [
+        "include",
+        "mkfs",
+        "fsck",
+    ],
+    target: {
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+cc_defaults {
+    name: "libf2fs_src_files",
+    cflags: ["-DWITH_BLKDISCARD"],
+    srcs: [
+        "lib/libf2fs.c",
+        "mkfs/f2fs_format.c",
+        "mkfs/f2fs_format_utils.c",
+        "lib/libf2fs_zoned.c",
+        "lib/nls_utf8.c",
+    ],
+    static_libs: [
+        "libext2_uuid",
+    ],
+}
+
+cc_defaults {
+    name: "make_f2fs_src_files",
+    srcs: [
+        "lib/libf2fs_io.c",
+        "mkfs/f2fs_format_main.c",
+    ],
+}
+
+cc_defaults {
+    name: "fsck_main_src_files",
+    srcs: [
+        "fsck/dir.c",
+        "fsck/dict.c",
+        "fsck/mkquota.c",
+        "fsck/quotaio.c",
+        "fsck/quotaio_tree.c",
+        "fsck/quotaio_v2.c",
+        "fsck/node.c",
+        "fsck/segment.c",
+        "fsck/xattr.c",
+        "fsck/main.c",
+        "fsck/mount.c",
+        "lib/libf2fs.c",
+        "lib/libf2fs_io.c",
+        "lib/libf2fs_zoned.c",
+        "lib/nls_utf8.c",
+        "fsck/dump.c",
+    ],
+}
+
+cc_library_static {
+    name: "libf2fs_fmt",
+    recovery_available: true,
+    defaults: [
+        "f2fs-tools-defaults",
+        "libf2fs_src_files"
+    ],
+}
+
+cc_library_host_static {
+    name: "libf2fs_fmt_host",
+    defaults: [
+        "f2fs-tools-defaults",
+        "libf2fs_src_files"
+    ],
+    target: {
+        windows: {
+            include_dirs: [ "external/e2fsprogs/include/mingw" ],
+            cflags: [
+                "-DANDROID_WINDOWS_HOST",
+                "-Wno-typedef-redefinition",
+                "-Wno-unused-parameter",
+            ],
+            enabled: true
+        },
+    },
+}
+
+cc_defaults {
+    name: "make_f2fs_defaults",
+    defaults: [
+        "f2fs-tools-defaults",
+        "make_f2fs_src_files",
+    ],
+    host_supported: true,
+    recovery_available: true,
+    target: {
+        android: {
+            static_libs: [
+                "libf2fs_fmt",
+            ],
+            shared_libs: [
+                "libext2_uuid",
+                "libsparse",
+                "libbase",
+            ],
+        },
+        host: {
+            static_libs: [
+                "libf2fs_fmt_host",
+                "libext2_uuid",
+                "libsparse",
+                "libbase",
+                "libz",
+            ],
+        },
+        windows: {
+            include_dirs: [ "external/e2fsprogs/include/mingw" ],
+            cflags: ["-DANDROID_WINDOWS_HOST"],
+            ldflags: ["-static"],
+            host_ldlibs: ["-lws2_32"],
+            enabled: true
+        },
+    },
+}
+
+cc_binary {
+    name: "make_f2fs",
+    defaults: [
+        "make_f2fs_defaults",
+    ],
+}
+
+cc_binary_host {
+    name: "make_f2fs_casefold",
+    defaults: [
+        "make_f2fs_defaults",
+    ],
+    target: {
+        host: {
+            cflags: ["-DCONF_CASEFOLD", "-DCONF_PROJID"],
+        },
+        windows: {
+            cflags: ["-DCONF_CASEFOLD", "-DCONF_PROJID"],
+        },
+    },
+}
+
+cc_binary_host {
+    name: "make_f2fs.static",
+    defaults: [
+        "make_f2fs_defaults",
+    ],
+    static_executable: true,
+    stl: "libc++_static",
+}
+
+cc_binary {
+    name: "fsck.f2fs",
+    defaults: [
+        "f2fs-tools-defaults",
+        "fsck_main_src_files",
+    ],
+    host_supported: true,
+    vendor_available: true,
+    recovery_available: true,
+    cflags: ["-DWITH_RESIZE", "-DWITH_DEFRAG", "-DWITH_DUMP"],
+    srcs: ["fsck/fsck.c", "fsck/resize.c", "fsck/defrag.c"],
+    shared_libs: [
+        "libext2_uuid",
+        "libsparse",
+        "libbase",
+    ],
+    symlinks: ["resize.f2fs", "defrag.f2fs", "dump.f2fs"],
+    vendor_ramdisk_available: true,
+}
+
+cc_binary {
+    name: "sload_f2fs",
+    defaults: [
+        "f2fs-tools-defaults",
+        "fsck_main_src_files",
+    ],
+    host_supported: true,
+    recovery_available: true,
+    cflags: ["-DWITH_SLOAD"],
+    srcs: [
+        "fsck/fsck.c",
+        "fsck/sload.c",
+        "fsck/compress.c",
+        ],
+    target: {
+        android: {
+            shared_libs: [
+                "libext2_uuid",
+                "libsparse",
+                "libbase",
+                "libcrypto",
+                "libselinux",
+                "libcutils",
+                "liblog",
+                "liblz4",
+            ],
+        },
+        host: {
+            static_libs: [
+                "libext2_uuid",
+                "libsparse",
+                "libbase",
+                "libcrypto",
+                "libselinux",
+                "libcutils",
+                "liblog",
+                "libz",
+                "liblz4",
+            ],
+        },
+    },
+}
+
+cc_binary {
+    name: "check_f2fs",
+    host_supported: false,
+    cflags: [
+        "--static",
+        "-U_FORTIFY_SOURCE",
+	"-Wall",
+	"-Werror",
+    ],
+    srcs: ["tools/check_f2fs.c"],
+    product_specific: true,
+}
+
+cc_defaults {
+    name: "tools-defaults",
+    cflags: [
+	"-Wall",
+	"-Werror",
+    ],
+    local_include_dirs: [
+        "include",
+    ],
+    target: {
+        windows: {
+            enabled: false,
+        },
+        darwin: {
+            enabled: false,
+        },
+    },
+    product_specific: true,
+}
+
+cc_binary {
+    name: "f2fscrypt",
+    defaults: [
+        "tools-defaults",
+    ],
+    shared_libs: [
+        "libext2_uuid",
+    ],
+    srcs: [
+        "tools/f2fscrypt.c",
+        "tools/sha512.c",
+    ],
+}
+
+cc_binary {
+    name: "f2fs.fibmap",
+    defaults: [
+        "tools-defaults",
+    ],
+    srcs: [
+        "tools/fibmap.c",
+    ],
+}

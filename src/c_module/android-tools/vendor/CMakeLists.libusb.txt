@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: Apache-2.0
+# CMakeLists.libusb.txt: CMake file for libusb directory
+
+set(android_tools_libusb_SOURCES
+	libusb/libusb/core.c
+	libusb/libusb/descriptor.c
+	libusb/libusb/hotplug.c
+	libusb/libusb/io.c
+	libusb/libusb/sync.c
+	libusb/libusb/strerror.c)
+
+if(WIN32)
+	list(APPEND android_tools_libusb_SOURCES
+		libusb/libusb/os/events_windows.c
+		libusb/libusb/os/threads_windows.c
+		libusb/libusb/os/windows_common.c
+		libusb/libusb/os/windows_usbdk.c
+		libusb/libusb/os/windows_winusb.c)
+elseif(APPLE)
+	list(APPEND android_tools_libusb_SOURCES
+		libusb/libusb/os/events_posix.c
+		libusb/libusb/os/darwin_usb.c
+		libusb/libusb/os/threads_posix.c)
+else()
+	list(APPEND android_tools_libusb_SOURCES
+		libusb/libusb/os/events_posix.c
+		libusb/libusb/os/linux_usbfs.c
+		libusb/libusb/os/threads_posix.c)
+	if(ANDROID_TOOLS_LIBUSB_ENABLE_UDEV)
+		list(APPEND android_tools_libusb_SOURCES libusb/libusb/os/linux_udev.c)
+	else()
+		list(APPEND android_tools_libusb_SOURCES libusb/libusb/os/linux_netlink.c)
+	endif()
+endif()
+
+add_library(android_tools_libusb STATIC ${android_tools_libusb_SOURCES})
+
+target_include_directories(android_tools_libusb PRIVATE libusb/libusb libusb/libusb/os)
+
+if(WIN32)
+	target_include_directories(android_tools_libusb PRIVATE libusb/windows)
+elseif(APPLE)
+	target_include_directories(android_tools_libusb PRIVATE libusb/darwin)
+
+	target_link_libraries(android_tools_libusb PRIVATE
+		"-framework CoreFoundation"
+		"-framework IOKit"
+		"-framework Security"
+		"-lobjc")
+else()
+	if(ANDROID_TOOLS_LIBUSB_ENABLE_UDEV)
+		target_compile_definitions(android_tools_libusb PRIVATE HAVE_LIBUDEV)
+		target_link_libraries(android_tools_libusb PUBLIC PkgConfig::libudev)
+	endif()
+	target_include_directories(android_tools_libusb PRIVATE libusb/linux)
+endif()

@@ -1,0 +1,4 @@
+URL: https://github.com/libusb/libusb
+Version: Rolling from upstream
+BugComponent: 1352
+Owners: jmgao, adb-bugs

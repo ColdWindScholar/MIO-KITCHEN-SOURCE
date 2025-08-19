@@ -1,0 +1,18 @@
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_library_headers {
+    name: "libstorage_literals_headers",
+    host_supported: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    export_include_dirs: ["."],
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+}

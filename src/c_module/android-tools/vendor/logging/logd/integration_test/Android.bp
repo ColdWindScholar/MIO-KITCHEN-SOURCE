@@ -1,0 +1,16 @@
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+python_test_host {
+    name: "logd_integration_test",
+    main: "logd_integration_test.py",
+    srcs: [
+        "logd_integration_test.py",
+    ],
+    test_config: "logd_integration_test.xml",
+    test_suites: ["general-tests"],
+    test_options: {
+        unit_test: false,
+    },
+}

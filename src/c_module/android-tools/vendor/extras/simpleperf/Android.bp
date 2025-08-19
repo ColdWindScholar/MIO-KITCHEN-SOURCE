@@ -1,0 +1,811 @@
+//
+// Copyright (C) 2018 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_team: "trendy_team_llvm_and_toolchains",
+    default_applicable_licenses: ["system_extras_simpleperf_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_extras_simpleperf_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "libsimpleperf_readelf_defaults",
+    static_libs: [
+        "libsimpleperf_readelf",
+    ],
+    target: {
+        linux: {
+            ldflags: ["-Wl,--exclude-libs=libsimpleperf_readelf.a"],
+        },
+        windows: {
+            host_ldlibs: [
+                "-lole32",
+                "-luuid",
+            ],
+        },
+    },
+    sanitize: {
+        hwaddress: false,
+    },
+}
+
+cc_defaults {
+    name: "simpleperf_cflags",
+    target: {
+        host: {
+            cflags: [
+                "-DUSE_BIONIC_UAPI_HEADERS",
+                "-fvisibility=hidden",
+            ],
+            compile_multilib: "64",
+            include_dirs: ["bionic/libc/kernel"],
+        },
+        darwin: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+            local_include_dirs: ["nonlinux_support/include"],
+        },
+        windows: {
+            cflags: ["-DNO_LIBDEXFILE_SUPPORT"],
+            local_include_dirs: ["nonlinux_support/include"],
+        },
+        android: {
+            compile_multilib: "both",
+        },
+    },
+}
+
+// linked as a separate library because using OpenCSD headers needs to enable exception
+cc_library_static {
+    name: "libsimpleperf_etm_decoder",
+    defaults: [
+        "simpleperf_cflags",
+        "libsimpleperf_readelf_defaults",
+    ],
+    host_supported: true,
+    srcs: ["ETMDecoder.cpp"],
+    cppflags: [
+        // flags needed to include libopencsd_decoder headers
+        "-Wno-ignored-qualifiers",
+        "-Wno-unused-parameter",
+        "-Wno-switch",
+        "-Wno-unused-private-field",
+        "-Wno-implicit-fallthrough",
+        "-fexceptions",
+    ],
+    rtti: true,
+    static_libs: [
+        "libopencsd_decoder",
+        "libbase",
+        "liblog",
+    ],
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+}
+
+// Build regex support in a separate library to catch std::regex_error exception.
+cc_library_static {
+    name: "libsimpleperf_regex",
+    host_supported: true,
+    srcs: ["RegEx.cpp"],
+    cppflags: ["-fexceptions"],
+    static_libs: ["libbase"],
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+}
+
+cc_defaults {
+    name: "simpleperf_static_libs",
+    defaults: [
+        "libsimpleperf_readelf_defaults",
+        "simpleperf_cflags",
+    ],
+    host_supported: true,
+    static_libs: [
+        "libsimpleperf_etm_decoder",
+        "libsimpleperf_regex",
+        "libbase",
+        "liblog",
+        "liblzma",
+        "libutils",
+        "libprotobuf-cpp-lite",
+        "libopencsd_decoder",
+        "libz",
+        "libziparchive",
+        "libzstd",
+    ],
+    target: {
+        linux: {
+            static_libs: [
+                "libunwindstack",
+                "libcutils",
+                "libprocinfo",
+                "libevent",
+                "librustc_demangle_static",
+            ],
+        },
+        linux_glibc_x86_64: {
+            stl: "libc++_static",
+        },
+        linux_musl_x86_64: {
+            stl: "libc++_static",
+        },
+        windows: {
+            enabled: true,
+            stl: "libc++_static",
+        },
+    },
+    use_version_lib: true,
+}
+
+cc_defaults {
+    name: "simpleperf_shared_libs",
+    defaults: [
+        "simpleperf_cflags",
+        "libsimpleperf_readelf_defaults",
+    ],
+    host_supported: true,
+    shared_libs: [
+        "libbase",
+        "liblog",
+        "liblzma",
+        "libprotobuf-cpp-lite",
+        "libz",
+        "libziparchive",
+    ],
+    static_libs: [
+        "libsimpleperf_etm_decoder",
+        "libsimpleperf_regex",
+        "libopencsd_decoder",
+        "libzstd",
+    ],
+    target: {
+        linux: {
+            shared_libs: [
+                "libcutils",
+                "libevent",
+                "libprocinfo",
+                "libunwindstack",
+            ],
+            static_libs: [
+                "libdexfile_support",
+                "librustc_demangle_static",
+            ],
+            runtime_libs: [
+                "libdexfile", // libdexfile_support dependency
+            ],
+        },
+        windows: {
+            enabled: true,
+        },
+    },
+    use_version_lib: true,
+}
+
+python_binary_host {
+    name: "event_table_generator",
+    srcs: ["event_table_generator.py"],
+}
+
+genrule {
+    name: "simpleperf_event_table",
+    out: ["event_table.cpp"],
+    srcs: ["event_table.json"],
+    tools: ["event_table_generator"],
+    cmd: "$(location event_table_generator) $(in) $(out)",
+}
+
+cc_defaults {
+    name: "libsimpleperf_srcs",
+    srcs: [
+        "cmd_dumprecord.cpp",
+        "cmd_help.cpp",
+        "cmd_inject.cpp",
+        "cmd_kmem.cpp",
+        "cmd_merge.cpp",
+        "cmd_report.cpp",
+        "cmd_report_sample.cpp",
+        "cmd_report_sample.proto",
+        "command.cpp",
+        "dso.cpp",
+        "branch_list.proto",
+        "BranchListFile.cpp",
+        "event_attr.cpp",
+        "event_type.cpp",
+        "kallsyms.cpp",
+        "perf_regs.cpp",
+        "read_apk.cpp",
+        "read_elf.cpp",
+        "read_symbol_map.cpp",
+        "record.cpp",
+        "RecordFilter.cpp",
+        "record_file.proto",
+        "record_file_reader.cpp",
+        "record_file_writer.cpp",
+        "report_utils.cpp",
+        "thread_tree.cpp",
+        "tracing.cpp",
+        "utils.cpp",
+        "ZstdUtil.cpp",
+        ":simpleperf_event_table",
+    ],
+    target: {
+        android: {
+            srcs: [
+                "cmd_boot_record.cpp",
+            ],
+        },
+        linux: {
+            srcs: [
+                "CallChainJoiner.cpp",
+                "cmd_api.cpp",
+                "cmd_debug_unwind.cpp",
+                "cmd_list.cpp",
+                "cmd_monitor.cpp",
+                "cmd_record.cpp",
+                "cmd_stat.cpp",
+                "cmd_trace_sched.cpp",
+                "environment.cpp",
+                "ETMRecorder.cpp",
+                "event_fd.cpp",
+                "event_selection_set.cpp",
+                "IOEventLoop.cpp",
+                "JITDebugReader.cpp",
+                "MapRecordReader.cpp",
+                "OfflineUnwinder.cpp",
+                "ProbeEvents.cpp",
+                "read_dex_file.cpp",
+                "RecordReadThread.cpp",
+                "workload.cpp",
+            ],
+        },
+        darwin: {
+            srcs: ["nonlinux_support/nonlinux_support.cpp"],
+        },
+        windows: {
+            srcs: ["nonlinux_support/nonlinux_support.cpp"],
+        },
+    },
+}
+
+cc_library_static {
+    name: "libsimpleperf",
+    defaults: [
+        "libsimpleperf_srcs",
+        "simpleperf_static_libs",
+    ],
+    proto: {
+        type: "lite",
+    },
+    static_libs: [
+        "libbuildversion",
+    ],
+    use_version_lib: false,
+
+    target: {
+        linux: {
+            // See note for libdexfile_static in simpleperf_ndk.
+            static_libs: ["libdexfile_support"],
+            runtime_libs: ["libdexfile"], // libdexfile_support dependency
+        },
+    },
+}
+
+// simpleperf shipped in system image
+cc_binary {
+    name: "simpleperf",
+    defaults: [
+        "simpleperf_shared_libs",
+    ],
+    host_supported: false,
+    srcs: [
+        "main.cpp",
+    ],
+    static_libs: ["libsimpleperf"],
+    target: {
+        android: {
+            compile_multilib: "first",
+        },
+    },
+    init_rc: ["simpleperf.rc"],
+}
+
+cc_library {
+    name: "libsimpleperf_profcollect",
+    defaults: ["simpleperf_shared_libs"],
+    srcs: ["profcollect.cpp"],
+    host_supported: false,
+    ldflags: ["-Wl,--exclude-libs=ALL"],
+    static_libs: ["libsimpleperf"],
+    shared_libs: [
+        "libpower",
+    ],
+}
+
+rust_bindgen {
+    name: "libsimpleperf_profcollect_bindgen",
+    wrapper_src: "include/simpleperf_profcollect.hpp",
+    crate_name: "simpleperf_profcollect_bindgen",
+    source_stem: "bindings",
+}
+
+rust_library {
+    name: "libsimpleperf_profcollect_rust",
+    crate_name: "simpleperf_profcollect",
+    srcs: ["rust/lib.rs"],
+    rlibs: ["libsimpleperf_profcollect_bindgen"],
+    shared_libs: ["libsimpleperf_profcollect"],
+    visibility: ["//system/extras/profcollectd:__subpackages__"],
+}
+
+rust_test {
+    name: "libsimpleperf_profcollect_bindgen_test",
+    srcs: [":libsimpleperf_profcollect_bindgen"],
+    crate_name: "simpleperf_profcollect_bindgen_test",
+    test_suites: ["general-tests"],
+    auto_gen_config: true,
+    clippy_lints: "none",
+    lints: "none",
+}
+
+// simpleperf released in ndk
+cc_binary {
+    name: "simpleperf_ndk",
+    defaults: [
+        "simpleperf_static_libs",
+    ],
+    dist: {
+        targets: ["simpleperf"],
+    },
+    multilib: {
+        lib32: {
+            suffix: "32",
+        },
+    },
+    srcs: [
+        "main.cpp",
+    ],
+    static_libs: [
+        "libsimpleperf",
+    ],
+
+    target: {
+        android: {
+            static_executable: true,
+            static_libs: [
+                "libc",
+            ],
+        },
+        android_arm: {
+            dist: {
+                dir: "simpleperf/android/arm",
+            },
+        },
+        android_arm64: {
+            dist: {
+                dir: "simpleperf/android/arm64",
+            },
+        },
+        android_x86: {
+            dist: {
+                dir: "simpleperf/android/x86",
+            },
+        },
+        android_x86_64: {
+            dist: {
+                dir: "simpleperf/android/x86_64",
+            },
+        },
+        host: {
+            stem: "simpleperf",
+        },
+        darwin: {
+            dist: {
+                dir: "simpleperf/darwin/x86",
+            },
+        },
+        darwin_x86_64: {
+            dist: {
+                dir: "simpleperf/darwin/x86_64",
+            },
+        },
+        linux: {
+            // In the NDK we need libdexfile_static which links libdexfile and
+            // its ART dependencies statically. However in other libraries we
+            // must use libdexfile_support, which dlopen's libdexfile.so from
+            // the ART APEX, to avoid getting ART internals in the system image.
+            static_libs: ["libdexfile_static"],
+        },
+        linux_glibc_x86: {
+            dist: {
+                dir: "simpleperf/linux/x86",
+            },
+        },
+        linux_glibc_x86_64: {
+            dist: {
+                dir: "simpleperf/linux/x86_64",
+            },
+        },
+        linux_musl_x86: {
+            dist: {
+                dir: "simpleperf/linux_musl/x86",
+            },
+        },
+        linux_musl_x86_64: {
+            dist: {
+                dir: "simpleperf/linux_musl/x86_64",
+            },
+        },
+        windows_x86: {
+            dist: {
+                dir: "simpleperf/windows/x86",
+            },
+        },
+        windows_x86_64: {
+            dist: {
+                dir: "simpleperf/windows/x86_64",
+            },
+        },
+    },
+}
+
+// It's linked to user's program, to get profile counters and samples for specific code ranges.
+cc_library {
+    name: "libsimpleperf_record",
+    defaults: [
+        "simpleperf_static_libs",
+    ],
+    export_include_dirs: ["include"],
+    ldflags: ["-Wl,--exclude-libs,ALL"],
+    srcs: [
+        "record_lib_interface.cpp",
+    ],
+    static_libs: [
+        "libsimpleperf",
+    ],
+    target: {
+        darwin: {
+            enabled: false,
+        },
+        windows: {
+            enabled: false,
+        },
+        linux: {
+            // See note for libdexfile_static in simpleperf_ndk.
+            static_libs: ["libdexfile_static"],
+        },
+    },
+}
+
+// It's the shared library used on host by python scripts to report samples in different ways.
+cc_library_shared {
+    name: "libsimpleperf_report",
+    defaults: [
+        "simpleperf_static_libs",
+    ],
+    dist: {
+        targets: ["simpleperf"],
+    },
+    srcs: [
+        "report_lib_interface.cpp",
+    ],
+    static_libs: ["libsimpleperf"],
+
+    target: {
+        android: {
+            enabled: false,
+        },
+        linux: {
+            ldflags: ["-Wl,--exclude-libs,ALL"],
+            // See note for libdexfile_static in simpleperf_ndk.
+            static_libs: ["libdexfile_static"],
+        },
+        darwin: {
+            dist: {
+                dir: "simpleperf/darwin/x86",
+            },
+        },
+        darwin_x86_64: {
+            dist: {
+                dir: "simpleperf/darwin/x86_64",
+            },
+        },
+        linux_glibc_x86: {
+            dist: {
+                dir: "simpleperf/linux/x86",
+            },
+        },
+        linux_glibc_x86_64: {
+            dist: {
+                dir: "simpleperf/linux/x86_64",
+            },
+        },
+        linux_musl_x86: {
+            dist: {
+                dir: "simpleperf/linux_musl/x86",
+            },
+        },
+        linux_musl_x86_64: {
+            dist: {
+                dir: "simpleperf/linux_musl/x86_64",
+            },
+        },
+        windows_x86: {
+            dist: {
+                dir: "simpleperf/windows/x86",
+            },
+        },
+        windows_x86_64: {
+            dist: {
+                dir: "simpleperf/windows/x86_64",
+            },
+        },
+    },
+}
+
+cc_defaults {
+    name: "simpleperf_test_srcs",
+    tidy_timeout_srcs: [
+        "record_test.cpp",
+        "cmd_report_sample_test.cpp",
+        "cmd_report_test.cpp",
+    ],
+    srcs: [
+        "BranchListFile_test.cpp",
+        "cmd_inject_test.cpp",
+        "cmd_kmem_test.cpp",
+        "cmd_merge_test.cpp",
+        "cmd_report_test.cpp",
+        "cmd_report_sample_test.cpp",
+        "command_test.cpp",
+        "dso_test.cpp",
+        "gtest_main.cpp",
+        "kallsyms_test.cpp",
+        "perf_regs_test.cpp",
+        "read_apk_test.cpp",
+        "read_elf_test.cpp",
+        "read_symbol_map_test.cpp",
+        "RecordFilter_test.cpp",
+        "RegEx_test.cpp",
+        "record_file_test.cpp",
+        "record_test.cpp",
+        "report_utils_test.cpp",
+        "sample_tree_test.cpp",
+        "thread_tree_test.cpp",
+        "test_util.cpp",
+        "tracing_test.cpp",
+        "utils_test.cpp",
+        "ZstdUtil_test.cpp",
+    ],
+    target: {
+        android: {
+            srcs: [
+                "cmd_boot_record_test.cpp",
+            ],
+        },
+        linux: {
+            tidy_timeout_srcs: [
+                "cmd_stat_test.cpp",
+                "cmd_record_test.cpp",
+            ],
+            srcs: [
+                "CallChainJoiner_test.cpp",
+                "cmd_api_test.cpp",
+                "cmd_debug_unwind_test.cpp",
+                "cmd_dumprecord_test.cpp",
+                "cmd_list_test.cpp",
+                "cmd_record_test.cpp",
+                "cmd_monitor_test.cpp",
+                "cmd_stat_test.cpp",
+                "cmd_trace_sched_test.cpp",
+                "environment_test.cpp",
+                "event_selection_set_test.cpp",
+                "IOEventLoop_test.cpp",
+                "JITDebugReader_test.cpp",
+                "MapRecordReader_test.cpp",
+                "OfflineUnwinder_test.cpp",
+                "ProbeEvents_test.cpp",
+                "read_dex_file_test.cpp",
+                "RecordReadThread_test.cpp",
+                "workload_test.cpp",
+            ],
+        },
+    },
+}
+
+cc_test {
+    name: "simpleperf_unit_test",
+    defaults: [
+        "simpleperf_test_srcs",
+        "simpleperf_shared_libs",
+    ],
+    static_libs: [
+        "libgmock",
+        "libsimpleperf",
+    ],
+    target: {
+        android: {
+            test_suites: ["device-tests"],
+        },
+    },
+    data: [
+        "testdata/**/*",
+    ],
+    sanitize: {
+        memtag_heap: false,
+    },
+}
+
+cc_test {
+    name: "simpleperf_cpu_hotplug_test",
+    defaults: [
+        "simpleperf_shared_libs",
+    ],
+    test_options: {
+        unit_test: true,
+    },
+    srcs: [
+        "cpu_hotplug_test.cpp",
+    ],
+    static_libs: ["libsimpleperf"],
+    target: {
+        android: {
+            test_suites: ["device-tests"],
+        },
+        darwin: {
+            enabled: false,
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+cc_library_static {
+    name: "libsimpleperf_cts_test",
+    defaults: [
+        "simpleperf_test_srcs",
+        "simpleperf_shared_libs",
+    ],
+    host_supported: false,
+    cflags: [
+        "-DIN_CTS_TEST",
+    ],
+    static_libs: [
+        "libgtest",
+    ],
+    whole_static_libs: [
+        "libgmock",
+        "libsimpleperf",
+        "libsimpleperf_regex",
+    ],
+}
+
+cc_test {
+    name: "simpleperf_record_test",
+    defaults: [
+        "simpleperf_shared_libs",
+    ],
+    srcs: [
+        "record_lib_test.cpp",
+    ],
+    shared_libs: ["libsimpleperf_record"],
+    target: {
+        android: {
+            test_suites: ["device-tests"],
+        },
+        darwin: {
+            enabled: false,
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+filegroup {
+    name: "system-extras-simpleperf-testdata",
+    srcs: ["CtsSimpleperfTestCases_testdata/**/*"],
+}
+
+cc_fuzz {
+    name: "libsimpleperf_report_fuzzer",
+    defaults: [
+        "simpleperf_static_libs",
+    ],
+    host_supported: true,
+    srcs: [
+        "libsimpleperf_report_fuzzer.cpp",
+    ],
+    static_libs: [
+        "libsimpleperf",
+    ],
+    target: {
+        linux: {
+            // Fuzzer may not be able to load libdexfile. So statically link it.
+            static_libs: ["libdexfile_static"],
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+    dictionary: "simpleperf_dict.dict",
+    corpus: ["testdata/**/*.data"],
+}
+
+cc_fuzz {
+    name: "simpleperf_writer_fuzzer",
+    defaults: [
+        "simpleperf_static_libs",
+    ],
+    host_supported: true,
+    srcs: [
+        "simpleperf_writer_fuzzer.cpp",
+    ],
+    static_libs: [
+        "libsimpleperf",
+    ],
+    target: {
+        linux: {
+            // Fuzzer may not be able to load libdexfile. So statically link it.
+            static_libs: ["libdexfile_static"],
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+genrule {
+    name: "simpleperf_script.zip",
+    tools: [
+        "soong_zip",
+    ],
+    srcs: [
+        "**/*.proto",
+        "app_api/**/*",
+        "doc/**/*",
+        "demo/**/*",
+        "runtest/**/*",
+        "scripts/**/*",
+        "testdata/**/*",
+    ],
+    cmd: "$(location soong_zip) -o $(out) -C system/extras/simpleperf " +
+        "-D system/extras/simpleperf ",
+    out: [
+        "simpleperf/simpleperf_script.zip",
+    ],
+    dist: {
+        targets: ["simpleperf"],
+        dir: "simpleperf",
+    },
+}

@@ -1,0 +1,26 @@
+#
+# Copyright (C) 2024 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# The adbd_test binary runs on older OS builds, so many of its dependencies
+# (such as libbase and libc++) need to be linked statically. The test also needs
+# to be linked with a version script to ensure that the statically-linked
+# libraries aren't exported from the executable, where they would override the
+# shared libraries that the OS itself uses. See b/333438055 for an example of
+# what goes wrong when libc++ is partially exported from an executable.
+{
+  local:
+    *;
+};

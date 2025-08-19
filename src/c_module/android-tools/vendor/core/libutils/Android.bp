@@ -1,0 +1,415 @@
+package {
+    default_applicable_licenses: ["system_core_libutils_license"],
+}
+
+license {
+    name: "system_core_libutils_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_library_headers {
+    name: "libutils_headers",
+    vendor_available: true,
+    product_available: true,
+    recovery_available: true,
+    vendor_ramdisk_available: true,
+    host_supported: true,
+    native_bridge_supported: true,
+    defaults: [
+        "apex-lowest-min-sdk-version",
+    ],
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+
+    header_libs: [
+        "libbase_headers",
+        "libcutils_headers",
+        "liblog_headers",
+        "libsystem_headers",
+    ],
+    export_header_lib_headers: [
+        "libbase_headers",
+        "libcutils_headers",
+        "liblog_headers",
+        "libsystem_headers",
+    ],
+    export_include_dirs: ["include"],
+
+    target: {
+        linux_bionic: {
+            enabled: true,
+        },
+        windows: {
+            enabled: true,
+        },
+    },
+}
+
+cc_defaults {
+    name: "libutils_defaults_nodeps",
+    vendor_available: true,
+    product_available: true,
+    recovery_available: true,
+    host_supported: true,
+
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wno-exit-time-destructors",
+        "-DANDROID_UTILS_REF_BASE_DISABLE_IMPLICIT_CONSTRUCTION",
+    ],
+
+    sanitize: {
+        misc_undefined: ["integer"],
+    },
+
+    target: {
+        android: {
+            cflags: ["-fvisibility=protected"],
+
+            shared_libs: [
+                "libvndksupport",
+            ],
+
+            sanitize: {
+                misc_undefined: ["integer"],
+            },
+        },
+
+        recovery: {
+            exclude_shared_libs: ["libvndksupport"],
+        },
+
+        linux_bionic: {
+            enabled: true,
+        },
+
+        darwin: {
+            cflags: ["-Wno-unused-parameter"],
+        },
+
+        windows: {
+            cflags: [
+                // Under MinGW, ctype.h doesn't need multi-byte support
+                "-DMB_CUR_MAX=1",
+                "-Wno-unused-private-field",
+            ],
+
+            enabled: true,
+        },
+    },
+    fuzz_config: {
+        cc: ["smoreland@google.com"],
+    },
+}
+
+cc_defaults {
+    name: "libutils_defaults",
+    defaults: [
+        "libutils_defaults_nodeps",
+    ],
+
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+}
+
+cc_defaults {
+    name: "libutils_impl_defaults",
+    defaults: [
+        "libutils_defaults",
+        "apex-lowest-min-sdk-version",
+    ],
+    native_bridge_supported: true,
+
+    whole_static_libs: ["libutils_binder"],
+
+    header_libs: [
+        "libbase_headers",
+        "libutils_headers",
+    ],
+    export_header_lib_headers: [
+        "libutils_headers",
+    ],
+
+    srcs: [
+        "FileMap.cpp",
+        "JenkinsHash.cpp",
+        "LightRefBase.cpp",
+        "NativeHandle.cpp",
+        "Printer.cpp",
+        "StopWatch.cpp",
+        "SystemClock.cpp",
+        "Threads.cpp",
+        "Timers.cpp",
+        "Tokenizer.cpp",
+        "misc.cpp",
+    ],
+
+    target: {
+        android: {
+            srcs: [
+                "Trace.cpp",
+            ],
+        },
+        linux: {
+            header_libs: ["libbase_headers"],
+            srcs: [
+                "Looper.cpp",
+            ],
+        },
+    },
+
+    apex_available: [
+        "//apex_available:anyapex",
+        "//apex_available:platform",
+    ],
+
+    afdo: true,
+}
+
+cc_library {
+    name: "libutils",
+    defaults: ["libutils_impl_defaults"],
+
+    double_loadable: true,
+
+    target: {
+        product: {
+            header_abi_checker: {
+                enabled: true,
+                // AFDO affects weak symbols.
+                diff_flags: ["-allow-adding-removing-weak-symbols"],
+                ref_dump_dirs: ["abi-dumps"],
+            },
+        },
+        vendor: {
+            header_abi_checker: {
+                enabled: true,
+                // AFDO affects weak symbols.
+                diff_flags: ["-allow-adding-removing-weak-symbols"],
+                ref_dump_dirs: ["abi-dumps"],
+            },
+        },
+    },
+}
+
+cc_library {
+    name: "libutils_test_compile",
+    defaults: ["libutils_impl_defaults"],
+
+    cflags: [
+        "-DDEBUG_CALLBACKS=1",
+        "-DDEBUG_POLL_AND_WAKE=1",
+        "-DDEBUG_REFS=1",
+        "-DDEBUG_TOKENIZER=1",
+    ],
+
+    visibility: [":__subpackages__"],
+}
+
+cc_library {
+    name: "libutilscallstack",
+    defaults: ["libutils_defaults"],
+    // TODO(b/153609531): remove when no longer needed.
+    native_bridge_supported: true,
+    min_sdk_version: "29",
+    double_loadable: true,
+
+    header_libs: [
+        "libbase_headers",
+        "libutils_headers",
+    ],
+    export_header_lib_headers: [
+        "libutils_headers",
+    ],
+
+    srcs: [
+        "CallStack.cpp",
+    ],
+
+    shared_libs: [
+        "libutils",
+        "libunwindstack",
+    ],
+
+    target: {
+        linux: {
+            srcs: [
+                "ProcessCallStack.cpp",
+            ],
+        },
+        darwin: {
+            enabled: false,
+        },
+        windows: {
+            enabled: false,
+        },
+    },
+}
+
+cc_defaults {
+    name: "libutils_fuzz_defaults",
+    host_supported: true,
+    shared_libs: [
+        "libutils",
+        "libbase",
+        "liblog",
+    ],
+    fuzz_config: {
+        cc: [
+            "smoreland@google.com",
+        ],
+        componentid: 128577,
+        description: "The fuzzer targets the APIs of libutils",
+        vector: "local_no_privileges_required",
+        service_privilege: "privileged",
+        users: "multi_user",
+        fuzzed_code_usage: "shipped",
+    },
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_bitset",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["BitSet_fuzz.cpp"],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_filemap",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["FileMap_fuzz.cpp"],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_printer",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["Printer_fuzz.cpp"],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_callstack",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["CallStack_fuzz.cpp"],
+    shared_libs: [
+        "libutilscallstack",
+    ],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_process_callstack",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["ProcessCallStack_fuzz.cpp"],
+    shared_libs: [
+        "libutilscallstack",
+    ],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_lrucache",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["LruCache_fuzz.cpp"],
+}
+
+cc_fuzz {
+    name: "libutils_fuzz_looper",
+    defaults: ["libutils_fuzz_defaults"],
+    srcs: ["Looper_fuzz.cpp"],
+}
+
+cc_test {
+    name: "libutils_test",
+    host_supported: true,
+
+    srcs: [
+        "BitSet_test.cpp",
+        "CallStack_test.cpp",
+        "FileMap_test.cpp",
+        "LruCache_test.cpp",
+        "Mutex_test.cpp",
+        "Singleton_test.cpp",
+        "Timers_test.cpp",
+    ],
+
+    target: {
+        android: {
+            srcs: [
+                "SystemClock_test.cpp",
+            ],
+            shared_libs: [
+                "libbase",
+                "libcutils",
+                "liblog",
+                "liblzma",
+                "libunwindstack",
+                "libutils",
+                "libutilscallstack",
+                "libz",
+            ],
+        },
+        linux: {
+            srcs: [
+                "Looper_test.cpp",
+            ],
+        },
+        host: {
+            static_libs: [
+                "libbase",
+                "liblog",
+                "liblzma",
+                "libunwindstack_no_dex",
+                "libutils",
+                "libutilscallstack",
+                "libz",
+            ],
+        },
+    },
+
+    data_libs: [
+        "libutils_test_singleton1",
+        "libutils_test_singleton2",
+    ],
+
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wthread-safety",
+    ],
+
+    test_suites: ["device-tests"],
+}
+
+cc_test_library {
+    name: "libutils_test_singleton1",
+    host_supported: true,
+    installable: false,
+    srcs: ["Singleton_test1.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    header_libs: ["libutils_headers"],
+}
+
+cc_test_library {
+    name: "libutils_test_singleton2",
+    host_supported: true,
+    installable: false,
+    srcs: ["Singleton_test2.cpp"],
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    shared_libs: ["libutils_test_singleton1"],
+    header_libs: ["libutils_headers"],
+}

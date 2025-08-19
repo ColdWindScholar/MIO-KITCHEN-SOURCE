@@ -1,0 +1,5 @@
+# Random contexts from AOSP.
+"u:r:system_server:s0"
+"u:r:adbd:s0"
+"u:r:shell:s0"
+"u:r:adbd:s0"

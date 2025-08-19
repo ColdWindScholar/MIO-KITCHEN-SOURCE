@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libsemanage
+Description: SELinux management library
+Version: @VERSION@
+URL: http://userspace.selinuxproject.org/
+Requires.private: libselinux libsepol
+Libs: -L${libdir} -lsemanage
+Libs.private: -lbz2
+Cflags: -I${includedir}

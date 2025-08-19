@@ -1,0 +1,40 @@
+# Copyright 2016 The Android Open Source Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+service cppreopts /system/bin/cppreopts.sh /postinstall
+    oneshot
+    disabled
+    user root
+    priority -20
+    ioprio rt 0
+    task_profiles ProcessCapacityHigh
+    capabilities
+
+# Post install is above Treble VINTF, because it runs some utilities from
+# /system. Therefore, the fstab can only be in either /system or /product.
+on property:sys.cppreopt=requested && property:ro.postinstall.fstab.prefix=/system
+    mount_all /system/etc/fstab.postinstall
+    exec_start cppreopts
+    # Optional script to copy additional preloaded content to data directory
+    exec - system system -- /system/bin/preloads_copy.sh /postinstall
+    umount_all /system/etc/fstab.postinstall
+    setprop sys.cppreopt finished
+
+on property:sys.cppreopt=requested && property:ro.postinstall.fstab.prefix=/product
+    mount_all /product/etc/fstab.postinstall
+    exec_start cppreopts
+    # Optional script to copy additional preloaded content to data directory
+    exec - system system -- /system/bin/preloads_copy.sh /postinstall
+    umount_all /product/etc/fstab.postinstall
+    setprop sys.cppreopt finished

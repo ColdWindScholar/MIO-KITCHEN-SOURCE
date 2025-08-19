@@ -1,0 +1,62 @@
+package {
+    // See: http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // all of the 'license_kinds' from "system_extras_verity_license"
+    // to get the below license kinds:
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["system_extras_verity_license"],
+}
+
+cc_binary_host {
+    name: "fec",
+
+    compile_multilib: "both",
+    multilib: {
+        lib32: {
+            suffix: "32",
+        },
+        lib64: {
+            suffix: "",
+        },
+    },
+    target: {
+        linux_glibc_x86_64: {
+            sanitize: {
+                misc_undefined: ["integer"],
+            },
+        },
+        linux_musl_x86_64: {
+            sanitize: {
+                misc_undefined: ["integer"],
+            },
+        },
+        linux: {
+            static_libs: [
+                "libavb",
+            ],
+        },
+    },
+
+    srcs: [
+        "main.cpp",
+        "image.cpp",
+    ],
+
+    static_libs: [
+        "libbase",
+        "libsparse",
+        "libz",
+        "libcrypto_utils",
+        "libcrypto",
+        "libfec",
+        "libfec_rs",
+        "libext4_utils",
+        "liblog",
+        "libsquashfs_utils",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-O3",
+    ],
+}

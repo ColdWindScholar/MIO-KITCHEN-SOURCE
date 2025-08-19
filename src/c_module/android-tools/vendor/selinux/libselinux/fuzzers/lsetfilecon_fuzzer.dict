@@ -1,0 +1,15 @@
+# A few paths from frameworks/native.
+
+path="/data/app/com.example/dir/dir/file"
+path="/data/user/0/com.example/secondary.dex"
+path="/dev/socket/pdx"
+path="/proc/net/xt_qtaguid/iface_stat_all"
+path="/sys/devices/system/cpu/cpufreq"
+path="/vendor/bin/hw/android.hardware.media.omx@1.0-service"
+
+# Random contexts from AOSP.
+
+con="u:r:system_server:s0"
+con="u:r:adbd:s0"
+con="u:r:shell:s0"
+con="u:r:adbd:s0"

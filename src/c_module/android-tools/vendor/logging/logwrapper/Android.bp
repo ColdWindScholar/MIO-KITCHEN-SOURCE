@@ -1,0 +1,88 @@
+package {
+    default_applicable_licenses: ["system_logging_logwrapper_license"],
+}
+
+// Added automatically by a large-scale-change
+license {
+    name: "system_logging_logwrapper_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+cc_defaults {
+    name: "logwrapper_defaults",
+    cflags: [
+        "-Werror",
+    ],
+}
+
+// ========================================================
+// Static and shared library
+// ========================================================
+
+cc_library {
+    name: "liblogwrap",
+    defaults: ["logwrapper_defaults"],
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    srcs: ["logwrap.cpp"],
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    header_libs: ["libbase_headers"],
+    export_include_dirs: ["include"],
+    local_include_dirs: ["include"],
+}
+
+// ========================================================
+// Executable
+// ========================================================
+
+cc_defaults {
+    name: "logwrapper_common",
+    defaults: ["logwrapper_defaults"],
+    local_include_dirs: ["include"],
+    srcs: [
+        "logwrap.cpp",
+        "logwrapper.cpp",
+    ],
+    header_libs: ["libbase_headers"],
+    shared_libs: ["libcutils", "liblog"],
+}
+
+cc_binary {
+    name: "logwrapper",
+    defaults: ["logwrapper_common"],
+}
+
+cc_binary {
+    name: "logwrapper_vendor",
+    defaults: ["logwrapper_common"],
+    stem: "logwrapper",
+    vendor: true,
+}
+
+// ========================================================
+// Benchmark
+// ========================================================
+
+cc_benchmark {
+    name: "logwrap_fork_execvp_benchmark",
+    defaults: ["logwrapper_defaults"],
+    srcs: [
+        "logwrap_fork_execvp_benchmark.cpp",
+    ],
+    shared_libs: [
+        "libbase",
+        "libcutils",
+        "liblog",
+        "liblogwrap",
+    ],
+}

@@ -1,0 +1,73 @@
+# This file is the LOCAL_INIT_RC file for the bootstat command.
+
+# Mirror bootloader boot reason to system boot reason
+# ro.boot.bootreason should be set by init already
+# before post-fs trigger
+on post-fs && property:ro.boot.bootreason=*
+    setprop sys.boot.reason ${ro.boot.bootreason}
+
+on post-fs-data
+    mkdir /data/misc/bootstat 0700 system log
+    # To deal with ota transition resulting from a change in DAC from
+    # root.root to system.log, may be deleted after ota has settled.
+    chown system log /data/misc/bootstat/absolute_boot_time
+    chown system log /data/misc/bootstat/boot_complete
+    chown system log /data/misc/bootstat/boot_complete_no_encryption
+    chown system log /data/misc/bootstat/boot_reason
+    chown system log /data/misc/bootstat/boottime.bootloader.1BLE
+    chown system log /data/misc/bootstat/boottime.bootloader.1BLL
+    chown system log /data/misc/bootstat/boottime.bootloader.2BLE
+    chown system log /data/misc/bootstat/boottime.bootloader.2BLL
+    chown system log /data/misc/bootstat/boottime.bootloader.AVB
+    chown system log /data/misc/bootstat/boottime.bootloader.KD
+    chown system log /data/misc/bootstat/boottime.bootloader.KL
+    chown system log /data/misc/bootstat/boottime.bootloader.ODT
+    chown system log /data/misc/bootstat/boottime.bootloader.SW
+    chown system log /data/misc/bootstat/boottime.bootloader.total
+    chown system log /data/misc/bootstat/build_date
+    chown system log /data/misc/bootstat/factory_reset
+    chown system log /data/misc/bootstat/factory_reset_boot_complete
+    chown system log /data/misc/bootstat/factory_reset_boot_complete_no_encryption
+    chown system log /data/misc/bootstat/factory_reset_current_time
+    chown system log /data/misc/bootstat/factory_reset_record_value
+    chown system log /data/misc/bootstat/last_boot_time_utc
+    chown system log /data/misc/bootstat/ota_boot_complete
+    chown system log /data/misc/bootstat/ota_boot_complete_no_encryption
+    chown system log /data/misc/bootstat/ro.boottime.init
+    chown system log /data/misc/bootstat/ro.boottime.init.cold_boot_wait
+    chown system log /data/misc/bootstat/ro.boottime.init.selinux
+    chown system log /data/misc/bootstat/time_since_factory_reset
+    chown system log /data/misc/bootstat/time_since_last_boot
+    # end ota transitional support
+
+# Initialize bootstat state machine.
+#
+# sys.bootstat.first_boot_completed: responsible for making sure that record_boot_complete happens
+# only once per device hard reboot. Possible values:
+#
+#   sys.bootstat.first_boot_completed=0 - first boot completed trigger wasn't processed yet.
+#   sys.bootstat.first_boot_completed=1 - first boot completed trigger was processed and
+#                                         record_boot_complete was called. Subsequent boot completed
+#                                         triggers (e.g. due to userspace reboot) won't retrigger
+#                                         record_boot_complete
+#
+# IMPORTANT, ro.persistent_properties.ready=1 trigger is used here to ensure that we initialize
+# state machine only once, which as result ensures that bootstat --set_system_boot_reason and
+# bootstat --record_boot_complete will be called only once per full reboot.
+on property:ro.persistent_properties.ready=true
+  setprop sys.bootstat.first_boot_completed 0
+
+# Set boot reason
+on property:ro.persistent_properties.ready=true
+    # Converts bootloader boot reason and persist.sys.boot.reason to system boot reason
+    # Need go after persist peroperties are loaded which is right before zygote-start trigger
+    exec_background - system log -- /system/bin/bootstat --set_system_boot_reason
+
+# Record boot complete metrics.
+on property:sys.boot_completed=1 && property:sys.bootstat.first_boot_completed=0
+    # Record boot_complete and related stats (decryption, etc).
+    # Record the boot reason.
+    # Record time since factory reset.
+    # Log all boot events.
+    exec_background - system log -- /system/bin/bootstat --record_boot_complete --record_boot_reason --record_time_since_factory_reset -l
+    setprop sys.bootstat.first_boot_completed 1

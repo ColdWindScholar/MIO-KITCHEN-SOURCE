@@ -1,0 +1,448 @@
+//
+// Copyright (C) 2017-2020 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["external_avb_license"],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+// See: http://go/android-license-faq
+license {
+    name: "external_avb_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+        "SPDX-license-identifier-BSD",
+        "SPDX-license-identifier-MIT",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+subdirs = [
+    "test",
+    "tools",
+]
+
+cc_defaults {
+    name: "avb_defaults",
+    cflags: [
+        "-D_FILE_OFFSET_BITS=64",
+        "-D_POSIX_C_SOURCE=199309L",
+        "-Wa,--noexecstack",
+        "-Werror",
+        "-Wall",
+        "-Wextra",
+        "-Wformat=2",
+        "-Wmissing-prototypes",
+        "-Wno-psabi",
+        "-Wno-unused-parameter",
+        "-Wno-format",
+        "-ffunction-sections",
+        "-fstack-protector-strong",
+        "-g",
+        "-DAVB_ENABLE_DEBUG",
+        "-DAVB_COMPILATION",
+    ],
+    cppflags: [
+        "-Wnon-virtual-dtor",
+        "-fno-strict-aliasing",
+    ],
+    ldflags: [
+        "-Wl,--gc-sections",
+        "-rdynamic",
+    ],
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
+}
+
+cc_defaults {
+    name: "avb_sources",
+    srcs: [
+        "libavb/avb_chain_partition_descriptor.c",
+        "libavb/avb_cmdline.c",
+        "libavb/avb_crc32.c",
+        "libavb/avb_crypto.c",
+        "libavb/avb_descriptor.c",
+        "libavb/avb_footer.c",
+        "libavb/avb_hash_descriptor.c",
+        "libavb/avb_hashtree_descriptor.c",
+        "libavb/avb_kernel_cmdline_descriptor.c",
+        "libavb/avb_property_descriptor.c",
+        "libavb/avb_rsa.c",
+        "libavb/avb_slot_verify.c",
+        "libavb/avb_util.c",
+        "libavb/avb_vbmeta_image.c",
+        "libavb/avb_version.c",
+    ],
+}
+
+cc_defaults {
+    name: "avb_crypto_ops_impl_boringssl",
+    srcs: [
+        "libavb/boringssl/sha.c",
+    ],
+    local_include_dirs: [
+        "libavb/boringssl",
+    ],
+}
+
+cc_defaults {
+    name: "avb_crypto_ops_impl_sha",
+    srcs: [
+        "libavb/sha/sha256_impl.c",
+        "libavb/sha/sha512_impl.c",
+    ],
+    local_include_dirs: [
+        "libavb/sha",
+    ],
+}
+
+python_library_host {
+    name: "libavbtool",
+    srcs: ["avbtool.py"],
+}
+
+python_binary_host {
+    name: "avbtool",
+    srcs: ["avbtool.py"],
+    main: "avbtool.py",
+    required: ["fec"],
+    version: {
+        py3: {
+            embedded_launcher: true,
+        },
+    },
+    compile_multilib: "first",
+}
+
+// Default common to both standard and baremetal versions of libavb.
+cc_defaults {
+    name: "libavb_base_defaults",
+    defaults: [
+        "avb_defaults",
+        "avb_sources",
+        "avb_crypto_ops_impl_boringssl",
+    ],
+    header_libs: [
+        "avb_headers",
+    ],
+    export_header_lib_headers: ["avb_headers"],
+}
+
+// Defaults for standard libavb; depends on only libc and libcrypto.
+//
+// The standard targets enable more logging and uses the standard versions of
+// the dependencies; see the baremetal variant for a slimmer alternative.
+cc_defaults {
+    name: "libavb_standard_defaults",
+    defaults: ["libavb_base_defaults"],
+    host_supported: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    shared_libs: [
+        "libcrypto",
+    ],
+    target: {
+        linux: {
+            srcs: ["libavb/avb_sysdeps_posix.c"],
+        },
+        darwin: {
+            enabled: true,
+            srcs: ["libavb/avb_sysdeps_posix.c"],
+        },
+        host_linux: {
+            cflags: ["-fno-stack-protector"],
+        },
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.virt",
+    ],
+}
+
+// libavb
+cc_library_static {
+    name: "libavb",
+    defaults: ["libavb_standard_defaults"],
+}
+
+// libavb + cert
+//
+// The cert extensions provides some additional support for minimal
+// certificate-based signing.
+cc_library_static {
+    name: "libavb_cert",
+    defaults: [
+        "avb_cert_sources",
+        "libavb_standard_defaults",
+    ],
+}
+
+// Defaults for a variant of libavb that can run in baremetal environments.
+//
+// The debug feature isn't enabled, removing verbose logging and assertions.
+// Also uses the baremetal variant of the dependencies.
+//
+// This does still require a handful of Posix APIs as used by the sysdeps
+// implementation.
+cc_defaults {
+    name: "libavb_baremetal_defaults",
+    defaults: ["libavb_base_defaults"],
+    cflags: ["-UAVB_ENABLE_DEBUG"],
+    static_libs: [
+        "libcrypto_baremetal",
+    ],
+    srcs: ["libavb/avb_sysdeps_posix.c"],
+}
+
+// Baremetal libavb
+cc_library_static {
+    name: "libavb_baremetal",
+    defaults: ["libavb_baremetal_defaults"],
+}
+
+// Baremetal libavb + cert
+cc_library_static {
+    name: "libavb_cert_baremetal",
+    defaults: [
+        "avb_cert_sources",
+        "libavb_baremetal_defaults",
+    ],
+}
+
+// Build libavb_user for the target - in addition to libavb, it
+// includes libavb_ab, libavb_user and also depends on libbase and
+// libfs_mgr.
+cc_library_static {
+    name: "libavb_user",
+    defaults: [
+        "avb_defaults",
+        "avb_sources",
+        "avb_crypto_ops_impl_boringssl",
+    ],
+    recovery_available: true,
+    header_libs: [
+        "avb_headers",
+    ],
+    export_header_lib_headers: ["avb_headers"],
+    shared_libs: [
+        "libbase",
+        "libcrypto",
+    ],
+    static_libs: ["libfs_mgr"],
+    cflags: [
+        "-DAVB_AB_I_UNDERSTAND_LIBAVB_AB_IS_DEPRECATED",
+    ],
+    srcs: [
+        "libavb/avb_sysdeps_posix.c",
+        "libavb_ab/avb_ab_flow.c",
+        "libavb_user/avb_ops_user.cpp",
+        "libavb_user/avb_user_verity.c",
+        "libavb_user/avb_user_verification.c",
+    ],
+}
+
+cc_binary {
+    name: "avbctl",
+    defaults: ["avb_defaults"],
+    static_libs: [
+        "libavb_user",
+        "libfs_mgr",
+    ],
+    shared_libs: [
+        "libbase",
+        "libcrypto",
+    ],
+    srcs: ["tools/avbctl/avbctl.cc"],
+}
+
+cc_library_host_static {
+    name: "libavb_ab_host",
+    defaults: ["avb_defaults"],
+    header_libs: [
+        "avb_headers",
+    ],
+    export_header_lib_headers: ["avb_headers"],
+    cflags: [
+        "-fno-stack-protector",
+        "-DAVB_AB_I_UNDERSTAND_LIBAVB_AB_IS_DEPRECATED",
+    ],
+    srcs: ["libavb_ab/avb_ab_flow.c"],
+}
+
+cc_defaults {
+    name: "avb_cert_sources",
+    srcs: ["libavb_cert/avb_cert_validate.c"],
+}
+
+cc_library_host_static {
+    name: "libavb_host_sysdeps",
+    defaults: ["avb_defaults"],
+    header_libs: [
+        "avb_headers",
+    ],
+    export_header_lib_headers: ["avb_headers"],
+    srcs: ["libavb/avb_sysdeps_posix.c"],
+}
+
+cc_defaults {
+    name: "avb_cert_example_sources",
+    srcs: ["examples/cert/avb_cert_slot_verify.c"],
+}
+
+cc_defaults {
+    name: "libavb_host_unittest_core",
+    defaults: [
+        "avb_defaults",
+        "avb_sources",
+        "avb_cert_sources",
+        "avb_cert_example_sources",
+    ],
+    required: [
+        "simg2img",
+        "img2simg",
+        "avbtool",
+    ],
+    test_options: {
+        unit_test: true,
+    },
+    compile_multilib: "first",
+    data: [
+        "avbtool.py",
+        "test/avbtool_signing_helper_test.py",
+        "test/avbtool_signing_helper_with_files_test.py",
+        "test/data/*",
+    ],
+    test_config: "test/libavb_host_unittest.xml",
+    test_suites: ["general-tests"],
+    static_libs: [
+        "libavb_ab_host",
+        "libgmock_host",
+        "libgtest_host",
+    ],
+    shared_libs: [
+        "libbase",
+        "libchrome",
+        "libcrypto",
+    ],
+    cflags: [
+        "-Wno-missing-prototypes",
+        "-DAVB_AB_I_UNDERSTAND_LIBAVB_AB_IS_DEPRECATED",
+    ],
+    srcs: [
+        "test/avb_ab_flow_unittest.cc",
+        "test/avb_cert_validate_unittest.cc",
+        "test/avb_cert_slot_verify_unittest.cc",
+        "test/avb_crypto_ops_unittest.cc",
+        "test/avb_slot_verify_unittest.cc",
+        "test/avb_unittest_util.cc",
+        "test/avb_util_unittest.cc",
+        "test/avb_vbmeta_image_unittest.cc",
+        "test/avbtool_unittest.cc",
+        "test/fake_avb_ops.cc",
+        "test/avb_sysdeps_posix_testing.cc",
+    ],
+}
+
+cc_test_host {
+    name: "libavb_host_unittest",
+    defaults: [
+        "avb_crypto_ops_impl_boringssl",
+        "libavb_host_unittest_core",
+    ],
+    data: [
+        ":img2simg",
+        ":simg2img",
+        ":fec",
+    ],
+}
+
+cc_test_host {
+    name: "libavb_host_unittest_sha",
+    defaults: [
+        "avb_crypto_ops_impl_sha",
+        "libavb_host_unittest_core",
+    ],
+    data: [
+        ":img2simg",
+        ":simg2img",
+        ":fec",
+    ],
+}
+
+cc_library_host_static {
+    name: "libavb_host_user_code_test",
+    defaults: ["avb_defaults"],
+    cflags: [
+        "-DAVB_AB_I_UNDERSTAND_LIBAVB_AB_IS_DEPRECATED",
+    ],
+    srcs: ["test/user_code_test.cc"],
+}
+
+cc_library {
+    name: "bootctrl.avb",
+    defaults: ["avb_defaults"],
+    relative_install_path: "hw",
+    static_libs: [
+        "libavb_user",
+        "libfs_mgr",
+    ],
+    shared_libs: [
+        "libbase",
+        "libcrypto",
+        "libcutils",
+    ],
+    cflags: [
+        "-DAVB_AB_I_UNDERSTAND_LIBAVB_AB_IS_DEPRECATED",
+    ],
+    srcs: ["boot_control/boot_control_avb.c"],
+}
+
+cc_library_headers {
+    name: "avb_headers",
+    host_supported: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    export_include_dirs: ["."],
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.virt",
+    ],
+}

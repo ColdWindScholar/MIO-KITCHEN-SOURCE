@@ -1,0 +1,240 @@
+//
+// Copyright (C) 2017 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: [
+        "Android-Apache-2.0",
+        "system_core_fs_mgr_license",
+    ],
+}
+
+// Added automatically by a large-scale-change that took the approach of
+// 'apply every license found to every target'. While this makes sure we respect
+// every license restriction, it may not be entirely correct.
+//
+// e.g. GPL in an MIT project might only apply to the contrib/ directory.
+//
+// Please consider splitting the single license below into multiple licenses,
+// taking care not to lose any license_kind information, and overriding the
+// default license using the 'licenses: [...]' property on targets as needed.
+//
+// For unused files, consider creating a 'fileGroup' with "//visibility:private"
+// to attach the license to, and including a comment whether the files may be
+// used in the current project.
+// See: http://go/android-license-faq
+license {
+    name: "system_core_fs_mgr_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-MIT",
+    ],
+    license_text: ["NOTICE"],
+}
+
+cc_defaults {
+    name: "fs_mgr_defaults",
+    sanitize: {
+        misc_undefined: ["integer"],
+    },
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+}
+
+cc_defaults {
+    name: "libfs_mgr_defaults",
+    defaults: ["fs_mgr_defaults"],
+    export_include_dirs: ["include"],
+    local_include_dirs: ["include/"],
+    cflags: [
+        "-D_FILE_OFFSET_BITS=64",
+    ],
+    srcs: [
+        "blockdev.cpp",
+        "file_wait.cpp",
+        "fs_mgr.cpp",
+        "fs_mgr_format.cpp",
+        "fs_mgr_dm_linear.cpp",
+        "fs_mgr_roots.cpp",
+        "fs_mgr_overlayfs_control.cpp",
+        "fs_mgr_overlayfs_mount.cpp",
+        "fs_mgr_vendor_overlay.cpp",
+        ":libfiemap_srcs",
+    ],
+    shared_libs: [
+        "libbase",
+        "libcrypto",
+        "libcrypto_utils",
+        "libcutils",
+        "libext4_utils",
+        "libfec",
+        "liblog",
+        "liblp",
+        "libselinux",
+    ],
+    static_libs: [
+        "libavb",
+        "libfs_avb",
+        "libgsi",
+    ],
+    export_static_lib_headers: [
+        "libfs_avb",
+        "libfstab",
+        "libdm",
+    ],
+    export_shared_lib_headers: [
+        "liblp",
+    ],
+    whole_static_libs: [
+        "liblogwrap",
+        "libdm",
+        "libext2_uuid",
+        "libfscrypt",
+        "libfstab",
+    ],
+    cppflags: [
+        "-DALLOW_ADBD_DISABLE_VERITY=0",
+    ],
+    product_variables: {
+        debuggable: {
+            cppflags: [
+                "-UALLOW_ADBD_DISABLE_VERITY",
+                "-DALLOW_ADBD_DISABLE_VERITY=1",
+            ],
+        },
+    },
+    header_libs: [
+        "libfiemap_headers",
+        "libstorage_literals_headers",
+    ],
+    export_header_lib_headers: [
+        "libfiemap_headers",
+    ],
+    target: {
+        platform: {
+            required: [
+                "e2freefrag",
+                "e2fsdroid",
+            ],
+        },
+        recovery: {
+            required: [
+                "e2fsdroid.recovery",
+            ],
+        },
+    },
+}
+
+// Two variants of libfs_mgr are provided: libfs_mgr and libfs_mgr_binder.
+// Use libfs_mgr in recovery, first-stage-init, or when libfiemap or overlayfs
+// is not used.
+//
+// Use libfs_mgr_binder when not in recovery/first-stage init, or when overlayfs
+// or libfiemap is needed. In this case, libfiemap will proxy over binder to
+// gsid.
+cc_library {
+    // Do not ever allow this library to be vendor_available as a shared library.
+    // It does not have a stable interface.
+    name: "libfs_mgr",
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+    defaults: [
+        "libfs_mgr_defaults",
+    ],
+    srcs: [
+        ":libfiemap_passthrough_srcs",
+    ],
+}
+
+cc_library {
+    // Do not ever allow this library to be vendor_available as a shared library.
+    // It does not have a stable interface.
+    name: "libfs_mgr_binder",
+    defaults: [
+        "libfs_mgr_defaults",
+        "libfiemap_binder_defaults",
+    ],
+}
+
+cc_library_static {
+    name: "libfs_mgr_file_wait",
+    defaults: ["fs_mgr_defaults"],
+    export_include_dirs: ["include"],
+    cflags: [
+        "-D_FILE_OFFSET_BITS=64",
+    ],
+    srcs: [
+        "file_wait.cpp",
+    ],
+    shared_libs: [
+        "libbase",
+    ],
+    host_supported: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+}
+
+cc_binary {
+    name: "remount",
+    defaults: ["fs_mgr_defaults"],
+    static_libs: [
+        "libavb_user",
+        "libgsid",
+        "libvold_binder",
+    ],
+    shared_libs: [
+        "libbootloader_message",
+        "libbase",
+        "libbinder",
+        "libcutils",
+        "libcrypto",
+        "libext4_utils",
+        "libfs_mgr_binder",
+        "liblog",
+        "liblp",
+        "libselinux",
+        "libutils",
+    ],
+    header_libs: [
+        "libcutils_headers",
+    ],
+    srcs: [
+        "fs_mgr_remount.cpp",
+    ],
+    cppflags: [
+        "-DALLOW_ADBD_DISABLE_VERITY=0",
+    ],
+    product_variables: {
+        debuggable: {
+            cppflags: [
+                "-UALLOW_ADBD_DISABLE_VERITY",
+                "-DALLOW_ADBD_DISABLE_VERITY=1",
+            ],
+            init_rc: [
+                "clean_scratch_files.rc",
+            ],
+        },
+    },
+    symlinks: [
+        "clean_scratch_files",
+        "disable-verity",
+        "enable-verity",
+        "set-verity-state",
+    ],
+}

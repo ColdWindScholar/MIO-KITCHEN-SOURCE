@@ -1,0 +1,673 @@
+//
+// Copyright (C) 2017 The Android Open Source Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+package {
+    default_applicable_licenses: ["system_core_init_license"],
+}
+
+// Added automatically by a large-scale-change
+// See: http://go/android-license-faq
+license {
+    name: "system_core_init_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-Apache-2.0",
+    ],
+    license_text: [
+        "NOTICE",
+    ],
+}
+
+init_common_sources = [
+    "action.cpp",
+    "action_manager.cpp",
+    "action_parser.cpp",
+    "capabilities.cpp",
+    "epoll.cpp",
+    "import_parser.cpp",
+    "interface_utils.cpp",
+    "interprocess_fifo.cpp",
+    "keychords.cpp",
+    "parser.cpp",
+    "property_type.cpp",
+    "rlimit_parser.cpp",
+    "service.cpp",
+    "service_list.cpp",
+    "service_parser.cpp",
+    "service_utils.cpp",
+    "subcontext.cpp",
+    "subcontext.proto",
+    "tokenizer.cpp",
+    "util.cpp",
+]
+init_device_sources = [
+    "apex_init_util.cpp",
+    "block_dev_initializer.cpp",
+    "bootchart.cpp",
+    "builtins.cpp",
+    "devices.cpp",
+    "firmware_handler.cpp",
+    "first_stage_console.cpp",
+    "first_stage_init.cpp",
+    "first_stage_mount.cpp",
+    "fscrypt_init_extensions.cpp",
+    "init.cpp",
+    "lmkd_service.cpp",
+    "modalias_handler.cpp",
+    "mount_handler.cpp",
+    "mount_namespace.cpp",
+    "persistent_properties.cpp",
+    "persistent_properties.proto",
+    "property_service.cpp",
+    "property_service.proto",
+    "reboot.cpp",
+    "reboot_utils.cpp",
+    "security.cpp",
+    "selabel.cpp",
+    "selinux.cpp",
+    "sigchld_handler.cpp",
+    "snapuserd_transition.cpp",
+    "switch_root.cpp",
+    "uevent_listener.cpp",
+    "ueventd.cpp",
+    "ueventd_parser.cpp",
+]
+init_host_sources = [
+    "check_builtins.cpp",
+    "host_import_parser.cpp",
+]
+
+soong_config_module_type {
+    name: "libinit_cc_defaults",
+    module_type: "cc_defaults",
+    config_namespace: "ANDROID",
+    bool_variables: [
+        "PRODUCT_INSTALL_DEBUG_POLICY_TO_SYSTEM_EXT",
+        "release_write_appcompat_override_system_properties",
+    ],
+    properties: [
+        "cflags",
+    ],
+}
+
+libinit_cc_defaults {
+    name: "init_defaults",
+    sanitize: {
+        misc_undefined: ["signed-integer-overflow"],
+    },
+    cflags: [
+        "-DALLOW_FIRST_STAGE_CONSOLE=0",
+        "-DALLOW_LOCAL_PROP_OVERRIDE=0",
+        "-DALLOW_PERMISSIVE_SELINUX=0",
+        "-DANDROID_BASE_UNIQUE_FD_DISABLE_IMPLICIT_CONVERSION",
+        "-DDUMP_ON_UMOUNT_FAILURE=0",
+        "-DINIT_FULL_SOURCES",
+        "-DINSTALL_DEBUG_POLICY_TO_SYSTEM_EXT=0",
+        "-DLOG_UEVENTS=0",
+        "-DREBOOT_BOOTLOADER_ON_PANIC=0",
+        "-DSHUTDOWN_ZERO_TIMEOUT=0",
+        "-DWORLD_WRITABLE_KMSG=0",
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wthread-safety",
+    ],
+    product_variables: {
+        debuggable: {
+            cppflags: [
+                "-UALLOW_FIRST_STAGE_CONSOLE",
+                "-DALLOW_FIRST_STAGE_CONSOLE=1",
+                "-UALLOW_LOCAL_PROP_OVERRIDE",
+                "-DALLOW_LOCAL_PROP_OVERRIDE=1",
+                "-UALLOW_PERMISSIVE_SELINUX",
+                "-DALLOW_PERMISSIVE_SELINUX=1",
+                "-UREBOOT_BOOTLOADER_ON_PANIC",
+                "-DREBOOT_BOOTLOADER_ON_PANIC=1",
+                "-UWORLD_WRITABLE_KMSG",
+                "-DWORLD_WRITABLE_KMSG=1",
+                "-UDUMP_ON_UMOUNT_FAILURE",
+                "-DDUMP_ON_UMOUNT_FAILURE=1",
+            ],
+        },
+        eng: {
+            cppflags: [
+                "-USHUTDOWN_ZERO_TIMEOUT",
+                "-DSHUTDOWN_ZERO_TIMEOUT=1",
+            ],
+        },
+        uml: {
+            cppflags: ["-DUSER_MODE_LINUX"],
+        },
+    },
+    soong_config_variables: {
+        PRODUCT_INSTALL_DEBUG_POLICY_TO_SYSTEM_EXT: {
+            cflags: [
+                "-UINSTALL_DEBUG_POLICY_TO_SYSTEM_EXT",
+                "-DINSTALL_DEBUG_POLICY_TO_SYSTEM_EXT=1",
+            ],
+        },
+        release_write_appcompat_override_system_properties: {
+            cflags: ["-DWRITE_APPCOMPAT_OVERRIDE_SYSTEM_PROPERTIES"],
+        },
+    },
+    static_libs: [
+        "libavb",
+        "libavf_cc_flags",
+        "libbootloader_message",
+        "libcgrouprc_format",
+        "liblmkd_utils",
+        "liblz4",
+        "libzstd",
+        "libmodprobe",
+        "libprocinfo",
+        "libprotobuf-cpp-lite",
+        "libpropertyinfoserializer",
+        "libpropertyinfoparser",
+        "libsnapshot_cow",
+        "libsnapshot_init",
+        "libxml2",
+        "lib_apex_manifest_proto_lite",
+        "update_metadata-protos",
+    ],
+    shared_libs: [
+        "libbase",
+        "libcutils",
+        "libdl",
+        "libext4_utils",
+        "libfs_mgr",
+        "libgsi",
+        "libhidl-gen-utils",
+        "liblog",
+        "liblogwrap",
+        "liblp",
+        "libprocessgroup",
+        "libprocessgroup_setup",
+        "libselinux",
+        "libunwindstack",
+        "libutils",
+        "libvendorsupport",
+    ],
+    header_libs: ["bionic_libc_platform_headers"],
+    bootstrap: true,
+    visibility: [":__subpackages__"],
+}
+
+cc_library_headers {
+    name: "libinit_headers",
+    export_include_dirs: ["."],
+    visibility: [":__subpackages__"],
+}
+
+cc_defaults {
+    name: "libinit_defaults",
+    recovery_available: true,
+    defaults: [
+        "init_defaults",
+        "selinux_policy_version",
+    ],
+    srcs: init_common_sources + init_device_sources,
+    export_include_dirs: ["."],
+    generated_sources: [
+        "apex-info-list",
+    ],
+    whole_static_libs: [
+        "libcap",
+        "libcom.android.sysprop.init",
+    ],
+    header_libs: ["bootimg_headers"],
+    proto: {
+        type: "lite",
+        export_proto_headers: true,
+    },
+
+    target: {
+        recovery: {
+            cflags: ["-DRECOVERY"],
+            exclude_static_libs: [
+                "libxml2",
+            ],
+            exclude_generated_sources: [
+                "apex-info-list",
+            ],
+            exclude_shared_libs: [
+                "libbinder",
+                "libutils",
+            ],
+        },
+    },
+}
+
+cc_library_static {
+    name: "libinit",
+    defaults: ["libinit_defaults"],
+}
+
+cc_library_static {
+    name: "libinit.microdroid",
+    defaults: [
+        "avf_build_flags_cc",
+        "libinit_defaults",
+    ],
+    recovery_available: false,
+    cflags: ["-DMICRODROID=1"],
+}
+
+phony {
+    name: "init",
+    required: [
+        "init_second_stage",
+    ],
+}
+
+cc_defaults {
+    name: "init_second_stage_defaults",
+    recovery_available: true,
+    stem: "init",
+    defaults: ["init_defaults"],
+    srcs: ["main.cpp"],
+    symlinks: ["ueventd"],
+}
+
+cc_binary {
+    name: "init_second_stage",
+    defaults: ["init_second_stage_defaults"],
+    static_libs: ["libinit"],
+    visibility: ["//visibility:any_system_partition"],
+    target: {
+        platform: {
+            required: [
+                "init.rc",
+                "ueventd.rc",
+                "e2fsdroid",
+                "extra_free_kbytes",
+                "make_f2fs",
+                "mke2fs",
+                "sload_f2fs",
+            ],
+        },
+        recovery: {
+            cflags: ["-DRECOVERY"],
+            exclude_static_libs: [
+                "libxml2",
+            ],
+            exclude_shared_libs: [
+                "libbinder",
+                "libutils",
+            ],
+            required: [
+                "init_recovery.rc",
+                "ueventd.rc.recovery",
+                "e2fsdroid.recovery",
+                "make_f2fs.recovery",
+                "mke2fs.recovery",
+                "sload_f2fs.recovery",
+            ],
+        },
+    },
+}
+
+cc_binary {
+    name: "init_second_stage.microdroid",
+    defaults: [
+        "avf_build_flags_cc",
+        "init_second_stage_defaults",
+    ],
+    recovery_available: false,
+    static_libs: ["libinit.microdroid"],
+    cflags: ["-DMICRODROID=1"],
+    no_full_install: true,
+    visibility: ["//packages/modules/Virtualization/build/microdroid"],
+}
+
+soong_config_module_type {
+    name: "init_first_stage_cc_defaults",
+    module_type: "cc_defaults",
+    config_namespace: "ANDROID",
+    bool_variables: ["BOARD_USES_RECOVERY_AS_BOOT"],
+    properties: ["no_full_install"],
+}
+
+// Do not install init_first_stage even with mma if we're system-as-root.
+// Otherwise, it will overwrite the symlink.
+init_first_stage_cc_defaults {
+    name: "init_first_stage_defaults",
+    soong_config_variables: {
+        BOARD_USES_RECOVERY_AS_BOOT: {
+            no_full_install: true,
+        },
+    },
+
+    stem: "init",
+
+    srcs: [
+        "block_dev_initializer.cpp",
+        "devices.cpp",
+        "first_stage_console.cpp",
+        "first_stage_init.cpp",
+        "first_stage_main.cpp",
+        "first_stage_mount.cpp",
+        "reboot_utils.cpp",
+        "selabel.cpp",
+        "service_utils.cpp",
+        "snapuserd_transition.cpp",
+        "switch_root.cpp",
+        "uevent_listener.cpp",
+        "util.cpp",
+    ],
+
+    static_libs: [
+        "libfs_avb",
+        "libavf_cc_flags",
+        "libfs_mgr",
+        "libfec",
+        "libfec_rs",
+        "libsquashfs_utils",
+        "libcrypto_utils",
+        "libavb",
+        "liblp",
+        "libcutils",
+        "libbase",
+        "liblog",
+        "libcrypto_static",
+        "libselinux",
+        "libcap",
+        "libgsi",
+        "liblzma",
+        "libunwindstack_no_dex",
+        "libmodprobe",
+        "libext2_uuid",
+        "libprotobuf-cpp-lite",
+        "libsnapshot_cow",
+        "liblz4",
+        "libzstd",
+        "libsnapshot_init",
+        "update_metadata-protos",
+        "libprocinfo",
+    ],
+
+    static_executable: true,
+    system_shared_libs: [],
+
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Werror",
+        "-DALLOW_FIRST_STAGE_CONSOLE=0",
+        "-DALLOW_LOCAL_PROP_OVERRIDE=0",
+        "-DALLOW_PERMISSIVE_SELINUX=0",
+        "-DREBOOT_BOOTLOADER_ON_PANIC=0",
+        "-DWORLD_WRITABLE_KMSG=0",
+        "-DDUMP_ON_UMOUNT_FAILURE=0",
+        "-DSHUTDOWN_ZERO_TIMEOUT=0",
+        "-DLOG_UEVENTS=0",
+        "-DSEPOLICY_VERSION=30", // TODO(jiyong): externalize the version number
+    ],
+
+    product_variables: {
+        debuggable: {
+            cflags: [
+                "-UALLOW_FIRST_STAGE_CONSOLE",
+                "-DALLOW_FIRST_STAGE_CONSOLE=1",
+
+                "-UALLOW_LOCAL_PROP_OVERRIDE",
+                "-DALLOW_LOCAL_PROP_OVERRIDE=1",
+
+                "-UALLOW_PERMISSIVE_SELINUX",
+                "-DALLOW_PERMISSIVE_SELINUX=1",
+
+                "-UREBOOT_BOOTLOADER_ON_PANIC",
+                "-DREBOOT_BOOTLOADER_ON_PANIC=1",
+
+                "-UWORLD_WRITABLE_KMSG",
+                "-DWORLD_WRITABLE_KMSG=1",
+
+                "-UDUMP_ON_UMOUNT_FAILURE",
+                "-DDUMP_ON_UMOUNT_FAILURE=1",
+            ],
+        },
+
+        eng: {
+            cflags: [
+                "-USHUTDOWN_ZERO_TIMEOUT",
+                "-DSHUTDOWN_ZERO_TIMEOUT=1",
+            ],
+        },
+    },
+
+    sanitize: {
+        misc_undefined: ["signed-integer-overflow"],
+
+        // First stage init is weird: it may start without stdout/stderr, and no /proc.
+        hwaddress: false,
+        memtag_stack: false,
+    },
+
+    // Install adb_debug.prop into debug ramdisk.
+    // This allows adb root on a user build, when debug ramdisk is used.
+    required: ["adb_debug.prop"],
+
+    ramdisk: true,
+
+    install_in_root: true,
+}
+
+cc_binary {
+    name: "init_first_stage",
+    defaults: ["init_first_stage_defaults"],
+}
+
+cc_binary {
+    name: "init_first_stage.microdroid",
+    defaults: [
+        "avf_build_flags_cc",
+        "init_first_stage_defaults",
+    ],
+    cflags: ["-DMICRODROID=1"],
+    no_full_install: true,
+}
+
+phony {
+    name: "init_system",
+    required: ["init_second_stage"],
+}
+
+// Tests
+// ------------------------------------------------------------------------------
+
+cc_test {
+    // Note: This is NOT a CTS test. See b/320800872
+    name: "CtsInitTestCases",
+    defaults: ["init_defaults"],
+    require_root: true,
+
+    compile_multilib: "first",
+
+    srcs: [
+        "devices_test.cpp",
+        "epoll_test.cpp",
+        "firmware_handler_test.cpp",
+        "init_test.cpp",
+        "interprocess_fifo_test.cpp",
+        "keychords_test.cpp",
+        "oneshot_on_test.cpp",
+        "persistent_properties_test.cpp",
+        "property_service_test.cpp",
+        "property_type_test.cpp",
+        "reboot_test.cpp",
+        "rlimit_parser_test.cpp",
+        "service_test.cpp",
+        "subcontext_test.cpp",
+        "tokenizer_test.cpp",
+        "ueventd_parser_test.cpp",
+        "ueventd_test.cpp",
+        "util_test.cpp",
+    ],
+    static_libs: [
+        "libgmock",
+        "libinit",
+    ],
+
+    test_suites: [
+        "device-tests",
+    ],
+}
+
+cc_benchmark {
+    name: "init_benchmarks",
+    defaults: ["init_defaults"],
+    srcs: [
+        "subcontext_benchmark.cpp",
+    ],
+    static_libs: ["libinit"],
+}
+
+cc_defaults {
+    name: "libinit_test_utils_libraries_defaults",
+    shared_libs: [
+        "libbase",
+        "libcutils",
+        "libselinux",
+        "liblog",
+        "libprocessgroup",
+        "libprotobuf-cpp-lite",
+    ],
+    static_libs: [
+        "libfs_mgr",
+        "libhidl-gen-utils",
+    ],
+}
+
+cc_library_static {
+    name: "libinit_test_utils",
+    defaults: ["libinit_test_utils_libraries_defaults"],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Werror",
+    ],
+    srcs: init_common_sources + [
+        "test_utils/service_utils.cpp",
+    ],
+    whole_static_libs: [
+        "libcap",
+    ],
+    export_include_dirs: ["test_utils/include"], // for tests
+    header_libs: ["bionic_libc_platform_headers"],
+    product_variables: {
+        shipping_api_level: {
+            cflags: ["-DBUILD_SHIPPING_API_LEVEL=%s"],
+        },
+    },
+}
+
+// Host Verifier
+// ------------------------------------------------------------------------------
+
+genrule {
+    name: "generated_stub_builtin_function_map",
+    tool_files: ["host_builtin_map.py"],
+    out: ["generated_stub_builtin_function_map.h"],
+    srcs: [
+        "builtins.cpp",
+        "check_builtins.cpp",
+    ],
+    cmd: "$(location host_builtin_map.py) --builtins $(location builtins.cpp) --check_builtins $(location check_builtins.cpp) > $(out)",
+}
+
+cc_defaults {
+    name: "init_host_defaults",
+    host_supported: true,
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Werror",
+    ],
+    static_libs: [
+        "libbase",
+        "libselinux",
+        "libpropertyinfoserializer",
+        "libpropertyinfoparser",
+    ],
+    whole_static_libs: ["libcap"],
+    shared_libs: [
+        "libcutils",
+        "libhidl-gen-utils",
+        "libhidlmetadata",
+        "liblog",
+        "libprocessgroup",
+        "libprotobuf-cpp-lite",
+    ],
+    proto: {
+        type: "lite",
+    },
+    generated_headers: [
+        "generated_stub_builtin_function_map",
+    ],
+    target: {
+        android: {
+            enabled: false,
+        },
+        darwin: {
+            enabled: false,
+        },
+    },
+    product_variables: {
+        shipping_api_level: {
+            cflags: ["-DBUILD_SHIPPING_API_LEVEL=%s"],
+        },
+    },
+}
+
+cc_binary {
+    name: "host_init_verifier",
+    defaults: ["init_host_defaults"],
+    srcs: ["host_init_verifier.cpp"] + init_common_sources + init_host_sources,
+    generated_headers: [
+        "generated_android_ids",
+    ],
+}
+
+cc_library_host_static {
+    name: "libinit_host",
+    defaults: ["init_host_defaults"],
+    srcs: init_common_sources + init_host_sources,
+    export_include_dirs: ["."],
+    proto: {
+        export_proto_headers: true,
+    },
+    visibility: [
+        // host_apex_verifier performs a subset of init.rc validation
+        "//system/apex/tools",
+    ],
+}
+
+sh_binary {
+    name: "extra_free_kbytes",
+    src: "extra_free_kbytes.sh",
+    filename_from_src: true,
+}
+
+phony {
+    name: "init_vendor",
+    required: select(soong_config_variable("ANDROID", "BOARD_USES_RECOVERY_AS_BOOT"), {
+        true: [],
+        default: ["init_first_stage"],
+    }),
+}

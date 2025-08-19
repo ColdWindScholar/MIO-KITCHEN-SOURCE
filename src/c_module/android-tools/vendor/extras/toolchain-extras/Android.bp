@@ -1,0 +1,175 @@
+package {
+    default_team: "trendy_team_android_testing_experiences",
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_defaults {
+    name: "libprofile-defaults",
+    srcs: [
+        "profile-extras.cpp",
+        "profile-globals.c",
+    ],
+    native_coverage: false,
+}
+
+cc_library_static {
+    name: "libprofile-extras",
+    defaults: ["libprofile-defaults"],
+
+    native_bridge_supported: true,
+    vendor_available: true,
+    product_available: true,
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+
+    stl: "none",
+    system_shared_libs: [],
+    header_libs: ["libc_headers"],
+}
+
+cc_library_static {
+    name: "libprofile-extras_ndk",
+    defaults: ["libprofile-defaults"],
+    native_bridge_supported: true,
+    vendor_available: true,
+    product_available: true,
+
+    sdk_version: "minimum",
+}
+
+cc_defaults {
+    name: "libprofile-clang-defaults",
+    srcs: [
+        "profile-clang-extras.cpp",
+        "profile-clang-openat.cpp",
+    ],
+    native_coverage: false,
+    sanitize: {
+        blocklist: "libprofile_clang_extras_blocklist.txt",
+    },
+    native_bridge_supported: true,
+    vendor_available: true,
+    product_available: true,
+}
+
+cc_defaults {
+    name: "libprofile-clang-platform-defaults",
+    defaults: ["libprofile-clang-defaults"],
+
+    ramdisk_available: true,
+    vendor_ramdisk_available: true,
+    recovery_available: true,
+
+    stl: "none",
+    system_shared_libs: [],
+    header_libs: ["libc_headers"],
+}
+
+// -----------------------------------------------------------------------------
+// libprofile-clang libraries for regular coverage. They also install a signal
+// handler that writes coverage data to disk.
+// -----------------------------------------------------------------------------
+
+cc_library_static {
+    name: "libprofile-clang-extras",
+    defaults: ["libprofile-clang-platform-defaults"],
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+}
+
+cc_library_static {
+    name: "libprofile-clang-extras_ndk",
+    defaults: ["libprofile-clang-defaults"],
+
+    sdk_version: "minimum",
+}
+
+cc_library_static {
+    name: "libprofile-clang-extras_cfi_support",
+    defaults: ["libprofile-clang-platform-defaults"],
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    sanitize: {
+        cfi: true,
+        config: {
+            cfi_assembly_support: true,
+        },
+    },
+}
+
+// -----------------------------------------------------------------------------
+// libprofile-clang libraries for continuous coverage. They install a no-op
+// signal handler.
+// -----------------------------------------------------------------------------
+
+cc_defaults {
+    name: "profile-extras-continuous-mode",
+    cflags: ["-D__CONTINUOUS_COVERAGE_MODE__"],
+}
+
+cc_library_static {
+    name: "libprofile-clang-extras_continuous",
+    defaults: [
+        "libprofile-clang-platform-defaults",
+        "profile-extras-continuous-mode",
+    ],
+}
+
+cc_library_static {
+    name: "libprofile-clang-extras_ndk_continuous",
+    defaults: [
+        "libprofile-clang-platform-defaults",
+        "profile-extras-continuous-mode",
+    ],
+
+    sdk_version: "minimum",
+}
+
+cc_library_static {
+    name: "libprofile-clang-extras_cfi_support_continuous",
+    defaults: [
+        "libprofile-clang-platform-defaults",
+        "profile-extras-continuous-mode",
+    ],
+
+    sanitize: {
+        cfi: true,
+        config: {
+            cfi_assembly_support: true,
+        },
+    },
+}
+
+// -----------------------------------------------------------------------------
+// tests
+// -----------------------------------------------------------------------------
+cc_test {
+    name: "libprofile-extras-test",
+    srcs: [
+        "profile-extras-test.cpp",
+    ],
+    static_libs: [
+        "libprofile-extras",
+    ],
+    ldflags: ["-uinit_profile_extras"],
+    native_coverage: false,
+}
+
+cc_test {
+    name: "libprofile-clang-extras-test",
+    srcs: [
+        "profile-clang-extras-test.cpp",
+    ],
+    whole_static_libs: [
+        "libprofile-clang-extras",
+    ],
+    ldflags: [
+        "-Wl,--wrap,open",
+    ],
+    native_coverage: false,
+}

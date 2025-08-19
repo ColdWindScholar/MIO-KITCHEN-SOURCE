@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package com.android.logcat.proto;
+option java_multiple_files = true;
+option optimize_for = LITE_RUNTIME;
+
+enum LogcatPriorityProto {
+  UNKNOWN = 0;
+  DEFAULT = 1;
+  VERBOSE = 2;
+  DEBUG = 3;
+  INFO = 4;
+  WARN = 5;
+  ERROR = 6;
+  FATAL = 8;
+  SILENT = 9;
+}
+
+message LogcatEntryProto {
+  uint64 time_sec = 1;
+  uint64 time_nsec = 2;
+  LogcatPriorityProto priority = 3;
+  uint64 uid = 4;
+  uint64 pid = 5;
+  uint64 tid = 6;
+  bytes tag = 7;
+  bytes message = 8;
+  optional string process_name = 9;
+}

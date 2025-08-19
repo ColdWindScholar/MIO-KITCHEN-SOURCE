@@ -1,0 +1,16 @@
+# A few paths from frameworks/native.
+
+"/data/app/com.example/dir/dir/file"
+"/data/user/0/com.example/secondary.dex"
+"/dev/socket/pdx"
+"/proc/net/xt_qtaguid/iface_stat_all"
+"/sys/devices/system/cpu/cpufreq"
+"/vendor/bin/hw/android.hardware.media.omx@1.0-service"
+
+# A few paths from system/core/init/selinux.cpp.
+
+"/dev"
+"/dev/kmsg"
+"/apex"
+"/linkerconfig"
+"/metadata/gsi"

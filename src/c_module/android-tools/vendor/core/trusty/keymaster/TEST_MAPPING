@@ -1,0 +1,24 @@
+{
+  "presubmit": [
+      {
+        "name": "VtsAidlKeyMintTargetTest"
+      },
+      {
+        "name": "VtsHalRemotelyProvisionedComponentTargetTest"
+      },
+      {
+        "name": "RkpdAppUnitTests"
+      },
+      {
+        "name": "RkpdAppGoogleUnitTests",
+        "keywords": ["internal"]
+      },
+      {
+        "name": "RkpdAppIntegrationTests"
+      },
+      {
+        "name": "RkpdAppGoogleIntegrationTests",
+        "keywords": ["internal"]
+      }
+  ]
+}

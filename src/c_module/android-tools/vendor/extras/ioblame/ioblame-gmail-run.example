@@ -1,0 +1,1593 @@
+adbd is already running as root
+Found aosp_gobo Device
+OK to kill sleep when test is done
+signal INT received, killing streaming trace capture
+
+READS :
+_______
+
+FILE VIEW:
+File: /
+            ogle.android.gm Reads: 4 KB
+            Total Reads: 4 KB i_size: 163840 KB
+File: /app/Chrome/Chrome.apk
+            Chrome_ChildIOT Reads: 96 KB
+            Chrome_DBThread Reads: 652 KB
+            Chrome_FileUser Reads: 72 KB
+            Chrome_InProcGp Reads: 732 KB
+            Chrome_IOThread Reads: 1396 KB
+            Compositor Reads: 652 KB
+            CookieMonsterBa Reads: 284 KB
+            CrRendererMain Reads: 17012 KB
+            dboxed_process0 Reads: 512 KB
+            JavaBridge Reads: 128 KB
+            ogle.android.gm Reads: 14996 KB
+            WorkerPool/8556 Reads: 408 KB
+            Total Reads: 36940 KB i_size: 71354 KB
+File: /app/Gmail2Light/Gmail2Light.apk
+            AsyncTask_#2 Reads: 24 KB
+            Chrome_IOThread Reads: 68 KB
+            ogle.android.gm Reads: 1440 KB
+            Thread-6 Reads: 8 KB
+            Total Reads: 1540 KB i_size: 9736 KB
+File: /bin/toybox
+            cat Reads: 304 KB
+            sh Reads: 16 KB
+            Total Reads: 320 KB i_size: 319 KB
+File: /data/com.google.android.gm/app_webview/GPUCache/index
+            Chrome_CacheThr Reads: 4 KB
+            Total Reads: 4 KB i_size: 24 bytes
+File: /data/com.google.android.gm/app_webview/metrics_guid
+            Chrome_FileThre Reads: 4 KB
+            Total Reads: 4 KB i_size: 36 bytes
+File: /data/com.google.android.gm/files/deviceName
+            AsyncTask_#3 Reads: 4 KB
+            Total Reads: 4 KB i_size: 17 bytes
+File: /data/com.google.android.gm/files/gaClientId
+            GAThread Reads: 4 KB
+            Total Reads: 4 KB i_size: 36 bytes
+File: /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 2 KB
+File: /data/com.google.android.gm/shared_prefs/AndroidMail.Main.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 206 bytes
+File: /data/com.google.android.gm/shared_prefs/c9edm_account-1303398453.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 254 bytes
+File: /data/com.google.android.gm/shared_prefs/c9edm_account-2137146394.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 167 bytes
+File: /data/com.google.android.gm/shared_prefs/Folder-android.smoke.fast@gmail.com-^sq_ig_i_personal.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 402 bytes
+File: /data/com.google.android.gm/shared_prefs/G6yPrefs.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 191 bytes
+File: /data/com.google.android.gm/shared_prefs/Gmail.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 1 KB
+File: /data/com.google.android.gm/shared_prefs/_has_set_default_values.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 130 bytes
+File: /data/com.google.android.gm/shared_prefs/Impressions-android.smoke.fast@gmail.com.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 65 bytes
+File: /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 65 bytes
+File: /data/com.google.android.gm/shared_prefs/UnifiedEmail.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 935 bytes
+File: /data/com.google.android.gm/shared_prefs/WebViewChromiumPrefs.xml
+            SharedPreferenc Reads: 4 KB
+            Total Reads: 4 KB i_size: 127 bytes
+File: /data/com.google.android.gsf/files/signatures/sig-281206196
+            Binder1550_5 Reads: 4 KB
+            Total Reads: 4 KB i_size: 1 KB
+File: /etc/fonts.xml
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 22 KB
+File: /etc/hosts
+            netd Reads: 4 KB
+            Total Reads: 4 KB i_size: 56 bytes
+File: /etc/security/cacerts/7999be0d.0
+            NetworkCursor_F Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/CarroisGothicSC-Regular.ttf
+            CrRendererMain Reads: 40 KB
+            Total Reads: 40 KB i_size: 39 KB
+File: /fonts/ComingSoon.ttf
+            CrRendererMain Reads: 60 KB
+            Total Reads: 60 KB i_size: 57 KB
+File: /fonts/CutiveMono.ttf
+            CrRendererMain Reads: 68 KB
+            Total Reads: 68 KB i_size: 67 KB
+File: /fonts/DancingScript-Bold.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 112 KB
+File: /fonts/DancingScript-Regular.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 113 KB
+File: /fonts/DroidSansMono.ttf
+            CrRendererMain Reads: 108 KB
+            Total Reads: 108 KB i_size: 105 KB
+File: /fonts/NotoColorEmoji.ttf
+            CrRendererMain Reads: 204 KB
+            Total Reads: 204 KB i_size: 7108 KB
+File: /fonts/NotoNaskhArabic-Bold.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 113 KB
+File: /fonts/NotoNaskhArabic-Regular.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 113 KB
+File: /fonts/NotoNaskhArabicUI-Bold.ttf
+            CrRendererMain Reads: 120 KB
+            Total Reads: 120 KB i_size: 116 KB
+File: /fonts/NotoNaskhArabicUI-Regular.ttf
+            CrRendererMain Reads: 120 KB
+            Total Reads: 120 KB i_size: 117 KB
+File: /fonts/NotoSansAdlam-Regular.ttf
+            CrRendererMain Reads: 52 KB
+            Total Reads: 52 KB i_size: 49 KB
+File: /fonts/NotoSansArmenian-Bold.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 15 KB
+File: /fonts/NotoSansArmenian-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 15 KB
+File: /fonts/NotoSansAvestan-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 11 KB
+File: /fonts/NotoSansBalinese-Regular.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 31 KB
+File: /fonts/NotoSansBamum-Regular.ttf
+            CrRendererMain Reads: 132 KB
+            Total Reads: 132 KB i_size: 130 KB
+File: /fonts/NotoSansBatak-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 12 KB
+File: /fonts/NotoSansBengali-Bold.ttf
+            CrRendererMain Reads: 100 KB
+            Total Reads: 100 KB i_size: 96 KB
+File: /fonts/NotoSansBengali-Regular.ttf
+            CrRendererMain Reads: 100 KB
+            Total Reads: 100 KB i_size: 99 KB
+File: /fonts/NotoSansBengaliUI-Bold.ttf
+            CrRendererMain Reads: 104 KB
+            Total Reads: 104 KB i_size: 101 KB
+File: /fonts/NotoSansBengaliUI-Regular.ttf
+            CrRendererMain Reads: 108 KB
+            Total Reads: 108 KB i_size: 104 KB
+File: /fonts/NotoSansBrahmi-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 23 KB
+File: /fonts/NotoSansBuginese-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansBuhid-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansCanadianAboriginal-Regular.ttf
+            CrRendererMain Reads: 48 KB
+            Total Reads: 48 KB i_size: 45 KB
+File: /fonts/NotoSansCarian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /fonts/NotoSansCham-Bold.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 21 KB
+File: /fonts/NotoSansCham-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 21 KB
+File: /fonts/NotoSansCherokee-Regular.ttf
+            CrRendererMain Reads: 60 KB
+            Total Reads: 60 KB i_size: 56 KB
+File: /fonts/NotoSansCJK-Regular.ttc
+            CrRendererMain Reads: 2380 KB
+            Total Reads: 2380 KB i_size: 18236 KB
+File: /fonts/NotoSansCoptic-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 21 KB
+File: /fonts/NotoSansCuneiform-Regular.ttf
+            CrRendererMain Reads: 200 KB
+            Total Reads: 200 KB i_size: 488 KB
+File: /fonts/NotoSansCypriot-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansDeseret-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 10 KB
+File: /fonts/NotoSansDevanagari-Bold.ttf
+            CrRendererMain Reads: 128 KB
+            Total Reads: 128 KB i_size: 128 KB
+File: /fonts/NotoSansDevanagari-Regular.ttf
+            CrRendererMain Reads: 128 KB
+            Total Reads: 128 KB i_size: 132 KB
+File: /fonts/NotoSansDevanagariUI-Bold.ttf
+            CrRendererMain Reads: 120 KB
+            Total Reads: 120 KB i_size: 118 KB
+File: /fonts/NotoSansDevanagariUI-Regular.ttf
+            CrRendererMain Reads: 124 KB
+            Total Reads: 124 KB i_size: 122 KB
+File: /fonts/NotoSansEgyptianHieroglyphs-Regular.ttf
+            CrRendererMain Reads: 200 KB
+            Total Reads: 200 KB i_size: 493 KB
+File: /fonts/NotoSansEthiopic-Bold.ttf
+            CrRendererMain Reads: 128 KB
+            Total Reads: 128 KB i_size: 140 KB
+File: /fonts/NotoSansEthiopic-Regular.ttf
+            CrRendererMain Reads: 128 KB
+            Total Reads: 128 KB i_size: 139 KB
+File: /fonts/NotoSansGeorgian-Bold.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 19 KB
+File: /fonts/NotoSansGeorgian-Regular.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 19 KB
+File: /fonts/NotoSansGlagolitic-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 15 KB
+File: /fonts/NotoSansGothic-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansGujarati-Bold.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 114 KB
+File: /fonts/NotoSansGujarati-Regular.ttf
+            CrRendererMain Reads: 120 KB
+            Total Reads: 120 KB i_size: 117 KB
+File: /fonts/NotoSansGujaratiUI-Bold.ttf
+            CrRendererMain Reads: 112 KB
+            Total Reads: 112 KB i_size: 111 KB
+File: /fonts/NotoSansGujaratiUI-Regular.ttf
+            CrRendererMain Reads: 116 KB
+            Total Reads: 116 KB i_size: 114 KB
+File: /fonts/NotoSansGurmukhi-Bold.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 30 KB
+File: /fonts/NotoSansGurmukhi-Regular.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 31 KB
+File: /fonts/NotoSansGurmukhiUI-Bold.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 31 KB
+File: /fonts/NotoSansGurmukhiUI-Regular.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 31 KB
+File: /fonts/NotoSansHanunoo-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /fonts/NotoSansHebrew-Bold.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 17 KB
+File: /fonts/NotoSansHebrew-Regular.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 16 KB
+File: /fonts/NotoSansImperialAramaic-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansInscriptionalPahlavi-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansInscriptionalParthian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansJavanese-Regular.ttf
+            CrRendererMain Reads: 40 KB
+            Total Reads: 40 KB i_size: 36 KB
+File: /fonts/NotoSansKaithi-Regular.ttf
+            CrRendererMain Reads: 60 KB
+            Total Reads: 60 KB i_size: 58 KB
+File: /fonts/NotoSansKannada-Bold.ttf
+            CrRendererMain Reads: 80 KB
+            Total Reads: 80 KB i_size: 78 KB
+File: /fonts/NotoSansKannada-Regular.ttf
+            CrRendererMain Reads: 84 KB
+            Total Reads: 84 KB i_size: 80 KB
+File: /fonts/NotoSansKannadaUI-Bold.ttf
+            CrRendererMain Reads: 80 KB
+            Total Reads: 80 KB i_size: 77 KB
+File: /fonts/NotoSansKannadaUI-Regular.ttf
+            CrRendererMain Reads: 80 KB
+            Total Reads: 80 KB i_size: 79 KB
+File: /fonts/NotoSansKayahLi-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansKharoshthi-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 21 KB
+File: /fonts/NotoSansKhmerUI-Bold.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 35 KB
+File: /fonts/NotoSansKhmerUI-Regular.ttf
+            CrRendererMain Reads: 40 KB
+            Total Reads: 40 KB i_size: 37 KB
+File: /fonts/NotoSansKhmer-VF.ttf
+            CrRendererMain Reads: 128 KB
+            Total Reads: 128 KB i_size: 140 KB
+File: /fonts/NotoSansLao-Bold.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 28 KB
+File: /fonts/NotoSansLao-Regular.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 29 KB
+File: /fonts/NotoSansLaoUI-Bold.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 28 KB
+File: /fonts/NotoSansLaoUI-Regular.ttf
+            CrRendererMain Reads: 32 KB
+            Total Reads: 32 KB i_size: 29 KB
+File: /fonts/NotoSansLepcha-Regular.ttf
+            CrRendererMain Reads: 100 KB
+            Total Reads: 100 KB i_size: 99 KB
+File: /fonts/NotoSansLimbu-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 10 KB
+File: /fonts/NotoSansLinearB-Regular.ttf
+            CrRendererMain Reads: 60 KB
+            Total Reads: 60 KB i_size: 56 KB
+File: /fonts/NotoSansLisu-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansLycian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansLydian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansMalayalam-Bold.ttf
+            CrRendererMain Reads: 56 KB
+            Total Reads: 56 KB i_size: 55 KB
+File: /fonts/NotoSansMalayalam-Regular.ttf
+            CrRendererMain Reads: 56 KB
+            Total Reads: 56 KB i_size: 55 KB
+File: /fonts/NotoSansMalayalamUI-Bold.ttf
+            CrRendererMain Reads: 56 KB
+            Total Reads: 56 KB i_size: 55 KB
+File: /fonts/NotoSansMalayalamUI-Regular.ttf
+            CrRendererMain Reads: 56 KB
+            Total Reads: 56 KB i_size: 55 KB
+File: /fonts/NotoSansMandaic-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /fonts/NotoSansMeeteiMayek-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 13 KB
+File: /fonts/NotoSansMongolian-Regular.ttf
+            CrRendererMain Reads: 112 KB
+            Total Reads: 112 KB i_size: 110 KB
+File: /fonts/NotoSansMyanmar-Bold.ttf
+            CrRendererMain Reads: 108 KB
+            Total Reads: 108 KB i_size: 106 KB
+File: /fonts/NotoSansMyanmar-Regular.ttf
+            CrRendererMain Reads: 108 KB
+            Total Reads: 108 KB i_size: 105 KB
+File: /fonts/NotoSansMyanmarUI-Bold.ttf
+            CrRendererMain Reads: 104 KB
+            Total Reads: 104 KB i_size: 102 KB
+File: /fonts/NotoSansMyanmarUI-Regular.ttf
+            CrRendererMain Reads: 104 KB
+            Total Reads: 104 KB i_size: 100 KB
+File: /fonts/NotoSansNewTaiLue-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /fonts/NotoSansNKo-Regular.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 18 KB
+File: /fonts/NotoSansOgham-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansOlChiki-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansOldItalic-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansOldPersian-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 12 KB
+File: /fonts/NotoSansOldSouthArabian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /fonts/NotoSansOldTurkic-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansOriya-Bold.ttf
+            CrRendererMain Reads: 84 KB
+            Total Reads: 84 KB i_size: 82 KB
+File: /fonts/NotoSansOriya-Regular.ttf
+            CrRendererMain Reads: 84 KB
+            Total Reads: 84 KB i_size: 83 KB
+File: /fonts/NotoSansOriyaUI-Bold.ttf
+            CrRendererMain Reads: 80 KB
+            Total Reads: 80 KB i_size: 78 KB
+File: /fonts/NotoSansOriyaUI-Regular.ttf
+            CrRendererMain Reads: 80 KB
+            Total Reads: 80 KB i_size: 78 KB
+File: /fonts/NotoSansOsmanya-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 7 KB
+File: /fonts/NotoSansPhagsPa-Regular.ttf
+            CrRendererMain Reads: 28 KB
+            Total Reads: 28 KB i_size: 27 KB
+File: /fonts/NotoSansPhoenician-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansRejang-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /fonts/NotoSansRunic-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 8 KB
+File: /fonts/NotoSansSamaritan-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 9 KB
+File: /fonts/NotoSansSaurashtra-Regular.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 18 KB
+File: /fonts/NotoSansShavian-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansSinhala-Bold.ttf
+            CrRendererMain Reads: 152 KB
+            Total Reads: 152 KB i_size: 149 KB
+File: /fonts/NotoSansSinhala-Regular.ttf
+            CrRendererMain Reads: 160 KB
+            Total Reads: 160 KB i_size: 156 KB
+File: /fonts/NotoSansSundanese-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 10 KB
+File: /fonts/NotoSansSylotiNagri-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /fonts/NotoSansSymbols-Regular-Subsetted2.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 32 KB
+File: /fonts/NotoSansSymbols-Regular-Subsetted.ttf
+            CrRendererMain Reads: 208 KB
+            Total Reads: 208 KB i_size: 692 KB
+File: /fonts/NotoSansSyriacEastern-Regular.ttf
+            CrRendererMain Reads: 52 KB
+            Total Reads: 52 KB i_size: 48 KB
+File: /fonts/NotoSansSyriacEstrangela-Regular.ttf
+            CrRendererMain Reads: 48 KB
+            Total Reads: 48 KB i_size: 45 KB
+File: /fonts/NotoSansSyriacWestern-Regular.ttf
+            CrRendererMain Reads: 52 KB
+            Total Reads: 52 KB i_size: 51 KB
+File: /fonts/NotoSansTagalog-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansTagbanwa-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 5 KB
+File: /fonts/NotoSansTaiLe-Regular.ttf
+            CrRendererMain Reads: 12 KB
+            Total Reads: 12 KB i_size: 9 KB
+File: /fonts/NotoSansTaiTham-Regular.ttf
+            CrRendererMain Reads: 48 KB
+            Total Reads: 48 KB i_size: 46 KB
+File: /fonts/NotoSansTaiViet-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 15 KB
+File: /fonts/NotoSansTamil-Bold.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 33 KB
+File: /fonts/NotoSansTamil-Regular.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 33 KB
+File: /fonts/NotoSansTamilUI-Bold.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 33 KB
+File: /fonts/NotoSansTamilUI-Regular.ttf
+            CrRendererMain Reads: 36 KB
+            Total Reads: 36 KB i_size: 33 KB
+File: /fonts/NotoSansTelugu-Bold.ttf
+            CrRendererMain Reads: 108 KB
+            Total Reads: 108 KB i_size: 107 KB
+File: /fonts/NotoSansTelugu-Regular.ttf
+            CrRendererMain Reads: 112 KB
+            Total Reads: 112 KB i_size: 108 KB
+File: /fonts/NotoSansTeluguUI-Bold.ttf
+            CrRendererMain Reads: 112 KB
+            Total Reads: 112 KB i_size: 109 KB
+File: /fonts/NotoSansTeluguUI-Regular.ttf
+            CrRendererMain Reads: 112 KB
+            Total Reads: 112 KB i_size: 109 KB
+File: /fonts/NotoSansThaana-Bold.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /fonts/NotoSansThaana-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 14 KB
+File: /fonts/NotoSansThai-Bold.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 17 KB
+File: /fonts/NotoSansThai-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 20 KB
+File: /fonts/NotoSansThaiUI-Bold.ttf
+            CrRendererMain Reads: 20 KB
+            Total Reads: 20 KB i_size: 18 KB
+File: /fonts/NotoSansThaiUI-Regular.ttf
+            CrRendererMain Reads: 24 KB
+            Total Reads: 24 KB i_size: 21 KB
+File: /fonts/NotoSansTibetan-Bold.ttf
+            CrRendererMain Reads: 244 KB
+            Total Reads: 244 KB i_size: 364 KB
+File: /fonts/NotoSansTibetan-Regular.ttf
+            CrRendererMain Reads: 252 KB
+            Total Reads: 252 KB i_size: 392 KB
+File: /fonts/NotoSansTifinagh-Regular.ttf
+            CrRendererMain Reads: 16 KB
+            Total Reads: 16 KB i_size: 13 KB
+File: /fonts/NotoSansUgaritic-Regular.ttf
+            CrRendererMain Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /fonts/NotoSansVai-Regular.ttf
+            CrRendererMain Reads: 64 KB
+            Total Reads: 64 KB i_size: 62 KB
+File: /fonts/NotoSansYi-Regular.ttf
+            CrRendererMain Reads: 124 KB
+            Total Reads: 124 KB i_size: 120 KB
+File: /fonts/NotoSerif-BoldItalic.ttf
+            CrRendererMain Reads: 248 KB
+            Total Reads: 248 KB i_size: 256 KB
+File: /fonts/NotoSerif-Bold.ttf
+            CrRendererMain Reads: 244 KB
+            Total Reads: 244 KB i_size: 242 KB
+File: /fonts/NotoSerif-Italic.ttf
+            CrRendererMain Reads: 244 KB
+            Total Reads: 244 KB i_size: 243 KB
+File: /fonts/NotoSerif-Regular.ttf
+            CrRendererMain Reads: 244 KB
+            Total Reads: 244 KB i_size: 240 KB
+File: /fonts/Roboto-BlackItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 322 KB
+File: /fonts/Roboto-Black.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 299 KB
+File: /fonts/Roboto-BoldItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 324 KB
+File: /fonts/Roboto-Bold.ttf
+            ogle.android.gm Reads: 276 KB
+            Total Reads: 276 KB i_size: 299 KB
+File: /fonts/RobotoCondensed-BoldItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 322 KB
+File: /fonts/RobotoCondensed-Bold.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 296 KB
+File: /fonts/RobotoCondensed-Italic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 321 KB
+File: /fonts/RobotoCondensed-LightItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 324 KB
+File: /fonts/RobotoCondensed-Light.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 295 KB
+File: /fonts/RobotoCondensed-MediumItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 322 KB
+File: /fonts/RobotoCondensed-Medium.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 296 KB
+File: /fonts/Roboto-LightItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 324 KB
+File: /fonts/Roboto-Light.ttf
+            ogle.android.gm Reads: 164 KB
+            Total Reads: 164 KB i_size: 299 KB
+File: /fonts/Roboto-MediumItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 323 KB
+File: /fonts/Roboto-Medium.ttf
+            ogle.android.gm Reads: 176 KB
+            Total Reads: 176 KB i_size: 299 KB
+File: /fonts/Roboto-Regular.ttf
+            CrRendererMain Reads: 88 KB
+            ogle.android.gm Reads: 88 KB
+            Total Reads: 176 KB i_size: 298 KB
+File: /fonts/Roboto-ThinItalic.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 321 KB
+File: /fonts/Roboto-Thin.ttf
+            CrRendererMain Reads: 256 KB
+            Total Reads: 256 KB i_size: 300 KB
+File: /framework/android.hidl.base-V1.0-java.jar
+            dboxed_process0 Reads: 8 KB
+            Total Reads: 8 KB i_size: 6 KB
+File: /framework/android.hidl.manager-V1.0-java.jar
+            dboxed_process0 Reads: 12 KB
+            Total Reads: 12 KB i_size: 9 KB
+File: /framework/apache-xml.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 542 KB
+File: /framework/arm/boot-android.hidl.base-V1.0-java.vdex
+            ogle.android.gm Reads: 12 KB
+            Total Reads: 12 KB i_size: 11 KB
+File: /framework/arm/boot.art
+            ogle.android.gm Reads: 16 KB
+            Total Reads: 16 KB i_size: 1956 KB
+File: /framework/arm/boot-conscrypt.vdex
+            dboxed_process0 Reads: 80 KB
+            Total Reads: 80 KB i_size: 374 KB
+File: /framework/arm/boot-core-libart.oat
+            Jit_thread_pool Reads: 28 KB
+            ogle.android.gm Reads: 1136 KB
+            Total Reads: 1164 KB i_size: 3076 KB
+File: /framework/arm/boot-core-libart.vdex
+            Jit_thread_pool Reads: 80 KB
+            ogle.android.gm Reads: 1332 KB
+            Total Reads: 1412 KB i_size: 3080 KB
+File: /framework/arm/boot-ext.oat
+            AsyncTask_#1 Reads: 156 KB
+            Total Reads: 156 KB i_size: 306 KB
+File: /framework/arm/boot-ext.vdex
+            AsyncTask_#1 Reads: 396 KB
+            Total Reads: 396 KB i_size: 1056 KB
+File: /framework/arm/boot-framework.oat
+            AsyncTask_#2 Reads: 116 KB
+            Binder8493_1 Reads: 24 KB
+            Chrome_InProcGp Reads: 196 KB
+            dboxed_process0 Reads: 280 KB
+            droid.launcher3 Reads: 112 KB
+            HeapTaskDaemon Reads: 132 KB
+            Jit_thread_pool Reads: 48 KB
+            NetworkCursor_F Reads: 164 KB
+            ogle.android.gm Reads: 2732 KB
+            Thread-9 Reads: 72 KB
+            Total Reads: 3876 KB i_size: 21357 KB
+File: /framework/arm/boot-framework.vdex
+            AsyncTask_#2 Reads: 40 KB
+            Binder8493_1 Reads: 72 KB
+            Chrome_InProcGp Reads: 300 KB
+            dboxed_process0 Reads: 24 KB
+            droid.launcher3 Reads: 116 KB
+            EGL_Init Reads: 116 KB
+            Jit_thread_pool Reads: 692 KB
+            NetworkCursor_F Reads: 208 KB
+            ogle.android.gm Reads: 2760 KB
+            Thread-9 Reads: 96 KB
+            Total Reads: 4424 KB i_size: 19304 KB
+File: /framework/arm/boot.oat
+            AsyncTask_#1 Reads: 104 KB
+            Chrome_InProcGp Reads: 12 KB
+            Chrome_IOThread Reads: 44 KB
+            dboxed_process0 Reads: 160 KB
+            GAThread Reads: 32 KB
+            NetworkCursor_F Reads: 44 KB
+            ogle.android.gm Reads: 320 KB
+            Thread-4 Reads: 96 KB
+            Total Reads: 812 KB i_size: 7511 KB
+File: /framework/arm/boot-okhttp.oat
+            ogle.android.gm Reads: 108 KB
+            Total Reads: 108 KB i_size: 545 KB
+File: /framework/arm/boot-okhttp.vdex
+            ogle.android.gm Reads: 244 KB
+            Total Reads: 244 KB i_size: 412 KB
+File: /framework/arm/boot-org.apache.http.legacy.boot.oat
+            NetworkCursor_F Reads: 280 KB
+            Total Reads: 280 KB i_size: 576 KB
+File: /framework/arm/boot-org.apache.http.legacy.boot.vdex
+            AsyncTask_#1 Reads: 88 KB
+            NetworkCursor_F Reads: 72 KB
+            Total Reads: 160 KB i_size: 509 KB
+File: /framework/arm/boot.vdex
+            AsyncTask_#1 Reads: 60 KB
+            dboxed_process0 Reads: 392 KB
+            Jit_thread_pool Reads: 356 KB
+            Total Reads: 808 KB i_size: 5144 KB
+File: /framework/bouncycastle.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 531 KB
+File: /framework/com.android.location.provider.jar
+            AsyncTask_#3 Reads: 16 KB
+            Total Reads: 16 KB i_size: 12 KB
+File: /framework/com.android.media.remotedisplay.jar
+            AsyncTask_#3 Reads: 8 KB
+            Total Reads: 8 KB i_size: 4 KB
+File: /framework/conscrypt.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 153 KB
+File: /framework/core-libart.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 1363 KB
+File: /framework/core-oj.jar
+            dboxed_process0 Reads: 24 KB
+            Total Reads: 24 KB i_size: 2214 KB
+File: /framework/ext.jar
+            dboxed_process0 Reads: 192 KB
+            Total Reads: 192 KB i_size: 2142 KB
+File: /framework/framework.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 7342 KB
+File: /framework/framework-res.apk
+            android.anim Reads: 16 KB
+            dboxed_process0 Reads: 496 KB
+            ogle.android.gm Reads: 720 KB
+            Total Reads: 1232 KB i_size: 18923 KB
+File: /framework/ims-common.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 46 KB
+File: /framework/legacy-test.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 16 KB
+File: /framework/oat/arm/com.android.location.provider.odex
+            AsyncTask_#3 Reads: 12 KB
+            Total Reads: 12 KB i_size: 20 KB
+File: /framework/oat/arm/com.android.media.remotedisplay.odex
+            AsyncTask_#3 Reads: 12 KB
+            Total Reads: 12 KB i_size: 20 KB
+File: /framework/okhttp.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 180 KB
+File: /framework/org.apache.http.legacy.boot.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 213 KB
+File: /framework/telephony-common.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 938 KB
+File: /framework/voip-common.jar
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 66 KB
+File: /lib/android.hardware.configstore@1.0.so
+            dboxed_process0 Reads: 112 KB
+            Total Reads: 112 KB i_size: 132 KB
+File: /lib/android.hardware.graphics.bufferqueue@1.0.so
+            dboxed_process0 Reads: 128 KB
+            Total Reads: 128 KB i_size: 223 KB
+File: /lib/android.hardware.renderscript@1.0.so
+            dboxed_process0 Reads: 124 KB
+            Total Reads: 124 KB i_size: 332 KB
+File: /lib/android.hidl.token@1.0.so
+            dboxed_process0 Reads: 80 KB
+            Total Reads: 80 KB i_size: 99 KB
+File: /lib/android.hidl.token@1.0-utils.so
+            dboxed_process0 Reads: 20 KB
+            Total Reads: 20 KB i_size: 20 KB
+File: /lib/egl/libGLES_mali.so
+            Chrome_InProcGp Reads: 220 KB
+            Total Reads: 220 KB i_size: 4454 KB
+File: /lib/hw/gralloc.mt6737m.so
+            ogle.android.gm Reads: 12 KB
+            Total Reads: 12 KB i_size: 40 KB
+File: /lib/libaaudio.so
+            dboxed_process0 Reads: 88 KB
+            Total Reads: 88 KB i_size: 115 KB
+File: /lib/libandroid_runtime.so
+            dboxed_process0 Reads: 88 KB
+            pool-3-thread-1 Reads: 4 KB
+            Total Reads: 92 KB i_size: 1451 KB
+File: /lib/libandroid.so
+            ogle.android.gm Reads: 84 KB
+            Total Reads: 84 KB i_size: 95 KB
+File: /lib/libart-compiler.so
+            Jit_thread_pool Reads: 128 KB
+            Total Reads: 128 KB i_size: 1975 KB
+File: /lib/libart-dexlayout.so
+            dboxed_process0 Reads: 120 KB
+            Total Reads: 120 KB i_size: 155 KB
+File: /lib/libart.so
+            dboxed_process0 Reads: 52 KB
+            ogle.android.gm Reads: 76 KB
+            Total Reads: 128 KB i_size: 5602 KB
+File: /lib/libcamera2ndk.so
+            dboxed_process0 Reads: 92 KB
+            Total Reads: 92 KB i_size: 94 KB
+File: /lib/libcamera_client.so
+            dboxed_process0 Reads: 120 KB
+            Total Reads: 120 KB i_size: 231 KB
+File: /lib/libcrypto.so
+            cat Reads: 112 KB
+            Total Reads: 112 KB i_size: 689 KB
+File: /lib/libdng_sdk.so
+            dboxed_process0 Reads: 356 KB
+            Total Reads: 356 KB i_size: 549 KB
+File: /lib/libdrmframework.so
+            dboxed_process0 Reads: 84 KB
+            Total Reads: 84 KB i_size: 102 KB
+File: /lib/libft2.so
+            CrRendererMain Reads: 56 KB
+            Total Reads: 56 KB i_size: 479 KB
+File: /lib/libGLESv2.so
+            ogle.android.gm Reads: 28 KB
+            Total Reads: 28 KB i_size: 68 KB
+File: /lib/libicuuc.so
+            CrRendererMain Reads: 88 KB
+            dboxed_process0 Reads: 76 KB
+            Total Reads: 164 KB i_size: 1182 KB
+File: /lib/libimg_utils.so
+            dboxed_process0 Reads: 60 KB
+            Total Reads: 60 KB i_size: 66 KB
+File: /lib/liblzma.so
+            Chrome_InProcGp Reads: 88 KB
+            Total Reads: 88 KB i_size: 93 KB
+File: /lib/libmedia_jni.so
+            Chrome_InProcGp Reads: 72 KB
+            dboxed_process0 Reads: 96 KB
+            Total Reads: 168 KB i_size: 299 KB
+File: /lib/libmedia.so
+            dboxed_process0 Reads: 88 KB
+            Total Reads: 88 KB i_size: 496 KB
+File: /lib/libmediautils.so
+            dboxed_process0 Reads: 36 KB
+            Total Reads: 36 KB i_size: 53 KB
+File: /lib/libmemunreachable.so
+            dboxed_process0 Reads: 84 KB
+            Total Reads: 84 KB i_size: 120 KB
+File: /lib/libmtp.so
+            dboxed_process0 Reads: 116 KB
+            Total Reads: 116 KB i_size: 122 KB
+File: /lib/libpackagelistparser.so
+            cat Reads: 8 KB
+            Total Reads: 8 KB i_size: 15 KB
+File: /lib/libpcre2.so
+            cat Reads: 48 KB
+            Total Reads: 48 KB i_size: 92 KB
+File: /lib/libprotobuf-cpp-lite.so
+            dboxed_process0 Reads: 88 KB
+            Total Reads: 88 KB i_size: 197 KB
+File: /lib/libradio.so
+            dboxed_process0 Reads: 36 KB
+            Total Reads: 36 KB i_size: 53 KB
+File: /lib/libRS.so
+            dboxed_process0 Reads: 40 KB
+            Total Reads: 40 KB i_size: 59 KB
+File: /lib/libselinux.so
+            cat Reads: 12 KB
+            Total Reads: 12 KB i_size: 75 KB
+File: /lib/libskia.so
+            ogle.android.gm Reads: 316 KB
+            Total Reads: 316 KB i_size: 5578 KB
+File: /lib/libstagefright.so
+            dboxed_process0 Reads: 244 KB
+            Total Reads: 244 KB i_size: 1487 KB
+File: /lib/libvintf.so
+            dboxed_process0 Reads: 96 KB
+            Total Reads: 96 KB i_size: 187 KB
+File: /lib/libvulkan.so
+            dboxed_process0 Reads: 80 KB
+            Total Reads: 80 KB i_size: 98 KB
+File: /lib/libwebviewchromium_loader.so
+            ogle.android.gm Reads: 12 KB
+            Total Reads: 12 KB i_size: 15 KB
+File: /lib/libwebviewchromium_plat_support.so
+            ogle.android.gm Reads: 16 KB
+            Total Reads: 16 KB i_size: 20 KB
+File: /lib/libwilhelm.so
+            dboxed_process0 Reads: 120 KB
+            Total Reads: 120 KB i_size: 199 KB
+File: /lib/libz.so
+            cat Reads: 20 KB
+            Total Reads: 20 KB i_size: 95 KB
+File: /misc/keychain/pubkey_blacklist.txt
+            NetworkCursor_F Reads: 4 KB
+            Total Reads: 4 KB i_size: 819 bytes
+File: /misc/keychain/serial_blacklist.txt
+            NetworkCursor_F Reads: 4 KB
+            Total Reads: 4 KB i_size: 0 bytes
+File: /priv-app/GmsCore/GmsCore.apk
+            AsyncTask_#3 Reads: 148 KB
+            Total Reads: 148 KB i_size: 37870 KB
+File: /priv-app/Launcher3/oat/arm/Launcher3.vdex
+            Jit_thread_pool Reads: 100 KB
+            Total Reads: 100 KB i_size: 1609 KB
+File: /resource-cache/overlays.list
+            dboxed_process0 Reads: 4 KB
+            Total Reads: 4 KB i_size: 0 bytes
+File: /user/0
+            ogle.android.gm Reads: 4 KB
+            Total Reads: 4 KB i_size: 10 bytes
+File: /usr/hyphen-data/hyph-en-us.hyb
+            ogle.android.gm Reads: 20 KB
+            Total Reads: 20 KB i_size: 58 KB
+File: /usr/icu/icudt58l.dat
+            ogle.android.gm Reads: 1400 KB
+            Total Reads: 1400 KB i_size: 22774 KB
+File: /usr/share/zoneinfo/tzdata
+            ChildProcessMai Reads: 112 KB
+            Total Reads: 112 KB i_size: 488 KB
+Grand Total File DATA KB Reads 76796
+PID VIEW:
+PID: android.anim
+            /framework/framework-res.apk Reads: 16 KB i_size: 18923 KB
+            Total Reads: 16 KB
+PID: AsyncTask_#1
+            /framework/arm/boot-ext.oat Reads: 156 KB i_size: 306 KB
+            /framework/arm/boot-ext.vdex Reads: 396 KB i_size: 1056 KB
+            /framework/arm/boot.oat Reads: 104 KB i_size: 7511 KB
+            /framework/arm/boot-org.apache.http.legacy.boot.vdex Reads: 88 KB i_size: 509 KB
+            /framework/arm/boot.vdex Reads: 60 KB i_size: 5144 KB
+            Total Reads: 804 KB
+PID: AsyncTask_#2
+            /app/Gmail2Light/Gmail2Light.apk Reads: 24 KB i_size: 9736 KB
+            /framework/arm/boot-framework.oat Reads: 116 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 40 KB i_size: 19304 KB
+            Total Reads: 180 KB
+PID: AsyncTask_#3
+            /data/com.google.android.gm/files/deviceName Reads: 4 KB i_size: 17 bytes
+            /framework/com.android.location.provider.jar Reads: 16 KB i_size: 12 KB
+            /framework/com.android.media.remotedisplay.jar Reads: 8 KB i_size: 4 KB
+            /framework/oat/arm/com.android.location.provider.odex Reads: 12 KB i_size: 20 KB
+            /framework/oat/arm/com.android.media.remotedisplay.odex Reads: 12 KB i_size: 20 KB
+            /priv-app/GmsCore/GmsCore.apk Reads: 148 KB i_size: 37870 KB
+            Total Reads: 200 KB
+PID: Binder1550_5
+            /data/com.google.android.gsf/files/signatures/sig-281206196 Reads: 4 KB i_size: 1 KB
+            Total Reads: 4 KB
+PID: Binder8493_1
+            /framework/arm/boot-framework.oat Reads: 24 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 72 KB i_size: 19304 KB
+            Total Reads: 96 KB
+PID: cat
+            /bin/toybox Reads: 304 KB i_size: 319 KB
+            /lib/libcrypto.so Reads: 112 KB i_size: 689 KB
+            /lib/libpackagelistparser.so Reads: 8 KB i_size: 15 KB
+            /lib/libpcre2.so Reads: 48 KB i_size: 92 KB
+            /lib/libselinux.so Reads: 12 KB i_size: 75 KB
+            /lib/libz.so Reads: 20 KB i_size: 95 KB
+            Total Reads: 504 KB
+PID: ChildProcessMai
+            /usr/share/zoneinfo/tzdata Reads: 112 KB i_size: 488 KB
+            Total Reads: 112 KB
+PID: Chrome_CacheThr
+            /data/com.google.android.gm/app_webview/GPUCache/index Reads: 4 KB i_size: 24 bytes
+            Total Reads: 4 KB
+PID: Chrome_ChildIOT
+            /app/Chrome/Chrome.apk Reads: 96 KB i_size: 71354 KB
+            Total Reads: 96 KB
+PID: Chrome_DBThread
+            /app/Chrome/Chrome.apk Reads: 652 KB i_size: 71354 KB
+            Total Reads: 652 KB
+PID: Chrome_FileThre
+            /data/com.google.android.gm/app_webview/metrics_guid Reads: 4 KB i_size: 36 bytes
+            Total Reads: 4 KB
+PID: Chrome_FileUser
+            /app/Chrome/Chrome.apk Reads: 72 KB i_size: 71354 KB
+            Total Reads: 72 KB
+PID: Chrome_InProcGp
+            /app/Chrome/Chrome.apk Reads: 732 KB i_size: 71354 KB
+            /framework/arm/boot-framework.oat Reads: 196 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 300 KB i_size: 19304 KB
+            /framework/arm/boot.oat Reads: 12 KB i_size: 7511 KB
+            /lib/egl/libGLES_mali.so Reads: 220 KB i_size: 4454 KB
+            /lib/liblzma.so Reads: 88 KB i_size: 93 KB
+            /lib/libmedia_jni.so Reads: 72 KB i_size: 299 KB
+            Total Reads: 1620 KB
+PID: Chrome_IOThread
+            /app/Chrome/Chrome.apk Reads: 1396 KB i_size: 71354 KB
+            /app/Gmail2Light/Gmail2Light.apk Reads: 68 KB i_size: 9736 KB
+            /framework/arm/boot.oat Reads: 44 KB i_size: 7511 KB
+            Total Reads: 1508 KB
+PID: Compositor
+            /app/Chrome/Chrome.apk Reads: 652 KB i_size: 71354 KB
+            Total Reads: 652 KB
+PID: CookieMonsterBa
+            /app/Chrome/Chrome.apk Reads: 284 KB i_size: 71354 KB
+            Total Reads: 284 KB
+PID: CrRendererMain
+            /app/Chrome/Chrome.apk Reads: 17012 KB i_size: 71354 KB
+            /etc/fonts.xml Reads: 24 KB i_size: 22 KB
+            /fonts/CarroisGothicSC-Regular.ttf Reads: 40 KB i_size: 39 KB
+            /fonts/ComingSoon.ttf Reads: 60 KB i_size: 57 KB
+            /fonts/CutiveMono.ttf Reads: 68 KB i_size: 67 KB
+            /fonts/DancingScript-Bold.ttf Reads: 116 KB i_size: 112 KB
+            /fonts/DancingScript-Regular.ttf Reads: 116 KB i_size: 113 KB
+            /fonts/DroidSansMono.ttf Reads: 108 KB i_size: 105 KB
+            /fonts/NotoColorEmoji.ttf Reads: 204 KB i_size: 7108 KB
+            /fonts/NotoNaskhArabic-Bold.ttf Reads: 116 KB i_size: 113 KB
+            /fonts/NotoNaskhArabic-Regular.ttf Reads: 116 KB i_size: 113 KB
+            /fonts/NotoNaskhArabicUI-Bold.ttf Reads: 120 KB i_size: 116 KB
+            /fonts/NotoNaskhArabicUI-Regular.ttf Reads: 120 KB i_size: 117 KB
+            /fonts/NotoSansAdlam-Regular.ttf Reads: 52 KB i_size: 49 KB
+            /fonts/NotoSansArmenian-Bold.ttf Reads: 16 KB i_size: 15 KB
+            /fonts/NotoSansArmenian-Regular.ttf Reads: 16 KB i_size: 15 KB
+            /fonts/NotoSansAvestan-Regular.ttf Reads: 12 KB i_size: 11 KB
+            /fonts/NotoSansBalinese-Regular.ttf Reads: 32 KB i_size: 31 KB
+            /fonts/NotoSansBamum-Regular.ttf Reads: 132 KB i_size: 130 KB
+            /fonts/NotoSansBatak-Regular.ttf Reads: 16 KB i_size: 12 KB
+            /fonts/NotoSansBengali-Bold.ttf Reads: 100 KB i_size: 96 KB
+            /fonts/NotoSansBengali-Regular.ttf Reads: 100 KB i_size: 99 KB
+            /fonts/NotoSansBengaliUI-Bold.ttf Reads: 104 KB i_size: 101 KB
+            /fonts/NotoSansBengaliUI-Regular.ttf Reads: 108 KB i_size: 104 KB
+            /fonts/NotoSansBrahmi-Regular.ttf Reads: 24 KB i_size: 23 KB
+            /fonts/NotoSansBuginese-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansBuhid-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansCanadianAboriginal-Regular.ttf Reads: 48 KB i_size: 45 KB
+            /fonts/NotoSansCarian-Regular.ttf Reads: 8 KB i_size: 6 KB
+            /fonts/NotoSansCham-Bold.ttf Reads: 24 KB i_size: 21 KB
+            /fonts/NotoSansCham-Regular.ttf Reads: 24 KB i_size: 21 KB
+            /fonts/NotoSansCherokee-Regular.ttf Reads: 60 KB i_size: 56 KB
+            /fonts/NotoSansCJK-Regular.ttc Reads: 2380 KB i_size: 18236 KB
+            /fonts/NotoSansCoptic-Regular.ttf Reads: 24 KB i_size: 21 KB
+            /fonts/NotoSansCuneiform-Regular.ttf Reads: 200 KB i_size: 488 KB
+            /fonts/NotoSansCypriot-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansDeseret-Regular.ttf Reads: 12 KB i_size: 10 KB
+            /fonts/NotoSansDevanagari-Bold.ttf Reads: 128 KB i_size: 128 KB
+            /fonts/NotoSansDevanagari-Regular.ttf Reads: 128 KB i_size: 132 KB
+            /fonts/NotoSansDevanagariUI-Bold.ttf Reads: 120 KB i_size: 118 KB
+            /fonts/NotoSansDevanagariUI-Regular.ttf Reads: 124 KB i_size: 122 KB
+            /fonts/NotoSansEgyptianHieroglyphs-Regular.ttf Reads: 200 KB i_size: 493 KB
+            /fonts/NotoSansEthiopic-Bold.ttf Reads: 128 KB i_size: 140 KB
+            /fonts/NotoSansEthiopic-Regular.ttf Reads: 128 KB i_size: 139 KB
+            /fonts/NotoSansGeorgian-Bold.ttf Reads: 20 KB i_size: 19 KB
+            /fonts/NotoSansGeorgian-Regular.ttf Reads: 20 KB i_size: 19 KB
+            /fonts/NotoSansGlagolitic-Regular.ttf Reads: 16 KB i_size: 15 KB
+            /fonts/NotoSansGothic-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansGujarati-Bold.ttf Reads: 116 KB i_size: 114 KB
+            /fonts/NotoSansGujarati-Regular.ttf Reads: 120 KB i_size: 117 KB
+            /fonts/NotoSansGujaratiUI-Bold.ttf Reads: 112 KB i_size: 111 KB
+            /fonts/NotoSansGujaratiUI-Regular.ttf Reads: 116 KB i_size: 114 KB
+            /fonts/NotoSansGurmukhi-Bold.ttf Reads: 32 KB i_size: 30 KB
+            /fonts/NotoSansGurmukhi-Regular.ttf Reads: 32 KB i_size: 31 KB
+            /fonts/NotoSansGurmukhiUI-Bold.ttf Reads: 32 KB i_size: 31 KB
+            /fonts/NotoSansGurmukhiUI-Regular.ttf Reads: 32 KB i_size: 31 KB
+            /fonts/NotoSansHanunoo-Regular.ttf Reads: 8 KB i_size: 6 KB
+            /fonts/NotoSansHebrew-Bold.ttf Reads: 20 KB i_size: 17 KB
+            /fonts/NotoSansHebrew-Regular.ttf Reads: 20 KB i_size: 16 KB
+            /fonts/NotoSansImperialAramaic-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansInscriptionalPahlavi-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansInscriptionalParthian-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansJavanese-Regular.ttf Reads: 40 KB i_size: 36 KB
+            /fonts/NotoSansKaithi-Regular.ttf Reads: 60 KB i_size: 58 KB
+            /fonts/NotoSansKannada-Bold.ttf Reads: 80 KB i_size: 78 KB
+            /fonts/NotoSansKannada-Regular.ttf Reads: 84 KB i_size: 80 KB
+            /fonts/NotoSansKannadaUI-Bold.ttf Reads: 80 KB i_size: 77 KB
+            /fonts/NotoSansKannadaUI-Regular.ttf Reads: 80 KB i_size: 79 KB
+            /fonts/NotoSansKayahLi-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansKharoshthi-Regular.ttf Reads: 24 KB i_size: 21 KB
+            /fonts/NotoSansKhmerUI-Bold.ttf Reads: 36 KB i_size: 35 KB
+            /fonts/NotoSansKhmerUI-Regular.ttf Reads: 40 KB i_size: 37 KB
+            /fonts/NotoSansKhmer-VF.ttf Reads: 128 KB i_size: 140 KB
+            /fonts/NotoSansLao-Bold.ttf Reads: 32 KB i_size: 28 KB
+            /fonts/NotoSansLao-Regular.ttf Reads: 32 KB i_size: 29 KB
+            /fonts/NotoSansLaoUI-Bold.ttf Reads: 32 KB i_size: 28 KB
+            /fonts/NotoSansLaoUI-Regular.ttf Reads: 32 KB i_size: 29 KB
+            /fonts/NotoSansLepcha-Regular.ttf Reads: 100 KB i_size: 99 KB
+            /fonts/NotoSansLimbu-Regular.ttf Reads: 12 KB i_size: 10 KB
+            /fonts/NotoSansLinearB-Regular.ttf Reads: 60 KB i_size: 56 KB
+            /fonts/NotoSansLisu-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansLycian-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansLydian-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansMalayalam-Bold.ttf Reads: 56 KB i_size: 55 KB
+            /fonts/NotoSansMalayalam-Regular.ttf Reads: 56 KB i_size: 55 KB
+            /fonts/NotoSansMalayalamUI-Bold.ttf Reads: 56 KB i_size: 55 KB
+            /fonts/NotoSansMalayalamUI-Regular.ttf Reads: 56 KB i_size: 55 KB
+            /fonts/NotoSansMandaic-Regular.ttf Reads: 16 KB i_size: 14 KB
+            /fonts/NotoSansMeeteiMayek-Regular.ttf Reads: 16 KB i_size: 13 KB
+            /fonts/NotoSansMongolian-Regular.ttf Reads: 112 KB i_size: 110 KB
+            /fonts/NotoSansMyanmar-Bold.ttf Reads: 108 KB i_size: 106 KB
+            /fonts/NotoSansMyanmar-Regular.ttf Reads: 108 KB i_size: 105 KB
+            /fonts/NotoSansMyanmarUI-Bold.ttf Reads: 104 KB i_size: 102 KB
+            /fonts/NotoSansMyanmarUI-Regular.ttf Reads: 104 KB i_size: 100 KB
+            /fonts/NotoSansNewTaiLue-Regular.ttf Reads: 16 KB i_size: 14 KB
+            /fonts/NotoSansNKo-Regular.ttf Reads: 20 KB i_size: 18 KB
+            /fonts/NotoSansOgham-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansOlChiki-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansOldItalic-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansOldPersian-Regular.ttf Reads: 16 KB i_size: 12 KB
+            /fonts/NotoSansOldSouthArabian-Regular.ttf Reads: 8 KB i_size: 4 KB
+            /fonts/NotoSansOldTurkic-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansOriya-Bold.ttf Reads: 84 KB i_size: 82 KB
+            /fonts/NotoSansOriya-Regular.ttf Reads: 84 KB i_size: 83 KB
+            /fonts/NotoSansOriyaUI-Bold.ttf Reads: 80 KB i_size: 78 KB
+            /fonts/NotoSansOriyaUI-Regular.ttf Reads: 80 KB i_size: 78 KB
+            /fonts/NotoSansOsmanya-Regular.ttf Reads: 8 KB i_size: 7 KB
+            /fonts/NotoSansPhagsPa-Regular.ttf Reads: 28 KB i_size: 27 KB
+            /fonts/NotoSansPhoenician-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansRejang-Regular.ttf Reads: 8 KB i_size: 6 KB
+            /fonts/NotoSansRunic-Regular.ttf Reads: 12 KB i_size: 8 KB
+            /fonts/NotoSansSamaritan-Regular.ttf Reads: 12 KB i_size: 9 KB
+            /fonts/NotoSansSaurashtra-Regular.ttf Reads: 20 KB i_size: 18 KB
+            /fonts/NotoSansShavian-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansSinhala-Bold.ttf Reads: 152 KB i_size: 149 KB
+            /fonts/NotoSansSinhala-Regular.ttf Reads: 160 KB i_size: 156 KB
+            /fonts/NotoSansSundanese-Regular.ttf Reads: 12 KB i_size: 10 KB
+            /fonts/NotoSansSylotiNagri-Regular.ttf Reads: 16 KB i_size: 14 KB
+            /fonts/NotoSansSymbols-Regular-Subsetted2.ttf Reads: 36 KB i_size: 32 KB
+            /fonts/NotoSansSymbols-Regular-Subsetted.ttf Reads: 208 KB i_size: 692 KB
+            /fonts/NotoSansSyriacEastern-Regular.ttf Reads: 52 KB i_size: 48 KB
+            /fonts/NotoSansSyriacEstrangela-Regular.ttf Reads: 48 KB i_size: 45 KB
+            /fonts/NotoSansSyriacWestern-Regular.ttf Reads: 52 KB i_size: 51 KB
+            /fonts/NotoSansTagalog-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansTagbanwa-Regular.ttf Reads: 8 KB i_size: 5 KB
+            /fonts/NotoSansTaiLe-Regular.ttf Reads: 12 KB i_size: 9 KB
+            /fonts/NotoSansTaiTham-Regular.ttf Reads: 48 KB i_size: 46 KB
+            /fonts/NotoSansTaiViet-Regular.ttf Reads: 16 KB i_size: 15 KB
+            /fonts/NotoSansTamil-Bold.ttf Reads: 36 KB i_size: 33 KB
+            /fonts/NotoSansTamil-Regular.ttf Reads: 36 KB i_size: 33 KB
+            /fonts/NotoSansTamilUI-Bold.ttf Reads: 36 KB i_size: 33 KB
+            /fonts/NotoSansTamilUI-Regular.ttf Reads: 36 KB i_size: 33 KB
+            /fonts/NotoSansTelugu-Bold.ttf Reads: 108 KB i_size: 107 KB
+            /fonts/NotoSansTelugu-Regular.ttf Reads: 112 KB i_size: 108 KB
+            /fonts/NotoSansTeluguUI-Bold.ttf Reads: 112 KB i_size: 109 KB
+            /fonts/NotoSansTeluguUI-Regular.ttf Reads: 112 KB i_size: 109 KB
+            /fonts/NotoSansThaana-Bold.ttf Reads: 16 KB i_size: 14 KB
+            /fonts/NotoSansThaana-Regular.ttf Reads: 16 KB i_size: 14 KB
+            /fonts/NotoSansThai-Bold.ttf Reads: 20 KB i_size: 17 KB
+            /fonts/NotoSansThai-Regular.ttf Reads: 24 KB i_size: 20 KB
+            /fonts/NotoSansThaiUI-Bold.ttf Reads: 20 KB i_size: 18 KB
+            /fonts/NotoSansThaiUI-Regular.ttf Reads: 24 KB i_size: 21 KB
+            /fonts/NotoSansTibetan-Bold.ttf Reads: 244 KB i_size: 364 KB
+            /fonts/NotoSansTibetan-Regular.ttf Reads: 252 KB i_size: 392 KB
+            /fonts/NotoSansTifinagh-Regular.ttf Reads: 16 KB i_size: 13 KB
+            /fonts/NotoSansUgaritic-Regular.ttf Reads: 8 KB i_size: 6 KB
+            /fonts/NotoSansVai-Regular.ttf Reads: 64 KB i_size: 62 KB
+            /fonts/NotoSansYi-Regular.ttf Reads: 124 KB i_size: 120 KB
+            /fonts/NotoSerif-BoldItalic.ttf Reads: 248 KB i_size: 256 KB
+            /fonts/NotoSerif-Bold.ttf Reads: 244 KB i_size: 242 KB
+            /fonts/NotoSerif-Italic.ttf Reads: 244 KB i_size: 243 KB
+            /fonts/NotoSerif-Regular.ttf Reads: 244 KB i_size: 240 KB
+            /fonts/Roboto-BlackItalic.ttf Reads: 256 KB i_size: 322 KB
+            /fonts/Roboto-Black.ttf Reads: 256 KB i_size: 299 KB
+            /fonts/Roboto-BoldItalic.ttf Reads: 256 KB i_size: 324 KB
+            /fonts/RobotoCondensed-BoldItalic.ttf Reads: 256 KB i_size: 322 KB
+            /fonts/RobotoCondensed-Bold.ttf Reads: 256 KB i_size: 296 KB
+            /fonts/RobotoCondensed-Italic.ttf Reads: 256 KB i_size: 321 KB
+            /fonts/RobotoCondensed-LightItalic.ttf Reads: 256 KB i_size: 324 KB
+            /fonts/RobotoCondensed-Light.ttf Reads: 256 KB i_size: 295 KB
+            /fonts/RobotoCondensed-MediumItalic.ttf Reads: 256 KB i_size: 322 KB
+            /fonts/RobotoCondensed-Medium.ttf Reads: 256 KB i_size: 296 KB
+            /fonts/Roboto-LightItalic.ttf Reads: 256 KB i_size: 324 KB
+            /fonts/Roboto-MediumItalic.ttf Reads: 256 KB i_size: 323 KB
+            /fonts/Roboto-Regular.ttf Reads: 88 KB i_size: 298 KB
+            /fonts/Roboto-ThinItalic.ttf Reads: 256 KB i_size: 321 KB
+            /fonts/Roboto-Thin.ttf Reads: 256 KB i_size: 300 KB
+            /lib/libft2.so Reads: 56 KB i_size: 479 KB
+            /lib/libicuuc.so Reads: 88 KB i_size: 1182 KB
+            Total Reads: 32760 KB
+PID: dboxed_process0
+            /app/Chrome/Chrome.apk Reads: 512 KB i_size: 71354 KB
+            /framework/android.hidl.base-V1.0-java.jar Reads: 8 KB i_size: 6 KB
+            /framework/android.hidl.manager-V1.0-java.jar Reads: 12 KB i_size: 9 KB
+            /framework/apache-xml.jar Reads: 20 KB i_size: 542 KB
+            /framework/arm/boot-conscrypt.vdex Reads: 80 KB i_size: 374 KB
+            /framework/arm/boot-framework.oat Reads: 280 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 24 KB i_size: 19304 KB
+            /framework/arm/boot.oat Reads: 160 KB i_size: 7511 KB
+            /framework/arm/boot.vdex Reads: 392 KB i_size: 5144 KB
+            /framework/bouncycastle.jar Reads: 20 KB i_size: 531 KB
+            /framework/conscrypt.jar Reads: 20 KB i_size: 153 KB
+            /framework/core-libart.jar Reads: 20 KB i_size: 1363 KB
+            /framework/core-oj.jar Reads: 24 KB i_size: 2214 KB
+            /framework/ext.jar Reads: 192 KB i_size: 2142 KB
+            /framework/framework.jar Reads: 20 KB i_size: 7342 KB
+            /framework/framework-res.apk Reads: 496 KB i_size: 18923 KB
+            /framework/ims-common.jar Reads: 20 KB i_size: 46 KB
+            /framework/legacy-test.jar Reads: 20 KB i_size: 16 KB
+            /framework/okhttp.jar Reads: 20 KB i_size: 180 KB
+            /framework/org.apache.http.legacy.boot.jar Reads: 20 KB i_size: 213 KB
+            /framework/telephony-common.jar Reads: 20 KB i_size: 938 KB
+            /framework/voip-common.jar Reads: 20 KB i_size: 66 KB
+            /lib/android.hardware.configstore@1.0.so Reads: 112 KB i_size: 132 KB
+            /lib/android.hardware.graphics.bufferqueue@1.0.so Reads: 128 KB i_size: 223 KB
+            /lib/android.hardware.renderscript@1.0.so Reads: 124 KB i_size: 332 KB
+            /lib/android.hidl.token@1.0.so Reads: 80 KB i_size: 99 KB
+            /lib/android.hidl.token@1.0-utils.so Reads: 20 KB i_size: 20 KB
+            /lib/libaaudio.so Reads: 88 KB i_size: 115 KB
+            /lib/libandroid_runtime.so Reads: 88 KB i_size: 1451 KB
+            /lib/libart-dexlayout.so Reads: 120 KB i_size: 155 KB
+            /lib/libart.so Reads: 52 KB i_size: 5602 KB
+            /lib/libcamera2ndk.so Reads: 92 KB i_size: 94 KB
+            /lib/libcamera_client.so Reads: 120 KB i_size: 231 KB
+            /lib/libdng_sdk.so Reads: 356 KB i_size: 549 KB
+            /lib/libdrmframework.so Reads: 84 KB i_size: 102 KB
+            /lib/libicuuc.so Reads: 76 KB i_size: 1182 KB
+            /lib/libimg_utils.so Reads: 60 KB i_size: 66 KB
+            /lib/libmedia_jni.so Reads: 96 KB i_size: 299 KB
+            /lib/libmedia.so Reads: 88 KB i_size: 496 KB
+            /lib/libmediautils.so Reads: 36 KB i_size: 53 KB
+            /lib/libmemunreachable.so Reads: 84 KB i_size: 120 KB
+            /lib/libmtp.so Reads: 116 KB i_size: 122 KB
+            /lib/libprotobuf-cpp-lite.so Reads: 88 KB i_size: 197 KB
+            /lib/libradio.so Reads: 36 KB i_size: 53 KB
+            /lib/libRS.so Reads: 40 KB i_size: 59 KB
+            /lib/libstagefright.so Reads: 244 KB i_size: 1487 KB
+            /lib/libvintf.so Reads: 96 KB i_size: 187 KB
+            /lib/libvulkan.so Reads: 80 KB i_size: 98 KB
+            /lib/libwilhelm.so Reads: 120 KB i_size: 199 KB
+            /resource-cache/overlays.list Reads: 4 KB i_size: 0 bytes
+            Total Reads: 5128 KB
+PID: droid.launcher3
+            /framework/arm/boot-framework.oat Reads: 112 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 116 KB i_size: 19304 KB
+            Total Reads: 228 KB
+PID: EGL_Init
+            /framework/arm/boot-framework.vdex Reads: 116 KB i_size: 19304 KB
+            Total Reads: 116 KB
+PID: GAThread
+            /data/com.google.android.gm/files/gaClientId Reads: 4 KB i_size: 36 bytes
+            /framework/arm/boot.oat Reads: 32 KB i_size: 7511 KB
+            Total Reads: 36 KB
+PID: HeapTaskDaemon
+            /framework/arm/boot-framework.oat Reads: 132 KB i_size: 21357 KB
+            Total Reads: 132 KB
+PID: JavaBridge
+            /app/Chrome/Chrome.apk Reads: 128 KB i_size: 71354 KB
+            Total Reads: 128 KB
+PID: Jit_thread_pool
+            /framework/arm/boot-core-libart.oat Reads: 28 KB i_size: 3076 KB
+            /framework/arm/boot-core-libart.vdex Reads: 80 KB i_size: 3080 KB
+            /framework/arm/boot-framework.oat Reads: 48 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 692 KB i_size: 19304 KB
+            /framework/arm/boot.vdex Reads: 356 KB i_size: 5144 KB
+            /lib/libart-compiler.so Reads: 128 KB i_size: 1975 KB
+            /priv-app/Launcher3/oat/arm/Launcher3.vdex Reads: 100 KB i_size: 1609 KB
+            Total Reads: 1432 KB
+PID: netd
+            /etc/hosts Reads: 4 KB i_size: 56 bytes
+            Total Reads: 4 KB
+PID: NetworkCursor_F
+            /etc/security/cacerts/7999be0d.0 Reads: 8 KB i_size: 4 KB
+            /framework/arm/boot-framework.oat Reads: 164 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 208 KB i_size: 19304 KB
+            /framework/arm/boot.oat Reads: 44 KB i_size: 7511 KB
+            /framework/arm/boot-org.apache.http.legacy.boot.oat Reads: 280 KB i_size: 576 KB
+            /framework/arm/boot-org.apache.http.legacy.boot.vdex Reads: 72 KB i_size: 509 KB
+            /misc/keychain/pubkey_blacklist.txt Reads: 4 KB i_size: 819 bytes
+            /misc/keychain/serial_blacklist.txt Reads: 4 KB i_size: 0 bytes
+            Total Reads: 784 KB
+PID: ogle.android.gm
+            / Reads: 4 KB i_size: 163840 KB
+            /app/Chrome/Chrome.apk Reads: 14996 KB i_size: 71354 KB
+            /app/Gmail2Light/Gmail2Light.apk Reads: 1440 KB i_size: 9736 KB
+            /fonts/Roboto-Bold.ttf Reads: 276 KB i_size: 299 KB
+            /fonts/Roboto-Light.ttf Reads: 164 KB i_size: 299 KB
+            /fonts/Roboto-Medium.ttf Reads: 176 KB i_size: 299 KB
+            /fonts/Roboto-Regular.ttf Reads: 88 KB i_size: 298 KB
+            /framework/arm/boot-android.hidl.base-V1.0-java.vdex Reads: 12 KB i_size: 11 KB
+            /framework/arm/boot.art Reads: 16 KB i_size: 1956 KB
+            /framework/arm/boot-core-libart.oat Reads: 1136 KB i_size: 3076 KB
+            /framework/arm/boot-core-libart.vdex Reads: 1332 KB i_size: 3080 KB
+            /framework/arm/boot-framework.oat Reads: 2732 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 2760 KB i_size: 19304 KB
+            /framework/arm/boot.oat Reads: 320 KB i_size: 7511 KB
+            /framework/arm/boot-okhttp.oat Reads: 108 KB i_size: 545 KB
+            /framework/arm/boot-okhttp.vdex Reads: 244 KB i_size: 412 KB
+            /framework/framework-res.apk Reads: 720 KB i_size: 18923 KB
+            /lib/hw/gralloc.mt6737m.so Reads: 12 KB i_size: 40 KB
+            /lib/libandroid.so Reads: 84 KB i_size: 95 KB
+            /lib/libart.so Reads: 76 KB i_size: 5602 KB
+            /lib/libGLESv2.so Reads: 28 KB i_size: 68 KB
+            /lib/libskia.so Reads: 316 KB i_size: 5578 KB
+            /lib/libwebviewchromium_loader.so Reads: 12 KB i_size: 15 KB
+            /lib/libwebviewchromium_plat_support.so Reads: 16 KB i_size: 20 KB
+            /user/0 Reads: 4 KB i_size: 10 bytes
+            /usr/hyphen-data/hyph-en-us.hyb Reads: 20 KB i_size: 58 KB
+            /usr/icu/icudt58l.dat Reads: 1400 KB i_size: 22774 KB
+            Total Reads: 28492 KB
+PID: pool-3-thread-1
+            /lib/libandroid_runtime.so Reads: 4 KB i_size: 1451 KB
+            Total Reads: 4 KB
+PID: sh
+            /bin/toybox Reads: 16 KB i_size: 319 KB
+            Total Reads: 16 KB
+PID: SharedPreferenc
+            /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml Reads: 4 KB i_size: 2 KB
+            /data/com.google.android.gm/shared_prefs/AndroidMail.Main.xml Reads: 4 KB i_size: 206 bytes
+            /data/com.google.android.gm/shared_prefs/c9edm_account-1303398453.xml Reads: 4 KB i_size: 254 bytes
+            /data/com.google.android.gm/shared_prefs/c9edm_account-2137146394.xml Reads: 4 KB i_size: 167 bytes
+            /data/com.google.android.gm/shared_prefs/Folder-android.smoke.fast@gmail.com-^sq_ig_i_personal.xml Reads: 4 KB i_size: 402 bytes
+            /data/com.google.android.gm/shared_prefs/G6yPrefs.xml Reads: 4 KB i_size: 191 bytes
+            /data/com.google.android.gm/shared_prefs/Gmail.xml Reads: 4 KB i_size: 1 KB
+            /data/com.google.android.gm/shared_prefs/_has_set_default_values.xml Reads: 4 KB i_size: 130 bytes
+            /data/com.google.android.gm/shared_prefs/Impressions-android.smoke.fast@gmail.com.xml Reads: 4 KB i_size: 65 bytes
+            /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml Reads: 4 KB i_size: 65 bytes
+            /data/com.google.android.gm/shared_prefs/UnifiedEmail.xml Reads: 4 KB i_size: 935 bytes
+            /data/com.google.android.gm/shared_prefs/WebViewChromiumPrefs.xml Reads: 4 KB i_size: 127 bytes
+            Total Reads: 48 KB
+PID: Thread-4
+            /framework/arm/boot.oat Reads: 96 KB i_size: 7511 KB
+            Total Reads: 96 KB
+PID: Thread-6
+            /app/Gmail2Light/Gmail2Light.apk Reads: 8 KB i_size: 9736 KB
+            Total Reads: 8 KB
+PID: Thread-9
+            /framework/arm/boot-framework.oat Reads: 72 KB i_size: 21357 KB
+            /framework/arm/boot-framework.vdex Reads: 96 KB i_size: 19304 KB
+            Total Reads: 168 KB
+PID: WorkerPool/8556
+            /app/Chrome/Chrome.apk Reads: 408 KB i_size: 71354 KB
+            Total Reads: 408 KB
+Grand Total File DATA KB Reads 76796
+Total (ALL) Read KB mmcblk0 = 96576
+READ DELTA: Total Blockdev Reads KB - Total File Data Reads KB = 19780 KB
+Total (ALL) Read IOs mmcblk0 = 2722
+Debug Grand Total KB READ 76796
+
+Writes :
+_______
+
+FILE VIEW:
+File: /data/com.android.providers.downloads/databases/downloads.db
+            Binder8274_1 Writes: 73 KB
+            Binder8274_3 Writes: 33 KB
+            Binder8274_4 Writes: 106 KB
+            sAsyncHandlerTh Writes: 33 KB
+            Thread-4 Writes: 66 KB
+            Thread-5 Writes: 49 KB
+            Binder8274_1 Writes: 73 KB
+            Binder8274_3 Writes: 33 KB
+            Binder8274_4 Writes: 106 KB
+            sAsyncHandlerTh Writes: 33 KB
+            Thread-4 Writes: 66 KB
+            Thread-5 Writes: 49 KB
+            Total Writes: 720 KB i_size: 8 KB
+File: /data/com.android.providers.downloads/databases/downloads.db-journal
+            Binder8274_1 Writes: 37 KB
+            Binder8274_3 Writes: 17 KB
+            Binder8274_4 Writes: 54 KB
+            sAsyncHandlerTh Writes: 17 KB
+            Thread-4 Writes: 34 KB
+            Thread-5 Writes: 25 KB
+            Total Writes: 184 KB i_size: 8 KB
+File: /data/com.android.providers.downloads/files/downloadfile.bin
+            Thread-4 Writes: 79 KB
+            Thread-5 Writes: 23 KB
+            Total Writes: 102 KB i_size: 23 KB
+File: /data/com.google.android.gm/app_sslcache/mail.google.com.443
+            NetworkCursor_F Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /data/com.google.android.gm/app_webview/Cookies
+            CookieMonsterBa Writes: 358 KB
+            Total Writes: 358 KB i_size: 5 KB
+File: /data/com.google.android.gm/app_webview/Cookies-journal
+            CookieMonsterBa Writes: 188 KB
+            Total Writes: 188 KB i_size: 5 KB
+File: /data/com.google.android.gm/cache/android.smoke.fast@gmail.com/jelly-bean-1.png
+            Background_task Writes: 79 KB
+            Total Writes: 79 KB i_size: 8 KB
+File: /data/com.google.android.gm/cache/android.smoke.fast@gmail.com/PANO_20120828_015822-1.jpg
+            Background_task Writes: 23 KB
+            Total Writes: 23 KB i_size: 8 KB
+File: /data/com.google.android.gm/databases/EmailProvider.db
+            AsyncTask_#2 Writes: 49 KB
+            Total Writes: 49 KB i_size: 8 KB
+File: /data/com.google.android.gm/databases/EmailProvider.db-journal
+            AsyncTask_#2 Writes: 25 KB
+            Total Writes: 25 KB i_size: 8 KB
+File: /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db
+            AsyncQueryWorke Writes: 224 KB
+            AsyncTask_#1 Writes: 264 KB
+            NetworkCursor_F Writes: 4866 KB
+            Thread-13 Writes: 292 KB
+            Thread-15 Writes: 280 KB
+            Thread-16 Writes: 320 KB
+            AsyncTask_#1 Writes: 264 KB
+            AsyncQueryWorke Writes: 224 KB
+            AsyncTask_#1 Writes: 264 KB
+            AsyncTask_#2 Writes: 108 KB
+            AsyncTask_#3 Writes: 64 KB
+            Background_task Writes: 16 KB
+            NetworkCursor_F Writes: 4866 KB
+            SyncAdapterThre Writes: 112 KB
+            Thread-12 Writes: 100 KB
+            Thread-13 Writes: 292 KB
+            Thread-14 Writes: 108 KB
+            Thread-15 Writes: 280 KB
+            Thread-16 Writes: 320 KB
+            Thread-17 Writes: 128 KB
+            Thread-18 Writes: 136 KB
+            Thread-19 Writes: 128 KB
+            Thread-20 Writes: 108 KB
+            Total Writes: 13764 KB i_size: 512 KB
+File: /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-shm
+            AsyncTask_#1 Writes: 0 KB
+            Total Writes: 0 KB i_size: 4 KB
+File: /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal
+            AsyncQueryWorke Writes: 48 KB
+            AsyncTask_#1 Writes: 76 KB
+            AsyncTask_#2 Writes: 108 KB
+            AsyncTask_#3 Writes: 64 KB
+            Background_task Writes: 16 KB
+            NetworkCursor_F Writes: 3242 KB
+            SyncAdapterThre Writes: 112 KB
+            Thread-12 Writes: 100 KB
+            Thread-13 Writes: 96 KB
+            Thread-14 Writes: 108 KB
+            Thread-15 Writes: 104 KB
+            Thread-16 Writes: 116 KB
+            Thread-17 Writes: 128 KB
+            Thread-18 Writes: 136 KB
+            Thread-19 Writes: 128 KB
+            Thread-20 Writes: 108 KB
+            Total Writes: 4690 KB i_size: 512 KB
+File: /data/com.google.android.gms/databases/playlog.db
+            lowpool[11] Writes: 11760 KB
+            Total Writes: 11760 KB i_size: 426 KB
+File: /data/com.google.android.gms/databases/playlog.db-wal
+            lowpool[11] Writes: 10884 KB
+            Total Writes: 10884 KB i_size: 426 KB
+File: /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml
+            ogle.android.gm Writes: 2 KB
+            queued-work-loo Writes: 11 KB
+            Total Writes: 13 KB i_size: 0 bytes
+File: /data/com.google.android.gm/shared_prefs/Gmail.xml
+            ogle.android.gm Writes: 1 KB
+            queued-work-loo Writes: 4 KB
+            Total Writes: 5 KB i_size: 0 bytes
+File: /data/com.google.android.gm/shared_prefs/Impressions-android.smoke.fast@gmail.com.xml
+            queued-work-loo Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /data/com.google.android.gm/shared_prefs/MailAppProvider.xml
+            ogle.android.gm Writes: 10 KB
+            queued-work-loo Writes: 97 KB
+            Total Writes: 107 KB i_size: 4 KB
+File: /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml
+            queued-work-loo Writes: 1 KB
+            Total Writes: 1 KB i_size: 0 bytes
+File: /misc/profiles/cur/0/com.android.systemui/primary.prof
+            Profile_Saver Writes: 10 KB
+            Total Writes: 10 KB i_size: 8 bytes
+File: /system/appops.xml
+            AsyncTask_#7 Writes: 11 KB
+            Total Writes: 11 KB i_size: 8 KB
+File: /system_ce/0/recent_tasks/20_task.xml
+            LazyTaskWriterT Writes: 2 KB
+            Total Writes: 2 KB i_size: 1 KB
+File: /system/job/jobs.xml
+            android.io Writes: 127 KB
+            Total Writes: 127 KB i_size: 8 KB
+File: /system/screen_on_time
+            android.bg Writes: 0 KB
+            Total Writes: 0 KB i_size: 0 bytes
+File: /system/usagestats/0/daily/1499287200538
+            android.bg Writes: 41 KB
+            Total Writes: 41 KB i_size: 8 KB
+File: /system/usagestats/0/monthly/1499287200538
+            android.bg Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /system/usagestats/0/weekly/1499287200538
+            android.bg Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /system/usagestats/0/yearly/1499287200538
+            android.bg Writes: 5 KB
+            Total Writes: 5 KB i_size: 4 KB
+File: /system/users/0/app_idle_stats.xml
+            android.bg Writes: 9 KB
+            Total Writes: 9 KB i_size: 8 KB
+File: /system/users/0/settings_secure.xml
+            SettingsProvide Writes: 12 KB
+            Total Writes: 12 KB i_size: 8 KB
+Grand Total File DATA KB Writes 43184
+PID VIEW:
+PID: android.bg
+            /system/screen_on_time Writes: 0 KB i_size: 0 bytes
+            /system/usagestats/0/daily/1499287200538 Writes: 41 KB i_size: 8 KB
+            /system/usagestats/0/monthly/1499287200538 Writes: 5 KB i_size: 4 KB
+            /system/usagestats/0/weekly/1499287200538 Writes: 5 KB i_size: 4 KB
+            /system/usagestats/0/yearly/1499287200538 Writes: 5 KB i_size: 4 KB
+            /system/users/0/app_idle_stats.xml Writes: 9 KB i_size: 8 KB
+            Total Writes: 65 KB
+PID: android.io
+            /system/job/jobs.xml Writes: 127 KB i_size: 8 KB
+            Total Writes: 127 KB
+PID: AsyncQueryWorke
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 224 KB i_size: 575 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 48 KB i_size: 575 KB
+            Total Writes: 272 KB
+PID: AsyncTask_#1
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 264 KB i_size: 512 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-shm Writes: 0 KB i_size: 4 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 76 KB i_size: 512 KB
+            Total Writes: 340 KB
+PID: AsyncTask_#2
+            /data/com.google.android.gm/databases/EmailProvider.db Writes: 49 KB i_size: 8 KB
+            /data/com.google.android.gm/databases/EmailProvider.db-journal Writes: 25 KB i_size: 8 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 108 KB i_size: 512 KB
+            Total Writes: 182 KB
+PID: AsyncTask_#3
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 64 KB i_size: 512 KB
+            Total Writes: 64 KB
+PID: AsyncTask_#7
+            /system/appops.xml Writes: 11 KB i_size: 8 KB
+            Total Writes: 11 KB
+PID: Background_task
+            /data/com.google.android.gm/cache/android.smoke.fast@gmail.com/jelly-bean-1.png Writes: 79 KB i_size: 8 KB
+            /data/com.google.android.gm/cache/android.smoke.fast@gmail.com/PANO_20120828_015822-1.jpg Writes: 23 KB i_size: 8 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 16 KB i_size: 512 KB
+            Total Writes: 118 KB
+PID: Binder8274_1
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 73 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 37 KB i_size: 8 KB
+            Total Writes: 110 KB
+PID: Binder8274_3
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 33 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 17 KB i_size: 8 KB
+            Total Writes: 50 KB
+PID: Binder8274_4
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 106 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 54 KB i_size: 8 KB
+            Total Writes: 160 KB
+PID: CookieMonsterBa
+            /data/com.google.android.gm/app_webview/Cookies Writes: 358 KB i_size: 5 KB
+            /data/com.google.android.gm/app_webview/Cookies-journal Writes: 188 KB i_size: 5 KB
+            Total Writes: 546 KB
+PID: LazyTaskWriterT
+            /system_ce/0/recent_tasks/20_task.xml Writes: 2 KB i_size: 1 KB
+            Total Writes: 2 KB
+PID: lowpool[11]
+            /data/com.google.android.gms/databases/playlog.db Writes: 11760 KB i_size: 426 KB
+            /data/com.google.android.gms/databases/playlog.db-wal Writes: 10884 KB i_size: 426 KB
+            Total Writes: 22644 KB
+PID: NetworkCursor_F
+            /data/com.google.android.gm/app_sslcache/mail.google.com.443 Writes: 5 KB i_size: 4 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 4866 KB i_size: 512 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 3242 KB i_size: 512 KB
+            Total Writes: 8113 KB
+PID: ogle.android.gm
+            /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml Writes: 2 KB i_size: 0 bytes
+            /data/com.google.android.gm/shared_prefs/Gmail.xml Writes: 1 KB i_size: 0 bytes
+            /data/com.google.android.gm/shared_prefs/MailAppProvider.xml Writes: 10 KB i_size: 4 KB
+            Total Writes: 13 KB
+PID: Profile_Saver
+            /misc/profiles/cur/0/com.android.systemui/primary.prof Writes: 10 KB i_size: 8 bytes
+            Total Writes: 10 KB
+PID: queued-work-loo
+            /data/com.google.android.gm/shared_prefs/Account-android.smoke.fast@gmail.com.xml Writes: 11 KB i_size: 0 bytes
+            /data/com.google.android.gm/shared_prefs/Gmail.xml Writes: 4 KB i_size: 0 bytes
+            /data/com.google.android.gm/shared_prefs/Impressions-android.smoke.fast@gmail.com.xml Writes: 0 KB i_size: 0 bytes
+            /data/com.google.android.gm/shared_prefs/MailAppProvider.xml Writes: 97 KB i_size: 4 KB
+            /data/com.google.android.gm/shared_prefs/SmartreplyEvents-android.smoke.fast@gmail.com.xml Writes: 1 KB i_size: 0 bytes
+            Total Writes: 113 KB
+PID: sAsyncHandlerTh
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 33 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 17 KB i_size: 8 KB
+            Total Writes: 50 KB
+PID: SettingsProvide
+            /system/users/0/settings_secure.xml Writes: 12 KB i_size: 8 KB
+            Total Writes: 12 KB
+PID: SyncAdapterThre
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 112 KB i_size: 512 KB
+            Total Writes: 112 KB
+PID: Thread-12
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 100 KB i_size: 512 KB
+            Total Writes: 100 KB
+PID: Thread-13
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 292 KB i_size: 512 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 96 KB i_size: 512 KB
+            Total Writes: 388 KB
+PID: Thread-14
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 108 KB i_size: 512 KB
+            Total Writes: 108 KB
+PID: Thread-15
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 280 KB i_size: 512 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 104 KB i_size: 512 KB
+            Total Writes: 384 KB
+PID: Thread-16
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db Writes: 320 KB i_size: 512 KB
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 116 KB i_size: 512 KB
+            Total Writes: 436 KB
+PID: Thread-17
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 128 KB i_size: 512 KB
+            Total Writes: 128 KB
+PID: Thread-18
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 136 KB i_size: 512 KB
+            Total Writes: 136 KB
+PID: Thread-19
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 128 KB i_size: 512 KB
+            Total Writes: 128 KB
+PID: Thread-20
+            /data/com.google.android.gm/databases/mailstore.android.smoke.fast@gmail.com.db-wal Writes: 108 KB i_size: 512 KB
+            Total Writes: 108 KB
+PID: Thread-4
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 66 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 34 KB i_size: 8 KB
+            /data/com.android.providers.downloads/files/downloadfile.bin Writes: 79 KB i_size: 79 KB
+            Total Writes: 179 KB
+PID: Thread-5
+            /data/com.android.providers.downloads/databases/downloads.db Writes: 49 KB i_size: 8 KB
+            /data/com.android.providers.downloads/databases/downloads.db-journal Writes: 25 KB i_size: 8 KB
+            /data/com.android.providers.downloads/files/downloadfile.bin Writes: 23 KB i_size: 23 KB
+            Total Writes: 97 KB
+Grand Total File DATA KB Writes 35306
+Total (ALL) Write KB mmcblk0 = 23520
+WRITE DELTA: Total Blockdev Writes KB - Total File Data Writes KB = -11786 KB
+Total (ALL) Write IOs mmcblk0 = 1829
+Debug Grand Total KB WRITTEN 20366

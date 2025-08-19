@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package report;
+
+message Keyword {
+  required string value = 1;
+}
+
+message Keywords {
+  repeated Keyword keyword = 1;
+}
+
+message Record {
+  required string timestamp = 1;
+  required string event = 2;
+  required int64 timing = 3;
+}
+
+message Report {
+  repeated Record record = 1;
+}
