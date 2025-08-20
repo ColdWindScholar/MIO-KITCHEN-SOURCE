@@ -724,10 +724,10 @@ int extract_ext4(extract_args_struct args) {
                         "usable on most systems.\n",
                 blocksize);
     conf_dir = strdup(args.config_dir);
-    android_configure++;
-    if ((args.image_type = "e"))
+    android_configure = true;
+    if ((args.image_type == "e"))
         image_type = RAW;
-    if ((args.image_type = "s"))
+    if ((args.image_type == "s"))
         image_type = SPARSE;
     android_configure_only = args.android_configure_only;
     if (*args.mountpoint != '/') {
@@ -803,7 +803,7 @@ int extract_ext4(extract_args_struct args) {
     {
         puts("\n");
         com_err(prog_name, retval, "while opening file %s", in_file);
-        return (EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     if (!quiet)
