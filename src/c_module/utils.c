@@ -1,5 +1,6 @@
 #include <Python.h>
 #include "utils.h"
+// s = str , i = int, p = bool
 int extract_ext4(extract_args_struct args);
 static PyObject* ext4_extractor(PyObject *self, PyObject* args, PyObject* kwargs) {
 
@@ -34,15 +35,10 @@ static PyMethodDef Methods[] = {
 
 
 static PyModuleDef libutils = {
-
     PyModuleDef_HEAD_INIT,
-
     "libutils",
-
     "MIO-KITCHEN C Module.",
-
     -1,
-
     Methods
 
 };
