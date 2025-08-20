@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sparse/sparse.h>
-#include <sparse_file.h>
 #if defined(__APPLE__) && defined(__MACH__) && defined(__CYGWIN__)
 #define lseek64 lseek
 #define off64_t off_t
@@ -50,10 +49,7 @@ static PyObject* img2simg(PyObject* self, PyObject* args,  PyObject* kwargs) {
     enum sparse_read_mode mode = SPARSE_READ_MODE_NORMAL;
     int in;
     int out;
-    int ret;
-    struct sparse_file* s;
     unsigned int block_size = 4096;
-    off64_t len;
     bool read_holes = false;
     char *kwlist[] = {
         "raw_image_file", "sparse_image_file", "block_size","read_hole",NULL
@@ -83,17 +79,17 @@ static PyObject* img2simg(PyObject* self, PyObject* args,  PyObject* kwargs) {
             return Py_BuildValue("i", EXIT_FAILURE);
         }
     }
-    len = lseek64(in, 0, SEEK_END);
+    off64_t len = lseek64(in, 0, SEEK_END);
     lseek64(in, 0, SEEK_SET);
 
-    s = sparse_file_new(block_size, len);
+    struct sparse_file *s = sparse_file_new(block_size, len);
     if (!s) {
         fprintf(stderr, "Failed to create sparse file\n");
         return Py_BuildValue("i", EXIT_FAILURE);
     }
 
     sparse_file_verbose(s);
-    ret = sparse_file_read(s, in, mode, false);
+    int ret = sparse_file_read(s, in, mode, false);
     if (ret) {
         fprintf(stderr, "Failed to read file\n");
         return Py_BuildValue("i", EXIT_FAILURE);
