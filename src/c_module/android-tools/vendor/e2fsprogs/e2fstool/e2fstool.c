@@ -16,6 +16,7 @@ char *in_file = NULL;
 char *out_dir = NULL;
 char *conf_dir = NULL;
 char *mountpoint;
+char *part_name;
 FILE *contexts, *filesystem;
 bool android_configure = false, android_configure_only = false;
 bool system_as_root = false;
@@ -723,6 +724,7 @@ int extract_ext4(extract_args_struct args) {
                 blocksize);
     conf_dir = strdup(args.config_dir);
     android_configure = true;
+    part_name = strdup(args.part_name);
     if (!strcmp(args.image_type, "e"))
         image_type = RAW;
     if (!strcmp(args.image_type, "s"))

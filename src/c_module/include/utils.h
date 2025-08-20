@@ -13,5 +13,6 @@ typedef struct {
     char * image_type;
     int blocksize;
     bool android_configure_only;
+    char * part_name;
 } extract_args_struct;
 #endif //C_MODULE_UTILS_H

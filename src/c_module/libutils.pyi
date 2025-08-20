@@ -3,8 +3,9 @@ from typing import Literal
 
 
 def ext4_extractor(config_dir: str, mountpoint: str, filename: str, directory: str, blocksize: int,
-                   image_type: Literal['e', 's'], android_configure_only: bool) -> int:
+                   image_type: Literal['e', 's'], android_configure_only: bool, part_name:str) -> int:
     """
+    :param part_name: partition_name:e.g:system
     :param config_dir: dir to store config files
     :param mountpoint: e.g: "/system"
     :param filename: image file path
