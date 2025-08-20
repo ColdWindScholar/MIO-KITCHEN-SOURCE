@@ -706,7 +706,6 @@ ctx_end:
     return retval;
 }
 int extract_ext4(extract_args_struct args) {
-    int show_version_only = 0;
     io_manager io_mgr = unix_io_manager;
     errcode_t retval = 0, close_retval = 0;
     unsigned int blocksize = args.blocksize;
@@ -739,7 +738,7 @@ int extract_ext4(extract_args_struct args) {
     add_error_table(&et_ext2_error_table);
 
 
-    if (!show_version_only)
+    if (true)
     {
 
         if (android_configure_only &&
