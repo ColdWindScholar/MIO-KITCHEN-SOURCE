@@ -31,3 +31,8 @@ target_include_directories(utils PRIVATE
 target_include_directories(utils PUBLIC include)
 include_directories(include)
 add_subdirectory(android-tools)
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_subdirectory(libnt)
+    target_include_directories(utils libnt/include)
+    target_link_libraries(utils libnt)
+endif()
