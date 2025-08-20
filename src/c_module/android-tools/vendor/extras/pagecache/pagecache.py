@@ -13,7 +13,7 @@ import queue
 STATS_UPDATE_INTERVAL = 0.2
 PAGE_SIZE = 4096
 
-class PagecacheStats():
+class PagecacheStats:
   """Holds pagecache stats by accounting for pages added and removed.
 
   """
@@ -63,8 +63,8 @@ class PagecacheStats():
 
   def reset_stats(self):
     self._file_pages.clear()
-    self._total_pages_added = 0;
-    self._total_pages_removed = 0;
+    self._total_pages_added = 0
+    self._total_pages_removed = 0
 
   def print_stats(self):
     # Create new merged dict
@@ -75,7 +75,7 @@ class PagecacheStats():
       filesize = self._file_size[filename]
       added = self._file_pages[filename][0]
       removed = self._file_pages[filename][1]
-      if (len(filename) > 64):
+      if len(filename) > 64:
         filename = filename[-64:]
       print(row_format.format(filename, self.pages_to_mb(added), self.pages_to_mb(removed), self.bytes_to_mb(filesize)))
 
@@ -94,7 +94,7 @@ class PagecacheStats():
       filesize = self._file_size[filename]
       added  = self._file_pages[filename][0]
       removed = self._file_pages[filename][1]
-      if (len(filename) > 64):
+      if len(filename) > 64:
         filename = filename[-64:]
       pad.addstr(y, 2, filename)
       pad.addstr(y, 70, self.pages_to_mb(added).rjust(10))
@@ -170,7 +170,7 @@ class FileReaderThread(threading.Thread):
     assert chunk_size > 0
     self._chunk_size = chunk_size
 
-class AdbUtils():
+class AdbUtils:
   @staticmethod
   def add_adb_serial(adb_command, device_serial):
     if device_serial is not None:
@@ -215,7 +215,7 @@ class AdbUtils():
       adb_return_code = error.returncode
       adb_output = error.output
 
-    return (adb_output, adb_return_code)
+    return adb_output, adb_return_code
 
   @staticmethod
   def do_preprocess_adb_cmd(command, serial):
@@ -230,13 +230,13 @@ class AdbUtils():
 def parse_atrace_line(line, pagecache_stats, app_name):
   # Find a mm_filemap_add_to_page_cache entry
   m = re.match('.* (mm_filemap_add_to_page_cache|mm_filemap_delete_from_page_cache): dev (\d+):(\d+) ino ([0-9a-z]+) page=([0-9a-z]+) pfn=([0-9a-z]+) ofs=(\d+).*', line)
-  if m != None:
+  if m is not None:
     # Get filename
     device_number = int(m.group(2)) << 8 | int(m.group(3))
     if device_number == 0:
       return
     inode = int(m.group(4), 16)
-    if app_name != None and not (app_name in m.group(0)):
+    if app_name is not None and not (app_name in m.group(0)):
       return
     if m.group(1) == 'mm_filemap_add_to_page_cache':
       pagecache_stats.add_page(device_number, inode, m.group(4))
@@ -251,13 +251,13 @@ def build_inode_lookup_table(inode_dump):
     if result:
       inode2filename[(int(result.group(1)), int(result.group(2)))] = (result.group(4), result.group(3))
 
-  return inode2filename;
+  return inode2filename
 
 def get_inode_data(datafile, dumpfile, adb_serial):
   if datafile is not None and os.path.isfile(datafile):
     print('Using cached inode data from ' + datafile)
     f = open(datafile, 'r')
-    stat_dump = f.read();
+    stat_dump = f.read()
   else:
     # Build inode maps if we were tracing page cache
     print('Downloading inode data from device')
@@ -281,7 +281,7 @@ def get_inode_data(datafile, dumpfile, adb_serial):
 def read_and_parse_trace_file(trace_file, pagecache_stats, app_name):
   for line in trace_file:
     parse_atrace_line(line, pagecache_stats, app_name)
-  pagecache_stats.print_stats();
+  pagecache_stats.print_stats()
 
 def read_and_parse_trace_data_live(stdout, stderr, pagecache_stats, app_name):
   # Start reading trace data
@@ -368,7 +368,7 @@ def parse_options(argv):
   options, categories = parser.parse_args(argv[1:])
   if options.inode_dump_file and options.inode_data_file:
     parser.error('options -d and -i can\'t be used at the same time')
-  return (options, categories)
+  return options, categories
 
 def main():
   options, categories = parse_options(sys.argv)
