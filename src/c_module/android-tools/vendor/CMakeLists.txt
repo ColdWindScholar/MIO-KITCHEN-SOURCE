@@ -110,6 +110,7 @@ find_package(Protobuf CONFIG)
 find_package(Protobuf REQUIRED)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+find_package(ZLIB REQUIRED)
 
 check_symbol_exists(strlcpy "string.h" HAVE_STRLCPY)
 check_symbol_exists(reallocarray "stdlib.h" HAVE_REALLOCARRAY)
