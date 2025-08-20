@@ -107,6 +107,7 @@ static PyObject* img2simg(PyObject* self, PyObject* args,  PyObject* kwargs) {
 
     close(in);
     close(out);
+    free(s);
     return Py_BuildValue("i", EXIT_SUCCESS);
 }
 static PyObject* simg2img(PyObject* self, PyObject* args,  PyObject* kwargs) {
