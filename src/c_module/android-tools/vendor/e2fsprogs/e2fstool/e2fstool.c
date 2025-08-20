@@ -709,9 +709,8 @@ int extract_ext4(extract_args_struct args) {
     int show_version_only = 0;
     io_manager io_mgr = unix_io_manager;
     errcode_t retval = 0, close_retval = 0;
-    unsigned int b, blocksize = 0;
-    blocksize = args.blocksize;
-    b = blocksize > 0 ? blocksize : -blocksize;
+    unsigned int blocksize = args.blocksize;
+    unsigned int b = blocksize > 0 ? blocksize : -blocksize;
     if (b < EXT2_MIN_BLOCK_SIZE ||
         b > EXT2_MAX_BLOCK_SIZE)
     {
@@ -725,9 +724,9 @@ int extract_ext4(extract_args_struct args) {
                 blocksize);
     conf_dir = strdup(args.config_dir);
     android_configure = true;
-    if ((args.image_type == "e"))
+    if (args.image_type == "e")
         image_type = RAW;
-    if ((args.image_type == "s"))
+    if (args.image_type == "s")
         image_type = SPARSE;
     android_configure_only = args.android_configure_only;
     if (*args.mountpoint != '/') {
