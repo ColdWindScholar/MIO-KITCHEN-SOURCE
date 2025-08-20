@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <sparse/sparse.h>
 #include <sparse_file.h>
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(__APPLE__) && defined(__MACH__) && defined(__CYGWIN__)
 #define lseek64 lseek
 #define off64_t off_t
 #endif
