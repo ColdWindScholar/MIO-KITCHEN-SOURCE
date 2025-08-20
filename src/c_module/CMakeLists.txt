@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(c_module)
 
-set(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS OFF)
 execute_process(
         COMMAND bash -c "python3-config --cflags"
         OUTPUT_VARIABLE C_FLAGS
