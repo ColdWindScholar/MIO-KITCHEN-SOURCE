@@ -14,8 +14,14 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 set(Python_ADDITIONAL_VERSIONS 3.13)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS}")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LD_FLAGS}")
+list(INSERT CMAKE_FIND_LIBRARY_PREFIXES 0 ${CMAKE_STATIC_LIBRARY_PREFIX})
+list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 ${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+# and after find_package(PkgConfig REQUIRED)
+list(APPEND PKG_CONFIG_EXECUTABLE "--static")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS} -static")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LD_FLAGS} -static")
 add_library(utils SHARED utils.c
         utils.h)
 target_link_libraries(utils e2fstool libext2fs libsparse libzip libcutils liblog libutil
