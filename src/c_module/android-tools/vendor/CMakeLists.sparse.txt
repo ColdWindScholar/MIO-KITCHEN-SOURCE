@@ -10,12 +10,6 @@ target_include_directories(libsparse PUBLIC
 	core/libsparse/include libbase/include)
 target_link_libraries(libsparse PRIVATE libbase)
 
-
-add_executable(img2simg
-	core/libsparse/img2simg.cpp)
-target_link_libraries(img2simg
-	libsparse z libbase)
-
 add_executable(append2simg
 	core/libsparse/append2simg.cpp)
 target_link_libraries(append2simg

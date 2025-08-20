@@ -134,7 +134,6 @@ include(CMakeLists.avb.txt)
 install(TARGETS
 	"${ANDROID_MKE2FS_NAME}"
 	append2simg
-	img2simg
 	lpadd
 	lpdump
 	lpflash
