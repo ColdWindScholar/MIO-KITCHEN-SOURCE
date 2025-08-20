@@ -142,7 +142,6 @@ install(TARGETS
 	lpunpack
 	make_f2fs
 	sload_f2fs
-	simg2img
 	ext2simg
 	DESTINATION bin)
 
