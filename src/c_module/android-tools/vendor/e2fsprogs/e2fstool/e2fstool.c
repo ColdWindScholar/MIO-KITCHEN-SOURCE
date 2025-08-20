@@ -637,7 +637,7 @@ static errcode_t walk_fs(ext2_filsys fs)
             return retval;
         }
 
-        if (asprintf(&se_path, "%s/selinux_contexts.fs", conf_dir) < 0) {
+        if (asprintf(&se_path, "%s/%s_file_contexts", conf_dir, part_name) < 0) {
             E2FSTOOL_ERROR("while allocating memory");
             return EXT2_ET_NO_MEMORY;
         }
@@ -649,7 +649,7 @@ static errcode_t walk_fs(ext2_filsys fs)
             goto ctx_end;
         }
 
-        if (asprintf(&fs_path, "%s/filesystem_config.fs", conf_dir) < 0) {
+        if (asprintf(&fs_path, "%s/%s_fs_config", conf_dir, part_name) < 0) {
             E2FSTOOL_ERROR("while allocating memory");
             retval = EXT2_ET_NO_MEMORY;
             goto fs_end;
