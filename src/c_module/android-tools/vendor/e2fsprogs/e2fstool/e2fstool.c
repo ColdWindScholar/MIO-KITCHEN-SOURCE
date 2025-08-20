@@ -723,9 +723,9 @@ int extract_ext4(extract_args_struct args) {
                 blocksize);
     conf_dir = strdup(args.config_dir);
     android_configure = true;
-    if (args.image_type == "e")
+    if (!strcmp(args.image_type, "e"))
         image_type = RAW;
-    if (args.image_type == "s")
+    if (!strcmp(args.image_type, "s"))
         image_type = SPARSE;
     android_configure_only = args.android_configure_only;
     if (*args.mountpoint != '/') {
