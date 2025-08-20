@@ -22,12 +22,12 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS} -static")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LD_FLAGS} -static")
 add_library(utils SHARED utils.c
-        utils.h)
+        include/utils.h)
 target_link_libraries(utils e2fstool libext2fs libsparse libzip libcutils liblog libutil
         libbase libselinux libsepol z pcre2-8 m pthread -static)
 target_include_directories(utils PRIVATE
         android-tools/vendor/e2fsprogs/lib android-tools/vendor/e2fsprogs/lib/ext2fs android-tools/vendor/selinux/libselinux/include
         android-tools/vendor/core/libcutils/include android-tools/vendor/e2fsprogs/misc)
 target_include_directories(utils PUBLIC include)
-include_directories(.)
+include_directories(include)
 add_subdirectory(android-tools)

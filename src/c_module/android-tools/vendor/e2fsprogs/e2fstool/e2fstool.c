@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include <utils.h>
+#include <../../../../include/utils.h>
 #include "e2fstool.h"
 #if !defined(O_BINARY)
 #define O_BINARY 0
