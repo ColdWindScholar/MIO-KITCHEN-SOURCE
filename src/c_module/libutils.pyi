@@ -16,3 +16,12 @@ def ext4_extractor(config_dir: str, mountpoint: str, filename: str, directory: s
     :return: 0 if successful else != 0
     """
     raise NotImplementedError("Sorry!Cannot use the func.")
+
+def simg2img(sparse_file_list:list[str], output_filename) -> int:
+    """
+
+    :param sparse_file_list:e.g:["sparse1.img", "sparse2.img"]
+    :param output_filename:e.g:"raw.img"
+    :return:0 if successful else != 0
+    """
+    raise NotImplementedError("Not Ready!")
