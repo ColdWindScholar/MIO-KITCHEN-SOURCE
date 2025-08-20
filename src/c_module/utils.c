@@ -1,7 +1,7 @@
 #include <Python.h>
 #include "utils.h"
 int extract_ext4(extract_args_struct args);
-static PyObject* ext4_extractor(PyObject* self, PyObject* args) {
+static PyObject* ext4_extractor(PyObject *self, PyObject* args, PyObject* kwargs) {
 
     char *config_dir, *mountpoint, *filename, *directory;
     char *image_type;
@@ -10,7 +10,7 @@ static PyObject* ext4_extractor(PyObject* self, PyObject* args) {
         "config_dir", "mountpoint", "filename", "directory", "blocksize", "image_type", "android_configure_only",NULL
     };
     extract_args_struct arguments;
-    if (!PyArg_ParseTupleAndKeywords(args,NULL, "ssssisp",kwlist ,&config_dir, &mountpoint, &filename, &directory, &blocksize, &image_type, &android_configure_only)) {
+    if (!PyArg_ParseTupleAndKeywords(args,kwargs, "ssssisp",kwlist ,&config_dir, &mountpoint, &filename, &directory, &blocksize, &image_type, &android_configure_only)) {
         return NULL;
     }
     arguments.config_dir = config_dir;
@@ -26,7 +26,7 @@ static PyObject* ext4_extractor(PyObject* self, PyObject* args) {
 
 static PyMethodDef Methods[] = {
 
-    {"ext4_extractor", ext4_extractor, METH_VARARGS | METH_KEYWORDS, "Extract ext4 images"},
+    {"ext4_extractor", (PyCFunction)ext4_extractor, METH_VARARGS | METH_KEYWORDS, "Extract ext4 images"},
 
     {NULL, NULL, 0, NULL}
 
