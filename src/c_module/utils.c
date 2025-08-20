@@ -18,7 +18,7 @@
 #endif
 struct sparse_file;
 
-// s = str , i = int, p = bool
+// s = str , i = int, p = bool, O = origin data
 int extract_ext4(extract_args_struct args);
 static PyObject* ext4_extractor(PyObject *self, PyObject* args, PyObject* kwargs) {
 
