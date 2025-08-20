@@ -24,7 +24,6 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional
-from src.c_module import libutils
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -6318,8 +6317,8 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False)
-                #imgextractor.Extractor().main(project_manger.current_work_path() + i + ".img", f'{work}/{i}', work)
+                #libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False, i)
+                imgextractor.Extractor().main(project_manger.current_work_path() + i + ".img", f'{work}/{i}', work)
                 if os.path.exists(f'{work}/{i}'):
                     try:
                         os.remove(f"{work}/{i}.img")
