@@ -18,11 +18,6 @@ static PyObject* ext4_extractor(PyObject* self, PyObject* args) {
     arguments.blocksize = blocksize ? blocksize:0;
     arguments.android_configure_only = android_configure_only;
     int return_code = extract_ext4(arguments);
-    free(config_dir);
-    free(mountpoint);
-    free(filename);
-    free(directory);
-    free(image_type);
     return Py_BuildValue("i", return_code);
 
 }
