@@ -20,9 +20,9 @@ if(PREFER_STATIC_LINKING)
 	list(INSERT CMAKE_FIND_LIBRARY_PREFIXES 0 ${CMAKE_STATIC_LIBRARY_PREFIX})
 	list(INSERT CMAKE_FIND_LIBRARY_SUFFIXES 0 ${CMAKE_STATIC_LIBRARY_SUFFIX})
 	list(APPEND PKG_CONFIG_EXECUTABLE "--static")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static -fPIC")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -fPIC")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -fPIC")
 endif()
 # Different versions of clang require a different set of flags for -ftrivial-auto-var-init
 # Simplify this contruct once old clang version support is dropped

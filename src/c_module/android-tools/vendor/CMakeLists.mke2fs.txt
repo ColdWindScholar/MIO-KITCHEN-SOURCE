@@ -139,7 +139,7 @@ add_executable(e2fsdroid
 	e2fsprogs/contrib/android/fsmap.c
 	e2fsprogs/contrib/android/block_list.c
 	e2fsprogs/contrib/android/perms.c)
-add_executable(e2fstool e2fsprogs/e2fstool/e2fstool.c)
+add_library(e2fstool STATIC e2fsprogs/e2fstool/e2fstool.c)
 include(CheckIncludeFile)
 CHECK_INCLUDE_FILE("sys/types.h" HAVE_SYS_TYPES_H)
 
@@ -204,14 +204,13 @@ target_include_directories(libext2_e2p PUBLIC
 target_link_libraries(e2fsdroid
 	libext2fs libsparse libzip libcutils liblog libutil
 	libbase libselinux libsepol z pcre2-8 pthread -static)
-target_link_libraries(e2fstool
-    libext2_com_err libext2_e2p libext2fs libsparse libbase z -static)
+
 target_include_directories(e2fsdroid PRIVATE
 	e2fsprogs/lib e2fsprogs/lib/ext2fs selinux/libselinux/include
 	core/libcutils/include e2fsprogs/misc)
 target_include_directories(e2fstool PRIVATE
 	e2fsprogs/lib e2fsprogs/lib/ext2fs selinux/libselinux/include
-	core/libcutils/include e2fsprogs/misc)
+	core/libcutils/include e2fsprogs/misc core/libsparse/include)
 
 endif()
 

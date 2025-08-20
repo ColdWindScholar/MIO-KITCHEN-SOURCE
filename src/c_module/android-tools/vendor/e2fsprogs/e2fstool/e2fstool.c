@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <utils.h>
 #include "e2fstool.h"
 #if !defined(O_BINARY)
 #define O_BINARY 0
@@ -142,10 +142,10 @@ static char *escape_regex_meta_chars(const char *filepath)
 
 errcode_t ino_get_xattr(ext2_filsys fs, ext2_ino_t ino, const char *key, void **val, size_t *val_len)
 {
-    errcode_t retval, close_retval;
+    errcode_t close_retval;
     struct ext2_xattr_handle *xhandle;
 
-    retval = ext2fs_xattrs_open(fs, ino, &xhandle);
+    errcode_t retval = ext2fs_xattrs_open(fs, ino, &xhandle);
     if (retval)
     {
         com_err(__func__, retval, "while opening inode %u", ino);
@@ -178,24 +178,23 @@ xattrs_close:
     return retval;
 }
 
-static inline errcode_t ino_get_selinux_xattr(ext2_filsys fs, ext2_ino_t ino,
-                                              void **val, size_t *val_len)
+static errcode_t ino_get_selinux_xattr(ext2_filsys fs, ext2_ino_t ino,
+                                       void **val, size_t *val_len)
 {
     errcode_t retval = ino_get_xattr(fs, ino, "security." XATTR_SELINUX_SUFFIX, val, val_len);
 
     return retval == EXT2_ET_EA_KEY_NOT_FOUND ? 0 : retval;
 }
 
-static inline errcode_t ino_get_capabilities_xattr(ext2_filsys fs, ext2_ino_t ino,
-                                                   uint64_t *cap)
+static errcode_t ino_get_capabilities_xattr(ext2_filsys fs, ext2_ino_t ino,
+                                            uint64_t *cap)
 {
-    errcode_t retval;
     struct vfs_cap_data *cap_data = NULL;
     size_t len = 0;
 
     *cap = 0;
 
-    retval = ino_get_xattr(fs, ino, "security." XATTR_CAPS_SUFFIX, (void **)&cap_data, &len);
+    errcode_t retval = ino_get_xattr(fs, ino, "security." XATTR_CAPS_SUFFIX, (void **) &cap_data, &len);
     if (retval)
     {
         goto end;
@@ -357,7 +356,7 @@ errcode_t ino_extract_regular(ext2_filsys fs, ext2_ino_t ino, const char *path)
     ext2_file_t e2_file;
     struct ext2_inode inode;
     char *buf = NULL;
-    int fd, nbytes;
+    int nbytes;
     unsigned int written = 0, got;
     errcode_t retval = 0, close_retval = 0;
 
@@ -368,7 +367,7 @@ errcode_t ino_extract_regular(ext2_filsys fs, ext2_ino_t ino, const char *path)
         return retval;
     }
 
-    fd = open(path, O_WRONLY | O_TRUNC | O_BINARY | O_CREAT, 0644);
+    int fd = open(path, O_WRONLY | O_TRUNC | O_BINARY | O_CREAT, 0644);
     if (fd < 0)
     {
         E2FSTOOL_ERROR("while creating file");
@@ -438,13 +437,12 @@ int walk_dir(ext2_ino_t dir,
              int blocksize EXT2FS_ATTR((unused)),
              char *buf EXT2FS_ATTR((unused)), void *priv_data)
 {
-    __u16 name_len;
     char *output_file;
     struct ext2_inode inode;
     struct inode_params *params = (struct inode_params *)priv_data;
     errcode_t retval = 0;
 
-    name_len = de->name_len & 0xff;
+    __u16 name_len = de->name_len & 0xff;
     if (!strncmp(de->name, ".", name_len) ||
         !strncmp(de->name, "..", name_len))
         return 0;
@@ -707,94 +705,43 @@ fs_end:
 ctx_end:
     return retval;
 }
-
-int main(int argc, char *argv[])
-{
-    int c, show_version_only = 0;
+int extract_ext4(extract_args_struct args) {
+    int show_version_only = 0;
     io_manager io_mgr = unix_io_manager;
     errcode_t retval = 0, close_retval = 0;
     unsigned int b, blocksize = 0;
-
+    blocksize = args.blocksize;
+    b = blocksize > 0 ? blocksize : -blocksize;
+    if (b < EXT2_MIN_BLOCK_SIZE ||
+        b > EXT2_MAX_BLOCK_SIZE)
+    {
+        com_err(prog_name, 0,
+                "invalid block size - %s", optarg);
+        exit(EXIT_FAILURE);
+    }
+    if (blocksize > 4096)
+        fprintf(stderr, "Warning: blocksize %d not "
+                        "usable on most systems.\n",
+                blocksize);
+    conf_dir = strdup(args.config_dir);
+    android_configure++;
+    if ((args.image_type = "e"))
+        image_type = RAW;
+    if ((args.image_type = "s"))
+        image_type = SPARSE;
+    android_configure_only = args.android_configure_only;
+    if (*args.mountpoint != '/') {
+        fprintf(stderr, "Invalid mountpoint %s", optarg);
+        return EXIT_FAILURE;
+    }
+    mountpoint = strdup(args.mountpoint);
+    in_file = strdup(args.filename);
+    out_dir = strdup(args.directory);
     add_error_table(&et_ext2_error_table);
 
-    while ((c = getopt(argc, argv, "b:c:ehm:oqsvV")) != EOF)
-    {
-        switch (c)
-        {
-        case 'b':
-            blocksize = parse_num_blocks2(optarg, -1);
-            b = blocksize > 0 ? blocksize : -blocksize;
-            if (b < EXT2_MIN_BLOCK_SIZE ||
-                b > EXT2_MAX_BLOCK_SIZE)
-            {
-                com_err(prog_name, 0,
-                        "invalid block size - %s", optarg);
-                exit(EXIT_FAILURE);
-            }
-            if (blocksize > 4096)
-                fprintf(stderr, "Warning: blocksize %d not "
-                                "usable on most systems.\n",
-                        blocksize);
-            break;
-        case 'c':
-            conf_dir = strdup(optarg);
-            android_configure++;
-            break;
-        case 'e':
-            image_type = RAW;
-            break;
-        case 's':
-            image_type = SPARSE;
-            break;
-        case 'o':
-            android_configure_only++;
-            break;
-        case 'm':
-            if (*optarg != '/')
-            {
-                fprintf(stderr, "Invalid mountpoint %s", optarg);
-                return EXIT_FAILURE;
-            }
-            mountpoint = strdup(optarg);
-            break;
-        case 'h':
-            usage(EXIT_SUCCESS);return 0;
-        case 'q':
-            ++quiet;
-            break;
-        case 'v':
-            ++verbose;
-            break;
-        case 'V':
-            ++show_version_only;
-            break;
-        default:
-            return EXIT_FAILURE;
-        }
-    }
 
     if (!show_version_only)
     {
-        if (optind >= argc)
-        {
-            fprintf(stderr, "Expected filename after options\n");
-            usage(EXIT_FAILURE);
-            return EXIT_FAILURE;
-        }
-
-        in_file = strdup(argv[optind++]);
-
-        if (!android_configure_only)
-        {
-            if (optind >= argc)
-            {
-                fprintf(stderr, "Expected directory after options\n");
-                usage(EXIT_FAILURE);
-                return EXIT_FAILURE;
-            }
-
-            out_dir = strdup(argv[optind++]);
-        }
 
         if (android_configure_only &&
             !android_configure)
@@ -804,12 +751,6 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-        if (optind < argc)
-        {
-            fprintf(stderr, "Unexpected argument: %s\n", argv[optind]);
-            usage(EXIT_FAILURE);
-            return EXIT_FAILURE;
-        }
 
         if (android_configure_only &&
             !android_configure)
@@ -818,17 +759,6 @@ int main(int argc, char *argv[])
             usage(EXIT_FAILURE);
             return EXIT_FAILURE;
         }
-    }
-
-    if (!quiet || show_version_only)
-        printf("e2fstool %s (%s)\n\n", E2FSTOOL_VERSION,
-               E2FSTOOL_DATE);
-
-    if (show_version_only)
-    {
-        printf("Using %s\n",
-               error_message(EXT2_ET_BASE));
-        exit(EXIT_SUCCESS);
     }
 
     if (image_type == UNKNOWN)
@@ -862,7 +792,7 @@ int main(int argc, char *argv[])
         if (asprintf(&new_in_file, "(%s):0:%u", in_file, blocksize) == -1)
         {
             E2FSTOOL_ERROR("while allocating file name");
-            exit(EXIT_FAILURE);
+            return EXIT_FAILURE;
         }
         free(in_file);
         in_file = new_in_file;
@@ -873,7 +803,7 @@ int main(int argc, char *argv[])
     {
         puts("\n");
         com_err(prog_name, retval, "while opening file %s", in_file);
-        exit(EXIT_FAILURE);
+        return (EXIT_FAILURE);
     }
 
     if (!quiet)

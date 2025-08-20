@@ -380,7 +380,7 @@ def _parse_ramdisk_copy_pair(pair, src_ramdisk_dir=None):
     if os.path.isabs(dst_file):
         raise ValueError('destination file name cannot be absolute: ' +
                          dst_file)
-    return (src_pathname, dst_file)
+    return src_pathname, dst_file
 
 
 def main():

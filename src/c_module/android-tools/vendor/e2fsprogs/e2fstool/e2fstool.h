@@ -53,4 +53,5 @@ struct inode_params {
     char *path;
     char *filename;
 };
+int extract_ext4(extract_args_struct args);
 #endif /* E2FSTOOL_H_INC */
