@@ -40,12 +40,7 @@ static PyModuleDef libutils = {
     "MIO-KITCHEN C Module.",
     -1,
     Methods
-
 };
 
 
-PyMODINIT_FUNC PyInit_libutils(void) {
-
-    return PyModule_Create(&libutils);
-
-}
+PyMODINIT_FUNC PyInit_libutils(void) {return PyModule_Create(&libutils);}
