@@ -116,16 +116,14 @@ static int is_overlapping(unsigned int begin1, unsigned int length1,
  */
 static int is_valid_ugid_map(const struct ugid_map* mapping)
 {
-	size_t i, j;
-
 	if (mapping->size > UID_GID_MAP_MAX_EXTENTS) {
 		fprintf(stderr, "too many u/gid mapping entries\n");
 		return 0;
 	}
 
-	for (i = 0; i < mapping->size; ++i) {
+	for (size_t i = 0; i < mapping->size; ++i) {
 		const struct ugid_map_entry *entry1 = &mapping->entries[i];
-		for (j = i + 1; j < mapping->size; ++j) {
+		for (size_t j = i + 1; j < mapping->size; ++j) {
 			const struct ugid_map_entry *entry2 =
 				&mapping->entries[j];
 			if (is_overlapping(entry1->child_id, entry1->length,
@@ -164,13 +162,12 @@ static int is_valid_ugid_map(const struct ugid_map* mapping)
  */
 static int parse_ugid_map(char* arg, struct ugid_map* result)
 {
-	int i;
 	char *line, *line_saveptr;
 	size_t current_index;
 
 	/* Count the number of lines. */
 	result->size = 1;
-	for (i = 0; arg[i]; ++i) {
+	for (int i = 0; arg[i]; ++i) {
 		if (arg[i] == '\n')
 			++result->size;
 	}
@@ -198,16 +195,10 @@ static int parse_ugid_map(char* arg, struct ugid_map* result)
 int e2fsdroid(e2fsdroid_args_struct arguments)
 {
 	int flags = EXT2_FLAG_RW;
-	errcode_t retval;
 	io_manager io_mgr;
 	ext2_filsys fs = NULL;
 	struct fs_ops_callbacks fs_callbacks = { NULL, NULL };
-	char *token;
 	int nr_opt = 0;
-	ext2_ino_t inodes_count;
-	ext2_ino_t free_inodes_count;
-	blk64_t blocks_count;
-	blk64_t free_blocks_count;
 	struct ugid_map uid_map = { 0, NULL }, gid_map = { 0, NULL };
 
 	add_error_table(&et_ext2_error_table);
@@ -220,7 +211,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 		android_configure = 1;
 	}
 	if (strcmp(arguments.file_contexts, "")!=0) {
-		token = strtok(arguments.file_contexts, ",");
+		char *token = strtok(arguments.file_contexts, ",");
 		while (token) {
 			if (nr_opt == max_nr_opt) {
 				fprintf(stderr, "Expected at most %d selinux opts\n",
@@ -277,7 +268,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 		io_mgr = unix_io_manager;
 		in_file = strdup(arguments.image);
 	}
-	retval = ext2fs_open(in_file, flags, 0, 0, io_mgr, &fs);
+	errcode_t retval = ext2fs_open(in_file, flags, 0, 0, io_mgr, &fs);
 	if (retval) {
 		com_err(prog_name, retval, "while opening file %s\n", in_file);
 		return retval;
@@ -340,10 +331,10 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 		}
 	}
 
-	inodes_count = fs->super->s_inodes_count;
-	free_inodes_count = fs->super->s_free_inodes_count;
-	blocks_count = ext2fs_blocks_count(fs->super);
-	free_blocks_count = ext2fs_free_blocks_count(fs->super);
+	ext2_ino_t inodes_count = fs->super->s_inodes_count;
+	ext2_ino_t free_inodes_count = fs->super->s_free_inodes_count;
+	blk64_t blocks_count = ext2fs_blocks_count(fs->super);
+	blk64_t free_blocks_count = ext2fs_free_blocks_count(fs->super);
 
 	retval = ext2fs_close_free(&fs);
 	if (retval) {
