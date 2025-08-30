@@ -238,7 +238,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 	if (strcmp(arguments.basefs_in, "") != 0) {
 		basefs_in = absolute_path(arguments.basefs_in);
 	}
-	if (strcmp(arguments.block_list, "") != 0) {
+	if (arguments.block_list != NULL && strcmp(arguments.block_list, "") != 0) {
 		block_list = absolute_path(arguments.block_list);
 	}
 	if (strcmp(arguments.src_dir, "") != 0) {
