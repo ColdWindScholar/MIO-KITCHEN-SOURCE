@@ -220,8 +220,7 @@ static PyObject * e2fsdroid_api(PyObject* self, PyObject* args,  PyObject* kwarg
     argument.gid_mapping = gid_mapping;
     argument.image = image;
     argument.is_share_dup = is_share_dup;
-    const int ret = e2fsdroid(argument);
-    return Py_BuildValue("i", ret);
+    return Py_BuildValue("i", e2fsdroid(argument));
 }
 
 static PyMethodDef Methods[] = {

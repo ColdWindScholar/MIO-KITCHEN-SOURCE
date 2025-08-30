@@ -326,7 +326,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 		if (retval) {
 			com_err(prog_name, retval, "%s",
 				"while creating the block_list");
-			return (1);
+			return 1;
 		}
 	}
 
@@ -336,7 +336,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 		if (retval) {
 			com_err(prog_name, retval, "%s",
 				"while creating the basefs file");
-			return (1);
+			return 1;
 		}
 	}
 
