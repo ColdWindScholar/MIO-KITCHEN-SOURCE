@@ -260,7 +260,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 
 	if (android_sparse_file) {
 		io_mgr = sparse_io_manager;
-		if (asprintf(&in_file, "(%s)", arguments.image) == -1) {
+		if (asprintf(&in_file, "(%s)", strdup(arguments.image)) == -1) {
 			fprintf(stderr, "Failed to allocate file name\n");
 			return EXIT_FAILURE;
 		}

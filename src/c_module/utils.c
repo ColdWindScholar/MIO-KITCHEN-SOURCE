@@ -200,7 +200,7 @@ static PyObject * e2fsdroid_api(PyObject* self, PyObject* args,  PyObject* kwarg
     char * image;
     bool is_share_dup;
     char *kwlist[] = {
-        "block_list", "basefs_out","timestamp", "fs_config", "file_contexts", "product_out", "mountpoint", "basefs_in", "src_dir", "is_raw", "is_share_dup", "uid_mapping", "gid_mapping","image",NULL
+        "block_list", "basefs_out","timestamp", "fs_config", "file_contexts", "product_out", "mountpoint", "basefs_in", "src_dir", "is_sparse", "is_share_dup", "uid_mapping", "gid_mapping","image",NULL
     };
     if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ssissssssppsss", kwlist, &block_list, &basefs_out,&timestamp, &fs_config,&file_contexts, &product_out, &mountpoint, &basefs_in, &src_dir, &android_sparse_file, &is_share_dup, &uid_mapping, &gid_mapping, &image)) {
         return NULL;

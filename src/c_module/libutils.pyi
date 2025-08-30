@@ -37,9 +37,10 @@ def img2simg(raw_image_file:str, sparse_image_file:str, block_size:int, read_hol
     """
     raise NotImplementedError("Not Ready!")
 
-def e2fsdroid(block_list:str, basefs_out:str,timestamp:int, fs_config:str, file_contexts:str, product_out:str, mountpoint:str, basefs_in:str, src_dir:str, is_raw:bool, is_share_dup:bool, uid_mapping:str, gid_mapping:str,image:str) -> str:
+def e2fsdroid(block_list:str, basefs_out:str,timestamp:int, fs_config:str, file_contexts:str, product_out:str, mountpoint:str, basefs_in:str, src_dir:str, is_sparse:bool, is_share_dup:bool, uid_mapping:str, gid_mapping:str,image:str) -> str:
     """
 
+    :param is_sparse:
     :param block_list:
     :param basefs_out:
     :param timestamp:
@@ -49,7 +50,6 @@ def e2fsdroid(block_list:str, basefs_out:str,timestamp:int, fs_config:str, file_
     :param mountpoint:
     :param basefs_in:
     :param src_dir:
-    :param is_raw:
     :param is_share_dup:
     :param uid_mapping:
     :param gid_mapping:
