@@ -271,7 +271,7 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 	errcode_t retval = ext2fs_open(in_file, flags, 0, 0, io_mgr, &fs);
 	if (retval) {
 		com_err(prog_name, retval, "while opening file %s\n", in_file);
-		return retval;
+		return 1;
 	}
 
 	if (src_dir) {
