@@ -20,11 +20,12 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libstdc++")
 # and after find_package(PkgConfig REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${C_FLAGS} -static")
+add_compile_options(-fPIC)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LD_FLAGS} -static")
 add_library(utils SHARED utils.c
         include/utils.h)
 target_link_libraries(utils e2fstool libext2fs libsparse libzip libcutils liblog libutil
-        libbase libselinux libsepol z pcre2-8 m pthread e2fsdroid -static)
+        libbase libselinux libsepol z pcre2-8 m pthread e2fsdroid c -static  -Wl,-Bstatic -static-libgcc)
 target_include_directories(utils PRIVATE
         android-tools/vendor/e2fsprogs/lib android-tools/vendor/e2fsprogs/lib/ext2fs android-tools/vendor/selinux/libselinux/include
         android-tools/vendor/core/libcutils/include android-tools/vendor/e2fsprogs/misc android-tools/vendor/core/libsparse)
