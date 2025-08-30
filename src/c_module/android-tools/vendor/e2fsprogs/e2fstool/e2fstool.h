@@ -10,9 +10,12 @@
 #include <e2p/e2p.h>
 #include <ext2fs/ext2fs.h>
 #include <ext2fs/ext2fsP.h>
-
-//#include <private/android_filesystem_capability.h>
+#if defined(__CYGWIN__) || defined(__DARWIN__)
+#include <private/android_filesystem_capability.h>
+#else
 #include <linux/capability.h>
+#endif
+
 
 #define E2FSTOOL_VERSION "1.1.0"
 #define E2FSTOOL_DATE "15-July-2024"
