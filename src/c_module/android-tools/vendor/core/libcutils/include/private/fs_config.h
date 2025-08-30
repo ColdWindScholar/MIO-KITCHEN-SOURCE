@@ -25,8 +25,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <unistd.h>
-
+#if defined(__CYGWIN__) || defined(__DARWIN__)
+#include <private/android_filesystem_capability.h>
+#else
 #include <linux/capability.h>
+#endif
 
 /* Rules for directories and files has moved to system/code/libcutils/fs_config.c */
 
