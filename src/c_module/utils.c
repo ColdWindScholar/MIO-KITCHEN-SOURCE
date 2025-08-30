@@ -33,7 +33,7 @@
 #define O_BINARY 0
 #endif
 struct sparse_file;
-
+int e2fsdroid(e2fsdroid_args_struct arguments);
 // s = str , i = int, p = bool, O = origin data
 int extract_ext4(extract_args_struct args);
 static PyObject* ext4_extractor(PyObject *self, PyObject* args, PyObject* kwargs) {
@@ -174,13 +174,61 @@ static PyObject* simg2img(PyObject* self, PyObject* args,  PyObject* kwargs) {
     close(out);
     return Py_BuildValue("i", 0);
 }
-
+static PyObject * e2fsdroid_api(PyObject* self, PyObject* args,  PyObject* kwargs) {
+    /*
+    * {
+    fprintf(stderr, "%s [-B block_list] [-D basefs_out] [-T timestamp]\n"
+            "\t[-C fs_config] [-S file_contexts] [-p product_out]\n"
+            "\t[-a mountpoint] [-d basefs_in] [-f src_dir] [-e] [-s]\n"
+            "\t[-u uid-mapping] [-g gid-mapping] image\n",
+                prog_name);
+    exit(ret);
+}
+     */
+    char * block_list;// a file
+    char * basefs_out;// a file
+    long int timestamp;
+    char * fs_config;
+    char * file_contexts;
+    char * product_out;// a file
+    char * mountpoint;
+    char * basefs_in;//a file
+    char * src_dir;
+    bool android_sparse_file;// e //
+    char * uid_mapping;
+    char * gid_mapping;
+    char * image;
+    bool is_share_dup;
+    char *kwlist[] = {
+        "block_list", "basefs_out","timestamp", "fs_config", "file_contexts", "product_out", "mountpoint", "basefs_in", "src_dir", "is_raw", "is_share_dup", "uid_mapping", "gid_mapping","image",NULL
+    };
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "ssissssssppsss", kwlist, &block_list, &basefs_out,&timestamp, &fs_config,&file_contexts, &product_out, &mountpoint, &basefs_in, &src_dir, &android_sparse_file, &is_share_dup, &uid_mapping, &gid_mapping, &image)) {
+        return NULL;
+    }
+    e2fsdroid_args_struct argument;
+    argument.block_list = block_list;
+    argument.basefs_out = basefs_out;
+    argument.timestamp = timestamp;
+    argument.fs_config = fs_config;
+    argument.file_contexts = file_contexts;
+    argument.product_out = product_out;
+    argument.mountpoint = mountpoint;
+    argument.basefs_in = basefs_in;
+    argument.src_dir = src_dir;
+    argument.android_sparse_file = android_sparse_file;
+    argument.uid_mapping = uid_mapping;
+    argument.gid_mapping = gid_mapping;
+    argument.image = image;
+    argument.is_share_dup = is_share_dup;
+    const int ret = e2fsdroid(argument);
+    return Py_BuildValue("i", ret);
+}
 
 static PyMethodDef Methods[] = {
-
     {"ext4_extractor", (PyCFunction)ext4_extractor, METH_VARARGS | METH_KEYWORDS, "Extract ext4 images"},
     {"simg2img", (PyCFunction)simg2img, METH_VARARGS | METH_KEYWORDS, "Sparse or split files to raw."},
     {"img2simg", (PyCFunction)img2simg, METH_VARARGS | METH_KEYWORDS, "RAW files to sparse."},
+    {"e2fsdroid", (PyCFunction)e2fsdroid_api, METH_VARARGS | METH_KEYWORDS, "e2fsdroid to fill data in a ext4 image."},
     {NULL, NULL, 0, NULL}
 };
 

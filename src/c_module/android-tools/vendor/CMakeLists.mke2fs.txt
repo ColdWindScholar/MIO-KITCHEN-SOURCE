@@ -131,7 +131,7 @@ target_include_directories("${ANDROID_MKE2FS_NAME}" PRIVATE
 
 # fails to build due to https://android-review.googlesource.com/c/platform/system/core/+/2760169
 if(NOT APPLE)
-add_executable(e2fsdroid
+add_library(e2fsdroid STATIC
 	e2fsprogs/contrib/android/e2fsdroid.c
 	e2fsprogs/contrib/android/basefs_allocator.c
 	e2fsprogs/contrib/android/block_range.c
