@@ -241,27 +241,27 @@ int e2fsdroid(e2fsdroid_args_struct arguments)
 	if (strcmp(arguments.mountpoint, "") != 0) {
 		mountpoint = strdup(arguments.mountpoint);
 	}
-	if (arguments.basefs_out) {
+	if (strcmp(arguments.basefs_out, "") != 0) {
 		basefs_out = absolute_path(arguments.basefs_out);
 	}
-	if (arguments.basefs_in) {
+	if (strcmp(arguments.basefs_in, "") != 0) {
 		basefs_in = absolute_path(arguments.basefs_in);
 	}
-	if (arguments.block_list) {
+	if (strcmp(arguments.block_list, "") != 0) {
 		block_list = absolute_path(arguments.block_list);
 	}
-	if (arguments.src_dir) {
+	if (strcmp(arguments.src_dir, "") != 0) {
 		src_dir = absolute_path(arguments.src_dir);
 	}
 	android_sparse_file = arguments.android_sparse_file;
 	if (arguments.is_share_dup)
 		flags |= EXT2_FLAG_SHARE_DUP;
-	if (arguments.uid_mapping) {
+	if (strcmp(arguments.uid_mapping, "") != 0) {
 		if (!parse_ugid_map(arguments.uid_mapping, &uid_map))
 			return EXIT_FAILURE;
 		android_configure = 1;
 	}
-	if (arguments.gid_mapping) {
+	if (strcmp(arguments.gid_mapping, "") != 0) {
 		if (!parse_ugid_map(arguments.gid_mapping, &gid_map))
 			return EXIT_FAILURE;
 		android_configure = 1;
