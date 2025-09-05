@@ -1,2 +1,0 @@
-# /data/misc subdirectories
-type bootio_data_file, file_type, data_file_type, core_data_file_type;

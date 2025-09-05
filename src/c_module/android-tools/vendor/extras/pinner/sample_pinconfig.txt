@@ -1,5 +1,0 @@
-file lib/arm64-v8a/libcrashpad_handler_trampoline.so
-file libmonochrome_64.so
-offset 108391596
-len 33348032
-file libarcore_sdk_c.so

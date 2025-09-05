@@ -1,7 +1,0 @@
-{
-  "postsubmit": [
-    {
-      "name": "libprocessgroup_util_test"
-    }
-  ]
-}

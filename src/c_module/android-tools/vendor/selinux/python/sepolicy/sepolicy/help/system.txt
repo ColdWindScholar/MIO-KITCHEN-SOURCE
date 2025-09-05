@@ -1,1 +1,0 @@
-This screen allows you to view modify the way SELinux is running on your system.

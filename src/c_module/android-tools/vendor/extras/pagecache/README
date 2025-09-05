@@ -1,4 +1,0 @@
-Pagecache tools.
-
-dumpcache.c: dumps complete pagecache of device.
-pagecache.py: shows live info on files going in/out of pagecache.

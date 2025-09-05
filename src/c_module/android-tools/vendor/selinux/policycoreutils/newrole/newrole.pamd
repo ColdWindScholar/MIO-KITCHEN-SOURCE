@@ -1,8 +1,0 @@
-#%PAM-1.0
-# Uncomment the next line if you do not want to enter your passwd every time
-# auth       sufficient   pam_rootok.so
-auth       include	system-auth
-account    include	system-auth
-password   include	system-auth
-session    include	system-auth
-session    optional	pam_xauth.so

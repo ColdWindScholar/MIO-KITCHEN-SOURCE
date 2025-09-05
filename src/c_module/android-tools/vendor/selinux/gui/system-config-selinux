@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec /usr/bin/pkexec /usr/share/system-config-selinux/system-config-selinux.py

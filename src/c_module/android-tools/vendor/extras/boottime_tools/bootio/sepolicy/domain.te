@@ -1,2 +1,0 @@
-# dontaudit bootio kernel:system module_request;
-allow bootio kernel:fd use;

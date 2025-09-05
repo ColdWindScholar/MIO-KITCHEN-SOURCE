@@ -1,2 +1,0 @@
-[cfi]
-fun:_ZL19llvm_signal_handleri

@@ -1,1 +1,0 @@
-install(PROGRAMS libufdt/utils/src/mkdtboimg.py DESTINATION bin RENAME mkdtboimg)

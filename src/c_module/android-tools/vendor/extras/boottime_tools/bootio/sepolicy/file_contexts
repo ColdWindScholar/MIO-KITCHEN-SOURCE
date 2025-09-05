@@ -1,5 +1,0 @@
-# System files
-/system/bin/bootio            u:object_r:bootio_exec:s0
-
-# Misc data
-/data/misc/bootio(/.*)?       u:object_r:bootio_data_file:s0

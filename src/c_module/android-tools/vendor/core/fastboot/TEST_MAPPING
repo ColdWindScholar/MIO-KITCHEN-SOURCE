@@ -1,7 +1,0 @@
-{
-  "presubmit": [
-    {
-      "name": "fastboot_test"
-    }
-  ]
-}

@@ -1,3 +1,0 @@
-# This file is no longer in use.
-# Please update linker configuration generator instead.
-# You can find the code from /system/linkerconfig

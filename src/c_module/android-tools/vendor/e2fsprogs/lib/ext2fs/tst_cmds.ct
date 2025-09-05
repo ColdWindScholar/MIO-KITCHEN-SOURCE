@@ -1,6 +1,0 @@
-command_table libext2fs_cmds;
-
-request do_block_iterate, "block_iterate",
-	block_iterate;
-
-end;
