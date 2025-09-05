@@ -362,9 +362,6 @@
   "select_compression_method": "Select compression method:",
   "pack_button_text": "Pack",
   "packing_in_progress": "Packing in progress...",
-  "packing_failed": "Failed to create payload.bin. Check logs for details.",
-  "verify_after_packing": "Verify payload after packing",
-  "verification_successful": "Verification successful! The payload is valid.",
   "ui_verification_failed": "Verification FAILED!",
   "decrypt_xtc_xml":"Decrypt Xtc Xml",
   "mtk_port_tool": "Mtk Port Tool"
