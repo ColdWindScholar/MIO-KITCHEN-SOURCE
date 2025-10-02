@@ -146,6 +146,9 @@ class Extractor:
                 dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                 if dir_target.endswith('.') and os.name == 'nt':
                     dir_target = dir_target[:-1]
+                if os.name == 'nt' and ":" in dir_target:
+                    print("[NTWarning] The <:> not allow in path, will replace <:> to <_>.")
+                    dir_target = dir_target.replace(":", "_")
                 if not os.path.isdir(dir_target):
                     os.makedirs(dir_target)
                 if os.name == 'posix' and os.geteuid() == 0:
