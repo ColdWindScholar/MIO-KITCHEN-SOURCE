@@ -213,6 +213,7 @@ def check_supported(args):
         LOGE("Your Device Was Not supported Yet.")
 
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='config', description='The tool to config/manage MIO-KITCHEN/TIK',
                                      exit_on_error=False)
@@ -222,6 +223,9 @@ if __name__ == '__main__':
     unpack_rom_parser.set_defaults(func=update)
     check_support = subparser.add_parser('check', help='check if supported this machine')
     check_support.set_defaults(func=check_supported)
+    help_support = subparser.add_parser('help', help='check if supported this machine')
+    help_support.set_defaults(func=lambda *_:parser.print_help(
+    ))
     subcmd, subcmd_args = parser.parse_known_args()
     if not hasattr(subcmd, 'func'):
         parser.print_help()
