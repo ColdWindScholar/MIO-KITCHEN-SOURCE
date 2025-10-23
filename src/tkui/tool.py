@@ -363,12 +363,8 @@ class Toplevel(TkToplevel):
         """
         super().__init__()
         if os.name == 'nt':  # Only apply this on Windows.
-            if settings.theme == 'dark':
-                # For a dark theme, set the title bar to a dark color.
-                set_title_bar_color(self)
-            else:
-                # For other themes (presumably light), set a default light title bar color.
-                set_title_bar_color(self, 0)
+            set_title_bar_color(self, 20 if settings.theme == 'dark' else 0)
+
 
 
 class CustomControls:

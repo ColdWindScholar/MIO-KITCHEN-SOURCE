@@ -109,7 +109,7 @@ def extract_xml(filename, key, iv):
                 break
         if pagesize == 0:
             print("Unknown pagesize. Aborting")
-            return
+            return None
 
         xmloffset = filesize - pagesize
         rf.seek(xmloffset + 0x14)
@@ -134,18 +134,14 @@ def extract_xml(filename, key, iv):
 
 def aes_cfb(data, key, iv):
     ctx = AES.new(key, AES.MODE_CFB, iv=iv, segment_size=128)
-    decrypted = ctx.decrypt(data)
-    return decrypted
+    return ctx.decrypt(data)
 
 
 def copysub(rf, wf, start, length):
     rf.seek(start)
     rlen = 0
     while length > 0:
-        if length < 0x100000:
-            size = length
-        else:
-            size = 0x100000
+        size = length if length < 0x100000 else 0x100000
         data = rf.read(size)
         wf.write(data)
         rlen += len(data)
@@ -272,7 +268,7 @@ def main(filename, outdir):
         zippw = bytes("flash@realme$50E7F7D847732396F1582CD62DD385ED7ABB0897", 'utf-8')
         with zipfile.ZipFile(filename) as file:
             for zfile in file.namelist():
-                print("Extracting " + zfile + " to " + outdir)
+                print("Extracting ", zfile , " to " , outdir)
                 file.extract(zfile, pwd=zippw, path=outdir)
             print("Files extracted to " + outdir)
             return
@@ -300,7 +296,7 @@ def main(filename, outdir):
         os.mkdir(path)
 
     print("Saving ProFile.xml")
-    with open(path + os.sep + "ProFile.xml", mode="w") as file_handle:
+    with open(path + "/ProFile.xml", mode="w") as file_handle:
         file_handle.write(xml)
 
     for child in et.fromstring(xml):
