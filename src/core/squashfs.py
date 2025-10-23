@@ -1,6 +1,12 @@
 from ctypes import LittleEndianStructure, sizeof, memmove, byref, string_at, addressof, c_uint32, c_uint16, c_uint64
 
+try:
+    from enum import IntEnum
+except ImportError:
+    IntEnum = int
 magics = [b'sqsh', b'hsqs']
+
+
 class BasicStruct(LittleEndianStructure):
     @property
     def _size(self):
@@ -19,6 +25,22 @@ class BasicStruct(LittleEndianStructure):
 
     def pack(self):
         return string_at(addressof(self), sizeof(self))
+
+
+class SuperblockFlags(IntEnum):
+    UNCOMPRESSED_INODES = 0x0001
+    UNCOMPRESSED_DATA = 0x0002
+    CHECK = 0x0004
+    UNCOMPRESSED_FRAGMENTS = 0x0008
+    NO_FRAGMENTS = 0x0010
+    ALWAYS_FRAGMENTS = 0x0020
+    DUPLICATES = 0x0040
+    EXPORTABLE = 0x0080
+    UNCOMPRESSED_XATTRS = 0x0100
+    NO_XATTRS = 0x0200
+    COMPRESSOR_OPTIONS = 0x0400
+    UNCOMPRESSED_IDS = 0x0800
+
 
 class SuperBlock(BasicStruct):
     _fields_ = [
