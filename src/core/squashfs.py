@@ -64,3 +64,13 @@ class SuperBlock(BasicStruct):
         ("frag_table", c_uint64),
         ("export_table", c_uint64),
     ]
+
+class InodeHeader(BasicStruct):
+    _fields_ = [
+        ("inode_type", c_uint16),
+        ("permissions", c_uint16),
+        ("uid_idx", c_uint16),
+        ("gid_idx", c_uint16),
+        ("modified_time", c_uint32),
+        ("inode_number", c_uint32),
+    ]
