@@ -15,17 +15,16 @@
 __version__ = "beta-1.15.2"
 __author__ = "Kamenta"
 
-import struct
-import hashlib
-import gzip
 import bz2
+import gzip
+import hashlib
+import io
 import lzma
 import os
-import io
-from enum import Enum
-from typing import Optional, List, BinaryIO, Tuple
+import struct
 from dataclasses import dataclass
-from pathlib import Path
+from enum import Enum
+from typing import Optional, List, BinaryIO
 
 try:
     import lz4.frame
