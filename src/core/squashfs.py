@@ -95,6 +95,7 @@ class InodeHeader(BasicStruct):
         ("inode_number", c_uint32),
     ]
 
+
 class Types(IntEnum):
     SQUASHFS_DIR_TYPE = 1
     SQUASHFS_FILE_TYPE = 2
@@ -111,3 +112,13 @@ class Types(IntEnum):
     SQUASHFS_LFIFO_TYPE = 13
     SQUASHFS_LSOCKET_TYPE = 14
 
+
+class FsFlags(IntEnum):
+    SQUASHFS_NOI = 0
+    SQUASHFS_NOD = 1
+    SQUASHFS_CHECK = 2
+    SQUASHFS_NOF = 3
+    SQUASHFS_NO_FRAG = 4
+    SQUASHFS_ALWAYS_FRAG = 5
+    SQUASHFS_DUPLICATE = 6
+    SQUASHFS_EXPORT = 7
