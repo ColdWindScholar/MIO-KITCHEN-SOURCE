@@ -1,5 +1,5 @@
 from ctypes import LittleEndianStructure, sizeof, memmove, byref, string_at, addressof, c_uint32, c_uint16, c_uint64, \
-    c_uint, c_ushort
+    c_uint, c_ushort, c_longlong
 
 try:
     from enum import IntEnum
@@ -122,3 +122,32 @@ class FsFlags(IntEnum):
     SQUASHFS_ALWAYS_FRAG = 5
     SQUASHFS_DUPLICATE = 6
     SQUASHFS_EXPORT = 7
+
+
+SQUASHFS_METADATA_SIZE = 8192
+SQUASHFS_METADATA_LOG = 13
+SQUASHFS_META_INDEXES = (SQUASHFS_METADATA_SIZE / sizeof(c_uint))
+SQUASHFS_META_ENTRIES = 31
+SQUASHFS_META_NUMBER = 8
+SQUASHFS_SLOTS = 4
+
+
+class MetaEntry(BasicStruct):
+    _fields_ = [
+        ("data_block", c_longlong),
+        ("index_block", c_uint),
+        ("offset", c_ushort),
+        ("pad", c_ushort),
+    ]
+
+class MetaIndex(BasicStruct):
+    _fields_ = [
+        ("inode_number", c_uint),
+        ("offset" ,c_uint),
+        ("entries",c_ushort),
+        ("skip",c_ushort),
+        ("locked",c_ushort),
+        ("pad",c_ushort),
+        ("meta_entry",MetaEntry * SQUASHFS_META_ENTRIES),
+
+    ]
