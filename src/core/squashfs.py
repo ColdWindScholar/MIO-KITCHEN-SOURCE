@@ -1,10 +1,12 @@
-from ctypes import LittleEndianStructure, sizeof, memmove, byref, string_at, addressof, c_uint32, c_uint16, c_uint64
+from ctypes import LittleEndianStructure, sizeof, memmove, byref, string_at, addressof, c_uint32, c_uint16, c_uint64, \
+    c_uint, c_ushort
 
 try:
     from enum import IntEnum
 except ImportError:
     IntEnum = int
-magics = [b'sqsh', b'hsqs']
+magic = b'sqsh'
+magic_swap = b'hsqs'
 
 
 class BasicStruct(LittleEndianStructure):
@@ -42,19 +44,36 @@ class SuperblockFlags(IntEnum):
     UNCOMPRESSED_IDS = 0x0800
 
 
+class Compressor(IntEnum):
+    GZIP = 1
+    LZMA = 2
+    LZO = 3
+    XZ = 4
+    LZ4 = 5
+    ZSTD = 6
+
+
+class DirHeader(BasicStruct):
+    _fields_ = [
+        ("count", c_uint),
+        ("start_block", c_uint),
+        ("inode_number", c_uint),
+    ]
+
+
 class SuperBlock(BasicStruct):
     _fields_ = [
-        ("magic", c_uint32),
-        ("inode_count", c_uint32),
-        ("mod_time", c_uint32),
-        ("block_size", c_uint32),
-        ("frag_count", c_uint32),
-        ("compressor", c_uint16),
-        ("block_log", c_uint16),
-        ("flags", c_uint16),
-        ("id_count", c_uint16),
-        ("version_major", c_uint16),
-        ("version_minor", c_uint16),
+        ("magic", c_uint),
+        ("inode_count", c_uint),
+        ("mod_time", c_uint),
+        ("block_size", c_uint),
+        ("frag_count", c_uint),
+        ("compressor", c_ushort),
+        ("block_log", c_ushort),
+        ("flags", c_ushort),
+        ("id_count", c_ushort),
+        ("version_major", c_ushort),
+        ("version_minor", c_ushort),
         ("root_inode", c_uint64),
         ("bytes_used", c_uint64),
         ("id_table", c_uint64),
@@ -65,6 +84,7 @@ class SuperBlock(BasicStruct):
         ("export_table", c_uint64),
     ]
 
+
 class InodeHeader(BasicStruct):
     _fields_ = [
         ("inode_type", c_uint16),
@@ -74,3 +94,6 @@ class InodeHeader(BasicStruct):
         ("modified_time", c_uint32),
         ("inode_number", c_uint32),
     ]
+
+
+
