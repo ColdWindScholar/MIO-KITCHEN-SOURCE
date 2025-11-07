@@ -15,6 +15,7 @@
 import sys
 sys_stdout = sys.stdout
 sys_stderr = sys.stderr
+import time
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8:
         input(
@@ -26,7 +27,8 @@ except Exception as e:
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
     print(e)
-    input(f"Sorry! We cannot init the tool.\nPlease report this error to developers.!")
+    print("Sorry! We cannot init the tool.\nPlease report this error to developers.!")
+    time.sleep(3)
     sys.exit(1)
 
 if __name__ == "__main__":
