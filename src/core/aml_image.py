@@ -94,6 +94,9 @@ def main(filepath: str, output_path: str):
         header.unpack(d)
         if header.magic != amlogic_magic:
             raise Exception("magic is not amlogic magic.")
+        if header.version != 2:
+            print(f"Only Amlogic v2 supported.\nIf u wanna support v{header.version}, Please sent this file to developers.")
+            return
         i = 0
         while i < header.itemNum:
             h2 = ItemInfo()

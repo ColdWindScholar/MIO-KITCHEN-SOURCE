@@ -55,6 +55,7 @@ import tkinter as tk
 from tkinter import ttk
 from timeit import default_timer as dti
 import zipfile
+from src.core.aml_image import main as aml_main
 from io import BytesIO, StringIO
 from .tkinterdnd2_build_in import Tk, DND_FILES
 from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
@@ -5918,6 +5919,8 @@ class Packxx(Toplevel):
                 logo_pack()
             elif parts_dict[i] == 'guoke_logo':
                 GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
+            elif parts_dict[i] == 'amlogic':
+
             else:
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
