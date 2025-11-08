@@ -99,7 +99,7 @@ def main(filepath: str, output_path: str):
             print(f"[{i}/{header.itemNum}] Extracting {sub_type}.{main_type}...")
             with open(output_path + f"/{sub_type}.{main_type}", "wb") as output_file:
                 origin_position = f.tell()
-                f.seek(h2.offsetInImage)
+                f.seek(h2.curoffsetInItem)
                 output_file.write(f.read(h2.offsetInImage))
                 f.seek(origin_position)
                 partitions.append([main_type, sub_type])
