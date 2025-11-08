@@ -5919,8 +5919,6 @@ class Packxx(Toplevel):
                 logo_pack()
             elif parts_dict[i] == 'guoke_logo':
                 GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
-            elif parts_dict[i] == 'amlogic':
-                aml_main(os.path.join(work, f"{dname}.img"), work)
             else:
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
@@ -6350,6 +6348,8 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
+            if parts_dict[i] == 'amlogic':
+                aml_main(os.path.join(work, f"{dname}.img"), work)
             if file_type == 'unknown' and is_empty_img(f"{work}/{i}.img"):
                 print(lang.text141)
     if not os.path.exists(f"{work}/config"):
