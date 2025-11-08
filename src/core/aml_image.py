@@ -90,7 +90,7 @@ def main(filepath: str, output_path: str):
     partitions_verify = []
     with open(filepath, "rb") as f:
         header = AmlHeader()
-        print(d := f.read(len(header)))
+        d = f.read(len(header))
         header.unpack(d)
         if header.magic != amlogic_magic:
             raise Exception("magic is not amlogic magic.")
