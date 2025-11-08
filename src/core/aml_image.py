@@ -39,13 +39,6 @@ class BasicStruct(LittleEndianStructure):
 amlogic_magic = 0x27b51956
 
 
-class VersionHeader(BasicStruct):
-    _fields_ = [
-        ("crc32", c_uint),
-        ("version", c_uint),
-    ]
-
-
 class AmlHeader(BasicStruct):
     _pack_ = 1
     _fields_ = [
