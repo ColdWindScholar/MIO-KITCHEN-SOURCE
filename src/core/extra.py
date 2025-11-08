@@ -43,7 +43,7 @@ def script2fs_context(input_f, outdir, project):
             for target in targets:
                 symlink(src, str(os.path.join(project, target.lstrip('/'))))
         elif command in ['set_metadata', 'set_metadata_recursive']:
-            dirmode = False if command == 'set_metadata' else True
+            dirmode = command != 'set_metadata'
             fpath, *fargs = args
             fpath = fpath.replace("+", "\\+").replace("[", "\\[").replace('//', '/')
             if fpath == last_fpath:
@@ -76,7 +76,7 @@ def script2fs_context(input_f, outdir, project):
             last_fpath = fpath
 
     # generate config
-    print("生成fs_config 和 file_contexts")
+    print("Generate fs_config and file_contexts")
     fs_label.sort()
     fc_label.sort()
     with open(os.path.join(outdir, "system_fs_config"), 'w', newline='\n', encoding='utf-8') as fs_config, open(
