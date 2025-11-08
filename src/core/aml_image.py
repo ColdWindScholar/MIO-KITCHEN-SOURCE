@@ -61,7 +61,8 @@ class ItemInfo(BasicStruct):
         ("reserve", c_char * 32),
     ]
 
-def generate_cfg(partitions_list:list, partitions_verify:list, output_file):
+
+def generate_cfg(partitions_list: list, partitions_verify: list, output_file):
     partitions_normal = [i for i in partitions_list if i[1] not in partitions_verify]
     with open(output_file, "w", encoding='utf-8', newline='\n') as f:
         f.write('[LIST_NORMAL]\n')
@@ -75,7 +76,8 @@ def generate_cfg(partitions_list:list, partitions_verify:list, output_file):
             main_type, sub_type = i
             f.write(f'file="{sub_type}.{main_type}"		main_type="{main_type}"		sub_type="{sub_type}"\n')
 
-def main(filepath:str, output_path:str):
+
+def main(filepath: str, output_path: str):
     partitions = []
     partitions_verify = []
     with open(filepath, "rb") as f:
@@ -94,15 +96,15 @@ def main(filepath:str, output_path:str):
             i += 1
             main_type = h2.itemMainType.decode()
             sub_type = h2.itemSubType.decode()
+            if main_type == 'VERIFY':
+                partitions_verify.append(sub_type)
+                continue
             with open(output_path + f"/{sub_type}.{main_type}", "wb") as output_file:
-                if main_type == 'VERIFY':
-                    partitions_verify.append(sub_type)
-                else:
-                    origin_position = f.tell()
-                    f.seek(h2.offsetInImage)
-                    output_file.write(f.read(h2.offsetInImage))
-                    f.seek(origin_position)
-                    partitions.append([main_type, sub_type])
+                origin_position = f.tell()
+                f.seek(h2.offsetInImage)
+                output_file.write(f.read(h2.offsetInImage))
+                f.seek(origin_position)
+                partitions.append([main_type, sub_type])
 
     generate_cfg(partitions, partitions_verify, output_path + "/config/image.cfg")
 
