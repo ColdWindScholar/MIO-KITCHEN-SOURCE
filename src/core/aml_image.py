@@ -84,7 +84,6 @@ def main(filepath: str, output_path: str):
         header = AmlHeader()
         print(d := f.read(len(header)))
         header.unpack(d)
-        print("header", header.itemNum)
         if header.magic != amlogic_magic:
             raise Exception("magic is not amlogic magic.")
         i = 0
