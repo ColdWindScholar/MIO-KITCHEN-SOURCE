@@ -62,7 +62,7 @@ class ItemInfo(BasicStruct):
     ]
 
 
-def generate_cfg(partitions_list: list, partitions_verify: list, output_file):
+def generate_cfg(partitions_list: list, partitions_verify: list, output_file:str):
     partitions_normal = [i for i in partitions_list if i[1] not in partitions_verify]
     with open(output_file, "w", encoding='utf-8', newline='\n') as f:
         f.write('[LIST_NORMAL]\n')
@@ -75,6 +75,7 @@ def generate_cfg(partitions_list: list, partitions_verify: list, output_file):
                 continue
             main_type, sub_type = i
             f.write(f'file="{sub_type}.{main_type}"		main_type="{main_type}"		sub_type="{sub_type}"\n')
+    print(f"Generated config file to {output_file} successfully.")
 
 
 def main(filepath: str, output_path: str):
