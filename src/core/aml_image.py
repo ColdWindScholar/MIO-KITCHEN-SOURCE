@@ -91,14 +91,13 @@ def main(filepath: str, output_path: str):
         while i < header.itemNum:
             h2 = ItemInfo()
             h2.unpack(f.read(len(h2)))
-            print(h2.curoffsetInItem, h2.offsetInImage, bytes(h2.itemMainType).decode(), h2.itemSubType, h2.verify,
-                  h2.isBackUpItem)
             i += 1
             main_type = h2.itemMainType.decode()
             sub_type = h2.itemSubType.decode()
             if main_type == 'VERIFY':
                 partitions_verify.append(sub_type)
                 continue
+            print(f"[{i}/{header.itemNum}] Extracting {sub_type}.{main_type}...")
             with open(output_path + f"/{sub_type}.{main_type}", "wb") as output_file:
                 origin_position = f.tell()
                 f.seek(h2.offsetInImage)
