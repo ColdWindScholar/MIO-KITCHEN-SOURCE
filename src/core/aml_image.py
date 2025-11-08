@@ -61,15 +61,23 @@ class ItemInfo(BasicStruct):
         ("reserve", c_char * 32),
     ]
 
-def generate_cfg(normal_list:list, verify_list:list, output_file):
+def generate_cfg(partitions_list:list, partitions_verify:list, output_file):
+    partitions_normal = [i for i in partitions_list if i[1] not in partitions_verify]
     with open(output_file, "w", encoding='utf-8', newline='\n') as f:
         f.write('[LIST_NORMAL]\n')
-
+        for i in partitions_normal:
+            main_type, sub_type = i
+            f.write(f'file="{sub_type}.{main_type}"		main_type="{main_type}"		sub_type="{sub_type}"\n')
+        f.write('[LIST_VERIFY]\n')
+        for i in partitions_list:
+            if i[1] not in partitions_verify:
+                continue
+            main_type, sub_type = i
+            f.write(f'file="{sub_type}.{main_type}"		main_type="{main_type}"		sub_type="{sub_type}"\n')
 
 def main(filepath:str, output_path:str):
-    partitions_list = []
-    normal_list = []
-    verify_list = []
+    partitions = []
+    partitions_verify = []
     with open(filepath, "rb") as f:
         header = AmlHeader()
         print(d := f.read(len(header)))
@@ -84,11 +92,20 @@ def main(filepath:str, output_path:str):
             print(h2.curoffsetInItem, h2.offsetInImage, bytes(h2.itemMainType).decode(), h2.itemSubType, h2.verify,
                   h2.isBackUpItem)
             i += 1
-            with open(output_path + f"/{h2.itemSubType.decode()}.{h2.itemMainType.decode()}", "wb") as output_file:
-                origin_position = f.tell()
-                f.seek(h2.offsetInImage)
-                output_file.write(f.read(h2.offsetInImage))
-                f.seek(origin_position)
+            main_type = h2.itemMainType.decode()
+            sub_type = h2.itemSubType.decode()
+            with open(output_path + f"/{sub_type}.{main_type}", "wb") as output_file:
+                if main_type == 'VERIFY':
+                    partitions_verify.append(sub_type)
+                else:
+                    origin_position = f.tell()
+                    f.seek(h2.offsetInImage)
+                    output_file.write(f.read(h2.offsetInImage))
+                    f.seek(origin_position)
+                    partitions.append([main_type, sub_type])
+
+    generate_cfg(partitions, partitions_verify, output_path + "/config/image.cfg")
+
 
 if __name__ == "__main__":
     main(r"C:\Users\16612\Downloads\晶晨线刷解压工具\bin\111.img", r"C:\Users\16612\Downloads\晶晨线刷解压工具")
