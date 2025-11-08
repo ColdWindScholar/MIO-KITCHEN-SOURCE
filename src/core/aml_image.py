@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import os
 from ctypes import LittleEndianStructure, sizeof, memmove, string_at, addressof, byref, c_uint, c_ulonglong, c_char, \
     c_ushort, c_uint64
 
@@ -70,6 +70,7 @@ class ItemInfo(BasicStruct):
 
 
 def generate_cfg(partitions_list: list, partitions_verify: list, output_file:str):
+    os.makedirs(os.path.basename(output_file), exist_ok=True)
     partitions_normal = [i for i in partitions_list if i[1] not in partitions_verify]
     with open(output_file, "w", encoding='utf-8', newline='\n') as f:
         f.write('[LIST_NORMAL]\n')
