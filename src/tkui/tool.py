@@ -6348,8 +6348,8 @@ def unpack(chose, form: str = '') -> bool:
                         os.remove(f"{work}/{i}.img")
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
-            if parts_dict[i] == 'amlogic':
-                aml_main(os.path.join(work, f"{dname}.img"), work)
+            if file_type == 'amlogic':
+                aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
             if file_type == 'unknown' and is_empty_img(f"{work}/{i}.img"):
                 print(lang.text141)
     if not os.path.exists(f"{work}/config"):
