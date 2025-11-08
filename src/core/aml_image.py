@@ -61,7 +61,15 @@ class ItemInfo(BasicStruct):
         ("reserve", c_char * 32),
     ]
 
+def generate_cfg(normal_list:list, verify_list:list, output_file):
+    with open(output_file, "w", encoding='utf-8', newline='\n') as f:
+        f.write('[LIST_NORMAL]\n')
+
+
 def main(filepath:str, output_path:str):
+    partitions_list = []
+    normal_list = []
+    verify_list = []
     with open(filepath, "rb") as f:
         header = AmlHeader()
         print(d := f.read(len(header)))
@@ -75,8 +83,12 @@ def main(filepath:str, output_path:str):
             h2.unpack(f.read(len(h2)))
             print(h2.curoffsetInItem, h2.offsetInImage, bytes(h2.itemMainType).decode(), h2.itemSubType, h2.verify,
                   h2.isBackUpItem)
-            print(f.tell())
             i += 1
+            with open(output_path + f"/{h2.itemSubType.decode()}.{h2.itemMainType.decode()}", "wb") as output_file:
+                origin_position = f.tell()
+                f.seek(h2.offsetInImage)
+                output_file.write(f.read(h2.offsetInImage))
+                f.seek(origin_position)
 
 if __name__ == "__main__":
-    main(r"C:\Users\16612\Downloads\晶晨线刷解压工具\bin\111.img")
+    main(r"C:\Users\16612\Downloads\晶晨线刷解压工具\bin\111.img", r"C:\Users\16612\Downloads\晶晨线刷解压工具")
