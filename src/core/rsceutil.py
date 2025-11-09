@@ -1,0 +1,94 @@
+# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
+#
+# Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.gnu.org/licenses/agpl-3.0.en.html#license-text
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import os
+from ctypes import LittleEndianStructure, sizeof, memmove, string_at, addressof, byref, c_char, \
+    c_uint32, c_uint16
+
+
+class BasicStruct(LittleEndianStructure):
+    @property
+    def _size(self):
+        return sizeof(type(self))
+
+    def __len__(self):
+        return self._size
+
+    def unpack(self, data: bytes):
+        if len(data) < self._size:
+            raise Exception("Input data size less than struct size.")
+        if not isinstance(data, (bytes, bytearray)):
+            raise Exception("Input data must be byte data or bytearray.")
+
+        return memmove(byref(self), data, self._size)
+
+    def pack(self):
+        return string_at(addressof(self), sizeof(self))
+
+
+HeaderMagic = b"RSCE"
+EntryMagic = b"ENTR"
+
+
+class Header(BasicStruct):
+    _fields_ = [
+        ("magic", c_char * 4),
+        ("RSCEver", c_uint16),
+        ("RSCEfileTblVer", c_uint16),
+        ("HdrBlkSize", c_char),
+        ("FileTblBlkOffset", c_char),
+        ("FileTblRecBlkSize", c_char),
+        ("Unknown", c_char),
+        ("FileCount", c_uint32),
+        ("Reserved", c_char * 496)
+    ]
+
+
+class FileEntry(BasicStruct):
+    _fields_ = [
+        ("magic", c_char * 4),
+        ("FileName", c_char * 256),
+        ("FileBlkOffset", c_uint32),
+        ("FileSize", c_uint32),
+        ("Reserved", c_char * 244)
+    ]
+
+
+def main(filename, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    header = Header()
+    with open(filename, "rb") as f:
+        data = f.read(len(header))
+        header.unpack(data)
+        if header.magic != HeaderMagic:
+            raise TypeError("Header magic mismatch.", header.magic)
+        i = 0
+        while i < header.FileCount:
+            entry = FileEntry()
+            entry_data = f.read(len(entry))
+            entry.unpack(entry_data)
+            if entry.magic != EntryMagic:
+                raise TypeError("Entry magic mismatch.", entry.magic)
+            print('Found File:', name:=entry.FileName.decode())
+            origin_seek = f.tell()
+            offset = entry.FileBlkOffset
+            size = entry.FileSize
+            f.seek(offset * 512)
+            with open(output_dir + "/" + name, 'wb') as output_file:
+                output_file.write(f.read(size))
+            f.seek(origin_seek)
+            i += 1
+
+
+if __name__ == "__main__":
+    main(r"C:\Users\16612\Downloads\second", r"C:\Users\16612\Downloads\second_output")
