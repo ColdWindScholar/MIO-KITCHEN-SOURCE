@@ -64,7 +64,7 @@ class FileEntry(BasicStruct):
     ]
 
 
-def main(filename, output_dir):
+def unpack(filename, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     header = Header()
     with open(filename, "rb") as f:
@@ -75,11 +75,10 @@ def main(filename, output_dir):
         i = 0
         while i < header.FileCount:
             entry = FileEntry()
-            entry_data = f.read(len(entry))
-            entry.unpack(entry_data)
+            entry.unpack(f.read(len(entry)))
             if entry.magic != EntryMagic:
                 raise TypeError("Entry magic mismatch.", entry.magic)
-            print('Found File:', name:=entry.FileName.decode())
+            print('Found File:', name := entry.FileName.decode())
             origin_seek = f.tell()
             offset = entry.FileBlkOffset
             size = entry.FileSize
@@ -90,5 +89,43 @@ def main(filename, output_dir):
             i += 1
 
 
+def repack(files_path, output_file):
+    if os.path.exists(output_file):
+        os.remove(output_file)
+    if not os.path.exists(files_path):
+        print("No such files_path.")
+        return
+    header = Header()
+    header.magic = HeaderMagic
+    header.RSCEver = c_uint16(0)
+    header.RSCEfileTblVer = c_uint16(0)
+    header.HdrBlkSize = c_char(1)
+    header.FileTblBlkOffset = c_char(1)
+    header.FileTblRecBlkSize = c_char(1)
+    header.Unknown = c_char(0)
+    header.FileCount = len(os.listdir(files_path))
+    total_offset = (header.FileCount + 1) * 512
+    with open(output_file, "wb") as f:
+        f.write(header.pack())
+        for i in os.listdir(files_path):
+            file_path = os.path.join(files_path, i)
+            file_entry = FileEntry()
+            file_entry.magic = EntryMagic
+            file_entry.FileName = i.encode()
+            file_entry.FileBlkOffset = total_offset // 512
+            file_entry.FileSize = os.path.getsize(file_path)
+            print(f'Adding: {i} offset: {file_entry.FileBlkOffset} size: {file_entry.FileSize}')
+            f.write(file_entry.pack())
+            with open(file_path, "rb") as input_file:
+                origin_seek = f.tell()
+                f.seek(total_offset)
+                file_content = input_file.read()
+                total_offset += f.write(file_content)
+                if total_offset % 512:
+                    total_offset += 512 - total_offset % 512
+                f.seek(origin_seek)
+
+
 if __name__ == "__main__":
-    main(r"C:\Users\16612\Downloads\second", r"C:\Users\16612\Downloads\second_output")
+    repack(r"C:\Users\16612\Downloads\second_output", r"C:\Users\16612\Downloads\second_repack", )
+    unpack(r"C:\Users\16612\Downloads\second_repack", r"C:\Users\16612\Downloads\second_output2")
