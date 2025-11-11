@@ -64,9 +64,10 @@ class FileEntry(BasicStruct):
     ]
 
 
-def unpack(filename, output_dir):
+def unpack(filename, output_dir, config_file):
     os.makedirs(output_dir, exist_ok=True)
     header = Header()
+    file_list:list[str] = []
     with open(filename, "rb") as f:
         data = f.read(len(header))
         header.unpack(data)
@@ -83,18 +84,27 @@ def unpack(filename, output_dir):
             offset = entry.FileBlkOffset
             size = entry.FileSize
             f.seek(offset * 512)
+            file_list.append(name)
             with open(output_dir + "/" + name, 'wb') as output_file:
                 output_file.write(f.read(size))
             f.seek(origin_seek)
             i += 1
+    with open(config_file, "w", newline='\n', encoding='utf-8') as f:
+        f.write("\n".join(file_list))
 
 
-def repack(files_path, output_file):
+def repack(files_path, output_file, config_file):
     if os.path.exists(output_file):
         os.remove(output_file)
     if not os.path.exists(files_path):
         print("No such files_path.")
         return
+    files_list = os.listdir(files_path)
+    with open(config_file, 'r', newline='\n', encoding='utf-8') as f:
+        files = [i.strip('\n') for i in f.readlines()]
+    files_list_new = [i for i in files if os.path.exists(os.path.join(files_path, i))]
+    [files_list_new.append(i) for i in files_list if i not in files]
+    files_list = files_list_new
     header = Header()
     header.magic = HeaderMagic
     header.RSCEver = c_uint16(0)
@@ -103,11 +113,11 @@ def repack(files_path, output_file):
     header.FileTblBlkOffset = c_char(1)
     header.FileTblRecBlkSize = c_char(1)
     header.Unknown = c_char(0)
-    header.FileCount = len(os.listdir(files_path))
+    header.FileCount = len(files_list)
     total_offset = (header.FileCount + 1) * 512
     with open(output_file, "wb") as f:
         f.write(header.pack())
-        for i in os.listdir(files_path):
+        for i in files_list:
             if total_offset % 512:
                 raise ValueError("Total offset is not a multiple of 512.")
             file_path = os.path.join(files_path, i)
@@ -129,5 +139,11 @@ def repack(files_path, output_file):
 
 
 if __name__ == "__main__":
-    repack(r"C:\Users\16612\Downloads\second_output", r"C:\Users\16612\Downloads\second_repack", )
-    unpack(r"C:\Users\16612\Downloads\second_repack", r"C:\Users\16612\Downloads\second_output2")
+    import sys
+    print(f'Usage:\n{sys.argv[0]} [u|r] <input_file> <output_dir> <config_file>')
+    if len(sys.argv) >= 5:
+        cmd = sys.argv[1]
+        if cmd == 'r':
+            repack(sys.argv[2], sys.argv[3], sys.argv[4])
+        elif cmd == 'u':
+            unpack(sys.argv[2], sys.argv[3],sys.argv[4])
