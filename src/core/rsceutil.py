@@ -108,6 +108,8 @@ def repack(files_path, output_file):
     with open(output_file, "wb") as f:
         f.write(header.pack())
         for i in os.listdir(files_path):
+            if total_offset % 512:
+                raise ValueError("Total offset is not a multiple of 512.")
             file_path = os.path.join(files_path, i)
             file_entry = FileEntry()
             file_entry.magic = EntryMagic
