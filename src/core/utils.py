@@ -77,7 +77,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03', "zopfli"], [b'\xfd7zXZ', 'lzma'],
            [b'\x5d\x00', 'lzma'],
            [b']\x00\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff', 'lzma'], [b'\x02!L\x18', 'lz4_lg'],
-           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'],
+           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'],[b"RSCE",'rk_rsce'],
            [b'(\x05\x00\x00$8"%', 'kdz'], [b"\x32\x96\x18\x74", 'dz'], [b'\xcf\xfa\xed\xfe', 'macos_bin'],
            [b'\xfa\xff\xfa\xff', 'pac', 2116],[b"NTPI", 'NTPI'],[b'\x56\x19\xb5\x27','amlogic',8],
            [b"-rom1fs-", 'romfs'],[b'UBI#', "ubi"],[b"sqsh", "squashfs"], [b'hsqs', 'squashfs'],[b"\x85\x19","jffs2"],
