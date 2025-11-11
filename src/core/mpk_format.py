@@ -32,11 +32,11 @@ class MpkHeader(BasicStruct):
         ("magic", c_uint),
         ("version", c_uint),
         ("crc32", c_uint),
-        ("identifier", c_char * 256),
+        ("identifier", c_char * 160),
         ("name", c_char * 256),
         ("support_system", c_char * 8),
         ("support_machine", c_char * 8),
-        ("signature", c_char * 128),
+        ("signature", c_char * 64),
         ("icon", c_uint64 * 128),
         ("desc", c_uint64 * 64),
         ("files_count", c_uint)
