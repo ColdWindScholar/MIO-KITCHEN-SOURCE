@@ -36,9 +36,9 @@ class MpkHeader(BasicStruct):
         ("name", c_char * 256),
         ("support_system", c_char * 8),
         ("support_machine", c_char * 8),
-        ("signature", c_char * 512),
+        ("signature", c_char * 128),
         ("icon", c_uint64 * 128),
-        ("desc", c_uint64 * 124),
+        ("desc", c_uint64 * 64),
         ("files_count", c_uint)
     ]
 
@@ -51,4 +51,4 @@ class FileEntryHeader(BasicStruct):
         ("offset", c_uint64),
         ("size", c_uint64),
     ]
-print(len(FileEntryHeader()))
+print(len(MpkHeader()))
