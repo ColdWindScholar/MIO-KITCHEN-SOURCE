@@ -116,7 +116,7 @@ def repack(files_path, output_file):
             file_entry.FileName = i.encode()
             file_entry.FileBlkOffset = total_offset // 512
             file_entry.FileSize = os.path.getsize(file_path)
-            print(f'Adding: {i} offset: {file_entry.FileBlkOffset} size: {file_entry.FileSize}')
+            print(f'Adding: {i}')
             f.write(file_entry.pack())
             with open(file_path, "rb") as input_file:
                 origin_seek = f.tell()
