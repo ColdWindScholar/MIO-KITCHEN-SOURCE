@@ -5557,7 +5557,12 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         return
 
     if os.path.isdir(f"{source}/ramdisk"):
-        cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
+        cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
+                        settings.tool_bin).replace(
+            '\\', "/")
+        os.chdir(f"{source}/ramdisk")
+        call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
+        os.chdir(source)
         with open(f"{source}/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
