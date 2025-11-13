@@ -32,6 +32,7 @@ from src.core.avb_disabler import process_fstab
 from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
+from src.core.rsceutil import unpack as rsceutil_unpack,repack as rsceutil_repack
 from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
 from ..core.xtc_recovery_helper import Xor_file
@@ -5519,6 +5520,9 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
         os.chdir(cwd_path)
         rmtree(work + name)
         return
+    if os.access(f"{work}/{name}/second", os.F_OK):
+        if gettype(f"{work}/{name}/second") == 'rk_rsce':
+            rsceutil_unpack(f"{work}/{name}/second", f"{work}/{name}/second_dump", f"{work}/{name}/second_order")
     if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK):
         comp = gettype(f"{work}/{name}/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
@@ -5555,7 +5559,8 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
     if not os.path.exists(source):
         print(f"Cannot Find {name}...")
         return
-
+    if os.path.isfile(f'{source}/second_order'):
+        rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
     if os.path.isdir(f"{source}/ramdisk"):
         cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                         settings.tool_bin).replace(
