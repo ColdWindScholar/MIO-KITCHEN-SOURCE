@@ -70,7 +70,7 @@ links = {
         "link": "https://api.github.com/repos/sekaiacg/erofs-utils/releases/latest",
         "github_json": True,
         # erofs-utils-v1.8.4-gc9629116-Android_arm64-v8a-2501262050.zip
-        "name_pattern": r"erofs-utils-(.*?)-(.*?)-(\D+?)_(.*)-\d+(?:-\d+)?.zip$"
+        "name_pattern": r"erofs-utils-(.*?)-(.*?)-(.*?)-(\D+?)_(.*)?.zip$"
     }
 }
 
@@ -170,7 +170,7 @@ def update(args):
                 for percentage, _, _, _, _ in download_api(url=browser_download_url, name=name, size_=size, path=temp):
                     green_1(f"\rPercentage:{percentage} %", end='')
                 downloaded_file = os.path.join(temp, name)
-                version, gitid, system, arch = re.search(content.get('name_pattern', "*$"), name).groups()
+                version, gitid,build_time, system, arch = re.search(content.get('name_pattern', "*$"), name).groups()
                 system = system_list.get(system, system)
                 if system == 'Windows' and arch == 'x86_64':
                     arch = "AMD64"
