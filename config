@@ -108,6 +108,7 @@ def download_api(url, path=None, int_=True, size_=0, name: str = None):
             percentage = (int((bytes_downloaded / file_size) * 100) if int_ else (
                                                                                          bytes_downloaded / file_size) * 100) if file_size != 0 else "None"
             yield percentage, speed, bytes_downloaded, file_size, elapsed
+        return None
 
 
 class Caller:
@@ -131,7 +132,7 @@ class Caller:
             if not self.verity():
                 return lambda *args: ...
             green(f"Start: [{func.__name__}]")
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
 
         return call_func
 
