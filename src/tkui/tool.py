@@ -5522,7 +5522,9 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
         return
     if os.access(f"{work}/{name}/second", os.F_OK):
         if gettype(f"{work}/{name}/second") == 'rk_rsce':
+            print("Unpack Rk resource...")
             rsceutil_unpack(f"{work}/{name}/second", f"{work}/{name}/second_dump", f"{work}/{name}/second_order")
+            print("Unpack Rk resource successfully...")
     if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK):
         comp = gettype(f"{work}/{name}/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
@@ -5560,7 +5562,9 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         print(f"Cannot Find {name}...")
         return
     if os.path.isfile(f'{source}/second_order'):
+        print("Repack Rk resource...")
         rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
+        print("Repack Rk resource successfully...")
     if os.path.isdir(f"{source}/ramdisk"):
         cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                         settings.tool_bin).replace(
