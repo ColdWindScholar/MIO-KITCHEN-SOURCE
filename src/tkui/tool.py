@@ -29,7 +29,6 @@ from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
-from src.core.cpio import extract as cpio_extract, repack as cpio_repack
 from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
@@ -5534,8 +5533,9 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
         print("Unpacking Ramdisk...")
-        cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
-                     os.path.join(work, name, 'ramdisk.txt'))
+        os.chdir(work + name)
+        call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
+        os.chdir(cwd_path)
     else:
         print("Unpack Done!")
     os.chdir(cwd_path)
