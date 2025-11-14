@@ -23,7 +23,7 @@ import threading
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
-from typing import Optional
+from typing import Optional, Any
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -2736,7 +2736,7 @@ class ModuleManager:
     def get_name(self, id_) -> str:
         if self.is_virtual(id_):
             return self.addon_loader.virtual[id_].get("name", id_)
-        return name if (name := self.get_info(id_, 'name')) else id_
+        return self.get_info(id_, 'name') or id_
 
     def list_packages(self):
         for i in os.listdir(self.module_dir):
@@ -2764,7 +2764,7 @@ class ModuleManager:
                     logging.error(f"Ошибка при загрузке плагина '{self.get_name(i)}' из '{script_path}/main.py': {e}")
                     logging.exception('Bugs')
 
-    def get_info(self, id_: str, item: str, default: str = None) -> dict:
+    def get_info(self, id_: str, item: str, default: str = None) -> str | dict[Any, Any] | Any:
         if not default:
             default = {}
         info_file = f'{self.module_dir}/{id_}/info.json'
@@ -2881,9 +2881,10 @@ class ModuleManager:
             return module_error_codes.IsBroken, ''
         try:
             with zipfile.ZipFile(mpk) as f:
-                if 'info' not in f.namelist():
+                f_list = f.namelist()
+                if 'info' not in f_list:
                     return module_error_codes.IsBroken, 'Missing info file'
-                if 'icon' not in f.namelist():
+                if 'icon' not in f_list:
                     return module_error_codes.Normal, 'Missing icon file'
         except zipfile.BadZipFile:
             return module_error_codes.IsBroken, 'Corrupted MPK archive'
@@ -3089,6 +3090,7 @@ class ModuleManager:
             print(lang.t15 % output_mpk_path)
         else:
             print(lang.t16 % output_mpk_path)
+        return None
 
     class New(Toplevel):
 
@@ -3157,7 +3159,7 @@ class ModuleManager:
                 return
             data = {
                 "name": self.name.get(),
-                "author": 'MIO-KITCHEN' if not self.aou.get() else self.aou.get(),
+                "author": self.aou.get() or 'MIO-KITCHEN',
                 "version": self.ver.get(),
                 "identifier": (iden := self.identifier.get()),
                 "describe": self.intro.get(1.0, tk.END),
