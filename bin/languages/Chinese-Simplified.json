@@ -276,5 +276,6 @@
   "t64": "您正在运行源代码\n请使用 \"git pull\" 以更新",
   "git_not_installed": "git未安装， 无法更新代码",
   "decrypt_xtc_xml":"解密小天才Xml",
-  "mtk_port_tool": "Mtk移植工具"
+  "mtk_port_tool": "Mtk移植工具",
+  "plugin_installed_button": "已安装"
  }
