@@ -4682,7 +4682,6 @@ class MpkStore(Toplevel):
                 logging.debug(
                     f"MpkStore.download: Processing file '{file_name_in_list}' for plugin '{id_}'. Target path: '{mpk_file_path_in_temp}'")
 
-                file_downloaded_this_iteration = False
                 expected_file_size_from_data = size
 
                 if os.path.exists(mpk_file_path_in_temp) and os.path.isfile(mpk_file_path_in_temp) and \
@@ -4698,7 +4697,7 @@ class MpkStore(Toplevel):
                     logging.info(
                         f"MpkStore.download: Downloading: {self.repo + file_name_in_list} to {mpk_file_path_in_temp}")
                     download_generator = download_api(self.repo + file_name_in_list, temp,
-                                                      size_=expected_file_size_from_data)
+                                                      size_=expected_file_size_from_data,  chunk_size=expected_file_size_from_data//4)
                     for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                         if not self.winfo_exists():
                             download_successful_for_all_files = False
@@ -5377,7 +5376,7 @@ class StdoutRedirector:
             time.sleep(0.5)
 
 
-def download_api(url, path=None, int_=True, size_=0):
+def download_api(url, path=None, int_=True, size_:int=0, chunk_size:int = 2048576):
     """
     return percentage, speed, bytes_downloaded, file_size, elapsed
     """
@@ -5417,8 +5416,6 @@ def download_api(url, path=None, int_=True, size_=0):
 
     try:
         with open(file_save_path, "wb") as f:
-            chunk_size = 2048576  # 2MB
-            chunk_kb = chunk_size / 1024
             bytes_downloaded = 0
             for data in response_get.iter_content(chunk_size=chunk_size):
                 if not data:  # Check for empty data if the connection was dropped
