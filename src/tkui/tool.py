@@ -5088,6 +5088,7 @@ class PackSuper(Toplevel):
         self.delete_source_file = IntVar()
         self.block_device_name = StringVar(value='super')
         self.selected = []
+        self.ordered_partitions = []  # Store original partition order
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
         (lf1_r := ttk.LabelFrame(self, text=lang.attribute)).pack(fill=BOTH)
         (lf2 := ttk.LabelFrame(self, text=lang.settings)).pack(fill=BOTH)
@@ -5153,7 +5154,16 @@ class PackSuper(Toplevel):
         if not self.verify_size():
             ask_win(lang.t10.format(self.super_size.get()), is_top=True)
             return False
-        lbs = self.tl.selected.copy()
+        
+        # Preserve original partition order from metadata
+        selected_set = set(self.tl.selected.copy())
+        if self.ordered_partitions:
+            # Filter selected partitions but maintain original order
+            lbs = [part for part in self.ordered_partitions if part in selected_set]
+        else:
+            # Fallback to original behavior
+            lbs = self.tl.selected.copy()
+            
         sc = self.delete_source_file.get()
         self.destroy()
         if not project_manger.exist():
@@ -5232,12 +5242,18 @@ class PackSuper(Toplevel):
                     if isinstance(name, str) and name != 'default':
                         self.group_name.set(name)
 
-                selected = []
+                # Store partitions in original order from metadata
+                ordered_selected = []
                 for i in data.get('partition_table', []):
                     name = i.get('name')
-                    if isinstance(name, str) and name not in selected:
-                        selected.append(name)
-                self.selected = selected
+                    if isinstance(name, str):
+                        # Remove _a/_b suffix to get base partition name
+                        base_name = name[:-2] if name.endswith('_a') or name.endswith('_b') else name
+                        if base_name not in ordered_selected:
+                            ordered_selected.append(base_name)
+                
+                self.selected = ordered_selected
+                self.ordered_partitions = ordered_selected
 
         # Read dynamic_partitions_op_list
         list_file = f"{self.work}/dynamic_partitions_op_list"
@@ -5285,7 +5301,8 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
             part = part[:-2]
         if part not in lb_c:
             lb_c.append(part)
-    part_list = lb_c
+    part_list = lb_c  # This now preserves the original order from the caller
+    
     for part in part_list:
         if not os.path.exists(f'{work}/{part}.img') and os.path.exists(f'{work}/{part}_a.img'):
             try:
@@ -5295,18 +5312,23 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
     command = ['lpmake', '--metadata-size', '65536', '-super-name', block_device_name, '-metadata-slots']
     if super_type == 1:
         command += ['2', '-device', f'{block_device_name}:{size}', "--group", f"{group_name}:{size}"]
-        for part in part_list:
+        for part in part_list:  # This will now use the correct order
             command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}",
                         '--image', f'{part}={work}/{part}.img']
     else:
-        command += ["3", '-device', f'super:{size}', '--group', f"{group_name}_a:{size}"]
+        command += ["3", '-device', f'super:{size}']
+        
+        # Add both groups first
+        command += ['--group', f"{group_name}_a:{size}"]
+        command += ["--group", f"{group_name}_b:{size}"]
+        
+        # MODIFIED: Process partitions in interleaved order _a, _b, _a, _b
         for part in part_list:
             command += ['--partition',
                         f"{part}_a:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}_a",
-                        '--image', f'{part}_a={work + part}.img']
-        command += ["--group", f"{group_name}_b:{size}"]
-        for part in part_list:
-            if not os.path.exists(f"{work + part}_b.img"):
+                        '--image', f'{part}_a={work}/{part}.img']
+            # Add _b partition to group_b
+            if not os.path.exists(f"{work}/{part}_b.img"):
                 command += ['--partition', f"{part}_b:{attrib}:0:{group_name}_b"]
             else:
                 command += ['--partition',
