@@ -6,11 +6,11 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import NavigationItemPosition, SplashScreen, setTheme, Theme, FluentWindow, FluentIcon as FIF
 from qframelesswindow.windows import QSize
 
-from about import AboutPage
-from home import HomePage
-from plugin import PluginPage
-from project import ProjectPage
-from settings import SettingsPage
+from .about import AboutPage
+from .home import HomePage
+from .plugin import PluginPage
+from .project import ProjectPage
+from .settings import SettingsPage
 
 
 class MainWindow(FluentWindow):

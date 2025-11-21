@@ -10,7 +10,7 @@ from qfluentwidgets import (TitleLabel, PushButton, FluentIcon as FIF,
                             InfoBar, InfoBarPosition, MessageBoxBase,
                             SubtitleLabel, CaptionLabel)
 
-from settings import cfg
+from .settings import cfg
 
 
 class CreateRenameDialog(MessageBoxBase):
