@@ -370,7 +370,8 @@ class ProjectPage(QWidget):
         try:
             project_path = os.path.join(self.project_dir, name)
             if os.path.exists(project_path):
-                self.show_info_bar("警告", f'项目{name}已存在')
+                self.show_info_bar("警告", f'项目{name}已存在', bar_type=2)
+                return
             os.makedirs(project_path, exist_ok=True)
             self.refresh_projects()
             card = ProjectCard(name, self, self.cards_container)
