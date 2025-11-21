@@ -200,7 +200,12 @@ class ProjectPage(QWidget):
         self.cards_layout = QVBoxLayout(self.cards_container)
         self.cards_layout.setContentsMargins(0, 0, 10, 0)
         self.cards_layout.setSpacing(10)
-
+        #remove unlinked projects
+        for project, card in self.projects_cards.items():
+            if project not in self.projects:
+                self.cards_layout.removeWidget(card)
+                card.widget().deleteLater()
+        #add new projects
         for project in self.projects:
             card = ProjectCard(project, self, self.cards_container)
             if card in self.projects_cards:
