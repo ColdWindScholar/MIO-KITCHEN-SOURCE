@@ -369,23 +369,21 @@ class ProjectPage(QWidget):
         """创建新项目并显示提示"""
         try:
             project_path = os.path.join(self.project_dir, name)
-            os.makedirs(project_path)
+            if os.path.exists(project_path):
+                self.show_info_bar("警告", f'项目{name}已存在')
+            os.makedirs(project_path, exist_ok=True)
             self.refresh_projects()
             card = ProjectCard(name, self, self.cards_container)
             self.project_cards.append(card)
             self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
-
-            if name == "杨洋":
-                self.show_info_bar("提示", "创建的什么啊？好难猜", is_error=False)
-            else:
-                self.show_info_bar("成功", f"项目 '{name}' 已创建", is_error=False)
+            self.show_info_bar("成功", f"项目 '{name}' 已创建", bar_type=3)
         except Exception as e:
-            self.show_info_bar("错误", f"创建项目失败: {str(e)}", is_error=True)
+            self.show_info_bar("错误", f"创建项目失败: {str(e)}", bar_type=1)
 
     def delete_project(self):
         """删除选中的项目并显示提示"""
         if not self.selected_project:
-            self.show_info_bar("提示", "请先选择一个项目", is_error=True)
+            self.show_info_bar("提示", "请先选择一个项目", bar_type=2)
             return
 
         result = MessageBox(
@@ -410,20 +408,14 @@ class ProjectPage(QWidget):
             self.selected_project = None
             self.current_project = None
             self.update_image_list()
-
-            if deleted_project == "杨洋":
-                self.show_info_bar("提示", "删除了个超级背刺王", is_error=False)
-            elif any(x in deleted_project.lower() for x in ["mio", "寒风居士"]):
-                self.show_info_bar("提示", "好删兄弟好删", is_error=False)
-            else:
-                self.show_info_bar("成功", "项目已删除", is_error=False)
+            self.show_info_bar("成功", f"项目{deleted_project}已删除", bar_type=3)
         except Exception as e:
-            self.show_info_bar("错误", f"删除项目失败: {str(e)}", is_error=True)
+            self.show_info_bar("错误", f"删除项目失败: {str(e)}", bar_type=1)
 
     def show_rename_dialog(self):
         """显示重命名项目对话框"""
         if not self.selected_project:
-            self.show_info_bar("提示", "请先选择一个项目", is_error=True)
+            self.show_info_bar("提示", "请先选择一个项目", bar_type=2)
             return
         dialog = CreateRenameDialog(
             title="重命名项目",
@@ -450,9 +442,9 @@ class ProjectPage(QWidget):
             self.selected_project = new_name
             self.current_project = new_name
             self.update_image_list()
-            self.show_info_bar("成功", f"项目已重命名为 '{new_name}'", is_error=False)
+            self.show_info_bar("成功", f"项目已重命名为 '{new_name}'", bar_type=3)
         except Exception as e:
-            self.show_info_bar("错误", f"重命名失败: {str(e)}", is_error=True)
+            self.show_info_bar("错误", f"重命名失败: {str(e)}", bar_type=1)
 
     def update_image_list(self):
         """更新镜像列表，显示当前项目文件夹下与所选格式匹配的文件"""
@@ -499,30 +491,41 @@ class ProjectPage(QWidget):
     def pack_image(self):
         """打包选中的镜像文件"""
         if not self.selected_project:
-            self.show_info_bar("提示", "你项目都没选你干🐔🪶呢！", is_error=True)
+            self.show_info_bar("提示", "你项目都没选你干🐔🪶呢！", bar_type=2)
             return
         if not self.selected_images:
-            self.show_info_bar("提示", "你镜像都没选你打包🐔🪶呢！", is_error=True)
+            self.show_info_bar("提示", "你镜像都没选你打包🐔🪶呢！", bar_type=2)
             return
         selected_format = self.format_combo.currentText()
-        self.show_info_bar("提示", f"开始打包 {', '.join(self.selected_images)} 为 {selected_format} 格式", is_error=False)
+        self.show_info_bar("提示", f"开始打包 {', '.join(self.selected_images)} 为 {selected_format} 格式", bar_type=3)
 
     def extract_img(self):
         """打印选中的镜像文件，供后续解包逻辑"""
         if not self.selected_project:
-            self.show_info_bar("提示", "你项目都没选你干🐔🪶呢！", is_error=True)
+            self.show_info_bar("提示", "你项目都没选你干🐔🪶呢！", bar_type=2)
             return
         if not self.selected_images:
-            self.show_info_bar("提示", "你镜像都没选你分解🐔🪶呢！", is_error=True)
+            self.show_info_bar("提示", "你镜像都没选你分解🐔🪶呢！", bar_type=2)
             return
         print(f"准备分解的镜像文件: {', '.join(self.selected_images)}")
-        self.show_info_bar("提示", f"准备分解: {', '.join(self.selected_images)}", is_error=False)
+        self.show_info_bar("提示", f"准备分解: {', '.join(self.selected_images)}", bar_type=3)
 
-    def show_info_bar(self, title, content, is_error=False, duration=3000):
+    def show_info_bar(self, title, content, bar_type:int=3, duration=3000):
+        """bar_type: 1=error 2=warning 3=info"""
         """显示提示条，根据配置决定是否显示"""
         if cfg.enableNotifications.value:
-            if is_error:
+            if bar_type == 1:
                 InfoBar.error(
+                    title=title,
+                    content=content,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.BOTTOM,
+                    duration=duration,
+                    parent=self
+                )
+            elif bar_type == 2:
+                InfoBar.warning(
                     title=title,
                     content=content,
                     orient=Qt.Horizontal,
