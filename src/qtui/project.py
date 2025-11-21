@@ -25,7 +25,7 @@ class CreateRenameDialog(MessageBoxBase):
         self.nameLineEdit.setClearButtonEnabled(True)
         self.nameLineEdit.setText(initial_text)
 
-        self.errorLabel = CaptionLabel("项目名称无效或已存在")
+        self.errorLabel = CaptionLabel(text="项目名称无效或已存在")
         self.errorLabel.setTextColor("#cf1010", QColor(255, 28, 32))
 
         self.viewLayout.addWidget(self.titleLabel)
