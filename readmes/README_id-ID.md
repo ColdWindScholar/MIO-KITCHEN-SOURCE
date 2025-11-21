@@ -34,16 +34,16 @@
 | Windows | x86_64 x86 amd64 arm64(by sewzj) |
 |  Macos  | Arm64  X86                       |
 ## Jenis gambar yang didukung
-| Jenis Gambar yang Didukung|
-|---------------------------|
-| Android Boot Image        |
-| Android Recovery Image    |
-| Android Vendor_boot Image |
-| Erofs                     |
-| Ext4                      |
-| F2fs(Linux Version)       |
-| Romfs                     |
-| Payload                   |
+| Jenis Gambar yang Didukung |
+|----------------------------|
+| Android Boot Image         |
+| Android Recovery Image     |
+| Android Vendor_boot Image  |
+| Erofs                      |
+| Ext4                       |
+| F2fs(Linux Version)        |
+| Romfs                      |
+| Payload                    |
 ## Jenis file yang didukung
 | Jenis file yang didukung |
 |----------------------|
