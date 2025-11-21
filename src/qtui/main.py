@@ -26,7 +26,7 @@ class MainWindow(FluentWindow):
         self.show()
 
         # 设置窗口标题
-        self.setWindowTitle("SY ROM Tools - 一款普通的ROM工具")
+        self.setWindowTitle("MIO-KITCHEN")
 
         # 设置窗口大小
         self.resize(900, 700)

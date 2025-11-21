@@ -14,15 +14,15 @@ class AboutPage(QWidget):
         layout.setSpacing(20)
 
         # 标题
-        title = TitleLabel("关于 SY ROM Tools", self)
+        title = TitleLabel("关于 MIO-KITCHEN", self)
         layout.addWidget(title)
 
         # 基本信息
         info = BodyLabel(
             "版本: 1.0.0\n"
-            "开发者: Kinaxie\n"
-            "描述: 一款个人开发的ROM工具\n"
-            "© 2025 Kinaxie 版权所有",
+            "Developer: ColdWindScholar\n"
+            "UI Designer: Kinaxie\n"
+            "© 2025 ColdWindScholar All Rights Reserved.",
             self
         )
         layout.addWidget(info)
