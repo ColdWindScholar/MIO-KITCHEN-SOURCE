@@ -139,6 +139,7 @@ class ProjectPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ProjectPage")
+        self.projects_cards = {}
         self.project_dir = "Project"
         self.current_project = None  # 跟踪当前选中的项目
         self.selected_project = None  # 当前选中的项目卡片
@@ -166,7 +167,7 @@ class ProjectPage(QWidget):
 
     def refresh_projects(self):
         """刷新项目列表"""
-        self.projects = [
+        self.projects: list[str] = [
             f for f in os.listdir(self.project_dir)
             if os.path.isdir(os.path.join(self.project_dir, f))
         ]
@@ -202,6 +203,9 @@ class ProjectPage(QWidget):
 
         for project in self.projects:
             card = ProjectCard(project, self, self.cards_container)
+            if card in self.projects_cards:
+                continue
+            self.projects_cards[project] = card
             self.cards_layout.addWidget(card)
             self.project_cards.append(card)
         self.cards_layout.addStretch()
