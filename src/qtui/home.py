@@ -15,7 +15,7 @@ class HomePage(QWidget):
         layout.setSpacing(25)
         layout.setContentsMargins(40, 40, 40, 40)
 
-        title_label = TitleLabel("SY ROM Tools", self)
+        title_label = TitleLabel("MIO-KITCHEN", self)
         title_label.setStyleSheet("font-size: 28px; font-weight: bold; color: #FFFFFF;")
         layout.addWidget(title_label)
 
