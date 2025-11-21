@@ -143,12 +143,12 @@ class Extractor:
                 self.fs_config.append(
                     f'{tmp_path} {uid} {gid} {mode}{cap} {link_target}')
             if entry_inode.is_dir:
+                if os.name == 'nt' and ":" in entry_inode_path:
+                    print("[NTWarning] The <:> not allow in path, will replace <:> to <_>.")
+                    entry_inode_path = entry_inode_path.replace(":", "_")
                 dir_target = self.EXTRACT_DIR + entry_inode_path.replace(' ', '_').replace('"', '')
                 if dir_target.endswith('.') and os.name == 'nt':
                     dir_target = dir_target[:-1]
-                if os.name == 'nt' and ":" in dir_target:
-                    print("[NTWarning] The <:> not allow in path, will replace <:> to <_>.")
-                    dir_target = dir_target.replace(":", "_")
                 if not os.path.isdir(dir_target):
                     os.makedirs(dir_target)
                 if os.name == 'posix' and os.geteuid() == 0:
