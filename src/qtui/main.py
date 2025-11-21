@@ -59,20 +59,26 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.home_page, FIF.HOME, '主页')
         self.addSubInterface(self.project_page, FIF.DOCUMENT, '项目')
         self.addSubInterface(self.plugin_page, FIF.APPLICATION, '插件')
-        self.addSubInterface(self.about_page, FIF.INFO, '关于' , NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.about_page, FIF.INFO, '关于', NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.settings_page, FIF.SETTING, '设置', NavigationItemPosition.BOTTOM)
 
         # 默认显示主页
         self.switchTo(self.home_page)
 
-if __name__ == "__main__":
+
+def __init__qt(args):
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling)
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
-    app = QApplication(sys.argv)
+    app = QApplication(args)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
+
+
+init = lambda args: __init__qt(args)
+if __name__ == '__main__':
+    init(sys.argv)
