@@ -355,7 +355,7 @@ def gettype(file) -> str:
         if is_super(file):
             return 'super'
     except IndexError:
-        logging.exception('is_super')
+        ...
     for header, desc, *offset in formats:
         with open(file, 'rb') as f:
             f.seek(offset[0] if offset else 0)
@@ -368,9 +368,9 @@ def gettype(file) -> str:
         if LogoDumper(file, str(None)).check_img(file):
             return 'logo'
     except AssertionError:
-        logging.exception("ISLOGO")
+        ...
     except struct.error:
-        logging.exception("Struct")
+        ...
     return "unknown"
 
 
