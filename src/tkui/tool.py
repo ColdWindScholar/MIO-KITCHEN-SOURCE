@@ -5330,8 +5330,10 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
                             logging.exception('Bugs')
         else:
             win.message_pop(lang.warn10)
+            return 1
     else:
         win.message_pop(lang.warn10)
+        return 1
 
 
 class StdoutRedirector:
