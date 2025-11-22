@@ -15,6 +15,7 @@ from .settings import cfg
 
 class CreateRenameDialog(MessageBoxBase):
     """自定义对话框，用于创建或重命名项目"""
+
     def __init__(self, title, existing_projects, initial_text="", parent=None):
         super().__init__(parent)
         self.existing_projects = existing_projects
@@ -72,6 +73,7 @@ class CreateRenameDialog(MessageBoxBase):
 
 class ProjectCard(CardWidget):
     """项目卡片，显示单个项目"""
+
     def __init__(self, project_name, project_page, parent=None):
         super().__init__(parent)
         self.project_name = project_name
@@ -136,6 +138,7 @@ class ProjectCard(CardWidget):
 
 class ProjectPage(QWidget):
     """项目页面，管理项目列表和镜像操作"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ProjectPage")
@@ -200,7 +203,12 @@ class ProjectPage(QWidget):
         self.cards_layout = QVBoxLayout(self.cards_container)
         self.cards_layout.setContentsMargins(0, 0, 10, 0)
         self.cards_layout.setSpacing(10)
-
+        #remove unlinked projects
+        for project, card in  self.projects_cards.items():
+            if project not in self.projects:
+                print(dir(card))
+                card.hide()
+        #add new projects
         for project in self.projects:
             if project in self.projects_cards:
                 continue
@@ -468,7 +476,8 @@ class ProjectPage(QWidget):
             if selected_format == 'payload.bin':
                 images = [f for f in os.listdir(project_path) if f.lower() == 'payload.bin']
             elif selected_format == 'super':
-                images = [f for f in os.listdir(project_path) if f.lower().startswith('super') and f.lower().endswith(('.img', '.bin'))]
+                images = [f for f in os.listdir(project_path) if
+                          f.lower().startswith('super') and f.lower().endswith(('.img', '.bin'))]
             else:
                 images = [f for f in os.listdir(project_path) if f.lower().endswith(f".{selected_format}")]
             if images:
@@ -509,7 +518,8 @@ class ProjectPage(QWidget):
             self.show_info_bar("提示", "你镜像都没选你打包🐔🪶呢！", is_error=True)
             return
         selected_format = self.format_combo.currentText()
-        self.show_info_bar("提示", f"开始打包 {', '.join(self.selected_images)} 为 {selected_format} 格式", is_error=False)
+        self.show_info_bar("提示", f"开始打包 {', '.join(self.selected_images)} 为 {selected_format} 格式",
+                           is_error=False)
 
     def extract_img(self):
         """打印选中的镜像文件，供后续解包逻辑"""

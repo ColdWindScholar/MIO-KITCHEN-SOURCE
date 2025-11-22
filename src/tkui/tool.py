@@ -2106,6 +2106,7 @@ class Welcome(ttk.Frame):
             if 'logging' in globals():
                 logging.critical(
                     "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+                error(1, 'Missing Main Window.')
             # The application could either fail or a temporary Toplevel could be created
             # if Welcome were intended to run standalone (which is unlikely here).
             # For now, let's assume 'win' is always available as per the original design.
@@ -3037,7 +3038,7 @@ class ModuleManager:
         name: str = self.get_name(id_)
         if self.is_virtual(id_):
             print(f"{name} is a virtual plugin!")
-            return
+            return 1
         if not id_:
             win.message_pop(lang.warn2)
             return 1
@@ -5825,7 +5826,7 @@ class Packxx(Toplevel):
                     except Exception:
                         logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(f"{work}/config", f"{dname}_fs_config"))
-                utils.qc(f"{work}/config/{dname}_fs_config")
+                utils.remove_duplicate(f"{work}/config/{dname}_fs_config")
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
                     if settings.contextpatch == "1":
@@ -5834,7 +5835,7 @@ class Packxx(Toplevel):
                         rules = JsonEdit(context_rule_file)
                         rules.write(new_rules | rules.read())
 
-                    utils.qc(contexts_file)
+                    utils.remove_duplicate(contexts_file)
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
