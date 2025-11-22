@@ -142,6 +142,7 @@ class ProjectPage(QWidget):
         self.project_dir = "Project"
         self.current_project = None  # 跟踪当前选中的项目
         self.selected_project = None  # 当前选中的项目卡片
+        self.projects_cards = {}
         self.selected_images = []  # 存储多选的镜像文件
         self.setStyleSheet("""
             QWidget#ProjectPage {
@@ -201,7 +202,10 @@ class ProjectPage(QWidget):
         self.cards_layout.setSpacing(10)
 
         for project in self.projects:
+            if project in self.projects_cards:
+                continue
             card = ProjectCard(project, self, self.cards_container)
+            self.projects_cards[project] = card
             self.cards_layout.addWidget(card)
             self.project_cards.append(card)
         self.cards_layout.addStretch()

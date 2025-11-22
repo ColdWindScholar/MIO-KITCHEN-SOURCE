@@ -22,7 +22,7 @@ if sys.version_info.major == 3:
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
 try:
-    from src.tkui.tool import *
+    from src.qtui.tool import *
 except Exception as e:
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
