@@ -154,7 +154,7 @@ class ProjectPage(QWidget):
             }
         """)
 
-        self.projects = []
+        self.projects: list[str] = []
         self.project_cards = []
         self.init_project_dir()
         self.init_ui()
@@ -386,6 +386,7 @@ class ProjectPage(QWidget):
             card = ProjectCard(name, self, self.cards_container)
             self.project_cards.append(card)
             self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
+            self.select_project(card)
             self.show_info_bar("成功", f"项目 '{name}' 已创建", bar_type=3)
         except Exception as e:
             self.show_info_bar("错误", f"创建项目失败: {str(e)}", bar_type=1)
@@ -410,7 +411,7 @@ class ProjectPage(QWidget):
             shutil.rmtree(project_path)
             deleted_project = self.selected_project
             self.refresh_projects()
-            for card in self.project_cards[:]:
+            for card in self.project_cards:
                 if card.project_name == self.selected_project:
                     self.cards_layout.removeWidget(card)
                     card.deleteLater()
