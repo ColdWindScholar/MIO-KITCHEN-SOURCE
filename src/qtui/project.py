@@ -413,12 +413,13 @@ class ProjectPage(QWidget):
             self.refresh_projects()
             for card in self.project_cards:
                 if card.project_name == self.selected_project:
-                    self.cards_layout.removeWidget(card)
-                    card.deleteLater()
+                    card.hide()
                     self.project_cards.remove(card)
+                    continue
+
             self.selected_project = None
             self.current_project = None
-            if  self.projects_cards:
+            if self.project_cards:
                 self.select_project(self.project_cards[0])
             self.update_image_list()
             self.show_info_bar("成功", f"项目{deleted_project}已删除", bar_type=3)
