@@ -36,22 +36,15 @@ key_table = [
 ]
 
 
-class Xtc_xor_hdr_struct:
-    encrypt: int
-    index: int
-    count: int
-    unknow4: int
+class XtcXorHdrStruct:
+    encrypt: int = 1
+    index: int = 41
+    count: int = 41
+    unknow4: int = 0
 
 
-Xtc_xor_hdr = Xtc_xor_hdr_struct()
-Xtc_xor_hdr.encrypt = 1
-Xtc_xor_hdr.index = 41
-Xtc_xor_hdr.count = 41
-Xtc_xor_hdr.unknow4 = 0
-
-
-def Xor_file(file_path: str):
-    hdr = Xtc_xor_hdr
+def decrypt(file_path: str):
+    hdr = XtcXorHdrStruct()
     if not os.path.exists(file_path):
         print("File does not exist")
         return

@@ -32,11 +32,12 @@ from src.core.avb_disabler import process_fstab
 from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
-from src.core.rsceutil import unpack as rsceutil_unpack,repack as rsceutil_repack
+from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repack
 from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
-from ..core.xtc_recovery_helper import Xor_file
+from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
 from src.porttool.__main__ import Main as MtkPortTool
+
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
@@ -314,15 +315,14 @@ def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master:
 
     popup_window = Toplevel()  # Use the custom Toplevel for theme consistency.
     popup_window.title(title)
-    
+
     # 1. Make the window "transient" to its parent. This ensures it always
     #    stays on top of the parent window.
     popup_window.transient(parent)
-    
+
     # 2. Set a "grab". This makes the window modal, preventing any interaction
     #    with the parent window until this dialog is closed.
     popup_window.grab_set()
-    
 
     ask_frame = ttk.Frame(popup_window, padding=(20, 10))
     ask_frame.pack(expand=True, fill=BOTH)
@@ -339,7 +339,7 @@ def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master:
     # Add an "OK" button that the user must click to close the window.
     ok_text = getattr(lang, 'ok', 'OK')  # Use localized text for the button.
     ok_button = ttk.Button(ask_frame, text=ok_text, command=close_popup, style="Accent.TButton")
-    ok_button.pack(pady=(0, 10), padx=20, fill=X, ipady=4) # ipady adds vertical padding inside the button.
+    ok_button.pack(pady=(0, 10), padx=20, fill=X, ipady=4)  # ipady adds vertical padding inside the button.
 
     popup_window.update_idletasks()
     move_center(popup_window)  # Center the dialog on the screen.
@@ -365,7 +365,6 @@ class Toplevel(TkToplevel):
         super().__init__()
         if os.name == 'nt':  # Only apply this on Windows.
             set_title_bar_color(self, 20 if settings.theme == 'dark' else 0)
-
 
 
 class CustomControls:
@@ -517,6 +516,7 @@ class ToolBox(ttk.Frame):
         def gui(self):
             ccontrols.filechose(self, self.path, lang.path, is_folder=True)
             ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
+
         def run(self):
             if not self.path.get() or not os.path.exists(self.path.get()):
                 warn_win('Please choose a path.')
@@ -526,7 +526,7 @@ class ToolBox(ttk.Frame):
                 for f in files:
                     if f.endswith('.xml'):
                         print(f"Decrypting {f}")
-                        Xor_file(os.path.join(root, f))
+                        decrypt_xtc(os.path.join(root, f))
 
     class MergequalcommimageOld(Toplevel):
         """A Toplevel window for merging Qualcomm sparse images using rawprogram.xml (Legacy version).
@@ -2106,6 +2106,7 @@ class Welcome(ttk.Frame):
             if 'logging' in globals():
                 logging.critical(
                     "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+                error(1, 'Missing Main Window.')
             # The application could either fail or a temporary Toplevel could be created
             # if Welcome were intended to run standalone (which is unlikely here).
             # For now, let's assume 'win' is always available as per the original design.
@@ -2876,7 +2877,7 @@ class ModuleManager:
         return 0
 
     @staticmethod
-    def check_mpk(mpk): # Move check progress from InstallMpk to this
+    def check_mpk(mpk):  # Move check progress from InstallMpk to this
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return module_error_codes.IsBroken, ''
         try:
@@ -3037,7 +3038,7 @@ class ModuleManager:
         name: str = self.get_name(id_)
         if self.is_virtual(id_):
             print(f"{name} is a virtual plugin!")
-            return
+            return 1
         if not id_:
             win.message_pop(lang.warn2)
             return 1
@@ -4697,7 +4698,8 @@ class MpkStore(Toplevel):
                     logging.info(
                         f"MpkStore.download: Downloading: {self.repo + file_name_in_list} to {mpk_file_path_in_temp}")
                     download_generator = download_api(self.repo + file_name_in_list, temp,
-                                                      size_=expected_file_size_from_data,  chunk_size=expected_file_size_from_data//4)
+                                                      size_=expected_file_size_from_data,
+                                                      chunk_size=expected_file_size_from_data // 4)
                     for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                         if not self.winfo_exists():
                             download_successful_for_all_files = False
@@ -4996,11 +4998,12 @@ class NewPostInstallConfig(Toplevel):
         self.combox.config(values=list(self.data.keys()))
         self.combox.set(part_name)
         self.read_value()
+
     def save_data(self):
         if os.path.exists(self.config_file):
             with open(self.config_file, 'w', encoding='utf-8') as f:
                 for i in self.data:
-                    for name in ['RUN_POSTINSTALL',"POSTINSTALL_PATH", "FILESYSTEM_TYPE", "POSTINSTALL_OPTIONAL"]:
+                    for name in ['RUN_POSTINSTALL', "POSTINSTALL_PATH", "FILESYSTEM_TYPE", "POSTINSTALL_OPTIONAL"]:
                         value = self.data[i].get(name)
                         if value:
                             f.write(f"{name}_{i}={value}\n")
@@ -5046,7 +5049,9 @@ class NewPostInstallConfig(Toplevel):
         frame.pack(padx=5, pady=5, expand=True, side='top', fill=X)
         self.frame_down.pack(padx=5, pady=5, expand=True, side='top', fill=X)
         self.frame_up.pack(padx=5, pady=5, expand=True, side='top', fill=X)
-        ttk.Button(self, text="Save", command=lambda: create_thread(self.save_data()), style="Accent.TButton").pack(padx=5, pady=5, expand=True, side='bottom', fill=X)
+        ttk.Button(self, text="Save", command=lambda: create_thread(self.save_data()), style="Accent.TButton").pack(
+            padx=5, pady=5, expand=True, side='bottom', fill=X)
+
 
 #dynamic_partitions_info config
 class DynamicPartitionsInfo(Toplevel):
@@ -5058,8 +5063,11 @@ super_{group_name}_group_size=17175674880
 super_partition_groups={group_name}
 super_{group_name}_partition_list=my_company my_preload vbmeta
     """
+
     def __init__(self):
         super().__init__()
+
+
 class PackPayload(Toplevel):
     def __init__(self):
         super().__init__()
@@ -5330,12 +5338,14 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
                             logging.exception('Bugs')
         else:
             win.message_pop(lang.warn10)
+            return 1
     else:
         win.message_pop(lang.warn10)
+        return 1
 
 
 class StdoutRedirector:
-    def __init__(self, text_widget : Text, error_=False):
+    def __init__(self, text_widget: Text, error_=False):
         self.text_space = text_widget
         self.error = error_
         self.error_info = ''
@@ -5376,7 +5386,7 @@ class StdoutRedirector:
             time.sleep(0.5)
 
 
-def download_api(url, path=None, int_=True, size_:int=0, chunk_size:int = 2048576):
+def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 2048576):
     """
     return percentage, speed, bytes_downloaded, file_size, elapsed
     """
@@ -5823,7 +5833,7 @@ class Packxx(Toplevel):
                     except Exception:
                         logging.exception('Bugs')
                 fspatch.main(work + dname, os.path.join(f"{work}/config", f"{dname}_fs_config"))
-                utils.qc(f"{work}/config/{dname}_fs_config")
+                utils.remove_duplicate(f"{work}/config/{dname}_fs_config")
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
                     if settings.contextpatch == "1":
@@ -5832,7 +5842,7 @@ class Packxx(Toplevel):
                         rules = JsonEdit(context_rule_file)
                         rules.write(new_rules | rules.read())
 
-                    utils.qc(contexts_file)
+                    utils.remove_duplicate(contexts_file)
                 if self.fs_conver.get():
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
@@ -5955,8 +5965,6 @@ def rdi(work, part_name) -> bool:
         print(lang.text3.format(part_name))
     else:
         win.message_pop(lang.text75 % part_name, "red")
-
-
 
 
 def script2fs(path):
@@ -6428,32 +6436,32 @@ def info_win(text: str, ok: Optional[str] = None, master: Optional[tk.Wm] = None
                 window (`win`) is used.
     """
     ok_text = ok or getattr(lang, 'ok', 'OK')
-    
+
     parent = master if master and master.winfo_exists() else win
-    
+
     dialog = Toplevel()
     dialog.title("")  # A clean, title-less dialog window.
-    
+
     # Make the dialog transient and modal.
     dialog.transient(parent)
     dialog.grab_set()
-    
+
     frame_inner = ttk.Frame(dialog)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
-    
+
     ttk.Label(frame_inner, text=text, font=(None, 20), wraplength=400).pack(side=TOP)
-    
+
     def close_dialog() -> None:
         """Releases the grab and destroys the dialog."""
         dialog.grab_release()
         dialog.destroy()
-        
+
     ttk.Button(frame_inner, text=ok_text, command=close_dialog, style="Accent.TButton").pack(padx=5, pady=5,
-                                                                                            fill=X, side=LEFT,
-                                                                                            expand=True)
+                                                                                             fill=X, side=LEFT,
+                                                                                             expand=True)
     dialog.update_idletasks()
     move_center(dialog)
-    
+
     parent.wait_window(dialog)
 
 
@@ -6872,6 +6880,7 @@ class UnpackGui(ttk.LabelFrame):
     It provides controls to switch between pack/unpack modes, select file formats,
     and lists the available items for the selected operation.
     """
+
     def __init__(self):
         super().__init__(master=win.tab2, text=lang.t57)
         self.ch = BooleanVar()  # Variable to toggle between Pack (False) and Unpack (True) modes.
@@ -6902,8 +6911,8 @@ class UnpackGui(ttk.LabelFrame):
                                    'new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                    'update.app'))
 
-        self.lsg = ListBox(self) # The listbox for displaying items.
-        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0) # Context menu for listbox items.
+        self.lsg = ListBox(self)  # The listbox for displaying items.
+        self.menu = Menu(self.lsg, tearoff=False, borderwidth=0)  # Context menu for listbox items.
         self.menu.add_command(label=lang.attribute, command=self.info)
         self.lsg.bind('<Button-3>', self.show_menu)
 
@@ -6930,8 +6939,8 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=50, side=BOTTOM, fill=X)
         self.lsg.pack(padx=5, pady=5, fill=Y, side=BOTTOM, expand=True)
 
-        self.refs() # Initial population of the listbox.
-        self.ch.trace("w", lambda *x: self.hd()) # Add trace to update UI on mode change.
+        self.refs()  # Initial population of the listbox.
+        self.ch.trace("w", lambda *x: self.hd())  # Add trace to update UI on mode change.
 
     def show_menu(self, event):
         """Displays the context menu if a single image item is selected."""
@@ -7016,7 +7025,8 @@ class UnpackGui(ttk.LabelFrame):
                 # Check if a corresponding folder type exists in parts_info.
                 folder_type = parts_dict.get(partition_name, f_type)
 
-                self.lsg.insert(f'{partition_name} [{folder_type}] ({hum_convert(os.path.getsize(img_path))})', partition_name)
+                self.lsg.insert(f'{partition_name} [{folder_type}] ({hum_convert(os.path.getsize(img_path))})',
+                                partition_name)
 
         return True
 
@@ -7098,7 +7108,6 @@ class UnpackGui(ttk.LabelFrame):
             self.refs()
         else:  # Pack mode (False)
             Packxx(lbs)
-                
 
 
 class FormatConversion(ttk.LabelFrame):

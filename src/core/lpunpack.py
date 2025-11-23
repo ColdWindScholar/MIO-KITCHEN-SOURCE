@@ -536,7 +536,8 @@ class Metadata:
         except Exception:
             ...
         finally:
-            return result
+            print("[Lpunpack] Cannot get info of this super image")
+        return result
 
     @property
     def get_info2(self):

@@ -49,10 +49,9 @@ DataImage = blockimgdiff.DataImage
 # ----VALUES
 
 # Prevent system errors
-try:
+if hasattr(sys, 'set_int_max_str_digits'):
     sys.set_int_max_str_digits(0)
-except AttributeError:
-    ...
+
 if os.name == 'nt':
     prog_path = getcwd()
 else:
@@ -446,7 +445,7 @@ def v_code(num=6) -> str:
     return ret
 
 
-def qc(file_) -> None:
+def remove_duplicate(file_) -> None:
     """
     remove Same Line of File
     :param file_:
@@ -748,13 +747,13 @@ class States:
     elif os.name == 'nt':
         root = windll.shell32.IsUserAnAdmin()
     else:
-        root = None
+        root: bool = False
 
 
 states = States()
 
 
-def hashlib_calculate(file_path, method: str):
+def hashlib_calculate(file_path, method: str) -> int:
     if not hasattr(hashlib, method):
         print(f"Warn, The algorithm {method} not exist in hashlib!")
         return 1
@@ -836,14 +835,14 @@ class MkcSugges:
         else:
             return None, None
 
-    def catch_error(self, string):
+    def catch_error(self, string) -> str | int:
         catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
         if not catch_error:
-            return
+            return 1
         else:
             catch_error = catch_error[0]
         if not catch_error:
-            return
+            return 1
         return catch_error
 
 
