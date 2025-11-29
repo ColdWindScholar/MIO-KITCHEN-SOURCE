@@ -3,6 +3,7 @@ NTPI File Parser
 Handles parsing of NTPI file structure and region extraction.
 """
 import ctypes
+import os.path
 import time
 import xml.etree.ElementTree as ET
 
@@ -108,7 +109,7 @@ def parse_ntpi_file(file_path, output_dir):
     stage1_start = time.time()
     
     # Validate file existence
-    if not file_path.exists():
+    if not os.path.exists(file_path):
         print(f"Error: Input file not found: {file_path}")
         return False
 

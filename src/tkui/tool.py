@@ -32,6 +32,8 @@ from src.core.avb_disabler import process_fstab
 from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
+from src.core.ntpiutils import parser as ntpiparser
+from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repack
 from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
@@ -6072,6 +6074,15 @@ def unpackrom(ifile) -> None:
         unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+        return
+    # NTPI
+    if gettype(ifile) == 'NTPI':
+        prog_name = os.path.splitext(os.path.basename(ifile))[0]
+        current_project_name.set(prog_name)
+        if not os.path.exists(project_manger.current_work_path()):
+            os.makedirs(project_manger.current_work_path(), exist_ok=True)
+        ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path())
+        ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
         return
     # zip
     if gettype(ifile) == 'zip':

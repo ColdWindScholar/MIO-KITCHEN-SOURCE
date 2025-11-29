@@ -481,11 +481,11 @@ def stage2_extract_files(temp_dir, final_output_dir, all_files=True, process_cou
     stage2_start = time.time()
     
     # Verify required input files exist
-    fileindex_path = temp_dir / "FileIndex.xml"
-    keymap_path = temp_dir / "KeyMap.bin"
-    region6_path = temp_dir / "region6block.bin"
+    fileindex_path = f"{temp_dir}/FileIndex.xml"
+    keymap_path = f"{temp_dir}/KeyMap.bin"
+    region6_path = f"{temp_dir}/region6block.bin"
     for path in [fileindex_path, keymap_path, region6_path]:
-        if not path.exists():
+        if not os.path.exists(path):
             print(f"Error: Required file for stage 2 not found: {path}")
             exit(-1)
 
