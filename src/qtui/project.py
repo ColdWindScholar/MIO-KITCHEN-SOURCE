@@ -155,7 +155,6 @@ class ProjectPage(QWidget):
         """)
 
         self.projects: list[str] = []
-        self.project_cards = []
         self.init_project_dir()
         self.init_ui()
 
@@ -212,7 +211,6 @@ class ProjectPage(QWidget):
                 continue
             self.projects_cards[project] = card
             self.cards_layout.addWidget(card)
-            self.project_cards.append(card)
         self.cards_layout.addStretch()
 
         scroll_area = FluentScrollArea(self)
@@ -359,7 +357,7 @@ class ProjectPage(QWidget):
         self.selected_project = card.project_name
         self.current_project = card.project_name
         print(f"切换到项目: {self.current_project}")
-        for c in self.project_cards:
+        for c in self.projects_cards.values():
             c.set_selected(c == card)
         self.update_image_list()
 
@@ -384,7 +382,7 @@ class ProjectPage(QWidget):
             os.makedirs(project_path, exist_ok=True)
             self.refresh_projects()
             card = ProjectCard(name, self, self.cards_container)
-            self.project_cards.append(card)
+            self.projects_cards[name] = card
             self.cards_layout.insertWidget(self.cards_layout.count() - 1, card)
             self.select_project(card)
             self.show_info_bar("成功", f"项目 '{name}' 已创建", bar_type=3)
@@ -411,19 +409,21 @@ class ProjectPage(QWidget):
             shutil.rmtree(project_path)
             deleted_project = self.selected_project
             self.refresh_projects()
-            for card in self.project_cards:
+            # list the values' to avoid RuntimeError
+            for card in list(self.projects_cards.values()):
                 if card.project_name == self.selected_project:
                     card.hide()
-                    self.project_cards.remove(card)
+                    self.projects_cards.pop(card.project_name)
                     continue
 
             self.selected_project = None
             self.current_project = None
-            if self.project_cards:
-                self.select_project(self.project_cards[0])
+            if self.projects_cards:
+                self.select_project(self.projects_cards.get(self.projects_cards.keys()[0]))
             self.update_image_list()
             self.show_info_bar("成功", f"项目{deleted_project}已删除", bar_type=3)
         except Exception as e:
+            raise ValueError from e
             self.show_info_bar("错误", f"删除项目失败: {str(e)}", bar_type=1)
 
     def show_rename_dialog(self):
@@ -448,7 +448,7 @@ class ProjectPage(QWidget):
             new_path = os.path.join(self.project_dir, new_name)
             os.rename(old_path, new_path)
             self.refresh_projects()
-            for card in self.project_cards:
+            for card in self.projects_cards.values():
                 if card.project_name == self.selected_project:
                     card.project_name = new_name
                     card.name_label.setText(new_name)
