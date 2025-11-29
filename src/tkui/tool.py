@@ -7457,7 +7457,10 @@ def __init__tk(args: list):
     win.protocol("WM_DELETE_WINDOW", exit_tool)
     if len(args) > 1 and is_pro:
         win.after(1000, ParseCmdline, args[1:])
-    win.mainloop()
+    try:
+        win.mainloop()
+    except KeyboardInterrupt:
+        exit_tool()
 
 
 # Cool Init
