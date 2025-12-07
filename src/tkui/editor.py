@@ -158,7 +158,7 @@ class PythonEditor(tk.Frame):
                     except Exception as e:
                         logging.exception('read license')
                         self.text.insert(tk.END,
-                                         f'[MIO-KITCHEN] Cannot load {os.path.join(self.path, self.file_name)}.\nWe think this\'s {gettype(os.path.join(self.path, self.file_name))}\nDon\'t Click \'Save\' Button!\nReason:\n{e}')
+                                         f'[MIO-KITCHEN] Cannot load {os.path.join(self.path, self.file_name)}.\nWe think this\'s {gettype(os.path.join(self.path, self.file_name))}.\nDon\'t Click \'Save\' Button!\nReason:\n{e}')
                     self.text.insert(tk.END, data)
             except Exception as e:
                 logging.debug(e)
