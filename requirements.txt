@@ -11,7 +11,7 @@ Pygments
 zstandard
 asn1crypto
 lxml
-wmi
+wmi; sys_platform == 'win32'
 six
 httpx
 cryptography
