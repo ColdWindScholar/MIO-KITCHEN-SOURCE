@@ -145,7 +145,7 @@ class PythonEditor(tk.Frame):
                         data = f.read().decode("utf-8")
                     except Exception as e:
                         logging.exception('read license')
-                        self.text.insert(tk.END, f'[MIO-KITCHEN] Cannot load the file.Don\'t Click \'Save\' Button!\nReason:\n{e}')
+                        self.text.insert(tk.END, f'[MIO-KITCHEN] Cannot load {os.path.join(self.path, self.file_name)}.\nDon\'t Click \'Save\' Button!\nReason:\n{e}')
                     self.text.insert(tk.END, data)
             except Exception as e:
                 logging.debug(e)
