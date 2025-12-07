@@ -364,5 +364,6 @@
   "packing_in_progress": "Packing in progress...",
   "ui_verification_failed": "Verification FAILED!",
   "decrypt_xtc_xml":"Decrypt Xtc Xml",
-  "mtk_port_tool": "Mtk Port Tool"
+  "mtk_port_tool": "Mtk Port Tool",
+  "encoding": "Encoding:"
 }

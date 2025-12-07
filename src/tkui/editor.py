@@ -53,7 +53,7 @@ class PythonEditor(tk.Frame):
         Button(ff, text=lang.text117, command=self.rename).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         ff.pack(padx=5, pady=5, fill=X, expand=True)
         format_frame = ttk.Frame(self)
-        ttk.Label(format_frame, text="Encoding:").pack(padx=5, pady=5, expand=True, side=LEFT, fill=X)
+        ttk.Label(format_frame, text=lang.encoding).pack(padx=5, pady=5, expand=True, side=LEFT, fill=X)
         encoding_comboxx = ttk.Combobox(format_frame, values=['utf-8', 'gbk', 'gb2312', 'utf-16'],
                                         textvariable=self.encoding)
         encoding_comboxx.pack(fill=X,
