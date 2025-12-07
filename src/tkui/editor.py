@@ -18,12 +18,12 @@ import time
 import tkinter as tk
 from tkinter import ttk, END, X, LEFT
 from tkinter.ttk import Button
-
 import pygments.lexers
 from chlorophyll import CodeView
 
 from ..core.utils import create_thread, lang
 from ..tkui.controls import input_
+
 
 class PythonEditor(tk.Frame):
     def __init__(self, parent, path, file_name, lexer=pygments.lexers.BashLexer):
@@ -35,14 +35,16 @@ class PythonEditor(tk.Frame):
         self.parent = parent
         self.text = CodeView(self, wrap="word", undo=True, lexer=lexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
+        self.encoding = tk.StringVar(value='utf-8')
+        self.encoding.trace('w', self.load)
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text=lang.text17, command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
-                                                                              expand=1)
+                                                                           expand=1)
         self.save_b = ttk.Button(f1, text=lang.t54, command=lambda: create_thread(self.save), style="Accent.TButton")
         self.save_b.pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5, expand=1)
         f1.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
         self.show = tk.Listbox(self, activestyle='dotbox', highlightthickness=0)
-        self.show.bind("<Double-Button-1>", lambda x:self.p_bind())
+        self.show.bind("<Double-Button-1>", lambda x: self.p_bind())
         self.show.pack(fill=tk.BOTH, padx=5, pady=5, expand=True)
         ff = ttk.Frame(self)
         Button(ff, text=lang.text23, command=self.refs).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
@@ -50,6 +52,17 @@ class PythonEditor(tk.Frame):
         Button(ff, text=lang.text116, command=self.delete).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         Button(ff, text=lang.text117, command=self.rename).pack(fill=X, side=LEFT, padx=5, pady=5, expand=True)
         ff.pack(padx=5, pady=5, fill=X, expand=True)
+        format_frame = ttk.Frame(self)
+        ttk.Label(format_frame, text="Encoding:").pack(padx=5, pady=5, expand=True, side=LEFT, fill=X)
+        encoding_comboxx = ttk.Combobox(format_frame, values=['utf-8', 'gbk', 'gb2312', 'utf-16'],
+                                        textvariable=self.encoding)
+        encoding_comboxx.pack(fill=X,
+                              side=LEFT,
+                              padx=5,
+                              pady=5,
+                              expand=True)
+        encoding_comboxx.bind('<<ComboboxSelected>>', lambda *x: self.load())
+        format_frame.pack(padx=5, pady=5, fill=X, expand=True)
         self.refs()
 
     def rename(self):
@@ -60,7 +73,7 @@ class PythonEditor(tk.Frame):
             return
         if file in ['.', '..']:
             return
-        is_current_file =  file == self.file_name
+        is_current_file = file == self.file_name
         if is_current_file:
             self.save()
         new_name = input_('Enter New Name', file, master=self)
@@ -103,7 +116,6 @@ class PythonEditor(tk.Frame):
         self.refs()
         self.load()
 
-
     def p_bind(self):
         try:
             file = self.show.get(self.show.curselection())
@@ -142,14 +154,15 @@ class PythonEditor(tk.Frame):
                 with open(os.path.join(self.path, self.file_name), 'rb+') as f:
                     self.text.delete(0.0, tk.END)
                     try:
-                        data = f.read().decode("utf-8")
+                        data = f.read().decode(self.encoding.get())
                     except Exception as e:
                         logging.exception('read license')
-                        self.text.insert(tk.END, f'[MIO-KITCHEN] Cannot load {os.path.join(self.path, self.file_name)}.\nDon\'t Click \'Save\' Button!\nReason:\n{e}')
+                        self.text.insert(tk.END,
+                                         f'[MIO-KITCHEN] Cannot load {os.path.join(self.path, self.file_name)}.\nDon\'t Click \'Save\' Button!\nReason:\n{e}')
                     self.text.insert(tk.END, data)
             except Exception as e:
                 logging.debug(e)
-            self.parent.title(f"{self.file_name} - Editor")
+            self.parent.title(f"{self.file_name}:[{self.encoding.get()}] - Editor")
 
 
 def main(file_=None, file_name=None, lexer=pygments.lexers.BashLexer):
