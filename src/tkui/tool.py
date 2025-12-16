@@ -1782,6 +1782,7 @@ class Tool(Tk):
         context.trace("w", lambda *x: enable_contextpatch())
         get_setting_button('ai_engine', sf4, lang.ai_engine)
         get_setting_button('magisk_not_decompress', sf4, lang.text142)
+        get_setting_button('boot_skip_ramdisk', sf4, lang.skip_ramdisk)
         get_setting_button('treff', sf4, lang.t61)
         enable_cp = ttk.Checkbutton(sf4, text=lang.context_patch, variable=context, onvalue='1',
                                     offvalue='0',
@@ -2356,6 +2357,7 @@ class SetUtils:
         self.version = 'basic'
         self.version_old = 'unknown'
         self.language = 'English'
+        self.boot_skip_ramdisk = '0'
         self.magisk_not_decompress = '0'
         self.updating = ''
         self.new_tool = ''
@@ -5536,7 +5538,7 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
             print("Unpack Rk resource...")
             rsceutil_unpack(f"{work}/{name}/second", f"{work}/{name}/second_dump", f"{work}/{name}/second_order")
             print("Unpack Rk resource successfully...")
-    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK):
+    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK) and settings.boot_skip_ramdisk == '0':
         comp = gettype(f"{work}/{name}/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
         with open(f"{work}/{name}/comp", "w", encoding='utf-8') as f:
@@ -5553,8 +5555,7 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
         os.chdir(work + name)
         call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
         os.chdir(cwd_path)
-    else:
-        print("Unpack Done!")
+    print("Unpack Done!")
     os.chdir(cwd_path)
 
 
@@ -5576,7 +5577,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         print("Repack Rk resource...")
         rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
         print("Repack Rk resource successfully...")
-    if os.path.isdir(f"{source}/ramdisk"):
+    if os.path.isdir(f"{source}/ramdisk") and settings.boot_skip_ramdisk == '0':
         cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
                         settings.tool_bin).replace(
             '\\', "/")
