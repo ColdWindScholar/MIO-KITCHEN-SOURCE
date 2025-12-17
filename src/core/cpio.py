@@ -189,6 +189,7 @@ def extract(filename, outputdir, output_info, check_crc: bool = False):
                 f.read(4 - (file_size % 4))
         with open(output_info, 'w', encoding='utf-8', newline='\n') as con:
             dump(info, con)
+            return None
 
 
 def scan_dir(folder: str, return_trailer: bool = True):
