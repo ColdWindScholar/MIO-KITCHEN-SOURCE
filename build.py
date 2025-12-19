@@ -62,13 +62,13 @@ class Builder:
     def generate_release_body(self):
         print('Generating Release Body...')
         # load config
-        conf = os.getenv('CONFIGER')
-        conf_obj = json.loads(conf)
         with open('bin/setting.ini', 'r', encoding='utf-8') as f:
             ver = [line for line in f.readlines()]
             ver = ver[0].strip('\n').split('=')[1]
         with open('body.md', 'w', encoding='utf-8', newline='\n') as f:
-            f.write(f"Build times: {conf_obj['github']['run_number']}\n")
+            f.write(f"Build times: {os.getenv('GITHUB_RUN_NUMBER')}\n")
+            f.write(f"Actor: {os.getenv('GITHUB_TRIGGERING_ACTOR')}\n")
+            f.write(f"Repository: {os.getenv('GITHUB_REPOSITORY')}\n")
             f.write(f'Version: {ver}\n')
             f.write(f'```\n')
             f.write(f'Changelog:\n')
