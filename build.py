@@ -115,7 +115,7 @@ class Builder:
                 '--hidden-import',
                 'PIL._tkinter_finder',
                 '--splash',
-                'splash.png'
+                'splash_loongarch.png' if platform.machine() == 'loongarch64' else 'splash.png'
             ])
         elif os.name == 'nt':
             mach_ = platform.machine()
