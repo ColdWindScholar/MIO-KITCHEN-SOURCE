@@ -80,6 +80,8 @@ def _require(tkroot: tkinter.Tk): # Added type hint for tkroot
                 tkdnd_platform_rep = "linux-arm64"
             elif current_machine_arch == "x86_64":
                 tkdnd_platform_rep = "linux-x64"
+            elif current_machine_arch == "loongarch64":
+                tkdnd_platform_rep = "linux-loongarch64"
             else:
                 raise RuntimeError(f'Unsupported Linux architecture: {current_machine_arch}')
         elif system_name == "Windows":

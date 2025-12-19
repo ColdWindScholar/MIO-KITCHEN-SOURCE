@@ -95,6 +95,8 @@ class Builder:
                     dndplat = 'linux-x64'
                 elif platform.machine() == 'aarch64':
                     dndplat = 'linux-arm64'
+                elif platform.machine() == 'loongarch64':
+                    dndplat = 'linux-loongarch64'
             PyInstaller.__main__.run([
                 'tool.py',
                 '-Fw',

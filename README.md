@@ -1,8 +1,7 @@
 > [!IMPORTANT]
-> We Are Rewriting The Project.This project has currently stopped updating!
-> But we will still accept bug fixes and pull requests 
+> Currently most of binaries are ported to Loongarch64 except **MagiskBoot** and **delta_generator** so related feature won't work
 # MIO-KITCHEN-SOURCE #
-![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/a9bcfdf613ad28e82f7899e3d420d76ecfea174c/splash.png)
+![Banner](https://github.com/WeiguangTWK/MIO-KITCHEN-SOURCE-Loongarch/blob/main/splash.png?raw=true)
 #### A Rom Tool Written in Python
 ##### The Best Free And Open Source Rom Tool For You
 > [!CAUTION]

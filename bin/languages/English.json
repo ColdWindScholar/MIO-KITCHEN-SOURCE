@@ -70,6 +70,7 @@
   "warn18": "Are you sure you want to enable this? This feature may cause the ROM to not boot!",
   "warn19": "The plugin with identifier %s already exists! Please change the identifier.",
   "warn20": "Support for Windows 7 and older operating systems will be removed after version 4.0.0",
+  "warnloongarch": "[I]: Now running on Loongarch64 Machine, MagiskBoot and repacking Payload.bin related feature unavaliable",
   "text1": "Writing:",
   "text2": "Error writing {}: {}",
   "text3": "Packed successfully: {}!",
