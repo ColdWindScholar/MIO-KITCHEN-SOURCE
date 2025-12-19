@@ -50,9 +50,9 @@ class PayloadHdr(object):
 
 class OrderedFileWriter(object):
     def __init__(
-        self,
-        file: BufferedWriter,
-        max_workers: int
+            self,
+            file: BufferedWriter,
+            max_workers: int
     ):
         self.file = file
         self.task_queue = Queue(max_workers * 2)
@@ -60,7 +60,6 @@ class OrderedFileWriter(object):
         self.stop_event = threading.Event()
         self.writer_thread = threading.Thread(target=self._write_worker, daemon=True)
         self.writer_thread.start()  # Start the thread immediately after creation
-
 
     def _write_worker(self):
         while not self.stop_event.is_set() or not self.task_queue.empty():
@@ -120,11 +119,11 @@ def init_payload_info(reader: IO[bytes]) -> update_metadata_pb2.DeltaArchiveMani
 
 
 def _extract_operation_to_file(
-    operation: update_metadata_pb2.InstallOperation,
-    writer: OrderedFileWriter,  # multi thread use
-    out_offset: int,
-    block_size: int,
-    data: bytes,
+        operation: update_metadata_pb2.InstallOperation,
+        writer: OrderedFileWriter,  # multi thread use
+        out_offset: int,
+        block_size: int,
+        data: bytes,
 ):
     match operation.type:
         case update_metadata_pb2.InstallOperation.REPLACE:
@@ -143,9 +142,9 @@ def _extract_operation_to_file(
                 #    out_file.seek(out_seek, SEEK_SET)
                 #    out_file.seek(num_blocks, SEEK_CUR)
         case (
-            update_metadata_pb2.InstallOperation.REPLACE_BZ
-            | update_metadata_pb2.InstallOperation.REPLACE_XZ
-            | update_metadata_pb2.InstallOperation.REPLACE_ZSTD
+        update_metadata_pb2.InstallOperation.REPLACE_BZ
+        | update_metadata_pb2.InstallOperation.REPLACE_XZ
+        | update_metadata_pb2.InstallOperation.REPLACE_ZSTD
         ):
             if operation.type == update_metadata_pb2.InstallOperation.REPLACE_BZ:
                 decompressed_data = bz2.decompress(data)
@@ -168,12 +167,12 @@ def _extract_operation_to_file(
 
 
 def _extract_partition_from_payload(
-    reader: IO[bytes],
-    block_size: int,
-    partition: update_metadata_pb2.PartitionUpdate,
-    out_path: str,
-    total_size: int,
-    executor: ThreadPoolExecutor,
+        reader: IO[bytes],
+        block_size: int,
+        partition: update_metadata_pb2.PartitionUpdate,
+        out_path: str,
+        total_size: int,
+        executor: ThreadPoolExecutor,
 ):
     with (
         open(out_path, "wb") as out_file,
@@ -184,8 +183,6 @@ def _extract_partition_from_payload(
         curr_data_offset = 0
 
         futures: List[Future] = []
-
-
 
         for operation in sorted(partition.operations, key=lambda o: o.data_offset):
             data_len = operation.data_length
@@ -218,10 +215,10 @@ def _extract_partition_from_payload(
 
 
 def extract_partitions_from_payload(
-    reader: IO[bytes],
-    partitions_name: List[str] = [],
-    out_dir: str = "out",
-    max_workers: int = 32,
+        reader: IO[bytes],
+        partitions_name: List[str] = [],
+        out_dir: str = "out",
+        max_workers: int = 32,
 ):
     reader.seek(0, SEEK_SET)
 
@@ -244,9 +241,9 @@ def extract_partitions_from_payload(
             # print(f"Extracting output size: {data_size}")
 
             total_length = (
-                p.operations[-1].dst_extents[-1].start_block
-                + p.operations[-1].dst_extents[-1].num_blocks
-            ) * block_size
+                                   p.operations[-1].dst_extents[-1].start_block
+                                   + p.operations[-1].dst_extents[-1].num_blocks
+                           ) * block_size
             # total_length = len(p.operations)
             print(f"Extracting {p.partition_name} ...")
             _extract_partition_from_payload(

@@ -88,9 +88,8 @@ def extract_nb0(file_name: str, extract_to: str) -> int:
             nb = nb0_header_item()
             nb0_headers[i] = nb
             read_header(nb, f)
-            feof = not len(f.read(1))
             f.seek(f.tell() - 1)
-            if feof or nb.offset < lastoffset:
+            if not len(f.read(1)) or nb.offset < lastoffset:
                 print("ERROR invalid nb0 file")
                 return -1
             print(f"offset = {nb.offset:08x} size = {nb.size:08x} name: '{nb.name}'\n")
@@ -108,15 +107,11 @@ def extract_nb0(file_name: str, extract_to: str) -> int:
                     list_file.write(f"{nb.name}\n")
                 sz = nb.size
                 while sz > 0:
-                    feof = not len(f.read(1))
                     f.seek(f.tell() - 1)
-                    if feof:
+                    if not len(f.read(1)):
                         print("ERROR unexpected end of file")
                         return 1
-                    if sz > buffer_size:
-                        toread = buffer_size
-                    else:
-                        toread = sz
+                    toread = buffer_size if sz > buffer_size else sz
                     buffer = f.read(toread)
                     rd = len(buffer)
                     if rd <= 0:
