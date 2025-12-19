@@ -225,7 +225,7 @@ class Builder:
 
 
 if __name__ == '__main__':
-    if not sys.argv[1:]:
+    if len(sys.argv) == 1:
         builder = Builder()
         builder.build()
     else:
