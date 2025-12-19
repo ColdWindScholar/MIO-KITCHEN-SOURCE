@@ -64,8 +64,8 @@ class Builder:
         print('Generating Release Body...')
         # load config
         with open('bin/setting.ini', 'r', encoding='utf-8') as f:
-            ver = [line for line in f.readlines()]
-            ver = ver[0].strip('\n').split('=')[1]
+            ver = [line for line in f.readlines() if 'version' in line]
+            ver = ver[0].strip().split(' = ')[1]
         with open('body.md', 'w', encoding='utf-8', newline='\n') as f:
             f.write(f"Build times: {os.getenv('GITHUB_RUN_NUMBER')}\n")
             f.write(f"Actor: {os.getenv('GITHUB_TRIGGERING_ACTOR')}\n")
