@@ -64,7 +64,7 @@ class Builder:
         # load config
         conf = os.getenv('CONFIGER')
         conf_obj = json.loads(conf)
-        with open('bin\setting.ini', 'r', encoding='utf-8') as f:
+        with open('bin/setting.ini', 'r', encoding='utf-8') as f:
             ver = [line for line in f.readlines()]
             ver = ver[0].strip('\n').split('=')[1]
         with open('body.md', 'w', encoding='utf-8', newline='\n') as f:
@@ -228,7 +228,15 @@ if __name__ == '__main__':
     if not sys.argv[1:]:
         builder = Builder()
         builder.build()
-    # Generate Release Body
-    if sys.argv[1] == 'grb':
-        builder = Builder()
-        builder.generate_release_body()
+    else:
+        # Generate Release Body
+        if sys.argv[1] == 'grb':
+            builder = Builder()
+            builder.generate_release_body()
+        else:
+            print('Usage:')
+            print('To Build Binary and Pack')
+            print('\tpython build.py')
+            print('To Generate Release Body')
+            print('\tpython build.py grb')
+
