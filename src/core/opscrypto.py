@@ -363,9 +363,7 @@ def encryptsubsub(rkey, data, wf):
 
 
 def encryptsub(rkey, rf, wf):
-    data = rf.read()
-    return encryptsubsub(rkey, data, wf)
-
+    return encryptsubsub(rkey, rf.read(), wf)
 
 def encryptfile(key, filename, wfilename):
     print(f"Encrypting {filename}")
@@ -389,10 +387,7 @@ def copysub(rf, wf, start, length):
     rf.seek(start)
     rlen = 0
     while length > 0:
-        if length < 0x100000:
-            size = length
-        else:
-            size = 0x100000
+        size = length if length < 0x100000 else 0x100000
         data = rf.read(size)
         wf.write(data)
         rlen += len(data)
@@ -438,7 +433,7 @@ def copyitem(item, directory, pos, wf):
         filename = item.attrib["Path"]
     except:
         filename = item.attrib["filename"]
-    if filename == "":
+    if not filename:
         return item, pos
     filename = os.path.join(directory, filename)
     start = pos // 0x200

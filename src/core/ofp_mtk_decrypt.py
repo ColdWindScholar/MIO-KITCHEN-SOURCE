@@ -106,10 +106,7 @@ def brutekey(rf):
     print("Unknown key. Please ask the author for support :)")
     exit(0)
 
-
-def cleancstring(input):
-    return input.replace(b"\x00", b"").decode('utf-8')
-
+cleancstring = lambda string: string.replace(b"\x00", b"").decode('utf-8')
 
 def main(filename, outdir):
     if not os.path.exists(outdir):

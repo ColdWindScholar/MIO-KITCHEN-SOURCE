@@ -107,7 +107,7 @@ def extract_xml(filename, key, iv):
             if unpack("<I", rf.read(4))[0] == 0x7CEF:
                 pagesize = x
                 break
-        if pagesize == 0:
+        if not pagesize:
             print("Unknown pagesize. Aborting")
             return None
 
@@ -154,9 +154,7 @@ def copy(filename, wfilename, path, start, length, checksums):
     with open(filename, 'rb') as rf:
         with open(os.path.join(path, wfilename), 'wb') as wf:
             rf.seek(start)
-            data = rf.read(length)
-            wf.write(data)
-
+            wf.write(rf.read(length))
     checkhashfile(os.path.join(path, wfilename), checksums, True)
 
 
@@ -274,7 +272,7 @@ def main(filename, outdir):
             return
 
     pagesize, key, iv, data = generatekey2(filename)
-    if pagesize == 0:
+    if not pagesize:
         print("Unknown key. Aborting")
         return
     else:
@@ -296,7 +294,7 @@ def main(filename, outdir):
         os.mkdir(path)
 
     print("Saving ProFile.xml")
-    with open(path + "/ProFile.xml", mode="w") as file_handle:
+    with open(f"{path}/ProFile.xml", mode="w") as file_handle:
         file_handle.write(xml)
 
     for child in et.fromstring(xml):
@@ -318,6 +316,6 @@ def main(filename, outdir):
                 copy(filename, wfilename, path, start, length, checksums)
             else:
                 decryptfile(key, iv, filename, path, wfilename, start, length, rlength, checksums, decryptsize)
-    print("\nDone. Extracted files to " + path)
+    print(f"\nDone. Extracted files to {path}")
 
     # main(filename_, outdir_)
