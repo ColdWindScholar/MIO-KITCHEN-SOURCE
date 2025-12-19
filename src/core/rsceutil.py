@@ -67,7 +67,7 @@ class FileEntry(BasicStruct):
 def unpack(filename, output_dir, config_file):
     os.makedirs(output_dir, exist_ok=True)
     header = Header()
-    file_list:list[str] = []
+    file_list: list[str] = []
     with open(filename, "rb") as f:
         data = f.read(len(header))
         header.unpack(data)
@@ -140,10 +140,11 @@ def repack(files_path, output_file, config_file):
 
 if __name__ == "__main__":
     import sys
+
     print(f'Usage:\n{sys.argv[0]} [u|r] <input_file> <output_dir> <config_file>')
     if len(sys.argv) >= 5:
         cmd = sys.argv[1]
         if cmd == 'r':
             repack(sys.argv[2], sys.argv[3], sys.argv[4])
         elif cmd == 'u':
-            unpack(sys.argv[2], sys.argv[3],sys.argv[4])
+            unpack(sys.argv[2], sys.argv[3], sys.argv[4])
