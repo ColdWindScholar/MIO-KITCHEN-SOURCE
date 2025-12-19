@@ -76,9 +76,16 @@ class Builder:
             head = self.run_command(['git', 'rev-parse', 'HEAD'], strip=True)
             f.write(self.run_command(['git', "log", "-1", "--pretty=%B", head]))
             f.write(f'```\n')
-        with open('version.txt', 'w', encoding='utf-8') as f:
-            f.write(ver)
 
+    def move_artifacts(self):
+        with open('bin/setting.ini', 'r', encoding='utf-8') as f:
+            ver = [line for line in f.readlines() if 'version' in line]
+            ver = ver[0].strip().split(' = ')[1]
+        for i in ['MIO-KITCHEN-win', 'MIO-KITCHEN-linux', 'MIO-KITCHEN-macos', 'MIO-KITCHEN-macos-intel']:
+            name_list = i.rsplit('-')
+            name_list.insert(2, ver)
+            name = '-'.join(name_list)
+            os.rename(f'{i}/{i}.zip', f'{name}.zip')
 
     def unit_test(self):
         from src.tool_tester import test_main, Test
@@ -234,10 +241,15 @@ if __name__ == '__main__':
         if sys.argv[1] == 'grb':
             builder = Builder()
             builder.generate_release_body()
+        elif sys.argv[1] == 'ma':
+            builder = Builder()
+            builder.move_artifacts()
         else:
             print('Usage:')
             print('To Build Binary and Pack')
             print('\tpython build.py')
+            print('To Move artifacts to local folder')
+            print('\tpython build.py ma')
             print('To Generate Release Body')
             print('\tpython build.py grb')
 

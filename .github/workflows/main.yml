@@ -27,29 +27,10 @@ jobs:
         run: |
           python3 -m pip install -U --force-reinstall pip
           sudo apt update -y && sudo apt install python3-tk git -y
-      - name: Generate Release Body
+      - name: Generate Release Content
         run: |
           python3 build.py grb
-      - name: Read version.txt
-        id: version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./version.txt
-          trim: true
-      - name: Rename Tool
-        run: |
-          cd MIO-KITCHEN-win
-          move ./MIO-KITCHEN-win.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-win.zip
-          cd ..
-          cd MIO-KITCHEN-linux
-          move ./MIO-KITCHEN-linux.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-linux.zip
-          cd ..
-          cd MIO-KITCHEN-macos
-          move ./MIO-KITCHEN-macos.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos.zip
-          cd ..
-          cd MIO-KITCHEN-macos-intel
-          move ./MIO-KITCHEN-macos-intel.zip ../MIO-KITCHEN-${{ steps.version.outputs.content }}-macos-intel.zip
-          cd ..
+          python3 build.py ma
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
