@@ -16,11 +16,12 @@
 import os
 import platform
 import shutil
+import subprocess
 import zipfile
 from platform import system
-
+import sys
 from pip._internal.cli.main import main as _main
-
+import json
 
 class Builder:
     def __init__(self):
@@ -50,6 +51,33 @@ class Builder:
         self.pyinstaller_build()
         self.config_folder()
         self.pack_zip(f'{self.local}/dist', self.name)
+
+    def run_command(self,  command:list[str],strip:bool=False):
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            return result.stdout.strip() if strip else result.stdout
+        except subprocess.CalledProcessError:
+            return None
+
+    def generate_release_body(self):
+        print('Generating Release Body...')
+        # load config
+        conf = os.getenv('CONFIGER')
+        conf_obj = json.loads(conf)
+        with open('bin\setting.ini', 'r', encoding='utf-8') as f:
+            ver = [line for line in f.readlines()]
+            ver = ver[0].strip('\n').split('=')[1]
+        with open('body.md', 'w', encoding='utf-8', newline='\n') as f:
+            f.write(f"Build times: {conf_obj['github']['run_number']}\n")
+            f.write(f'Version: {ver}\n')
+            f.write(f'```\n')
+            f.write(f'Changelog:\n')
+            head = self.run_command(['git', 'rev-parse', 'HEAD'], strip=True)
+            f.write(self.run_command(['git', "log", "-1", "--pretty=%B", head]))
+            f.write(f'```\n')
+        with open('version.txt', 'w', encoding='utf-8') as f:
+            f.write(ver)
+
 
     def unit_test(self):
         from src.tool_tester import test_main, Test
@@ -197,5 +225,10 @@ class Builder:
 
 
 if __name__ == '__main__':
-    builder = Builder()
-    builder.build()
+    if not sys.argv[1:]:
+        builder = Builder()
+        builder.build()
+    # Generate Release Body
+    if sys.argv[1] == 'grb':
+        builder = Builder()
+        builder.generate_release_body()
