@@ -17,11 +17,12 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 import zipfile
 from platform import system
-import sys
+
 from pip._internal.cli.main import main as _main
-import json
+
 
 class Builder:
     def __init__(self):
