@@ -46,11 +46,11 @@ def handle_target_file(target):
     if os.path.isfile(target) and os.path.getsize(target) > 0:
         action = 'y'
         if action.lower() in ["y", "yes"]:
-            print(f"- 继续写入 {target}")
+            print(f"- Write[a] {target}")
             with open(target, 'r', encoding='utf-8') as f:
                 return re.sub(r"[{}()]", "", f.read()).replace('allow ', '')
         elif action.lower() in ["n", "no"]:
-            print(f"- 清空 {target}")
+            print(f"- Clean {target}")
             open(target, 'w').close()
             return ""
     else:
