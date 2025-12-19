@@ -37,7 +37,7 @@ jobs:
           allowUpdates: true
           omitBodyDuringUpdate: true
           removeArtifacts: true
-          name: "MIO-KITCHEN-${{ steps.version.outputs.content }}"
+          name: "MIO-KITCHEN-${{ env.ver }}"
           tag: "CI_BUILD_${{ github.run_number }}"
           bodyFile: "body.md"
           artifacts: "*.zip"
