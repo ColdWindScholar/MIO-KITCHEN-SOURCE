@@ -20,6 +20,7 @@ import platform
 import shutil
 import subprocess
 import threading
+import platform
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
@@ -1572,6 +1573,8 @@ class Tool(Tk):
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
+        if platform.machine() == 'loongarch64':
+            print(lang.warnloongarch)
         self.sub_win2 = ttk.Frame(self)
         self.sub_win3 = ttk.Frame(self)
         self.sub_win2.pack(fill=BOTH, side=RIGHT, expand=True)
