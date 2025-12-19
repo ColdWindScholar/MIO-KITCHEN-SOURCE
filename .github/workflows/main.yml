@@ -127,7 +127,7 @@ jobs:
           name: MIO-KITCHEN-macos
           path: './MIO-KITCHEN-macos.zip'
       - name: Upload x86_64 Macos Build
-        if: success() && matrix.os == 'macos-13'
+        if: success() && matrix.os == 'macos-15-intel'
         uses: actions/upload-artifact@v4
         with:
           name: MIO-KITCHEN-macos-intel
