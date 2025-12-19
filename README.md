@@ -1,11 +1,16 @@
-> [!IMPORTANT]
-> Currently most of binaries are ported to Loongarch64 except **MagiskBoot** and **delta_generator** so related feature won't work
 # MIO-KITCHEN-SOURCE #
-![Banner](https://github.com/WeiguangTWK/MIO-KITCHEN-SOURCE-Loongarch/blob/main/splash.png?raw=true)
+![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/splash.png?raw=true)
 #### A Rom Tool Written in Python
 ##### The Best Free And Open Source Rom Tool For You
 > [!CAUTION]
 > Unauthorized commercial use prohibited
+***
+
+## Linux-LoongArch64 Supported!
+![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/splash_loongarch.png?raw=true)
+> [!IMPORTANT]
+> Currently most of binaries are ported to Loongarch64 except **MagiskBoot** and **delta_generator** so related feature won't work
+
 ***
 ## Used Projects
 
@@ -60,7 +65,7 @@
 
 |   Os    | Arch                             |
 |:-------:|----------------------------------|
-|  Linux  | x86_64 arm64                     |
+|  Linux  | x86_64 arm64 loongarch64         |
 | Windows | x86_64 x86 amd64 arm64(by sewzj) |
 |  Macos  | Arm64  X86                       |
 ## Supported Image Types
