@@ -87,8 +87,7 @@ class Builder:
             name = '-'.join(name_list)
             os.rename(f'{i}/{i}.zip', f'{name}.zip')
         # write ver to github env
-        gitenv = os.getenv('GITHUB_ENV')
-        with open(gitenv, 'a', encoding='utf-8') as f:
+        with open(os.getenv('GITHUB_ENV'), 'a', encoding='utf-8') as f:
             f.write(f'ver={ver}\n')
 
     def unit_test(self):
