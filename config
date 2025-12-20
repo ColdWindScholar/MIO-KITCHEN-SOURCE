@@ -173,8 +173,8 @@ def update(args):
                 size = a.get("size", None)
 
                 log(f'Downloading {name}')
-                for percentage, _, _, _, _ in download_api(url=browser_download_url, name=name, size_=size, path=temp):
-                    green_1(f"\rPercentage:{percentage} %", end='')
+                for percentage, speed, _, _, _ in download_api(url=browser_download_url, name=name, size_=size, path=temp):
+                    green_1(f"\rSpeed {speed}\tPercentage:{percentage} %", end='')
                 downloaded_file = os.path.join(temp, name)
                 groups = re.search(content.get('name_pattern', "*$"), name).groups()
                 if len(groups) == 2:
