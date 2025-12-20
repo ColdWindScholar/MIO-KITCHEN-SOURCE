@@ -70,7 +70,7 @@ class ItemInfo(BasicStruct):
 
 
 def generate_cfg(partitions_list: list, partitions_verify: list, output_file:str):
-    os.makedirs(os.path.basename(output_file), exist_ok=True)
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     partitions_normal = [i for i in partitions_list if i[1] not in partitions_verify]
     with open(output_file, "w", encoding='utf-8', newline='\n') as f:
         f.write('[LIST_NORMAL]\n')
