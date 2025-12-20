@@ -36,7 +36,7 @@ class PythonEditor(tk.Frame):
         self.text = CodeView(self, wrap="word", undo=True, lexer=lexer, color_scheme="dracula")
         self.text.pack(side="left", fill="both", expand=True)
         self.encoding = tk.StringVar(value='utf-8')
-        self.encoding.trace('w', self.load)
+        self.encoding.trace('w', lambda *_:self.load())
         f1 = ttk.Frame(self.parent)
         ttk.Button(f1, text=lang.text17, command=self.parent.destroy).pack(side=tk.LEFT, fill=tk.X, padx=5, pady=5,
                                                                            expand=1)
