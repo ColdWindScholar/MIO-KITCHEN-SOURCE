@@ -30,7 +30,7 @@ class Builder:
         try:
             from tkinter import END
         except:
-            raise FileNotFoundError("Tkinter IS not exist!\nThe Build may not Work!")
+            raise FileNotFoundError("Tkinter is not exist!\nThe dist may not Work!")
         if ostype == 'Linux':
             name = 'MIO-KITCHEN-linux.zip'
         elif ostype == 'Darwin':
@@ -53,7 +53,7 @@ class Builder:
         self.config_folder()
         self.pack_zip(f'{self.local}/dist', self.name)
 
-    def run_command(self,  command:list[str],strip:bool=False):
+    def run_command(self, command: list[str], strip: bool = False):
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True)
             return result.stdout.strip() if strip else result.stdout
@@ -216,12 +216,9 @@ class Builder:
                     os.chmod(os.path.join(root, i), 0o7777, follow_symlinks=False)
 
     def pack_zip(self, source, name):
-        # 获取文件夹的绝对路径和文件夹名称
         abs_folder_path = os.path.abspath(source)
-        # 创建一个同名的zip文件
         zip_file_path = os.path.join(self.local, name)
         with zipfile.ZipFile(zip_file_path, "w", zipfile.ZIP_DEFLATED) as archive:
-            # 遍历文件夹中的所有文件和子文件夹
             for root, _, files in os.walk(abs_folder_path):
                 for file in files:
                     if file == name:
@@ -230,7 +227,6 @@ class Builder:
                     if ".git" in file_path:
                         continue
                     print(f"Adding: {file_path}")
-                    # 将文件添加到zip文件中
                     archive.write(file_path, os.path.relpath(file_path, abs_folder_path))
         print("Pack Zip Done!")
 
@@ -255,4 +251,3 @@ if __name__ == '__main__':
             print('\tpython build.py ma')
             print('To Generate Release Body')
             print('\tpython build.py grb')
-
