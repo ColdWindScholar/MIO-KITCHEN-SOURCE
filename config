@@ -147,7 +147,7 @@ class Caller:
                 try:
                     ret = func(*args, **kwargs)
                 except Exception as e:
-                    print(f'Retry {self.retry_times} / {total_times}.{e}')
+                    LOGE(f'Retry {self.retry_times} / {total_times} because of {e}')
                     continue
                 else:
                     return ret
