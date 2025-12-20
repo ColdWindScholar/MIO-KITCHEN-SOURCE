@@ -217,6 +217,8 @@ def update(args):
                         z_name = z_info.filename
                         if content.get('rename_pattern'):
                             real_name = content.get('name')
+                            if system == 'Windows'and not real_name.endswith('.exe'):
+                                real_name += '.exe'
                             caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
                             if not len(caught_name):
                                 return
