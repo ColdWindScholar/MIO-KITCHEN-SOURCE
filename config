@@ -69,6 +69,7 @@ links = {
     "erofs_utils": {
         "link": "https://api.github.com/repos/sekaiacg/erofs-utils/releases/latest",
         "github_json": True,
+        'rename_pattern':"",
         # erofs-utils-v1.8.4-gc9629116-Android_arm64-v8a-2501262050.zip
         "name_pattern": r"erofs-utils-(.*?)-(.*?)-(.*?)-(\D+?)_(.*)?.zip$"
     },
@@ -76,6 +77,8 @@ links = {
         "link": 'https://api.github.com/repos/suyulin/apftool-rs/releases/latest',
         "github_json": True,
         #afptool-rs-linux-aarch64.zip
+        'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
+        'name':'afptool',
         "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
     }
 }
@@ -161,7 +164,7 @@ def update(args):
         if content.get('github_json', False):
             url = requests.get(content.get('link'))
             json_: dict = json.loads(url.text)
-            green_1(f"Found {name}{json_.get('tag_name')}")
+            green_1(f"Found {name} {json_.get('tag_name')}")
             if JsonEdit(update_info).read().get(name) == json_.get('tag_name'):
                 yellow(f"{name} was latest already!")
                 continue
@@ -198,9 +201,19 @@ def update(args):
                     LOGE("Not Update it.Skip")
                     continue
                 with zipfile.ZipFile(downloaded_file) as z:
-                    for z_name in z.namelist():
-                        if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
-                            z.extract(z_name, path=f'bin/{system}/{arch}')
+                    for z_info in z.infolist():
+                        z_name = z_info.filename
+                        if content.get('rename_pattern'):
+                            real_name = content.get('name')
+                            caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
+                            if not len(caught_name):
+                                return
+                            caught_name = caught_name[0]
+                            if caught_name:
+                                log(f'Will rename {z_name} to {real_name}')
+                                z_info.filename = real_name
+                        if os.path.exists(f'bin/{system}/{arch}/{z_name}') or 1:
+                            z.extract(z_info, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
         JsonEdit(update_info).write(origin_info)
 
