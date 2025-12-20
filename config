@@ -162,7 +162,9 @@ arch_list = {
     "armeabi-v7a": "aarch"
 }
 system_list = {
-    "Cygwin": "Windows"
+    "Cygwin": "Windows",
+    'macos':'Darwin',
+    'windows':"Windows"
 }
 
 
