@@ -41,6 +41,7 @@
 |     Nh4RomTools      | Codes for disable vb                          | [Click](https://github.com/affggh/NH4RomTool)                                                      |          Affggh |
 |         zstd         | Unpack and repack zstd files                  | [Click](https://github.com/facebook/zstd)                                                          |        facebook |
 |       rsceutil       | Unpack and repack Rk resource images          | Inspired by [Rsce-go](https://github.com/Evsio0n/rsce-go)                                          | ColdWindScholar |
+|      apftool-rs      | Unpack and repack RKFW and RKAF images        | [Click](https://github.com/suyulin/apftool-rs)                                                     |         suyulin |
 |      aml_image       | Unpack Amlogic V2 images                      | [View Code](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/src/core/aml_image.py) | ColdWindScholar |
 * And other projects! Huge shout out to the developers! 
 
