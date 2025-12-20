@@ -6360,7 +6360,7 @@ def unpack(chose, form: str = '') -> bool:
             if file_type == 'romfs':
                 fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
                 fs.extract(work)
-            if file_type == 'rkfw':
+            if file_type in ['rkfw', 'rkaf']:
                 call(['afptool', 'unpack', f"{project_manger.current_work_path()}/{i}.img", work])
             if file_type == 'guoke_logo':
                 GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
