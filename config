@@ -122,7 +122,7 @@ def download_api(url, path=None, int_=True, size_=0, name: str = None):
 
 class Caller:
     def __init__(self, ):
-        self.retry_times = 10
+        self.retry_times = 100
 
     @staticmethod
     def verity() -> bool:
