@@ -6708,7 +6708,7 @@ def rmdir(path: str, quiet: bool = False):
                 rmtree(path)
             except (Exception, BaseException):
                 logging.exception("Rmtree")
-                call(['busybox', 'rm', '-rf', path], out=False if quiet else True)
+                call(['busybox', 'rm', '-rf', path], out=not quiet)
         except (Exception, BaseException):
             print(lang.warn11.format(path))
         if not quiet:
