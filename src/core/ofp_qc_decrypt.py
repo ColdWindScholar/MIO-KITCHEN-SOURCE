@@ -268,7 +268,7 @@ def main(filename, outdir):
             for zfile in file.namelist():
                 print("Extracting ", zfile , " to " , outdir)
                 file.extract(zfile, pwd=zippw, path=outdir)
-            print("Files extracted to " + outdir)
+            print(f"Files extracted to {outdir}")
             return
 
     pagesize, key, iv, data = generatekey2(filename)
