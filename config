@@ -73,7 +73,7 @@ links = {
         "name_pattern": r"erofs-utils-(.*?)-(.*?)-(.*?)-(\D+?)_(.*)?.zip$"
     },
     "apftool":{
-        "link": 'https://github.com/suyulin/apftool-rs/releases/latest',
+        "link": 'https://api.github.com/repos/suyulin/apftool-rs/releases/latest',
         "github_json": True,
         #afptool-rs-linux-aarch64.zip
         "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
