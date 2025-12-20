@@ -149,9 +149,9 @@ system_list = {
 
 @caller
 def update(args):
+    origin_info = JsonEdit(update_info).read()
     for name, content in links.items():
         blue(f"Updating {name}")
-        origin_info = JsonEdit(update_info).read()
         if content.get('github_json', False):
             url = requests.get(content.get('link'))
             json_: dict = json.loads(url.text)
@@ -191,7 +191,7 @@ def update(args):
                         if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
                             z.extract(z_name, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
-                JsonEdit(update_info).write(origin_info)
+    JsonEdit(update_info).write(origin_info)
 
 
 @caller
