@@ -2158,9 +2158,9 @@ class Welcome(ttk.Frame):
 
         self.button_frame = ttk.Frame(self)
 
-        back_text = "Back"
-        if _lang_obj and hasattr(_lang_obj, 'back_step'):
-            lang_back = getattr(_lang_obj, 'back_step')
+        back_text = "Previous"
+        if _lang_obj and hasattr(_lang_obj, 'previous_step'):
+            lang_back = getattr(_lang_obj, 'previous_step')
             if isinstance(lang_back, str) and lang_back.strip().lower() != "none":
                 back_text = lang_back
 
