@@ -6785,7 +6785,7 @@ def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False
         ask.wait_window()
         if value.get() != 1:
             return
-        if pack_hybrid_rom:
+        if pack_hybrid_rom.get():
             if not PackHybridRom():
                 return
 
