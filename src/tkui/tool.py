@@ -1825,6 +1825,7 @@ class Updater(Toplevel):
         self.update_download_url = ''
         self.update_size = 0
         self.update_zip = ''
+        self.download_count = '0'
         self.update_assets = []
         f = ttk.Frame(self)
         ttk.Label(f, text='MIO-KITCHEN', font=(None, 20)).pack(side=LEFT, padx=5, pady=2)
@@ -1939,6 +1940,7 @@ class Updater(Toplevel):
                 if platform.machine() in ['AMD64', 'X86_64', 'x86_64']:
                     self.update_download_url = i.get('browser_download_url')
                     self.update_size = i.get('size')
+                    self.download_count = i.get('download_count')
                     return
                 else:
                     break
