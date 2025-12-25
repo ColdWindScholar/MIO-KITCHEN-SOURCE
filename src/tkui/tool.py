@@ -16,7 +16,6 @@
 import argparse
 import gzip
 import json
-import platform
 import shutil
 import subprocess
 import threading
