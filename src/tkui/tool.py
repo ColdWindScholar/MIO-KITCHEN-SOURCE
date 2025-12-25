@@ -6213,10 +6213,11 @@ class ProjectManager:
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def exist(self, name=None):
+        if name:
+            return os.path.exists(self.get_work_path(name))
         if not current_project_name.get():
             return False
-        return os.path.exists(self.current_work_path()) if name is None else os.path.exists(
-            self.get_work_path(current_project_name.get()))
+        return os.path.exists(self.get_work_path(current_project_name.get()))
 
 
 project_manger = ProjectManager()
