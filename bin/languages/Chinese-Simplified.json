@@ -280,5 +280,6 @@
   "mtk_port_tool": "Mtk移植工具",
   "plugin_installed_button": "已安装",
   "encoding": "编码:",
-  "skip_ramdisk": "跳过处理 ramdisk"
+  "skip_ramdisk": "跳过处理 ramdisk",
+  "copying_project": "正在复制项目:"
  }

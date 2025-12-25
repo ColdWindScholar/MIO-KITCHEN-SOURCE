@@ -5986,9 +5986,31 @@ def script2fs(path):
                     parts[v] = 'ext'
         json_.write(parts)
 
+@animation
+def copy_project(dir_path:str):
+    name = os.path.basename(dir_path)
+    print(lang.copying_project, name)
+    if not os.path.exists(dir_path):
+        print('No Such Folder.')
+        return 1
+    if os.path.isfile(dir_path):
+        return unpackrom(dir_path)
+    if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name), os.path.abspath(dir_path)):
+        print("Same File!")
+        return 1
+
+    if project_manger.exist(name):
+        name += v_code()
+    project_path = project_manger.new(name)
+    current_project_name.set(name)
+    project_menu.listdir()
+    project_menu.set_project(name)
+    shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
+    return 0
+
 
 @animation
-def unpackrom(ifile) -> None:
+def unpackrom(ifile:str) -> None:
     print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
     # gzip
     if ftype == 'gzip':
@@ -6159,7 +6181,10 @@ class ProjectManager:
     def get_work_path(name):
         path = str(os.path.join(settings.path, name) + os.sep)
         return path if os.name != 'nt' else path.replace('\\', '/')
-
+    def new(self, name:str):
+        path = self.get_work_path(name)
+        os.makedirs(path, exist_ok=True)
+        return path
     def current_work_path(self):
         if settings.project_struct == 'single':
             path = self.get_work_path(current_project_name.get())
@@ -6790,10 +6815,13 @@ def dndfile(files: list):
         except (Exception, BaseException):
             logging.exception('fI')
         if os.path.exists(fi):
-            if fi.endswith(".mpk"):
-                InstallMpk(fi)
-            else:
-                create_thread(unpackrom, fi)
+            if os.path.isfile(fi):
+                if fi.endswith(".mpk"):
+                    InstallMpk(fi)
+                else:
+                    create_thread(unpackrom, fi)
+            elif os.path.isdir(fi):
+                create_thread(copy_project, fi)
         else:
             print(fi + lang.text84)
 

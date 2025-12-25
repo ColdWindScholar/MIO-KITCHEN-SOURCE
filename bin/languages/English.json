@@ -367,5 +367,6 @@
   "decrypt_xtc_xml":"Decrypt Xtc Xml",
   "mtk_port_tool": "Mtk Port Tool",
   "encoding": "Encoding:",
-  "skip_ramdisk": "Skip Process Ramdisk"
+  "skip_ramdisk": "Skip Process Ramdisk",
+  "copying_project": "Copying Project:"
 }
