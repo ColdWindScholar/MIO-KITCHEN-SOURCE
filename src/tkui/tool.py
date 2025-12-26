@@ -6740,9 +6740,8 @@ def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, 
 
 @animation
 def rmdir(path: str, quiet: bool = False):
-    if not path:
-        if not quiet:
-            win.message_pop(lang.warn1)
+    if not path and not quiet:
+        win.message_pop(lang.warn1)
     else:
         if not quiet:
             print(f"{lang.text97} {path}")
