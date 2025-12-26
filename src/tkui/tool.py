@@ -5955,7 +5955,7 @@ class Packxx(Toplevel):
                 logging.warning(f"{i} Not Supported.")
 
 
-def rdi(work, part_name) -> bool:
+def rdi(work:str, part_name:str) -> bool:
     if not os.listdir(f"{work}/config"):
         rmtree(f"{work}/config")
         return False
@@ -5972,9 +5972,10 @@ def rdi(work, part_name) -> bool:
         print(lang.text3.format(part_name))
     else:
         win.message_pop(lang.text75 % part_name, "red")
+    return True
 
 
-def script2fs(path):
+def script2fs(path:str):
     if os.path.exists(os.path.join(path, "system", "app")):
         if not os.path.exists(path + "/config"):
             os.makedirs(path + "/config")
