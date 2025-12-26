@@ -5061,7 +5061,7 @@ class NewPostInstallConfig(Toplevel):
             padx=5, pady=5, expand=True, side='bottom', fill=X)
 
 
-#dynamic_partitions_info config
+# dynamic_partitions_info config
 class DynamicPartitionsInfo(Toplevel):
     """
     #The Config File Like following.
@@ -5987,8 +5987,9 @@ def script2fs(path):
                     parts[v] = 'ext'
         json_.write(parts)
 
+
 @animation
-def copy_project(dir_path:str):
+def copy_project(dir_path: str):
     name = os.path.basename(dir_path)
     print(lang.copying_project, name)
     if not os.path.exists(dir_path):
@@ -5996,7 +5997,8 @@ def copy_project(dir_path:str):
         return 1
     if os.path.isfile(dir_path):
         return unpackrom(dir_path)
-    if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name), os.path.abspath(dir_path)):
+    if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name),
+                                                                               os.path.abspath(dir_path)):
         print("Same File!")
         return 1
 
@@ -6011,7 +6013,7 @@ def copy_project(dir_path:str):
 
 
 @animation
-def unpackrom(ifile:str) -> None:
+def unpackrom(ifile: str) -> None:
     print(lang.text77 + ifile, f'Type:[{(ftype := gettype(ifile))}]')
     # gzip
     if ftype == 'gzip':
@@ -6182,10 +6184,14 @@ class ProjectManager:
     def get_work_path(name):
         path = str(os.path.join(settings.path, name) + os.sep)
         return path if os.name != 'nt' else path.replace('\\', '/')
-    def new(self, name:str):
+
+    def new(self, name: str):
+        if ' ' in name:
+            name = name.replace(" ", '_')
         path = self.get_work_path(name)
         os.makedirs(path, exist_ok=True)
         return path
+
     def current_work_path(self):
         if settings.project_struct == 'single':
             path = self.get_work_path(current_project_name.get())
@@ -6214,18 +6220,23 @@ class ProjectManager:
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def exist(self, name=None):
-        if name:
-            return os.path.exists(self.get_work_path(name))
-        if not current_project_name.get():
+        current_name = name or current_project_name.get()
+        if not current_name:
             return False
-        return os.path.exists(self.get_work_path(current_project_name.get()))
+        return os.path.exists(self.get_work_path(current_name))
 
+    def remove(self, name):
+        if not self.exist(name):
+            return True
+        else:
+            rmdir(self.get_work_path(name))
+        return not self.exist(name)
 
 project_manger = ProjectManager()
 
 
 @animation
-def unpack(chose, form: str = '') -> bool:
+def unpack(chose: list | dict, form: str = '') -> bool:
     if os.name == 'nt':
         if windll.shell32.IsUserAnAdmin():
             try:
@@ -6377,7 +6388,7 @@ def unpack(chose, form: str = '') -> bool:
                         mount = mount[len(mount) - 1]
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
-                #libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False, i)
+                # libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False, i)
                 imgextractor.Extractor().main(project_manger.current_work_path() + i + ".img", f'{work}/{i}', work)
                 if os.path.exists(f'{work}/{i}'):
                     try:
@@ -6578,7 +6589,7 @@ class GetFolderSize:
 
 
 @animation
-def datbr(work, name, brl: str | int, dat_ver=4):
+def datbr(work:str, name:str, brl: str | int, dat_ver:int=4):
     """
 
     :param work: working dir
@@ -6884,8 +6895,10 @@ class ProjectMenuUtils(ttk.LabelFrame):
         return True
 
     def remove(self):
-        win.message_pop(lang.warn1) if not project_manger.exist() else rmdir(
-            project_manger.get_work_path(current_project_name.get()))
+        name = current_project_name.get()
+        if not project_manger.exist(name):
+            win.message_pop(lang.warn1)
+        project_manger.remove(name)
         self.listdir()
 
     def new(self):
@@ -6896,7 +6909,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
             if not inputvar.isprintable():
                 win.message_pop(lang.warn12)
             print(lang.text99 % inputvar)
-            os.mkdir(settings.path + os.sep + inputvar)
+            project_manger.new(inputvar)
         self.listdir()
 
 
@@ -6912,7 +6925,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            #("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
+            # ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
             column = index % 4
