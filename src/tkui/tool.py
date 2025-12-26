@@ -6880,16 +6880,17 @@ class ProjectMenuUtils(ttk.LabelFrame):
                 self.combobox.current(0)
 
     def rename(self) -> bool:
-        if not project_manger.exist():
+        name = current_project_name.get()
+        if not project_manger.exist(name):
             print(lang.warn1)
             return False
-        if os.path.exists(settings.path + os.sep + (
-                inputvar := input_(lang.text102 + current_project_name.get(), current_project_name.get(), master=win))):
+        if project_manger.exist((inputvar := input_(lang.text102 + name, name, master=win))):
             print(lang.text103)
             return False
-        if inputvar != current_project_name.get():
-            os.rename(settings.path + os.sep + current_project_name.get(), settings.path + os.sep + inputvar)
+        if inputvar != name:
+            os.rename(project_manger.get_work_path(name), project_manger.get_work_path(inputvar))
             self.listdir()
+            self.set_project(inputvar)
         else:
             print(lang.text104)
         return True
