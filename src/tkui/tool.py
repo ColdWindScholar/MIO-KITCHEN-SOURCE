@@ -6178,13 +6178,16 @@ def unpackrom(ifile: str) -> None:
 
 class ProjectManager:
     def __init__(self):
-        ...
+        self.hide_items = ['bin', 'src', 'readmes']
 
     @staticmethod
     def get_work_path(name):
         path = str(os.path.join(settings.path, name) + os.sep)
         return path if os.name != 'nt' else path.replace('\\', '/')
-
+    def get_projects(self):
+        for f in os.listdir(settings.path):
+            if os.path.isdir(f'{settings.path}/{f}') and f not in self.hide_items and not f.startswith('.'):
+                yield f
     def new(self, name: str):
         if ' ' in name:
             name = name.replace(" ", '_')
@@ -6865,12 +6868,10 @@ class ProjectMenuUtils(ttk.LabelFrame):
         current_project_name.set(name)
 
     def listdir(self):
-        hide_items = ['bin', 'src', 'readmes']
-        array = [f for f in os.listdir(settings.path) if
-                 os.path.isdir(f'{settings.path}/{f}') and f not in hide_items and not f.startswith('.')]
+        projects = list(project_manger.get_projects())
         origin_project = current_project_name.get()
-        self.combobox["value"] = array
-        if not array:
+        self.combobox["value"] = projects
+        if not projects:
             current_project_name.set('')
             self.combobox.current()
         else:
