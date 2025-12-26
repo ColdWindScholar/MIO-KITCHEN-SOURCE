@@ -943,7 +943,7 @@ class ToolBox(ttk.Frame):
             self.controls = []
             self.gui()
             self.geometry("400x450")
-            self.resizable(False, False)
+            #self.resizable(False, False)
             self.dnd = lambda file_list: create_thread(self.__dnd, file_list)
             move_center(self)
 
@@ -1011,7 +1011,7 @@ class ToolBox(ttk.Frame):
             self.title(lang.trim_image)
             self.gui()
             move_center(self)
-            self.resizable(False, False)
+            #self.resizable(False, False)
 
         def gui(self):
             ttk.Label(self, text=lang.help_trim_image).pack(padx=5, pady=5)
@@ -3835,7 +3835,7 @@ class InstallMpk(Toplevel):
         self.installable = True
         self.mpk = mpk
         self.title(lang.text31)
-        self.resizable(False, False)
+        #self.resizable(False, False)
         f = Frame(self)
         self.logo = Label(f)
         self.logo.pack(padx=10, pady=10)
