@@ -6184,10 +6184,12 @@ class ProjectManager:
     def get_work_path(name):
         path = str(os.path.join(settings.path, name) + os.sep)
         return path if os.name != 'nt' else path.replace('\\', '/')
+
     def get_projects(self):
         for f in os.listdir(settings.path):
             if os.path.isdir(f'{settings.path}/{f}') and f not in self.hide_items and not f.startswith('.'):
                 yield f
+
     def new(self, name: str):
         if ' ' in name:
             name = name.replace(" ", '_')
@@ -6234,6 +6236,7 @@ class ProjectManager:
         else:
             rmdir(self.get_work_path(name))
         return not self.exist(name)
+
 
 project_manger = ProjectManager()
 
@@ -6592,7 +6595,7 @@ class GetFolderSize:
 
 
 @animation
-def datbr(work:str, name:str, brl: str | int, dat_ver:int=4):
+def datbr(work: str, name: str, brl: str | int, dat_ver: int = 4):
     """
 
     :param work: working dir
