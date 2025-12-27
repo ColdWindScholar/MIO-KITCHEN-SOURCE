@@ -95,7 +95,7 @@ from src.core import ext4
 from src.core.config_parser import ConfigParser
 from src.core import utils
 from src.core.unpac import MODE as PACMODE, unpac
-
+from multiprocessing import cpu_count
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from src.core.extra import fspatch, re, contextpatch
@@ -147,7 +147,6 @@ if os.name == 'nt':
         set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
         window.update()
 
-
 class LoadAnim:
     """Manages animated loading indicators for background tasks.
 
@@ -173,7 +172,7 @@ class LoadAnim:
         self.frame = None  # The current GIF frame being displayed.
         self.tasks = {}  # Dictionary to keep track of running tasks associated with the animation.
         self.task_num_index = 0  # Index for assigning unique task numbers.
-        self.task_num_max = 100  # Maximum number of concurrent tasks (for task_num_index cycling).
+        self.task_num_max = cpu_count()  # Maximum number of concurrent tasks (for task_num_index cycling).
 
     def set_master(self, master):
         """Sets or updates the master widget for the animation.
@@ -272,6 +271,8 @@ class LoadAnim:
                 return_value = func(*a, **k)
 
             # Start the animation in a new thread to avoid blocking the UI.
+            if len(self.tasks) > self.task_num_max:
+                return lambda *a, **k: print("Cannot create new thread.Please wait for a while.")
             create_thread(self.run())
             task_num = self.get_task_num()
             # The actual function execution also happens in a separate thread.
