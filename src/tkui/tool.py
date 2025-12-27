@@ -6642,7 +6642,7 @@ def mkerofs(name: str, format_, work, work_output, level, old_kernel: bool = Fal
            f'--fs-config-file={work}/config/{name}_fs_config',
            f'--file-contexts={work}/config/{name}_file_contexts',
            f'{work_output}/{name}.img', f'{work}/{name}/']
-    return call(cmd, out=False)
+    return call(cmd, out=True)
 
 
 @animation
