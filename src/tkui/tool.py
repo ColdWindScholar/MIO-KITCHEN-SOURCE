@@ -3047,6 +3047,7 @@ class ModuleManager:
     def export(self, id_: str):
 
         name: str = self.get_name(id_)
+        name = name.replace('/', '')
         if self.is_virtual(id_):
             print(f"{name} is a virtual plugin!")
             return 1
@@ -3088,7 +3089,6 @@ class ModuleManager:
 
         resource_zip_content = buffer_resource_zip.getvalue()
         buffer_resource_zip.close()
-
         output_mpk_path = os.path.join(settings.path, f"{name}.mpk")
         with zipfile.ZipFile(output_mpk_path, 'w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as mpk_final_file:
             mpk_final_file.writestr(data['resource'], resource_zip_content)
