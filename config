@@ -243,7 +243,7 @@ def update(args):
 @caller
 def check_supported(args):
     file_list = ['brotli', 'busybox', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
-                 'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd','afptool']
+                 'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd','afptool', 'bootimg']
     if platform.machine() != 'x86_64' or platform.system() != 'Linux':
         file_list.remove('mkfs.f2fs')
         file_list.remove('extract.f2fs')
@@ -252,7 +252,7 @@ def check_supported(args):
         file_list.append('cygwin1.dll')
         file_list.append('mv.exe')
     if os.path.exists(tool_bin):
-        LOGS("Your Device was Supported Fully!")
+        LOGS("Your Device was Supported!")
         lost_binary = [i for i in file_list if not os.path.exists(os.path.join(tool_bin, i))]
         if lost_binary:
             LOGE(f"But The Following Binary Were Lost:{lost_binary}")
