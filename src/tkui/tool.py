@@ -96,6 +96,7 @@ from src.core.config_parser import ConfigParser
 from src.core import utils
 from src.core.unpac import MODE as PACMODE, unpac
 from multiprocessing import cpu_count
+
 if os.name == 'nt':
     from .sv_ttk_fixes import *
 from src.core.extra import fspatch, re, contextpatch
@@ -146,6 +147,7 @@ if os.name == 'nt':
         value = c_int(2)
         set_window_attribute(hwnd, rendering_policy, byref(value), sizeof(value))
         window.update()
+
 
 class LoadAnim:
     """Manages animated loading indicators for background tasks.
@@ -5956,7 +5958,7 @@ class Packxx(Toplevel):
                 logging.warning(f"{i} Not Supported.")
 
 
-def rdi(work:str, part_name:str) -> bool:
+def rdi(work: str, part_name: str) -> bool:
     if not os.listdir(f"{work}/config"):
         rmtree(f"{work}/config")
         return False
@@ -5976,7 +5978,7 @@ def rdi(work:str, part_name:str) -> bool:
     return True
 
 
-def script2fs(path:str):
+def script2fs(path: str):
     if os.path.exists(os.path.join(path, "system", "app")):
         if not os.path.exists(path + "/config"):
             os.makedirs(path + "/config")
