@@ -29,8 +29,8 @@ warnings.warn = lambda *args: ...
 temp = 'bin/temp'
 tool_bin = os.path.join('bin', platform.system(), platform.machine())
 update_info = 'bin/update.json'
-LOGE = lambda info: print('[%s] \033[91m[ERROR]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
-LOGS = lambda info: print('[%s] \033[92m[SUCCESS]\033[0m%s\n' % (strftime('%H:%M:%S'), info))
+LOGE = lambda info: print('[%s] \033[91m[ERROR]\033[0m%s' % (strftime('%H:%M:%S'), info))
+LOGS = lambda info: print('[%s] \033[92m[SUCCESS]\033[0m%s' % (strftime('%H:%M:%S'), info))
 green = lambda info: print(f"\033[32m[{strftime('%H:%M:%S')}]{info}\033[0m")
 # 青
 green_1: print = lambda info, end=None: print(f"\033[36m[{strftime('%H:%M:%S')}]{info}\033[0m", end=end)
