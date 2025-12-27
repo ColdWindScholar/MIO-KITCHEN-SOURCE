@@ -2773,7 +2773,7 @@ class ModuleManager:
                         print(
                             f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
                 except Exception as e:
-                    logging.error(f"Ошибка при загрузке плагина '{self.get_name(i)}' из '{script_path}/main.py': {e}")
+                    logging.error(f"Load Failed '{self.get_name(i)}' path '{script_path}/main.py': {e}")
                     logging.exception('Bugs')
 
     def get_info(self, id_: str, item: str, default: str = None) -> str | dict[Any, Any] | Any:
