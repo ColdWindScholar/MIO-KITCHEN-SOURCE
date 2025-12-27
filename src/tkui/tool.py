@@ -5718,7 +5718,7 @@ class Packxx(Toplevel):
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=X, side=LEFT)
         frame_t.pack(fill=X, padx=5, pady=5, side=BOTTOM)
-        ttk.Checkbutton(lf3, text='Fs Converter', variable=self.fs_conver, onvalue=True, offvalue=False,
+        ttk.Checkbutton(lf3, text=lang.fs_converter, variable=self.fs_conver, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
         fs_conver = ttk.Frame(lf3, width=20)

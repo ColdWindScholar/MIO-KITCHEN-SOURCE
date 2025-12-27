@@ -368,5 +368,6 @@
   "mtk_port_tool": "Mtk Port Tool",
   "encoding": "Encoding:",
   "skip_ramdisk": "Skip Process Ramdisk",
-  "copying_project": "Copying Project:"
+  "copying_project": "Copying Project:",
+  "fs_converter": "Fs Converter"
 }

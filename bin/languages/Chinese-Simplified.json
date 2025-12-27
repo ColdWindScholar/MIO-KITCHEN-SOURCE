@@ -282,5 +282,6 @@
   "encoding": "编码:",
   "skip_ramdisk": "跳过处理 ramdisk",
   "copying_project": "正在复制项目:",
-  "previous_step": "上一步"
+  "previous_step": "上一步",
+  "fs_converter": "文件系统转换"
  }
