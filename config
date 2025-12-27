@@ -80,6 +80,14 @@ links = {
         'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
         'name':'afptool',
         "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
+    },
+    "apftool-loongarch":{
+        "link": 'https://api.github.com/repos/WeiguangTWK/apftool-rs-loongarch64/releases/latest',
+        "github_json": True,
+        #afptool-rs-linux-aarch64.zip
+        'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
+        'name':'afptool',
+        "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
     }
 }
 
