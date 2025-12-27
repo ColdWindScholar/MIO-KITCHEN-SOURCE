@@ -242,11 +242,12 @@ def update(args):
 
 @caller
 def check_supported(args):
-    file_list = ['brotli', 'busybox', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg',
+    file_list = ['brotli', 'busybox', 'dtc', 'e2fsdroid', 'extract.erofs', 'extract.f2fs', 'img2simg','delta_generator',
                  'lpmake', 'magiskboot', 'make_ext4fs', 'mke2fs', 'mkfs.erofs', 'mkfs.f2fs', 'sload.f2fs', 'zstd','afptool']
     if platform.machine() != 'x86_64' or platform.system() != 'Linux':
         file_list.remove('mkfs.f2fs')
         file_list.remove('extract.f2fs')
+        file_list.remove('delta_generator')
     if os.name == 'nt':
         file_list = [f'{i}.exe' for i in file_list]
         file_list.append('cygwin1.dll')
