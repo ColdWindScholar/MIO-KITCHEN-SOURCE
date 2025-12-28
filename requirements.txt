@@ -18,4 +18,4 @@ cryptography
 toml
 lz4
 python-lzo
-backports.lzma
+configparser
