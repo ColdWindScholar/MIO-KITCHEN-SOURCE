@@ -16,3 +16,6 @@ six
 httpx
 cryptography
 toml
+lz4
+python-lzo
+backports.lzma
