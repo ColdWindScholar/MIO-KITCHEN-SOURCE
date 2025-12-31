@@ -2795,6 +2795,7 @@ class ModuleManager:
 
     @animation
     def run(self, id_=None) -> int:
+        # fixme: the python loader's wrong
         if not id_:
             return 0
         if not current_project_name.get():
