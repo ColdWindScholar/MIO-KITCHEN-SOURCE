@@ -2754,25 +2754,28 @@ class ModuleManager:
                 if os.path.isdir(os.path.join(self.module_dir, i)):
                     yield i
 
+    def register_plugin(self, id_:str):
+        script_path = f"{self.module_dir}/{id_}"
+        if os.path.exists(f"{script_path}/main.py") and imp:
+            try:
+                module = imp.load_source('__maddon__', f"{script_path}/main.py")
+                if hasattr(module, 'entrances'):
+                    for entry, func in module.entrances.items():
+                        self.addon_loader.register(id_, entry, func)
+                elif hasattr(module, 'main'):
+                    self.addon_loader.register(id_, self.addon_entries.main, module.main)
+                else:
+                    print(
+                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
+            except Exception as e:
+                logging.error(f"Load Failed '{self.get_name(id_)}' path '{script_path}/main.py': {e}")
+                logging.exception('Bugs')
+
     def load_plugins(self):
         if not os.path.exists(self.module_dir) or not os.path.isdir(self.module_dir):
             os.makedirs(self.module_dir, exist_ok=True)
         for i in self.list_packages():
-            script_path = f"{self.module_dir}/{i}"
-            if os.path.exists(f"{script_path}/main.py") and imp:
-                try:
-                    module = imp.load_source('__maddon__', f"{script_path}/main.py")
-                    if hasattr(module, 'entrances'):
-                        for entry, func in module.entrances.items():
-                            self.addon_loader.register(i, entry, func)
-                    elif hasattr(module, 'main'):
-                        self.addon_loader.register(i, self.addon_entries.main, module.main)
-                    else:
-                        print(
-                            f"Can't registry Module {self.get_name(i)} as Plugin, Check if enterances or main function in it.")
-                except Exception as e:
-                    logging.error(f"Load Failed '{self.get_name(i)}' path '{script_path}/main.py': {e}")
-                    logging.exception('Bugs')
+            self.register_plugin(i)
 
     def get_info(self, id_: str, item: str, default: str = None) -> str | dict[Any, Any] | Any:
         if not default:
@@ -2873,6 +2876,8 @@ class ModuleManager:
             return call_result
 
         elif os.path.exists(main_py_path) and imp:
+            if not self.addon_loader.is_registered(id_):
+                self.register_plugin(id_)
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif self.is_virtual(id_):
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
@@ -3133,7 +3138,7 @@ class ModuleManager:
                 return False
             path = os.path.join(self.module_dir, id_)
             if os.path.exists(f"{path}/main.py"):
-                editor.main(path, 'main.py', lexer=pygments.lexers.PythonLexer)
+                editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
             elif not os.path.exists(f'{path}/main.sh'):
                 with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
