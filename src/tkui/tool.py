@@ -2876,7 +2876,7 @@ class ModuleManager:
             return call_result
 
         elif os.path.exists(main_py_path) and imp:
-            if not self.addon_loader.is_registered(id_):
+            if not self.addon_loader.is_registered(id_)[0]:
                 self.register_plugin(id_)
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif self.is_virtual(id_):
