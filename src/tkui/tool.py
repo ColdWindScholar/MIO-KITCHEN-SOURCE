@@ -6339,7 +6339,8 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     print("transferfile" + lang.text84)
         if os.access(f"{work}/{i}.img", os.F_OK):
             try:
-                parts.pop(i)
+                if i in parts:
+                    parts.pop(i)
             except KeyError:
                 logging.exception('Key')
             if gettype(f"{work}/{i}.img") != 'sparse':
