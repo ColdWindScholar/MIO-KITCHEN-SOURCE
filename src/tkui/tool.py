@@ -2794,7 +2794,9 @@ class ModuleManager:
             return default
 
     @animation
-    def run(self, id_) -> int:
+    def run(self, id_=None) -> int:
+        if not id_:
+            return 0
         if not current_project_name.get():
             print(lang.warn1)
             return 1
@@ -2876,7 +2878,7 @@ class ModuleManager:
             return call_result
 
         elif os.path.exists(main_py_path) and imp:
-            if not self.addon_loader.is_registered(id_)[0]:
+            if not self.addon_loader.is_registered(id_):
                 self.register_plugin(id_)
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif self.is_virtual(id_):

@@ -37,15 +37,15 @@ class Type(Enum):
 
 class PluginLoader(object):
     def __init__(self):
-        self.plugins = {}
+        self.plugins = dict()
         self.virtual = {}
 
-    def register(self, id_: str, entry: Entry = Entry, func: None = None, virtual: bool = False,
+    def register(self, id_: str, entry: Entry, func: None = None, virtual: bool = False,
                  virtual_info: dict = None, parent: str = 'addon'):
         if not func:
             logging.debug(f"{entry} of {id_} is {func}!")
         if id_ not in self.plugins:
-            self.plugins[id_] = {}
+            self.plugins[id_] = dict()
         self.plugins[id_][entry] = func
         if virtual and not virtual_info:
             virtual_info = {
@@ -59,16 +59,16 @@ class PluginLoader(object):
         if entry == Entry.boot:
             self.run(id_, entry)
 
-    def is_registered(self, id_:str) -> tuple[bool, Type]:
+    def is_registered(self, id_:str) -> bool:
         if id_ in self.plugins:
-            return True, Type.normal
+            return True
         elif id_ in self.virtual:
-            return True, Type.virtual
+            return True
         elif not id_ in self.plugins and not id_ in self.virtual:
-            return False, Type.normal
-        return False, Type.normal
+            return False
+        return False
 
-    def run(self, id_: str, entry: Entry = Entry, mapped_args: dict = None, *args, **kwargs):
+    def run(self, id_: str, entry: Entry, mapped_args: dict = None, *args, **kwargs):
         if not id_ in self.plugins.keys():
             print(f"{id_} is not callable.")
             return lambda: ...
