@@ -196,9 +196,7 @@ class LoadAnim:
         if not self.hide_gif:
             self.master.gif_label.pack(padx=10, pady=10)
         self.frame = self.frames[ind]
-        ind += 1
-        if ind == len(self.frames):
-            ind = 0  # Loop back to the first frame.
+        ind = (ind + 1) % len(self.frames)
         self.master.gif_label.configure(image=self.frame)
         self.gifs.append(self.master.gif_label.after(30, self.run, ind))
 
