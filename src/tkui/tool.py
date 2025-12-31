@@ -6373,18 +6373,19 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                 parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                 lpunpack.unpack(f"{work}/{i}.img", work)
                 for file_name in os.listdir(work):
+                    file_path = work + file_name
                     if file_name.endswith('_a.img'):
-                        if os.path.exists(work + file_name) and os.path.exists(work + file_name.replace('_a', '')):
-                            if pathlib.Path(work + file_name).samefile(work + file_name.replace('_a', '')):
-                                os.remove(work + file_name)
+                        if os.path.exists(file_path) and os.path.exists(work + file_name.replace('_a', '')):
+                            if pathlib.Path(file_path).samefile(work + file_name.replace('_a', '')):
+                                os.remove(file_path)
                             else:
                                 os.remove(work + file_name.replace('_a', ''))
-                                os.rename(work + file_name, work + file_name.replace('_a', ''))
+                                os.rename(file_path, work + file_name.replace('_a', ''))
                         else:
-                            os.rename(work + file_name, work + file_name.replace('_a', ''))
+                            os.rename(file_path, work + file_name.replace('_a', ''))
                     if file_name.endswith('_b.img'):
-                        if os.path.getsize(work + file_name) == 0:
-                            os.remove(work + file_name)
+                        if not os.path.getsize(file_path):
+                            os.remove(file_path)
                 json_.write(parts)
                 parts.clear()
             if (file_type := gettype(f"{work}/{i}.img")) == "ext":
@@ -6398,7 +6399,7 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     if mount != i and mount and i != 'mi_ext':
                         parts[mount] = 'ext'
                 # libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False, i)
-                imgextractor.Extractor().main(project_manger.current_work_path() + i + ".img", f'{work}/{i}', work)
+                imgextractor.Extractor().main(project_manger.current_work_path() + f"{i}.img", f'{work}/{i}', work)
                 if os.path.exists(f'{work}/{i}'):
                     try:
                         os.remove(f"{work}/{i}.img")
