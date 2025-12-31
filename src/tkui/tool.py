@@ -6020,13 +6020,14 @@ def unpackrom(ifile: str) -> None:
     # gzip
     if ftype == 'gzip':
         print(lang.text79 + ifile)
-        current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
-        if not project_manger.exist():
+        name = os.path.splitext(os.path.basename(ifile))[0]
+        current_project_name.set(name)
+        if not project_manger.exist(name):
             re_folder(project_manger.current_work_path())
-        if os.path.basename(ifile).endswith(".gz"):
-            output_file_name = os.path.basename(ifile)[:-3]
-        else:
-            output_file_name = os.path.basename(ifile)
+        output_file_name = os.path.basename(ifile)
+        if ifile.endswith(".gz"):
+            output_file_name = output_file_name[:-3]
+
         output_file_ = os.path.join(project_manger.current_work_path(), output_file_name)
         with open(output_file_, "wb") as output, gzip.open(ifile, "rb") as input_file:
             data = input_file.read(8192)
@@ -7110,7 +7111,7 @@ class UnpackGui(ttk.LabelFrame):
                     return True
             self.fm.current(0)
             return True
-        create_thread(self.__refs)
+        return create_thread(self.__refs)
 
     @animation
     def __refs(self):
