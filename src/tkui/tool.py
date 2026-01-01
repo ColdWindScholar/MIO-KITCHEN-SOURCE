@@ -2758,7 +2758,7 @@ class ModuleManager:
         script_path = f"{self.module_dir}/{id_}"
         if os.path.exists(f"{script_path}/main.py") and imp:
             try:
-                module = imp.load_source('__maddon__', f"{script_path}/main.py")
+                module = imp.load_source(id_, f"{script_path}/main.py")
                 if hasattr(module, 'entrances'):
                     for entry, func in module.entrances.items():
                         self.addon_loader.register(id_, entry, func)
