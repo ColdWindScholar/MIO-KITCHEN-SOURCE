@@ -6461,17 +6461,18 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master:Tk | Toplevel = None) -> int:
     if not ok:
         ok = lang.ok
     if not cancel:
         cancel = lang.cancel
     value = IntVar()
+    master = master or win
     if is_top:
         ask = Toplevel()
         move_center(ask)
     else:
-        ask = ttk.LabelFrame(win)
+        ask = ttk.LabelFrame(master)
         ask.place(relx=0.5, rely=0.5, anchor="center")
     frame_inner = ttk.Frame(ask)
     frame_inner.pack(expand=True, fill=BOTH, padx=20, pady=20)
