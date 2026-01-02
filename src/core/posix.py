@@ -44,9 +44,6 @@ def readlink(path):
                     return f.read().decode("utf-16")[:-1]
                 else:
                     return ''
+        return ''
     else:
-        if os.path.islink(path):
-            return os.readlink(path)
-        else:
-            return ''
-    return ''
+        return os.readlink(path)
