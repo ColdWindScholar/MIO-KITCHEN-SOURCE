@@ -7,6 +7,7 @@ from hashlib import md5
 from os import walk, getcwd, chdir, symlink, readlink, name as osname, stat, unlink
 from pathlib import Path
 from shutil import rmtree, copytree
+from typing import Any, Generator
 from zipfile import ZipFile, ZIP_DEFLATED, is_zipfile
 from .Magisk import Magisk_patch
 from .bootimg import unpack_bootimg, repack_bootimg
@@ -36,7 +37,7 @@ class prop_utils:
         self.prop: dict = {n: v for n, v in self.__loadprop}
 
     @property
-    def __loadprop(self) -> list:
+    def __loadprop(self) -> Generator[list[str], Any, None]:
         for __ in self.fd.readlines():
             if __[:1] == '#':
                 return
