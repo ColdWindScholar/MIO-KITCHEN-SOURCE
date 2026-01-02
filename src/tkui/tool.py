@@ -38,7 +38,7 @@ from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repa
 from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
 from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
-from src.porttool.__main__ import Main as MtkPortTool
+from src.porttool.ui import MyUI
 
 if platform.system() != 'Darwin':
     try:
@@ -78,7 +78,10 @@ if os.name == 'nt':
     from tkinter import filedialog
 else:
     from src.core import mkc_filedialog as filedialog
+if os.name == 'nt':
+    from multiprocessing.dummy import freeze_support
 
+    freeze_support()
 from src.core import imgextractor
 from src.core import lpunpack
 from src.core import mkdtboimg
@@ -486,7 +489,7 @@ class ToolBox(ttk.Frame):
             (lang.mergequalcommimage, self.MergequalcommimageOld),  # Merge Qualcomm Image (Legacy)
             (lang.merge_file_segments, self.MergeSparseImage),
             (lang.decrypt_xtc_xml, self.DecryptXtcXml),
-            (lang.mtk_port_tool, MtkPortTool),
+            (lang.mtk_port_tool, self.MtkPortTool),
         ]
         width_controls = 3  # Number of buttons per row.
         index_row = 0
@@ -507,6 +510,18 @@ class ToolBox(ttk.Frame):
         """
         self.label_frame.update_idletasks()  # Ensure all pending geometry changes are processed.
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
+
+    class MtkPortTool(Toplevel):
+        def __init__(self):
+            super().__init__()
+            self.title("MTK Port Tool")
+            self.gui()
+
+        def gui(self):
+            myapp = MyUI(self)
+            myapp.pack(side='top', fill='both', padx=5, pady=5, expand=True)
+            move_center(self)
+            self.update()
 
     class DecryptXtcXml(Toplevel):
         def __init__(self):
