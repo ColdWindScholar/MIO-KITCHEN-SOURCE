@@ -211,10 +211,7 @@ class QCSparse:
                 self.tmpdata = self.tmpdata[length:]
                 return tdata
 
-
-def gsbox(offset):
-    return int.from_bytes(sbox[offset:offset + 4], 'little')
-
+gsbox = lambda offset: int.from_bytes(sbox[offset:offset + 4], 'little')
 
 def key_update(iv1, asbox):
     d = iv1[0] ^ asbox[0]  # 9EE3B5B1
