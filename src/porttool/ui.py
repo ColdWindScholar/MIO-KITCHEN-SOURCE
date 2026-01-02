@@ -1,3 +1,4 @@
+import os.path
 from multiprocessing.dummy import DummyProcess
 from tkinter import (
     ttk,
@@ -93,7 +94,7 @@ class MyUI(ttk.Labelframe):
             return
         files = boot, system, portzip = FileChooser(self).get()
         for i in boot, system, portzip:
-            if not Path(i).exists() or not i:
+            if not os.path.exists(i) or not i:
                 print(f"File{i} Not chosen or not exists")
                 return
         print(f"Boot from baserom：{boot}\n"

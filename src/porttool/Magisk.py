@@ -6,7 +6,7 @@ import subprocess
 import sys
 import zipfile
 from src.core.utils import prog_path
-local = prog_path + os.sep + 'local'
+local = f'{prog_path}/local'
 
 
 class Magisk_patch:
