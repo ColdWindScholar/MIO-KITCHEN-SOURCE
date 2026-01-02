@@ -9,9 +9,7 @@ from struct import unpack
 
 from Crypto.Cipher import AES
 
-
-def swap(ch):
-    return ((ch & 0xF) << 4) + ((ch & 0xF0) >> 4)
+swap = lambda ch: ((ch & 0xF) << 4) + ((ch & 0xF0) >> 4)
 
 
 def keyshuffle(key, hkey):
@@ -133,8 +131,7 @@ def extract_xml(filename, key, iv):
 
 
 def aes_cfb(data, key, iv):
-    ctx = AES.new(key, AES.MODE_CFB, iv=iv, segment_size=128)
-    return ctx.decrypt(data)
+    return AES.new(key, AES.MODE_CFB, iv=iv, segment_size=128).decrypt(data)
 
 
 def copysub(rf, wf, start, length):
@@ -266,7 +263,7 @@ def main(filename, outdir):
         zippw = bytes("flash@realme$50E7F7D847732396F1582CD62DD385ED7ABB0897", 'utf-8')
         with zipfile.ZipFile(filename) as file:
             for zfile in file.namelist():
-                print("Extracting ", zfile , " to " , outdir)
+                print("Extracting", zfile, "to", outdir)
                 file.extract(zfile, pwd=zippw, path=outdir)
             print(f"Files extracted to {outdir}")
             return
@@ -289,9 +286,7 @@ def main(filename, outdir):
 
     if os.path.exists(path):
         shutil.rmtree(path)
-        os.mkdir(path)
-    else:
-        os.mkdir(path)
+    os.mkdir(path)
 
     print("Saving ProFile.xml")
     with open(f"{path}/ProFile.xml", mode="w") as file_handle:

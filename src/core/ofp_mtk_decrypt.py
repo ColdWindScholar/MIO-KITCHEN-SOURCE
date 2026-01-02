@@ -10,11 +10,9 @@ from struct import unpack
 from Crypto.Cipher import AES
 
 
-def swap(ch):
-    return ((ch & 0xF) << 4) + ((ch & 0xF0) >> 4)
+swap = lambda ch: ((ch & 0xF) << 4) + ((ch & 0xF0) >> 4)
 
-
-def mtk_shuffle(key, keylength, input, inputlength):
+def mtk_shuffle(key, keylength: int, input, inputlength):
     for i in range(0, inputlength):
         k = key[(i % keylength)]
         h = ((((input[i]) & 0xF0) >> 4) | (16 * ((input[i]) & 0xF)))
@@ -29,7 +27,7 @@ def mtk_shuffle2(key, keylength, input, inputlength):
     return input
 
 
-def aes_cfb(key, iv, data, decrypt=True, segment_size=128):
+def aes_cfb(key, iv, data, decrypt:bool=True, segment_size:int=128):
     cipher = AES.new(key, AES.MODE_CFB, IV=iv, segment_size=segment_size)
     if decrypt:
         plaintext = cipher.decrypt(data)

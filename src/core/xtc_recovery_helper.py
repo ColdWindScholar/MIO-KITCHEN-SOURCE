@@ -80,4 +80,3 @@ def decrypt(file_path: str):
     with open(file_path, 'wb') as file:
         file.seek(0, 0)
         file.write(buffer)
-

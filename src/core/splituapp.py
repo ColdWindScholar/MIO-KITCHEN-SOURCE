@@ -22,7 +22,7 @@ def extract(source, out_dir: str, flist: list):
         ...
     if not path.exists(source):
         print('The File Not Exist!')
-        return 
+        return
     with open(source, 'rb') as f:
         while True:
             i = f.read(byte_num)
