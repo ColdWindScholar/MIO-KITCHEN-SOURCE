@@ -222,7 +222,7 @@ support_packtype = ['zip', 'img']
 ext_ext = '.exe' if os.name == 'nt' else ''
 
 # binarys
-make_ext4fs_bin = op.join(tool_bin, "make_ext4fs" + ext_ext)
-magiskboot_bin = op.join(tool_bin, "magiskboot" + ext_ext)
-simg2img_bin = op.join(tool_bin, "simg2img" + ext_ext)
-img2simg_bin = op.join(tool_bin, "img2simg" + ext_ext)
+make_ext4fs_bin = op.join(tool_bin, f"make_ext4fs{ext_ext}")
+magiskboot_bin = op.join(tool_bin, f"magiskboot{ext_ext}")
+simg2img_bin = op.join(tool_bin, f"simg2img{ext_ext}]")
+img2simg_bin = op.join(tool_bin, f"img2simg{ext_ext}")
