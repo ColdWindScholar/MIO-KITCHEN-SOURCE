@@ -9,7 +9,7 @@ from tkinter import (
 from tkinter.filedialog import askopenfilename
 
 from .configs import *
-from .pathlib import Path
+from pathlib import Path
 from .utils import portutils
 
 
