@@ -6880,6 +6880,29 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.combobox: ttk.Combobox
         self.pack(padx=5, pady=5)
 
+    @staticmethod
+    def open_dir():
+        name = current_project_name.get()
+        if not project_manger.exist(name):
+            win.message_pop(lang.warn1)
+            return
+
+        path = project_manger.get_work_path(name)
+        if not path or not os.path.exists(path):
+            win.message_pop(f"Cannot open folder:\n{path}")
+            return
+
+        try:
+            path = os.path.normpath(path)
+            if os.name == 'nt':
+                os.startfile(path)  # type: ignore[attr-defined]
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', path])
+            else:
+                subprocess.Popen(['xdg-open', path])
+        except Exception:
+            logging.exception("Failed to open project folder: %s", path)
+            win.message_pop(f"Cannot open folder:\n{path}")
     def gui(self):
         top_row = ttk.Frame(self)
         top_row.pack(side="top", padx=10, pady=10, fill=X)
@@ -6888,7 +6911,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
         icon = ttk.Label(top_row, text="📂", cursor="hand2")
         icon.pack(side="right", padx=(6, 0))
-        icon.bind("<Button-1>", self.gui)
+        icon.bind("<Button-1>", lambda event:self.open_dir())
         functions = [
             (lang.text23, self.listdir),
             (lang.text115, self.new),
