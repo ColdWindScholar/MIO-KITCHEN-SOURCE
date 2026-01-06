@@ -2550,7 +2550,7 @@ def logo_pack(origin_logo=None) -> int:
     if not os.path.exists(dir_ := f"{work}/logo") or not os.path.exists(origin_logo):
         print(lang.warn6)
         return 1
-    utils.LogoDumper(origin_logo, logo, dir_).repack()
+    LogoDumper(origin_logo, logo, dir_).repack()
     os.remove(origin_logo)
     os.rename(logo, origin_logo)
     rmdir(dir_)
