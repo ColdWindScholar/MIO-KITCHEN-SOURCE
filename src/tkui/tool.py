@@ -2411,7 +2411,7 @@ class SetUtils:
         theme.set(self.theme)
         sv_ttk.set_theme(self.theme)
         if is_pro:
-            if 'active_code' not in self.__dir__():
+            if 'active_code' not in dir(self):
                 self.active_code = 'None'
             verify.verify(self.active_code)
         if self.treff == "1":
