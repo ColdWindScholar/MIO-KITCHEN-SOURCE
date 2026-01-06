@@ -2087,7 +2087,6 @@ def error(code, desc="unknown error"):
     er.protocol("WM_DELETE_WINDOW", win.destroy)
     er.title(f"Program crashed! [{settings.version}]")
     er.lift()
-    er.resizable(False, False)
     ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
     ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.",
               font=(None, 10)).pack(
@@ -2120,7 +2119,6 @@ def error(code, desc="unknown error"):
     move_center(er)
     er.wait_window()
     sys.exit()
-
 
 class Welcome(ttk.Frame):
     def __init__(self):
