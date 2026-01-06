@@ -2414,10 +2414,7 @@ class SetUtils:
             if 'active_code' not in dir(self):
                 self.active_code = 'None'
             verify.verify(self.active_code)
-        if self.treff == "1":
-            win.attributes("-alpha", self.bar_level)
-        else:
-            win.attributes("-alpha", 1)
+        win.attributes("-alpha", self.bar_level if self.treff == "1" else 1)
 
     @staticmethod
     def load_language(name):
