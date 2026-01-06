@@ -6909,9 +6909,8 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.combobox = ttk.Combobox(top_row, textvariable=current_project_name, state='readonly')
         self.combobox.pack(side="left", fill=X, expand=True)
         self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
-        icon = ttk.Label(top_row, text="📂", cursor="hand2")
+        icon = ttk.Button(top_row, text=lang.open, command=self.open_dir)
         icon.pack(side="right", padx=(6, 0))
-        icon.bind("<Button-1>", lambda event:self.open_dir())
         functions = [
             (lang.text23, self.listdir),
             (lang.text115, self.new),

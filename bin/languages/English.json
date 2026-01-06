@@ -369,5 +369,6 @@
   "encoding": "Encoding:",
   "skip_ramdisk": "Skip Process Ramdisk",
   "copying_project": "Copying Project:",
-  "fs_converter": "Fs Converter"
+  "fs_converter": "Fs Converter",
+  "open": "Open"
 }
