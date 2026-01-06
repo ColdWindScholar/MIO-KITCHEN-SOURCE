@@ -131,7 +131,6 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
 cwd_path = utils.prog_path
-
 if os.name == 'nt':
     def set_title_bar_color(window, dark_value: int = 20):
         """Adjusts Windows title bar theme color.
@@ -1501,6 +1500,7 @@ class Tool(Tk):
         # Attempt to get the current alpha value before the "shake".
         # This is important if user settings already include transparency by default.
         initial_alpha = 1.0  # Default to fully opaque
+        self.loops = []
         try:
             # Important: attributes() might not be available if the window isn't mapped yet,
             # though this is usually not an issue in __init__.
@@ -1584,7 +1584,9 @@ class Tool(Tk):
     def update_frame(self):
         self.frame_bg.update_idletasks()
         self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
-
+    def start_loops(self):
+        for i in self.loops:
+            create_thread(i)
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -5382,8 +5384,8 @@ class StdoutRedirector:
         self.error_info = ''
         self.w = 0
         self.flush = lambda: error(1, self.error_info) if self.error_info else ...
-        create_thread(self.loop)
-        create_thread(self.loop2)
+        win.loops.append(self.loop)
+        win.loops.append(self.loop2)
 
     def write(self, string):
         self.w = 1
@@ -6879,9 +6881,14 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.pack(padx=5, pady=5)
 
     def gui(self):
-        self.combobox = ttk.Combobox(self, textvariable=current_project_name, state='readonly')
-        self.combobox.pack(side="top", padx=10, pady=10, fill=X)
+        top_row = ttk.Frame(self)
+        top_row.pack(side="top", padx=10, pady=10, fill=X)
+        self.combobox = ttk.Combobox(top_row, textvariable=current_project_name, state='readonly')
+        self.combobox.pack(side="left", fill=X, expand=True)
         self.combobox.bind('<<ComboboxSelected>>', lambda *x: print(lang.text96 + current_project_name.get()))
+        icon = ttk.Label(top_row, text="📂", cursor="hand2")
+        icon.pack(side="right", padx=(6, 0))
+        icon.bind("<Button-1>", self.gui)
         functions = [
             (lang.text23, self.listdir),
             (lang.text115, self.new),
@@ -7539,7 +7546,7 @@ def __init__tk(args: list):
     win.update()
 
     move_center(win)
-    win.get_time()
+    win.loops.append(win.get_time)
     print(lang.text134 % (dti() - start))
     if os.name == 'nt':
         do_override_sv_ttk_fonts()
@@ -7550,6 +7557,7 @@ def __init__tk(args: list):
     if len(args) > 1 and is_pro:
         win.after(1000, ParseCmdline, args[1:])
     try:
+        win.after(1000, win.start_loops)
         win.mainloop()
     except KeyboardInterrupt:
         exit_tool()
