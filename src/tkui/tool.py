@@ -2927,7 +2927,7 @@ class ModuleManager:
                 f"ModuleManager.install: MPK check failed for '{mpk_path}'. Result: {check_mpk_result}, Reason: '{reason}'")
             return check_mpk_result, reason
 
-        mconf = ConfigParser()  # Используем ConfigParser
+        mconf = ConfigParser()
         try:
             with zipfile.ZipFile(mpk_path) as f:
                 with f.open('info') as info_file:
@@ -2953,7 +2953,14 @@ class ModuleManager:
                 return module_error_codes.PlatformNotSupport, f"Unsupported platform: {platform.system()}"
         except Exception as e:
             logging.exception(f"ModuleManager.install: Error checking platform support for '{install_id}': {e}")
-
+        system_target = mconf.get("module", 'system', 'all')
+        if system_target != 'all':
+            if platform.system() not in system_target.split(" "):
+                return module_error_codes.PlatformNotSupport, f"Unsupported platform: {system_target}"
+        arch_target = mconf.get("module", 'arch', 'all')
+        if arch_target != 'all':
+            if platform.machine() not in arch_target.split(" "):
+                return module_error_codes.PlatformNotSupport, f"Unsupported Arch: {arch_target}"
         depend_str = mconf.get('module', 'depend', '')
         logging.debug(f"ModuleManager.install: Dependencies for '{install_id}': '{depend_str}'")
         for dep_id_str in depend_str.split():
