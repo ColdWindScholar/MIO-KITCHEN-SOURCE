@@ -427,8 +427,7 @@ class CustomControls:
         ft = ttk.Frame(master)
         ft.pack(fill=X)
         ttk.Label(ft, text=text, width=15, font=(None, 12)).pack(side='left', padx=10, pady=10)
-        ttk.Combobox(ft, textvariable=textvariable,
-                     values=values, state=state).pack(side='left', padx=5, pady=5)
+        ttk.Combobox(ft, textvariable=textvariable, values=values, state=state).pack(side='left', padx=5, pady=5)
 
 
 ccontrols = CustomControls()
