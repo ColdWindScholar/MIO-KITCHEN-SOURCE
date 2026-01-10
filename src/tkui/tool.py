@@ -3895,7 +3895,7 @@ class InstallMpk(Toplevel):
         self.installb.config(state=DISABLED)
         ret, reason = module_manager.install(self.mpk)
         if ret == module_error_codes.PlatformNotSupport:
-            self.state['text'] = lang.warn15.format(platform.system())
+            self.state['text'] = lang.warn15.format(platform.system()) + reason
         elif ret == module_error_codes.DependsMissing:
             self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
             self.installb['text'] = lang.text37
