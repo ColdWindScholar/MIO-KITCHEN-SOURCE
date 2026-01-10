@@ -1,7 +1,7 @@
 Pillow>=10.0.1
 pycryptodome>=3.19.1
 Requests>2.31.0
-protobuf>5
+protobuf>6
 sv_ttk
 pyinstaller
 chlorophyll
@@ -17,5 +17,5 @@ httpx
 cryptography
 toml
 lz4
-python-lzo
+python-lzo; sys_platform == 'linux'
 configparser
