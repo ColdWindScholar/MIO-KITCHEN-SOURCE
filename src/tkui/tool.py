@@ -412,7 +412,7 @@ class CustomControls:
                                                                                                            pady=10)
 
     @staticmethod
-    def combobox(master, textvariable: tk.Variable, values: list, text: str, state: str = 'normal'):
+    def combobox(master, textvariable: tk.Variable, values: list | tuple[str, ...], text: str, state: str = 'normal'):
         """Creates a labeled combobox widget group.
 
         This group consists of a label and a combobox.
