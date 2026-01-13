@@ -275,7 +275,7 @@ class LoadAnim:
             # Start the animation in a new thread to avoid blocking the UI.
             if len(self.tasks) > self.task_num_max:
                 return lambda *a, **k: print("Cannot create new thread.Please wait for a while.")
-            create_thread(self.run())
+            self.run()
             task_num = self.get_task_num()
             # The actual function execution also happens in a separate thread.
             task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
