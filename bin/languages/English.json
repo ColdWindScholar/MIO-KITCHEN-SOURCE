@@ -370,5 +370,7 @@
   "skip_ramdisk": "Skip Process Ramdisk",
   "copying_project": "Copying Project:",
   "fs_converter": "Fs Converter",
-  "open": "Open"
+  "open": "Open",
+  "supported_system": "Supported System:",
+  "supported_arch": "Supported Arch:"
 }

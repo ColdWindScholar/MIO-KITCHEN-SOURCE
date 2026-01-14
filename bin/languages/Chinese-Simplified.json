@@ -284,5 +284,7 @@
   "copying_project": "正在复制项目:",
   "previous_step": "上一步",
   "fs_converter": "文件系统转换",
-  "open": "打开"
+  "open": "打开",
+  "supported_system": "适配系统:",
+  "supported_arch": "适配架构:"
  }

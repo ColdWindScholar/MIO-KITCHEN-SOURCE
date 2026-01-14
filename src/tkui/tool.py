@@ -3179,6 +3179,10 @@ class ModuleManager:
             self.ver = self.label_entry(f, lang.t22, TOP, "1.0")
             self.dep = self.label_entry(f, lang.t23, TOP, '')
             self.identifier = self.label_entry(f, lang.identifier, TOP, 'example.mio_kitchen.plugin')
+            #
+            self.system = self.label_entry(f, lang.supported_system, TOP, platform.system())
+            self.arch = self.label_entry(f, lang.supported_arch, TOP, platform.machine())
+            ###
             f.pack(padx=5, pady=5, side=LEFT)
             f = ttk.Frame(f_b)
             ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
@@ -3187,7 +3191,7 @@ class ModuleManager:
             f.pack(padx=5, pady=5, side=LEFT)
             f_b.pack(padx=5, pady=5)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Button(self, text=lang.text115, command=self.create).pack(fill=X, padx=5, pady=5)
+            ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5, pady=5)
 
         def create(self):
             if not self.identifier.get():
@@ -3201,7 +3205,9 @@ class ModuleManager:
                 "version": self.ver.get(),
                 "identifier": (iden := self.identifier.get()),
                 "describe": self.intro.get(1.0, tk.END),
-                "depend": self.dep.get()
+                "depend": self.dep.get(),
+                "system": self.system.get(),
+                "arch": self.arch.get()
             }
             self.destroy()
 
