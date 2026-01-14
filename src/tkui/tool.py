@@ -4181,7 +4181,7 @@ class MpkStore(Toplevel):
         ttk.Button(header_frame, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10,
                                                                                side=RIGHT)  # Button to modify repository URL.
         ttk.Button(header_frame, text=lang.refresh, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10,
-                                                                                                    side=RIGHT)  # Button to refresh plugin database.
+                                                                                                     side=RIGHT)  # Button to refresh plugin database.
         header_frame.pack(padx=10, pady=10, fill=X)
 
         ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=5, fill=X)
@@ -4604,7 +4604,7 @@ class MpkStore(Toplevel):
 
             if new_repo_val != current_repo_val:  # If the URL changed.
                 self.init_repo()  # Re-initialize repository related settings.
-                create_thread(self.get_db)  # Refresh database from the new repository in a separate thread.
+                create_thread(self.get_db, True)  # Refresh database from the new repository in a separate thread.
 
         def on_cancel_repo():
             """Handles the Cancel button click in the repository modification dialog."""
@@ -4847,7 +4847,7 @@ class MpkStore(Toplevel):
                     pass
             logging.info(f"MpkStore.download: Download/install process finished for plugin '{id_}'.")
 
-    def get_db(self, refresh:bool = False):
+    def get_db(self, refresh: bool = False):
         """Fetches the plugin database from the repository and populates the UI.
 
         Clears existing plugin listings, downloads 'plugin.json' from the configured
@@ -4862,7 +4862,7 @@ class MpkStore(Toplevel):
         logging.info("MpkStore.get_db: Cleared existing plugin UI elements.")
 
         try:
-            if refresh and os.path.exists(self.local_db_path) and (data:=JsonEdit(self.local_db_path).read()):
+            if not refresh and os.path.exists(self.local_db_path) and (data := JsonEdit(self.local_db_path).read()):
                 self.data = data
             else:
                 # Fetch plugin database (plugin.json).
