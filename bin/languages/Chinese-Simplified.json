@@ -291,5 +291,6 @@
   "disable_avb": "禁用fstab内的AVB",
   "disable_avb_info": "选择你想要关闭AVB的分区。这个工具会自动查找并修改其中的fstab文件。",
   "available_partitions": "可用的分区",
-  "project_not_selected": "未选择项目"
+  "project_not_selected": "未选择项目",
+  "refresh": "刷新"
  }
