@@ -292,5 +292,7 @@
   "disable_avb_info": "选择你想要关闭AVB的分区。这个工具会自动查找并修改其中的fstab文件。",
   "available_partitions": "可用的分区",
   "project_not_selected": "未选择项目",
-  "refresh": "刷新"
+  "refresh": "刷新",
+  "disable_encryption": "禁用Data加密",
+  "disable_encryption_info": "这个工具会修改已选择分区内的fstab文件以禁用首次启动时的强制data加密。"
  }
