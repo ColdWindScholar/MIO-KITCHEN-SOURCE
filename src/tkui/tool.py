@@ -960,7 +960,7 @@ class ToolBox(ttk.Frame):
             self.controls = []
             self.gui()
             self.geometry("400x450")
-            #self.resizable(False, False)
+            # self.resizable(False, False)
             self.dnd = lambda file_list: create_thread(self.__dnd, file_list)
             move_center(self)
 
@@ -1028,7 +1028,7 @@ class ToolBox(ttk.Frame):
             self.title(lang.trim_image)
             self.gui()
             move_center(self)
-            #self.resizable(False, False)
+            # self.resizable(False, False)
 
         def gui(self):
             ttk.Label(self, text=lang.help_trim_image).pack(padx=5, pady=5)
@@ -1586,9 +1586,11 @@ class Tool(Tk):
     def update_frame(self):
         self.frame_bg.update_idletasks()
         self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
+
     def start_loops(self):
         for i in self.loops:
             create_thread(i)
+
     def gui(self):
         if os.name == 'posix' and os.geteuid() != 0:
             print(lang.warn13)
@@ -2121,6 +2123,7 @@ def error(code, desc="unknown error"):
     move_center(er)
     er.wait_window()
     sys.exit()
+
 
 class Welcome(ttk.Frame):
     def __init__(self):
@@ -2768,7 +2771,7 @@ class ModuleManager:
                 if os.path.isdir(os.path.join(self.module_dir, i)):
                     yield i
 
-    def register_plugin(self, id_:str):
+    def register_plugin(self, id_: str):
         script_path = f"{self.module_dir}/{id_}"
         if os.path.exists(f"{script_path}/main.py") and imp:
             try:
@@ -3191,7 +3194,8 @@ class ModuleManager:
             f.pack(padx=5, pady=5, side=LEFT)
             f_b.pack(padx=5, pady=5)
             ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5, pady=5)
+            ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5,
+                                                                                                  pady=5)
 
         def create(self):
             if not self.identifier.get():
@@ -3866,11 +3870,11 @@ class MpkMan(ttk.Frame):
 class InstallMpk(Toplevel):
     def __init__(self, mpk=None):
         super().__init__()
-        self.mconf = ConfigParser()
-        self.installable = True
-        self.mpk = mpk
+        self.mconf: ConfigParser = ConfigParser()
+        self.installable: bool = True
+        self.mpk: str = mpk
         self.title(lang.text31)
-        #self.resizable(False, False)
+        # self.resizable(False, False)
         f = Frame(self)
         self.logo = Label(f)
         self.logo.pack(padx=10, pady=10)
@@ -6488,7 +6492,7 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master:Tk | Toplevel = None) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master: Tk | Toplevel = None) -> int:
     if not ok:
         ok = lang.ok
     if not cancel:
@@ -6913,6 +6917,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         except Exception:
             logging.exception("Failed to open project folder: %s", path)
             win.message_pop(f"Cannot open folder:\n{path}")
+
     def gui(self):
         top_row = ttk.Frame(self)
         top_row.pack(side="top", padx=10, pady=10, fill=X)
