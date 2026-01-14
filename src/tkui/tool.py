@@ -4891,8 +4891,8 @@ class MpkStore(Toplevel):
             self.data = self.apps = []  # Reset data on error.
 
         if self.winfo_exists():  # Check if window still exists before UI update.
-            logging.debug(f"MpkStore.get_db: Calling add_app with {len(self.apps if self.apps else [])} items.")
-            self.add_app(self.apps if self.apps else [])  # Populate UI with plugins.
+            logging.debug(f"MpkStore.get_db: Calling add_app with {len(self.apps or [])} items.")
+            self.add_app(self.apps or [])  # Populate UI with plugins.
         else:
             logging.warning("MpkStore.get_db: Window was destroyed before UI update could be completed.")
 
