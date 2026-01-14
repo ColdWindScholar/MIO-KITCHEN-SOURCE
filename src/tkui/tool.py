@@ -965,7 +965,7 @@ class ToolBox(ttk.Frame):
             move_center(self)
 
         def gui(self):
-            a = ttk.LabelFrame(self, text='Drop')
+            a = ttk.LabelFrame(self, text=lang.drop)
             (tl := ttk.Label(a, text=lang.text132_e)).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)

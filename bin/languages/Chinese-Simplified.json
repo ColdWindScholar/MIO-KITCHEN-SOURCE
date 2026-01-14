@@ -286,5 +286,8 @@
   "fs_converter": "文件系统转换",
   "open": "打开",
   "supported_system": "适配系统:",
-  "supported_arch": "适配架构:"
+  "supported_arch": "适配架构:",
+  "drop": "拖入",
+  "disable_avb": "禁用fstab内的AVB",
+  "disable_avb_info": "选择你想要关闭AVB的分区。这个工具会自动查找并修改其中的fstab文件。"
  }

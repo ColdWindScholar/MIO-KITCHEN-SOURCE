@@ -372,5 +372,6 @@
   "fs_converter": "Fs Converter",
   "open": "Open",
   "supported_system": "Supported System:",
-  "supported_arch": "Supported Arch:"
+  "supported_arch": "Supported Arch:",
+  "drop": "Drop"
 }
