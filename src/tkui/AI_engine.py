@@ -14,9 +14,9 @@
 import os.path
 from tkinter import Toplevel, ttk, BOTH
 
-from ..core.utils import move_center, prog_path, lang, MkcSugges
+from ..core.utils import move_center, prog_path, lang, MkcSuggest
 
-suggester = MkcSugges(os.path.join(prog_path, 'bin', 'help_document.json'))
+suggester = MkcSuggest(os.path.join(prog_path, 'bin', 'help_document.json'))
 
 
 def suggest(string: str = '', language='English', ok='ok'):

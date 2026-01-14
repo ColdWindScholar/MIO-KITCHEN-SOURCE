@@ -798,7 +798,7 @@ class JsonEdit:
         self.write(data)
 
 
-class MkcSugges:
+class MkcSuggest:
     def __init__(self, help_file: str = 'None'):
         if not help_file:
             self.help_file = os.path.join(prog_path, 'bin', 'help_document.json')
