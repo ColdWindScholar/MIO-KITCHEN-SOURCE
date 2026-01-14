@@ -4172,6 +4172,7 @@ class MpkStore(Toplevel):
         self.app_infos = {}  # Dictionary to store UI frames associated with plugin IDs.
         self.protocol("WM_DELETE_WINDOW", self._on_close_window)  # Handle window close event.
         self.repo = ''  # URL of the plugin repository.
+        self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
         self.init_repo()  # Initialize repository URL from settings or defaults.
 
         # --- UI Setup --- 
@@ -4846,7 +4847,7 @@ class MpkStore(Toplevel):
                     pass
             logging.info(f"MpkStore.download: Download/install process finished for plugin '{id_}'.")
 
-    def get_db(self):
+    def get_db(self, refresh:bool = False):
         """Fetches the plugin database from the repository and populates the UI.
 
         Clears existing plugin listings, downloads 'plugin.json' from the configured
@@ -4861,10 +4862,15 @@ class MpkStore(Toplevel):
         logging.info("MpkStore.get_db: Cleared existing plugin UI elements.")
 
         try:
-            # Fetch plugin database (plugin.json).
-            url_response = requests.get(self.repo + 'plugin.json', timeout=10)
-            url_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx).
-            self.data = url_response.json()  # Parse JSON response.
+            if refresh and os.path.exists(self.local_db_path) and (data:=JsonEdit(self.local_db_path).read()):
+                self.data = data
+            else:
+                # Fetch plugin database (plugin.json).
+                url_response = requests.get(self.repo + 'plugin.json', timeout=10)
+                url_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx).
+                self.data = url_response.json()  # Parse JSON response.
+                JsonEdit(self.local_db_path).write(self.data)
+
             self.apps = self.data  # Store parsed data for app population.
             logging.info(
                 f"MpkStore.get_db: Successfully loaded {len(self.data)} plugin entries from {self.repo + 'plugin.json'}")
