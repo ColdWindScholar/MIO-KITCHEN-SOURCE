@@ -196,7 +196,10 @@ class LoadAnim:
         """
         self.hide_gif = False
         if not self.hide_gif:
-            self.master.gif_label.pack(padx=10, pady=10)
+            try:
+                self.master.gif_label.pack(padx=10, pady=10)
+            except RuntimeError:
+                return
         self.frame = self.frames[ind]
         ind = (ind + 1) % len(self.frames)
         self.master.gif_label.configure(image=self.frame)
