@@ -3847,7 +3847,7 @@ class MpkMan(ttk.Frame):
         # Bind context menu to the "Available plugins" label and to IconGrid/Canvas itself
         rmenu = Menu(self, tearoff=False, borderwidth=0)  # Menu parent is self (MpkMan)
         rmenu.add_command(label=lang.text21, command=self.install_mpk_wrapper)
-        rmenu.add_command(label=lang.text23, command=lambda: create_thread(self.refresh))
+        rmenu.add_command(label=lang.refresh, command=lambda: create_thread(self.refresh))
         rmenu.add_command(label=lang.text115, command=lambda: create_thread(module_manager.new))
 
         plugins_label.bind('<Button-3>', lambda event: rmenu.post(event.x_root, event.y_root))
@@ -4179,7 +4179,7 @@ class MpkStore(Toplevel):
         ttk.Label(header_frame, text="Mpk Store", font=(None, 20)).pack(padx=10, pady=10, side=LEFT)
         ttk.Button(header_frame, text=lang.t58, command=self.modify_repo).pack(padx=10, pady=10,
                                                                                side=RIGHT)  # Button to modify repository URL.
-        ttk.Button(header_frame, text=lang.text23, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10,
+        ttk.Button(header_frame, text=lang.refresh, command=lambda: create_thread(self.get_db)).pack(padx=10, pady=10,
                                                                                                     side=RIGHT)  # Button to refresh plugin database.
         header_frame.pack(padx=10, pady=10, fill=X)
 
@@ -5182,7 +5182,7 @@ class PackSuper(Toplevel):
         ttk.Checkbutton(t_frame, text=lang.t11, variable=self.delete_source_file, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
-        ttk.Button(t_frame, text=lang.text23, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
+        ttk.Button(t_frame, text=lang.refresh, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
         self.g_b = ttk.Button(t_frame, text=lang.t27, command=lambda: create_thread(self.generate))
         self.g_b.pack(side=LEFT, padx=10, pady=10, fill=BOTH)
         t_frame.pack(fill=X)
@@ -6927,7 +6927,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         icon = ttk.Button(top_row, text=lang.open, command=self.open_dir)
         icon.pack(side="right", padx=(6, 0))
         functions = [
-            (lang.text23, self.listdir),
+            (lang.refresh, self.listdir),
             (lang.text115, self.new),
             (lang.text116, lambda: create_thread(self.remove)),
             (lang.text117, lambda: create_thread(self.rename)),
