@@ -6413,7 +6413,7 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     win.message_pop(lang.warn11.format(f"{i}.img"))
             if i not in parts.keys():
                 parts[i] = gettype(f"{work}/{i}.img")
-            print(lang.text79 + i + f".img[{file_type}]")
+            print(lang.text79 + f"{i}.img[{file_type}]")
             if gettype(f"{work}/{i}.img") == 'super':
                 parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                 lpunpack.unpack(f"{work}/{i}.img", work)
