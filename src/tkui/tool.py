@@ -5861,7 +5861,7 @@ class Packxx(Toplevel):
         ck.wait_window()
 
     @animation
-    def packrom(self) -> bool:
+    def packrom(self) -> bool | None:
         if not project_manger.exist():
             win.message_pop(lang.warn1, "red")
             return False
