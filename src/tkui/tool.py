@@ -6499,10 +6499,8 @@ def cprint(*args, **kwargs):
 
 
 def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master: Tk | Toplevel = None) -> int:
-    if not ok:
-        ok = lang.ok
-    if not cancel:
-        cancel = lang.cancel
+    ok = ok or lang.ok
+    cancel = cancel or lang.cancel
     value = IntVar()
     master = master or win
     if is_top:
