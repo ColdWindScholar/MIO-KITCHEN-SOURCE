@@ -1820,7 +1820,6 @@ class Tool(Tk):
         ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
 
 
-# win = Tool()
 animation = LoadAnim()
 start = dti()
 
