@@ -2368,10 +2368,7 @@ class SetUtils:
         self.project_struct = 'single'
         self.auto_unpack = '0'
         self.treff = '0'
-        if set_ini:
-            self.set_file = set_ini
-        else:
-            self.set_file = os.path.join(cwd_path, "bin", "setting.ini")
+        self.set_file = set_ini or os.path.join(cwd_path, "bin", "setting.ini")
         self.plugin_repo = None
         self.contextpatch = '0'
         self.oobe = '0'
