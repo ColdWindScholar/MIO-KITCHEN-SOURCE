@@ -3864,11 +3864,11 @@ class MpkMan(ttk.Frame):
 
 
 class InstallMpk(Toplevel):
-    def __init__(self, mpk=None):
+    def __init__(self, mpk_path: str = None):
         super().__init__()
         self.mconf: ConfigParser = ConfigParser()
         self.installable: bool = True
-        self.mpk: str = mpk
+        self.mpk: str = mpk_path
         self.title(lang.text31)
         # self.resizable(False, False)
         f = Frame(self)
