@@ -1841,7 +1841,7 @@ class Updater(Toplevel):
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
         states.update_window = True
-        self.update_url = settings.update_url if settings.update_url else 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+        self.update_url = settings.update_url or 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.package_head = ''
         self.update_download_url = ''
         self.update_size = 0
