@@ -5133,7 +5133,7 @@ class PackSuper(Toplevel):
         self.super_type = IntVar()
         self.attrib = StringVar(value='readonly')
         self.group_name = StringVar()
-        self.delete_source_file = IntVar()
+        self.delete_source_file = BooleanVar(value=False)
         self.block_device_name = StringVar(value='super')
         self.selected = []
         (lf1 := ttk.LabelFrame(self, text=lang.text54)).pack(fill=BOTH)
@@ -5172,7 +5172,7 @@ class PackSuper(Toplevel):
                         style="Switch.TCheckbutton").pack(
             padx=10, pady=10, fill=BOTH)
         t_frame = Frame(self)
-        ttk.Checkbutton(t_frame, text=lang.t11, variable=self.delete_source_file, onvalue=1, offvalue=0,
+        ttk.Checkbutton(t_frame, text=lang.t11, variable=self.delete_source_file, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(side=LEFT,
                                                           padx=10, pady=10, fill=BOTH)
         ttk.Button(t_frame, text=lang.refresh, command=self.refresh).pack(side=RIGHT, padx=10, pady=10)
@@ -5318,7 +5318,7 @@ class PackSuper(Toplevel):
 
 
 @animation
-def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_=0, return_cmd=0,
+def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_:bool=False, return_cmd=0,
                attrib='readonly',
                output_dir: str = None, work: str = None, block_device_name: str = 'None'):
     if not block_device_name:
@@ -5369,16 +5369,16 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
     if call(command) == 0:
         if os.access(output_dir + "super.img", os.F_OK):
             print(lang.text59 % (output_dir + "super.img"))
-            if del_ == 1:
+            if del_:
                 for img in part_list:
-                    if os.path.exists(f"{work}{img}.img"):
+                    if os.path.exists(f"{work}/{img}.img"):
                         try:
-                            os.remove(f"{work}{img}.img")
+                            os.remove(f"{work}/{img}.img")
                         except Exception:
                             logging.exception('Bugs')
         else:
             win.message_pop(lang.warn10)
-            return 1
+        return 1
     else:
         win.message_pop(lang.warn10)
         return 1
