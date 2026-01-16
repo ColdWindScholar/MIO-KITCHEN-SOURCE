@@ -15,8 +15,7 @@ import types
 from _imp import (init_frozen, is_builtin, is_frozen)
 from importlib import machinery
 from importlib import util
-
-from importlib._bootstrap import _ERR_MSG, _exec, _load, _builtin_from_name
+from importlib._bootstrap import _exec, _load, _builtin_from_name
 from importlib._bootstrap_external import SourcelessFileLoader
 
 try:
@@ -227,7 +226,7 @@ def find_module(name, path=None):
             continue
         break  # Break out of outer loop when breaking out of inner loop.
     else:
-        raise ImportError(_ERR_MSG.format(name), name=name)
+        raise ImportError('No module named {!r}'.format(name), name=name)
 
     encoding = None
     if 'b' not in mode:
