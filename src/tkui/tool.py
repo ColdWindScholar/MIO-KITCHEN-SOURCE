@@ -5405,7 +5405,7 @@ class StdoutRedirector:
         self.text_space.insert(tk.END, string)
         create_thread(logging.debug, string)
         if settings.ai_engine == '1':
-            AI_engine.suggest(string, language=settings.language, ok=lang.ok)
+            AI_engine.suggest(str(string) if not isinstance(string, str) else str, language=settings.language, ok=lang.ok)
 
     def loop(self):
         while True:
