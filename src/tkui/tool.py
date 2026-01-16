@@ -2953,7 +2953,7 @@ class ModuleManager:
         arch_target = mconf.get("module", 'arch', 'all')
         if arch_target != 'all':
             if platform.machine() not in arch_target.split(" "):
-                return module_error_codes.PlatformNotSupport, f"Unsupported Arch: {arch_target}"
+                return module_error_codes.ArchNotSupported, f"Unsupported Arch: {arch_target}"
         depend_str = mconf.get('module', 'depend', '')
         logging.debug(f"ModuleManager.install: Dependencies for '{install_id}': '{depend_str}'")
         for dep_id_str in depend_str.split():
@@ -3891,8 +3891,10 @@ class InstallMpk(Toplevel):
         self.prog.start()
         self.installb.config(state=DISABLED)
         ret, reason = module_manager.install(self.mpk)
+        if ret == module_error_codes.ArchNotSupported:
+            self.state['text'] = reason
         if ret == module_error_codes.PlatformNotSupport:
-            self.state['text'] = lang.warn15.format(platform.system()) + reason
+            self.state['text'] = lang.warn15.format(platform.system())
         elif ret == module_error_codes.DependsMissing:
             self.state['text'] = lang.text36 % (self.mconf.get('module', 'name'), reason, reason)
             self.installb['text'] = lang.text37

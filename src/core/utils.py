@@ -874,5 +874,6 @@ class ModuleErrorCodes(IntEnum):
     PlatformNotSupport = 1
     DependsMissing = 2
     IsBroken = 3
+    ArchNotSupported = 4
     # GenericError is not recommended.
     GenericError = 9
