@@ -6871,7 +6871,7 @@ def dndfile(files: list):
                 if fi.endswith(".mpk"):
                     InstallMpk(fi)
                 else:
-                    if any([i for i in ['txt', 'log', 'prop'] if fi.endswith(f".{i}")]):
+                    if gettype(fi) == 'unknown':
                         editor.main(os.path.dirname(fi), os.path.basename(fi))
                     else:
                         create_thread(unpackrom, fi)
