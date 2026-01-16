@@ -7,7 +7,7 @@
 # Based on the app_structure file in split_up_data.pl by McSpoon
 
 
-from os import makedirs, sep, path
+from os import makedirs, path
 from string import printable
 from struct import unpack
 
@@ -49,16 +49,13 @@ def extract(source, out_dir: str, flist: list):
 
             if not flist or filename in flist:
                 if filename in img_files:
-                    filename = filename + '_2'
+                    filename = f'{filename}_2'
 
                 print(f'Extracting {filename}.img ...')
-
-                chunk = 10240
-
                 try:
-                    with open(out_dir + sep + filename + '.img', 'wb') as o:
+                    with open(f'{out_dir}/{filename}.img', 'wb') as o:
                         while file_size > 0:
-                            chunk = min(chunk, file_size)
+                            chunk = min(10240, file_size)
 
                             o.write(f.read(chunk))
                             file_size -= chunk
