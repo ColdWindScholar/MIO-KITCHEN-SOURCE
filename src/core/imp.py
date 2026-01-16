@@ -31,10 +31,10 @@ PKG_DIRECTORY = 5
 C_BUILTIN = 6
 PY_FROZEN = 7
 
-new_module = lambda name:types.ModuleType(name)
-get_magic  = lambda : util.MAGIC_NUMBER
-get_tag = lambda : sys.implementation.cache_tag
-cache_from_source = lambda path, debug_override=None:util.cache_from_source(path, debug_override)
+new_module = lambda name: types.ModuleType(name)
+get_magic = lambda: util.MAGIC_NUMBER
+get_tag = lambda: sys.implementation.cache_tag
+cache_from_source = lambda path, debug_override=None: util.cache_from_source(path, debug_override)
 source_from_cache = lambda path: util.source_from_cache(path)
 
 
@@ -235,7 +235,9 @@ def find_module(name, path=None):
     file = open(file_path, mode, encoding=encoding)
     return file, file_path, (suffix, mode, type_)
 
-reload = lambda module:importlib.reload(module)
+
+reload = lambda module: importlib.reload(module)
+
 
 def init_builtin(name):
     """**DEPRECATED**
