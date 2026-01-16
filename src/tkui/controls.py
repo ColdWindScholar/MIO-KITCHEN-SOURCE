@@ -100,8 +100,7 @@ class ListBox(Frame):
         c = Checkbutton(self.label_frame, text=text, variable=var, onvalue=True, offvalue=False)
         self.vars.append(var)
         args = (var, value)
-        var.trace('w',
-                  lambda *x, arg=args: self.__set_value(*arg))
+        var.trace_add('write', lambda *x, arg=args: self.__set_value(*arg))
         if state:
             self.__set_value(var, value)
         self.controls.append(c)
