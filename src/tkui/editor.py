@@ -21,7 +21,7 @@ from tkinter.ttk import Button
 import pygments.lexers
 from chlorophyll import CodeView
 
-from ..core.utils import create_thread, lang, gettype
+from ..core.utils import create_thread, lang, gettype, move_center
 from ..tkui.controls import input_
 
 
@@ -170,3 +170,4 @@ def main(file_=None, file_name=None, lexer=pygments.lexers.BashLexer):
     root.title("Editor")
     editor = PythonEditor(root, file_, file_name, lexer=lexer)
     editor.pack(side="top", fill="both", expand=True)
+    move_center(root)
