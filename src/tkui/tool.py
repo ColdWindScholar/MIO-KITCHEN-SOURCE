@@ -194,7 +194,7 @@ class LoadAnim:
             try:
                 self.master.gif_label.pack(padx=10, pady=10)
             except RuntimeError:
-                return
+                return 1
         self.frame = self.frames[ind]
         ind = (ind + 1) % len(self.frames)
         self.master.gif_label.configure(image=self.frame)
