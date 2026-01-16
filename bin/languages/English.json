@@ -279,7 +279,7 @@
   "mpk_store_button_min_width": "12",
   "dependency_error_title": "Installation Failed",
   "dependency_missing_for_plugin_install": "Could not install '{plugin_name}'. This plugin requires the 'Java.mpk' plugin to function. Please find and install 'Java.mpk' from the Mpk Store first, then try again.",
-  "dependency_not_in_repo_msg": "Could not install '{plugin_name}'. It requires the 'Java.mpk' plugin to function, which is missing from the Mpk Store. Please contact the developer of '{plugin_name}' for assistance.",
+  "dependency_not_in_repo_msg": "Cannot install '{plugin_name}'. Required dependency '{dep_name}' not found in the repository.",
   "dependency_installation_failed_msg": "Installation of '{plugin_name}' was cancelled because it requires the 'Java.mpk' plugin, which was not installed.",
   "plugin_installed_button": "Installed",
   "plugin_install_failed_mpkstore": "Failed to install plugin {plugin_name}: {reason_text}",
