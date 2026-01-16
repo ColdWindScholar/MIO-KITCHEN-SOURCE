@@ -199,6 +199,7 @@ class LoadAnim:
         ind = (ind + 1) % len(self.frames)
         self.master.gif_label.configure(image=self.frame)
         self.gifs.append(self.master.gif_label.after(30, self.run, ind))
+        return 0
 
     def get_task_num(self):
         """Generates a unique task number for tracking.
