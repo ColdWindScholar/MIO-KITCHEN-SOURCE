@@ -3090,7 +3090,7 @@ class ModuleManager:
         with open(info_json_path, 'r', encoding='UTF-8') as f:
             data: dict = json.load(f)
             data.setdefault('resource', "main.zip")
-            (info_ := ConfigParser())['module'] = data  # Используем ConfigParser
+            (info_ := ConfigParser())['module'] = data
 
             buffer_info_ini = StringIO()
             info_.write(buffer_info_ini)
@@ -3231,7 +3231,7 @@ class ModuleManager:
         @staticmethod
         def _button(master, text, command):
             ttk.Button(master, text=text,
-                       command=lambda: print(command)).pack(side='left')
+                       command=lambda: exec(command)).pack(side='left')
 
         def _filechose(self, master, set, text):
             ft = ttk.Frame(master)
