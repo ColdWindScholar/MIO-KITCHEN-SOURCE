@@ -16,7 +16,7 @@ from queue import Queue
 import mmap
 
 
-def mmap_io(filename, mode, length=0):
+def mmap_io(filename: str, mode: str, length: int = 0):
     if mode == "rb":
         with open(filename, mode="rb") as file_obj:
             return mmap.mmap(file_obj.fileno(), length=0, access=mmap.ACCESS_READ)
@@ -211,7 +211,9 @@ class QCSparse:
                 self.tmpdata = self.tmpdata[length:]
                 return tdata
 
+
 gsbox = lambda offset: int.from_bytes(sbox[offset:offset + 4], 'little')
+
 
 def key_update(iv1, asbox):
     d = iv1[0] ^ asbox[0]  # 9EE3B5B1
@@ -361,6 +363,7 @@ def encryptsubsub(rkey, data, wf):
 
 def encryptsub(rkey, rf, wf):
     return encryptsubsub(rkey, rf.read(), wf)
+
 
 def encryptfile(key, filename, wfilename):
     print(f"Encrypting {filename}")

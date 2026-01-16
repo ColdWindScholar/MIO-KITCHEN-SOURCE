@@ -373,5 +373,6 @@
   "open": "Open",
   "supported_system": "Supported System:",
   "supported_arch": "Supported Arch:",
-  "drop": "Drop"
+  "drop": "Drop",
+  "no_idea": "No idea about:\n\t{}\nPlease Report It To us."
 }
