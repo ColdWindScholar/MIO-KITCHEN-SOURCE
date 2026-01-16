@@ -3209,9 +3209,8 @@ class ModuleManager:
             }
             self.destroy()
 
-            if not os.path.exists(f'{self.module_dir}/{iden}'):
-                os.makedirs(f'{self.module_dir}/{iden}')
-            with open(self.module_dir + f"/{iden}/info.json", 'w+', encoding='utf-8',
+            os.makedirs(f'{self.module_dir}/{iden}', exist_ok=True)
+            with open(f"{self.module_dir}/{iden}/info.json", 'w+', encoding='utf-8',
                       newline='\n') as js:
                 json.dump(data, js, ensure_ascii=False, indent=4)
             if callable(list_pls_plugin):
