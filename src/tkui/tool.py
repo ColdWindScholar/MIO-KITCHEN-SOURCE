@@ -4028,24 +4028,24 @@ class Debugger(Toplevel):
     def show_info():
         ck = Toplevel()
         ck.title('Info')
-        ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange').grid(row=0, column=0, padx=5, pady=5,
-                                                                                     sticky='nw')
-        text = f"""
-        Open Source License: {states.open_source_license}
-        Python: {sys.version}
-        Platform: {sys.platform}
-        Exec Command: {sys.argv}
-        Tool Version: {settings.version}
-        Source code running: {states.run_source}
-        python Implementation: {platform.python_implementation()}
-        Uname: {platform.uname()}
-        Log File: {tool_log}
-        """
+        ttk.Label(ck, text='MIO-KITCHEN', font=(None, 15), foreground='orange', anchor='center').grid(row=0, column=0,
+                                                                                                      padx=5, pady=5,
+                                                                                                      sticky='ns')
+        text = f"""Open Source License: {states.open_source_license}
+Python: {sys.version}
+Platform: {sys.platform}
+Exec Command: {sys.argv}
+Tool Version: {settings.version}
+Source code running: {states.run_source}
+python Implementation: {platform.python_implementation()}
+Uname: {platform.uname()}
+Log File: {tool_log}"""
         # _base_executable: {sys._base_executable}
         if hasattr(sys, '_base_executable'):
             text += f'_base_executable: {sys._base_executable}'
-        ttk.Label(ck, text=text, foreground='gray').grid(row=1, column=0, padx=5, pady=5,
-                                                         sticky='nw')
+        text_ = Text(ck, foreground='gray')
+        text_.insert(1.0, text)
+        text_.grid(row=1, column=0, padx=5, pady=5, sticky='nw')
         move_center(ck)
 
     @staticmethod
@@ -5318,7 +5318,7 @@ class PackSuper(Toplevel):
 
 
 @animation
-def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_:bool=False, return_cmd=0,
+def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: list, del_: bool = False, return_cmd=0,
                attrib='readonly',
                output_dir: str = None, work: str = None, block_device_name: str = 'None'):
     if not block_device_name:
@@ -5659,7 +5659,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
 
 
 class Packxx(Toplevel):
-    def __init__(self, list_:list):
+    def __init__(self, list_: list):
         self.lg = list_
         self.spatchvb = IntVar()
         self.custom_size = {}
