@@ -5659,9 +5659,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
 
 
 class Packxx(Toplevel):
-    def __init__(self, list_):
-        if not list_:
-            return
+    def __init__(self, list_:list):
         self.lg = list_
         self.spatchvb = IntVar()
         self.custom_size = {}
