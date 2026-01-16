@@ -840,11 +840,11 @@ class MkcSuggest:
             return str(string)
         catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
         if not catch_error:
-            return 1
+            return 0
         else:
             catch_error = catch_error[0]
         if not catch_error:
-            return 1
+            return 0
         return catch_error
 
 
