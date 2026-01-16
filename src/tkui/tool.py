@@ -5670,7 +5670,7 @@ class PackPartition(Toplevel):
         self.scale = IntVar(value=0)
         self.UTC = IntVar(value=int(time.time()))
         self.scale_erofs = IntVar()
-        self.delywj = IntVar()
+        self.remove_source_files = IntVar()
         self.ext4_method = StringVar(value=lang.t32)
 
         self.origin_fs = StringVar(value='ext')
@@ -5742,7 +5742,7 @@ class PackPartition(Toplevel):
         ttk.Checkbutton(frame_t, text=lang.text52, variable=self.spatchvb, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=X, side=LEFT)
-        ttk.Checkbutton(frame_t, text=lang.t11, variable=self.delywj, onvalue=1, offvalue=0,
+        ttk.Checkbutton(frame_t, text=lang.t11, variable=self.remove_source_files, onvalue=1, offvalue=0,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=X, side=LEFT)
         frame_t.pack(fill=X, padx=5, pady=5, side=BOTTOM)
@@ -5890,7 +5890,7 @@ class PackPartition(Toplevel):
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
-                        if self.delywj.get() == 1:
+                        if self.remove_source_files.get() == 1:
                             rdi(work, dname)
                         print(lang.text3.format(dname))
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
@@ -5908,7 +5908,7 @@ class PackPartition(Toplevel):
                                  UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
                     else:
-                        if self.delywj.get() == 1:
+                        if self.remove_source_files.get() == 1:
                             rdi(work, dname)
                         print(lang.text3.format(dname))
                         if self.dbgs.get() in ["dat", "br", "sparse"]:
@@ -5962,7 +5962,7 @@ class PackPartition(Toplevel):
                         print(lang.text75 % dname)
                         continue
 
-                    if self.delywj.get() == 1:
+                    if self.remove_source_files.get() == 1:
                         rdi(work, dname)
                     if self.dbgs.get() == "dat":
                         datbr(project_manger.current_work_output_path(), dname, "dat",
