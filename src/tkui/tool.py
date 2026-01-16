@@ -178,14 +178,6 @@ class LoadAnim:
         self.task_num_index = 0  # Index for assigning unique task numbers.
         self.task_num_max = cpu_count()  # Maximum number of concurrent tasks (for task_num_index cycling).
 
-    def set_master(self, master):
-        """Sets or updates the master widget for the animation.
-
-        Args:
-            master: The new parent Tkinter widget.
-        """
-        self.master = master
-
     def run(self, ind: int = 0):
         """Cycles through GIF frames to create the animation.
 
@@ -195,6 +187,9 @@ class LoadAnim:
             ind: The index of the current frame to display.
         """
         self.hide_gif = False
+        if not self.master:
+            logging.warning('Master\'s not set! Skip Animation init.')
+            return 1
         if not self.hide_gif:
             try:
                 self.master.gif_label.pack(padx=10, pady=10)
@@ -7545,7 +7540,7 @@ def __init__tk(args: list):
     win = Tool()
     if os.name == 'nt':
         set_title_bar_color(win)
-    animation.set_master(win)
+    animation.master = win
     global current_project_name, theme, language
     current_project_name = utils.project_name = StringVar()
     theme = StringVar()
