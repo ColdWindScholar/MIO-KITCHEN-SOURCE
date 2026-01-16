@@ -5659,7 +5659,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         print("Successfully packed Boot...")
 
 
-class Packxx(Toplevel):
+class PackPartition(Toplevel):
     def __init__(self, list_: list):
         self.lg = list_
         self.spatchvb = IntVar()
@@ -7233,7 +7233,7 @@ class UnpackGui(ttk.LabelFrame):
             unpack(lbs, self.fm.get())
             self.refs()
         else:  # Pack mode (False)
-            Packxx(lbs)
+            PackPartition(lbs)
 
 
 class FormatConversion(ttk.LabelFrame):
