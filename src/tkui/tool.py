@@ -5660,8 +5660,8 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
 
 
 class PackPartition(Toplevel):
-    def __init__(self, list_: list):
-        self.lg = list_
+    def __init__(self, parts: list):
+        self.chosen_parts:list = parts
         self.spatchvb = IntVar()
         self.custom_size = {}
         self.ext4_packer = StringVar(value='make_ext4fs')
@@ -5782,7 +5782,7 @@ class PackPartition(Toplevel):
 
     def verify(self):
         parts_dict = JsonEdit(project_manger.current_work_path() + "config/parts_info").read()
-        for i in self.lg:
+        for i in self.chosen_parts:
             if i not in parts_dict.keys():
                 parts_dict[i] = 'unknown'
             if parts_dict[i] in ['ext', 'erofs', 'f2fs']:
@@ -5805,7 +5805,7 @@ class PackPartition(Toplevel):
             f.insert(0, str(self.custom_size.get(h.get(), 0)))
 
         def load():
-            for dname in self.lg:
+            for dname in self.chosen_parts:
                 if self.custom_size.get(dname, ''):
                     continue
                 ext4_size_value = 0
@@ -5852,7 +5852,7 @@ class PackPartition(Toplevel):
             win.message_pop(lang.warn1, "red")
             return False
         parts_dict = JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
-        for i in self.lg:
+        for i in self.chosen_parts:
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
                 parts_dict[dname] = 'unknown'
