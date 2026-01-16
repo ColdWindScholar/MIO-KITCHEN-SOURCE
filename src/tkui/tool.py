@@ -4039,7 +4039,7 @@ Tool Version: {settings.version}
 Source code running: {states.run_source}
 python Implementation: {platform.python_implementation()}
 Uname: {platform.uname()}
-Log File: {tool_log}"""
+Log File: {tool_log}\n"""
         # _base_executable: {sys._base_executable}
         if hasattr(sys, '_base_executable'):
             text += f'_base_executable: {sys._base_executable}'
