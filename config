@@ -33,8 +33,8 @@ LOGE = lambda info: print('[%s] \033[91m[ERROR]\033[0m%s' % (strftime('%H:%M:%S'
 LOGS = lambda info: print('[%s] \033[92m[SUCCESS]\033[0m%s' % (strftime('%H:%M:%S'), info))
 green = lambda info: print(f"\033[32m[{strftime('%H:%M:%S')}]{info}\033[0m")
 # 青
-green_1: print = lambda info, end=None: print(f"\033[36m[{strftime('%H:%M:%S')}]{info}\033[0m", end=end)
-log: print = lambda info, end=None: print(f"[{strftime('%H:%M:%S')}]{info}", end=end)
+green_1 = lambda info, end=None: print(f"\033[36m[{strftime('%H:%M:%S')}]{info}\033[0m", end=end)
+log = lambda info, end=None: print(f"[{strftime('%H:%M:%S')}]{info}", end=end)
 red = lambda info: print(f"\033[31m{info}\033[0m")
 yellow = lambda info: print(f"\033[33m{info}\033[0m")
 blue = lambda info: print(f"\033[34m{info}\033[0m")
