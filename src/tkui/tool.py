@@ -5664,9 +5664,9 @@ class PackPartition(Toplevel):
         self.lg = list_
         self.spatchvb = IntVar()
         self.custom_size = {}
-        self.dbfs = StringVar(value='make_ext4fs')
-        self.dbgs = StringVar(value='raw')
-        self.edbgs = StringVar(value='lz4hc')
+        self.ext4_packer = StringVar(value='make_ext4fs')
+        self.format = StringVar(value='raw')
+        self.erofs_compress_format = StringVar(value='lz4hc')
         self.scale = IntVar(value=0)
         self.UTC = IntVar(value=int(time.time()))
         self.scale_erofs = IntVar()
@@ -5696,7 +5696,7 @@ class PackPartition(Toplevel):
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.dbfs).pack(
+        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.ext4_packer).pack(
             side='left', padx=5, pady=5)
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
@@ -5710,11 +5710,11 @@ class PackPartition(Toplevel):
         create_thread(self.show_modify_size)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf3, state="readonly", textvariable=self.dbgs, values=("raw", "sparse", "br", "dat")).pack(padx=5,
-                                                                                                                pady=5,
-                                                                                                                side='left')
+        ttk.Combobox(lf3, state="readonly", textvariable=self.format, values=("raw", "sparse", "br", "dat")).pack(padx=5,
+                                                                                                                  pady=5,
+                                                                                                                  side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf2, state="readonly", textvariable=self.edbgs,
+        ttk.Combobox(lf2, state="readonly", textvariable=self.erofs_compress_format,
                      values=("lz4", "lz4hc", "lzma", "deflate", "zstd")).pack(side='left', padx=5, pady=5)
         ttk.Checkbutton(lf2, text=lang.t35, variable=self.erofs_old_kernel, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
@@ -5885,7 +5885,7 @@ class PackPartition(Toplevel):
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
-                    if mkerofs(dname, str(self.edbgs.get()), work=work,
+                    if mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print(lang.text75 % dname)
@@ -5893,12 +5893,12 @@ class PackPartition(Toplevel):
                         if self.remove_source_files.get() == 1:
                             rdi(work, dname)
                         print(lang.text3.format(dname))
-                        if self.dbgs.get() in ["dat", "br", "sparse"]:
+                        if self.format.get() in ["dat", "br", "sparse"]:
                             img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if self.dbgs.get() == 'dat':
+                            if self.format.get() == 'dat':
                                 datbr(project_manger.current_work_output_path(), dname, "dat",
                                       int(parts_dict.get('dat_ver', 4)))
-                            elif self.dbgs.get() == 'br':
+                            elif self.format.get() == 'br':
                                 datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
@@ -5911,12 +5911,12 @@ class PackPartition(Toplevel):
                         if self.remove_source_files.get() == 1:
                             rdi(work, dname)
                         print(lang.text3.format(dname))
-                        if self.dbgs.get() in ["dat", "br", "sparse"]:
+                        if self.format.get() in ["dat", "br", "sparse"]:
                             img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if self.dbgs.get() == 'dat':
+                            if self.format.get() == 'dat':
                                 datbr(project_manger.current_work_output_path(), dname, "dat",
                                       int(parts_dict.get('dat_ver', 4)))
-                            elif self.dbgs.get() == 'br':
+                            elif self.format.get() == 'br':
                                 datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
@@ -5942,17 +5942,17 @@ class PackPartition(Toplevel):
                                     ext4_size_value = int(f.read().strip())
                                 except ValueError:
                                     ext4_size_value = 0
-                    if self.dbfs.get() == "make_ext4fs":
+                    if self.ext4_packer.get() == "make_ext4fs":
                         exit_code = make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
-                                                sparse=self.dbgs.get() in ["dat", "br", "sparse"], size=ext4_size_value,
+                                                sparse=self.format.get() in ["dat", "br", "sparse"], size=ext4_size_value,
                                                 UTC=self.UTC.get(), has_contexts=os.path.exists(contexts_file))
 
                     else:
                         exit_code = mke2fs(
                             name=dname, work=work,
                             work_output=project_manger.current_work_output_path(),
-                            sparse=self.dbgs.get() in [
+                            sparse=self.format.get() in [
                                 "dat",
                                 "br",
                                 "sparse"],
@@ -5964,10 +5964,10 @@ class PackPartition(Toplevel):
 
                     if self.remove_source_files.get() == 1:
                         rdi(work, dname)
-                    if self.dbgs.get() == "dat":
+                    if self.format.get() == "dat":
                         datbr(project_manger.current_work_output_path(), dname, "dat",
                               int(parts_dict.get('dat_ver', '4')))
-                    elif self.dbgs.get() == "br":
+                    elif self.format.get() == "br":
                         datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                               int(parts_dict.get('dat_ver', '4')))
                     else:
