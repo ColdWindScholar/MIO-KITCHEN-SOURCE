@@ -20,7 +20,7 @@ from typing import Any, Generator, Union, Optional
 from .utils import JsonEdit
 
 
-def scan_context(file) -> dict:  # 读取context文件返回一个字典
+def scan_context(file) -> dict:
     context = {}
     with open(file, "r", encoding='utf-8') as file_:
         for i in file_.readlines():
@@ -53,14 +53,11 @@ str_to_selinux = lambda string: escape(string).replace('\\-', '-') if not string
 
 def context_patch(fs_file, dir_path, fix_permission: dict) -> tuple:  # 接收两个字典对比
     new_fs = {}
-    # 定义已修补过的 避免重复修补
     r_new_fs = {}
     add_new = 0
     print(f"ContextPatcher: the Original File Has {len(fs_file.keys()):d} entries")
-    # 定义默认SeLinux标签
     permission_d = 'u:object_r:system_file:s0'
     for i in scan_dir(os.path.abspath(dir_path)):
-        # 把不可打印字符替换为*
         if not i.isprintable():
             i = ''.join([c if c.isprintable() or not c.strip(' ') else '*' for c in i])
         i = str_to_selinux(i)
@@ -72,9 +69,7 @@ def context_patch(fs_file, dir_path, fix_permission: dict) -> tuple:  # 接收�
             permission = None
             if r_new_fs.get(i):
                 continue
-            # 确认i不为空
             if i:
-                # 搜索已定义的权限
                 for f in fix_permission.keys():
                     if search(f, i):
                         permission = fix_permission.get(f)
