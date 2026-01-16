@@ -3152,11 +3152,11 @@ class ModuleManager:
                 return False
             path = os.path.join(self.module_dir, id_)
             if os.path.exists(f"{path}/main.py"):
-                editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
+                return editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
             elif not os.path.exists(f'{path}/main.sh'):
                 with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
-            editor.main(path, "main.sh")
+            return editor.main(path, "main.sh")
 
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
