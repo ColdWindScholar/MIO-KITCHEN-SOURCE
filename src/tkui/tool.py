@@ -4044,7 +4044,7 @@ Log File: {tool_log}\n"""
         if hasattr(sys, '_base_executable'):
             text += f'_base_executable: {sys._base_executable}'
         text_ = Text(ck, foreground='gray')
-        text_.insert(0, text)
+        text_.insert(1.0, text)
         text_.grid(row=1, column=0, padx=5, pady=5, sticky='nw')
         move_center(ck)
 
