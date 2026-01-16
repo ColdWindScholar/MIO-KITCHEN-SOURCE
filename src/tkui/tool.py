@@ -3164,9 +3164,7 @@ class ModuleManager:
             elif not os.path.exists(f'{path}/main.sh'):
                 with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
                     sh.write("echo 'MIO-KITCHEN'")
-                editor.main(path, "main.sh")
-            else:
-                editor.main(path, 'main.sh')
+            editor.main(path, "main.sh")
 
         def gui(self):
             ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
