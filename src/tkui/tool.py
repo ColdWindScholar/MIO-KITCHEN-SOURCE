@@ -4940,6 +4940,7 @@ class PackHybridRom:
         for i, t_ in enumerate(data):
             if text in t_:
                 return i
+        raise ValueError("The line u looking for isn't exist.")
 
     @staticmethod
     def zstd_compress(path):
