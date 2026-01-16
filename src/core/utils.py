@@ -835,7 +835,9 @@ class MkcSuggest:
         else:
             return None, None
 
-    def catch_error(self, string) -> str | int:
+    def catch_error(self, string:str) -> str | int:
+        if not isinstance(string, str):
+            return string
         catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
         if not catch_error:
             return 1
