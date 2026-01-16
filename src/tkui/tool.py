@@ -1789,15 +1789,11 @@ class Tool(Tk):
 
         def enable_contextpatch():
             if context.get() == '1':
-                if ask_win(
+                if not ask_win(
                         lang.warn18, is_top=True):
-                    settings.set_value('contextpatch', context.get())
-                else:
                     context.set('0')
-                    settings.set_value('contextpatch', context.get())
                     enable_cp.configure(state='off')
-            else:
-                settings.set_value('contextpatch', context.get())
+            settings.set_value('contextpatch', context.get())
 
         context.trace("w", lambda *x: enable_contextpatch())
         get_setting_button('ai_engine', sf4, lang.ai_engine)
