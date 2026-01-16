@@ -234,7 +234,7 @@ def update(args):
                             if caught_name:
                                 log(f'Will rename {z_name} to {real_name}')
                                 z_info.filename = real_name
-                        if os.path.exists(f'bin/{system}/{arch}/{z_name}') or 1:
+                        if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
                             z.extract(z_info, path=f'bin/{system}/{arch}')
                             green(f"Update {z_name}")
         JsonEdit(update_info).write(origin_info)
