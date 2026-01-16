@@ -28,6 +28,7 @@ def input_(title: str = None, text: str = "", master: Tk | Toplevel | tkinter.Fr
     input_frame.place(relx=0.5, rely=0.5, anchor="center")
     entry = ttk.Entry(input_frame, textvariable=input_var)
     entry.pack(pady=5, padx=5, fill=BOTH)
+    entry.focus_set()
     entry.bind("<Return>", lambda *x: input_frame.destroy())
     ttk.Button(input_frame, text=lang.ok, command=input_frame.destroy).pack(padx=5, pady=5, fill=BOTH, side='bottom')
     input_frame.wait_window()
