@@ -1992,7 +1992,10 @@ class Updater(Toplevel):
 
     def update_process(self):
         win.withdraw()
-        self.notice.configure(text=lang.t51)
+        self.notice.configure(text=lang.t51, foreground='orange')
+        self.update_button.configure(state='disabled', text=lang.t43)
+        self.progressbar.configure(mode='indeterminate')
+        self.progressbar.start()
         if os.path.basename(sys.argv[0]).startswith('tool') and hasattr(settings, 'update_done'):
             self.__update_progress3()
         elif os.path.basename(sys.argv[0]) == 'updater.exe':
