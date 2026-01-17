@@ -1851,6 +1851,7 @@ def check_upgrade() -> bool:
         Updater()
         return True
     else:
+        print(lang.t49)
         return False
 
 
