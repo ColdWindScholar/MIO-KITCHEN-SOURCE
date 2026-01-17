@@ -2074,7 +2074,6 @@ class Updater(Toplevel):
 
     def __update_progress3(self):
         self.notice.configure(text=lang.t51)
-        time.sleep(200)
         if hasattr(settings, 'wait_pids'):
             for i in settings.wait_pids.split(' '):
                 try:
@@ -7585,7 +7584,7 @@ def __init__tk(args: list):
     settings.load()
     if settings.updating == 'true':
         updater = Updater()
-        if states.update_window:
+        if updater.winfo_exists():
             updater.wait_window()
     if int(settings.oobe) < 5:
         Welcome()
