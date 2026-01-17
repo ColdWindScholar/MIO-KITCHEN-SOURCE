@@ -1694,7 +1694,7 @@ class Tool(Tk):
             return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
 
         def update_angle():
-            self.rotate_angle = (self.rotate_angle + 10) % 180
+            self.rotate_angle = (self.rotate_angle + 10) % 360
             canvas.itemconfigure(text_item, angle=self.rotate_angle)
 
         canvas = tk.Canvas(self.tab4, width=400, height=100)
