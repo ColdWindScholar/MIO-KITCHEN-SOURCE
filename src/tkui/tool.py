@@ -1848,6 +1848,7 @@ def check_upgrade() -> bool:
 
     if not new_version.endswith(settings.version):
         print(lang.t48 % new_version)
+        Updater()
         return True
     else:
         return False
