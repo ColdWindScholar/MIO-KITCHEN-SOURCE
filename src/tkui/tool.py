@@ -1826,6 +1826,27 @@ from src.core.utils import states, call
 
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 
+def check_upgrade() -> bool:
+    update_url = settings.update_url or 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
+    try:
+        url = requests.get(update_url)
+    except (Exception, BaseException) as e:
+        return False
+    try:
+        json_ = json.loads(url.text)
+    except (Exception, BaseException):
+        return False
+    new_version = json_.get('name')
+
+    if new_version is None:
+        return False
+
+    if not new_version.endswith(settings.version):
+        print(lang.t48 % new_version)
+        return True
+    else:
+        return False
+
 
 class Updater(Toplevel):
 
