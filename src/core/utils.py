@@ -88,8 +88,6 @@ if os.name == 'nt':
     from ctypes import windll
 
     kernel32 = windll.kernel32
-
-
     def terminate_process(pid):
         h_process = kernel32.OpenProcess(0x0001, False, pid) # NOQA: PyUnresolvedReferencesInspection
         if h_process:

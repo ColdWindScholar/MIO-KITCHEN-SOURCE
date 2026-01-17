@@ -1872,14 +1872,12 @@ class Updater(Toplevel):
                                 pady=10,
                                 padx=10)
         f3.pack(padx=5, pady=5, fill=X)
-        if 'upgrade' in os.path.basename(tool_self) and settings.updating == '1':
-            self.update_process2()
-        elif 'tool' in os.path.basename(tool_self) and settings.updating == '2':
-            self.update_process3()
-        else:
-            create_thread(self.get_update)
         self.resizable(width=False, height=False)
         move_center(self)
+        if settings.updating == 'true':
+            self.update_process()
+        else:
+            create_thread(self.get_update)
 
     def get_update(self):
         if self.update_button.cget('text') == lang.t40:
@@ -1984,8 +1982,15 @@ class Updater(Toplevel):
         self.progressbar['value'] = 100
         self.progressbar.update()
 
-    # fixme:Rewrite it.
     def update_process(self):
+        if os.path.basename(sys.argv[0]).startswith('tool') and hasattr(settings, 'update_done'):
+            self.__update_progress3()
+        elif os.path.basename(sys.argv[0]) == 'updater.exe':
+            self.__update_process2()
+        else:
+            self.__update_process()
+
+    def __update_process(self):
         [terminate_process(i) for i in states.open_pids]
         self.notice.configure(text=lang.t51)
         update_files = []
@@ -1999,26 +2004,30 @@ class Updater(Toplevel):
                         update_files.append(file)
                 else:
                     zip_ref.extract(file, os.path.join(cwd_path, "bin"))
+        states.open_pids.append(os.getpid())
         update_dict = {
-            'updating': '1',
+            'updating': 'true',
             'language': settings.language,
             'oobe': settings.oobe,
             'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
             "version_old": settings.version,
-            "update_files": ' '.join(update_files)
+            "update_files": ' '.join(update_files),
+            "wait_pids": " ".join([str(i) for i in states.open_pids]),
         }
         for i in update_dict.keys():
             settings.set_value(i, update_dict.get(i, ''))
-        shutil.copy(os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
-                    os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-        subprocess.Popen(
-            [os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe')))],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        terminate_process(os.getpid())
+        updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
+        shutil.copy(tool_self, updater_path)
+        subprocess.Popen([updater_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    def update_process2(self):
+    def __update_process2(self):
         self.notice.configure(text=lang.t51)
-        time.sleep(2)
+        if hasattr(settings, 'wait_pids'):
+            for i in settings.wait_pids.split(' '):
+                try:
+                    terminate_process(int(i))
+                except ProcessLookupError:
+                    continue
         if hasattr(settings, 'update_files'):
             for i in settings.update_files.split(' '):
                 try:
@@ -2026,48 +2035,38 @@ class Updater(Toplevel):
                     path = os.path.join(temp, real)
                 except (KeyError, ValueError):
                     continue
-                if calculate_md5_file(path) == calculate_md5_file(os.path.join(cwd_path, real)):
+                if os.path.samefile(path, os.path.join(cwd_path, real)):
                     continue
                 if os.path.exists(path):
                     os.rename(path, os.path.join(cwd_path, real))
                 else:
                     logging.warning(path)
-
         if os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe'))))
-            settings.set_value('updating', '2')
+            win.withdraw()
+            settings.set_value('wait_pids', str(os.getpid()))
+            settings.set_value("update_done", 'true')
             subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            terminate_process(os.getpid())
+
         else:
             self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
             settings.set_value('version', settings.version_old)
 
-    def update_process3(self):
-        self.notice.configure(text=lang.t52)
-        time.sleep(2)
-        if os.path.exists(settings.new_tool):
-            try:
-                if os.path.isfile(settings.new_tool):
-                    os.remove(settings.new_tool)
-                if os.path.isfile(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))):
-                    os.remove(os.path.normpath(os.path.join(cwd_path, "upgrade" + ('' if os.name != 'nt' else '.exe'))))
-                if os.path.exists(temp):
-                    shutil.rmtree(temp)
-                os.makedirs(temp, exist_ok=True)
-            except (IOError, IsADirectoryError, FileNotFoundError, PermissionError):
-                logging.exception('Bugs')
-            settings.set_value('updating', '')
-            settings.set_value('new_tool', '')
-            subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
-                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            terminate_process(os.getpid())
-        else:
-            self.notice.configure(text=lang.t41, foreground='red')
-            self.update_button.configure(state='normal', text=lang.text37)
-            settings.set_value('version', settings.version_old)
+    def __update_progress3(self):
+        self.notice.configure(text=lang.t51)
+        if hasattr(settings, 'wait_pids'):
+            for i in settings.wait_pids.split(' '):
+                try:
+                    terminate_process(int(i))
+                except ProcessLookupError:
+                    continue
+        updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
+        os.remove(updater_path)
+        print(f'Upgrade Done!\nFrom {settings.version_old} to  {settings.version}')
+        self.close()
 
     def close(self):
         states.update_window = False
@@ -5664,7 +5663,7 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
 
 class PackPartition(Toplevel):
     def __init__(self, parts: list):
-        self.chosen_parts:list = parts
+        self.chosen_parts: list = parts
         self.spatchvb = IntVar()
         self.custom_size = {}
         self.ext4_packer = StringVar(value='make_ext4fs')
@@ -5699,7 +5698,8 @@ class PackPartition(Toplevel):
         (sf1 := Frame(lf3)).pack(fill=X, padx=5, pady=5, side=TOP)
         # EXT4 Settings
         Label(lf1, text=lang.text48).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"), textvariable=self.ext4_packer).pack(
+        ttk.Combobox(lf1, state="readonly", values=("make_ext4fs", "mke2fs+e2fsdroid"),
+                     textvariable=self.ext4_packer).pack(
             side='left', padx=5, pady=5)
         Label(lf1, text=lang.t31).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf1, state="readonly", values=(lang.t32, lang.t33), textvariable=self.ext4_method).pack(
@@ -5713,9 +5713,10 @@ class PackPartition(Toplevel):
         create_thread(self.show_modify_size)
         #
         Label(lf3, text=lang.text49).pack(side='left', padx=5, pady=5)
-        ttk.Combobox(lf3, state="readonly", textvariable=self.format, values=("raw", "sparse", "br", "dat")).pack(padx=5,
-                                                                                                                  pady=5,
-                                                                                                                  side='left')
+        ttk.Combobox(lf3, state="readonly", textvariable=self.format, values=("raw", "sparse", "br", "dat")).pack(
+            padx=5,
+            pady=5,
+            side='left')
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf2, state="readonly", textvariable=self.erofs_compress_format,
                      values=("lz4", "lz4hc", "lzma", "deflate", "zstd")).pack(side='left', padx=5, pady=5)
@@ -5948,7 +5949,8 @@ class PackPartition(Toplevel):
                     if self.ext4_packer.get() == "make_ext4fs":
                         exit_code = make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
-                                                sparse=self.format.get() in ["dat", "br", "sparse"], size=ext4_size_value,
+                                                sparse=self.format.get() in ["dat", "br", "sparse"],
+                                                size=ext4_size_value,
                                                 UTC=self.UTC.get(), has_contexts=os.path.exists(contexts_file))
 
                     else:
@@ -7550,8 +7552,9 @@ def __init__tk(args: list):
     theme = StringVar()
     language = StringVar()
     settings.load()
-    if settings.updating in ['1', '2']:
-        Updater()
+    if settings.updating == 'true':
+        updater = Updater()
+        updater.wait_window()
     if int(settings.oobe) < 5:
         Welcome()
     init_verify()
