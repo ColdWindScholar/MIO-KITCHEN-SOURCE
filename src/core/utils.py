@@ -477,7 +477,7 @@ def create_thread(func, *args, join=False, deamon: bool = True):
         t.join()
 
 
-def simg2img(path):
+def simg2img(path:str):
     """
     convert Sparse image to Raw Image
     :param path:
