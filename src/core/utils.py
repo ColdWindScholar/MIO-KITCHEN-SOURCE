@@ -91,10 +91,10 @@ if os.name == 'nt':
 
 
     def terminate_process(pid):
-        h_process = kernel32.OpenProcess(0x0001, False, pid)
+        h_process = kernel32.OpenProcess(0x0001, False, pid) # NOQA: PyUnresolvedReferencesInspection
         if h_process:
-            kernel32.TerminateProcess(h_process, 0)
-            kernel32.CloseHandle(h_process)
+            kernel32.TerminateProcess(h_process, 0) # NOQA: PyUnresolvedReferencesInspection
+            kernel32.CloseHandle(h_process) # NOQA: PyUnresolvedReferencesInspection
         else:
             print(f"Failed to open process with PID {pid}")
 else:
