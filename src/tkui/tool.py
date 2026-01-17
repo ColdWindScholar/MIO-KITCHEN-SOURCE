@@ -2115,7 +2115,8 @@ class Updater(Toplevel):
         while True:
             try:
                 for i in remove_list:
-                    os.remove(i)
+                    if os.path.exists(i):
+                        os.remove(i)
             except (Exception, BaseException):
                 continue
             else:
