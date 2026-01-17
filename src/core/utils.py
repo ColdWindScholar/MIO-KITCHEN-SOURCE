@@ -99,7 +99,9 @@ if os.name == 'nt':
             print(f"Failed to open process with PID {pid}")
 else:
     def terminate_process(pid):
-        os.kill(pid, 9)
+        import signal
+        os.kill(pid, signal.SIGKILL)
+
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
 
 
