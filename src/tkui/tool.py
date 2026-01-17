@@ -7581,7 +7581,8 @@ def __init__tk(args: list):
     settings.load()
     if settings.updating == 'true':
         updater = Updater()
-        updater.wait_window()
+        if states.update_window:
+            updater.wait_window()
     if int(settings.oobe) < 5:
         Welcome()
     init_verify()
