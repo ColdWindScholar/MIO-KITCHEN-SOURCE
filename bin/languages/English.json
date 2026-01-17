@@ -374,5 +374,6 @@
   "supported_system": "Supported System:",
   "supported_arch": "Supported Arch:",
   "drop": "Drop",
-  "no_idea": "No idea about:\n\t{}\nPlease Report It To us."
+  "no_idea": "No idea about:\n\t{}\nPlease Report It To us.",
+  "upgrade_complete": "Upgraded from {} to {}."
 }
