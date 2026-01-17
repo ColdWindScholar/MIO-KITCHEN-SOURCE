@@ -1992,6 +1992,7 @@ class Updater(Toplevel):
 
     def update_process(self):
         win.withdraw()
+        self.notice.configure(text=lang.t51)
         if os.path.basename(sys.argv[0]).startswith('tool') and hasattr(settings, 'update_done'):
             self.__update_progress3()
         elif os.path.basename(sys.argv[0]) == 'updater.exe':
@@ -2001,7 +2002,6 @@ class Updater(Toplevel):
 
     def __update_process(self):
         [terminate_process(i) for i in states.open_pids]
-        self.notice.configure(text=lang.t51)
         update_files = []
         with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
             for file in zip_ref.namelist():
@@ -2031,7 +2031,6 @@ class Updater(Toplevel):
         win.destroy()
 
     def __update_process2(self):
-        self.notice.configure(text=lang.t51)
         if hasattr(settings, 'wait_pids'):
             for i in settings.wait_pids.split(' '):
                 try:
@@ -2072,7 +2071,6 @@ class Updater(Toplevel):
             settings.set_value('updating', "false")
 
     def __update_progress3(self):
-        self.notice.configure(text=lang.t51)
         if hasattr(settings, 'wait_pids'):
             for i in settings.wait_pids.split(' '):
                 try:
