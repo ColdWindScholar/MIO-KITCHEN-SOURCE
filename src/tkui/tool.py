@@ -2074,6 +2074,7 @@ class Updater(Toplevel):
 
     def __update_progress3(self):
         self.notice.configure(text=lang.t51)
+        time.sleep(200)
         if hasattr(settings, 'wait_pids'):
             for i in settings.wait_pids.split(' '):
                 try:
