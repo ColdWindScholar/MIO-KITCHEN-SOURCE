@@ -2092,6 +2092,8 @@ class Updater(Toplevel):
             else:
                 break
         settings.set_value('updating', "false")
+        settings.set_value('new_tool','')
+        settings.set_value('update_files','')
         print(f'Upgrade Done!\nFrom {settings.version_old} to {settings.version}')
         win.wm_deiconify()
         self.close()
