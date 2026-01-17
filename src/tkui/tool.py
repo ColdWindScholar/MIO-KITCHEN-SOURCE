@@ -2093,6 +2093,7 @@ class Updater(Toplevel):
                 break
         settings.set_value('updating', "false")
         print(f'Upgrade Done!\nFrom {settings.version_old} to {settings.version}')
+        win.wm_deiconify()
         self.close()
 
     def close(self):
