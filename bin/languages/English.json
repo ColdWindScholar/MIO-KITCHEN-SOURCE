@@ -375,5 +375,6 @@
   "supported_arch": "Supported Arch:",
   "drop": "Drop",
   "no_idea": "No idea about:\n\t{}\nPlease Report It To us.",
-  "upgrade_complete": "Upgraded from {} to {}."
+  "upgrade_complete": "Upgraded from {} to {}.",
+  "auto_check_updates": "Auto Check Updates"
 }

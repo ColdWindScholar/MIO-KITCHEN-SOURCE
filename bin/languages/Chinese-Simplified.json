@@ -296,5 +296,6 @@
   "disable_encryption": "禁用Data加密",
   "disable_encryption_info": "这个工具会修改已选择分区内的fstab文件以禁用首次启动时的强制data加密。",
   "no_idea": "未知错误:\n\t{}\n请将它报告给我们.",
-  "upgrade_complete": "已从{}升级到{}."
+  "upgrade_complete": "已从{}升级到{}.",
+  "auto_check_updates": "自动检查更新"
  }

@@ -1722,12 +1722,12 @@ class Tool(Tk):
             link.pack()
 
     def setting_tab(self):
-        def get_setting_button(item, master, text, on_v='1', off_v='0'):
+        def get_setting_button(item, master, text, on_v='1', off_v='0',style:str = "Toggle.TButton"):
             a = StringVar(value=getattr(settings, item))
             a.trace("w", lambda *x: settings.set_value(item, a.get()))
             ttk.Checkbutton(master, text=text, variable=a, onvalue=on_v,
                             offvalue=off_v,
-                            style="Toggle.TButton").pack(padx=10, pady=10, fill=X)
+                            style=style).pack(padx=10, pady=10, fill=X)
 
         def get_cache_size():
             size = 0
@@ -1789,7 +1789,8 @@ class Tool(Tk):
         slo2.pack(padx=10, pady=10, side='left')
         ttk.Button(sf6, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left", padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
-
+        check_upgrade = StringVar(value=settings.check_upgrade)
+        check_upgrade.trace('w', lambda *x:settings.set_value('check_upgrade', check_upgrade.get()))
         def enable_contextpatch():
             if context.get() == '1':
                 if not ask_win(
@@ -1812,7 +1813,11 @@ class Tool(Tk):
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
         for i in [sf1, sf2, sf3, sf5, sf6, sf4]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
-        ttk.Button(self.tab3, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X)
+        check_frame = Frame(self.tab3)
+        ttk.Button(check_frame, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X, side="left",expand=True)
+        ttk.Checkbutton(check_frame, text=lang.auto_check_updates, variable=check_upgrade, onvalue='1', offvalue='0').pack(padx=10, pady=10, fill=X, side="right",expand=True)
+        check_frame.pack(padx=10, pady=10, fill=X, expand=True)
+
 
 
 animation = LoadAnim()
@@ -2421,6 +2426,7 @@ class SetUtils:
         self.bar_level = '0.9'
         self.ai_engine = '0'
         self.version = 'basic'
+        self.check_upgrade = '0'
         self.version_old = 'unknown'
         self.language = 'English'
         self.boot_skip_ramdisk = '0'
