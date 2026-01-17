@@ -7615,7 +7615,7 @@ def __init__tk(args: list):
         updater = Updater()
         try:
             updater.wait_window()
-        except (BaseException, Exception) as e:
+        except (BaseException, Exception):
             logging.exception('Cannot wait the Updater.Maybe the step completed.')
     if int(settings.oobe) < 5:
         Welcome()
