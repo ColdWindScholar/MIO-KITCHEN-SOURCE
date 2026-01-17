@@ -1877,9 +1877,11 @@ class Updater(Toplevel):
         if settings.updating == 'true':
             try:
                 self.update_process()
-            except (Exception, BaseException):
+            except (Exception, BaseException) as e:
+                logging.exception("Updating failed")
+                self.change_log.insert('insert', e)
+                self.notice.configure(text=lang.t41, foreground='red')
                 settings.set_value('updating', "false")
-                self.close()
         else:
             create_thread(self.get_update)
 
