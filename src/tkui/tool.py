@@ -2023,6 +2023,7 @@ class Updater(Toplevel):
         updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
         shutil.copy(tool_self, updater_path)
         subprocess.Popen([updater_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        win.destroy()
 
     def __update_process2(self):
         self.notice.configure(text=lang.t51)
