@@ -2114,7 +2114,8 @@ class Updater(Toplevel):
             remove_list.append(settings.new_tool)
         while True:
             try:
-                os.remove(updater_path)
+                for i in remove_list:
+                    os.remove(i)
             except (Exception, BaseException):
                 continue
             else:
