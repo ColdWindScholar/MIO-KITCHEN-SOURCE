@@ -7584,8 +7584,10 @@ def __init__tk(args: list):
     settings.load()
     if settings.updating == 'true':
         updater = Updater()
-        if updater.winfo_exists():
+        try:
             updater.wait_window()
+        except (BaseException, Exception) as e:
+            logging.exception('Cannot wait the Updater.Maybe thestep completed.')
     if int(settings.oobe) < 5:
         Welcome()
     init_verify()
