@@ -1686,11 +1686,14 @@ class Tool(Tk):
         def getColor():
             nonlocal debugger_num
             debugger_num += 1
-            if debugger_num >= 5:
+            if debugger_num >= 5 and not states.debugger_window:
                 debugger_num = 0
                 a = Debugger()
+                states.debugger_window = a.winfo_exists()
                 a.lift()
                 a.focus_force()
+                a.wait_window()
+                states.debugger_window = False
             return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
 
         def update_angle():

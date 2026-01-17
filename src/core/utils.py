@@ -734,8 +734,8 @@ class LogoDumper:
 
 class States:
     update_window = False
-    donate_window = False
     mpk_store = False
+    debugger_window = False
     open_pids = []
     run_source = gettype(sys.argv[0]) == "unknown" and os.path.isdir(os.path.join(prog_path, '.git'))
     in_oobe = False
