@@ -1882,6 +1882,8 @@ class Updater(Toplevel):
                 self.change_log.insert('insert', e)
                 self.notice.configure(text=lang.t41, foreground='red')
                 settings.set_value('updating', "false")
+                if settings.version_old:
+                    settings.set_value('version',settings.version_old)
         else:
             create_thread(self.get_update)
 
@@ -1989,6 +1991,7 @@ class Updater(Toplevel):
         self.progressbar.update()
 
     def update_process(self):
+        win.withdraw()
         if os.path.basename(sys.argv[0]).startswith('tool') and hasattr(settings, 'update_done'):
             self.__update_progress3()
         elif os.path.basename(sys.argv[0]) == 'updater.exe':
@@ -2054,14 +2057,14 @@ class Updater(Toplevel):
                     os.rename(path, os.path.join(cwd_path, real))
                 else:
                     logging.warning(path)
-        if os.path.exists(settings.new_tool):
+        if settings.new_tool and os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
                             os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe'))))
-            win.withdraw()
             settings.set_value('wait_pids', str(os.getpid()))
             settings.set_value("update_done", 'true')
             subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            win.destroy()
 
         else:
             self.notice.configure(text=lang.t41, foreground='red')
@@ -2078,9 +2081,11 @@ class Updater(Toplevel):
                 except ProcessLookupError:
                     continue
         updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
+        if settings.new_tool:
+            os.remove(settings.new_tool)
         os.remove(updater_path)
         settings.set_value('updating', "false")
-        print(f'Upgrade Done!\nFrom {settings.version_old} to  {settings.version}')
+        print(f'Upgrade Done!\nFrom {settings.version_old} to {settings.version}')
         self.close()
 
     def close(self):
