@@ -2038,6 +2038,12 @@ class Updater(Toplevel):
                 if os.path.samefile(path, os.path.join(cwd_path, real)):
                     continue
                 if os.path.exists(path):
+                    if os.path.exists(os.path.join(cwd_path, real)):
+                        try:
+                            os.remove(os.path.join(cwd_path, real))
+                        except PermissionError:
+                            logging.warning(os.path.join(cwd_path, real))
+                            continue
                     os.rename(path, os.path.join(cwd_path, real))
                 else:
                     logging.warning(path)
