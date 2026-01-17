@@ -2064,7 +2064,6 @@ class Updater(Toplevel):
             settings.set_value("update_done", 'true')
             subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            win.destroy()
 
         else:
             self.notice.configure(text=lang.t41, foreground='red')
