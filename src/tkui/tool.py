@@ -2081,9 +2081,16 @@ class Updater(Toplevel):
                 except ProcessLookupError:
                     continue
         updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
+        remove_list = [updater_path]
         if settings.new_tool:
-            os.remove(settings.new_tool)
-        os.remove(updater_path)
+            remove_list.append(settings.new_tool)
+        while True:
+            try:
+                os.remove(updater_path)
+            except (Exception, BaseException):
+                continue
+            else:
+                break
         settings.set_value('updating', "false")
         print(f'Upgrade Done!\nFrom {settings.version_old} to {settings.version}')
         self.close()
