@@ -1875,7 +1875,11 @@ class Updater(Toplevel):
         self.resizable(width=False, height=False)
         move_center(self)
         if settings.updating == 'true':
-            self.update_process()
+            try:
+                self.update_process()
+            except (Exception, BaseException):
+                settings.set_value('updating', "false")
+                self.close()
         else:
             create_thread(self.get_update)
 
