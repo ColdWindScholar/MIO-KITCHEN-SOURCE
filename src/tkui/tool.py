@@ -2060,6 +2060,7 @@ class Updater(Toplevel):
             self.notice.configure(text=lang.t41, foreground='red')
             self.update_button.configure(state='normal', text=lang.text37)
             settings.set_value('version', settings.version_old)
+            settings.set_value('updating', "false")
 
     def __update_progress3(self):
         self.notice.configure(text=lang.t51)
@@ -2071,6 +2072,7 @@ class Updater(Toplevel):
                     continue
         updater_path = os.path.normpath(os.path.join(cwd_path, "updater.exe"))
         os.remove(updater_path)
+        settings.set_value('updating', "false")
         print(f'Upgrade Done!\nFrom {settings.version_old} to  {settings.version}')
         self.close()
 
