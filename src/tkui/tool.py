@@ -7643,6 +7643,8 @@ def __init__tk(args: list):
 
     move_center(win)
     win.loops.append(win.get_time)
+    if settings.check_upgrade == '1':
+        win.loops.append(check_upgrade)
     print(lang.text134 % (dti() - start))
     if os.name == 'nt':
         do_override_sv_ttk_fonts()
