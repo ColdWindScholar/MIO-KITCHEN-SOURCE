@@ -5427,12 +5427,13 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
         if super_type == 2:
             command += ["--virtual-ab"]
     if sparse: command += ["--sparse"]
-    command += ['--out', f'{output_dir}/super.img']
+    output_super_path = f'{output_dir}/super.img'
+    command += ['--out', output_super_path]
     if return_cmd == 1:
         return command
     if call(command) == 0:
-        if os.access(output_dir + "super.img", os.F_OK):
-            print(lang.text59 % (output_dir + "super.img"))
+        if os.access(output_super_path, os.F_OK):
+            print(lang.text59 % output_super_path)
             if del_:
                 for img in part_list:
                     if os.path.exists(f"{work}/{img}.img"):
