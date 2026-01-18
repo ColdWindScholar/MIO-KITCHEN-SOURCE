@@ -333,8 +333,8 @@ def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master:
     ask_frame.pack(expand=True, fill=BOTH)
 
     msg_label = ttk.Label(ask_frame, text=text, font=(None, 14), foreground=color, wraplength=350,
-                          justify=CENTER)
-    msg_label.pack(pady=(10, 20), expand=True, fill=X)
+                          justify='center')
+    msg_label.pack(pady=(10, 20), expand=True, fill='x')
 
     def close_popup() -> None:
         """Releases the modal grab and destroys the popup window."""
@@ -719,10 +719,10 @@ class ToolBox(ttk.Frame):
 
             # Boot file selection section
             ft_boot = ttk.Frame(self)
-            ft_boot.pack(fill=X, padx=5, pady=2)
+            ft_boot.pack(fill='x', padx=5, pady=2)
             ttk.Label(ft_boot, text=lang.boot_file, width=12).pack(side='left', padx=(0, 5),
                                                                    pady=5)  # Standardized label width.
-            ttk.Entry(ft_boot, textvariable=self.boot_file).pack(side='left', padx=5, pady=5, expand=True, fill=X)
+            ttk.Entry(ft_boot, textvariable=self.boot_file).pack(side='left', padx=5, pady=5, expand=True, fill='x')
             ttk.Button(ft_boot, text=lang.text28,  # Assuming lang.text28 is 'Browse' or similar.
                        command=lambda: self.boot_file.set(
                            filedialog.askopenfilename(title="Select Boot Image",
