@@ -57,6 +57,7 @@ from webbrowser import open as openurl
 import tkinter as tk
 from tkinter import ttk
 from timeit import default_timer as dti
+start = dti()
 import zipfile
 from src.core.aml_image import main as aml_main
 from io import BytesIO, StringIO
@@ -1820,7 +1821,6 @@ class Tool(Tk):
 
 
 animation = LoadAnim()
-start = dti()
 
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 temp = os.path.join(cwd_path, "bin", "temp").replace(os.sep, '/')
