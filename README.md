@@ -12,6 +12,8 @@
 > Currently most of binaries are ported to Loongarch64 except **MagiskBoot** and **delta_generator** so related feature won't work
 
 ***
+<details><summary><h1>Used Projects</h1>></summary>
+
 ## Used Projects
 
 |         Name         | Used for                                      | Link                                                                                               |       Developer |
@@ -44,6 +46,7 @@
 |      apftool-rs      | Unpack and repack RKFW and RKAF images        | [Click](https://github.com/suyulin/apftool-rs)                                                     |         suyulin |
 |      aml_image       | Unpack Amlogic V2 images                      | [View Code](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/src/core/aml_image.py) | ColdWindScholar |
 * And other projects! Huge shout out to the developers! 
+</details>
 
 ***
 ## Localization
