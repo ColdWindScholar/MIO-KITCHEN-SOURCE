@@ -12,7 +12,7 @@
 > Currently most of binaries are ported to Loongarch64 except **MagiskBoot** and **delta_generator** so related feature won't work
 
 ***
-<details><summary><h1>Used Projects</h1>></summary>
+<details><summary><h2>Used Projects</h2></summary>
 
 ## Used Projects
 
