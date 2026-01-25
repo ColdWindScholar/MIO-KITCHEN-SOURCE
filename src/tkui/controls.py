@@ -34,6 +34,7 @@ def input_(title: str = None, text: str = "", master: Tk | Toplevel | tkinter.Fr
     input_frame.wait_window()
     return input_var.get()
 
+
 class ListBox(Frame):
     def __init__(self, master):
         super().__init__(master=master)
@@ -67,7 +68,7 @@ class ListBox(Frame):
         self.label_frame = Frame(self.canvas)
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
         self.canvas.bind("<MouseWheel>",
-                             lambda event: self.__on_mouse(event))
+                         lambda event: self.__on_mouse(event))
         self.set_all = Checkbutton(self, text=lang.set_all, variable=self.var, onvalue=True, offvalue=False,
                                    command=lambda *x, var_=self.var: [i.set(True) for i in
                                                                       self.vars] if var_.get() else [i.set(False) for i
@@ -143,8 +144,44 @@ class ScrollFrame(Frame):
         self.canvas.config(scrollregion=self.canvas.bbox('all'), highlightthickness=0)
 
 
+class ToggledFrame(Frame):
+
+    def __init__(self, master, text="",font=(None, None), callback=None, unfold: bool = False, *args, **options):
+        super().__init__(master=master, *args, **options)
+        self.callback = callback
+        self.show = BooleanVar(value=False)
+
+        self.title_frame = ttk.Frame(self)
+        self.title_frame.pack(fill="x", expand=1, padx=10, pady=5)
+
+        self.title_label = ttk.Label(self.title_frame, text=text)
+        self.title_label.pack(side="left", fill="x", expand=1, padx=10, pady=5)
+        if all(font):
+            self.title_label.config(font=font)
+
+        self.toggle_button = ttk.Checkbutton(self.title_frame, width=1, onvalue=True, offvalue=False,
+                                             command=self.toggle,
+                                             variable=self.show, style='TMenubutton')
+        self.toggle_button.pack(side="right")
+
+        self.sub_frame = Frame(self)
+        self.sub_frame.config(borderwidth=1)
+        if unfold:
+            self.show.set(unfold)
+            self.toggle()
+
+    def toggle(self):
+        if self.show.get():
+            self.sub_frame.pack(fill="x", expand=1)
+        else:
+            self.sub_frame.forget()
+        if callable(self.callback):
+            self.callback()
+
+
 if __name__ == '__main__':
     from sv_ttk import use_dark_theme
+
     a = Tk()
     b = ListBox(a)
     use_dark_theme()

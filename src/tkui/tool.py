@@ -106,7 +106,7 @@ if os.name == 'nt':
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
-from .controls import ListBox, ScrollFrame, input_
+from .controls import ListBox, ScrollFrame, input_, ToggledFrame
 from src.core.undz import DZFileTools
 from src.core.selinux_audit_allow import main as selinux_audit_allow
 import logging
@@ -1751,12 +1751,14 @@ class Tool(Tk):
         Setting_Frame = ScrollFrame(self.tab3)
         Setting_Frame.gui()
         Setting_Frame.pack(fill=BOTH, expand=True)
-        sub_frame_theme = ttk.Frame(Setting_Frame.label_frame) #
-        sub_frame_language = ttk.Frame(Setting_Frame.label_frame)
-        sub_frame_path = ttk.Frame(Setting_Frame.label_frame)
-        sub_frame_others = ttk.Frame(Setting_Frame.label_frame, width=20)
-        sub_frame_project_struct = ttk.Frame(Setting_Frame.label_frame)
-        sub_frame_cache = ttk.Frame(Setting_Frame.label_frame)
+        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Tool', callback=Setting_Frame.update_ui, unfold=True)
+        sub_frame_theme = ttk.Frame(sub_tool_settings_main.sub_frame)
+        sub_frame_language = ttk.Frame(sub_tool_settings_main.sub_frame)
+        sub_frame_path = ttk.Frame(sub_tool_settings_main.sub_frame)
+        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Others', callback=Setting_Frame.update_ui)
+        sub_frame_others = sub_frame_others_main.sub_frame
+        sub_frame_project_struct = ttk.Frame(sub_tool_settings_main.sub_frame)
+        sub_frame_cache = ttk.Frame(sub_tool_settings_main.sub_frame)
         ttk.Label(sub_frame_theme, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sub_frame_theme, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
@@ -1811,7 +1813,7 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache, sub_frame_others]: i.pack(padx=10, pady=7, fill='both')
+        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache,sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         # Check Update
         check_frame = Frame(self.tab3)
