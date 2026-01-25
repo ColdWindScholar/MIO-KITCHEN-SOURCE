@@ -14,8 +14,6 @@
 ***
 <details><summary><h2>Used Projects</h2></summary>
 
-## Used Projects
-
 |         Name         | Used for                                      | Link                                                                                               |       Developer |
 |:--------------------:|-----------------------------------------------|----------------------------------------------------------------------------------------------------|----------------:|
 |       unpac_py       | unpack sprd pac file                          | [Click](https://github.com/affggh/unpac_py)                                                        |          Affggh |
