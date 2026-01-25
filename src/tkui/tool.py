@@ -1751,43 +1751,43 @@ class Tool(Tk):
         Setting_Frame = ScrollFrame(self.tab3)
         Setting_Frame.gui()
         Setting_Frame.pack(fill=BOTH, expand=True)
-        sf1 = ttk.Frame(Setting_Frame.label_frame)
-        sf2 = ttk.Frame(Setting_Frame.label_frame)
-        sf3 = ttk.Frame(Setting_Frame.label_frame)
-        sf4 = ttk.Frame(Setting_Frame.label_frame, width=20)
-        sf5 = ttk.Frame(Setting_Frame.label_frame)
-        sf6 = ttk.Frame(Setting_Frame.label_frame)
-        ttk.Label(sf1, text=lang.text124).pack(side='left', padx=10, pady=10)
-        self.list2 = ttk.Combobox(sf1, textvariable=theme, state='readonly', values=["light", "dark"])
+        sub_frame_theme = ttk.Frame(Setting_Frame.label_frame) #
+        sub_frame_language = ttk.Frame(Setting_Frame.label_frame)
+        sub_frame_path = ttk.Frame(Setting_Frame.label_frame)
+        sub_frame_others = ttk.Frame(Setting_Frame.label_frame, width=20)
+        sub_frame_project_struct = ttk.Frame(Setting_Frame.label_frame)
+        sub_frame_cache = ttk.Frame(Setting_Frame.label_frame)
+        ttk.Label(sub_frame_theme, text=lang.text124).pack(side='left', padx=10, pady=10)
+        self.list2 = ttk.Combobox(sub_frame_theme, textvariable=theme, state='readonly', values=["light", "dark"])
         self.list2.pack(padx=10, pady=10, side='left')
         self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
         ###
         project_struct = StringVar(value=settings.project_struct)
-        ttk.Label(sf5, text=lang.project_struct).pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sf5, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10,
+        ttk.Label(sub_frame_project_struct, text=lang.project_struct).pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sub_frame_project_struct, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10,
                                                                                              side='left')
-        ttk.Radiobutton(sf5, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10,
+        ttk.Radiobutton(sub_frame_project_struct, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10,
                                                                                            side='left')
         project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
         ###
-        ttk.Label(sf3, text=lang.text125).pack(side='left', padx=10, pady=10)
-        slo = ttk.Label(sf3, textvariable=self.show_local, wraplength=200)
+        ttk.Label(sub_frame_path, text=lang.text125).pack(side='left', padx=10, pady=10)
+        slo = ttk.Label(sub_frame_path, textvariable=self.show_local, wraplength=200)
         slo.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
                                                                        1) if os.name == 'nt' else ...)
         slo.pack(padx=10, pady=10, side='left')
-        ttk.Button(sf3, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
+        ttk.Button(sub_frame_path, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
 
-        ttk.Label(sf2, text=lang.lang).pack(side='left', padx=10, pady=10)
-        lb3 = ttk.Combobox(sf2, state='readonly', textvariable=language,
+        ttk.Label(sub_frame_language, text=lang.lang).pack(side='left', padx=10, pady=10)
+        lb3 = ttk.Combobox(sub_frame_language, state='readonly', textvariable=language,
                            values=[str(i.rsplit('.', 1)[0]) for i in
                                    os.listdir(f"{cwd_path}/bin/languages")])
         ###
-        ttk.Label(sf6, text=lang.cache_size).pack(side='left', padx=10, pady=10)
-        slo2 = ttk.Label(sf6, text=hum_convert(get_cache_size()), wraplength=200)
+        ttk.Label(sub_frame_cache, text=lang.cache_size).pack(side='left', padx=10, pady=10)
+        slo2 = ttk.Label(sub_frame_cache, text=hum_convert(get_cache_size()), wraplength=200)
         slo2.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
                                                                         1) if os.name == 'nt' else ...)
         slo2.pack(padx=10, pady=10, side='left')
-        ttk.Button(sf6, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left", padx=10, pady=10)
+        ttk.Button(sub_frame_cache, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left", padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
         check_upgrade = StringVar(value=settings.check_upgrade)
         check_upgrade.trace('w', lambda *x:settings.set_value('check_upgrade', check_upgrade.get()))
@@ -1800,19 +1800,20 @@ class Tool(Tk):
             settings.set_value('contextpatch', context.get())
 
         context.trace("w", lambda *x: enable_contextpatch())
-        get_setting_button('ai_engine', sf4, lang.ai_engine)
-        get_setting_button('magisk_not_decompress', sf4, lang.text142)
-        get_setting_button('boot_skip_ramdisk', sf4, lang.skip_ramdisk)
-        get_setting_button('treff', sf4, lang.t61)
-        enable_cp = ttk.Checkbutton(sf4, text=lang.context_patch, variable=context, onvalue='1',
+        get_setting_button('ai_engine', sub_frame_others, lang.ai_engine)
+        get_setting_button('magisk_not_decompress', sub_frame_others, lang.text142)
+        get_setting_button('boot_skip_ramdisk', sub_frame_others, lang.skip_ramdisk)
+        get_setting_button('treff', sub_frame_others, lang.t61)
+        enable_cp = ttk.Checkbutton(sub_frame_others, text=lang.context_patch, variable=context, onvalue='1',
                                     offvalue='0',
                                     style="Toggle.TButton")
         enable_cp.pack(padx=10, pady=10, fill=X)
-        get_setting_button('auto_unpack', sf4, lang.auto_unpack)
+        get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sf1, sf2, sf3, sf5, sf6, sf4]: i.pack(padx=10, pady=7, fill='both')
+        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache, sub_frame_others]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
+        # Check Update
         check_frame = Frame(self.tab3)
         ttk.Button(check_frame, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X, side="left",expand=True)
         ttk.Checkbutton(check_frame, text=lang.auto_check_updates, variable=check_upgrade, onvalue='1', offvalue='0').pack(padx=10, pady=10, fill=X, side="right",expand=True)
