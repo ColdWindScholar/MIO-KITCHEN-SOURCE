@@ -5660,7 +5660,7 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
 
 
 @animation
-def dboot(name: str = 'boot', source: str = None, boot: str = None):
+def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
     work = project_manger.current_work_path()
     flag = ''
     if boot is None:
@@ -6043,7 +6043,7 @@ class PackPartition(Toplevel):
                     else:
                         print(lang.text3.format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                dboot(i)
+                repack_boot(i)
             elif parts_dict[i] == 'dtbo':
                 pack_dtbo()
             elif parts_dict[i] == 'logo':
