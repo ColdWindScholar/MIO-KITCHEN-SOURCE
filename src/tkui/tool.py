@@ -5703,7 +5703,11 @@ def dboot(name: str = 'boot', source: str = None, boot: str = None):
         else:
             if os.path.exists('ramdisk.cpio'):
                 os.remove("ramdisk.cpio")
-            os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+            if os.path.exists('ramdisk-new.cpio'):
+                os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+            else:
+                print("Failed to repack ramdisk.")
+                return 1
         print(f"Ramdisk Compression:{comp}")
         if comp == "unknown":
             flag = "-n"
