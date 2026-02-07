@@ -7481,6 +7481,8 @@ def init_verify():
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():
         ask_win(lang.warn16 % lang.special_words, is_top=True)
+    if " " in settings.path:
+        ask_win(f"The path ({settings.path}) do not allow [space], please change the path!", is_top=True)
 
 
 def exit_tool():
