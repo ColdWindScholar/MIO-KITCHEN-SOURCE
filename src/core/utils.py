@@ -684,7 +684,7 @@ class LogoDumper:
                     self.cfg.imgnum += 1
                 else:
                     break
-        assert self.magic == b"LOGO!!!!", "File does not match xiaomi logo magic!"
+        assert self.magic == self.cfg.magic, "File does not match xiaomi logo magic!"
         return True
 
     def unpack(self):
