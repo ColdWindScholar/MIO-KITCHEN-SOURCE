@@ -663,7 +663,6 @@ class LogoDumper:
         self.out = out
         self.img = img
         self.dir = dir__
-        self.struct_str = "<8s"
         self.cfg = Dumpcfg()
         self.check_img(img)
 
@@ -675,10 +674,8 @@ class LogoDumper:
         """
         assert os.access(img, os.F_OK), f"{img} does not exist!"
         with open(img, 'rb') as f:
-            f.seek(self.cfg.headoff, 0)
-            self.magic = struct.unpack(
-                self.struct_str, f.read(struct.calcsize(self.struct_str))
-            )[0]
+            f.seek(self.cfg.headoff)
+            self.magic = f.read(8)
             while True:
                 m = XiaomiBlkstruct(f.read(8))
                 if m.img_offset != 0:
