@@ -92,9 +92,9 @@ links = {
     "ImgKit":{
         "link":"https://api.github.com/repos/Kindness-Kismet/ImgKit-Scuti/releases/latest",
         "github_json":True,
-        "rename_pattern":"imgkit-(.*?)-(.*?)?.exe$",
+        "rename_pattern": "imgkit-(.*?)-(.*?)(?:\\.exe)$",
         "name":'imgkit',
-        "name_pattern":r"imgkit-(.*?)-(.*?)?.exe$",
+        "name_pattern":r"imgkit-(.*?)-(.*?)(?:\.exe)$",
         "is_binary":True
     }
 }
