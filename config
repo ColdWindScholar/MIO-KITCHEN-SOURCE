@@ -92,9 +92,9 @@ links = {
     "ImgKit":{
         "link":"https://api.github.com/repos/Kindness-Kismet/ImgKit-Scuti/releases/latest",
         "github_json":True,
-        "rename_pattern": "imgkit-(.*?)-(.*?)(?:\\.exe)$",
+        "rename_pattern": "imgkit-(.*?)-(.*?)(?:\\.exe)?$",
         "name":'imgkit',
-        "name_pattern":r"imgkit-(.*?)-(.*?)(?:\.exe)$",
+        "name_pattern":r"imgkit-(.*?)-(.*?)(?:\.exe)?$",
         "is_binary":True
     }
 }
@@ -221,7 +221,7 @@ def update(args):
                 system = system_list.get(system, system)
                 if system == 'Windows' and arch in ['x86_64', "x64"]:
                     arch = "AMD64"
-                if system == 'Darwin' and arch == 'aarch64':
+                if system == 'Darwin' and arch in ['aarch64', "arm64"]:
                     arch = 'arm64'
                 else:
                     arch = arch_list.get(arch, arch)
@@ -246,7 +246,8 @@ def update(args):
                         if caught_name:
                             log(f'Will rename {z_name} to {real_name}')
                     if os.path.exists(f'bin/{system}/{arch}/{real_name}'):
-                        os.remove(f'bin/{system}/{arch}/{real_name}')
+                        if os.path.exists(f'bin/{system}/{arch}/{real_name}'):
+                            os.remove(f'bin/{system}/{arch}/{real_name}')
                         os.rename(downloaded_file, f'bin/{system}/{arch}/{real_name}')
                         green(f"Update {z_name}")
                 else:
