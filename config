@@ -88,6 +88,14 @@ links = {
         'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
         'name':'afptool',
         "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
+    },
+    "ImgKit":{
+        "link":"https://api.github.com/repos/Kindness-Kismet/ImgKit-Scuti/releases/latest",
+        "github_json":True,
+        "rename_pattern":"imgkit-(.*?)-(.*?)$",
+        "name":'imgkit',
+        "name_pattern":r"imgkit-(.*?)-(.*?)$",
+        "is_binary":True
     }
 }
 
@@ -155,7 +163,7 @@ class Caller:
                 try:
                     ret = func(*args, **kwargs)
                 except Exception as e:
-                    LOGE(f'Retry {self.retry_times} / {total_times} because of {e}')
+                    LOGE(f'Retry {total_times - self.retry_times} / {total_times} because of {e}')
                     continue
                 else:
                     return ret
@@ -167,6 +175,7 @@ class Caller:
 caller = Caller()
 arch_list = {
     "arm64-v8a": "aarch64",
+    "arm64": "aarch64",
     "armeabi-v7a": "aarch"
 }
 system_list = {
@@ -214,29 +223,46 @@ def update(args):
                     arch = arch_list.get(arch, arch)
                 yellow(f"\nVersion:{version}\nGitid:{gitid}\nSystem:{system}\nArch:{arch}")
                 if os.path.exists(downloaded_file):
-                    if not zipfile.is_zipfile(downloaded_file):
+                    if not zipfile.is_zipfile(downloaded_file) and not content.get("is_binary",False):
                         LOGE("Not Update it.Skip")
                         continue
                 else:
                     LOGE("Not Update it.Skip")
                     continue
-                with zipfile.ZipFile(downloaded_file) as z:
-                    for z_info in z.infolist():
-                        z_name = z_info.filename
-                        if content.get('rename_pattern'):
-                            real_name = content.get('name')
-                            if system == 'Windows'and not real_name.endswith('.exe'):
-                                real_name += '.exe'
-                            caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
-                            if not len(caught_name):
-                                return
-                            caught_name = caught_name[0]
-                            if caught_name:
-                                log(f'Will rename {z_name} to {real_name}')
-                                z_info.filename = real_name
-                        if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
-                            z.extract(z_info, path=f'bin/{system}/{arch}')
-                            green(f"Update {z_name}")
+                if content.get("is_binary",False):
+                    z_name = name
+                    if content.get('rename_pattern'):
+                        real_name = content.get('name')
+                        if system == 'Windows' and not real_name.endswith('.exe'):
+                            real_name += '.exe'
+                        caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
+                        if not len(caught_name):
+                            return
+                        caught_name = caught_name[0]
+                        if caught_name:
+                            log(f'Will rename {z_name} to {real_name}')
+                    if os.path.exists(f'bin/{system}/{arch}/{z_name}') or 1:
+                        #os.remove(f'bin/{system}/{arch}/{z_name}')
+                        os.rename(downloaded_file, f'bin/{system}/{arch}/{z_name}')
+                        green(f"Update {z_name}")
+                else:
+                    with zipfile.ZipFile(downloaded_file) as z:
+                        for z_info in z.infolist():
+                            z_name = z_info.filename
+                            if content.get('rename_pattern'):
+                                real_name = content.get('name')
+                                if system == 'Windows' and not real_name.endswith('.exe'):
+                                    real_name += '.exe'
+                                caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
+                                if not len(caught_name):
+                                    return
+                                caught_name = caught_name[0]
+                                if caught_name:
+                                    log(f'Will rename {z_name} to {real_name}')
+                                    z_info.filename = real_name
+                            if os.path.exists(f'bin/{system}/{arch}/{z_name}'):
+                                z.extract(z_info, path=f'bin/{system}/{arch}')
+                                green(f"Update {z_name}")
         JsonEdit(update_info).write(origin_info)
 
 
