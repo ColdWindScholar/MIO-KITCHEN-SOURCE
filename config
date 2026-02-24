@@ -193,6 +193,9 @@ def update(args):
         if content.get('github_json', False):
             url = requests.get(content.get('link'))
             json_: dict = json.loads(url.text)
+            if json_.get("message"):
+                print(json_.get("message"))
+                continue
             green_1(f"Found {name} {json_.get('tag_name')}")
             if JsonEdit(update_info).read().get(name) == json_.get('tag_name'):
                 yellow(f"{name} was latest already!")
