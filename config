@@ -92,9 +92,9 @@ links = {
     "ImgKit":{
         "link":"https://api.github.com/repos/Kindness-Kismet/ImgKit-Scuti/releases/latest",
         "github_json":True,
-        "rename_pattern":"imgkit-(.*?)-(.*?)$",
+        "rename_pattern":"imgkit-(.*?)-(.*?)?.$",
         "name":'imgkit',
-        "name_pattern":r"imgkit-(.*?)-(.*?)$",
+        "name_pattern":r"imgkit-(.*?)-(.*?)?.$",
         "is_binary":True
     }
 }
@@ -105,7 +105,7 @@ def download_api(url, path=None, int_=True, size_=0, name: str = None):
         LOGE("URL not valid.")
         return 1
     if path is None:
-        LOGE("The Path Isn't Valid.")
+        LOGE("The Path Is Invalid.")
         return 1
 
     start_time = time()
