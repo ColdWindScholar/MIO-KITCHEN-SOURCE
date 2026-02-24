@@ -1,6 +1,6 @@
-# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
+# Copyright (C) 2022-2026 The MIO-KITCHEN-SOURCE Project
 #
-# Licensed under theGNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
+# Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #

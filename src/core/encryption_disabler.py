@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
+# Copyright (C) 2022-2026 The MIO-KITCHEN-SOURCE Project
 #
 # Licensed under the GNU AFFERO GENERAL PUBLIC LICENSE, Version 3.0
 #
