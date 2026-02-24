@@ -212,7 +212,7 @@ def update(args):
                 for percentage, speed, _, _, _ in download_api(url=browser_download_url, name=name, size_=size, path=temp):
                     green_1(f"\rSpeed {speed}\tPercentage:{percentage} %", end='')
                 downloaded_file = os.path.join(temp, name)
-                groups = re.search(content.get('name_pattern', "*$"), name).groups()
+                groups = re.search(content.get('name_pattern', "*$") + (".exe" if content.get("is_binary") and os.name == "nt" else ""), name).groups()
                 if len(groups) == 2:
                     version, gitid, build_time = ['U', 'U', 'U']
                     system, arch = groups
@@ -239,7 +239,7 @@ def update(args):
                         real_name = content.get('name')
                         if system == 'Windows' and not real_name.endswith('.exe'):
                             real_name += '.exe'
-                        caught_name = re.search(content.get('rename_pattern', "*$"), z_name).groups()
+                        caught_name = re.search(content.get('rename_pattern', "*$") + (".exe" if content.get("is_binary") and os.name == "nt" else ""), z_name).groups()
                         if not len(caught_name):
                             return
                         caught_name = caught_name[0]
