@@ -6529,7 +6529,7 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                if call(exe=['extract.f2fs', '-o', work, os.path.join(project_manger.current_work_path(), f'{i}.img')],
+                if call(exe=['imgkit', 'unpack',"-i", os.path.join(project_manger.current_work_path(), f'{i}.img'), "-o", work],
                         out=False) != 0:
                     print('Unpack failed...')
                     continue
