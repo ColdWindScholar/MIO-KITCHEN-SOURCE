@@ -218,7 +218,7 @@ def update(args):
                 else:
                     version, gitid, build_time, system, arch = groups
                 system = system_list.get(system, system)
-                if system == 'Windows' and arch == 'x86_64':
+                if system == 'Windows' and arch in ['x86_64', "x64"]:
                     arch = "AMD64"
                 if system == 'Darwin' and arch == 'aarch64':
                     arch = 'arm64'
@@ -244,9 +244,9 @@ def update(args):
                         caught_name = caught_name[0]
                         if caught_name:
                             log(f'Will rename {z_name} to {real_name}')
-                    if os.path.exists(f'bin/{system}/{arch}/{z_name}') or 1:
-                        #os.remove(f'bin/{system}/{arch}/{z_name}')
-                        os.rename(downloaded_file, f'bin/{system}/{arch}/{z_name}')
+                    if os.path.exists(f'bin/{system}/{arch}/{real_name}'):
+                        os.remove(f'bin/{system}/{arch}/{real_name}')
+                        os.rename(downloaded_file, f'bin/{system}/{arch}/{real_name}')
                         green(f"Update {z_name}")
                 else:
                     with zipfile.ZipFile(downloaded_file) as z:
