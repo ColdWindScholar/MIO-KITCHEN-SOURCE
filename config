@@ -176,7 +176,8 @@ caller = Caller()
 arch_list = {
     "arm64-v8a": "aarch64",
     "arm64": "aarch64",
-    "armeabi-v7a": "aarch"
+    "armeabi-v7a": "aarch",
+    "x64":"x86_64"
 }
 system_list = {
     "Cygwin": "Windows",
