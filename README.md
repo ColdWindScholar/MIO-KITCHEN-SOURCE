@@ -136,6 +136,12 @@ pip install -r requirements.txt
 sudo apt update -y && sudo apt install python3-tk -y
 ````
 
+If using NixOS
+
+```` shell
+nix-shell
+````
+
 </details>
 
 <details><summary>Windows</summary>
