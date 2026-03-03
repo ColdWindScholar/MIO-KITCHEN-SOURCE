@@ -6774,8 +6774,20 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
-    size_f2fs = (54 * 1024 * 1024) + size
-    size_f2fs = int(size_f2fs * 1.15) + 1
+
+    def align_to_4k(size):
+        # Align the size upwards to multiples of 4096 bytes.
+        return (size + 4095) // 4096 * 4096
+
+    # Set to 64MB to reserve space for F2FS Metadata
+    size_f2fs = (64 * 1024 * 1024) + size
+    # Apply a safety margin
+    size_f2fs = int(size_f2fs * 1.15)
+    # Align size to 4096-byte multiples.
+    # Android dynamic partitions require sector alignment. 
+    # Mismatched block sizes will cause 'lpmake' read errors or mount failures.
+    size_f2fs = align_to_4k(size_f2fs)
+
     if not UTC:
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
