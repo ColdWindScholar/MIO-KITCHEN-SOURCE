@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import threading
 import platform
+from contextlib import suppress
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
@@ -6790,15 +6791,12 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
     file_contexts_path = f'{work}/config/{name}_file_contexts'
 
     found = False
-    try:
+    with suppress(FileNotFoundError):
         with open(file_contexts_path, 'r', encoding='utf-8') as f_read:
             for line in f_read:
                 if line.strip() == line_to_ensure.strip():
                     found = True
                     break
-    except FileNotFoundError:
-        # If the file doesn't exist, the 'a' mode used below will create it.
-        pass
 
     if not found:
         with open(file_contexts_path, 'a', encoding='utf-8') as f_append:
