@@ -16,7 +16,7 @@ def process_by_xml(file: str, prefix='system', out_file_path: str = None):
     img_orders = []
     for i in range(count - 1):
         file_name = elems_program[i].getAttribute('filename')
-        if file_name[0:len(prefix) + 1] == prefix + '_':
+        if file_name[0:len(prefix) + 1] == f'{prefix}_':
             n = int(file_name[file_name.find('_') + 1:file_name.find('.')])
             img_orders.append([n, i])
 
