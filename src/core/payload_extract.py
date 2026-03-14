@@ -110,9 +110,8 @@ def init_payload_info(reader: IO[bytes]) -> update_metadata_pb2.DeltaArchiveMani
         reader.read(hdr.manifest_len)
     )
     if manifest.minor_version not in [0, 8, 9]:
-        raise BadPayload(
-            "delta payloads are not supported, please use a full payload file"
-        )
+        print("Warning: delta payloads are not supported, please use a full payload file")
+
     reader.seek(hdr.manifest_sig_len, SEEK_CUR)
 
     return manifest
