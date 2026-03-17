@@ -21,6 +21,9 @@ import subprocess
 import threading
 import platform
 from contextlib import suppress
+import os
+import re
+import math
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
@@ -6530,13 +6533,49 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
+                def get_f2fs_actual_used_size(img_path):
+                    """
+                    Calculate used space: Max Size − Free Space (from fsck)
+                    """
+                    try:
+                        # Run fsck.f2fs to check file size
+                        output = subprocess.check_output(
+                            ['fsck.f2fs', img_path], 
+                            stderr=subprocess.STDOUT, 
+                            universal_newlines=True,
+                            encoding='utf-8'
+                        )
+
+                        # Extract Max image size and Free space
+                        # et al.: [FSCK] Max image size: 1332 MB, Free space: 592 MB
+                        match = re.search(r"Max image size:\s+(\d+)\s+MB,\s+Free space:\s+(\d+)\s+MB", output)
+                        if match:
+                            max_size_mb = int(match.group(1))
+                            free_size_mb = int(match.group(2))
+                            used_size_bytes = (max_size_mb - free_size_mb) * 1024 * 1024
+                            return used_size_bytes
+                    except Exception as e:
+                        print(f"Warning: Failed to parse F2FS size: {e}")
+                    return None
+                img_src = os.path.join(project_manger.current_work_path(), f'{i}.img')
+
+                # Get physical usage prior to decompression
+                actual_used = get_f2fs_actual_used_size(img_src)
+                if actual_used:
+                    # Save physical size to parts + 5% buffer for future packing
+                    parts[f"{i}_base_physical"] = actual_used
+                    print(f"Detected {i} physical used size: {actual_used // 1024 // 1024} MB")
+
                 if call(exe=['imgkit', 'unpack',"-i", os.path.join(project_manger.current_work_path(), f'{i}.img'), "-o", work],
                         out=False) != 0:
                     print('Unpack failed...')
                     continue
                 if os.path.exists(f'{work}/{i}'):
+                    initial_logical_size = GetFolderSize(work + i, 1, 1).rsize_v
+                    parts[f"{i}_initial_logical"] = initial_logical_size
+                    print(f"[{i}] Physical: {actual_used//1024**2}MB, Logical: {initial_logical_size//1024**2}MB")
                     try:
-                        os.remove(f"{work}/{i}.img")
+                        os.remove(img_src)
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'amlogic':
@@ -6640,67 +6679,79 @@ class GetFolderSize:
     # 2 - return Rsize value of dir size
     # 3 - return Rsize value of dir size and modify dynampic_partition_list
     def __init__(self, dir_: str, num: int = 1, get: int = 2, list_f: str = None):
-        self.rsize_v: int
+        self.rsize_v: int = 0
         self.num = num
         self.get = get
         self.list_f = list_f
-        self.dname = os.path.basename(dir_)
+        self.dname = os.path.basename(dir_.rstrip(os.sep))
         self.size = 0
 
         def get_dir_size(path):
+            total_size = 0
             for root, _, files in os.walk(path):
                 for name in files:
+                    file_path = os.path.join(root, name)
                     try:
-                        file_path = os.path.join(root, name)
-                        if not os.path.isfile(file_path):
-                            self.size += len(name)
-                        self.size += os.path.getsize(file_path)
-                    except (PermissionError, BaseException, Exception):
-                        logging.exception(f"Getsize {name}")
-                        self.size += 1
-            self.size += (self.size / 16384) * 256
-            if self.size > 100 * 1024 * 1024:
-                self.size += 16 * (1024 ** 2)
+                        # For symbolic links, count only the path length (actual space in the image)
+                        if os.path.islink(file_path):
+                            total_size += len(name)
+                            continue
+                        
+                        # Retrieve true file size from storage, not logical size
+                        f_size = os.path.getsize(file_path)
+                        # Block simulation: min 4KB per file (aligned)
+                        total_size += (f_size + 4095) // 4096 * 4096
+                    except (PermissionError, OSError) as e:
+                        logging.warning(f"Unable to get size for {name}: {e}")
+                        # In case of read failure, use minimum block size as default value
+                        total_size += 4096
+
+            # # Simulate metadata overhead for F2FS
+            total_size += (total_size // 16384) * 256
+            if total_size > 100 * 1024 * 1024:
+                total_size += 16 * (1024 ** 2)
+            
+            self.size = int(total_size)
 
         get_dir_size(dir_)
+
         if self.get == 1:
             self.rsize_v = self.size
         else:
             self.rsize(self.size, self.num)
 
     def rsize(self, size: int, num: int):
-        print(f"{self.dname} Size : {hum_convert(size)}")
-        if size <= 2097152:
-            self.rsize_v = 2097152
-        elif size <= 1048576:
+        print(f"{self.dname} Size : {hum_convert(size)}") 
+        # Reorder conditional logic to ensure the 1MB branch is reachable
+        if size <= 1048576:      # 1MB
             self.rsize_v = 1048576
+        elif size <= 2097152:    # 2MB
+            self.rsize_v = 2097152
         else:
-            size_ = int(size)
-            if size_ % 4096:
-                size_ = size_ + (4096 - size_ % 4096)
-            self.rsize_v = size_
-        if self.get == 3:
+            # Align content to 4KB page boundary for memory mapping
+            self.rsize_v = (int(size) + 4095) // 4096 * 4096
+
+        if self.get == 3 and self.list_f:
+
             self.rsizelist(self.dname, self.rsize_v, self.list_f)
         self.rsize_v = int(self.rsize_v / num)
 
     @staticmethod
     def rsizelist(part_name, size, file):
-        if os.access(file, os.F_OK):
-            print(lang.text74 % (part_name, size))
+        if file and os.path.exists(file) and os.access(file, os.W_OK):
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
+            
+            # # Word-boundary matching prevents false positives; double backslash in f-string for regex
+            content = re.sub(rf"\bresize {part_name} \d+", f"resize {part_name} {size}", content)
+            content = re.sub(rf"\bresize {part_name}_a \d+", f"resize {part_name}_a {size}", content)
+            content = re.sub(rf"# Grow partition {part_name} from 0 to \d+", 
+                             f"# Grow partition {part_name} from 0 to {size}", content)
+            content = re.sub(rf"# Grow partition {part_name}_a from 0 to \d+", 
+                             f"# Grow partition {part_name}_a from 0 to {size}", content)
+            
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
-                content = re.sub(f"resize {part_name} \\d+",
-                                 f"resize {part_name} {size}", content)
-                content = re.sub(f"resize {part_name}_a \\d+",
-                                 f"resize {part_name}_a {size}", content)
-                content = re.sub(f"# Grow partition {part_name} from 0 to \\d+",
-                                 f"# Grow partition {part_name} from 0 to {size}",
-                                 content)
-                content = re.sub(f"# Grow partition {part_name}_a from 0 to \\d+",
-                                 f"# Grow partition {part_name}_a from 0 to {size}", content)
                 ff.write(content)
-
 
 @animation
 def datbr(work: str, name: str, brl: str | int, dat_ver: int = 4):
@@ -6773,17 +6824,36 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size: i
 @animation
 def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
     print(lang.text91 % name)
-    size = GetFolderSize(work + name, 1, 1).rsize_v
-    print(f"{name}:[{size}]")
+    current_logical_size = GetFolderSize(work + name, 1, 1).rsize_v
+    print(f"{name}:Current size: [{current_logical_size}]")
+
+    # Load unpack metadata from config
+    parts_dict = JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
+    base_physical = parts_dict.get(f"{name}_base_physical")
+    initial_logical = parts_dict.get(f"{name}_initial_logical")
+
+    if base_physical and initial_logical:
+        # Delta calc: negative = deletions occurred
+        diff = current_logical_size - initial_logical
+        # Return current max size even when actual usage drops
+        if diff < 0: diff = 0
+        # total_size + 64MB for FS-specific metadata allocation
+        target_size = base_physical + diff + (64 * 1024 * 1024)
+        size_f2fs = int(target_size * 1.05)
+        print(f"[{name}] Original Physical: {base_physical//1024**2}MB")
+        print(f"[{name}] User Added: {diff//1024**2}MB")
+    else:
+        # # Handle unknown/new devices by recalculating total capacity
+        size_f2fs = current_logical_size
 
     def align_to_4k(size):
         # Align the size upwards to multiples of 4096 bytes.
         return (size + 4095) // 4096 * 4096
 
     # Set to 64MB to reserve space for F2FS Metadata
-    size_f2fs = (64 * 1024 * 1024) + size
+    size_f2fs += (64 * 1024 * 1024)
     # Apply a safety margin
-    size_f2fs = int(size_f2fs * 1.15)
+    size_f2fs = int(size_f2fs * 1.05)
     # Align size to 4096-byte multiples.
     # Android dynamic partitions require sector alignment. 
     # Mismatched block sizes will cause 'lpmake' read errors or mount failures.
@@ -6815,7 +6885,7 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
             f_append.write(line_to_ensure)
     return call(
         ['sload.f2fs', '-f', work + name, '-C', f'{work}/config/{name}_fs_config', '-T', f'{UTC}', '-s',
-         f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
+         f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', '-a', 'lz4', '-r', '-L', '2', f'{work_output}/{name}.img'])
 
 
 def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
