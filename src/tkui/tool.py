@@ -6548,12 +6548,17 @@ def unpack(chose: list | dict, form: str = '') -> bool:
 
                         # Extract Max image size and Free space
                         # et al.: [FSCK] Max image size: 1332 MB, Free space: 592 MB
-                        match = re.search(r"Max image size:\s+(\d+)\s+MB,\s+Free space:\s+(\d+)\s+MB", output)
-                        if match:
-                            max_size_mb = int(match.group(1))
-                            free_size_mb = int(match.group(2))
+                        newer_match = re.search(r"Max image size:\s+(\d+)\s+MB,\s+Free space:\s+(\d+)\s+MB", output)
+                        if not newer_match:
+                            sector_match = re.search(r"total (?:FS )?sectors = \d+ \((\d+) MB\)", output)
+                        if newer_match:
+                            max_size_mb = int(newer_match.group(1))
+                            free_size_mb = int(newer_match.group(2))
                             used_size_bytes = (max_size_mb - free_size_mb) * 1024 * 1024
                             return used_size_bytes
+                        if sector_match:
+                            max_size_mb = int(sector_match.group(1))
+                            return max_size_mb
                     except Exception as e:
                         print(f"Warning: Failed to parse F2FS size: {e}")
                     return None
