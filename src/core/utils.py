@@ -76,11 +76,13 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03', "zopfli"], [b'\xfd7zXZ', 'lzma'],
            [b'\x5d\x00', 'lzma'],
            [b']\x00\x00\x00\x04\xff\xff\xff\xff\xff\xff\xff\xff', 'lzma'], [b'\x02!L\x18', 'lz4_lg'],
-           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'],[b"RSCE",'rk_rsce'],
+           [b'\x89PNG', 'png'], [b"LOGO!!!!", 'logo', 4000], [b'\x28\xb5\x2f\xfd', 'zstd'], [b"RSCE", 'rk_rsce'],
            [b'(\x05\x00\x00$8"%', 'kdz'], [b"\x32\x96\x18\x74", 'dz'], [b'\xcf\xfa\xed\xfe', 'macos_bin'],
-           [b'\xfa\xff\xfa\xff', 'pac', 2116],[b"NTPI", 'NTPI'],[b'\x56\x19\xb5\x27','amlogic',8],
-           [b"-rom1fs-", 'romfs'],[b'UBI#', "ubi"],[b"sqsh", "squashfs"], [b'hsqs', 'squashfs'],[b"\x85\x19","jffs2"],[b'RKFW','rkfw'],[b'RKAF','rkaf'],
-           [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P', 'guoke_logo']
+           [b'\xfa\xff\xfa\xff', 'pac', 2116], [b"NTPI", 'NTPI'], [b'\x56\x19\xb5\x27', 'amlogic', 8],
+           [b"-rom1fs-", 'romfs'], [b'UBI#', "ubi"], [b"sqsh", "squashfs"], [b'hsqs', 'squashfs'],
+           [b"\x85\x19", "jffs2"], [b'RKFW', 'rkfw'], [b'RKAF', 'rkaf'],
+           [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P',
+            'guoke_logo']
            )
 
 # ----DEFS
@@ -88,11 +90,13 @@ if os.name == 'nt':
     from ctypes import windll
 
     kernel32 = windll.kernel32
+
+
     def terminate_process(pid):
-        h_process = kernel32.OpenProcess(0x0001, False, pid) # NOQA: PyUnresolvedReferencesInspection
+        h_process = kernel32.OpenProcess(0x0001, False, pid)  # NOQA: PyUnresolvedReferencesInspection
         if h_process:
-            kernel32.TerminateProcess(h_process, 0) # NOQA: PyUnresolvedReferencesInspection
-            kernel32.CloseHandle(h_process) # NOQA: PyUnresolvedReferencesInspection
+            kernel32.TerminateProcess(h_process, 0)  # NOQA: PyUnresolvedReferencesInspection
+            kernel32.CloseHandle(h_process)  # NOQA: PyUnresolvedReferencesInspection
         else:
             print(f"Failed to open process with PID {pid}")
 else:
@@ -114,6 +118,7 @@ def call(exe, extra_path=True, out: bool = True):
                 print(out_put)
             else:
                 logging.info(out_put)
+
     logging.info(exe)
     if isinstance(exe, list):
         cmd = exe
@@ -223,8 +228,8 @@ class Sdat2img:
         self.output_image_file = output_image_file
         self.list_file = self.parse_transfer_list_file()
         block_size = 4096
-        version = next(self.list_file)
-        self.version = version
+        version: int = next(self.list_file)
+        self.version: int = version
         next(self.list_file)
         versions = {
             1: "Lollipop 5.0",
@@ -477,7 +482,7 @@ def create_thread(func, *args, join=False, deamon: bool = True):
         t.join()
 
 
-def simg2img(path:str):
+def simg2img(path: str):
     """
     convert Sparse image to Raw Image
     :param path:
@@ -832,7 +837,7 @@ class MkcSuggest:
         else:
             return None, None
 
-    def catch_error(self, string:str) -> str | int:
+    def catch_error(self, string: str) -> str | int:
         if not isinstance(string, str):
             return str(string)
         catch_error = [i for i in string.split("\n") if 'error' in i or 'failed' in i]
