@@ -14,7 +14,7 @@ lxml
 wmi; sys_platform == 'win32'
 six
 httpx
-cryptography
+cryptography>=46
 toml
 lz4
 python-lzo; sys_platform == 'linux'
