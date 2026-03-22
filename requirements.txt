@@ -1,7 +1,7 @@
 Pillow>=10.0.1
 pycryptodome>=3.19.1
 Requests>2.31.0
-protobuf>6
+protobuf>7
 sv_ttk
 pyinstaller
 chlorophyll
