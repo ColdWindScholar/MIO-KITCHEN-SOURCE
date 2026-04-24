@@ -1,4 +1,5 @@
 #!/bin/python3
+import os.path
 
 from src.core.splash_editor.src.logo_gen import GenerateLogoImg
 
@@ -9,10 +10,12 @@ def splash_repack(input_dir: str, output_file: str, nolimit=False):
     print("Generate 1024 byte of empty file...")
     with open(output_file, "wb") as f:
         f.write(b'\x00' * 1024)
-    for i in [100864, 613888, 101888, 204288, 204288, 0]:
+    for i in [100864, 613888, 101888, 204288, 204288, 0, 0, 0]:
         if nolimit:
             i = 0
         print(f"Compress splash{n}.png padding into {output_file}...")
+        if not os.path.exists(f"{input_dir}/splash{n}.png"):
+            break
         data = GenerateLogoImg(f"{input_dir}/splash{n}.png", i)
         a = len(data)
         b = a + 512
