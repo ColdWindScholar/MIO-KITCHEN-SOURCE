@@ -1,8 +1,8 @@
-import logging
 import struct
 import uuid
 
 from partition_types import PartitionTypes
+
 
 class PartitionTableEntry(object):
     def __init__(self, raw_entry):

@@ -1,8 +1,8 @@
+import logging
+
 from gpt_file import GPTFile
 from partition_table_header import PartitionTableHeader
 
-import logging
-import binascii
 
 class GPTReader(object):
     def __init__(self, filename, sector_size=512, little_endian=True):

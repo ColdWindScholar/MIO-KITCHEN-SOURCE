@@ -11,9 +11,9 @@ class PartitionTypes(Enum):
     MicrosoftReserved = uuid.UUID('16e3c9e3-5c0b-b84d-817d-f92df00215ae')
     MicrosoftLdmMetadata = uuid.UUID('aac80858-8f7e-e042-85d2-e1e90434cfb3')
     MicrosoftLDM = uuid.UUID('a0609baf-3114-624f-68bc-3311714a69ad')
-    WindowsRecoverEnvrionment = ('a4bb94de-d106-404d-a6a1-bfd50179d6ac')
-    MicrosoftIBMGeneralParallel = ('90cfaf37-7def-964e-c391-2d7ae055b174')
-    MicrosoftStorageSpace = ('8fafc5e7-80f6-ee4c-a3af-b001e56efc2d')
+    WindowsRecoverEnvrionment = 'a4bb94de-d106-404d-a6a1-bfd50179d6ac'
+    MicrosoftIBMGeneralParallel = '90cfaf37-7def-964e-c391-2d7ae055b174'
+    MicrosoftStorageSpace = '8fafc5e7-80f6-ee4c-a3af-b001e56efc2d'
 
     # Linux types from https://en.wikipedia.org/wiki/GUID_Partition_Table
     # First three blocks have bytes swapped to conform to little-endian storage
