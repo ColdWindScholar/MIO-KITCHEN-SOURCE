@@ -81,7 +81,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'\xfa\xff\xfa\xff', 'pac', 2116], [b"NTPI", 'NTPI'], [b'\x56\x19\xb5\x27', 'amlogic', 8],
            [b"-rom1fs-", 'romfs'], [b'UBI#', "ubi"], [b"sqsh", "squashfs"], [b'hsqs', 'squashfs'],
            [b"\x85\x19", "jffs2"], [b'RKFW', 'rkfw'], [b'RKAF', 'rkaf'],
-           [b'EFI PART', 'gpt',0x200],
+           [b'EFI PART', 'gpt',0x200],[b'SPLASH!!', 'splash', 1024],
            [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P',
             'guoke_logo']
            )
