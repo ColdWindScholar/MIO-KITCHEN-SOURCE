@@ -6527,7 +6527,7 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     if True:
                         file_base_name = partition.name if partition.name else str(partition.partition_id)
 
-                        out_file = os.path.join(work, f'{partition.name}.img')
+                        out_file = os.path.join(work, f'{file_base_name}.img')
                         print(f'Writing partition to file {out_file}')
 
                         with open(out_file, 'wb+') as fout:
