@@ -2,6 +2,7 @@ from enum import Enum
 
 import uuid
 
+
 class PartitionTypes(Enum):
     Unused = uuid.UUID('00000000-0000-0000-0000-000000000000')
 
@@ -21,7 +22,7 @@ class PartitionTypes(Enum):
     LinuxRaidPart = uuid.UUID('0f889da1-fc05-3B4d-06a0-743f0f84911e')
     LinuxRootPart = uuid.UUID('40954744-97f2-b241-f79a-d131d5f0458a')
     LinuxRootPartX86_64 = uuid.UUID('e3bc684f-cde8-b14d-e796-fbcaf984b709')
-    LinuxRootPartRootArm32 =     uuid.UUID('10d7da69-e42c-3c4e-6cb1-21a1d49abed3')
+    LinuxRootPartRootArm32 = uuid.UUID('10d7da69-e42c-3c4e-6cb1-21a1d49abed3')
     LinuxRootPartArm64 = uuid.UUID('45b021b9-f01d-c341-44af-4c6f280d3fae')
     LinuxSwapPart = uuid.UUID('6dfd5706-aba4-c443-e584-0933c84b4f4f')
     LinuxLVMPart = uuid.UUID('79d3d6e6-07f5-c244-3ca2-238f2a3df928')
