@@ -27,6 +27,7 @@ from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
 from pygpt.gpt_reader import GPTReader
+from splash_editor.main import splash_repack
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
@@ -6053,6 +6054,8 @@ class PackPartition(Toplevel):
                 repack_boot(i)
             elif parts_dict[i] == 'dtbo':
                 pack_dtbo()
+            elif parts_dict[i] == 'splash':
+                splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             elif parts_dict[i] == 'logo':
                 logo_pack()
             elif parts_dict[i] == 'guoke_logo':
