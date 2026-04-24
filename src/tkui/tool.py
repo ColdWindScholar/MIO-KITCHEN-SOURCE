@@ -27,6 +27,7 @@ from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
 from pygpt.gpt_reader import GPTReader
+from splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -6519,6 +6520,10 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                 call(['afptool', 'unpack', f"{project_manger.current_work_path()}/{i}.img", work])
             if file_type == 'guoke_logo':
                 GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
+            if file_type == 'splash':
+                if not os.path.exists(splash_out_dir:=os.path.join(work, i)):
+                    os.makedirs(splash_out_dir, True)
+                process_splashimg(os.path.join(project_manger.current_work_path(), f'{i}.img'), f"{work}/{i}/splash.png")
             if file_type == 'gpt':
                 reader = GPTReader(os.path.join(project_manger.current_work_path(), f'{i}.img'), sector_size=512)
                 for partition in reader.partition_table.valid_entries():
