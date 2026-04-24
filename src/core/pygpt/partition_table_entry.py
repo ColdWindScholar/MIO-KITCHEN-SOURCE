@@ -1,7 +1,7 @@
 import struct
 import uuid
 
-from partition_types import PartitionTypes
+from src.core.pygpt.partition_types import PartitionTypes
 
 
 class PartitionTableEntry(object):

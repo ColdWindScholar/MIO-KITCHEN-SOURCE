@@ -1,7 +1,7 @@
 import logging
 
-from gpt_file import GPTFile
-from partition_table_header import PartitionTableHeader
+from src.core.pygpt.gpt_file import GPTFile
+from src.core.pygpt.partition_table_header import PartitionTableHeader
 
 
 class GPTReader(object):

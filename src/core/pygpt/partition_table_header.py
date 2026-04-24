@@ -4,7 +4,7 @@ import struct
 import uuid
 import zlib
 
-from partition_table_entry import PartitionTableEntry
+from src.core.pygpt.partition_table_entry import PartitionTableEntry
 
 PARTITION_TABLE_HEADER_DEFAULT_BLOCK = 1
 PARTITION_TABLE_HEADER_BACKUP_BLOCK = -1
