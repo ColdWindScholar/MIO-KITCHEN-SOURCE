@@ -26,9 +26,9 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
-from pygpt.gpt_reader import GPTReader
-from splash_editor.main import splash_repack
-from splash_editor.src.logo_gen_decoder import process_splashimg
+from src.core.pygpt.gpt_reader import GPTReader
+from src.core.splash_editor.main import splash_repack
+from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
