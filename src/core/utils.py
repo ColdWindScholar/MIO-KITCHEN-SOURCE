@@ -29,7 +29,7 @@ from os import getcwd
 from os.path import exists
 from random import randint, choice
 from subprocess import Popen
-from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
 from lzma import LZMADecompressor
 import tarfile
 from . import blockimgdiff
@@ -467,8 +467,8 @@ def remove_duplicate(file_) -> None:
         f.writelines(data)
     del data
 
-
-def create_thread(func, *args, join=False, deamon: bool = True):
+_EXECUTOR = ThreadPoolExecutor(max_workers=10)
+def create_thread(func, *args, join=False):
     """
     Multithreaded running tasks
     :param deamon:
@@ -477,10 +477,9 @@ def create_thread(func, *args, join=False, deamon: bool = True):
     :param join:if wait the task
     :return:
     """
-    t = Thread(target=func, args=args, daemon=deamon)
-    t.start()
+    future = _EXECUTOR.submit(func, *args)
     if join:
-        t.join()
+        future.result()
 
 
 def simg2img(path: str):
