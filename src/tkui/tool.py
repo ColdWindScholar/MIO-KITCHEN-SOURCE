@@ -4663,11 +4663,9 @@ class MpkStore(Toplevel):
                 self.init_repo()  # Re-initialize repository related settings.
                 create_thread(self.get_db, True)  # Refresh database from the new repository in a separate thread.
 
-        def on_cancel_repo():
-            """Handles the Cancel button click in the repository modification dialog."""
-            a.destroy()  # Close the dialog.
 
-        ttk.Button(button_frame_repo, text=getattr(lang, 'cancel', "Cancel"), command=on_cancel_repo).pack(side=LEFT,
+
+        ttk.Button(button_frame_repo, text=getattr(lang, 'cancel', "Cancel"), command=a.destroy).pack(side=LEFT,
                                                                                                            padx=(0, 5),
                                                                                                            expand=True,
                                                                                                            fill=X)
