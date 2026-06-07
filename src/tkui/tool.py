@@ -44,13 +44,13 @@ from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
 from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
 from src.porttool.ui import MyUI
-
+pyi_splash_available = False
 if platform.system() != 'Darwin':
     try:
         import pyi_splash
 
         pyi_splash.update_text('Loading ...')
-        pyi_splash.close()
+        pyi_splash_available = True
     except ModuleNotFoundError:
         ...
 import os.path
@@ -7634,7 +7634,6 @@ class ParseCmdline:
             cprint("Workdir or Output Dir Not Exist!")
             return
 
-
 def __init__tk(args: list):
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
@@ -7647,6 +7646,7 @@ def __init__tk(args: list):
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
     global win
     win = Tool()
+    win.withdraw()
     if os.name == 'nt':
         set_title_bar_color(win)
     animation.master = win
@@ -7686,7 +7686,10 @@ def __init__tk(args: list):
         if not verify.state:
             Active(verify, settings, win, images, lang).gui()
     win.update()
-
+    if pyi_splash_available:
+        pyi_splash.close()
+    win.deiconify()
+    win.focus_force()
     move_center(win)
     win.loops.append(win.get_time)
     if settings.check_upgrade == '1':
