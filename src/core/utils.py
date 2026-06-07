@@ -747,12 +747,11 @@ class States:
     development = False
     inited = False
     open_source_license = "GNU AFFERO GENERAL PUBLIC LICENSE V3"
+    root = False
     if os.name == 'posix':
         root = os.getuid() == 0
     elif os.name == 'nt':
         root = windll.shell32.IsUserAnAdmin()
-    else:
-        root: bool = False
 
 
 states = States()
