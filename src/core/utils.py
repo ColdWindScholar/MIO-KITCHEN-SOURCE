@@ -290,7 +290,7 @@ class Sdat2img:
         with open(self.transfer_list_file, 'r', encoding='utf-8') as trans_list:
             # First line in transfer list is the version number
             # Second line in transfer list is the total number of blocks we expect to write
-            if (version := int(trans_list.readline())) >= 2 and (new_blocks := int(trans_list.readline())):
+            if (version := int(trans_list.readline())) >= 2 & (new_blocks := int(trans_list.readline())):
                 # Third line is how many stash entries are needed simultaneously
                 trans_list.readline()
                 # Fourth line is the maximum number of blocks that will be stashed simultaneously
