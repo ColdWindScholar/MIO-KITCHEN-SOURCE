@@ -1,4 +1,5 @@
 # MIO-KITCHEN-SOURCE #
+<script src="https://keepandroidopen.org/banner.js"></script>
 ![Banner](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/blob/main/splash.png?raw=true)
 #### A Rom Tool Written in Python
 ##### The Best Free And Open Source Rom Tool For You
