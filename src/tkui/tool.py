@@ -7662,8 +7662,8 @@ def __init__tk(args: list):
         except (BaseException, Exception):
             logging.exception('Cannot wait the Updater.Maybe the step completed.')
     if int(settings.oobe) < 5:
+        win.deiconify()  # for oobe
         Welcome()
-        win.deiconify() # for oobe
     init_verify()
     try:
         win.winfo_exists()
