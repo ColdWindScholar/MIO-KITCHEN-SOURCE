@@ -20,6 +20,7 @@ import shutil
 import subprocess
 import threading
 import platform
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from functools import wraps
 from random import randrange
@@ -177,12 +178,13 @@ class LoadAnim:
             master: The parent Tkinter widget (optional).
         """
         self.master = master  # The parent widget where the GIF label will be displayed.
+        self.threadpool = ThreadPoolExecutor(max_workers=cpu_count() // 2)
         self.frames = []  # Stores individual frames of the GIF.
         self.hide_gif = False  # Flag to control GIF visibility.
         self.frame = None  # The current GIF frame being displayed.
         self.tasks = {}  # Dictionary to keep track of running tasks associated with the animation.
         self.task_num_index = 0  # Index for assigning unique task numbers.
-        self.task_num_max = cpu_count()  # Maximum number of concurrent tasks (for task_num_index cycling).
+        self.task_num_max = cpu_count()//2  # Maximum number of concurrent tasks (for task_num_index cycling).
 
     def run(self, ind: int = 0):
         """Cycles through GIF frames to create the animation.
@@ -270,29 +272,18 @@ class LoadAnim:
         @wraps(func)
         def call_func(*args, **kwargs):
             """The wrapper function that manages the animation and task execution."""
-            return_value = None
-
-            def wrapper(*a, **k):
-                # This inner wrapper executes the original function.
-                nonlocal return_value
-                return_value = func(*a, **k)
-
             # Start the animation in a new thread to avoid blocking the UI.
             if len(self.tasks) > self.task_num_max:
                 return lambda *a, **k: print("Cannot create new thread.Please wait for a while.")
             self.run()
             task_num = self.get_task_num()
             # The actual function execution also happens in a separate thread.
-            task_real = threading.Thread(target=wrapper, args=args, kwargs=kwargs, daemon=True)
+            task_real = self.threadpool.submit(func, *args, **kwargs)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
-                # Handle cases where a task number might be reused, though it's unlikely with task_num_max.
-                print(f"Warning: Task number {task_num} reused by {task_real.native_id} for {info[0]}.")
-                # Not returning None here, as the task should still proceed.
+                return lambda *a, **k: print(f"Error: Task number {task_num} is being used by {task_real} for {info[0]}.")
             self.tasks[task_num] = info
-            task_real.start()
-            task_real.join()  # Wait for the task to complete.
-
+            return_value = task_real.result()
             if task_num in self.tasks:
                 del self.tasks[task_num]
             # 'info' or 'task_num' go out of scope automatically.

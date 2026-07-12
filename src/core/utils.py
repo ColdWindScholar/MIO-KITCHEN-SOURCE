@@ -25,7 +25,7 @@ import tempfile
 import traceback
 from difflib import SequenceMatcher
 from enum import IntEnum
-from os import getcwd
+from os import getcwd, cpu_count
 from os.path import exists
 from random import randint, choice
 from subprocess import Popen
@@ -468,7 +468,7 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=10)
+_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count()//2)
 
 
 def create_thread(func, *args, join=False):
