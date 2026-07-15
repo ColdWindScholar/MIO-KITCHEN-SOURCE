@@ -7654,6 +7654,8 @@ def __init__tk(args: list):
             logging.exception('Cannot wait the Updater.Maybe the step completed.')
     if int(settings.oobe) < 5:
         win.deiconify()  # for oobe
+        if pyi_splash_available:
+            pyi_splash.close()
         Welcome()
     init_verify()
     try:

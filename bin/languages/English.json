@@ -376,5 +376,7 @@
   "drop": "Drop",
   "no_idea": "No idea about:\n\t{}\nPlease Report It To us.",
   "upgrade_complete": "Upgraded from {} to {}.",
-  "auto_check_updates": "Auto Check Updates"
+  "auto_check_updates": "Auto Check Updates",
+  "keep_android_open": "Keep Android Open",
+  "your_phone_is_about_to_stop_being_yours": "Your phone is about to stop being yours."
 }
