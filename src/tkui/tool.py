@@ -1661,17 +1661,23 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
+        def react():
+            print("KeMiaoJiang: Dont't Touch me!")
         link = ttk.Label(self.tab, text=lang.your_phone_is_about_to_stop_being_yours, cursor="hand2",
                          style="Link.TLabel", foreground="#CF2C2C")
         link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
         link.pack(pady=5)
-        ttk.Label(self.tab, text=lang.keep_android_open, cursor="hand2",
-                  style="Link.TLabel", foreground="#CF2C2C").pack(padx=16, pady=5)
+        link2 = ttk.Label(self.tab, text=lang.keep_android_open, cursor="hand2",
+                  style="Link.TLabel", foreground="#CF2C2C")
+        link2.pack(padx=16, pady=5)
+        link2.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
         global kemiaojiang
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
-        Label(self.tab, image=kemiaojiang).pack(side='left', padx=0, expand=True)
-        Label(self.tab, text=lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN"), justify='left',
+        kmj = ttk.Label(self.tab, image=kemiaojiang)
+        kmj.pack(side='left', padx=0, expand=True)
+        kmj.bind("<Button-1>", lambda *x:react())
+        ttk.Label(self.tab, text=lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN"), justify='left',
               foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
 
     def tab6_content(self):
