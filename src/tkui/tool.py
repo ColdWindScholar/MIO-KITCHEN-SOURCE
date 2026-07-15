@@ -1662,7 +1662,7 @@ class Tool(Tk):
 
     def tab_content(self):
         def react():
-            print("KeMiaoJiang: Dont't Touch me!")
+            warn_win("Hi! What can i do for you?", "#814487", "KeMiaoJiang")
         link = ttk.Label(self.tab, text=lang.your_phone_is_about_to_stop_being_yours, cursor="hand2",
                          style="Link.TLabel", foreground="#CF2C2C")
         link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
