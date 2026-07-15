@@ -2148,15 +2148,14 @@ def error(code, desc="unknown error"):
         win.withdraw()
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
-    img = open_img(BytesIO(images.error_logo_byte)).resize((100, 100))
-    pyt = PhotoImage(img)
-    Label(er, image=pyt).pack(padx=10, pady=10)
     er.protocol("WM_DELETE_WINDOW", win.destroy)
     er.title(f"Program crashed! [{settings.version}]")
     er.lift()
+    kmj = ttk.Label(er, image=kemiaojiang)
+    kmj.pack(side='left', padx=0, expand=True)
     ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
-    ttk.Label(er, text="Dont Worry! Its not your problem.\nYou just need to Report the bug to us.",
-              font=(None, 10)).pack(
+    ttk.Label(er, text="Seems something went wrong.\nJust report it to us.Thanks you.",
+              font=(None, 20),foreground="#FFC0CB").pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
