@@ -1661,6 +1661,12 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
+        link = ttk.Label(self.tab, text=lang.your_phone_is_about_to_stop_being_yours, cursor="hand2",
+                         style="Link.TLabel", foreground="#CF2C2C")
+        link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
+        link.pack(pady=5)
+        ttk.Label(self.tab, text=lang.keep_android_open, cursor="hand2",
+                  style="Link.TLabel", foreground="#CF2C2C").pack(padx=16, pady=5)
         global kemiaojiang
         kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
