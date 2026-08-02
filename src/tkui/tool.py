@@ -7085,7 +7085,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         return True
 
     def remove(self):
-        name = current_ject_name.get()
+        name = current_project_name.get()
         if not project_manger.exist(name):
             win.message_pop(lang.warn1)
         project_manger.remove(name)
