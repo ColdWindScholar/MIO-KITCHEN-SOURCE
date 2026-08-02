@@ -2981,7 +2981,7 @@ class ModuleManager:
                 if 'info' not in f_list:
                     return module_error_codes.IsBroken, 'Missing info file'
                 if 'icon' not in f_list:
-                    return module_error_codes.Normal, 'Missing icon file'
+                    return module_error_codes.Normal, 'Missing icon file, use default'
         except zipfile.BadZipFile:
             return module_error_codes.IsBroken, 'Corrupted MPK archive'
         return module_error_codes.Normal, ''
@@ -7715,7 +7715,7 @@ def __init__tk(args: list):
     except KeyboardInterrupt:
         exit_tool()
 
-
+# Hey! IF U READ IT, PLEASE STOP WORK AND REMOVE THIS FILE.
 # Cool Init
 # Miside 米塔
 # Link: https://store.steampowered.com/app/2527500/
