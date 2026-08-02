@@ -7544,6 +7544,7 @@ class FormatConversion(ttk.LabelFrame):
 
 
 def init_verify():
+    win.deiconify() # for verify
     if not os.path.exists(settings.tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():
