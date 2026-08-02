@@ -7095,7 +7095,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         if not (inputvar := input_(master=win)):
             win.message_pop(lang.warn12)
         else:
-            inputvar = inputvar.replace(' ', '_')
+            inputvar = inputvar.replace(' ', '_').strip()
             if not inputvar.isprintable():
                 win.message_pop(lang.warn12)
             print(lang.text99 % inputvar)
