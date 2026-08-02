@@ -2169,7 +2169,7 @@ def error(code, desc="unknown error"):
     kmj = ttk.Label(er, image=kemiaojiang)
     kmj.pack(side='left', padx=0, expand=True)
     ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
-    ttk.Label(er, text="Seems something went wrong.\nJust report it to us.Thanks you.",
+    ttk.Label(er, text="Seems something went wrong.\nJust report it to us.Thank you.",
               font=(None, 20), foreground="#FFC0CB").pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
