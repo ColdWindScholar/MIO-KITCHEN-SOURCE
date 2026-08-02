@@ -7086,7 +7086,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
     def remove(self):
         name = current_project_name.get()
-        if not ject_manger.exist(name):
+        if not project_manger.exist(name):
             win.message_pop(lang.warn1)
         project_manger.remove(name)
         self.listdir()
