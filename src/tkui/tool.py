@@ -2046,7 +2046,10 @@ class Updater(Toplevel):
         update_files = []
         with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
             for file in zip_ref.namelist():
-                if file != ('tool' + ('' if os.name == 'posix' else '.exe')):
+                tool_name = "tool"
+                if os.name != "posix":
+                    tool_name += ".exe"
+                if file != tool_name:
                     try:
                         zip_ref.extract(file, cwd_path)
                     except PermissionError:
@@ -2059,7 +2062,7 @@ class Updater(Toplevel):
             'updating': 'true',
             'language': settings.language,
             'oobe': settings.oobe,
-            'new_tool': os.path.join(cwd_path, "bin", "tool" + ('' if os.name != 'nt' else '.exe')),
+            'new_tool': os.path.join(cwd_path, "bin", tool_name),
             "version_old": settings.version,
             "update_files": ' '.join(update_files),
             "wait_pids": " ".join([str(i) for i in states.open_pids]),
@@ -3429,7 +3432,6 @@ class ModuleManager:
             content_frame = ttk.Frame(self)
             content_frame.pack(padx=15, pady=15, fill=BOTH, expand=True)
 
-            message_text = ""
             plugin_display_name_for_message = self.value2 if self.value2 else self.value
             if plugin_display_name_for_message is None:
                 plugin_display_name_for_message = getattr(lang, "unknown_plugin_name", "Unknown Plugin")
