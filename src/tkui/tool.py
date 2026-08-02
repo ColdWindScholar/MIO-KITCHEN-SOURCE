@@ -45,6 +45,7 @@ from src.core.unkdz import KDZFileTools
 from ..core.payload_extract import extract_partitions_from_payload
 from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
 from src.porttool.ui import MyUI
+
 pyi_splash_available = False
 if platform.system() != 'Darwin':
     try:
@@ -63,6 +64,7 @@ from webbrowser import open as openurl
 import tkinter as tk
 from tkinter import ttk
 from timeit import default_timer as dti
+
 start = dti()
 import zipfile
 from src.core.aml_image import main as aml_main
@@ -184,7 +186,7 @@ class LoadAnim:
         self.frame = None  # The current GIF frame being displayed.
         self.tasks = {}  # Dictionary to keep track of running tasks associated with the animation.
         self.task_num_index = 0  # Index for assigning unique task numbers.
-        self.task_num_max = cpu_count()//2  # Maximum number of concurrent tasks (for task_num_index cycling).
+        self.task_num_max = cpu_count() // 2  # Maximum number of concurrent tasks (for task_num_index cycling).
 
     def run(self, ind: int = 0):
         """Cycles through GIF frames to create the animation.
@@ -281,7 +283,8 @@ class LoadAnim:
             task_real = self.threadpool.submit(func, *args, **kwargs)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
-                return lambda *a, **k: print(f"Error: Task number {task_num} is being used by {task_real} for {info[0]}.")
+                return lambda *a, **k: print(
+                    f"Error: Task number {task_num} is being used by {task_real} for {info[0]}.")
             self.tasks[task_num] = info
             return_value = task_real.result()
             if task_num in self.tasks:
@@ -1663,12 +1666,13 @@ class Tool(Tk):
     def tab_content(self):
         def react():
             warn_win("Hi! What can i do for you?", "#814487", "KeMiaoJiang")
+
         link = ttk.Label(self.tab, text=lang.your_phone_is_about_to_stop_being_yours, cursor="hand2",
                          style="Link.TLabel", foreground="#CF2C2C")
         link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
         link.pack(pady=5)
         link2 = ttk.Label(self.tab, text=lang.keep_android_open, cursor="hand2",
-                  style="Link.TLabel", foreground="#CF2C2C")
+                          style="Link.TLabel", foreground="#CF2C2C")
         link2.pack(padx=16, pady=5)
         link2.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
         global kemiaojiang
@@ -1676,9 +1680,9 @@ class Tool(Tk):
         kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
         kmj = ttk.Label(self.tab, image=kemiaojiang)
         kmj.pack(side='left', padx=0, expand=True)
-        kmj.bind("<Button-1>", lambda *x:react())
+        kmj.bind("<Button-1>", lambda *x: react())
         ttk.Label(self.tab, text=lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN"), justify='left',
-              foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
+                  foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
@@ -1730,7 +1734,7 @@ class Tool(Tk):
             link.pack()
 
     def setting_tab(self):
-        def get_setting_button(item, master, text, on_v='1', off_v='0',style:str = "Toggle.TButton"):
+        def get_setting_button(item, master, text, on_v='1', off_v='0', style: str = "Toggle.TButton"):
             a = StringVar(value=getattr(settings, item))
             a.trace("w", lambda *x: settings.set_value(item, a.get()))
             ttk.Checkbutton(master, text=text, variable=a, onvalue=on_v,
@@ -1759,11 +1763,13 @@ class Tool(Tk):
         Setting_Frame = ScrollFrame(self.tab3)
         Setting_Frame.gui()
         Setting_Frame.pack(fill=BOTH, expand=True)
-        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Tool', callback=Setting_Frame.update_ui, unfold=True)
+        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Tool',
+                                              callback=Setting_Frame.update_ui, unfold=True)
         sub_frame_theme = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_language = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_path = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Others', callback=Setting_Frame.update_ui)
+        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Others',
+                                             callback=Setting_Frame.update_ui)
         sub_frame_others = sub_frame_others_main.sub_frame
         sub_frame_project_struct = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_cache = ttk.Frame(sub_tool_settings_main.sub_frame)
@@ -1774,10 +1780,12 @@ class Tool(Tk):
         ###
         project_struct = StringVar(value=settings.project_struct)
         ttk.Label(sub_frame_project_struct, text=lang.project_struct).pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text=lang.single, variable=project_struct, value='single').pack(padx=10, pady=10,
-                                                                                             side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text=lang.split, variable=project_struct, value='split').pack(padx=10, pady=10,
-                                                                                           side='left')
+        ttk.Radiobutton(sub_frame_project_struct, text=lang.single, variable=project_struct, value='single').pack(
+            padx=10, pady=10,
+            side='left')
+        ttk.Radiobutton(sub_frame_project_struct, text=lang.split, variable=project_struct, value='split').pack(padx=10,
+                                                                                                                pady=10,
+                                                                                                                side='left')
         project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
         ###
         ttk.Label(sub_frame_path, text=lang.text125).pack(side='left', padx=10, pady=10)
@@ -1797,10 +1805,12 @@ class Tool(Tk):
         slo2.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
                                                                         1) if os.name == 'nt' else ...)
         slo2.pack(padx=10, pady=10, side='left')
-        ttk.Button(sub_frame_cache, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left", padx=10, pady=10)
+        ttk.Button(sub_frame_cache, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left",
+                                                                                                      padx=10, pady=10)
         context = StringVar(value=settings.contextpatch)
         check_upgrade = StringVar(value=settings.check_upgrade)
-        check_upgrade.trace('w', lambda *x:settings.set_value('check_upgrade', check_upgrade.get()))
+        check_upgrade.trace('w', lambda *x: settings.set_value('check_upgrade', check_upgrade.get()))
+
         def enable_contextpatch():
             if context.get() == '1':
                 if not ask_win(
@@ -1821,14 +1831,15 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache,sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
+        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache,
+                  sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         # Check Update
         check_frame = Frame(self.tab3)
-        ttk.Button(check_frame, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X, side="left",expand=True)
-        ttk.Checkbutton(check_frame, text=lang.auto_check_updates, variable=check_upgrade, onvalue='1', offvalue='0').pack(padx=10, pady=10, fill=X, side="right",expand=True)
+        ttk.Button(check_frame, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X, side="left", expand=True)
+        ttk.Checkbutton(check_frame, text=lang.auto_check_updates, variable=check_upgrade, onvalue='1',
+                        offvalue='0').pack(padx=10, pady=10, fill=X, side="right", expand=True)
         check_frame.pack(padx=10, pady=10, fill=X, expand=True)
-
 
 
 animation = LoadAnim()
@@ -1840,6 +1851,7 @@ context_rule_file = os.path.join(cwd_path, 'bin', "context_rules.json")
 from src.core.utils import states, call
 
 module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
+
 
 def check_upgrade() -> bool:
     update_url = settings.update_url or 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
@@ -1921,7 +1933,7 @@ class Updater(Toplevel):
                 self.notice.configure(text=lang.t41, foreground='red')
                 settings.set_value('updating', "false")
                 if settings.version_old:
-                    settings.set_value('version',settings.version_old)
+                    settings.set_value('version', settings.version_old)
         else:
             create_thread(self.get_update)
 
@@ -2135,8 +2147,8 @@ class Updater(Toplevel):
             else:
                 break
         settings.set_value('updating', "false")
-        settings.set_value('new_tool','')
-        settings.set_value('update_files','')
+        settings.set_value('new_tool', '')
+        settings.set_value('update_files', '')
         print(lang.upgrade_complete.format(settings.version_old, settings.version))
         win.wm_deiconify()
         self.close()
@@ -2158,7 +2170,7 @@ def error(code, desc="unknown error"):
     kmj.pack(side='left', padx=0, expand=True)
     ttk.Label(er, text=f"Error:0x{code}", font=(None, 20), foreground='red').pack(padx=10, pady=10)
     ttk.Label(er, text="Seems something went wrong.\nJust report it to us.Thanks you.",
-              font=(None, 20),foreground="#FFC0CB").pack(
+              font=(None, 20), foreground="#FFC0CB").pack(
         padx=10, pady=10)
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
@@ -2928,7 +2940,7 @@ class ModuleManager:
         if os.path.exists(main_sh_path):
             if not os.path.exists(temp):
                 re_folder(temp)
-            exports:dict = dict()
+            exports: dict = dict()
             if values:
                 for va, string_var in values.items():
                     gva = string_var.get()
@@ -4666,12 +4678,10 @@ class MpkStore(Toplevel):
                 self.init_repo()  # Re-initialize repository related settings.
                 create_thread(self.get_db, True)  # Refresh database from the new repository in a separate thread.
 
-
-
         ttk.Button(button_frame_repo, text=getattr(lang, 'cancel', "Cancel"), command=a.destroy).pack(side=LEFT,
-                                                                                                           padx=(0, 5),
-                                                                                                           expand=True,
-                                                                                                           fill=X)
+                                                                                                      padx=(0, 5),
+                                                                                                      expand=True,
+                                                                                                      fill=X)
         ttk.Button(button_frame_repo, text=getattr(lang, 'ok', "OK"), command=on_ok_repo, style="Accent.TButton").pack(
             side=LEFT, padx=(5, 0), expand=True, fill=X)
 
@@ -6525,9 +6535,10 @@ def unpack(chose: list | dict, form: str = '') -> bool:
             if file_type == 'guoke_logo':
                 GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
             if file_type == 'splash':
-                if not os.path.exists(splash_out_dir:=os.path.join(work, i)):
+                if not os.path.exists(splash_out_dir := os.path.join(work, i)):
                     os.makedirs(splash_out_dir, True)
-                process_splashimg(os.path.join(project_manger.current_work_path(), f'{i}.img'), f"{work}/{i}/splash.png")
+                process_splashimg(os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                                  f"{work}/{i}/splash.png")
             if file_type == 'gpt':
                 reader = GPTReader(os.path.join(project_manger.current_work_path(), f'{i}.img'), sector_size=512)
                 for partition in reader.partition_table.valid_entries():
@@ -6556,7 +6567,8 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                     except (Exception, BaseException):
                         win.message_pop(lang.warn11.format(i + ".img"))
             if file_type == 'f2fs':
-                if call(exe=['imgkit', 'unpack',"-i", os.path.join(project_manger.current_work_path(), f'{i}.img'), "-o", work],
+                if call(exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                             "-o", work],
                         out=False) != 0:
                     print('Unpack failed...')
                     continue
@@ -7073,7 +7085,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         return True
 
     def remove(self):
-        name = current_project_name.get()
+        name = current_ject_name.get()
         if not project_manger.exist(name):
             win.message_pop(lang.warn1)
         project_manger.remove(name)
@@ -7103,6 +7115,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
+            ("Apk Manager", lambda: create_thread(lambda :ApkManager(current_project_name.get()))),
             # ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
@@ -7346,6 +7359,21 @@ class UnpackGui(ttk.LabelFrame):
             self.refs()
         else:  # Pack mode (False)
             PackPartition(lbs)
+
+
+#todo: read apk info via aapt2 / apktool
+class ApkManager(Toplevel):
+    def __init__(self, project_name:str = "generic"):
+        super().__init__()
+        self.title("Apk Manager")
+        #format: apkname :packagename:version:size:path
+        #todo: extract app icon to a tmp folder, name them by packagename, format: png
+        self.apk_infos: dict = dict()
+        self.icons_path = os.path.join(
+            temp, f"icon_{project_name}"
+        )
+    def gui(self):
+        pass
 
 
 class FormatConversion(ttk.LabelFrame):
@@ -7637,6 +7665,7 @@ class ParseCmdline:
             cprint("Workdir or Output Dir Not Exist!")
             return
 
+
 def __init__tk(args: list):
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
@@ -7714,6 +7743,7 @@ def __init__tk(args: list):
         win.mainloop()
     except KeyboardInterrupt:
         exit_tool()
+
 
 # Hey! IF U READ IT, PLEASE STOP WORK AND REMOVE THIS FILE.
 # Cool Init
