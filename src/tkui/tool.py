@@ -2928,12 +2928,12 @@ class ModuleManager:
         if os.path.exists(main_sh_path):
             if not os.path.exists(temp):
                 re_folder(temp)
-            exports = ''
+            exports:dict = dict()
             if values:
                 for va, string_var in values.items():
                     gva = string_var.get()
                     if gva:
-                        exports += f"export {va}='{gva}';"
+                        exports[va] = gva
 
             norm_tool_bin = os.path.normpath(settings.tool_bin).replace(os.sep, '/')
             norm_script_path = os.path.normpath(script_path).replace(os.sep, '/')
@@ -2942,19 +2942,18 @@ class ModuleManager:
             norm_project_work = os.path.normpath(project_manger.current_work_path()).replace(os.sep, '/')
             norm_module_exec = os.path.normpath(module_exec).replace(os.sep, '/')
             norm_main_sh_path = os.path.normpath(main_sh_path).replace(os.sep, '/')
-
-            exports += f"export tool_bin='{norm_tool_bin}';"
-            exports += f"export version='{settings.version}';"
-            exports += f"export language='{settings.language}';"
-            exports += f"export bin='{norm_script_path}';"
-            exports += f"export moddir='{norm_module_dir}';"
-            exports += f"export project_output='{norm_project_output}';"
-            exports += f"export project='{norm_project_work}';"
+            exports['tool_bin'] = norm_tool_bin
+            exports['version'] = settings.version
+            exports['language'] = settings.language
+            exports['bin'] = norm_script_path
+            exports['moddir'] = norm_module_dir
+            exports['project_output'] = norm_project_output
+            exports['project'] = norm_project_work
 
             shell_command_prefix = 'ash' if os.name == 'posix' else 'bash'
-            full_shell_command = f"{exports} exec {norm_module_exec} {norm_main_sh_path}"
+            full_shell_command = f"exec {norm_module_exec} {norm_main_sh_path}"
 
-            call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command])
+            call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command], env=exports)
             return call_result
 
         elif os.path.exists(main_py_path) and imp:

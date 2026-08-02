@@ -108,7 +108,7 @@ else:
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
 
 
-def call(exe, extra_path=True, out: bool = True):
+def call(exe, extra_path=True, out: bool = True, env:dict[str, str] |None =  None):
     def output(inp: subprocess.CalledProcessError | Popen[bytes]):
         for i in iter(inp.stdout.readline, b""):
             try:
@@ -133,7 +133,7 @@ def call(exe, extra_path=True, out: bool = True):
     conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
     try:
         ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT, creationflags=conf)
+                               stderr=subprocess.STDOUT, creationflags=conf, env=env)
         pid = ret.pid
         states.open_pids.append(pid)
         output(ret)
