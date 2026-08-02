@@ -7086,7 +7086,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
 
     def remove(self):
         name = current_project_name.get()
-        if not project_manger.exist(name):
+        if not ject_manger.exist(name):
             win.message_pop(lang.warn1)
         project_manger.remove(name)
         self.listdir()
@@ -7365,13 +7365,16 @@ class UnpackGui(ttk.LabelFrame):
 class ApkManager(Toplevel):
     def __init__(self, project_name:str = "generic"):
         super().__init__()
-        self.title("Apk Manager")
+        self.title(f"Apk Manager[{project_name}]")
         #format: apkname :packagename:version:size:path
         #todo: extract app icon to a tmp folder, name them by packagename, format: png
         self.apk_infos: dict = dict()
         self.icons_path = os.path.join(
             temp, f"icon_{project_name}"
         )
+        self.gui()
+        move_center(self)
+
     def gui(self):
         pass
 
