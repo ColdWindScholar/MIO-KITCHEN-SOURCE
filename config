@@ -100,7 +100,7 @@ links = {
 }
 
 
-def download_api(url, path=None, int_=True, size_=0, name: str = None):
+def download_api(url, path=None, int_=True, size_=0, name: str | None = None):
     if url is None:
         LOGE("URL not valid.")
         return 1
@@ -302,7 +302,7 @@ if __name__ == '__main__':
     unpack_rom_parser.set_defaults(func=update)
     check_support = subparser.add_parser('check', help='check if supported this machine')
     check_support.set_defaults(func=check_supported)
-    help_support = subparser.add_parser('help', help='check if supported this machine')
+    help_support = subparser.add_parser('help', help='print help info')
     help_support.set_defaults(func=lambda *_:parser.print_help(
     ))
     subcmd, subcmd_args = parser.parse_known_args()
