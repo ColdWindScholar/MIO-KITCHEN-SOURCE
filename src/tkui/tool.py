@@ -274,7 +274,7 @@ class LoadAnim:
             """The wrapper function that manages the animation and task execution."""
             # Start the animation in a new thread to avoid blocking the UI.
             if len(self.tasks) > self.task_num_max:
-                return lambda *a, **k: print("Cannot create new thread.Please wait for a while.")
+                return lambda *a, **k: print("Cannot create new thread.The thread pool has been filled.")
             self.run()
             task_num = self.get_task_num()
             # The actual function execution also happens in a separate thread.
@@ -368,7 +368,7 @@ class Toplevel(TkToplevel):
             set_title_bar_color(self, 20 if settings.theme == 'dark' else 0)
 
 
-class CustomControls:
+class CustomWidgets:
     """Provides static methods for creating common custom UI control groups.
 
     Encapsulates the creation of frequently used compound widgets,
@@ -426,7 +426,7 @@ class CustomControls:
         ttk.Combobox(ft, textvariable=textvariable, values=values, state=state).pack(side='left', padx=5, pady=5)
 
 
-ccontrols = CustomControls()
+c_widgets = CustomWidgets()
 
 
 class ToolBox(ttk.Frame):
@@ -526,7 +526,7 @@ class ToolBox(ttk.Frame):
             move_center(self)
 
         def gui(self):
-            ccontrols.filechose(self, self.path, lang.path, is_folder=True)
+            c_widgets.filechose(self, self.path, lang.path, is_folder=True)
             ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
@@ -559,9 +559,9 @@ class ToolBox(ttk.Frame):
 
         def gui(self):
             """Creates the GUI elements for the MergeQualcommImage_old window."""
-            ccontrols.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
-            ccontrols.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
-            ccontrols.filechose(self, self.output_path, lang.output_path, is_folder=True)
+            c_widgets.filechose(self, self.rawprogram_xml, 'RawProgram Xml：')
+            c_widgets.combobox(self, self.partition_name, ('system', 'userdata', 'cache'), lang.partition_name)
+            c_widgets.filechose(self, self.output_path, lang.output_path, is_folder=True)
             ttk.Button(self, text=lang.run, command=lambda: create_thread(self.run)).pack(padx=5, pady=5, fill='both')
 
         def run(self):
