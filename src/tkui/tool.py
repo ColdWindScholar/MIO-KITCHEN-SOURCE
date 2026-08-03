@@ -1885,6 +1885,9 @@ class Updater(Toplevel):
         super().__init__()
         self.title(lang.t38)
         self.protocol("WM_DELETE_WINDOW", self.close)
+        self.tool_name = "tool"
+        if os.name != "posix":
+            self.tool_name += ".exe"
         states.update_window = True
         self.update_url = settings.update_url or 'https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest'
         self.package_head = ''
@@ -2058,10 +2061,7 @@ class Updater(Toplevel):
         update_files = []
         with zipfile.ZipFile(self.update_zip, 'r') as zip_ref:
             for file in zip_ref.namelist():
-                tool_name = "tool"
-                if os.name != "posix":
-                    tool_name += ".exe"
-                if file != tool_name:
+                if file != self.tool_name:
                     try:
                         zip_ref.extract(file, cwd_path)
                     except PermissionError:
@@ -2114,10 +2114,10 @@ class Updater(Toplevel):
                     logging.warning(path)
         if settings.new_tool and os.path.exists(settings.new_tool):
             shutil.copyfile(settings.new_tool,
-                            os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe'))))
+                            os.path.normpath(os.path.join(cwd_path, self.tool_name)))
             settings.set_value('wait_pids', str(os.getpid()))
             settings.set_value("update_done", 'true')
-            subprocess.Popen([os.path.normpath(os.path.join(cwd_path, "tool" + ('' if os.name != 'nt' else '.exe')))],
+            subprocess.Popen([os.path.normpath(os.path.join(cwd_path, self.tool_name))],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         else:
