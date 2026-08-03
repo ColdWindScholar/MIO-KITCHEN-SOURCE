@@ -2074,7 +2074,7 @@ class Updater(Toplevel):
             'updating': 'true',
             'language': settings.language,
             'oobe': settings.oobe,
-            'new_tool': os.path.join(cwd_path, "bin", tool_name),
+            'new_tool': os.path.join(cwd_path, "bin", self.tool_name),
             "version_old": settings.version,
             "update_files": ' '.join(update_files),
             "wait_pids": " ".join([str(i) for i in states.open_pids]),
