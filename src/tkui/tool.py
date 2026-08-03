@@ -2442,7 +2442,7 @@ class Welcome(ttk.Frame):
 
 
 class SetUtils:
-    def __init__(self, set_ini: str = None, load=True):
+    def __init__(self, set_ini: str | None = None, load=True):
         self.project_struct = 'single'
         self.auto_unpack = '0'
         self.treff = '0'
