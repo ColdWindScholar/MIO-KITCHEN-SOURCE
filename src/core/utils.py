@@ -145,6 +145,7 @@ def call(exe, extra_path=True, out: bool = True, env:dict[str, str] |None =  Non
         logging.exception('Bugs')
         return 2
     ret.wait()
+    logging.debug(f"exit_code : {ret.returncode}")
     return ret.returncode
 
 
