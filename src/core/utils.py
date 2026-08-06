@@ -108,7 +108,7 @@ else:
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
 
 
-def call(exe, extra_path=True, out: bool = True, env:dict[str, str] |None =  None):
+def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = None, debug_binary: bool = False):
     def output(inp: subprocess.CalledProcessError | Popen[bytes]):
         for i in iter(inp.stdout.readline, b""):
             try:
@@ -131,6 +131,12 @@ def call(exe, extra_path=True, out: bool = True, env:dict[str, str] |None =  Non
         if os.name == 'posix':
             cmd = cmd.split()
     conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
+    if debug_binary:
+        if os.name == 'nt':
+            strace_path = f"{tool_bin}/strace.exe"
+        else:
+            strace_path = "strace"
+        cmd = [strace_path, *cmd]
     try:
         ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, creationflags=conf, env=env)
@@ -469,7 +475,7 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count()//2)
+_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count() // 2)
 
 
 def create_thread(func, *args, join=False):
