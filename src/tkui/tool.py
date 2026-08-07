@@ -5501,8 +5501,7 @@ class StdoutRedirector:
             if not line_first:
                 line_first = self.text_space.get("end-1c linestart", "end-1c")
             if line_first == self.text_space.get("end-1c linestart", "end-1c"):
-                i += 1
-                i = i % 1
+                i %= i + 1
             line_first = None
             if not i:
                 self.w = 0
