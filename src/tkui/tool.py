@@ -5449,7 +5449,7 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
     command += ['--out', output_super_path]
     if return_cmd == 1:
         return command
-    if call(command) == 0:
+    if call(command, debug_binary=states.development) == 0:
         if os.access(output_super_path, os.F_OK):
             print(lang.text59 % output_super_path)
             if del_:
