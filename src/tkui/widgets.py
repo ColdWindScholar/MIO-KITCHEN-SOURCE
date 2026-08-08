@@ -97,6 +97,7 @@ class ListBox(Frame):
     def insert(self, text: str = '', value: str = '', state=False):
         if value in self.loaded_value:
             return
+        self.loaded_value.append(value)
         var = BooleanVar(value=state)
         c = Checkbutton(self.label_frame, text=text, variable=var, onvalue=True, offvalue=False)
         self.vars.append(var)
