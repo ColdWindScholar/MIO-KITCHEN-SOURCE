@@ -52,6 +52,7 @@ class ListBox(Frame):
 
     def clear(self):
         self.selected.clear()
+        self.loaded_value.clear()
         for i in self.controls:
             try:
                 i.destroy()
