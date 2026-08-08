@@ -19,3 +19,4 @@ toml
 lz4
 python-lzo; sys_platform == 'linux'
 configparser
+datetime

@@ -16,6 +16,7 @@
 import argparse
 import gzip
 import json
+import random
 import shutil
 import subprocess
 import threading
@@ -26,6 +27,8 @@ from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
+
+import datetime
 
 from src.core.pygpt.gpt_reader import GPTReader
 from src.core.splash_editor.main import splash_repack
@@ -1667,25 +1670,93 @@ class Tool(Tk):
         MpkMan().gui()
 
     def tab_content(self):
-        def react():
-            warn_win("Hi! What can i do for you?", "#814487", "KeMiaoJiang")
 
-        link = ttk.Label(self.tab, text=lang.your_phone_is_about_to_stop_being_yours, cursor="hand2",
-                         style="Link.TLabel", foreground="#CF2C2C")
-        link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
-        link.pack(pady=5)
-        link2 = ttk.Label(self.tab, text=lang.keep_android_open, cursor="hand2",
-                          style="Link.TLabel", foreground="#CF2C2C")
-        link2.pack(padx=16, pady=5)
-        link2.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org/"))
+
+        # 1. Main Content Layout Container (Grid Alignment for Pixel-Perfect Layout)
+        main_container = ttk.Frame(self.tab, padding=20)
+        main_container.pack(fill='both', expand=True)
+        main_container.columnconfigure(0, weight=4)  # Left Column: KeMiaoJiang + Speech Bubble
+        main_container.columnconfigure(1, weight=5)  # Right Column: Text Information & Actions
+
+        # =========================================================================
+        # LEFT SIDE: MASCOT & MODERN INTEGRATED DIALOGUE BUBBLE
+        # =========================================================================
+        left_panel = ttk.Frame(main_container)
+        left_panel.grid(row=0, column=0, sticky='nsew', padx=10)
+
+        # A Cute Dialogue Bubble Container Panel
+        bubble_frame = ttk.LabelFrame(left_panel, text="KeMiaoJiang:", padding=(12, 10))
+        bubble_frame.pack(fill='x', side='top', pady=(10, 5))
+
+        # The Live Label replacing warn_win()
+        self.dialogue_label = ttk.Label(
+            bubble_frame,
+            text="Hi! What can I do for you? ✨",
+            font=('Segoe UI', 10, 'italic'),
+            foreground="#814487",  # Cute Signature Purple Accent
+            wraplength=250,
+            justify='center',
+            anchor='center'
+        )
+        self.dialogue_label.pack(fill='x', expand=True)
+
+        def react():
+            current_time = datetime.datetime.now()
+            last_click = getattr(self, "_last_react_time", None)
+
+            if last_click and (current_time - last_click).total_seconds() < 0.6:
+                return
+            self._last_react_time = current_time
+            self.react_click_count = getattr(self, "react_click_count", 0) + 1
+
+            hour = current_time.hour
+            time_greeting = "Good morning! 🌅" if 5 <= hour < 12 else "Good afternoon! ☀️" if 12 <= hour < 18 else "Good evening! 🌙"
+
+            greetings = [
+                f"{time_greeting} Need me to unpack some partitions? 🛠️",
+                "Master, let's patch some fresh fs_config mappings! 🚀",
+                "MIO-KITCHEN is active! Let's build something awesome today! ✨",
+                "Your ROM kitchen helper KeMiaoJiang is ready for commands! 💖"
+            ]
+
+            if self.react_click_count == 7:
+                self.dialogue_label.configure(text="Hey! Please stop poking me, it tickles! 😂", foreground="#FF6B6B")
+            elif self.react_click_count >= 15:
+                self.dialogue_label.configure(text="System Overload! Going to sleep... 💤", foreground="#777777")
+                self.react_click_count = 0
+            else:
+                self.dialogue_label.configure(text=random.choice(greetings), foreground="#814487")
+
+        img_path = os.path.join(cwd_path, "bin", "kemiaojiang.png")
         global kemiaojiang
-        kemiaojiang_img = open_img(open(f'{cwd_path}/bin/kemiaojiang.png', 'rb'))
-        kemiaojiang = PhotoImage(kemiaojiang_img.resize((280, 540)))
-        kmj = ttk.Label(self.tab, image=kemiaojiang)
-        kmj.pack(side='left', padx=0, expand=True)
+        with open(img_path, 'rb') as f:
+            kemiaojiang_img = open_img(f)
+            kemiaojiang = PhotoImage(kemiaojiang_img.resize((240, 460)))
+
+        kmj = ttk.Label(left_panel, image=kemiaojiang, cursor="hand2")
+        kmj.pack(side='top', pady=5)
         kmj.bind("<Button-1>", lambda *x: react())
-        ttk.Label(self.tab, text=lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN"), justify='left',
-                  foreground='#87CEFA', font=(None, 12)).pack(side='top', padx=5, pady=120, expand=True)
+
+
+        right_panel = ttk.Frame(main_container, padding=(10, 0))
+        right_panel.grid(row=0, column=1, sticky='nsew')
+
+        welcome_str = lang.welcome_text % ("KeMiaoJiang", "HY-惠", "MIO-KITCHEN")
+        ttk.Label(right_panel, text=welcome_str, justify='left',
+                  foreground='#87CEFA', font=('Segoe UI', 11, 'bold')).pack(anchor='w', pady=(30, 15))
+
+        link_card = ttk.LabelFrame(right_panel, text="Campaign & Community ", padding=15)
+        link_card.pack(fill='x', anchor='w', pady=10)
+
+        link = ttk.Label(link_card, text=lang.your_phone_is_about_to_stop_being_yours,
+                         cursor="hand2", style="Link.TLabel", foreground="#CF2C2C", font=('Segoe UI', 10, 'underline'))
+        link.pack(anchor='w', pady=6)
+        link.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org"))
+
+        link2 = ttk.Label(link_card, text=lang.keep_android_open,
+                          cursor="hand2", style="Link.TLabel", foreground="#CF2C2C", font=('Segoe UI', 10, 'bold'))
+        link2.pack(anchor='w', pady=6)
+        link2.bind("<Button-1>", lambda *x: openurl("https://keepandroidopen.org"))
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
