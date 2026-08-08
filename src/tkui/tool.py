@@ -114,7 +114,7 @@ if os.name == 'nt':
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
-from .controls import ListBox, ScrollFrame, input_, ToggledFrame
+from .widgets import ListBox, ScrollFrame, input_, ToggledFrame
 from src.core.undz import DZFileTools
 from src.core.selinux_audit_allow import main as selinux_audit_allow
 import logging
