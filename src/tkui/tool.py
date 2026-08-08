@@ -5755,6 +5755,7 @@ def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
     os.chdir(source)
     if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
+        os.chdir(cwd_path)
     else:
         os.remove(boot)
         os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
