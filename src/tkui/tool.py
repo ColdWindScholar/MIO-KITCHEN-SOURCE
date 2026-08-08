@@ -1724,7 +1724,7 @@ class Tool(Tk):
             ]
 
             if self.react_click_count == 7:
-                self.dialogue_label.configure(text="Hey! Please stop poking me, it tickles! 😂", foreground="#FF6B6B")
+                self.dialogue_label.configure(text="Wahh! Poke limit exceeded! Stop it, it tickles too much~! ヽ(≧Д≦)ノ", foreground="#FF6B6B")
             elif self.react_click_count >= 15:
                 self.dialogue_label.configure(text="System Overload! Going to sleep... 💤", foreground="#777777")
                 self.react_click_count = 0
