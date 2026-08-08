@@ -4246,6 +4246,7 @@ Exec Command: {sys.argv}
 Tool Version: {settings.version}
 Source code running: {states.run_source}
 python Implementation: {platform.python_implementation()}
+Max tasks: {animation.task_num_max}
 Uname: {platform.uname()}
 Log File: {tool_log}\n"""
         # _base_executable: {sys._base_executable}
