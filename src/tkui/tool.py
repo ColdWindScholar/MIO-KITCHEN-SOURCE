@@ -5723,7 +5723,6 @@ def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
                 '\\', "/")
             os.chdir(f"{source}/ramdisk")
             call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
-            os.chdir(source)
         with open(f"{source}/comp", "r", encoding='utf-8') as compf:
             comp = compf.read()
         print(f"Compressing:{comp}")
