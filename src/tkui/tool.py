@@ -1697,6 +1697,8 @@ class Tool(Tk):
     def tab4_content(self):
         self.rotate_angle = 0
         debugger_num = 0
+        PRIMARY_COLOR = '#00BFFF'
+        SECONDARY_COLOR = '#888888'
 
         def getColor():
             nonlocal debugger_num
@@ -1722,26 +1724,48 @@ class Tool(Tk):
         canvas.tag_bind(text_item, '<B1-Motion>', lambda event: update_angle())
         canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
 
-        Label(self.tab4, text=lang.text111, font=(None, 15), fg='#00BFFF').pack(padx=10, pady=10)
-        Label(self.tab4,
-              text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
-              font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
-        if os.path.exists(cwd_path + "/bin/update.json"):
+        Label(self.tab4, text=lang.text111, font=('Segoe UI', 13, 'bold'), fg=PRIMARY_COLOR).pack(pady=(0, 15))
+
+        card_frame = ttk.Frame(self.tab4, padding=15, style="Card.TFrame")
+        card_frame.pack(fill='x', padx=30, pady=10)
+
+        sys_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+        info_text = lang.text128.format(settings.version, sys_ver, platform.system(), machine())
+        ttk.Label(card_frame, text=info_text, font=('Segoe UI', 10), justify='center', anchor='center').pack(fill='x',
+                                                                                                             pady=5)
+
+        update_path = os.path.join(cwd_path, "bin", "update.json")
+        if os.path.exists(update_path):
             try:
-                json_obj = JsonEdit(cwd_path + "/bin/update.json")
-                for k, v in json_obj.read().items():
-                    ttk.Label(self.tab4, text=f"{k}: {v}", foreground='#01aaff', font=(None, 11), justify='right').pack(padx=10, pady=0)
+                json_obj = JsonEdit(update_path)
+                json_frame = ttk.Frame(card_frame)
+                json_frame.pack(fill='x', pady=5)
+
+                for key, val in json_obj.read().items():
+                    row = ttk.Frame(json_frame)
+                    row.pack(fill='x', pady=2)
+                    ttk.Label(row, text=f"{key}:", font=('Segoe UI', 9, 'bold'), foreground=PRIMARY_COLOR).pack(
+                        side='left', padx=(10, 0))
+                    ttk.Label(row, text=str(val), font=('Segoe UI', 9)).pack(side='right', padx=(0, 10))
             except Exception as e:
-                logging.exception(e)
-        ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
-                  background='gray').pack(pady=5)
-        Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
-        ttk.Label(self.tab4, text=lang.t63, style="Link.TLabel").pack()
-        link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
-                         style="Link.TLabel")
+                logging.exception("读取本地更新配置失败: %s", e)
+
+        footer_frame = ttk.Frame(self.tab4)
+        footer_frame.pack(side='bottom', fill='x', pady=20)
+
+        credits_text = f"{settings.language} By {lang.language_file_by}"
+        ttk.Label(footer_frame, text=credits_text, font=('Segoe UI', 9), foreground=SECONDARY_COLOR,
+                  anchor='center').pack(pady=2)
+
+        ttk.Label(footer_frame, text=lang.t63, style="Link.TLabel", anchor='center').pack(pady=2)
+        link = ttk.Label(footer_frame, text="GitHub: MIO-KITCHEN-SOURCE", cursor="hand2", style="Link.TLabel",
+                         font=('Segoe UI', 9, 'underline'))
         link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
         if not is_pro:
-            link.pack()
+            link.pack(pady=2)
+
+        Label(footer_frame, text=lang.text110, font=('Segoe UI', 8), fg=SECONDARY_COLOR).pack(pady=(8, 0))
+
 
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0', style: str = "Toggle.TButton"):
