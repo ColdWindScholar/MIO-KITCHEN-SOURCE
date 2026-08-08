@@ -1,0 +1,9 @@
+{
+  "name": "boot宽容",
+  "version": "1.0",
+  "author": "tao1996",
+  "describe": "boot宽容",
+  "resource": "main.zip",
+  "identifier": "preboot",
+  "depend": ""
+}
