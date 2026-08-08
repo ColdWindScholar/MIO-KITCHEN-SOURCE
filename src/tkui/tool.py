@@ -1718,7 +1718,7 @@ class Tool(Tk):
                 "MIO-KITCHEN is active! Let's build something awesome today! Pin~",
                 "Your ROM kitchen helper KeMiaoJiang is ready for commands! OwO",
                 "What can i do for ya~ :)",
-                "Zzz~~~"
+                "QwQ, I don't recognise this format!"
             ]
 
             if self.react_click_count == 7:
