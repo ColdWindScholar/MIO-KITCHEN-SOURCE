@@ -5752,7 +5752,6 @@ def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
         if comp == "unknown":
             flag = "-n"
         print("Successfully packed Ramdisk..")
-    os.chdir(source)
     if call(['magiskboot', 'repack', flag, boot]) != 0:
         print("Failed to Pack boot...")
         os.chdir(cwd_path)
