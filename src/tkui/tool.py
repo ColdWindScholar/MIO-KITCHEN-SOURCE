@@ -1710,7 +1710,7 @@ class Tool(Tk):
             self.react_click_count = getattr(self, "react_click_count", 0) + 1
 
             hour = current_time.hour
-            time_greeting = "Good morning! 🌅" if 5 <= hour < 12 else "Good afternoon! ☀️" if 12 <= hour < 18 else "Good evening! 🌙"
+            time_greeting = "Good morning! ZwZ" if 5 <= hour < 12 else "Good afternoon! O^O" if 12 <= hour < 18 else "Good evening! Zzz~~"
 
             greetings = [
                 f"{time_greeting} Need me to unpack some partitions? :>",
