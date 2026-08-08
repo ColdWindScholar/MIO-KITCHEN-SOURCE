@@ -240,7 +240,7 @@ def repack(input_dir, config_file, output_file: str, magic_type: CpioMagicFormat
                 value = {'file_type': file_type, 'file_mode': file_mode}
             ino_sum += 1
             ino_ran = max(value.get('c_ino', 0), ino_sum)
-            if ino_ran == ino_sum:
+            if ino_ran == ino_sum and entry != "TRAILER!!!":
                 print(f"Warning: {entry}:{ino_ran} == {ino_sum}")
                 ino_ran += 1
             is_file = False
