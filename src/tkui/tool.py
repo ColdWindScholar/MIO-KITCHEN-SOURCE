@@ -1717,7 +1717,8 @@ class Tool(Tk):
                 "Master, let's patch some fresh fs_config mappings! w^w",
                 "MIO-KITCHEN is active! Let's build something awesome today! Pin~",
                 "Your ROM kitchen helper KeMiaoJiang is ready for commands! OwO",
-                "What can i do for ya~ :)"
+                "What can i do for ya~ :)",
+                "Zzz~~~"
             ]
 
             if self.react_click_count == 7:
