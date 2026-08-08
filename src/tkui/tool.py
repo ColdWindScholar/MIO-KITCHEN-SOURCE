@@ -84,7 +84,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path, _EXECUTOR
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -184,7 +184,7 @@ class LoadAnim:
             master: The parent Tkinter widget (optional).
         """
         self.master = master  # The parent widget where the GIF label will be displayed.
-        self.threadpool = ThreadPoolExecutor(max_workers=cpu_count() // 2)
+        self.threadpool = _EXECUTOR
         self.frames = []  # Stores individual frames of the GIF.
         self.hide_gif = False  # Flag to control GIF visibility.
         self.frame = None  # The current GIF frame being displayed.
