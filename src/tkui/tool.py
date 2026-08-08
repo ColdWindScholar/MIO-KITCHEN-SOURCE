@@ -5715,16 +5715,19 @@ def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
         rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
         print("Repack Rk resource successfully...")
     if os.path.isdir(f"{source}/ramdisk") and settings.boot_skip_ramdisk == '0':
-        cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                        settings.tool_bin).replace(
-            '\\', "/")
-        os.chdir(f"{source}/ramdisk")
-        call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
-        os.chdir(source)
-        with open(f"{source}/comp", "r", encoding='utf-8') as compf:
-            comp = compf.read()
+        if settings.cpio_impl == 'python':
+            cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
+        else:
+            cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
+                            settings.tool_bin).replace(
+                '\\', "/")
+            os.chdir(f"{source}/ramdisk")
+            call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
+            os.chdir(source)
+            with open(f"{source}/comp", "r", encoding='utf-8') as compf:
+                comp = compf.read()
+            os.chdir(source)
         print(f"Compressing:{comp}")
-        os.chdir(source)
         if comp != "unknown":
             if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
                 print("Failed to pack Ramdisk...")
