@@ -381,5 +381,7 @@
   "your_phone_is_about_to_stop_being_yours": "Your phone is about to stop being yours.",
   "cpio_impl": "Cpio Implementation",
   "native": "Native",
-  "python": "Python"
+  "python": "Python",
+  "others": "Others",
+  "tool": "Tool"
 }

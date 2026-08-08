@@ -302,5 +302,7 @@
   "your_phone_is_about_to_stop_being_yours": "你的手机很快就不再属于你。",
   "cpio_impl": "cpio 实现",
   "native": "原生",
-  "python": "Python"
+  "python": "Python",
+  "others": "其他",
+  "tool": "工具"
  }

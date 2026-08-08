@@ -1764,12 +1764,12 @@ class Tool(Tk):
         Setting_Frame = ScrollFrame(self.tab3)
         Setting_Frame.gui()
         Setting_Frame.pack(fill=BOTH, expand=True)
-        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Tool',
+        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text=lang.tool,
                                               callback=Setting_Frame.update_ui, unfold=True)
         sub_frame_theme = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_language = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_path = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text='Others',
+        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text=lang.others,
                                              callback=Setting_Frame.update_ui)
         sub_frame_others = sub_frame_others_main.sub_frame
         sub_frame_project_struct = ttk.Frame(sub_tool_settings_main.sub_frame)
