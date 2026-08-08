@@ -304,5 +304,6 @@
   "native": "原生",
   "python": "Python",
   "others": "其他",
-  "tool": "工具"
+  "tool": "工具",
+  "warning": "警告"
  }

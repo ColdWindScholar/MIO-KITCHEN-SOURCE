@@ -383,5 +383,6 @@
   "native": "Native",
   "python": "Python",
   "others": "Others",
-  "tool": "Tool"
+  "tool": "Tool",
+  "warning": "Warning"
 }

@@ -300,7 +300,7 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master: Optional[tk.Toplevel] = None) -> None:
+def warn_win(text: str = '', color: str = 'red', title: str | None = None, master: Optional[tk.Toplevel] = None) -> None:
     """
     Displays a modal warning/error window that stays until the user closes it.
 
@@ -317,6 +317,8 @@ def warn_win(text: str = '', color: str = 'red', title: str = "Warning", master:
     """
     # Determine the parent window; default to the main app window if not specified.
     parent = master if master and master.winfo_exists() else win
+    if not title:
+        title = lang.warning
 
     popup_window = Toplevel()  # Use the custom Toplevel for theme consistency.
     popup_window.title(title)
