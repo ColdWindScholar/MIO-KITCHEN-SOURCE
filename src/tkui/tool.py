@@ -1782,11 +1782,11 @@ class Tool(Tk):
         ###
         ###
         cpio_impl = StringVar(value=settings.cpio_impl)
-        ttk.Label(sub_frame_cpio_impl, text="Cpio impl").pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sub_frame_cpio_impl, text="python", variable=cpio_impl, value='python').pack(
+        ttk.Label(sub_frame_cpio_impl, text=lang.cpio_impl).pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sub_frame_cpio_impl, text=lang.python, variable=cpio_impl, value='python').pack(
             padx=10, pady=10,
             side='left')
-        ttk.Radiobutton(sub_frame_cpio_impl, text="native", variable=cpio_impl, value='native').pack(padx=10,
+        ttk.Radiobutton(sub_frame_cpio_impl, text=lang.native, variable=cpio_impl, value='native').pack(padx=10,
                                                                                                                 pady=10,
                                                                                                                 side='left')
         cpio_impl.trace("w", lambda *x: settings.set_value('cpio_impl', cpio_impl.get()))
