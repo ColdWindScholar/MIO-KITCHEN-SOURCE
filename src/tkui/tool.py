@@ -190,7 +190,7 @@ class LoadAnim:
         self.frame = None  # The current GIF frame being displayed.
         self.tasks = {}  # Dictionary to keep track of running tasks associated with the animation.
         self.task_num_index = 0  # Index for assigning unique task numbers.
-        self.task_num_max = cpu_count() // 2  # Maximum number of concurrent tasks (for task_num_index cycling).
+        self.task_num_max = cpu_count()  # Maximum number of concurrent tasks (for task_num_index cycling).
 
     def run(self, ind: int = 0):
         """Cycles through GIF frames to create the animation.
