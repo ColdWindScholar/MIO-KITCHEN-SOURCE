@@ -67,7 +67,7 @@ class JsonEdit:
 # Links
 links = {
     "erofs_utils": {
-        "link": "https://api.github.com/repos/sekaiacg/erofs-utils/releases/latest",
+        "link": "https://api.github.com/repos/ColdWindScholar/erofs-utils/releases/latest",
         "github_json": True,
         'rename_pattern':"",
         # erofs-utils-v1.8.4-gc9629116-Android_arm64-v8a-2501262050.zip
