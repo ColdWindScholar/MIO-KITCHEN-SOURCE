@@ -1778,6 +1778,18 @@ class Tool(Tk):
         self.list2.pack(padx=10, pady=10, side='left')
         self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
         ###
+        ###
+        cpio_impl = StringVar(value=settings.cpio_impl)
+        ttk.Label(sub_frame_project_struct, text="Cpio impl").pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sub_frame_project_struct, text="python", variable=cpio_impl, value='python').pack(
+            padx=10, pady=10,
+            side='left')
+        ttk.Radiobutton(sub_frame_project_struct, text="native", variable=cpio_impl, value='native').pack(padx=10,
+                                                                                                                pady=10,
+                                                                                                                side='left')
+        cpio_impl.trace("w", lambda *x: settings.set_value('cpio_impl', cpio_impl.get()))
+        ###
+        ###
         project_struct = StringVar(value=settings.project_struct)
         ttk.Label(sub_frame_project_struct, text=lang.project_struct).pack(padx=10, pady=10, side='left')
         ttk.Radiobutton(sub_frame_project_struct, text=lang.single, variable=project_struct, value='single').pack(
@@ -2455,6 +2467,7 @@ class SetUtils:
         self.ai_engine = '0'
         self.version = 'basic'
         self.check_upgrade = '0'
+        self.cpio_impl = 'native'
         self.version_old = 'unknown'
         self.language = 'English'
         self.boot_skip_ramdisk = '0'

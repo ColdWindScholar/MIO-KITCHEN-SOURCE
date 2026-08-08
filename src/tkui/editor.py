@@ -22,7 +22,7 @@ import pygments.lexers
 from chlorophyll import CodeView
 
 from ..core.utils import create_thread, lang, gettype, move_center
-from ..tkui.controls import input_
+from ..tkui.widgets import input_
 
 
 class PythonEditor(tk.Frame):
