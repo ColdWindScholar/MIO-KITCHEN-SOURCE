@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     needs: [build-win,build-linux,build-macos]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.12.6"]
