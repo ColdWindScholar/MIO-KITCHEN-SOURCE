@@ -1730,11 +1730,11 @@ class Tool(Tk):
             try:
                 json_obj = JsonEdit(cwd_path + "/bin/update.json")
                 for k, v in json_obj.read().items():
-                    ttk.Label(self.tab4, text=f"{k}: {v}", foreground='#00aaff', font=(None, 11)).pack(padx=10, pady=10)
+                    ttk.Label(self.tab4, text=f"{k}: {v}", foreground='#01aaff', font=(None, 11)).pack(padx=10, pady=0)
             except Exception as e:
                 logging.exception(e)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
-                  background='gray').pack()
+                  background='gray').pack(pady=5)
         Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
         ttk.Label(self.tab4, text=lang.t63, style="Link.TLabel").pack()
         link = ttk.Label(self.tab4, text="Github: MIO-KITCHEN-SOURCE", cursor="hand2",
