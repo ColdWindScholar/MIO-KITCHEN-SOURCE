@@ -1710,7 +1710,7 @@ class Tool(Tk):
             self.react_click_count = getattr(self, "react_click_count", 0) + 1
 
             hour = current_time.hour
-            time_greeting = "Good morning! ZwZ" if 5 <= hour < 12 else "Good afternoon! O^O" if 12 <= hour < 18 else "Good evening! Zzz~~"
+            time_greeting = "Good morning! ~_~" if 5 <= hour < 12 else "Good afternoon! O^O" if 12 <= hour < 18 else "Good evening! Zzz~~"
 
             greetings = [
                 f"{time_greeting} Need me to unpack some partitions? :>",
@@ -1718,7 +1718,9 @@ class Tool(Tk):
                 "MIO-KITCHEN is active! Let's build something awesome today! Pin~",
                 "Your ROM kitchen helper KeMiaoJiang is ready for commands! OwO",
                 "What can i do for ya~ :)",
-                "QwQ, I don't recognise this format!"
+                "QwQ, I don't recognise this format!",
+                "Unpacking roms...",
+                "My binaries are the latest (￣▽￣)~* "
             ]
 
             if self.react_click_count == 7:
