@@ -1726,6 +1726,13 @@ class Tool(Tk):
         Label(self.tab4,
               text=lang.text128.format(settings.version, sys.version[:6], platform.system(), machine()),
               font=(None, 11), fg='#00aaff').pack(padx=10, pady=10)
+        if os.path.exists(cwd_path + "/bin/update.json"):
+            try:
+                json_obj = JsonEdit(cwd_path + "/bin/update.json")
+                for k, v in json_obj.read().items():
+                    ttk.Label(self.tab4, text=f"{k}: {v}", foreground='#00aaff', font=(None, 11)).pack(padx=10, pady=10)
+            except Exception as e:
+                logging.exception(e)
         ttk.Label(self.tab4, text=f"{settings.language} By {lang.language_file_by}", foreground='orange',
                   background='gray').pack()
         Label(self.tab4, text=lang.text110, font=(None, 10)).pack(padx=10, pady=10, side='bottom')
