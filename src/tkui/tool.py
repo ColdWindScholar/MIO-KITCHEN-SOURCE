@@ -1772,6 +1772,7 @@ class Tool(Tk):
                                              callback=Setting_Frame.update_ui)
         sub_frame_others = sub_frame_others_main.sub_frame
         sub_frame_project_struct = ttk.Frame(sub_tool_settings_main.sub_frame)
+        sub_frame_cpio_impl = ttk.Frame(sub_tool_settings_main.sub_frame)
         sub_frame_cache = ttk.Frame(sub_tool_settings_main.sub_frame)
         ttk.Label(sub_frame_theme, text=lang.text124).pack(side='left', padx=10, pady=10)
         self.list2 = ttk.Combobox(sub_frame_theme, textvariable=theme, state='readonly', values=["light", "dark"])
@@ -1780,11 +1781,11 @@ class Tool(Tk):
         ###
         ###
         cpio_impl = StringVar(value=settings.cpio_impl)
-        ttk.Label(sub_frame_project_struct, text="Cpio impl").pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text="python", variable=cpio_impl, value='python').pack(
+        ttk.Label(sub_frame_cpio_impl, text="Cpio impl").pack(padx=10, pady=10, side='left')
+        ttk.Radiobutton(sub_frame_cpio_impl, text="python", variable=cpio_impl, value='python').pack(
             padx=10, pady=10,
             side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text="native", variable=cpio_impl, value='native').pack(padx=10,
+        ttk.Radiobutton(sub_frame_cpio_impl, text="native", variable=cpio_impl, value='native').pack(padx=10,
                                                                                                                 pady=10,
                                                                                                                 side='left')
         cpio_impl.trace("w", lambda *x: settings.set_value('cpio_impl', cpio_impl.get()))
@@ -1843,7 +1844,7 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cache,
+        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct,sub_frame_cpio_impl, sub_frame_cache,
                   sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         # Check Update
