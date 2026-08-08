@@ -1713,10 +1713,11 @@ class Tool(Tk):
             time_greeting = "Good morning! 🌅" if 5 <= hour < 12 else "Good afternoon! ☀️" if 12 <= hour < 18 else "Good evening! 🌙"
 
             greetings = [
-                f"{time_greeting} Need me to unpack some partitions? 🛠️",
-                "Master, let's patch some fresh fs_config mappings! 🚀",
-                "MIO-KITCHEN is active! Let's build something awesome today! ✨",
-                "Your ROM kitchen helper KeMiaoJiang is ready for commands! 💖"
+                f"{time_greeting} Need me to unpack some partitions? :>",
+                "Master, let's patch some fresh fs_config mappings! w^w",
+                "MIO-KITCHEN is active! Let's build something awesome today! Pin~",
+                "Your ROM kitchen helper KeMiaoJiang is ready for commands! OwO",
+                "What can i do for ya~ :)"
             ]
 
             if self.react_click_count == 7:
