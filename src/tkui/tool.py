@@ -68,6 +68,7 @@ from timeit import default_timer as dti
 start = dti()
 import zipfile
 from src.core.aml_image import main as aml_main
+from src.core.cpio import extract as cpio_extract, repack as cpio_repack
 from io import BytesIO, StringIO
 from .tkinterdnd2_build_in import Tk, DND_FILES
 from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
@@ -5684,9 +5685,13 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
         print("Unpacking Ramdisk...")
-        os.chdir(work + name)
-        call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
-        os.chdir(cwd_path)
+        if settings.cpio_impl == 'python':
+            cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
+                         os.path.join(work, name, 'ramdisk.txt'))
+        else:
+            os.chdir(work + name)
+            call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
+            os.chdir(cwd_path)
     print("Unpack Done!")
     os.chdir(cwd_path)
 
