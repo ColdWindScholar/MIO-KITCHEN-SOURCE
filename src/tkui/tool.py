@@ -14,40 +14,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import datetime
 import gzip
 import json
+import platform
 import random
 import shutil
 import subprocess
 import threading
-import platform
-from concurrent.futures import ThreadPoolExecutor
 from contextlib import suppress
 from functools import wraps
 from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
-import datetime
-
-from src.core.pygpt.gpt_reader import GPTReader
-from src.core.splash_editor.main import splash_repack
-from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
+from src.core.cpb_file import extract_cpb
 from src.core.encryption_disabler import process_fstab_for_encryption
+from src.core.ntpiutils import extractor as ntpiextractor
+from src.core.ntpiutils import parser as ntpiparser
+from src.core.pygpt.gpt_reader import GPTReader
 from src.core.qsb_imger import process_by_xml
 from src.core.romfs_parse import RomfsParse
-from src.core.ntpiutils import parser as ntpiparser
-from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repack
+from src.core.splash_editor.main import splash_repack
+from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core.unkdz import KDZFileTools
+from src.porttool.ui import MyUI
 from ..core.payload_extract import extract_partitions_from_payload
 from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
-from src.porttool.ui import MyUI
 
 pyi_splash_available = False
 if platform.system() != 'Darwin':
@@ -6358,6 +6357,8 @@ def unpackrom(ifile: str) -> None:
             unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         return
     # NTPI
+    if gettype(ifile) == 'cpb':
+        extract_cpb(ifile, project_manger.current_work_path())
     if gettype(ifile) == 'NTPI':
         prog_name = os.path.splitext(os.path.basename(ifile))[0]
         current_project_name.set(prog_name)

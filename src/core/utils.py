@@ -83,7 +83,8 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b"\x85\x19", "jffs2"], [b'RKFW', 'rkfw'], [b'RKAF', 'rkaf'],
            [b'EFI PART', 'gpt', 0x200], [b'SPLASH!!', 'splash', 1024],
            [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P',
-            'guoke_logo']
+            'guoke_logo'],
+           [b'CP', 'cpb']
            )
 
 # ----DEFS
