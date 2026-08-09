@@ -6461,7 +6461,7 @@ class ProjectManager:
             if not os.path.exists(path) and current_project_name.get():
                 os.makedirs(path, exist_ok=True)
         if mkdir:
-            os.makedirs(path, exists_ok=True)
+            os.makedirs(path, exist_ok=True)
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def current_origin_path(self):
