@@ -175,7 +175,7 @@ def extract_cpb(filepath: str, output_folder: str):
             if img_header.size == 0:
                 continue
             origin_seek = f.tell()
-            f.seek(img_header.offset + header_offset, os.SEEK_SET)
+            f.seek(img_header.offset + header_offset)
             with open(os.path.join(output_folder, file_name), "wb") as of:
                 of.write(f.read(img_header.size))
             f.seek(origin_seek)
