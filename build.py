@@ -102,7 +102,7 @@ class Builder:
                 print(f"Installing {i}")
                 _main(['install', i])
         for ext in os.listdir("src/c_extension"):
-            print(f"[Ext] Installing {i}")
+            print(f"[Ext] Installing {ext}")
             _main(['install', f"src/c_extension/{ext}"])
 
     def pyinstaller_build(self):
