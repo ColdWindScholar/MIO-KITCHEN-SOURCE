@@ -6620,8 +6620,10 @@ def unpack(chose: list | dict, form: str = '') -> bool:
                 print(lang.text79 + f"{i}.img[{file_type}]")
                 try:
                     utils.simg2img(f"{work}/{i}.img")
-                except (Exception, BaseException):
-                    win.message_pop(lang.warn11.format(f"{i}.img"))
+                except (Exception, BaseException) as e:
+                    logging.exception(e)
+                    win.message_pop(e)
+                    continue
             if i not in parts.keys():
                 parts[i] = gettype(f"{work}/{i}.img")
             print(lang.text79 + f"{i}.img[{file_type}]")
@@ -7461,8 +7463,8 @@ class UnpackGui(ttk.LabelFrame):
                     f_type = gettype(work + file_name)
                     if f_type == 'unknown':
                         f_type = form
-                    self.lsg.insert(f'{file_name.split(f".{form}")[0]} [{f_type}]',
-                                    file_name.split(f".{form}")[0])
+                    self.lsg.insert(f'{file_name[:-len(f".{form}")]} [{f_type}]',
+                                    file_name[:-len(f".{form}")])
         return True
 
     def refs2(self):
