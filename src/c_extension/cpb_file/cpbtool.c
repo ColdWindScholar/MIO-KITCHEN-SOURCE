@@ -21,11 +21,11 @@ typedef struct tagCPBHEADER
 	uint8 cp_version[2] ; 	//CPB文件版本
 	uint16 correct[6] ;		//12字节校正用 
 	uint8 unknown[32] ;		//未知32字节
-	char model[32] ;		//适用的手机型号，如"8730L" 
-	char hardVersion[16] ;	//适用的硬件版本号，如"P3"
-	char version[64] ;		//适用的版本号，如"4.3.066.P3.140417.8730L"
+	char model[32] ;		//适用的手机型号,如"8730L" 
+	char hardVersion[16] ;	//适用的硬件版本号,如"P3"
+	char version[64] ;		//适用的版本号,如"4.3.066.P3.140417.8730L"
 	char romFrom[256] ;		//
-	uint32 imgHdrEndPos ; 	//Image Header停止的位置，这样就能确定Image Header大小
+	uint32 imgHdrEndPos ; 	//Image Header停止的位置,这样就能确定Image Header大小
 	uint8 reverse[128] ;  	//保留
 	uint32 checkSum ;		//校验和（CRC16） 
 }CPBHEADER, *LPCPBHEADER ;
@@ -159,7 +159,7 @@ void PrintCpbHeader(LPCPBHEADER pHdr)
 	printf("HardWare Version:%s\n", buf) ;
 	strncpy(buf, pHdr->version, sizeof(buf)) ;
 	printf("Version:%s\n", buf) ;
-	printf("Header size:%u，every 76 bytes，total %u.\n",
+	printf("Header size:%u,every 76 bytes,total %u.\n",
 		pHdr->imgHdrEndPos-sizeof(CPBHEADER), (pHdr->imgHdrEndPos-sizeof(CPBHEADER)) / sizeof(IMAGEHEADER)) ;
 	printf("checkSum:0x%08X\n\n", pHdr->checkSum) ;
 }
@@ -199,7 +199,7 @@ void CreateListFile(const char *lpszCpb, const char *lpszList)
 	if(pImgHdr == NULL)
 	{
 		fclose(fcpb) ;
-		printf("malloc %u failed，invalid file!\n", nImgSize) ;
+		printf("malloc %u failed,invalid file!\n", nImgSize) ;
 		return 0 ;
 	}
 	sz = fread(pImgHdr, nImgSize, 1, fcpb) ;
@@ -216,10 +216,10 @@ void CreateListFile(const char *lpszCpb, const char *lpszList)
 		for(i=0; i<nImgCount; i++)
 			fprintf(flst, "%s\n", pImgHdr[i].fileName) ;
 		fclose(flst) ;
-		printf("list file ‘%s’ Generated!\n", lpszList) ;
+		printf("list file '%s' Generated!\n", lpszList) ;
 	}
 	else
-		printf("list file ‘%s’Generate failed!\n", lpszList) ;
+		printf("list file '%s'Generate failed!\n", lpszList) ;
 	free(pImgHdr) ;
 	fclose(fcpb) ;
 	return 0 ;
@@ -285,7 +285,7 @@ void DumpFile(FILE *fcpb, const char *lpszPath, LPIMAGEHEADER pImgHdrs, uint32 n
 		fImg = fopen(szFile, "wb") ;
 		if(fImg == NULL)
 		{
-			printf("Generate ‘%s’ Failed!\n", szFile) ;
+			printf("Generate '%s' Failed!\n", szFile) ;
 			continue ;
 		}
 		for(nLen=0, uiCrc=0; (nLen+iBufSize)<=pImgHdrs[i].imageSize; nLen+=iBufSize)
@@ -336,7 +336,7 @@ void UnpackCpb(const char *lpszCpb, const char *lpszPath)
 	strncpy(szPath, lpszPath, sizeof(szPath)) ;
 	if(MkdirRecursive(szPath) != 0)
 	{
-		printf("Create ‘%s’ Failed!\n", lpszPath) ;
+		printf("Create '%s' Failed!\n", lpszPath) ;
 		return ;
 	}
 	sz = strlen(szPath) ;
@@ -380,7 +380,7 @@ void UnpackCpb(const char *lpszCpb, const char *lpszPath)
 	if(pImgHdr == NULL)
 	{
 		fclose(fcpb) ;
-		printf("Malloc %u bytes failed，wrong file!\n", nImgSize) ;
+		printf("Malloc %u bytes failed,wrong file!\n", nImgSize) ;
 		return ;
 	}
 	sz = fread(pImgHdr, nImgSize, 1, fcpb) ;
@@ -401,7 +401,7 @@ void UnpackCpb(const char *lpszCpb, const char *lpszPath)
 	{
 		free(pImgHdr) ;
 		fclose(fcpb) ;
-		printf("Veridy Failed!Expected:0x%.8X，But:0x%.8X\n",
+		printf("Verify Failed!Expected:0x%.8X,But:0x%.8X\n",
 			cpbHdr.checkSum, uiCrc) ;
 		return ;
 	}
@@ -509,7 +509,7 @@ void PackCpb(LPCPBHEADER pCpbHdr, const char *lpszPath, const char *lpszList, co
 	
 	if(lpszPath == NULL || lpszPath[0]=='\0' || access(lpszPath, 0) != 0)
 	{
-		printf("‘%s’ invalid path!\n", lpszPath) ;
+		printf("'%s' invalid path!\n", lpszPath) ;
 		return ;
 	}
 	strncpy(szPath, lpszPath, sizeof(szPath)) ;
@@ -530,20 +530,20 @@ void PackCpb(LPCPBHEADER pCpbHdr, const char *lpszPath, const char *lpszList, co
 	
 	if(access( lpszPath, 0 ) != 0)
 	{
-		printf("Path ‘%s’ cannot access!\n", lpszPath) ;
+		printf("Path '%s' cannot access!\n", lpszPath) ;
 		return ;
 	}
 	flst = fopen(lpszList, "r") ;
 	if(flst == NULL)
 	{
-		printf("list file ‘%s’ open failed!\n", lpszList) ;
+		printf("list file '%s' open failed!\n", lpszList) ;
 		return ;
 	}
 	fcpb = fopen(lpszCpb, "wb") ;
 	if(fcpb == NULL)
 	{
 		fclose(flst) ;
-		printf("Create ‘%s’ Failed!\n", lpszCpb) ;
+		printf("Create '%s' Failed!\n", lpszCpb) ;
 		return ;
 	}
 	pImgHdr = malloc(sizeof(IMAGEHEADER) * MAX_IMG) ;
@@ -564,20 +564,20 @@ void PackCpb(LPCPBHEADER pCpbHdr, const char *lpszPath, const char *lpszList, co
 		{
 			if(fseek(fImgs[nCount], 0, SEEK_END) != 0)
 			{
-				printf("file ‘%s’seek failed!\n", szFile) ;
+				printf("file '%s'seek failed!\n", szFile) ;
 				continue ;
 			}
 			pImgHdr[nCount].imageOffset += sizeof(IMAGEHEADER) ;
 			pImgHdr[nCount].imageSize = ftell(fImgs[nCount]) ;
 			if((int32)pImgHdr[nCount].imageSize == -1)
 			{
-				printf("get file ‘%s’  size failed!\n", szFile) ;
+				printf("get file '%s'  size failed!\n", szFile) ;
 				continue ;
 			}
 			fseek(fImgs[nCount], 0, SEEK_SET) ;
 			nCount++ ;
 		}
-		else printf("file ‘%s’ open failed!\n", szFile) ;
+		else printf("file '%s' open failed!\n", szFile) ;
 	}
 	pCpbHdr->imgHdrEndPos = sizeof(CPBHEADER) + nCount * sizeof(IMAGEHEADER) ;
 	uiCrc = CRC16((uint8 *)pCpbHdr, sizeof(CPBHEADER)-4, 0) ;
