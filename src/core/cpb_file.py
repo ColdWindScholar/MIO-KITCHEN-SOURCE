@@ -165,7 +165,7 @@ def extract_cpb(filepath: str, output_folder: str):
             return
         nImgCount = (header.img_header_end_pos - sizeof(header)) // sizeof(ImageHeader)
         # todo: impl verify
-        header_offset = nImgCount * len(ImageHeader) + len(header)
+        header_offset = nImgCount * len(ImageHeader()) + len(header)
         for i in range(nImgCount):
             img_header = ImageHeader()
             img_d = f.read(len(img_header))
