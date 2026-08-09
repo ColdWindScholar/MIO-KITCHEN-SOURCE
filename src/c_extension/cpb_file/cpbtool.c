@@ -657,7 +657,9 @@ static PyObject* c_extract(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "ss", &filepath, &output)) {
         return NULL;
     }
+    Py_BEGIN_ALLOW_THREADS
     UnpackCpb(filepath, output);
+    Py_END_ALLOW_THREADS
     Py_RETURN_NONE;
 }
 
