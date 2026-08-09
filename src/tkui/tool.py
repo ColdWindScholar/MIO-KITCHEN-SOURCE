@@ -6360,7 +6360,7 @@ def unpackrom(ifile: str) -> None:
     # NTPI
     if ftype == 'cpb':
         prog_name = os.path.splitext(os.path.basename(ifile))[:1]
-        current_project_name.set(prog_name)
+        current_project_name.set("".join(prog_name))
         extract_cpb(ifile, project_manger.current_work_path(mkdir=True))
         return
     if ftype == 'NTPI':
