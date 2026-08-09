@@ -6350,16 +6350,18 @@ def unpackrom(ifile: str) -> None:
         unpackg.refs(True)
         return
     # pac
-    if gettype(ifile) == 'pac':
+    ftype = gettype(ifile)
+    if ftype == 'pac':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
         if settings.auto_unpack == '1':
             unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         return
     # NTPI
-    if gettype(ifile) == 'cpb':
+    if ftype == 'cpb':
         extract_cpb(ifile, project_manger.current_work_path())
-    if gettype(ifile) == 'NTPI':
+        return
+    if ftype == 'NTPI':
         prog_name = os.path.splitext(os.path.basename(ifile))[0]
         current_project_name.set(prog_name)
         if not os.path.exists(project_manger.current_work_path()):
@@ -6368,7 +6370,7 @@ def unpackrom(ifile: str) -> None:
         ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
         return
     # zip
-    if gettype(ifile) == 'zip':
+    if ftype == 'zip':
         current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
         with zipfile.ZipFile(ifile, 'r') as fz:
             for fi in fz.namelist():
