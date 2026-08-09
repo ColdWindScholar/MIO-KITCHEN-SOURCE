@@ -6359,14 +6359,14 @@ def unpackrom(ifile: str) -> None:
         return
     # NTPI
     if ftype == 'cpb':
-        extract_cpb(ifile, project_manger.current_work_path())
+        prog_name = os.path.splitext(os.path.basename(ifile))[:1]
+        current_project_name.set(prog_name)
+        extract_cpb(ifile, project_manger.current_work_path(mkdir=True))
         return
     if ftype == 'NTPI':
         prog_name = os.path.splitext(os.path.basename(ifile))[0]
         current_project_name.set(prog_name)
-        if not os.path.exists(project_manger.current_work_path()):
-            os.makedirs(project_manger.current_work_path(), exist_ok=True)
-        ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path())
+        ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path(mkdir=True))
         ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
         return
     # zip
@@ -6453,13 +6453,15 @@ class ProjectManager:
         os.makedirs(path, exist_ok=True)
         return path
 
-    def current_work_path(self):
+    def current_work_path(self, mkdir=False):
         if settings.project_struct == 'single':
             path = self.get_work_path(current_project_name.get())
         else:
             path = os.path.join(self.get_work_path(current_project_name.get()), 'Source') + os.sep
             if not os.path.exists(path) and current_project_name.get():
                 os.makedirs(path, exist_ok=True)
+        if mkdir:
+            os.makedirs(path, exists_ok=True)
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def current_origin_path(self):
