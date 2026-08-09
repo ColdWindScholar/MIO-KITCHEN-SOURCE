@@ -307,13 +307,13 @@ void DumpFile(FILE *fcpb, const char *lpszPath, LPIMAGEHEADER pImgHdrs, uint32 n
 				fwrite(pBuf, nLen, 1, fImg) ;
 			}
 			else
-				printf("Generate “%s” Failed!!\n\n", pImgHdrs[i].fileName) ;
+				printf("Generate %s Failed!!\n\n", pImgHdrs[i].fileName) ;
 		}
 		fclose(fImg) ;
 		if(uiCrc != pImgHdrs[i].checkSum)
-			printf("Verify Failed!Generated “%s” invalid!wrong cpb!\n\n", pImgHdrs[i].fileName) ;
+			printf("Verify Failed!Generated %s invalid!wrong cpb!\n\n", pImgHdrs[i].fileName) ;
 		else
-			printf("“%s” Generated!\n\n", pImgHdrs[i].fileName) ;
+			printf("%s Generated!\n\n", pImgHdrs[i].fileName) ;
 	}
 	free(pBuf) ;
 }
@@ -658,6 +658,7 @@ static PyObject* c_extract(PyObject* self, PyObject* args) {
         return NULL;
     }
     UnpackCpb(filepath, output);
+    Py_RETURN_NONE;
 }
 
 static PyMethodDef MyMethods[] = {
