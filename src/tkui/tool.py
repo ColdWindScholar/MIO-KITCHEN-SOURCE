@@ -33,7 +33,7 @@ from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
-from src.core.cpb_file import extract_cpb
+from cpb_file import extract as extract_cpb
 from src.core.encryption_disabler import process_fstab_for_encryption
 from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
