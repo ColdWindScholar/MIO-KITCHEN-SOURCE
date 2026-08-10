@@ -5826,9 +5826,11 @@ def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
         if settings.cpio_impl == 'python':
             cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
         else:
-            cpio = findfile("cpio.exe" if os.name != 'posix' else 'cpio',
-                            settings.tool_bin).replace(
-                '\\', "/")
+            cpio = os.path.join(settings.tool_bin, 'cpio' if os.name != 'nt' else "cpio.exe")
+            cpio = os.path.realpath(cpio)
+            if os.name == 'nt':
+                cpio = cpio.replace("\\", '/')
+
             os.chdir(f"{source}/ramdisk")
             call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
         with open(f"{source}/comp", "r", encoding='utf-8') as compf:
