@@ -84,7 +84,7 @@ formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef
            [b'EFI PART', 'gpt', 0x200], [b'SPLASH!!', 'splash', 1024],
            [b'###\x00|\x00\x00\x00LOGO_TABLE\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00P',
             'guoke_logo'],
-           [b'CP', 'cpb']
+           [b'CP', 'cpb'], [b'IMAGEWTY', 'allwin']
            )
 
 # ----DEFS
