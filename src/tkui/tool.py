@@ -5805,7 +5805,7 @@ def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
 
 
 @animation
-def repack_boot(name: str = 'boot', source: str = None, boot: str = None):
+def repack_boot(name: str = 'boot', source: str | None = None, boot: str | None = None):
     work = project_manger.current_work_path()
     flag = ''
     if boot is None:
