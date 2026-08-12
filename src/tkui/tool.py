@@ -5895,6 +5895,8 @@ class PackPartition(Toplevel):
         self.fs_conver = BooleanVar(value=False)
 
         self.erofs_old_kernel = BooleanVar(value=False)
+        self.f2fs_read_only = BooleanVar(value=False)
+        self.f2fs_compresion = BooleanVar(value=False)
         if not self.verify():
             self.start_()
             return
@@ -5933,6 +5935,7 @@ class PackPartition(Toplevel):
             padx=5,
             pady=5,
             side='left')
+        # Erofs
         Label(lf2, text=lang.text50).pack(side='left', padx=5, pady=5)
         ttk.Combobox(lf2, state="readonly", textvariable=self.erofs_compress_format,
                      values=("lz4", "lz4hc", "lzma", "deflate", "zstd")).pack(side='left', padx=5, pady=5)
@@ -5946,6 +5949,13 @@ class PackPartition(Toplevel):
         self.label_e = tk.Label(lf2, text=lang.t30.format(int(scales_erofs.get())))
         self.label_e.pack(side='left', padx=5, pady=5)
         scales_erofs.pack(fill="x", padx=5, pady=5)
+        #
+        ttk.Checkbutton(f2fs_frame, text="Read only", variable=self.f2fs_read_only, onvalue=True, offvalue=False,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH, side='left')
+        ttk.Checkbutton(f2fs_frame, text="Compression", variable=self.f2fs_compresion, onvalue=True, offvalue=False,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
         # --
         scales = ttk.Scale(sf1, from_=0, to=9, orient="horizontal",
                            command=lambda x: self.label.config(text=lang.text47.format(int(float(x))) % "Brotli"),
@@ -6125,7 +6135,7 @@ class PackPartition(Toplevel):
                                 print(lang.text3.format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
-                                 UTC=self.UTC.get()) != 0:
+                                 UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(), compress=self.f2fs_compresion.get()) != 0:
                         print(lang.text75 % dname)
                     else:
                         if self.remove_source_files.get() == 1:
@@ -6949,7 +6959,7 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size: i
 
 
 @animation
-def make_f2fs(name: str, work: str, work_output: str, UTC: int = None):
+def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False, compress: bool =  False):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
     print(f"{name}:[{size}]")
