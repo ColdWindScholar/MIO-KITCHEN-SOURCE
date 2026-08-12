@@ -20,3 +20,5 @@ lz4
 python-lzo; sys_platform == 'linux'
 configparser
 datetime
+androguard
+loguru

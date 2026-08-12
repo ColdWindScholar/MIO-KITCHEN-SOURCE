@@ -34,6 +34,8 @@ from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
+from src.tkui.apk_manager import ApkManagerContent
+
 try:
     from cpb_file import extract as extract_cpb
 except ModuleNotFoundError:
@@ -306,7 +308,8 @@ class LoadAnim:
         return call_func
 
 
-def warn_win(text: str = '', color: str = 'red', title: str | None = None, master: Optional[tk.Toplevel] = None) -> None:
+def warn_win(text: str = '', color: str = 'red', title: str | None = None,
+             master: Optional[tk.Toplevel] = None) -> None:
     """
     Displays a modal warning/error window that stays until the user closes it.
 
@@ -1674,7 +1677,6 @@ class Tool(Tk):
 
     def tab_content(self):
 
-
         # 1. Main Content Layout Container (Grid Alignment for Pixel-Perfect Layout)
         main_container = ttk.Frame(self.tab, padding=20)
         main_container.pack(fill='both', expand=True)
@@ -1727,7 +1729,8 @@ class Tool(Tk):
             ]
 
             if self.react_click_count == 7:
-                self.dialogue_label.configure(text="Wahh! Poke limit exceeded! Stop it, it tickles too much~! ヽ(≧Д≦)ノ", foreground="#FF6B6B")
+                self.dialogue_label.configure(
+                    text="Wahh! Poke limit exceeded! Stop it, it tickles too much~! ヽ(≧Д≦)ノ", foreground="#FF6B6B")
             elif self.react_click_count >= 15:
                 self.dialogue_label.configure(text="System Overload! Going to sleep... 💤", foreground="#777777")
                 self.react_click_count = 0
@@ -1743,7 +1746,6 @@ class Tool(Tk):
         kmj = ttk.Label(left_panel, image=kemiaojiang, cursor="hand2")
         kmj.pack(side='top', pady=5)
         kmj.bind("<Button-1>", lambda *x: react())
-
 
         right_panel = ttk.Frame(main_container, padding=(10, 0))
         right_panel.grid(row=0, column=1, sticky='nsew')
@@ -1844,7 +1846,6 @@ class Tool(Tk):
 
         Label(footer_frame, text=lang.text110, font=('Segoe UI', 8), fg=SECONDARY_COLOR).pack(pady=(8, 0))
 
-
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0', style: str = "Toggle.TButton"):
             a = StringVar(value=getattr(settings, item))
@@ -1898,8 +1899,8 @@ class Tool(Tk):
             padx=10, pady=10,
             side='left')
         ttk.Radiobutton(sub_frame_cpio_impl, text=lang.native, variable=cpio_impl, value='native').pack(padx=10,
-                                                                                                                pady=10,
-                                                                                                                side='left')
+                                                                                                        pady=10,
+                                                                                                        side='left')
         cpio_impl.trace("w", lambda *x: settings.set_value('cpio_impl', cpio_impl.get()))
         ###
         ###
@@ -1956,7 +1957,8 @@ class Tool(Tk):
         get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
         lb3.pack(padx=10, pady=10, side='left')
         lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct,sub_frame_cpio_impl, sub_frame_cache,
+        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cpio_impl,
+                  sub_frame_cache,
                   sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
         Setting_Frame.update_ui()
         # Check Update
@@ -6139,7 +6141,8 @@ class PackPartition(Toplevel):
                                 print(lang.text3.format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
-                                 UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(), compress=self.f2fs_compresion.get()) != 0:
+                                 UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(),
+                                 compress=self.f2fs_compresion.get()) != 0:
                         print(lang.text75 % dname)
                     else:
                         if self.remove_source_files.get() == 1:
@@ -6963,7 +6966,8 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size: i
 
 
 @animation
-def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False, compress: bool =  False):
+def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False,
+              compress: bool = False):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
     part_uuid = str(uuid.uuid4())
@@ -6988,7 +6992,9 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, re
         f.truncate(size_f2fs)
     # /usr/bin/make_f2fs -d 0 -l odm -O extra_attr,compression,ro -U d6112980-bd3b-4b9e-bf4c-fba453cfdb42 -T 1230768000 ./Projects/Project_name/Build/odm.img -f
     #
-    if call(['mkfs.f2fs', '-d', '0', '-l', name, '-O', "extra_attr,compression,ro" if readonly else 'extra_attr,inode_checksum,sb_checksum,compression', "-U", part_uuid, '-T', str(UTC), f"{work_output}/{name}.img", '-f']):
+    if call(['mkfs.f2fs', '-d', '0', '-l', name, '-O',
+             "extra_attr,compression,ro" if readonly else 'extra_attr,inode_checksum,sb_checksum,compression', "-U",
+             part_uuid, '-T', str(UTC), f"{work_output}/{name}.img", '-f']):
         return 1
     # The efficiency of verifying and adding file contexts has been improved.
     # Let's confirm that the basic context for the partition is present.
@@ -7006,7 +7012,9 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, re
     if not found:
         with open(file_contexts_path, 'a', encoding='utf-8') as f_append:
             f_append.write(line_to_ensure)
-    return call(['sload.f2fs', '-d', '0', '-c' if compress else '', '-r' if readonly else '', '-C', f'{work}/config/{name}_fs_config', '-f', work + name, '-p', f'{work_output}/{name}.img', '-s', f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC), f'{work_output}/{name}.img'])
+    return call(['sload.f2fs', '-d', '0', '-c' if compress else '', '-r' if readonly else '', '-C',
+                 f'{work}/config/{name}_fs_config', '-f', work + name, '-p', f'{work_output}/{name}.img', '-s',
+                 f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC), f'{work_output}/{name}.img'])
 
 
 def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
@@ -7268,7 +7276,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            ("Apk Manager", lambda: create_thread(lambda :ApkManager(current_project_name.get()))),
+            ("Apk Manager", lambda: create_thread(lambda: ApkManager(current_project_name.get()))),
             # ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
@@ -7514,22 +7522,13 @@ class UnpackGui(ttk.LabelFrame):
             PackPartition(lbs)
 
 
-#todo: read apk info via aapt2 / apktool
 class ApkManager(Toplevel):
-    def __init__(self, project_name:str = "generic"):
+    def __init__(self, project_name: str = "generic"):
         super().__init__()
         self.title(f"Apk Manager[{project_name}]")
-        #format: apkname :packagename:version:size:path
-        #todo: extract app icon to a tmp folder, name them by packagename, format: png
-        self.apk_infos: dict = dict()
-        self.icons_path = os.path.join(
-            temp, f"icon_{project_name}"
-        )
-        self.gui()
+        self.apkManager = ApkManagerContent(self)
+        self.apkManager.start_parallel_parse(project_manger.current_work_path())
         move_center(self)
-
-    def gui(self):
-        pass
 
 
 class FormatConversion(ttk.LabelFrame):
@@ -7697,7 +7696,7 @@ class FormatConversion(ttk.LabelFrame):
 
 
 def init_verify():
-    win.deiconify() # for verify
+    win.deiconify()  # for verify
     if not os.path.exists(settings.tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():

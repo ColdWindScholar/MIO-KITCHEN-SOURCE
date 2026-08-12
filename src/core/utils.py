@@ -32,10 +32,10 @@ from subprocess import Popen
 from concurrent.futures import ThreadPoolExecutor
 from lzma import LZMADecompressor
 import tarfile
-from . import blockimgdiff
-from . import sparse_img
-from . import update_metadata_pb2 as um
-from .lpunpack import SparseImage
+from src.core import blockimgdiff
+from src.core import sparse_img
+from src.core import update_metadata_pb2 as um
+from src.core.lpunpack import SparseImage
 
 DataImage = blockimgdiff.DataImage
 
