@@ -305,5 +305,6 @@
   "python": "Python",
   "others": "其他",
   "tool": "工具",
-  "warning": "警告"
+  "warning": "警告",
+  "f2fs_settings": "F2FS设置"
  }

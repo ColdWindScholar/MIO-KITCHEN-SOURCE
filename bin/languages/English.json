@@ -384,5 +384,6 @@
   "python": "Python",
   "others": "Others",
   "tool": "Tool",
-  "warning": "Warning"
+  "warning": "Warning",
+  "f2fs_settings": "F2FS Settings"
 }

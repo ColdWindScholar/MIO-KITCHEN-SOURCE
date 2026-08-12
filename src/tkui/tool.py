@@ -5911,7 +5911,7 @@ class PackPartition(Toplevel):
         lf1.pack(fill=BOTH, padx=5, pady=5)
         lf2 = ttk.LabelFrame(self, text=lang.text44)
         lf2.pack(fill=BOTH, padx=5, pady=5)
-        f2fs_frame = ttk.LabelFrame(self, text="F2FS Settings")
+        f2fs_frame = ttk.LabelFrame(self, text=lang.f2fs_settings)
         f2fs_frame.pack(fill=BOTH, padx=5, pady=5)
         lf3 = ttk.LabelFrame(self, text=lang.text45)
         lf3.pack(fill=BOTH, padx=5, pady=5)
