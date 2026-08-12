@@ -306,5 +306,7 @@
   "others": "其他",
   "tool": "工具",
   "warning": "警告",
-  "f2fs_settings": "F2FS设置"
+  "f2fs_settings": "F2FS设置",
+  "readonly": "只读",
+  "compression": "压缩"
  }

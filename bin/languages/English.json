@@ -385,5 +385,7 @@
   "others": "Others",
   "tool": "Tool",
   "warning": "Warning",
-  "f2fs_settings": "F2FS Settings"
+  "f2fs_settings": "F2FS Settings",
+  "readonly": "Readonly",
+  "compression": "Compression"
 }

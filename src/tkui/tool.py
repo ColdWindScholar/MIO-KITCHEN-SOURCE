@@ -5954,10 +5954,10 @@ class PackPartition(Toplevel):
         self.label_e.pack(side='left', padx=5, pady=5)
         scales_erofs.pack(fill="x", padx=5, pady=5)
         #
-        ttk.Checkbutton(f2fs_frame, text="Read only", variable=self.f2fs_read_only, onvalue=True, offvalue=False,
+        ttk.Checkbutton(f2fs_frame, text=lang.readonly, variable=self.f2fs_read_only, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH, side='left')
-        ttk.Checkbutton(f2fs_frame, text="Compression", variable=self.f2fs_compresion, onvalue=True, offvalue=False,
+        ttk.Checkbutton(f2fs_frame, text=lang.compression, variable=self.f2fs_compresion, onvalue=True, offvalue=False,
                         style="Switch.TCheckbutton").pack(
             padx=5, pady=5, fill=BOTH)
         # --
