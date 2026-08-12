@@ -91,6 +91,7 @@ class ApkManagerContent:
                                                                                 "search...") if not self.search_var.get() else None)
 
         ttk.Button(top, text="Import debloat list", command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=6)
+        ttk.Button(top, text="Export debloat list", command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=6)
 
 
         ws = tk.Frame(self.root)
@@ -132,6 +133,14 @@ class ApkManagerContent:
         self.list_perms = tk.Listbox(rp, fg="white", bd=0, highlightthickness=1,
                                      highlightbackground="#2d3748", font=("Consolas", 9))
         self.list_perms.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
+
+    def export_debloat_list(self):
+        f = filedialog.asksaveasfilename(filetypes=[("Debloat List", ".txt")])
+        if f:
+            with open(f, "w", encoding='utf-8', newline='\n') as f:
+                for info in self.get_selected_apps_info():
+                    f.write(f"{info['package']}\n")
+
     def import_debloat_list(self):
         f = filedialog.askopenfilename(filetypes=[("Debloat List", "*.txt")])
         if f:
