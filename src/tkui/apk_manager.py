@@ -91,7 +91,6 @@ class ApkManagerContent:
                                                                                 "search...") if not self.search_var.get() else None)
 
         ttk.Button(top, text="Import debloat list", command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=6)
-        ttk.Button(top, text="Scan a dir", command=self.select_dir).pack(side=tk.RIGHT, padx=5, pady=6)
 
 
         ws = tk.Frame(self.root)
