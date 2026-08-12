@@ -22,6 +22,7 @@ import random
 import shutil
 import subprocess
 import threading
+import uuid
 from contextlib import suppress
 from functools import wraps
 from random import randrange
@@ -6962,7 +6963,8 @@ def make_ext4fs(name: str, work: str, work_output, sparse: bool = False, size: i
 def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False, compress: bool =  False):
     print(lang.text91 % name)
     size = GetFolderSize(work + name, 1, 1).rsize_v
-    print(f"{name}:[{size}]")
+    part_uuid = str(uuid.uuid4())
+    print(f"{name} - {size} - {part_uuid}")
 
     def align_to_4k(size):
         # Align the size upwards to multiples of 4096 bytes.
@@ -6981,9 +6983,9 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, re
         UTC = int(time.time())
     with open(f"{work + name}.img", 'wb') as f:
         f.truncate(size_f2fs)
-    if call(['mkfs.f2fs', f"{work_output}/{name}.img", '-O', 'extra_attr', '-O', 'inode_checksum', '-O', 'sb_checksum',
-             '-O',
-             'compression', '-f']) != 0:
+    # /usr/bin/make_f2fs -d 0 -l odm -O extra_attr,compression,ro -U d6112980-bd3b-4b9e-bf4c-fba453cfdb42 -T 1230768000 ./Projects/Project_name/Build/odm.img -f
+    #
+    if call(['mkfs.f2fs', '-d', '0', '-l', name, '-O', "extra_attr,compression,ro" if readonly else 'extra_attr,inode_checksum,sb_checksum,compression', "-U", part_uuid, '-T', str(UTC), f"{work_output}/{name}.img", '-f']):
         return 1
     # The efficiency of verifying and adding file contexts has been improved.
     # Let's confirm that the basic context for the partition is present.
@@ -7001,9 +7003,7 @@ def make_f2fs(name: str, work: str, work_output: str, UTC: int | None = None, re
     if not found:
         with open(file_contexts_path, 'a', encoding='utf-8') as f_append:
             f_append.write(line_to_ensure)
-    return call(
-        ['sload.f2fs', '-f', work + name, '-C', f'{work}/config/{name}_fs_config', '-T', f'{UTC}', '-s',
-         f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-c', f'{work_output}/{name}.img'])
+    return call(['sload.f2fs', '-d', '0', '-c' if compress else '', '-r' if readonly else '', '-C', f'{work}/config/{name}_fs_config', '-f', work + name, '-p', f'{work_output}/{name}.img', '-s', f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC), f'{work_output}/{name}.img'])
 
 
 def mke2fs(name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
