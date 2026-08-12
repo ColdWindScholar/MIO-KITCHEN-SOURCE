@@ -8,6 +8,9 @@ from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
 import sv_ttk
+
+from src.core.utils import hum_convert
+
 logger.remove()
 
 class ApkCard(tk.Frame):
@@ -149,7 +152,7 @@ class ApkManagerContent:
     def parse_single_apk(self, path):
         try:
             apk = APK(path)
-            size = f"{os.path.getsize(path) / (1024 * 1024):.2f} MB"
+            size = hum_convert(os.path.getsize(path))
 
             icon_tk = self.default_icon
             icon_path = apk.get_app_icon(max_dpi=480)
