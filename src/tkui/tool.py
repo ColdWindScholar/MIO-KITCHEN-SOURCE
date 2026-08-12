@@ -7527,7 +7527,7 @@ class ApkManager(Toplevel):
         super().__init__()
         self.title(f"Apk Manager[{project_name}]")
         self.apkManager = ApkManagerContent(self)
-        create_thread(self.apkManager.start_parallel_parse, project_manger.current_work_path())
+        create_thread(self.apkManager.select_dir, project_manger.current_work_path())
         move_center(self)
 
 

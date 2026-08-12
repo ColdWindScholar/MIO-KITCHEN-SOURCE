@@ -1,222 +1,247 @@
 import os
+import threading
+from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor
 import tkinter as tk
-from tkinter import ttk
-
-import logging
+from tkinter import filedialog, ttk
+from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
-from src.core.utils import hum_convert
-# Remove the default logger console handler completely
+import sv_ttk
 logger.remove()
+
+class ApkCard(tk.Frame):
+    def __init__(self, parent, info, on_click, on_toggle):
+        sv_ttk.use_dark_theme()
+        super().__init__(parent, highlightthickness=1, highlightbackground="#2d3748")
+        self.info = info
+        self.on_toggle = on_toggle
+        self.configure(width=280, height=80)
+        self.pack_propagate(False)
+
+        self.chk_var = tk.BooleanVar(value=info.get("selected", False))
+        self.chk = ttk.Checkbutton(
+            self, variable=self.chk_var, command=self._toggle_handler
+        )
+        self.chk.pack(side=tk.LEFT, padx=(10, 0))
+
+        lbl_img = tk.Label(self, image=info["icon_img"])
+        lbl_img.pack(side=tk.LEFT, padx=10)
+
+        f_txt = tk.Frame(self)
+        f_txt.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, pady=8)
+
+        tk.Label(f_txt, text=info["internal_name"], font=("Segoe UI", 10, "bold"), fg="white",
+                 anchor="w").pack(fill=tk.X)
+        tk.Label(f_txt, text=info["package"], font=("Segoe UI", 8), fg="#a0aec0", anchor="w").pack(
+            fill=tk.X)
+        tk.Label(f_txt, text=f"{info['size']} • SDK {info['target_sdk']}", font=("Segoe UI", 8), fg="#718096"
+                , anchor="w").pack(fill=tk.X)
+
+        for w in (self, lbl_img, f_txt):
+            w.bind("<Button-1>", lambda e: on_click(self.info, self))
+
+    def _toggle_handler(self):
+        self.on_toggle(self.info, self.chk_var.get())
+
+    def update_checkbox(self, value):
+        self.chk_var.set(value)
+
+    def mark_selected(self, sel):
+        self.configure(highlightbackground="#0078D4" if sel else "#2d3748", highlightthickness=2 if sel else 1)
 
 
 class ApkManagerContent:
-
     def __init__(self, root):
+        sv_ttk.use_dark_theme()
         self.root = root
-        self.root.geometry("1000x550")
-        self.apk_data_list = {}
-        self.create_widgets()
-        style = ttk.Style()
+        self.root.geometry("1300x600")
+        self.root.configure()
+        self.apk_data = []
+        self.active_card = None
+        self.icon_cache = []
+        self.card_widgets = {}
 
-        style.map("Treeview",
-                  background=[("selected", "#0078D4")],  # Custom Windows-like blue on select
-                  foreground=[("selected", "#ffffff")],  # White text on select
-                  )
+        img = Image.new("RGBA", (48, 48), "#2d3748")
+        self.default_icon = ImageTk.PhotoImage(img)
+        self.icon_cache.append(self.default_icon)
+        self.create_widgets()
 
     def create_widgets(self):
-        self.lbl_status = tk.Label(
-            self.root,
-            text="Loaded 0 APK's",
-            fg="#a0aec0",
-            bg="#212b36",
-            anchor="w",
-            padx=10,
-        )
-        self.lbl_status.pack(fill=tk.X, pady=5)
+        top = ttk.Frame(self.root, height=40)
+        top.pack(fill=tk.X)
+        top.pack_propagate(False)
 
-        # 2. 中部核心表格
-        columns = (
-            "filename",
-            "package",
-            "internal_name",
-            "size",
-            "partition",
-            "version",
-            "target_sdk",
-        )
-        self.tree = ttk.Treeview(
-            self.root,
-            columns=columns,
-            show="headings",
-        )
+        self.lbl_status = tk.Label(top, text="Loaded 0 APK's", fg="#a0aec0",  font=("Segoe UI", 9, "bold"),
+                                   padx=15)
+        self.lbl_status.pack(side=tk.LEFT, fill=tk.Y)
 
-        headers = {
-            "filename": "Filename",
-            "package": "Package",
-            "internal_name": "Internal Name",
-            "size": "Size",
-            "partition": "Partition",
-            "version": "Version",
-            "target_sdk": "Target SDK",
-        }
-        for col, text in headers.items():
-            self.tree.heading(col, text=text, anchor="w")
-            self.tree.column(col, width=130, anchor="w")
-
-        self.tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
-        self.tree.bind("<<TreeviewSelect>>", self.on_item_selected)
-
-        bottom_frame = tk.Frame(self.root)
-        bottom_frame.pack(fill=tk.X, padx=10, pady=10)
-
-        left_pane = tk.Frame(bottom_frame)
-        left_pane.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        search_frame = tk.Frame(left_pane)
-        search_frame.pack(fill=tk.X, pady=5)
-
-
-
-        self.search_entry = tk.Entry(
-            search_frame, fg="white", insertbackground="white"
-        )
+        # Search Entry Bar
+        self.search_var = tk.StringVar()
+        self.search_var.trace_add("write", lambda *args: self.filter_cards())
+        self.search_entry = ttk.Entry(top, textvariable=self.search_var, font=("Segoe UI", 9), width=30)
+        self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
         self.search_entry.insert(0, "search...")
-        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
+        self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.delete(0,
+                                                                               tk.END) if self.search_var.get() == "search..." else None)
+        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.insert(0,
+                                                                                "search...") if not self.search_var.get() else None)
+
+        ttk.Button(top, text="Import debloat list", command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=6)
+        ttk.Button(top, text="Scan a dir", command=self.select_dir).pack(side=tk.RIGHT, padx=5, pady=6)
+
+
+        ws = tk.Frame(self.root)
+        ws.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        g_con = tk.Frame(ws)
+        g_con.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.canvas = tk.Canvas(g_con, bd=0, highlightthickness=0)
+        sb = ttk.Scrollbar(g_con, orient="vertical", command=self.canvas.yview)
+        self.grid_frame = tk.Frame(self.canvas)
+        self.grid_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.grid_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=sb.set)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        sb.pack(side=tk.RIGHT, fill=tk.Y)
+
+        rp = tk.Frame(ws, width=340, highlightthickness=1, highlightbackground="#2d3748")
+        rp.pack(side=tk.RIGHT, fill=tk.BOTH, padx=(10, 0))
+        rp.pack_propagate(False)
+
+        self.ins_icon = tk.Label(rp, image=self.default_icon)
+        self.ins_icon.pack(pady=(20, 5))
+        self.ins_name = tk.Label(rp, text="Select an APK", font=("Segoe UI", 12, "bold"), fg="white")
+        self.ins_name.pack()
 
         self.meta_labels = {}
-        meta_keys = [
-            "Version",
-            "Min. SDK Version",
-            "Target SDK Version",
-            "Screen Sizes",
-            "Screen Densities",
-        ]
-        for key in meta_keys:
-            f = tk.Frame(left_pane)
-            f.pack(fill=tk.X, pady=2)
-            tk.Label(
-                f, text=f"{key}:", fg="#a0aec0", width=18, anchor="w"
-            ).pack(side=tk.LEFT)
-            lbl_val = tk.Label(
-                f, text="<none>", fg="white", anchor="w"
-            )
-            lbl_val.pack(side=tk.LEFT, fill=tk.X)
-            self.meta_labels[key] = lbl_val
+        for key in ["Version", "Min. SDK Version", "Target SDK Version"]:
+            f = tk.Frame(rp)
+            f.pack(fill=tk.X, padx=20, pady=4)
+            tk.Label(f, text=f"{key}:", font=("Segoe UI", 9), fg="#a0aec0", width=15, anchor="w").pack(
+                side=tk.LEFT)
+            lbl = tk.Label(f, text="<none>", font=("Segoe UI", 9, "bold"), fg="white", anchor="w")
+            lbl.pack(side=tk.LEFT, fill=tk.X)
+            self.meta_labels[key] = lbl
 
-        right_pane = tk.Frame(bottom_frame)
-        right_pane.pack(side=tk.RIGHT, fill=tk.BOTH)
+        tk.Label(rp, text="Permissions", font=("Segoe UI", 9, "bold"), fg="#a0aec0").pack(anchor="w",
+                                                                                                        padx=20,
+                                                                                                        pady=(15, 2))
+        self.list_perms = tk.Listbox(rp, fg="white", bd=0, highlightthickness=1,
+                                     highlightbackground="#2d3748", font=("Consolas", 9))
+        self.list_perms.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
+    def import_debloat_list(self):
+        f = filedialog.askopenfilename(filetypes=[("Debloat List", "*.txt")])
+        if f:
+            with open(f, "r") as f:
+                for line in f.readlines():
+                    line = line.strip()
+                    self.select_by_package(line)
+    def select_dir(self, d):
+        if d:
+            for w in self.grid_frame.winfo_children(): w.destroy()
+            self.apk_data.clear()
+            self.card_widgets.clear()
+            self.search_var.set("")
+            self.active_card = None
+            threading.Thread(target=self.parse_dir, args=(d,), daemon=True).start()
 
-        p_frame = tk.Frame(right_pane)
-        p_frame.pack(side=tk.LEFT, padx=5)
-        tk.Label(p_frame, text="Permissions").pack(
-            anchor="w"
-        )
-        self.list_perms = tk.Listbox(
-            p_frame,
-            width=25,
-            height=6,
-            bg="#1a202c",
-            fg="white",
-            selectbackground="#0078D4",
-        )
-        self.list_perms.pack()
+    def parse_single_apk(self, path):
+        try:
+            apk = APK(path)
+            size = f"{os.path.getsize(path) / (1024 * 1024):.2f} MB"
 
-        f_frame = tk.Frame(right_pane)
-        f_frame.pack(side=tk.LEFT, padx=5)
-        tk.Label(f_frame, text="Features").pack(
-            anchor="w"
-        )
-        self.list_features = tk.Listbox(
-            f_frame,
-            width=25,
-            height=6,
-            bg="#1a202c",
-            fg="white",
-            selectbackground="#0078D4",
-        )
-        self.list_features.pack()
+            icon_tk = self.default_icon
+            icon_path = apk.get_app_icon(max_dpi=480)
+            if icon_path:
+                icon_data = apk.get_file(icon_path)
+                if icon_data:
+                    img = Image.open(BytesIO(icon_data))
+                    img = img.resize((48, 48), Image.Resampling.LANCZOS)
+                    icon_tk = ImageTk.PhotoImage(img)
 
-
-    def parse_single_apk(self, full_path):
-        f_size = hum_convert(os.path.getsize(full_path))
-        apk = APK(full_path)
-        return {
-                "success": True,
-                "filename": os.path.basename(full_path),
-                "package": apk.get_package(),
-                "internal_name": apk.get_app_name() or "<Unknown>",
-                "size": f_size,
-                "partition": os.path.dirname(os.path.dirname(full_path)).split("/")[-1:],
-                "version": apk.get_androidversion_name(),
-                "target_sdk": apk.get_target_sdk_version(),
-                "min_sdk": apk.get_min_sdk_version(),
-                "permissions": apk.get_permissions(),
-                "features": apk.get_features(),
+            return {
+                "success": True, "filename": os.path.basename(path), "package": apk.get_package() or "Unknown",
+                "internal_name": apk.get_app_name() or os.path.basename(path), "size": size,
+                "version": apk.get_androidversion_name() or "1.0", "target_sdk": apk.get_target_sdk_version() or "?",
+                "min_sdk": apk.get_min_sdk_version() or "?", "permissions": apk.get_permissions() or [],
+                "icon_img": icon_tk,
+                "selected": False
             }
+        except:
+            return {"success": False}
 
+    def parse_dir(self, d):
+        self.lbl_status.config(text="Scanning...")
+        files = [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.lower().endswith(".apk")]
 
-    def start_parallel_parse(self, dir_path):
         count = 0
-        self.lbl_status.config(
-            text=f"Loading...")
-        for dirpath, dirnames, filenames in os.walk(dir_path):
-            for filename in filenames:
-                if filename.endswith(".apk"):
-                    self.lbl_status.config(
-                        text=f"[{count}]Loading {filename}")
-                    try:
-                        res = self.parse_single_apk(os.path.join(dirpath, filename))
-                    except Exception as e:
-                        logging.exception(e)
-                        continue
-                    if res and res["success"]:
-                        self.insert_tree_item(res)
-                        count += 1
-        self.lbl_status.config(
-                text=f"Loaded {count} APK's")
+        with ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as ex:
+            for res in ex.map(self.parse_single_apk, files):
+                if res.get("success"):
+                    count += 1
+                    self.add_card(res, count)
+        self.lbl_status.config(text=f"Loaded {count} APK's completely.")
 
+    def add_card(self, info, count):
+        self.apk_data.append(info)
+        self.icon_cache.append(info["icon_img"])
+        self.lbl_status.config(text=f"[{count}] Parsing: {info['filename']}")
+        card = ApkCard(self.grid_frame, info, self.on_click, self.on_toggle)
+        self.card_widgets[info["package"]] = card
+        self.filter_cards()
 
+    def filter_cards(self):
+        query = self.search_var.get().strip().lower()
+        if query == "search...":
+            query = ""
 
-    def insert_tree_item(self, info):
-        item_id = self.tree.insert(
-            "",
-            tk.END,
-            values=(
-                info["filename"],
-                info["package"],
-                info["internal_name"],
-                info["size"],
-                info["partition"],
-                info["version"],
-                info["target_sdk"],
-            ),
-        )
-        self.apk_data_list[item_id] = info
+        visible_idx = 0
+        for info in self.apk_data:
+            card = self.card_widgets.get(info["package"])
+            if not card: continue
 
-    def on_item_selected(self, event):
-        selected_items = self.tree.selection()
-        if not selected_items:
-            return
+            match = (query in info["package"].lower() or
+                     query in info["filename"].lower() or
+                     query in info["internal_name"].lower())
 
-        item_id = selected_items[0]
-        info = self.apk_data_list.get(item_id)
-        if not info:
-            return
+            if match:
+                card.grid(row=visible_idx // 3, column=visible_idx % 3, padx=10, pady=10, sticky="nsew")
+                visible_idx += 1
+            else:
+                card.grid_forget()
 
+    def on_click(self, info, widget):
+        if self.active_card:
+            self.active_card.mark_selected(False)
+        self.active_card = widget
+        self.active_card.mark_selected(True)
+
+        self.ins_icon.config(image=info["icon_img"])
+        self.ins_name.config(text=info["internal_name"])
         self.meta_labels["Version"].config(text=info["version"])
         self.meta_labels["Min. SDK Version"].config(text=info["min_sdk"])
         self.meta_labels["Target SDK Version"].config(text=info["target_sdk"])
-        self.meta_labels["Screen Sizes"].config(text="Dynamic")
-        self.meta_labels["Screen Densities"].config(text="Dynamic")
 
         self.list_perms.delete(0, tk.END)
-        for perm in info["permissions"]:
-            self.list_perms.insert(tk.END, perm.split(".")[-1])
+        for p in info["permissions"]: self.list_perms.insert(tk.END, p.split(".")[-1])
 
-        self.list_features.delete(0, tk.END)
-        for feat in info["features"]:
-            self.list_features.insert(tk.END, feat)
+    def on_toggle(self, info, is_checked):
+        info["selected"] = is_checked
 
+    def select_by_package(self, package_name, state=True):
+        for info in self.apk_data:
+            if info["package"] == package_name:
+                info["selected"] = state
+                if package_name in self.card_widgets:
+                    self.card_widgets[package_name].update_checkbox(state)
+                break
 
+    def get_selected_apps_info(self):
+        return [info for info in self.apk_data if info.get("selected")]
 
+if __name__ == "__main__":
+    root = tk.Tk()
+    ttk.Style(root).theme_use("clam")
+    app = ApkManagerContent(root)
+    root.mainloop()
