@@ -2,6 +2,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
+import logging
 from androguard.core.apk import APK
 from loguru import logger
 from src.core.utils import hum_convert
@@ -146,7 +147,7 @@ class ApkManagerContent:
                 "package": apk.get_package(),
                 "internal_name": apk.get_app_name() or "<Unknown>",
                 "size": f_size,
-                "partition": "N/A",
+                "partition": os.path.dirname(os.path.dirname(full_path)).split("/")[-1:],
                 "version": apk.get_androidversion_name(),
                 "target_sdk": apk.get_target_sdk_version(),
                 "min_sdk": apk.get_min_sdk_version(),
@@ -164,7 +165,11 @@ class ApkManagerContent:
                 if filename.endswith(".apk"):
                     self.lbl_status.config(
                         text=f"[{count}]Loading {filename}")
-                    res = self.parse_single_apk(os.path.join(dirpath, filename))
+                    try:
+                        res = self.parse_single_apk(os.path.join(dirpath, filename))
+                    except Exception as e:
+                        logging.exception(e)
+                        continue
                     if res and res["success"]:
                         self.insert_tree_item(res)
                         count += 1
