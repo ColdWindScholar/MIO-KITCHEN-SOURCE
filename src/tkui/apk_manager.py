@@ -1,13 +1,13 @@
 import os
-import threading
-from io import BytesIO
-from concurrent.futures import ThreadPoolExecutor
 import tkinter as tk
+from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
 from tkinter import filedialog, ttk
+
+import sv_ttk
 from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
-import sv_ttk
 
 from src.core.utils import hum_convert, lang
 
@@ -152,7 +152,7 @@ class ApkManagerContent:
             self.card_widgets.clear()
             self.search_var.set("")
             self.active_card = None
-            threading.Thread(target=self.parse_dir, args=(d,), daemon=True).start()
+            self.parse_dir(d)
 
     def parse_single_apk(self, path):
         try:
