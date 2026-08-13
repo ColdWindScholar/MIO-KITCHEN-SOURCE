@@ -183,6 +183,10 @@ class ApkManagerContent:
             return {"success": False}
 
     def parse_dir(self):
+        self.apk_data.clear()
+        self.icon_cache.clear()
+        self.active_card = None
+        [w.destroy() for w in self.grid_frame.winfo_children()]
         count = 0
         with ThreadPoolExecutor(max_workers=4) as ex:
             for res in ex.map(self.parse_single_apk,
