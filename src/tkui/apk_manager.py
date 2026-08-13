@@ -84,18 +84,13 @@ class ApkManagerContent:
         self.search_var.trace_add("write", lambda *args: self.filter_cards())
         self.search_entry = ttk.Entry(top, textvariable=self.search_var, font=("Segoe UI", 9), width=30)
         self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
-        self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.delete(0,
-                                                                               tk.END) if self.search_var.get() == "search..." else None)
-
-
         ttk.Button(top, text=lang.import_debloat_list, command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
         ttk.Button(top, text=lang.export_debloat_list, command=self.export_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
 
-
-        ws = tk.Frame(self.root)
+        ws = ttk.Frame(self.root)
         ws.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        g_con = tk.Frame(ws)
+        g_con = ttk.Frame(ws)
         g_con.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.canvas = tk.Canvas(g_con, bd=0, highlightthickness=0)
         sb = ttk.Scrollbar(g_con, orient="vertical", command=self.canvas.yview)
