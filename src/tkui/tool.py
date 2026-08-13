@@ -271,7 +271,7 @@ class LoadAnim:
                 return_value = func(*args, **kwargs)
             """The wrapper function that manages the animation and task execution."""
             # Start the animation in a new thread to avoid blocking the UI.
-            if len(self.tasks) > self.task_num_max:
+            if len(self.tasks) >= self.task_num_max or utils.threads >= self.task_num_max:
                 return lambda *a, **k: print("Cannot create new thread.The thread pool has been filled.")
             self.run()
             task_num = self.get_task_num()
