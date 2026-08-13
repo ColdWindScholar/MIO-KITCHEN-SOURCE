@@ -9,7 +9,7 @@ from androguard.core.apk import APK
 from loguru import logger
 import sv_ttk
 
-from src.core.utils import hum_convert
+from src.core.utils import hum_convert, lang
 
 logger.remove()
 
@@ -90,8 +90,8 @@ class ApkManagerContent:
         self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.insert(0,
                                                                                 "search...") if not self.search_var.get() else None)
 
-        ttk.Button(top, text="Import debloat list", command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
-        ttk.Button(top, text="Export debloat list", command=self.export_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
+        ttk.Button(top, text=lang.import_debloat_list, command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
+        ttk.Button(top, text=lang.export_debloat_list, command=self.export_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
 
 
         ws = tk.Frame(self.root)

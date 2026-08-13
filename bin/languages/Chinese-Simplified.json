@@ -308,5 +308,7 @@
   "warning": "警告",
   "f2fs_settings": "F2FS设置",
   "readonly": "只读",
-  "compression": "压缩"
+  "compression": "压缩",
+  "import_debloat_list": "导入精简列表",
+  "export_debloat_list": "导出精简列表"
  }

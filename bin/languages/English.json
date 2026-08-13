@@ -387,5 +387,7 @@
   "warning": "Warning",
   "f2fs_settings": "F2FS Settings",
   "readonly": "Readonly",
-  "compression": "Compression"
+  "compression": "Compression",
+  "import_debloat_list": "Import debloat list",
+  "export_debloat_list": "Export debloat list"
 }
