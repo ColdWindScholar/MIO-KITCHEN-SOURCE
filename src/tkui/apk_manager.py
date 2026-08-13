@@ -47,9 +47,6 @@ class ApkCard(tk.Frame):
     def _toggle_handler(self):
         self.on_toggle(self.info, self.chk_var.get())
 
-    def update_checkbox(self, value):
-        self.chk_var.set(value)
-
     def mark_selected(self, sel):
         self.configure(highlightbackground="#0078D4" if sel else "#2d3748", highlightthickness=2 if sel else 1)
 
@@ -229,7 +226,7 @@ class ApkManagerContent:
             if info["package"] == package_name:
                 info["selected"] = state
                 if package_name in self.card_widgets:
-                    self.card_widgets[package_name].update_checkbox(state)
+                    self.card_widgets[package_name].chk_var.set(state)
                 break
 
     def get_selected_apps_info(self):
