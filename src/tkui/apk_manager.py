@@ -131,11 +131,14 @@ class ApkManagerContent:
         for info in self.get_selected_apps_info():
             path = info['path']
             if os.path.exists(path):
+                print(f"Removing {path}")
+                os.remove(path)
                 try:
                     os.remove(path)
                 except Exception as e:
                     logging.exception(e)
                     print(f"Removed {path}")
+        self.filter_cards()
 
     def export_debloat_list(self):
         f = filedialog.asksaveasfile(filetypes=[("Debloat List", ".txt")], title="Save debloat list",
