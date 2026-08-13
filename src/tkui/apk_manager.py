@@ -203,9 +203,6 @@ class ApkManagerContent:
 
     def filter_cards(self):
         query = self.search_var.get().strip().lower()
-        if query == "search...":
-            query = ""
-
         visible_idx = 0
         for info in self.apk_data:
             card = self.card_widgets.get(info["package"])
