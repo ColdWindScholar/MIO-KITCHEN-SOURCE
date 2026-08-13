@@ -2380,13 +2380,12 @@ class Welcome(ttk.Frame):
         self.change_page(self.oobe)  # Initial page load.
 
         # Centering the main window 'win' after the Welcome frame is packed and the first page is loaded.
-        _move_center_func = globals().get('move_center')
-        if _main_app_window and _move_center_func and callable(_move_center_func):
+        if _main_app_window and move_center and callable(move_center):
             try:
                 # Ensure the Welcome frame itself and its content are updated before centering the master window.
                 self.update_idletasks()
                 _main_app_window.update_idletasks()  # Ensure the master (win) knows its new size with Welcome packed.
-                _move_center_func(_main_app_window)
+                move_center(_main_app_window)
             except Exception as e_mc:
                 if 'logging' in globals(): logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
 
