@@ -2339,11 +2339,6 @@ class Welcome(ttk.Frame):
                 logging.critical(
                     "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
                 error(1, 'Missing Main Window.')
-            # The application could either fail or a temporary Toplevel could be created
-            # if Welcome were intended to run standalone (which is unlikely here).
-            # For now, let's assume 'win' is always available as per the original design.
-            # If 'win' is truly missing, the super().__init__ below would likely fail or misbehave.
-            pass  # Allowing execution to continue; an error might occur later if 'win' is not a tk.Tk instance.
 
         super().__init__(master=_main_app_window)  # Explicitly pass master.
         self.pack(fill=BOTH, expand=True)  # Welcome frame fills its master (win).
@@ -3709,7 +3704,6 @@ class ModuleManager:
                     if self.winfo_exists(): self.update_idletasks()
                 except tk.TclError:
                     logging.warning(f"TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
-                    pass
 
             print(lang.text29.format(show_name if show_name else name))
 
@@ -7761,8 +7755,6 @@ class ParseCmdline:
             return
         subcmd.func(subcmd_args)
 
-    def __pass(self):
-        pass
 
     # Export Methods
     def set(self, args):
@@ -7772,7 +7764,6 @@ class ParseCmdline:
         name, value = args
         settings.set_value(name, value)
         logging.info(f'Set Config ({name})[{getattr(settings, name, "")}] ==> [{value}]')
-        self.__pass()
 
     def get(self, args):
         if len(args) > 1:
@@ -7780,7 +7771,6 @@ class ParseCmdline:
             return
         name, = args
         cprint(getattr(settings, name))
-        self.__pass()
 
     def help(self, args):
         if hasattr(sys, 'stdout_origin'):
