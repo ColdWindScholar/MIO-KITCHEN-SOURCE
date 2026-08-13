@@ -84,7 +84,6 @@ class ApkManagerContent:
         self.search_var.trace_add("write", lambda *args: self.filter_cards())
         self.search_entry = ttk.Entry(top, textvariable=self.search_var, font=("Segoe UI", 9), width=30)
         self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
-        self.search_entry.insert(0, "search...")
         self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.delete(0,
                                                                                tk.END) if self.search_var.get() == "search..." else None)
         self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.insert(0,
