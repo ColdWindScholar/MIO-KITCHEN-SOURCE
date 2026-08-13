@@ -9,8 +9,7 @@ from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
 
-from src.core.utils import hum_convert, lang
-from utils import create_thread
+from src.core.utils import hum_convert, lang, create_thread
 
 logger.remove()
 
