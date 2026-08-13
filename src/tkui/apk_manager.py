@@ -140,14 +140,7 @@ class ApkManagerContent:
                 for line in f.readlines():
                     line = line.strip()
                     self.select_by_package(line)
-    def select_dir(self, d):
-        if d:
-            for w in self.grid_frame.winfo_children(): w.destroy()
-            self.apk_data.clear()
-            self.card_widgets.clear()
-            self.search_var.set("")
-            self.active_card = None
-            self.parse_dir(d)
+
 
     def parse_single_apk(self, path):
         try:
