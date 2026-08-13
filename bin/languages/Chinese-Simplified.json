@@ -313,5 +313,6 @@
   "export_debloat_list": "导出精简列表",
   "select_an_apk": "选择一个Apk",
   "permissions": "权限",
-  "apk_manager": "Apk管理器"
+  "apk_manager": "Apk管理器",
+  "loaded_x_apks_completely": "已加载 {} 个Apk."
  }

@@ -392,5 +392,6 @@
   "export_debloat_list": "Export debloat list",
   "select_an_apk": "Select an APK",
   "permissions": "Permissions",
-  "apk_manager": "Apk Manager"
+  "apk_manager": "Apk Manager",
+    "loaded_x_apks_completely": "Loaded {} APK's completely."
 }

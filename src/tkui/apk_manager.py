@@ -169,7 +169,7 @@ class ApkManagerContent:
                 if res.get("success"):
                     count += 1
                     self.add_card(res, count)
-        self.lbl_status.config(text=f"Loaded {count} APK's completely.")
+        self.lbl_status.config(text=lang.loaded_x_apks_completely.format(count))
 
     def add_card(self, info, count):
         self.apk_data.append(info)
