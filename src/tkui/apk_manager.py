@@ -114,7 +114,7 @@ class ApkManagerContent:
 
         self.ins_icon = tk.Label(rp, image=self.default_icon)
         self.ins_icon.pack(pady=(20, 5))
-        self.ins_name = tk.Label(rp, text="Select an APK", font=("Segoe UI", 12, "bold"), fg="white")
+        self.ins_name = tk.Label(rp, text=lang.select_an_apk, font=("Segoe UI", 12, "bold"), fg="white")
         self.ins_name.pack()
 
         self.meta_labels = {}
