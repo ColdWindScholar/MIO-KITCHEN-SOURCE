@@ -1,6 +1,5 @@
 import os
 import tkinter as tk
-from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from tkinter import filedialog, ttk
 
@@ -8,7 +7,7 @@ from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
 
-from src.core.utils import hum_convert, lang, create_thread
+from src.core.utils import hum_convert, lang, _EXECUTOR
 
 logger.remove()
 
@@ -163,7 +162,7 @@ class ApkManagerContent:
 
     def parse_dir(self, d):
         count = 0
-        with ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as ex:
+        with _EXECUTOR as ex:
             for res in ex.map(self.parse_single_apk, [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.endswith(".apk")]):
                 if res.get("success"):
                     count += 1
