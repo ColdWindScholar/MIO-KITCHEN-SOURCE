@@ -52,11 +52,12 @@ class ApkCard(tk.Frame):
 
 
 class ApkManagerContent:
-    def __init__(self, root):
+    def __init__(self, root, content_path:str):
         self.root = root
         self.root.geometry("1300x600")
         self.root.configure()
         self.apk_data = []
+        self.content_path = content_path
         self.active_card = None
         self.icon_cache = []
         self.card_widgets: dict[dict, ApkCard] = {}
@@ -138,7 +139,7 @@ class ApkManagerContent:
                 except Exception as e:
                     logging.exception(e)
                     print(f"Removed {path}")
-        self.filter_cards()
+        self.parse_dir()
 
     def export_debloat_list(self):
         f = filedialog.asksaveasfile(filetypes=[("Debloat List", ".txt")], title="Save debloat list",
@@ -180,11 +181,11 @@ class ApkManagerContent:
         except:
             return {"success": False}
 
-    def parse_dir(self, d):
+    def parse_dir(self):
         count = 0
         with ThreadPoolExecutor(max_workers=4) as ex:
             for res in ex.map(self.parse_single_apk,
-                              [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.endswith(".apk")]):
+                              [os.path.join(dp, f) for dp, _, fn in os.walk(self.content_path) for f in fn if f.endswith(".apk")]):
                 if res.get("success"):
                     count += 1
                     self.add_card(res, count)
