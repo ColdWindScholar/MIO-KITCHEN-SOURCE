@@ -63,7 +63,7 @@ class ApkManagerContent:
         self.apk_data = []
         self.active_card = None
         self.icon_cache = []
-        self.card_widgets = {}
+        self.card_widgets: dict[dict, ApkCard] = {}
 
         img = Image.new("RGBA", (48, 48), "#2d3748")
         self.default_icon = ImageTk.PhotoImage(img)
