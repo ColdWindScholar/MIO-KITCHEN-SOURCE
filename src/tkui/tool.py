@@ -7254,7 +7254,7 @@ class Frame3(ttk.LabelFrame):
             (lang.text123, lambda: create_thread(PackSuper)),
             (lang.text19, lambda: win.notepad.select(win.tab7)),
             (lang.t13, lambda: create_thread(FormatConversion)),
-            ("Apk Manager", lambda: create_thread(lambda: ApkManager(current_project_name.get()))),
+            (lang.apk_manager, lambda: ApkManager(current_project_name.get())),
             # ("打包 Payload", lambda: create_thread(NewPostInstallConfig)),
         ]
         for index, (text, func) in enumerate(functions):
@@ -7506,7 +7506,7 @@ class UnpackGui(ttk.LabelFrame):
 class ApkManager(Toplevel):
     def __init__(self, project_name: str = "generic"):
         super().__init__()
-        self.title(f"Apk Manager[{project_name}]")
+        self.title(f"{lang.apk_manager} [{project_name}]")
         self.apkManager = ApkManagerContent(self)
         create_thread(self.apkManager.parse_dir, project_manger.current_work_path())
         move_center(self)

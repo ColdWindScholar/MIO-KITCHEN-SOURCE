@@ -312,5 +312,6 @@
   "import_debloat_list": "导入精简列表",
   "export_debloat_list": "导出精简列表",
   "select_an_apk": "选择一个Apk",
-  "permissions": "权限"
+  "permissions": "权限",
+  "apk_manager": "Apk管理器"
  }
