@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from tkinter import filedialog, ttk
 
-import sv_ttk
 from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
@@ -15,7 +14,6 @@ logger.remove()
 
 class ApkCard(tk.Frame):
     def __init__(self, parent, info, on_click, on_toggle):
-        sv_ttk.use_dark_theme()
         super().__init__(parent, highlightthickness=1, highlightbackground="#2d3748")
         self.info = info
         self.on_toggle = on_toggle
@@ -53,7 +51,6 @@ class ApkCard(tk.Frame):
 
 class ApkManagerContent:
     def __init__(self, root):
-        sv_ttk.use_dark_theme()
         self.root = root
         self.root.geometry("1300x600")
         self.root.configure()
