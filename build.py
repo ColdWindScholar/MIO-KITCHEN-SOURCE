@@ -124,6 +124,8 @@ class Builder:
                 'sv_ttk',
                 '--collect-data',
                 'chlorophyll',
+                '--collect-data',
+                'androguard',
                 '--hidden-import',
                 'tkinter',
                 '--hidden-import',
@@ -150,6 +152,8 @@ class Builder:
                 'sv_ttk',
                 '--collect-data',
                 'chlorophyll',
+                '--collect-data',
+                'androguard',
                 '--hidden-import',
                 'tkinter',
                 '--hidden-import',
@@ -179,6 +183,8 @@ class Builder:
                 'sv_ttk',
                 '--collect-data',
                 'chlorophyll',
+                '--collect-data',
+                'androguard',
                 '--splash',
                 'splash.png'
             ])
