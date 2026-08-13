@@ -314,5 +314,6 @@
   "select_an_apk": "选择一个Apk",
   "permissions": "权限",
   "apk_manager": "Apk管理器",
-  "loaded_x_apks_completely": "已加载 {} 个Apk."
+  "loaded_x_apks_completely": "已加载 {} 个Apk.",
+  "parsing_apks": "[{}] 正在解析: {}"
  }

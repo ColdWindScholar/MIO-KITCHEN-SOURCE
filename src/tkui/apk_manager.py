@@ -172,7 +172,7 @@ class ApkManagerContent:
     def add_card(self, info, count):
         self.apk_data.append(info)
         self.icon_cache.append(info["icon_img"])
-        self.lbl_status.config(text=f"[{count}] Parsing: {info['filename']}")
+        self.lbl_status.config(text=lang.parsing_apks.format(count, info['filename']))
         card = ApkCard(self.grid_frame, info, self.on_click, self.on_toggle)
         self.card_widgets[info["package"]]: list[ApkCard] = card
         self.filter_cards()
