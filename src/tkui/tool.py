@@ -7485,8 +7485,11 @@ class UnpackGui(ttk.LabelFrame):
         else:
             for file_name in os.listdir(work):
                 if file_name.endswith(form):
-                    f_type = gettype(work + file_name)
-                    if f_type == 'unknown':
+                    if file_name.endswith("img"):
+                        f_type = gettype(work + file_name)
+                        if f_type == 'unknown':
+                            f_type = form
+                    else:
                         f_type = form
                     self.lsg.insert(f'{file_name[:-len(f".{form}")]} [{f_type}]',
                                     file_name[:-len(f".{form}")])
