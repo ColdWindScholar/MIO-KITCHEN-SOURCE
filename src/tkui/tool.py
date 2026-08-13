@@ -2329,13 +2329,12 @@ class Welcome(ttk.Frame):
         super().__init__(master=_main_app_window)  # Explicitly pass master.
         self.pack(fill=BOTH, expand=True)  # Welcome frame fills its master (win).
 
-        _settings_obj = globals().get('settings')
-        _states_obj = globals().get('states')
-        _lang_obj = globals().get('lang')
+        _settings_obj = settings
+        _states_obj = states
+        _lang_obj = lang
 
         if not (_settings_obj and _states_obj and _lang_obj):
-            if 'logging' in globals():
-                logging.error("Welcome.__init__: Global objects (settings, states, lang) not fully available.")
+            logging.error("Welcome.__init__: Global objects (settings, states, lang) not fully available.")
             # Handle missing globals if necessary, e.g., by disabling functionality or using defaults.
 
         self.oobe = 0  # Default value.
@@ -2364,12 +2363,7 @@ class Welcome(ttk.Frame):
 
         self.button_frame = ttk.Frame(self)
 
-        back_text = "Previous"
-        if _lang_obj and hasattr(_lang_obj, 'previous_step'):
-            lang_back = getattr(_lang_obj, 'previous_step')
-            if isinstance(lang_back, str) and lang_back.strip().lower() != "none":
-                back_text = lang_back
-
+        back_text = lang.previous_step
         next_text = "Next"
         if _lang_obj and hasattr(_lang_obj, 'text138'):
             lang_next = getattr(_lang_obj, 'text138')
