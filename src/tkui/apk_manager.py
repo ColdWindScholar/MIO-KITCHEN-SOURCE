@@ -125,7 +125,7 @@ class ApkManagerContent:
             lbl.pack(side=tk.LEFT, fill=tk.X)
             self.meta_labels[key] = lbl
 
-        tk.Label(rp, text="Permissions", font=("Segoe UI", 9, "bold"), fg="#a0aec0").pack(anchor="w",
+        tk.Label(rp, text=lang.permissions, font=("Segoe UI", 9, "bold"), fg="#a0aec0").pack(anchor="w",
                                                                                                         padx=20,
                                                                                                         pady=(15, 2))
         self.list_perms = tk.Listbox(rp, fg="white", bd=0, highlightthickness=1,

@@ -390,5 +390,6 @@
   "compression": "Compression",
   "import_debloat_list": "Import debloat list",
   "export_debloat_list": "Export debloat list",
-    "select_an_apk": "Select an APK"
+  "select_an_apk": "Select an APK",
+  "permissions": "Permissions"
 }
