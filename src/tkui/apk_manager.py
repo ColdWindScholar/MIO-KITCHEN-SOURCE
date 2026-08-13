@@ -10,6 +10,7 @@ from androguard.core.apk import APK
 from loguru import logger
 
 from src.core.utils import hum_convert, lang
+from utils import create_thread
 
 logger.remove()
 
@@ -81,7 +82,7 @@ class ApkManagerContent:
         self.search_var.trace_add("write", lambda *args: self.filter_cards())
         self.search_entry = ttk.Entry(top, textvariable=self.search_var, font=("Segoe UI", 9), width=30)
         self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
-        ttk.Button(top, text=lang.remove_selected_apps, command=self.remove_selected).pack(side=tk.RIGHT, padx=5,
+        ttk.Button(top, text=lang.remove_selected_apps, command=lambda :create_thread(self.remove_selected)).pack(side=tk.RIGHT, padx=5,
                                                                                            pady=3)
         ttk.Button(top, text=lang.import_debloat_list, command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5,
                                                                                               pady=3)
