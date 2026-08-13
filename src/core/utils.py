@@ -493,6 +493,9 @@ def create_thread(func, *args, join=False):
     :return:
     """
     global threads
+    if threads >= cpu_count():
+        print(f"Cannot create thread {func.__name__} with {args}")
+        return
     threads += 1
     thread = Thread(target=func_wrapper, args=(func, *args), daemon=True)
     thread.start()
