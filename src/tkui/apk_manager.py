@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from tkinter import filedialog, ttk
 
+import logging
 from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
@@ -69,7 +70,7 @@ class ApkManagerContent:
         top.pack(fill=tk.X)
         top.pack_propagate(False)
 
-        self.lbl_status = tk.Label(top, text="Loaded 0 APK's", fg="#a0aec0",  font=("Segoe UI", 9, "bold"),
+        self.lbl_status = tk.Label(top, fg="#a0aec0",  font=("Segoe UI", 9, "bold"),
                                    padx=15)
         self.lbl_status.pack(side=tk.LEFT, fill=tk.Y)
 
@@ -78,6 +79,7 @@ class ApkManagerContent:
         self.search_var.trace_add("write", lambda *args: self.filter_cards())
         self.search_entry = ttk.Entry(top, textvariable=self.search_var, font=("Segoe UI", 9), width=30)
         self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
+        ttk.Button(top, text=lang.remove_selected_apps, command=self.remove_selected).pack(side=tk.RIGHT, padx=5, pady=3)
         ttk.Button(top, text=lang.import_debloat_list, command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
         ttk.Button(top, text=lang.export_debloat_list, command=self.export_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
 
@@ -120,7 +122,15 @@ class ApkManagerContent:
         self.list_perms = tk.Listbox(rp, fg="white", bd=0, highlightthickness=1,
                                      highlightbackground="#2d3748", font=("Consolas", 9))
         self.list_perms.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
-
+    def remove_selected(self):
+        for info in self.get_selected_apps_info():
+            path = info['path']
+            if os.path.exists(path):
+                try:
+                    os.remove(path)
+                except Exception as e:
+                    logging.exception(e)
+                    print(f"Removed {path}")
     def export_debloat_list(self):
         f = filedialog.asksaveasfile(filetypes=[("Debloat List", ".txt")], title="Save debloat list", defaultextension=".txt")
         if f:
@@ -154,7 +164,7 @@ class ApkManagerContent:
                 "success": True, "filename": os.path.basename(path), "package": apk.get_package() or "Unknown",
                 "internal_name": apk.get_app_name() or os.path.basename(path), "size": size,
                 "version": apk.get_androidversion_name() or "1.0", "target_sdk": apk.get_target_sdk_version() or "?",
-                "min_sdk": apk.get_min_sdk_version() or "?", "permissions": apk.get_permissions() or [],
+                "min_sdk": apk.get_min_sdk_version() or "?", "permissions": apk.get_permissions() or [],"path":path,
                 "icon_img": icon_tk,
                 "selected": False
             }

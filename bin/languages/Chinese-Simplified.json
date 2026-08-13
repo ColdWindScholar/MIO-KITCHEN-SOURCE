@@ -315,5 +315,6 @@
   "permissions": "权限",
   "apk_manager": "Apk管理器",
   "loaded_x_apks_completely": "已加载 {} 个Apk.",
-  "parsing_apks": "[{}] 正在解析: {}"
+  "parsing_apks": "[{}] 正在解析: {}",
+  "remove_selected_apps": "删除选择的App"
  }

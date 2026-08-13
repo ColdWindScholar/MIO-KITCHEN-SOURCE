@@ -394,6 +394,8 @@
   "permissions": "Permissions",
   "apk_manager": "Apk Manager",
     "loaded_x_apks_completely": "Loaded {} APK's completely.",
-    "parsing_apks": "[{}] Parsing: {}"
+    "parsing_apks": "[{}] Parsing: {}",
+    "remove_selected_apps": "Remove selected apps"
+
 
 }
