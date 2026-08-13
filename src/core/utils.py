@@ -18,21 +18,21 @@ import logging
 import os
 import os.path
 import platform
-import queue
 import struct
 import subprocess
 import sys
+import tarfile
 import tempfile
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from difflib import SequenceMatcher
 from enum import IntEnum
+from lzma import LZMADecompressor
 from os import getcwd, cpu_count
 from os.path import exists
 from random import randint, choice
 from subprocess import Popen
-from concurrent.futures import ThreadPoolExecutor
-from lzma import LZMADecompressor
-import tarfile
+
 from src.core import blockimgdiff
 from src.core import sparse_img
 from src.core import update_metadata_pb2 as um
