@@ -2395,20 +2395,20 @@ class Welcome(ttk.Frame):
             _states_obj.in_oobe = False
 
     def change_page(self, step: int = 0):  # Default step to 0 if None
-        _main_app_window = globals().get('win')  # The main Tk window
-        _settings_obj = globals().get('settings')
-        _lang_obj = globals().get('lang')
-        _move_center_func = globals().get('move_center')
+        _main_app_window = win
+        _settings_obj = settings
+        _lang_obj = lang
+        _move_center_func = move_center
 
         if not isinstance(step, int) or step not in self.frames:
             step = 0  # Default to the first page if step is invalid
 
         self.oobe = step
-        if _settings_obj:
+        if settings:
             try:
-                _settings_obj.set_value('oobe', str(step))  # Ensure value is string for set_value
+                settings.set_value('oobe', str(step))  # Ensure value is string for set_value
             except Exception as e_set_oobe:
-                if 'logging' in globals(): logging.error(
+                logging.error(
                     f"Welcome.change_page: Failed to save OOBE step {step}: {e_set_oobe}")
 
         # Clear previous page content from the inner frame
@@ -2460,7 +2460,7 @@ class Welcome(ttk.Frame):
 
     def destroy_welcome(self):
         """ Safely destroys the Welcome frame. """
-        _states_obj = globals().get('states')
+        _states_obj = states
         if _states_obj:
             _states_obj.in_oobe = False  # Set this before destroying, so mainloop doesn't get stuck
 
