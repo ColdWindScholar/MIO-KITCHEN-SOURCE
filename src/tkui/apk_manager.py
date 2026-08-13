@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 from androguard.core.apk import APK
 from loguru import logger
 
-from src.core.utils import hum_convert, lang
+from src.core.utils import hum_convert, lang, create_thread
 
 logger.remove()
 
@@ -162,12 +162,10 @@ class ApkManagerContent:
             return {"success": False}
 
     def parse_dir(self, d):
-        self.lbl_status.config(text="Scanning...")
-        files = [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.lower().endswith(".apk")]
 
         count = 0
         with ThreadPoolExecutor(max_workers=min(4, os.cpu_count() or 2)) as ex:
-            for res in ex.map(self.parse_single_apk, files):
+            for res in ex.map(self.parse_single_apk, [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.endswith(".apk")]):
                 if res.get("success"):
                     count += 1
                     self.add_card(res, count)
