@@ -196,14 +196,14 @@ class ApkManagerContent:
         self.icon_cache.append(info["icon_img"])
         self.lbl_status.config(text=f"[{count}] Parsing: {info['filename']}")
         card = ApkCard(self.grid_frame, info, self.on_click, self.on_toggle)
-        self.card_widgets[info["package"]] = card
+        self.card_widgets[info["package"]]: list[ApkCard] = card
         self.filter_cards()
 
     def filter_cards(self):
         query = self.search_var.get().strip().lower()
         visible_idx = 0
         for info in self.apk_data:
-            card = self.card_widgets.get(info["package"])
+            card: ApkCard = self.card_widgets.get(info["package"])
             if not card: continue
             if query:
                 match = (query in info["package"].lower() or
