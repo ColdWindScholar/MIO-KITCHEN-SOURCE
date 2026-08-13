@@ -89,7 +89,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path, _EXECUTOR
+    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
 
 if os.name == 'nt':
     from ctypes import windll, c_int, byref, sizeof
@@ -173,7 +173,6 @@ class LoadAnim:
             master: The parent Tkinter widget (optional).
         """
         self.master = master  # The parent widget where the GIF label will be displayed.
-        self.threadpool = _EXECUTOR
         self.frames = []  # Stores individual frames of the GIF.
         self.hide_gif = False  # Flag to control GIF visibility.
         self.frame = None  # The current GIF frame being displayed.
@@ -266,6 +265,10 @@ class LoadAnim:
 
         @wraps(func)
         def call_func(*args, **kwargs):
+            return_value = None
+            def wrapper():
+                nonlocal return_value
+                return_value = func(*args, **kwargs)
             """The wrapper function that manages the animation and task execution."""
             # Start the animation in a new thread to avoid blocking the UI.
             if len(self.tasks) > self.task_num_max:
@@ -273,13 +276,12 @@ class LoadAnim:
             self.run()
             task_num = self.get_task_num()
             # The actual function execution also happens in a separate thread.
-            task_real = self.threadpool.submit(func, *args, **kwargs)
+            task_real = create_thread(wrapper, join=True)
             info = [func.__name__, args, task_real]
             if task_num in self.tasks:
                 return lambda *a, **k: print(
                     f"Error: Task number {task_num} is being used by {task_real} for {info[0]}.")
             self.tasks[task_num] = info
-            return_value = task_real.result()
             if task_num in self.tasks:
                 del self.tasks[task_num]
             # 'info' or 'task_num' go out of scope automatically.

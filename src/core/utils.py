@@ -24,7 +24,6 @@ import sys
 import tarfile
 import tempfile
 import traceback
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from difflib import SequenceMatcher
 from enum import IntEnum
 from lzma import LZMADecompressor
@@ -32,6 +31,7 @@ from os import getcwd, cpu_count
 from os.path import exists
 from random import randint, choice
 from subprocess import Popen
+from threading import Thread
 
 from src.core import blockimgdiff
 from src.core import sparse_img
@@ -477,9 +477,12 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count())
+threads: int = 0
 
-
+def func_wrapper(func, *args):
+    global threads
+    func(*args)
+    threads -= 1
 def create_thread(func, *args, join=False):
     """
     Multithreaded running tasks
@@ -489,9 +492,13 @@ def create_thread(func, *args, join=False):
     :param join:if wait the task
     :return:
     """
-    future = _EXECUTOR.submit(func, *args)
+    global threads
+    threads += 1
+    thread = Thread(target=func_wrapper, args=(func, *args), daemon=True)
+    thread.start()
     if join:
-        future.result()
+        thread.join()
+        threads -= 1
 
 
 def simg2img(path: str):
