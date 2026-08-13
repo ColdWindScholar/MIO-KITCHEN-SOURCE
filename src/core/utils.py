@@ -477,7 +477,7 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-_EXECUTOR = ProcessPoolExecutor(max_workers=cpu_count()//2, max_tasks_per_child=cpu_count())
+_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count()//2, max_tasks_per_child=cpu_count())
 
 
 def create_thread(func, *args, join=False):
