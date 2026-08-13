@@ -205,10 +205,12 @@ class ApkManagerContent:
         for info in self.apk_data:
             card = self.card_widgets.get(info["package"])
             if not card: continue
-
-            match = (query in info["package"].lower() or
+            if query:
+                match = (query in info["package"].lower() or
                      query in info["filename"].lower() or
                      query in info["internal_name"].lower())
+            else:
+                match = 1
 
             if match:
                 card.grid(row=visible_idx // 3, column=visible_idx % 3, padx=10, pady=10, sticky="nsew")
