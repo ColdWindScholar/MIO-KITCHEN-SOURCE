@@ -18,6 +18,7 @@ import logging
 import os
 import os.path
 import platform
+import queue
 import struct
 import subprocess
 import sys

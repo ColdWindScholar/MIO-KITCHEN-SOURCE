@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from tkinter import filedialog, ttk
 
@@ -162,7 +163,7 @@ class ApkManagerContent:
 
     def parse_dir(self, d):
         count = 0
-        with _EXECUTOR as ex:
+        with ThreadPoolExecutor(max_workers=4) as ex:
             for res in ex.map(self.parse_single_apk, [os.path.join(dp, f) for dp, _, fn in os.walk(d) for f in fn if f.endswith(".apk")]):
                 if res.get("success"):
                     count += 1
