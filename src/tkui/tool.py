@@ -3728,11 +3728,7 @@ class ModuleManager:
                 logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
 
                 if callable(list_pls_plugin):
-                    if hasattr(win, 'after') and callable(win.after):
-                        win.after(10, list_pls_plugin)
-                    else:
-                        logging.error(
-                            "CRITICAL: Main window 'win' or 'win.after' is not available. Cannot schedule GUI update for MpkMan.")
+                    win.after(10, list_pls_plugin)
                 else:
                     logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
 
