@@ -86,8 +86,7 @@ class ApkManagerContent:
         self.search_entry.pack(side=tk.RIGHT, padx=15, pady=8)
         self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.delete(0,
                                                                                tk.END) if self.search_var.get() == "search..." else None)
-        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.insert(0,
-                                                                                "search...") if not self.search_var.get() else None)
+
 
         ttk.Button(top, text=lang.import_debloat_list, command=self.import_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
         ttk.Button(top, text=lang.export_debloat_list, command=self.export_debloat_list).pack(side=tk.RIGHT, padx=5, pady=3)
