@@ -24,7 +24,7 @@ import sys
 import tarfile
 import tempfile
 import traceback
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from difflib import SequenceMatcher
 from enum import IntEnum
 from lzma import LZMADecompressor
@@ -477,7 +477,7 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=cpu_count())
+_EXECUTOR = ProcessPoolExecutor(max_workers=cpu_count()//2, max_tasks_per_child=cpu_count())
 
 
 def create_thread(func, *args, join=False):
