@@ -20,7 +20,7 @@ class MainWindow(FluentWindow):
         # 设置主题
         setTheme(Theme.DARK)
 
-        self.setWindowIcon(QIcon('resource/logo.png'))
+        self.setWindowIcon(QIcon('icon.ico'))
         self.splashScreen = SplashScreen(self.windowIcon(), self)
         self.splashScreen.setIconSize(QSize(140, 140))
         self.show()
