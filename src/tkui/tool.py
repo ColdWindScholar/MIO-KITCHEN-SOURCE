@@ -339,7 +339,7 @@ def warn_win(text: str = '', color: str = 'red', title: str | None = None,
         popup_window.destroy()
 
     # Add an "OK" button that the user must click to close the window.
-    ok_text = getattr(lang, 'ok', 'OK')  # Use localized text for the button.
+    ok_text = lang.ok  # Use localized text for the button.
     ok_button = ttk.Button(ask_frame, text=ok_text, command=close_popup, style="Accent.TButton")
     ok_button.pack(pady=(0, 10), padx=20, fill=X, ipady=4)  # ipady adds vertical padding inside the button.
 
@@ -2366,7 +2366,7 @@ class Welcome(ttk.Frame):
         back_text = lang.previous_step
         next_text = "Next"
         if _lang_obj and hasattr(_lang_obj, 'text138'):
-            lang_next = getattr(_lang_obj, 'text138')
+            lang_next = lang.text138
             if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
                 next_text = lang_next
 
@@ -2434,13 +2434,13 @@ class Welcome(ttk.Frame):
         # Update button states and text
         finish_text = "Finish"
         if _lang_obj and hasattr(_lang_obj, 'text34'):
-            lang_finish = getattr(_lang_obj, 'text34')
+            lang_finish = lang.text34
             if isinstance(lang_finish, str) and lang_finish.strip().lower() != "none":
                 finish_text = lang_finish
 
         next_text = "Next"  # Default, defined in __init__
         if _lang_obj and hasattr(_lang_obj, 'text138'):
-            lang_next = getattr(_lang_obj, 'text138')
+            lang_next = lang.text138
             if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
                 next_text = lang_next
 
