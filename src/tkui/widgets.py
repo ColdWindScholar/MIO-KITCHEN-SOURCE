@@ -40,8 +40,10 @@ class ListBox(Frame):
         super().__init__(master=master)
         self.var = None
         self.set_all = None
+        self.search_entry = None
         self.label_frame = None
         self.canvas = None
+        self.search_var = StringVar()
         self.selected: list = []
         self.vars = []
         self.controls = []
@@ -49,7 +51,8 @@ class ListBox(Frame):
 
     def __on_mouse(self, event):
         self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
-
+    def __on_search(self):
+        pass
     def clear(self):
         self.selected.clear()
         self.loaded_value.clear()
@@ -62,6 +65,7 @@ class ListBox(Frame):
 
     def gui(self):
         self.var = BooleanVar(value=False)
+        self.search_var.trace_add('write', lambda *x: self.__on_search())
         scrollbar = Scrollbar(self, orient='vertical')
         self.canvas = Canvas(self, yscrollcommand=scrollbar.set, width=250, height=150)
         self.canvas.pack_propagate(False)
@@ -70,12 +74,17 @@ class ListBox(Frame):
         self.canvas.create_window((0, 0), window=self.label_frame, anchor='nw')
         self.canvas.bind("<MouseWheel>",
                          lambda event: self.__on_mouse(event))
-        self.set_all = Checkbutton(self, text=lang.set_all, variable=self.var, onvalue=True, offvalue=False,
+        # select all & search
+        frame = ttk.Frame(self)
+        self.set_all = Checkbutton(frame, text=lang.set_all, variable=self.var, onvalue=True, offvalue=False,
                                    command=lambda *x, var_=self.var: [i.set(True) for i in
                                                                       self.vars] if var_.get() else [i.set(False) for i
                                                                                                      in self.vars])
 
-        self.set_all.pack(padx=5, pady=5, anchor='sw', side='bottom')
+        self.set_all.pack(padx=5, pady=5, side='left')
+        self.search_entry = ttk.Entry(frame, textvariable=self.search_var)
+        self.search_entry.pack(padx=5, pady=5, side='right')
+        frame.pack(padx=5, pady=5, side='bottom', fill='x')
         Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X, side='bottom')
         scrollbar.pack(side='right', fill='y', padx=10, pady=10)
         self.canvas.pack(fill='both', expand=True)
