@@ -83,7 +83,7 @@ class ListBox(Frame):
 
         self.set_all.pack(padx=5, pady=5, side='left')
         self.search_entry = ttk.Entry(frame, textvariable=self.search_var)
-        self.search_entry.pack(padx=5, pady=5, side='right')
+        self.search_entry.pack(padx=5, pady=5)
         frame.pack(padx=5, pady=5, side='bottom', fill='x')
         Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X, side='bottom')
         scrollbar.pack(side='right', fill='y', padx=10, pady=10)
