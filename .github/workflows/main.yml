@@ -46,13 +46,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12.6
+      - name: Set up Python 3.13.7
         uses: actions/setup-python@v5
         with:
           # Semantic version range syntax or exact version of a Python version
-          python-version: '3.12.6'
+          python-version: '3.13.7'
           # Optional - x64 or x86 architecture, defaults to x64
-          architecture: 'x86'
+          architecture: 'x64'
       # You can test your matrix by printing the current Python version
       - name: Update pip
         run:  python -m pip install -U --force-reinstall pip
@@ -97,7 +97,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           # Semantic version range syntax or exact version of a Python version
-          python-version: '3.12'
+          python-version: '3.13'
           # Optional - x64 or x86 architecture, defaults to x64
       - name: Install Packages
         run: |
