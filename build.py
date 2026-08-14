@@ -194,7 +194,7 @@ class Builder:
         if not os.path.exists('dist/bin'):
             os.makedirs('dist/bin', exist_ok=True)
         while_list = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'setting.ini', self.ostype,
-                      'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json', "exec.sh"]
+                      'kemiaojiang.png', 'License_kemiaojiang.txt', "tkdnd", 'help_document.json', "exec.sh", 'update.json']
         for i in os.listdir(self.local + "/bin"):
             if i in while_list:
                 if os.path.isdir(f"{self.local}/bin/{i}"):
