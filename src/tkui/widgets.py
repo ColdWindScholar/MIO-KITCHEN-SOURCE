@@ -51,8 +51,15 @@ class ListBox(Frame):
 
     def __on_mouse(self, event):
         self.canvas.yview_scroll(-1 * (int(event.delta / 120)), "units")
+
     def __on_search(self):
-        pass
+        search_text = self.search_var.get()
+        for c in self.controls:
+            if search_text not in c.cget("text"):
+                c.pack_forget()
+            else:
+                c.pack(anchor='nw', fill='y', padx=5, pady=3)
+
     def clear(self):
         self.selected.clear()
         self.loaded_value.clear()
@@ -157,7 +164,7 @@ class ScrollFrame(Frame):
 
 class ToggledFrame(Frame):
 
-    def __init__(self, master, text="",font=(None, None), callback=None, unfold: bool = False, *args, **options):
+    def __init__(self, master, text="", font=(None, None), callback=None, unfold: bool = False, *args, **options):
         super().__init__(master=master, *args, **options)
         self.callback = callback
         self.show = BooleanVar(value=False)
