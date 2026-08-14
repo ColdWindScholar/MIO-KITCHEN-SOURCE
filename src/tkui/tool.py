@@ -92,7 +92,7 @@ from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_fi
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
 
 if os.name == 'nt':
-    from ctypes import windll, c_int, byref, sizeof
+    from ctypes import windll
     from tkinter import filedialog
 else:
     from src.core import mkc_filedialog as filedialog
@@ -5728,7 +5728,7 @@ def download_file():
 
 
 @animation
-def unpack_boot(name: str = 'boot', boot: str = None, work: str = None):
+def unpack_boot(name: str = 'boot', boot: str | None= None, work: str | None= None):
     if not work:
         work = project_manger.current_work_path()
     if not boot:
