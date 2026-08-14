@@ -81,7 +81,7 @@
 | Android Vendor_boot Image |
 | Erofs                     |
 | Ext4                      |
-| F2fs(Linux Version)       |
+| F2fs(macos not supported) |
 | Romfs                     |
 | Amlogic v2 image          |
 | RockChip resource image   |
