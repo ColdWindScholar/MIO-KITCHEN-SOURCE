@@ -15,6 +15,13 @@
 import sys
 sys_stdout = sys.stdout
 sys_stderr = sys.stderr
+class DevNull(object):
+    def write(self, s):
+        pass
+    def flush(self):
+        pass
+if not sys.stdout:
+    sys.stdout = DevNull()
 import time
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8:
