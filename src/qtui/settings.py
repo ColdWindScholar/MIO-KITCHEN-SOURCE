@@ -27,15 +27,9 @@ class Config(QConfig):
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
-
-def load_config():
-    """ 加载配置文件 """
-    config = Config()
-    qconfig.load(config_file, config)
-    return config
-
-# 初始化配置
-cfg = load_config()
+config = Config()
+qconfig.load(config_file, config)
+cfg = config
 
 class SettingsPage(QScrollArea):
     """ 设置页面 """
