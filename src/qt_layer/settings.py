@@ -20,6 +20,7 @@ class Config(QConfig):
     tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
     workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
     pluginRepo = ConfigItem("Tool", "pluginRepo", "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/")
+    updateURL = ConfigItem("Tool", "updateURL", "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest")
     language = OptionsConfigItem(
         "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
