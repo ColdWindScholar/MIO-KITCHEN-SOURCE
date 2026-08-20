@@ -6447,7 +6447,7 @@ class ProjectMenuUtils(ttk.LabelFrame):
         self.listdir()
 
     def new(self):
-        if not (inputvar := input_(master=win)):
+        if not (inputvar := input_(master=win.tk_root)):
             win.message_pop(lang.warn12)
         else:
             inputvar = inputvar.replace(' ', '_').strip()
