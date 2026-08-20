@@ -1479,7 +1479,7 @@ class Tool(TkinterEmbeddedPanel):
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
-        self.after(1000, self.get_time)
+        self.tk_root.after(1000, self.get_time)
 
     def get_frame(self, title):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
@@ -7532,7 +7532,7 @@ def init_tk(windows_tk):
     global win
     win = windows_tk
     # Prevent multiple initializations (ensure home_page / Tk init runs only once)
-    if getattr(states, "inited", False):
+    if states.inited:
         logging.debug("init_tk: already initialized, skipping.")
         return
     if not os.path.exists(temp):
@@ -7544,13 +7544,13 @@ def init_tk(windows_tk):
                             filename=tool_log, filemode='w')
     else:
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
-    animation.master = win.tk_root
+    animation.master = windows_tk.tk_root
     global current_project_name, theme, language
     current_project_name = utils.project_name = StringVar()
     theme = StringVar()
     language = StringVar()
     settings.load()
-    win.gui()
+    windows_tk.gui()
     if settings.updating == 'true':
         updater = Updater()
         try:
