@@ -6015,13 +6015,6 @@ def unpack(chose: list | dict, form: str = '') -> bool:
     return True
 
 
-def cprint(*args, **kwargs):
-    if not hasattr(sys, 'stdout_origin'):
-        print("stdout_origin not defined!")
-    else:
-        print(*args, **kwargs, file=sys.stdout_origin)
-
-
 def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master: tk.Tk | Toplevel = None) -> int:
     ok = ok or lang.ok
     cancel = cancel or lang.cancel
