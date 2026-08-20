@@ -2409,7 +2409,6 @@ class SetUtils:
             if 'active_code' not in dir(self):
                 self.active_code = 'None'
             verify.verify(self.active_code)
-        win.tk_root.attributes("-alpha", self.bar_level if self.treff == "1" else 1)
 
     @staticmethod
     def load_language(name):
