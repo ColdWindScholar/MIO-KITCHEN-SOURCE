@@ -3078,9 +3078,8 @@ class ModuleManager:
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif not os.path.exists(os.path.join(self.module_dir, value)):
             win.message_pop(lang.warn7.format(value))
-            if callable(list_pls_plugin):
-                list_pls_plugin()
-            if hasattr(win, 'tab7') and hasattr(win.tab7, 'lift'): win.tab7.lift()
+            list_pls_plugin()
+            win.tab7.lift()
         else:
             print(lang.warn8.format(self.get_name(id_)))
         return 0
@@ -3666,8 +3665,7 @@ class ModuleManager:
             logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
             if not name:
                 logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
-                if hasattr(win, 'message_pop') and callable(win.message_pop):
-                    win.message_pop(
+                win.message_pop(
                         getattr(lang, "internal_error_plugin_id_missing",
                                 "Internal error: Plugin ID missing for removal."),
                         title=getattr(lang, "error_title", "Error"), color="red"
@@ -3818,7 +3816,7 @@ class MpkMan(ttk.Frame):
         logging.debug(f"DEBUG: MpkMan.list_pls - Phase 3: Processing physical plugins from '{self.moduledir}'.")
         if not os.path.exists(self.moduledir) or not os.path.isdir(self.moduledir):
             logging.warning(f"MpkMan.list_pls: Module directory '{self.moduledir}' does not exist.")
-            if hasattr(self.pls, 'on_frame_configure'): self.pls.on_frame_configure()
+            self.pls.on_frame_configure()
             logging.debug("DEBUG: MpkMan.list_pls - EXITED early due to missing module directory.")
             return
 
@@ -3885,8 +3883,7 @@ class MpkMan(ttk.Frame):
                 logging.debug(f"DEBUG: MpkMan.list_pls - Added new physical plugin widget for '{plugin_id}'.")
 
         # Update IconGrid configuration (e.g., scrollregion)
-        if hasattr(self.pls, 'on_frame_configure') and callable(self.pls.on_frame_configure):
-            self.pls.on_frame_configure()
+        self.pls.on_frame_configure()
 
         logging.debug(f"DEBUG: MpkMan.list_pls - EXITED. Final apps count in IconGrid: {len(self.pls.apps)}")
 
@@ -3925,9 +3922,7 @@ class MpkMan(ttk.Frame):
     def _prepare_and_launch_editor(self, plugin_id_to_edit: str):
         if not plugin_id_to_edit:
             logging.warning("MpkMan._prepare_and_launch_editor: plugin_id_to_edit is empty.")
-            if hasattr(win, 'message_pop') and callable(win.message_pop) and hasattr(lang,
-                                                                                     'editor_no_plugin_selected_warn'):
-                win.message_pop(
+            win.message_pop(
                     lang.editor_no_plugin_selected_warn,
                     title=getattr(lang, "editor_warn_title", "Editor Warning"),
                     color="orange"
@@ -3943,22 +3938,21 @@ class MpkMan(ttk.Frame):
             error_message = f"MpkMan._prepare_and_launch_editor: Error preparing editor for plugin '{plugin_id_to_edit}': {e}"
             logging.error(error_message)
             logging.exception("Detailed stack trace for editor launch failure:")
-            if hasattr(win, 'message_pop') and callable(win.message_pop):
-                title_key = "editor_launch_error_title"
-                message_key = "editor_launch_error_message"
-                default_title = "Editor Launch Error"
-                default_message_template = "Could not launch editor for plugin '{plugin_id}'.\nError: {error}"
-                title_text = getattr(lang, title_key, default_title)
-                message_template = getattr(lang, message_key, default_message_template)
-                try:
+            title_key = "editor_launch_error_title"
+            message_key = "editor_launch_error_message"
+            default_title = "Editor Launch Error"
+            default_message_template = "Could not launch editor for plugin '{plugin_id}'.\nError: {error}"
+            title_text = getattr(lang, title_key, default_title)
+            message_template = getattr(lang, message_key, default_message_template)
+            try:
                     final_message = message_template.format(plugin_id=plugin_id_to_edit, error=str(e))
-                except (KeyError, AttributeError, IndexError) as format_error:
+            except (KeyError, AttributeError, IndexError) as format_error:
                     logging.warning(f"Could not format localized error message '{message_key}': {format_error}")
-                    if "{plugin_id}" in message_template or "{error}" in message_template:
+                if "{plugin_id}" in message_template or "{error}" in message_template:
                         final_message = f"{message_template} (plugin: {plugin_id_to_edit}, raw error: {str(e)})"
-                    else:
+                else:
                         final_message = message_template + f"\n(Plugin: {plugin_id_to_edit}, Error: {str(e)})"
-                win.message_pop(final_message, title=title_text, color="red")
+            win.message_pop(final_message, title=title_text, color="red")
 
     def _handle_uninstall_plugin(self, plugin_id_to_uninstall):
         if not plugin_id_to_uninstall:
