@@ -26,8 +26,6 @@ class Config(QConfig):
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
-    autoSaveProjects = ConfigItem("Projects", "AutoSave", True, BoolValidator())
-    enableNotifications = ConfigItem("General", "EnableNotifications", True, BoolValidator())
 
 def load_config():
     """ 加载配置文件 """
@@ -153,15 +151,6 @@ class SettingsPage(QScrollArea):
         )
         self.scrollLayout.addWidget(self.checkUpdate)
 
-        self.notificationCard = SwitchSettingCard(
-            FluentIcon.RINGER,
-            "启用通知",
-            "在操作完成时显示通知提醒",
-            cfg.enableNotifications,
-            parent=self.scrollWidget
-        )
-        self.notificationCard.setChecked(cfg.enableNotifications.value)
-        self.scrollLayout.addWidget(self.notificationCard)
 
         self.helpCard = HyperlinkCard(
             "#",
