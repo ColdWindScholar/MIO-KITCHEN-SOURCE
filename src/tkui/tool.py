@@ -1504,16 +1504,14 @@ class Tool(TkinterEmbeddedPanel):
         self.sub_win2.pack(fill=BOTH, side=RIGHT, expand=True)
         self.sub_win3.pack(fill=BOTH, side=RIGHT, expand=True)
         self.notepad = ttk.Notebook(self.sub_win2)
-        if not is_pro:
-            self.tab = ttk.Frame(self.notepad)
+
         self.tab2 = ttk.Frame(self.notepad)
         self.tab3 = ttk.Frame(self.notepad)
         self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
         self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
-        if not is_pro:
-            self.notepad.add(self.tab, text=lang.text11)
+
         self.notepad.add(self.tab2, text=lang.text12)
         self.notepad.add(self.tab7, text=lang.text19)
         self.notepad.add(self.tab3, text=lang.text13)
