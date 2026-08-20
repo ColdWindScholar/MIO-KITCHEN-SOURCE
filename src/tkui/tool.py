@@ -7126,11 +7126,10 @@ class UnpackGui(ttk.LabelFrame):
         It refreshes the list of items to reflect the contents of the new project.
         """
         # Check if the `hd` method exists and the widget itself is still valid before calling.
-        if hasattr(self, 'hd') and callable(self.hd):
-            if self.winfo_exists():
+        if self.winfo_exists():
                 # Calling `hd()` will update the list of sections for the new project,
                 # taking into account the current mode (Unpack/Pack).
-                self.hd()
+            self.hd()
 
     def gui(self):
         """Builds the graphical user interface for this component."""

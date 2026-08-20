@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme, 
                             FluentWindow, FluentIcon as FIF)
 
+from qt_layer.home import HomePage
 from src.qt_layer.widgets import TkinterEmbeddedPanel, Empty, Empty2, Empty3, Empty4
 from src.tkui.tool import Tool, init_tk
 os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -87,8 +88,8 @@ class MainWindow(FluentWindow):
         self.titleBar.setMouseTracking(True)
 
         # 创建页面
-        self.home_page = Tool()
-        self.project_page = Empty()
+        self.home_page = HomePage()
+        self.project_page = Tool()
         self.plugin_page = Empty2()
         self.about_page = Empty3()
         self.settings_page = Empty4()
