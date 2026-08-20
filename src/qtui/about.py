@@ -1,10 +1,11 @@
 import random
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
-    CardWidget, isDarkTheme
+    CardWidget
 )
 
 
