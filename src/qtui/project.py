@@ -527,7 +527,7 @@ class ProjectPage(QWidget):
     def show_info_bar(self, title, content, bar_type:int=3, duration=3000):
         """bar_type: 1=error 2=warning 3=info"""
         """显示提示条，根据配置决定是否显示"""
-        if cfg.enableNotifications.value:
+        if True:
             if bar_type == 1:
                 InfoBar.error(
                     title=title,
