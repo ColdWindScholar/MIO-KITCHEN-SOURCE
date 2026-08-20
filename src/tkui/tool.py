@@ -1533,8 +1533,7 @@ class Tool(TkinterEmbeddedPanel):
         self.tab4_content()
         self.tab6_content()
         self.setting_tab()
-        if not is_pro:
-            self.about_tab()
+
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
