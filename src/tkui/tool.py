@@ -7590,7 +7590,7 @@ def init_tk(windows_tk):
         win.loops.append(check_upgrade)
     print(lang.text134 % (dti() - start))
     states.inited = True
-    win.protocol("WM_DELETE_WINDOW", exit_tool)
+    win.tk_root.protocol("WM_DELETE_WINDOW", exit_tool)
     try:
         win.tk_root.after(1000, win.start_loops)
     except KeyboardInterrupt:
