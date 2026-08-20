@@ -2086,8 +2086,7 @@ class Updater(Toplevel):
 
 
 def error(code, desc="unknown error"):
-    if settings.debug_mode == 'No':
-        win.withdraw()
+
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
     er.protocol("WM_DELETE_WINDOW", win.destroy)
