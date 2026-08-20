@@ -4398,7 +4398,7 @@ class MpkStore(Toplevel):
         elif event.num == 5:
             self.canvas.yview_scroll(1, "units")
         # Handle Windows/macOS mouse wheel events (delta)
-        elif hasattr(event, 'delta') and event.delta != 0:
+        elif event.delta != 0:
             self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _on_label_frame_configure(self, event=None):
