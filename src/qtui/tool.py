@@ -1,9 +1,11 @@
 import sys
+import warnings
 
-from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent
+from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject
 from PySide6.QtGui import QIcon, QGuiApplication, QCursor
 from PySide6.QtWidgets import QApplication
-from qfluentwidgets import NavigationItemPosition, SplashScreen, setTheme, Theme, FluentWindow, FluentIcon as FIF
+from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme, 
+                            FluentWindow, FluentIcon as FIF)
 
 from .about import AboutPage
 from .home import HomePage
@@ -12,16 +14,63 @@ from .project import ProjectPage
 from .settings import SettingsPage
 
 
+class TitleBarEventFilter(QObject):
+    """Event filter for title bar dragging"""
+    
+    def __init__(self, window):
+        super().__init__()
+        self.window = window
+        self.m_drag = False
+        self.m_dragPosition = QPoint()
+    
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.m_drag = True
+                self.m_dragPosition = event.globalPos() - self.window.frameGeometry().topLeft()
+                obj.setCursor(QCursor(Qt.CursorShape.ClosedHandCursor))
+                return True
+        
+        elif event.type() == QEvent.MouseMove:
+            if self.m_drag and event.buttons() == Qt.MouseButton.LeftButton:
+                self.window.move(event.globalPos() - self.m_dragPosition)
+                return True
+            else:
+                obj.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
+        
+        elif event.type() == QEvent.MouseButtonRelease:
+            if event.button() == Qt.MouseButton.LeftButton:
+                self.m_drag = False
+                obj.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+                return True
+        
+        elif event.type() == QEvent.Leave:
+            obj.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
+        
+        return False
+
+
 class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
+
+        # Suppress window opacity warnings on Linux
+        warnings.filterwarnings('ignore', message='.*opacity.*')
 
         # 设置主题
         setTheme(Theme.DARK)
 
         self.setWindowIcon(QIcon('icon.ico'))
-        self.splashScreen = SplashScreen(self.windowIcon(), self)
-        self.splashScreen.setIconSize(QSize(140, 140))
+        
+        # Create splash screen with error handling
+        try:
+            self.splashScreen = SplashScreen(self.windowIcon(), self)
+            self.splashScreen.setIconSize(QSize(140, 140))
+        except Exception as e:
+            # If splash screen fails due to opacity, just continue
+            print(f"Warning: SplashScreen creation skipped ({e})")
+            self.splashScreen = None
+        
         self.show()
 
         # 设置窗口标题
@@ -33,11 +82,10 @@ class MainWindow(FluentWindow):
         # 窗口居中显示
         self.center()
 
-        # Window dragging support
-        self.drag_position = QPoint()
-        self.is_dragging = False
-        self.title_bar_height = 40
-        self.normal_cursor = QCursor(Qt.CursorShape.ArrowCursor)
+        # Install event filter on title bar for dragging
+        self.title_bar_filter = TitleBarEventFilter(self)
+        self.titleBar.installEventFilter(self.title_bar_filter)
+        self.titleBar.setMouseTracking(True)
 
         # 创建页面
         self.home_page = HomePage()
@@ -49,7 +97,9 @@ class MainWindow(FluentWindow):
         # 初始化导航
         self.initNavigation()
 
-        QTimer.singleShot(1000, self.splashScreen.finish)
+        # Finish splash screen if it was created
+        if self.splashScreen:
+            QTimer.singleShot(1000, self.splashScreen.finish)
 
     def center(self):
         desktop = QGuiApplication.primaryScreen().availableGeometry()
@@ -70,71 +120,6 @@ class MainWindow(FluentWindow):
         # 默认显示主页
         self.switchTo(self.home_page)
 
-    def eventFilter(self, obj, event):
-        """Global event filter to handle window dragging"""
-        if event.type() == QEvent.MouseButtonPress:
-            if event.button() == Qt.MouseButton.LeftButton:
-                # Check if click is on title bar area (40px from top)
-                global_pos = QGuiApplication.primaryScreen().geometry().topLeft()
-                if event.globalPos().y() - self.frameGeometry().top() < self.title_bar_height:
-                    self.is_dragging = True
-                    self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
-                    self.setCursor(self.normal_cursor)
-                    return False
-        
-        elif event.type() == QEvent.MouseMove:
-            if self.is_dragging and event.buttons() == Qt.MouseButton.LeftButton:
-                self.move(event.globalPos() - self.drag_position)
-                return False
-            # Reset cursor when not on title bar
-            if not self.is_dragging:
-                local_y = event.globalPos().y() - self.frameGeometry().top()
-                if local_y < self.title_bar_height:
-                    self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
-                else:
-                    self.setCursor(self.normal_cursor)
-        
-        elif event.type() == QEvent.MouseButtonRelease:
-            if event.button() == Qt.MouseButton.LeftButton:
-                self.is_dragging = False
-                self.setCursor(self.normal_cursor)
-                return False
-
-        return super().eventFilter(obj, event)
-
-    def mousePressEvent(self, event):
-        """Handle mouse press for window dragging from title bar"""
-        if event.button() == Qt.MouseButton.LeftButton:
-            # Check if click is on the title bar area (upper region)
-            if event.position().y() < self.title_bar_height:
-                self.is_dragging = True
-                self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
-        super().mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        """Handle mouse move for window dragging"""
-        if self.is_dragging and event.buttons() == Qt.MouseButton.LeftButton:
-            self.move(event.globalPos() - self.drag_position)
-        super().mouseMoveEvent(event)
-
-    def mouseReleaseEvent(self, event):
-        """Handle mouse release to stop dragging"""
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.is_dragging = False
-        super().mouseReleaseEvent(event)
-
-    def mouseMoveEvent(self, event):
-        """Update cursor when moving over title bar"""
-        if self.is_dragging:
-            self.move(event.globalPos() - self.drag_position)
-        else:
-            # Show open hand cursor over title bar
-            if event.position().y() < self.title_bar_height:
-                self.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
-            else:
-                self.setCursor(self.normal_cursor)
-        super().mouseMoveEvent(event)
-
 
 def __init__qt(args):
     QApplication.setHighDpiScaleFactorRoundingPolicy(
@@ -146,7 +131,7 @@ def __init__qt(args):
     app = QApplication(args)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 init = lambda args: __init__qt(args)
