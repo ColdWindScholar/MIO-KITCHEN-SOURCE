@@ -1488,14 +1488,12 @@ class Tool(TkinterEmbeddedPanel):
         self.notepad = ttk.Notebook(self.sub_win2)
 
         self.tab2 = ttk.Frame(self.notepad)
-        self.tab3 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
         self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
 
         self.notepad.add(self.tab2, text=lang.text12)
         self.notepad.add(self.tab7, text=lang.text19)
-        self.notepad.add(self.tab3, text=lang.text13)
         self.notepad.add(self.tab5, text=lang.text15)
         self.notepad.add(self.tab6, text=lang.toolbox)
         self.scrollbar = ttk.Scrollbar(self.tab5, orient=tk.VERTICAL)
