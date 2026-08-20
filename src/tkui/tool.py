@@ -1472,8 +1472,6 @@ class Tool(TkinterEmbeddedPanel):
         self.message_pop = warn_win
         init_tk(self)
 
-
-
     def get_frame(self, title):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
         frame.pack(padx=10, pady=10)
