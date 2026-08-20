@@ -7040,6 +7040,8 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
+        if not hasattr(self, 'fm'):
+            return
         if self.ch.get():  # True = Unpack mode
             self.fm.configure(state='readonly')
             self.refs()
