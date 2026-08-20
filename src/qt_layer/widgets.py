@@ -19,3 +19,25 @@ class TkinterEmbeddedPanel(QWidget):
         self.timer.setInterval(20)
         self.timer.timeout.connect(self.tk_root.update)
         self.timer.start()
+
+class Empty(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("e1")
+
+class Empty2(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("e12")
+
+
+class Empty3(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("e1122")
+
+
+class Empty4(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("e12121")
