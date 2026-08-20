@@ -77,8 +77,7 @@ import zipfile
 from src.core.aml_image import main as aml_main
 from src.core.cpio import extract as cpio_extract, repack as cpio_repack
 from io import BytesIO, StringIO
-from .tkinterdnd2_build_in import Tk, DND_FILES
-from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel as TkToplevel,
+from tkinter import (BOTH, LEFT, RIGHT, Canvas, Text, X, Y, BOTTOM, StringVar, IntVar, TOP, Toplevel,
                      HORIZONTAL, TclError, Frame, Label, DISABLED, Menu, BooleanVar, CENTER)
 from shutil import rmtree, copy, move
 import pygments.lexers
@@ -114,8 +113,7 @@ from src.core import utils
 from src.core.unpac import MODE as PACMODE, unpac
 from multiprocessing import cpu_count
 
-if os.name == 'nt':
-    from .sv_ttk_fixes import *
+
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
@@ -145,9 +143,6 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
 cwd_path = utils.prog_path
-if os.name == 'nt':
-    from src.tkui.tk_apis import set_title_bar_color
-
 
 class LoadAnim:
     """Manages animated loading indicators for background tasks.
@@ -349,22 +344,6 @@ def warn_win(text: str = '', color: str = 'red', title: str | None = None,
     parent.wait_window(popup_window)
 
 
-class Toplevel(TkToplevel):
-    """Custom Toplevel window with Windows-specific title bar color theming.
-
-    Ensures that new windows in the application consistently
-    apply the dark/light theme to their title bars on Windows.
-    """
-
-    def __init__(self):
-        """Initializes the custom Toplevel window.
-
-        Calls the parent TkToplevel constructor and then applies
-        the title bar color if the OS is Windows and a theme is set.
-        """
-        super().__init__()
-        if os.name == 'nt':  # Only apply this on Windows.
-            set_title_bar_color(self, 20 if settings.theme == 'dark' else 0)
 
 
 class CustomWidgets:
@@ -960,8 +939,7 @@ class ToolBox(ttk.Frame):
             (tl := ttk.Label(a, text=lang.text132_e)).pack(fill=BOTH, padx=5, pady=5)
             tl.bind('<Button-1>', lambda *x: self.dnd([filedialog.askopenfilename()]))
             a.pack(side=TOP, padx=5, pady=5, fill=BOTH)
-            a.drop_target_register(DND_FILES)
-            a.dnd_bind('<<Drop>>', lambda x: self.dnd([x.data]))
+
             self.b = ttk.LabelFrame(self, text='INFO')
             self.b.pack(fill=BOTH, side=TOP)
 
@@ -1485,7 +1463,7 @@ class ToolBox(ttk.Frame):
                 self.run_button.config(state='normal', text=lang.create_super_image_button)
 
 
-class Tool(Tk):
+class Tool(tk.Tk):
     def __init__(self):
         super().__init__()
         self.rotate_angle = 0  # Moved from tab4_content as it's a window state
@@ -1507,13 +1485,7 @@ class Tool(Tk):
             if 'logging' in globals(): logging.warning(
                 f"Tool.__init__: Could not get initial alpha ({e_alpha_get}), assuming {initial_alpha}.")
 
-        # Apply Windows-specific default font settings if available.
-        if os.name == 'nt':
-                try:
-                    do_set_window_deffont(self)
-                except Exception as e_font_fix:
-                    if 'logging' in globals(): logging.error(
-                        f"Tool.__init__: Error in do_set_window_deffont: {e_font_fix}")
+
 
         # Assign the warning window function to a method for easier access.
         self.message_pop = warn_win
@@ -1638,10 +1610,7 @@ class Tool(Tk):
         sys.stdout.write(data)
         del data
         sys.stderr = StdoutRedirector(self.show, error_=True)
-        tr.drop_target_register(DND_FILES)
-        tr.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
-        tr2.drop_target_register(DND_FILES)
-        tr2.dnd_bind('<<Drop>>', lambda x: dndfile([x.data]))
+
         self.scroll.config(command=self.show.yview)
         self.show.config(yscrollcommand=self.scroll.set)
 
@@ -6707,7 +6676,7 @@ def cprint(*args, **kwargs):
         print(*args, **kwargs, file=sys.stdout_origin)
 
 
-def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master: Tk | Toplevel = None) -> int:
+def ask_win(text='', ok=None, cancel=None, wait=True, is_top: bool = False, master: tk.Tk | Toplevel = None) -> int:
     ok = ok or lang.ok
     cancel = cancel or lang.cancel
     value = IntVar()
@@ -7676,8 +7645,7 @@ def __init__tk(args: list):
     global win
     win = Tool()
     win.withdraw()
-    if os.name == 'nt':
-        set_title_bar_color(win)
+
     animation.master = win
     global current_project_name, theme, language
     current_project_name = utils.project_name = StringVar()
@@ -7728,7 +7696,6 @@ def __init__tk(args: list):
         win.loops.append(check_upgrade)
     print(lang.text134 % (dti() - start))
     if os.name == 'nt':
-        do_override_sv_ttk_fonts()
         if sys.getwindowsversion().major <= 6:
             ask_win(lang.warn20)
     states.inited = True
