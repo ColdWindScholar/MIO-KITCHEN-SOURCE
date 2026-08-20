@@ -266,9 +266,11 @@ class LoadAnim:
         @wraps(func)
         def call_func(*args, **kwargs):
             return_value = None
+
             def wrapper():
                 nonlocal return_value
                 return_value = func(*args, **kwargs)
+
             """The wrapper function that manages the animation and task execution."""
             # Start the animation in a new thread to avoid blocking the UI.
             if len(self.tasks) >= self.task_num_max or utils.threads >= self.task_num_max:
@@ -3666,10 +3668,10 @@ class ModuleManager:
             if not name:
                 logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
                 win.message_pop(
-                        getattr(lang, "internal_error_plugin_id_missing",
-                                "Internal error: Plugin ID missing for removal."),
-                        title=getattr(lang, "error_title", "Error"), color="red"
-                    )
+                    getattr(lang, "internal_error_plugin_id_missing",
+                            "Internal error: Plugin ID missing for removal."),
+                    title=getattr(lang, "error_title", "Error"), color="red"
+                )
                 return
 
             module_path = os.path.join(self.module_dir, str(name))
@@ -3923,10 +3925,10 @@ class MpkMan(ttk.Frame):
         if not plugin_id_to_edit:
             logging.warning("MpkMan._prepare_and_launch_editor: plugin_id_to_edit is empty.")
             win.message_pop(
-                    lang.editor_no_plugin_selected_warn,
-                    title=getattr(lang, "editor_warn_title", "Editor Warning"),
-                    color="orange"
-                )
+                lang.editor_no_plugin_selected_warn,
+                title=getattr(lang, "editor_warn_title", "Editor Warning"),
+                color="orange"
+            )
             return
 
         try:
@@ -3945,13 +3947,13 @@ class MpkMan(ttk.Frame):
             title_text = getattr(lang, title_key, default_title)
             message_template = getattr(lang, message_key, default_message_template)
             try:
-                    final_message = message_template.format(plugin_id=plugin_id_to_edit, error=str(e))
+                final_message = message_template.format(plugin_id=plugin_id_to_edit, error=str(e))
             except (KeyError, AttributeError, IndexError) as format_error:
-                    logging.warning(f"Could not format localized error message '{message_key}': {format_error}")
-                if "{plugin_id}" in message_template or "{error}" in message_template:
-                        final_message = f"{message_template} (plugin: {plugin_id_to_edit}, raw error: {str(e)})"
-                else:
-                        final_message = message_template + f"\n(Plugin: {plugin_id_to_edit}, Error: {str(e)})"
+                logging.warning(f"Could not format localized error message '{message_key}': {format_error}")
+            if "{plugin_id}" in message_template or "{error}" in message_template:
+                final_message = f"{message_template} (plugin: {plugin_id_to_edit}, raw error: {str(e)})"
+            else:
+                final_message = message_template + f"\n(Plugin: {plugin_id_to_edit}, Error: {str(e)})"
             win.message_pop(final_message, title=title_text, color="red")
 
     def _handle_uninstall_plugin(self, plugin_id_to_uninstall):
@@ -5037,12 +5039,12 @@ class MpkStore(Toplevel):
             logging.error(f"MpkStore.get_db: Failed to get plugin.json due to network error: {e_req}")
             self.data = self.apps = []  # Reset data on error.
             win.message_pop(f"{getattr(lang, 'repo_fetch_error', 'Error fetching plugin list')}:\n{e_req}",
-                                color="orange", title="Repository Error")
+                            color="orange", title="Repository Error")
         except json.JSONDecodeError as e_json:  # Handle errors parsing JSON.
             logging.error(f"MpkStore.get_db: Failed to parse plugin.json: {e_json}")
             self.data = self.apps = []  # Reset data on error.
             win.message_pop(getattr(lang, 'repo_parse_error', 'Error parsing plugin list.'), color="orange",
-                                title="Repository Error")
+                            title="Repository Error")
         except Exception as e_unexp:  # Catch other unexpected errors.
             logging.exception(f'MpkStore.get_db: Unexpected error during data fetch: {e_unexp}')
             self.data = self.apps = []  # Reset data on error.
@@ -5719,7 +5721,7 @@ def download_file():
 
 
 @animation
-def unpack_boot(name: str = 'boot', boot: str | None= None, work: str | None= None):
+def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = None):
     if not work:
         work = project_manger.current_work_path()
     if not boot:
@@ -7714,7 +7716,6 @@ class ParseCmdline:
             self.parser.print_help()
             return
         subcmd.func(subcmd_args)
-
 
     # Export Methods
     def set(self, args):
