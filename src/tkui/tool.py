@@ -4521,7 +4521,7 @@ class MpkStore(Toplevel):
         Reads the repository URL from settings. If not found or empty,
         it defaults to a predefined URL.
         """
-        if not hasattr(settings, 'plugin_repo') or not settings.plugin_repo:
+        if not settings.plugin_repo:
             # Default repository URL if not configured in settings.
             self.repo = "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/"
         else:
