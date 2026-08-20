@@ -447,7 +447,6 @@ class ToolBox(ttk.Frame):
         """
         self.pack_basic()
         functions = [
-            (lang.text114, lambda: create_thread(download_file)),  # Download File
             (lang.t59, self.GetFileInfo),  # Get File Info
             (lang.t60, self.FileBytes),  # File Bytes Operations
             (lang.audit_allow, self.SelinuxAuditAllow),  # Selinux Audit Allow
