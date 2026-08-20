@@ -1538,8 +1538,7 @@ class Tool(TkinterEmbeddedPanel):
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side=TOP)
         self.Clear_Load_canvas = Canvas(self.rzf)
         self.Clear_Load_canvas.config(highlightthickness=0)
-        ttk.Button(self.Clear_Load_canvas, text=lang.text105, command=lambda: self.show.delete(1.0, tk.END)).pack(
-            padx=10, pady=10, side=TOP)
+
         self.gif_label = Label(self.Clear_Load_canvas)
         self.gif_label.pack(padx=10, pady=10, side=TOP)
         self.Clear_Load_canvas.pack(side=RIGHT, anchor='ne')
