@@ -88,7 +88,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
+    JsonEdit, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
 from tkinter import filedialog
 
 if os.name == 'nt':
@@ -2194,7 +2194,6 @@ def error(code, desc="unknown error"):
     scroll = ttk.Scrollbar(er)
     scroll.pack(side=tk.RIGHT, fill=tk.Y)
     te = Text(er, height=20, width=60)
-    sys.stdout = StdoutRedirector(te)
     scroll.config(command=te.yview)
     te.pack(padx=10, pady=10, fill=BOTH)
     te.insert('insert', desc)
@@ -2824,7 +2823,6 @@ module_error_codes = ModuleErrorCodes
 class ModuleManager:
     def __init__(self):
         sys.stdout_origin = sys.stdout
-        sys.stdout = DevNull()
         self.module_dir = os.path.join(cwd_path, "bin", "module")
         self.uninstall_gui = self.UninstallMpk
         self.new = self.New
@@ -5459,45 +5457,6 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
         return 1
 
 
-class StdoutRedirector:
-    def __init__(self, text_widget: Text, error_=False):
-        self.text_space = text_widget
-        self.error = error_
-        self.error_info = ''
-        self.w = 0
-        self.flush = lambda: error(1, self.error_info) if self.error_info else ...
-        win.loops.append(self.loop)
-        win.loops.append(self.loop2)
-
-    def write(self, string):
-        self.w = 1
-        if self.error:
-            self.error_info += string
-            logging.error(string)
-            return
-        self.text_space.insert(tk.END, string)
-        create_thread(logging.debug, string)
-        if settings.ai_engine == '1':
-            AI_engine.suggest(string, language=settings.language, ok=lang.ok)
-
-    def loop(self):
-        while True:
-            if self.w:
-                self.text_space.see('end')
-            time.sleep(0.01)
-
-    def loop2(self):
-        i = 0
-        line_first = None
-        while True:
-            if not line_first:
-                line_first = self.text_space.get("end-1c linestart", "end-1c")
-            if line_first == self.text_space.get("end-1c linestart", "end-1c"):
-                i %= i + 1
-            line_first = None
-            if not i:
-                self.w = 0
-            time.sleep(0.5)
 
 
 def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 2048576):
