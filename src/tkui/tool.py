@@ -7669,111 +7669,6 @@ def exit_tool():
     win.destroy()
 
 
-class ParseCmdline:
-    def __init__(self, args_list):
-        self.args_list = args_list
-        self.cmd_exit = settings.cmd_exit
-        if settings.cmd_invisible == '1':
-            win.withdraw()
-            win.iconify()
-        self.parser = argparse.ArgumentParser(prog='tool', description='A cool tool like hat-Mita!',
-                                              exit_on_error=False)
-        subparser = self.parser.add_subparsers(title='subcommand',
-                                               description='Valid subcommands')
-        # Unpack Rom
-        unpack_rom_parser = subparser.add_parser('unpack', add_help=False, help="Unpack Suported File")
-        unpack_rom_parser.set_defaults(func=dndfile)
-        # Set Config
-        set_config_parse = subparser.add_parser('set', help="Set Config")
-        set_config_parse.set_defaults(func=self.set)
-        get_config_parse = subparser.add_parser('get', help="Get Config")
-        get_config_parse.set_defaults(func=self.get)
-        # Help
-        help_parser = subparser.add_parser('help', help="Print Help")
-        help_parser.set_defaults(func=self.help)
-        # Lpmake
-        lpmake_parser = subparser.add_parser('lpmake', help='To make super image')
-        lpmake_parser.set_defaults(func=self.lpmake)
-        # End
-        if len(args_list) == 1 and args_list[0] not in ["help", '--help', '-h']:
-            dndfile(args_list)
-        if len(args_list) == 1 and args_list[0] in ['--help', '-h']:
-            self.help([])
-        else:
-            try:
-                self.__parse()
-            except (argparse.ArgumentError, ValueError):
-                logging.exception('CMD')
-                self.help([])
-                self.cmd_exit = '1'
-        if self.cmd_exit == '1':
-            sys.exit(1)
-
-    # Hidden Methods
-    def __parse(self):
-        subcmd, subcmd_args = self.parser.parse_known_args(self.args_list)
-        if not hasattr(subcmd, 'func'):
-            self.parser.print_help()
-            return
-        subcmd.func(subcmd_args)
-
-    # Export Methods
-    def set(self, args):
-        if len(args) > 2:
-            print('Many Args!')
-            return
-        name, value = args
-        settings.set_value(name, value)
-        logging.info(f'Set Config ({name})[{getattr(settings, name, "")}] ==> [{value}]')
-
-    def get(self, args):
-        if len(args) > 1:
-            cprint('Many Args!')
-            return
-        name, = args
-        cprint(getattr(settings, name))
-
-    def help(self, args):
-        if hasattr(sys, 'stdout_origin'):
-            self.parser.print_help(sys.stdout_origin)
-        else:
-            logging.warning('sys.stdout_origin not defined!')
-
-    def lpmake(self, arglist):
-        parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument('outputdir', nargs='?',
-                            type=str,
-                            default=None)
-        parser.add_argument('workdir', type=str, help='The Work Dir', action='store', default=None)
-        parser.add_argument('--sparse', type=int, dest='Sparse:1.enable 0.disable', action='store', default=0)
-        # dbfz...
-        parser.add_argument('--group-name', type=str, action='store',
-                            help='qti_dynamic_partitions main mot_dp_group',
-                            default='qti_dynamic_partitions')
-        parser.add_argument('--size', type=int, help='Super Size (Bytes)',
-                            action='store',
-                            default=9126805504)
-        parser.add_argument('--list', type=str,
-                            help='the including parts of the super, use "," to split, like"odm,system"',
-                            action='store',
-                            default=None)
-        # Wheather remove source files
-        parser.add_argument('--delete', type=int, help='Delete Source Images:1.del 0.no_del',
-                            action='store',
-                            default=0)
-        # V-AB AB A-ONLY
-        parser.add_argument('--part_type', type=int, help='[1] A-only [2] V-ab [3] a/b',
-                            action='store',
-                            default=1)
-        # the attrib of super
-        parser.add_argument('--attrib', type=str, help='The Attrib Of the super',
-                            action='store',
-                            default='readonly')
-        args = parser.parse_args(arglist)
-        if not args.workdir or not args.outputdir \
-                or not os.path.exists(args.workdir) or not os.path.exists(args.outputdir):
-            cprint("Workdir or Output Dir Not Exist!")
-            return
 
 
 def __init__tk(args: list):
@@ -7846,8 +7741,6 @@ def __init__tk(args: list):
             ask_win(lang.warn20)
     states.inited = True
     win.protocol("WM_DELETE_WINDOW", exit_tool)
-    if len(args) > 1 and is_pro:
-        win.after(1000, ParseCmdline, args[1:])
     try:
         win.after(1000, win.start_loops)
         win.mainloop()
