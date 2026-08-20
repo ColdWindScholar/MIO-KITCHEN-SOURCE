@@ -215,7 +215,8 @@ class LoadAnim:
             except (Exception, BaseException):
                 # Log any exceptions during cancellation, as it might indicate a minor issue.
                 logging.exception('Error stopping GIF animation')
-        self.master.gif_label.pack_forget()
+        if hasattr(self.master, 'gif_label'):
+            self.master.gif_label.pack_forget()
         self.hide_gif = True
 
     def init(self):
