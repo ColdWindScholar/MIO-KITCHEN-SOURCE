@@ -1472,9 +1472,7 @@ class Tool(TkinterEmbeddedPanel):
         self.message_pop = warn_win
         init_tk(self)
 
-    def get_time(self):
-        self.tsk.config(text=time.strftime("%H:%M:%S"))
-        self.tk_root.after(1000, self.get_time)
+
 
     def get_frame(self, title):
         frame = ttk.LabelFrame(self.frame_bg, text=title)
@@ -1525,7 +1523,6 @@ class Tool(TkinterEmbeddedPanel):
 
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
-        self.tsk.pack(padx=10, pady=10, side='top')
 
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side=TOP)
         self.Clear_Load_canvas = Canvas(self.rzf)
@@ -7101,7 +7098,6 @@ def init_tk(windows_tk):
     win.update()
     if pyi_splash_available:
         pyi_splash.close()
-    win.loops.append(win.get_time)
     if settings.check_upgrade == '1':
         win.loops.append(check_upgrade)
     print(lang.text134 % (dti() - start))
