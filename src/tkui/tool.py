@@ -13,11 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import datetime
 import gzip
 import json
 import platform
-import random
 import shutil
 import subprocess
 import threading
@@ -107,7 +105,6 @@ from . import editor
 from src.core import opscrypto
 from src.core import images
 from src.core import extra
-from . import AI_engine
 from src.core import ext4
 from src.core.config_parser import ConfigParser
 from src.core import utils
