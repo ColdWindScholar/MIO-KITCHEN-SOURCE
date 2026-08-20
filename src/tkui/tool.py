@@ -1618,7 +1618,7 @@ class Tool(Tk):
         self.tab6_content()
         self.setting_tab()
         if not is_pro:
-            self.tab_content()
+            self.about_tab()
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
         self.tsk = Label(self.sub_win3, text="MIO-KITCHEN", font=(None, 15))
@@ -1658,7 +1658,7 @@ class Tool(Tk):
 
         MpkMan().gui()
 
-    def tab_content(self):
+    def about_tab(self):
 
         # 1. Main Content Layout Container (Grid Alignment for Pixel-Perfect Layout)
         main_container = ttk.Frame(self.tab, padding=20)
