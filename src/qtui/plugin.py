@@ -115,7 +115,6 @@ class PluginPage(QWidget):
         thirdparty_card = PluginSectionCard("第三方插件", FIF.DOWN)
         thirdparty_card.add_plugin("Redis缓存", "2.1.0", "Redis 数据库连接和操作插件", FIF.CLOUD)
         thirdparty_card.add_plugin("ElasticSearch", "1.5.2", "ElasticSearch 搜索引擎集成", FIF.SEARCH)
-        thirdparty_card.add_plugin("数据库连接", "3.0.1", "支持多种数据库连接和管理", FIF.DOCUMENT)
         main_layout.addWidget(thirdparty_card)
 
         # Install button
