@@ -4732,14 +4732,14 @@ class MpkStore(Toplevel):
 
     def clear(self):
 
-        if hasattr(self, 'label_frame') and self.label_frame.winfo_exists():
+        if self.label_frame.winfo_exists():
             for widget in self.label_frame.winfo_children():
                 widget.destroy()
 
         self.app_infos.clear()
         self.control.clear()
 
-        if hasattr(self, 'canvas') and self.canvas.winfo_exists():
+        if self.canvas.winfo_exists():
             self._on_label_frame_configure()
 
     def modify_repo(self):
@@ -4767,8 +4767,7 @@ class MpkStore(Toplevel):
         def on_ok_repo():
             """Handles the OK button click in the repository modification dialog."""
             new_repo_val = input_var.get()
-            if hasattr(settings, 'set_value'):  # Save the new repository URL to settings.
-                settings.set_value('plugin_repo', new_repo_val)
+            settings.set_value('plugin_repo', new_repo_val)
 
             a.destroy()  # Close the dialog.
 
@@ -4840,7 +4839,7 @@ class MpkStore(Toplevel):
                     if not module_manager.is_installed(dep_id_str):
                         logging.error(
                             f"MpkStore.download: Dependency '{dep_name_display}' for plugin '{plugin_display_name}' failed to install.")
-                        if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                        if self.winfo_exists():
                             # --- USING win.message_pop ---
                             msg_template = getattr(lang, "dependency_installation_failed_msg",
                                                    "Installation of plugin '{plugin_name}' aborted because dependency '{dep_name}' failed to install.")
@@ -4855,7 +4854,7 @@ class MpkStore(Toplevel):
                 else:
                     logging.warning(
                         f"MpkStore.download: Info for dependency '{dep_id_str}' not found in self.data. Cannot install for '{plugin_display_name}'.")
-                    if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                    if self.winfo_exists():
                         # --- USING win.message_pop ---
                         msg = getattr(lang, "dependency_not_in_repo_msg",
                                       "Cannot install '{plugin_name}'. Required dependency '{dep_name}' not found in the repository.")
@@ -4943,7 +4942,7 @@ class MpkStore(Toplevel):
                     if install_result != module_error_codes.Normal:
                         logging.error(
                             f"MpkStore.download: Failed to install plugin '{id_}' from '{file_name_in_list}'. Reason: '{reason_text}', Code: {install_result}")
-                        if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+                        if self.winfo_exists():
                             msg_template_key = "plugin_install_failed_dependency_mpkstore" if install_result == module_error_codes.DependsMissing else "plugin_install_failed_mpkstore"
                             error_msg_template = getattr(lang, msg_template_key,
                                                          "Failed to install plugin {plugin_name}: {reason_text}")
@@ -4981,7 +4980,7 @@ class MpkStore(Toplevel):
 
         except (ConnectTimeout, HTTPError) as e_conn:
             logging.exception(f'MpkStore.download: Connection/HTTP error during download for plugin {id_}: {e_conn}')
-            if self.winfo_exists() and hasattr(win, 'message_pop') and callable(win.message_pop):
+            if self.winfo_exists():
                 win.message_pop(
                     text=f"{getattr(lang, 'download_failed', 'Download failed')}: {e_conn}",
                     color='orange',
@@ -5043,14 +5042,12 @@ class MpkStore(Toplevel):
         except requests.exceptions.RequestException as e_req:  # Handle network-related errors.
             logging.error(f"MpkStore.get_db: Failed to get plugin.json due to network error: {e_req}")
             self.data = self.apps = []  # Reset data on error.
-            if hasattr(win, 'message_pop') and callable(win.message_pop):
-                win.message_pop(f"{getattr(lang, 'repo_fetch_error', 'Error fetching plugin list')}:\n{e_req}",
+            win.message_pop(f"{getattr(lang, 'repo_fetch_error', 'Error fetching plugin list')}:\n{e_req}",
                                 color="orange", title="Repository Error")
         except json.JSONDecodeError as e_json:  # Handle errors parsing JSON.
             logging.error(f"MpkStore.get_db: Failed to parse plugin.json: {e_json}")
             self.data = self.apps = []  # Reset data on error.
-            if hasattr(win, 'message_pop') and callable(win.message_pop):
-                win.message_pop(getattr(lang, 'repo_parse_error', 'Error parsing plugin list.'), color="orange",
+            win.message_pop(getattr(lang, 'repo_parse_error', 'Error parsing plugin list.'), color="orange",
                                 title="Repository Error")
         except Exception as e_unexp:  # Catch other unexpected errors.
             logging.exception(f'MpkStore.get_db: Unexpected error during data fetch: {e_unexp}')
