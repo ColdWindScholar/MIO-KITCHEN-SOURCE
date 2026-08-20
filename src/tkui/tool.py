@@ -2131,15 +2131,14 @@ def error(code, desc="unknown error"):
 class Welcome(ttk.Frame):
     def __init__(self):
         # master=win specifies that Welcome will be a child widget of the main window 'win'.
-        _main_app_window = globals().get('win')
-        if not (_main_app_window and isinstance(_main_app_window, tk.Tk)):
-            # This is a critical situation if Welcome expects 'win' to be its master.
-            if 'logging' in globals():
-                logging.critical(
-                    "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
-                error(1, 'Missing Main Window.')
 
-        super().__init__(master=_main_app_window)  # Explicitly pass master.
+        if not win:
+            # This is a critical situation if Welcome expects 'win' to be its master.
+            logging.critical(
+                    "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+            error(1, 'Missing Main Window.')
+
+        super().__init__(master=win.tk_root)  # Explicitly pass master.
         self.pack(fill=BOTH, expand=True)  # Welcome frame fills its master (win).
 
         _settings_obj = settings
@@ -2193,14 +2192,14 @@ class Welcome(ttk.Frame):
         self.change_page(self.oobe)  # Initial page load.
 
         # Centering the main window 'win' after the Welcome frame is packed and the first page is loaded.
-        if _main_app_window and move_center and callable(move_center):
+        if win.tk_root and move_center and callable(move_center):
             try:
                 # Ensure the Welcome frame itself and its content are updated before centering the master window.
                 self.update_idletasks()
-                _main_app_window.update_idletasks()  # Ensure the master (win) knows its new size with Welcome packed.
-                move_center(_main_app_window)
+                win.tk_root.update_idletasks()  # Ensure the master (win) knows its new size with Welcome packed.
+                move_center(win.tk_root)
             except Exception as e_mc:
-                if 'logging' in globals(): logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
+                logging.error(f"Welcome.__init__: Error centering main window: {e_mc}")
 
         self.wait_window()  # This makes the Welcome sequence modal relative to 'win'.
 
