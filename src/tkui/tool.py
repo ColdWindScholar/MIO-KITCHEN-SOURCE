@@ -181,7 +181,7 @@ class LoadAnim:
             ind: The index of the current frame to display.
         """
         self.hide_gif = False
-        if not self.master:
+        if not self.master or not hasattr(self.master, 'gif_label'):
             logging.warning('Master\'s not set! Skip Animation init.')
             return 1
         if not self.hide_gif:
