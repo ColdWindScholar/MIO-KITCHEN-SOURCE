@@ -1,17 +1,22 @@
 {
-  "theme": "dark",
-  "path": "",
-  "ai_engine": false,
-  "version": "4.2.1",
-  "oobe": 5,
-  "language": "English",
-  "contextpatch": false,
-  "project_struct": "single",
-  "plugin_repo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
-  "auto_unpack": false,
-  "transport": false,
-  "magisk_not_decompress": false,
-  "boot_skip_ramdisk": false,
-  "check_update": false,
-  "cpio_impl": "native"
+    "Tool": {
+        "AiEngine": false,
+        "autoUnpack": false,
+        "checkUpdate": false,
+        "CpioImpl": "Native",
+        "Language": "Japanese",
+        "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
+        "ProjectStructure": "Single",
+        "selinuxPatch": false,
+        "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
+    },
+    "QFluentWidgets": {
+        "FontFamilies": [
+            "Segoe UI",
+            "Microsoft YaHei",
+            "PingFang SC"
+        ],
+        "ThemeColor": "#ff0078d4",
+        "ThemeMode": "Dark"
+    }
 }

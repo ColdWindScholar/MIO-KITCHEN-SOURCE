@@ -1509,7 +1509,6 @@ class Tool(Tk):
 
         # Apply Windows-specific default font settings if available.
         if os.name == 'nt':
-            if 'do_set_window_deffont' in globals() and callable(globals()['do_set_window_deffont']):
                 try:
                     do_set_window_deffont(self)
                 except Exception as e_font_fix:
