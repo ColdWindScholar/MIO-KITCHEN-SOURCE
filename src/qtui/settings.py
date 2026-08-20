@@ -114,17 +114,16 @@ class SettingsPage(QScrollArea):
         )
         self.cleanCacheCard.clicked.connect(self.clean_cache)
         self.scrollLayout.addWidget(self.cleanCacheCard)
-
         self.scrollLayout.addWidget(self.cpioImplCard)
-        self.autoSaveCard = SwitchSettingCard(
+        #ai
+        self.aiEngine = SwitchSettingCard(
             FluentIcon.SAVE,
-            "自动保存项目",
-            "在关闭项目时自动保存项目数据",
-            cfg.autoSaveProjects,
+            "AiEngine",
+            "AiEngine",
+            cfg.aiEngine,
             parent=self.scrollWidget
         )
-        self.autoSaveCard.setChecked(cfg.autoSaveProjects.value)
-        self.scrollLayout.addWidget(self.autoSaveCard)
+        self.scrollLayout.addWidget(self.aiEngine)
 
         self.notificationCard = SwitchSettingCard(
             FluentIcon.RINGER,
