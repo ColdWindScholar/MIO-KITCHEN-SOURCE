@@ -88,7 +88,6 @@ class MainWindow(FluentWindow):
 
         # 创建页面
         self.home_page = Tool()
-        init_tk(self.home_page)
         self.project_page = Empty()
         self.plugin_page = Empty2()
         self.about_page = Empty3()

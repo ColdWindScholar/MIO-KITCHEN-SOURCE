@@ -1475,6 +1475,7 @@ class Tool(TkinterEmbeddedPanel):
         initial_alpha = 1.0  # Default to fully opaque
         self.loops = []
         self.message_pop = warn_win
+        init_tk(self)
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
