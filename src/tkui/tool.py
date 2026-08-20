@@ -7549,7 +7549,6 @@ def init_tk(windows_tk):
     theme = StringVar()
     language = StringVar()
     settings.load()
-    windows_tk.gui()
     if settings.updating == 'true':
         updater = Updater()
         try:
