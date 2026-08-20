@@ -107,8 +107,6 @@ class PluginPage(QWidget):
         # Built-in plugins section
         builtin_card = PluginSectionCard("内置插件", FIF.DEVELOPER_TOOLS)
         builtin_card.add_plugin("日志插件", "1.0.0", "内置日志管理和查询功能", FIF.DOCUMENT)
-        builtin_card.add_plugin("数据导出", "1.0.0", "支持 CSV, JSON, Excel 格式导出", FIF.SAVE_AS)
-        builtin_card.add_plugin("系统监控", "1.0.0", "实时监控系统资源占用情况", FIF.SPEED_HIGH)
         main_layout.addWidget(builtin_card)
 
         # Third-party plugins section
