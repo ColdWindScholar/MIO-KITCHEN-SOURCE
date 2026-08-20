@@ -5,12 +5,13 @@ import warnings
 from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject
 from PySide6.QtGui import QIcon, QGuiApplication, QCursor
 from PySide6.QtWidgets import QApplication
-from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme, 
+from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
                             FluentWindow, FluentIcon as FIF)
 
 from qt_layer.home import HomePage
-from src.qt_layer.widgets import TkinterEmbeddedPanel, Empty, Empty2, Empty3, Empty4
-from src.tkui.tool import Tool, init_tk
+from src.qt_layer.widgets import Empty2, Empty3, Empty4
+from src.tkui.tool import Tool
+
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 

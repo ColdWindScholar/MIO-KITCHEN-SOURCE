@@ -1,6 +1,5 @@
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QWidget
-
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
 
 import tkinter as tk
 
@@ -10,20 +9,18 @@ class TkinterEmbeddedPanel(QWidget):
 
         # 1. Force Qt to create a native window handle/X11 ID for THIS specific widget
         self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
-        self.win_id = int(self.winId())  # Get the raw X11 Window ID
-
+        layout = QVBoxLayout()
+        self.widget = QWidget()
+        layout.addWidget(self.widget)
+        layout.setContentsMargins(40, 40, 40, 40)
+        self.setLayout(layout)
         # 2. Bind Tkinter root directly into the Qt Widget's handle
         # The 'use' parameter forces Tkinter to render inside the Qt boundary
-        self.tk_root = tk.Tk(use=hex(self.win_id))
+        self.tk_root = tk.Tk(use=hex(self.widget.winId()))
         self.timer = QTimer(self)
         self.timer.setInterval(20)
         self.timer.timeout.connect(self.tk_root.update)
         self.timer.start()
-
-class Empty(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("e1")
 
 class Empty2(QWidget):
     def __init__(self, parent=None):
