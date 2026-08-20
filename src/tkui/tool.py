@@ -1507,7 +1507,6 @@ class Tool(TkinterEmbeddedPanel):
 
         self.tab2 = ttk.Frame(self.notepad)
         self.tab3 = ttk.Frame(self.notepad)
-        self.tab4 = ttk.Frame(self.notepad)
         self.tab5 = ttk.Frame(self.notepad)
         self.tab6 = ttk.Frame(self.notepad)
         self.tab7 = ttk.Frame(self.notepad)
@@ -1515,7 +1514,6 @@ class Tool(TkinterEmbeddedPanel):
         self.notepad.add(self.tab2, text=lang.text12)
         self.notepad.add(self.tab7, text=lang.text19)
         self.notepad.add(self.tab3, text=lang.text13)
-        self.notepad.add(self.tab4, text=lang.text14)
         self.notepad.add(self.tab5, text=lang.text15)
         self.notepad.add(self.tab6, text=lang.toolbox)
         self.scrollbar = ttk.Scrollbar(self.tab5, orient=tk.VERTICAL)
@@ -1569,77 +1567,6 @@ class Tool(TkinterEmbeddedPanel):
         tool_box.gui()
         tool_box.pack(fill=BOTH, expand=True)
 
-    def tab4_content(self):
-        self.rotate_angle = 0
-        debugger_num = 0
-        PRIMARY_COLOR = '#00BFFF'
-        SECONDARY_COLOR = '#888888'
-
-        def getColor():
-            nonlocal debugger_num
-            debugger_num += 1
-            if debugger_num >= 5 and not states.debugger_window:
-                debugger_num = 0
-                a = Debugger()
-                states.debugger_window = a.winfo_exists()
-                a.lift()
-                a.focus_force()
-                a.wait_window()
-                states.debugger_window = False
-            return f"#{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}{hex(randrange(16, 256))[2:]}"
-
-        def update_angle():
-            self.rotate_angle = (self.rotate_angle + 10) % 360
-            canvas.itemconfigure(text_item, angle=self.rotate_angle)
-
-        canvas = tk.Canvas(self.tab4, width=400, height=100)
-        canvas.pack()
-        text_item = canvas.create_text(200, 50, text='MIO-KITCHEN', font=('Arial', 30), fill='white')
-
-        canvas.tag_bind(text_item, '<B1-Motion>', lambda event: update_angle())
-        canvas.tag_bind(text_item, '<Button-1>', lambda *x: canvas.itemconfigure(text_item, fill=getColor()))
-
-        Label(self.tab4, text=lang.text111, font=('Segoe UI', 13, 'bold'), fg=PRIMARY_COLOR).pack(pady=(0, 15))
-
-        card_frame = ttk.Frame(self.tab4, padding=15, style="Card.TFrame")
-        card_frame.pack(fill='x', padx=30, pady=10)
-
-        sys_ver = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        info_text = lang.text128.format(settings.version, sys_ver, platform.system(), machine())
-        ttk.Label(card_frame, text=info_text, font=('Segoe UI', 10), justify='center', anchor='center').pack(fill='x',
-                                                                                                             pady=5)
-
-        update_path = os.path.join(cwd_path, "bin", "update.json")
-        if os.path.exists(update_path):
-            try:
-                json_obj = JsonEdit(update_path)
-                json_frame = ttk.Frame(card_frame)
-                json_frame.pack(fill='x', pady=5)
-
-                for key, val in json_obj.read().items():
-                    row = ttk.Frame(json_frame)
-                    row.pack(fill='x', pady=2)
-                    ttk.Label(row, text=f"{key}:", font=('Segoe UI', 9, 'bold'), foreground=PRIMARY_COLOR).pack(
-                        side='left', padx=(10, 0))
-                    ttk.Label(row, text=str(val), font=('Segoe UI', 9)).pack(side='right', padx=(0, 10))
-            except Exception as e:
-                logging.exception("读取本地更新配置失败: %s", e)
-
-        footer_frame = ttk.Frame(self.tab4)
-        footer_frame.pack(side='bottom', fill='x', pady=20)
-
-        credits_text = f"{settings.language} By {lang.language_file_by}"
-        ttk.Label(footer_frame, text=credits_text, font=('Segoe UI', 9), foreground=SECONDARY_COLOR,
-                  anchor='center').pack(pady=2)
-
-        ttk.Label(footer_frame, text=lang.t63, style="Link.TLabel", anchor='center').pack(pady=2)
-        link = ttk.Label(footer_frame, text="GitHub: MIO-KITCHEN-SOURCE", cursor="hand2", style="Link.TLabel",
-                         font=('Segoe UI', 9, 'underline'))
-        link.bind("<Button-1>", lambda *x: openurl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE"))
-        if not is_pro:
-            link.pack(pady=2)
-
-        Label(footer_frame, text=lang.text110, font=('Segoe UI', 8), fg=SECONDARY_COLOR).pack(pady=(8, 0))
 
     def setting_tab(self):
         def get_setting_button(item, master, text, on_v='1', off_v='0', style: str = "Toggle.TButton"):
@@ -7024,7 +6951,7 @@ class UnpackGui(ttk.LabelFrame):
         It refreshes the list of items to reflect the contents of the new project.
         """
         # Check if the `hd` method exists and the widget itself is still valid before calling.
-        if self.winfo_exists():
+        if self.winfo_exists() and hasattr(self,'hd'):
                 # Calling `hd()` will update the list of sections for the new project,
                 # taking into account the current mode (Unpack/Pack).
             self.hd()
