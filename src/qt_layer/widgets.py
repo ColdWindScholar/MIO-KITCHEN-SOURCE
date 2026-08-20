@@ -12,7 +12,6 @@ class TkinterEmbeddedPanel(QWidget):
         layout = QVBoxLayout()
         self.widget = QWidget()
         layout.addWidget(self.widget)
-        layout.setContentsMargins(40, 40, 40, 40)
         self.setLayout(layout)
         # 2. Bind Tkinter root directly into the Qt Widget's handle
         # The 'use' parameter forces Tkinter to render inside the Qt boundary
