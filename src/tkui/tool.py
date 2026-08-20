@@ -303,7 +303,7 @@ def warn_win(text: str = '', color: str = 'red', title: str | None = None,
                 window (`win`) is used as the parent.
     """
     # Determine the parent window; default to the main app window if not specified.
-    parent = master if master and master.winfo_exists() else win
+    parent = master or win.tk_root
     if not title:
         title = lang.warning
 

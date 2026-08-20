@@ -17,6 +17,7 @@ class TkinterEmbeddedPanel(QWidget):
         # 2. Bind Tkinter root directly into the Qt Widget's handle
         # The 'use' parameter forces Tkinter to render inside the Qt boundary
         self.tk_root = tk.Tk(use=hex(self.widget.winId()))
+        self.tk_root.willdispatch()
         self.timer = QTimer(self)
         self.timer.setInterval(20)
         self.timer.timeout.connect(self.tk_root.update)
