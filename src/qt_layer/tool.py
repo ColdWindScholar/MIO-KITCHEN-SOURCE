@@ -85,11 +85,10 @@ class MainWindow(FluentWindow):
         self.title_bar_filter = TitleBarEventFilter(self)
         self.titleBar.installEventFilter(self.title_bar_filter)
         self.titleBar.setMouseTracking(True)
-        self.tool = Tool()
-        init_tk(self.tool)
 
         # 创建页面
-        self.home_page = self.tool
+        self.home_page = Tool()
+        init_tk(self.home_page)
         self.project_page = Empty()
         self.plugin_page = Empty2()
         self.about_page = Empty3()
