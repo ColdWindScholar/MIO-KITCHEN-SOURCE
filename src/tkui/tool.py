@@ -1548,10 +1548,7 @@ class Tool(TkinterEmbeddedPanel):
 
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
-        data: str = ""
         sys.stdout = StdoutRedirector(self.show)
-        sys.stdout.write(data)
-        del data
         sys.stderr = StdoutRedirector(self.show, error_=True)
 
         self.scroll.config(command=self.show.yview)
