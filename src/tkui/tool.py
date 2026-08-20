@@ -22,13 +22,12 @@ import threading
 import uuid
 from contextlib import suppress
 from functools import wraps
-from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
 from qt_layer.widgets import TkinterEmbeddedPanel
 from src.core import merge_sparse
-from src.core import tarsafe, miside_banner
+from src.core import tarsafe
 from src.core.Magisk import Magisk_patch
 from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
@@ -65,7 +64,6 @@ import os.path
 import pathlib
 import sys
 import time
-from platform import machine
 from webbrowser import open as openurl
 import tkinter as tk
 from tkinter import ttk
@@ -115,7 +113,7 @@ from multiprocessing import cpu_count
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
-from .widgets import ListBox, ScrollFrame, input_, ToggledFrame
+from .widgets import ListBox, input_
 from src.core.undz import DZFileTools
 from src.core.selinux_audit_allow import main as selinux_audit_allow
 import logging
