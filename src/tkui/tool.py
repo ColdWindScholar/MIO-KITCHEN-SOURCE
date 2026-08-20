@@ -7531,6 +7531,10 @@ def exit_tool():
 def init_tk(windows_tk):
     global win
     win = windows_tk
+    # Prevent multiple initializations (ensure home_page / Tk init runs only once)
+    if getattr(states, "inited", False):
+        logging.debug("init_tk: already initialized, skipping.")
+        return
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
