@@ -8,8 +8,7 @@ from qfluentwidgets import (
     PushSettingCard, PrimaryPushSettingCard
 )
 from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig, OptionsConfigItem, OptionsValidator
-from src.core.utils import prog_path, temp, re_folder
-from utils import hum_convert
+from src.core.utils import prog_path, temp, re_folder, hum_convert
 
 config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 
