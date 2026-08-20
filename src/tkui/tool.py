@@ -5039,49 +5039,6 @@ def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 20
         logging.info(f"Finished download: {url} to {file_save_path}, total bytes: {bytes_downloaded}")
 
 
-def download_file():
-    var1 = BooleanVar(value=False)
-    down = win.get_frame(lang.text61)
-    url = input_(title=lang.text60, master=win)
-    if not url:
-        win.message_pop(lang.warn_empty_url, "red")  # used  a new key
-        return
-    win.message_pop(lang.text62, "green")
-    progressbar = ttk.Progressbar(down, length=200, mode="determinate")
-    progressbar.pack(padx=10, pady=10)
-    ttk.Label(down, text=os.path.basename(url), justify='left').pack(padx=10, pady=5)
-    ttk.Label(down, text=url, wraplength=200, justify='left').pack(padx=10, pady=5)
-    ttk.Label(down, textvariable=(jd := StringVar())).pack(padx=10, pady=10)
-    c1 = ttk.Checkbutton(down, text=lang.text63, variable=var1, onvalue=True, offvalue=False)
-    c1.pack(padx=10, pady=10)
-    start_time = time.time()
-    try:
-        for percentage, speed, bytes_downloaded, file_size, elapsed in download_api(url):
-            progressbar["value"] = percentage
-            jd.set(lang.text64.format(str(percentage), str(speed), str(bytes_downloaded), str(file_size)))
-            progressbar.update()
-        elapsed = time.time() - start_time
-        print(lang.text65.format(os.path.basename(url), str(elapsed)))
-        down.destroy()
-        if var1.get():
-            downloaded_file = settings.path + os.sep + os.path.basename(url)
-            unpackrom(downloaded_file)
-            os.remove(downloaded_file)
-    except Exception as e:
-        print(lang.text66, str(e))
-        try:
-            os.remove(os.path.basename(url))
-        except (Exception, BaseException):
-            if os.access(os.path.basename(url), os.F_OK):
-                print(lang.text67 + os.path.basename(url))
-            else:
-                try:
-                    down.destroy()
-                except Exception as e:
-                    win.message_pop(str(e))
-                win.message_pop(lang.text68, "red")
-
-
 @animation
 def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = None):
     if not work:
