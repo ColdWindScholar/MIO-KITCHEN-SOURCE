@@ -1567,129 +1567,6 @@ class Tool(TkinterEmbeddedPanel):
         tool_box.pack(fill=BOTH, expand=True)
 
 
-    def setting_tab(self):
-        def get_setting_button(item, master, text, on_v='1', off_v='0', style: str = "Toggle.TButton"):
-            a = StringVar(value=getattr(settings, item))
-            a.trace("w", lambda *x: settings.set_value(item, a.get()))
-            ttk.Checkbutton(master, text=text, variable=a, onvalue=on_v,
-                            offvalue=off_v,
-                            style=style).pack(padx=10, pady=10, fill=X)
-
-        def get_cache_size():
-            size = 0
-            for root, _, files in os.walk(temp):
-                try:
-                    size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
-                                 not os.path.islink(os.path.join(root, name))])
-                except:
-                    logging.exception("Bugs")
-            return size
-
-        def clean_cache():
-            try:
-                re_folder(temp, quiet=True)
-            except:
-                logging.exception("Bugs")
-            slo2.configure(text=hum_convert(get_cache_size()))
-
-        self.show_local = StringVar()
-        self.show_local.set(settings.path)
-        Setting_Frame = ScrollFrame(self.tab3)
-        Setting_Frame.gui()
-        Setting_Frame.pack(fill=BOTH, expand=True)
-        sub_tool_settings_main = ToggledFrame(Setting_Frame.label_frame, width=600, text=lang.tool,
-                                              callback=Setting_Frame.update_ui, unfold=True)
-        sub_frame_theme = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_language = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_path = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_others_main = ToggledFrame(Setting_Frame.label_frame, width=600, text=lang.others,
-                                             callback=Setting_Frame.update_ui)
-        sub_frame_others = sub_frame_others_main.sub_frame
-        sub_frame_project_struct = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_cpio_impl = ttk.Frame(sub_tool_settings_main.sub_frame)
-        sub_frame_cache = ttk.Frame(sub_tool_settings_main.sub_frame)
-        ttk.Label(sub_frame_theme, text=lang.text124).pack(side='left', padx=10, pady=10)
-        self.list2 = ttk.Combobox(sub_frame_theme, textvariable=theme, state='readonly', values=["light", "dark"])
-        self.list2.pack(padx=10, pady=10, side='left')
-        self.list2.bind('<<ComboboxSelected>>', lambda *x: settings.set_theme())
-        ###
-        ###
-        cpio_impl = StringVar(value=settings.cpio_impl)
-        ttk.Label(sub_frame_cpio_impl, text=lang.cpio_impl).pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sub_frame_cpio_impl, text=lang.python, variable=cpio_impl, value='python').pack(
-            padx=10, pady=10,
-            side='left')
-        ttk.Radiobutton(sub_frame_cpio_impl, text=lang.native, variable=cpio_impl, value='native').pack(padx=10,
-                                                                                                        pady=10,
-                                                                                                        side='left')
-        cpio_impl.trace("w", lambda *x: settings.set_value('cpio_impl', cpio_impl.get()))
-        ###
-        ###
-        project_struct = StringVar(value=settings.project_struct)
-        ttk.Label(sub_frame_project_struct, text=lang.project_struct).pack(padx=10, pady=10, side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text=lang.single, variable=project_struct, value='single').pack(
-            padx=10, pady=10,
-            side='left')
-        ttk.Radiobutton(sub_frame_project_struct, text=lang.split, variable=project_struct, value='split').pack(padx=10,
-                                                                                                                pady=10,
-                                                                                                                side='left')
-        project_struct.trace("w", lambda *x: settings.set_value('project_struct', project_struct.get()))
-        ###
-        ttk.Label(sub_frame_path, text=lang.text125).pack(side='left', padx=10, pady=10)
-        slo = ttk.Label(sub_frame_path, textvariable=self.show_local, wraplength=200)
-        slo.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
-                                                                       1) if os.name == 'nt' else ...)
-        slo.pack(padx=10, pady=10, side='left')
-        ttk.Button(sub_frame_path, text=lang.text126, command=settings.modpath).pack(side="left", padx=10, pady=10)
-
-        ttk.Label(sub_frame_language, text=lang.lang).pack(side='left', padx=10, pady=10)
-        lb3 = ttk.Combobox(sub_frame_language, state='readonly', textvariable=language,
-                           values=[str(i.rsplit('.', 1)[0]) for i in
-                                   os.listdir(f"{cwd_path}/bin/languages")])
-        ###
-        ttk.Label(sub_frame_cache, text=lang.cache_size).pack(side='left', padx=10, pady=10)
-        slo2 = ttk.Label(sub_frame_cache, text=hum_convert(get_cache_size()), wraplength=200)
-        slo2.bind('<Button-1>', lambda *x: windll.shell32.ShellExecuteW(None, "open", self.show_local.get(), None, None,
-                                                                        1) if os.name == 'nt' else ...)
-        slo2.pack(padx=10, pady=10, side='left')
-        ttk.Button(sub_frame_cache, text=lang.clean, command=lambda: create_thread(clean_cache)).pack(side="left",
-                                                                                                      padx=10, pady=10)
-        context = StringVar(value=settings.contextpatch)
-        check_upgrade = StringVar(value=settings.check_upgrade)
-        check_upgrade.trace('w', lambda *x: settings.set_value('check_upgrade', check_upgrade.get()))
-
-        def enable_contextpatch():
-            if context.get() == '1':
-                if not ask_win(
-                        lang.warn18, is_top=True):
-                    context.set('0')
-                    enable_cp.configure(state='off')
-            settings.set_value('contextpatch', context.get())
-
-        context.trace("w", lambda *x: enable_contextpatch())
-        get_setting_button('ai_engine', sub_frame_others, lang.ai_engine)
-        get_setting_button('magisk_not_decompress', sub_frame_others, lang.text142)
-        get_setting_button('boot_skip_ramdisk', sub_frame_others, lang.skip_ramdisk)
-        get_setting_button('treff', sub_frame_others, lang.t61)
-        enable_cp = ttk.Checkbutton(sub_frame_others, text=lang.context_patch, variable=context, onvalue='1',
-                                    offvalue='0',
-                                    style="Toggle.TButton")
-        enable_cp.pack(padx=10, pady=10, fill=X)
-        get_setting_button('auto_unpack', sub_frame_others, lang.auto_unpack)
-        lb3.pack(padx=10, pady=10, side='left')
-        lb3.bind('<<ComboboxSelected>>', lambda *x: settings.set_language())
-        for i in [sub_frame_theme, sub_frame_language, sub_frame_path, sub_frame_project_struct, sub_frame_cpio_impl,
-                  sub_frame_cache,
-                  sub_tool_settings_main, sub_frame_others_main]: i.pack(padx=10, pady=7, fill='both')
-        Setting_Frame.update_ui()
-        # Check Update
-        check_frame = Frame(self.tab3)
-        ttk.Button(check_frame, text=lang.t38, command=Updater).pack(padx=10, pady=10, fill=X, side="left", expand=True)
-        ttk.Checkbutton(check_frame, text=lang.auto_check_updates, variable=check_upgrade, onvalue='1',
-                        offvalue='0').pack(padx=10, pady=10, fill=X, side="right", expand=True)
-        check_frame.pack(padx=10, pady=10, fill=X, expand=True)
-
-
 animation = LoadAnim()
 
 tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
@@ -2271,7 +2148,7 @@ class Welcome(ttk.Frame):
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10, expand=True)
 
-
+from src.qt_layer.settings import cfg
 class SetUtils:
     def __init__(self, set_ini: str | None = None, load=True):
         self.project_struct = 'single'
@@ -2348,35 +2225,6 @@ class SetUtils:
         setattr(self, name, value)
         if name in ['treff', 'barlevel', 'theme']:
             self.load()
-
-    def set_theme(self):
-        print(lang.text100 + theme.get())
-        try:
-            self.set_value("theme", theme.get())
-            sv_ttk.set_theme(theme.get())
-            animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
-        except Exception as e:
-            logging.exception('Bugs')
-            win.message_pop(lang.text101 % (theme.get(), e))
-
-    def set_language(self):
-        print(lang.text129 + language.get())
-        try:
-            self.set_value("language", language.get())
-            self.load_language(language.get())
-            if not states.in_oobe:
-                if ask_win(lang.t36):
-                    restart()
-        except Exception as e:
-            logging.exception('Bugs')
-            print(lang.t130, e)
-
-    def modpath(self):
-        if not (folder := filedialog.askdirectory()):
-            return
-        self.set_value("path", folder)
-        win.show_local.set(folder)
-        self.load()
 
 
 settings = SetUtils(load=False)
