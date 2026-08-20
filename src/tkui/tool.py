@@ -1472,17 +1472,6 @@ class Tool(TkinterEmbeddedPanel):
         self.message_pop = warn_win
         init_tk(self)
 
-    def get_frame(self, title):
-        frame = ttk.LabelFrame(self.frame_bg, text=title)
-        frame.pack(padx=10, pady=10)
-        ttk.Button(frame, text=lang.text17, command=frame.destroy).pack(anchor="ne", padx=5, pady=5)
-        self.update_frame()
-        self.scrollbar.config(command=self.canvas1.yview)
-        return frame
-
-    def update_frame(self):
-        self.frame_bg.update_idletasks()
-        self.canvas1.config(scrollregion=self.canvas1.bbox('all'))
 
     def start_loops(self):
         for i in self.loops:
