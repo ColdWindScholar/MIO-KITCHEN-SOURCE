@@ -2151,8 +2151,7 @@ from src.qt_layer.settings import cfg
 class SetUtils:
     def __init__(self, set_ini: str | None = None, load=True):
         self.project_struct = 'single'
-        self.auto_unpack = '0'
-        self.treff = '0'
+        self.auto_unpack = str(cfg.autoUnpack.value)
         self.set_file = set_ini or os.path.join(cwd_path, "bin", "setting.ini")
         self.plugin_repo = None
         self.contextpatch = '0'
