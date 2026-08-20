@@ -1523,7 +1523,6 @@ class Tool(TkinterEmbeddedPanel):
         self.frame_bg = ttk.Frame(self.canvas1)
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
-        self.tab4_content()
         self.tab6_content()
         self.setting_tab()
 
