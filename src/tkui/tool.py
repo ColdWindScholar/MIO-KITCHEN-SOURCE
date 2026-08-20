@@ -1488,7 +1488,6 @@ class Tool(TkinterEmbeddedPanel):
 
     def start_loops(self):
         for i in self.loops:
-            print(i)
             create_thread(i)
 
     def gui(self):
