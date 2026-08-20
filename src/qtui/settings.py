@@ -19,6 +19,8 @@ class Config(QConfig):
     language = OptionsConfigItem(
         "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
+    projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
+    cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
     autoSaveProjects = ConfigItem("Projects", "AutoSave", True, BoolValidator())
     enableNotifications = ConfigItem("General", "EnableNotifications", True, BoolValidator())
 
@@ -85,6 +87,23 @@ class SettingsPage(QScrollArea):
         self.workingCard.clicked.connect(self.change_working_folder)
         self.scrollLayout.addWidget(self.workingCard)
 
+        #
+        self.projectStructureCard = OptionsSettingCard(
+            cfg.projectStructure,
+            FluentIcon.PROJECTOR,
+            "projectStructureCard",
+            "projectStructureCard",
+            texts=cfg.projectStructure.options
+        )
+        self.scrollLayout.addWidget(self.projectStructureCard)
+        self.cpioImplCard = OptionsSettingCard(
+            cfg.cpioImpl,
+            FluentIcon.UNIT,
+            "cpioImpl",
+            "cpioImpl",
+            texts=cfg.cpioImpl.options
+        )
+        self.scrollLayout.addWidget(self.cpioImplCard)
         self.autoSaveCard = SwitchSettingCard(
             FluentIcon.SAVE,
             "自动保存项目",
