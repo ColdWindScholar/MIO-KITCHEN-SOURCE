@@ -1543,8 +1543,6 @@ class Tool(TkinterEmbeddedPanel):
         self.gif_label = Label(self.Clear_Load_canvas)
         self.gif_label.pack(padx=10, pady=10, side=TOP)
         self.Clear_Load_canvas.pack(side=RIGHT, anchor='ne')
-        self.scroll.pack(side=RIGHT, fill=BOTH)
-        self.show.pack(side=RIGHT, fill=BOTH, expand=True)
 
         MpkMan().gui()
 
