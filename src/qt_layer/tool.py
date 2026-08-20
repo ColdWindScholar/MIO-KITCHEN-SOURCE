@@ -9,6 +9,7 @@ from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Them
                             FluentWindow, FluentIcon as FIF)
 
 from src.qt_layer.widgets import TkinterEmbeddedPanel
+from src.tkui.tool import Tool, init_tk
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 
@@ -84,9 +85,11 @@ class MainWindow(FluentWindow):
         self.title_bar_filter = TitleBarEventFilter(self)
         self.titleBar.installEventFilter(self.title_bar_filter)
         self.titleBar.setMouseTracking(True)
+        self.tool = Tool()
+        init_tk(self.tool)
 
         # 创建页面
-        self.home_page = TkinterEmbeddedPanel()
+        self.home_page = self.tool
         self.project_page = TkinterEmbeddedPanel()
         self.plugin_page = TkinterEmbeddedPanel()
         self.about_page = TkinterEmbeddedPanel()

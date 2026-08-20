@@ -28,6 +28,7 @@ from random import randrange
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
+from qt_layer.widgets import TkinterEmbeddedPanel
 from src.core import merge_sparse
 from src.core import tarsafe, miside_banner
 from src.core.Magisk import Magisk_patch
@@ -1463,75 +1464,17 @@ class ToolBox(ttk.Frame):
                 self.run_button.config(state='normal', text=lang.create_super_image_button)
 
 
-class Tool(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class Tool(TkinterEmbeddedPanel):
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.setObjectName("tool")
         self.rotate_angle = 0  # Moved from tab4_content as it's a window state
 
         # Attempt to get the current alpha value before the "shake".
         # This is important if user settings already include transparency by default.
         initial_alpha = 1.0  # Default to fully opaque
         self.loops = []
-        try:
-            # Important: attributes() might not be available if the window isn't mapped yet,
-            # though this is usually not an issue in __init__.
-            # If this causes an error, we'll stick with initial_alpha = 1.0.
-            self.update_idletasks()  # Ensure the window is ready for attribute queries
-            current_alpha_str = self.attributes("-alpha")
-            initial_alpha = float(current_alpha_str)
-            if 'logging' in globals(): logging.info(f"Tool.__init__: Initial alpha detected as {initial_alpha}")
-        except (tk.TclError, ValueError) as e_alpha_get:
-            # If getting alpha fails, assume it's 1.0 (fully opaque).
-            if 'logging' in globals(): logging.warning(
-                f"Tool.__init__: Could not get initial alpha ({e_alpha_get}), assuming {initial_alpha}.")
-
-
-
-        # Assign the warning window function to a method for easier access.
         self.message_pop = warn_win
-
-        self.title('MIO-KITCHEN')
-        # Set application icon, except on POSIX systems (where it might behave differently or not be needed).
-        if os.name != "posix" and 'images' in globals() and hasattr(images, 'icon_byte') and 'PhotoImage' in globals():
-            try:
-                self.iconphoto(True, PhotoImage(data=images.icon_byte))
-            except Exception as e_icon:
-                logging.error(f"Failed to set application icon: {e_icon}")
-
-        # --- Proposed fix for micro-freezes on Windows ---
-        if os.name == 'nt':
-            # This "shake" of the alpha attribute can help the Windows DWM (Desktop Window Manager)
-            # correctly initialize window composition for smoother rendering.
-            # This is done once during window initialization.
-            # A value like 0.99 is used to make the change minimally noticeable,
-            # yet sufficient to trigger the DWM mechanism.
-            try:
-                if 'logging' in globals(): logging.info("Tool.__init__: Applying alpha 'shake' fix for Windows.")
-
-                # Briefly set alpha to slightly less than 1.0.
-                self.attributes("-alpha", 0.99)
-
-                # Allow Tkinter and the system time to process this change.
-                # self.update() can be too aggressive here and might cause other issues.
-                # self.update_idletasks() is generally safer.
-                self.update_idletasks()
-
-                # Restore the original or desired alpha value.
-                # If initial_alpha was successfully retrieved and is not 1.0 (e.g., from user settings),
-                # restore it. Otherwise, restore to 1.0.
-                self.attributes("-alpha", initial_alpha)
-                self.update_idletasks()  # Call again to ensure the change is applied.
-
-                if 'logging' in globals(): logging.info(
-                    f"Tool.__init__: Alpha 'shake' fix applied. Alpha restored to {initial_alpha}.")
-            except tk.TclError as e_alpha_fix:
-                # This error can occur if the window is not yet ready for attribute changes.
-                if 'logging' in globals(): logging.error(
-                    f"Tool.__init__: TclError during alpha 'shake' fix: {e_alpha_fix}. Window might not be ready.")
-            except Exception as e_generic_alpha_fix:
-                # Catch any other unexpected errors during the fix.
-                if 'logging' in globals(): logging.error(
-                    f"Tool.__init__: Generic error during alpha 'shake' fix: {e_generic_alpha_fix}")
 
     def get_time(self):
         self.tsk.config(text=time.strftime("%H:%M:%S"))
@@ -1558,8 +1501,8 @@ class Tool(tk.Tk):
             print(lang.warn13)
         if platform.machine() == 'loongarch64':
             print(lang.warnloongarch)
-        self.sub_win2 = ttk.Frame(self)
-        self.sub_win3 = ttk.Frame(self)
+        self.sub_win2 = ttk.Frame(self.tk_root)
+        self.sub_win3 = ttk.Frame(self.tk_root)
         self.sub_win2.pack(fill=BOTH, side=RIGHT, expand=True)
         self.sub_win3.pack(fill=BOTH, side=RIGHT, expand=True)
         self.notepad = ttk.Notebook(self.sub_win2)
@@ -2562,7 +2505,7 @@ class SetUtils:
             if 'active_code' not in dir(self):
                 self.active_code = 'None'
             verify.verify(self.active_code)
-        win.attributes("-alpha", self.bar_level if self.treff == "1" else 1)
+        win.tk_root.attributes("-alpha", self.bar_level if self.treff == "1" else 1)
 
     @staticmethod
     def load_language(name):
@@ -7616,7 +7559,6 @@ class FormatConversion(ttk.LabelFrame):
 
 
 def init_verify():
-    win.deiconify()  # for verify
     if not os.path.exists(settings.tool_bin):
         error(1, 'Sorry,Not support your device yet.')
     if not settings.path.isprintable():
@@ -7630,9 +7572,9 @@ def exit_tool():
     win.destroy()
 
 
-
-
-def __init__tk(args: list):
+def init_tk(windows_tk):
+    global win
+    win = windows_tk
     if not os.path.exists(temp):
         re_folder(temp, quiet=True)
     if not os.path.exists(tool_log):
@@ -7642,11 +7584,7 @@ def __init__tk(args: list):
                             filename=tool_log, filemode='w')
     else:
         logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s')
-    global win
-    win = Tool()
-    win.withdraw()
-
-    animation.master = win
+    animation.master = win.tk_root
     global current_project_name, theme, language
     current_project_name = utils.project_name = StringVar()
     theme = StringVar()
@@ -7659,13 +7597,12 @@ def __init__tk(args: list):
         except (BaseException, Exception):
             logging.exception('Cannot wait the Updater.Maybe the step completed.')
     if int(settings.oobe) < 5:
-        win.deiconify()  # for oobe
         if pyi_splash_available:
             pyi_splash.close()
         Welcome()
     init_verify()
     try:
-        win.winfo_exists()
+        win.tk_root.winfo_exists()
     except TclError:
         logging.exception('TclError')
         return
@@ -7688,21 +7625,14 @@ def __init__tk(args: list):
     win.update()
     if pyi_splash_available:
         pyi_splash.close()
-    win.deiconify()
-    win.focus_force()
-    move_center(win)
     win.loops.append(win.get_time)
     if settings.check_upgrade == '1':
         win.loops.append(check_upgrade)
     print(lang.text134 % (dti() - start))
-    if os.name == 'nt':
-        if sys.getwindowsversion().major <= 6:
-            ask_win(lang.warn20)
     states.inited = True
     win.protocol("WM_DELETE_WINDOW", exit_tool)
     try:
-        win.after(1000, win.start_loops)
-        win.mainloop()
+        win.tk_root.after(1000, win.start_loops)
     except KeyboardInterrupt:
         exit_tool()
 
