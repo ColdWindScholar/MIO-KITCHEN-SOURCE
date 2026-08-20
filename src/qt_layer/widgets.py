@@ -1,7 +1,8 @@
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout
-
 import tkinter as tk
+
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtWidgets import QWidget, QVBoxLayout
+
 
 class TkinterEmbeddedPanel(QWidget):
     def __init__(self, parent=None):
