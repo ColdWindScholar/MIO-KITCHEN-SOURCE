@@ -7246,7 +7246,7 @@ def init_tk(windows_tk):
     project_menu.listdir()
     unpackg.gui()
     Frame3().gui()
-    animation.load_gif(open_img(BytesIO(getattr(images, f"loading_{win.list2.get()}_byte"))))
+    animation.load_gif(open_img(BytesIO(getattr(images, f"loading_dark_byte"))))
     animation.init()
     if not is_pro:
         print(lang.text108)
