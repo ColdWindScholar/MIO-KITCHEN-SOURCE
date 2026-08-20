@@ -1548,7 +1548,7 @@ class Tool(TkinterEmbeddedPanel):
 
         self.scroll = ttk.Scrollbar(self.rzf)
         self.show = Text(self.rzf)
-        data: str = sys.stdout.data
+        data: str = ""
         sys.stdout = StdoutRedirector(self.show)
         sys.stdout.write(data)
         del data
@@ -7590,6 +7590,7 @@ def init_tk(windows_tk):
     theme = StringVar()
     language = StringVar()
     settings.load()
+    win.gui()
     if settings.updating == 'true':
         updater = Updater()
         try:
@@ -7641,7 +7642,6 @@ def init_tk(windows_tk):
 # Cool Init
 # Miside 米塔
 # Link: https://store.steampowered.com/app/2527500/
-init = lambda args: __init__tk(args)
 
 
 def restart(er: Toplevel = None):
