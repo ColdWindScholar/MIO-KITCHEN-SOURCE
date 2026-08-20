@@ -23,6 +23,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import traceback
 from difflib import SequenceMatcher
 from enum import IntEnum
@@ -30,6 +31,7 @@ from lzma import LZMADecompressor
 from os import getcwd, cpu_count
 from os.path import exists
 from random import randint, choice
+from shutil import rmtree
 from subprocess import Popen
 from threading import Thread
 
@@ -62,6 +64,9 @@ else:
         if path_frags[-3:] == ['tool.app', 'Contents', 'MacOS']:
             path_frags = path_frags[:-3]
             prog_path = os.path.sep.join(path_frags)
+
+temp = os.path.join(prog_path, "bin", "temp").replace(os.sep, '/')
+tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}.log'
 project_name = None
 # [header, desc, offset (if exist)]
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
@@ -156,6 +161,10 @@ def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = No
     logging.debug(f"exit_code : {ret.returncode}")
     return ret.returncode
 
+def re_folder(path):
+    if os.path.exists(path):
+        rmtree(path)
+    os.makedirs(path, exist_ok=True)
 
 class GuoKeLogo:
     def __init__(self):

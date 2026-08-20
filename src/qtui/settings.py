@@ -1,13 +1,15 @@
+import logging
 import os
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
 from qfluentwidgets import (
     HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, qconfig, OptionsSettingCard, ComboBoxSettingCard,
-    PushSettingCard
+    PushSettingCard, PrimaryPushSettingCard
 )
 from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig, OptionsConfigItem, OptionsValidator
-from src.core.utils import prog_path
+from src.core.utils import prog_path, temp, re_folder
+from utils import hum_convert
 
 config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 
@@ -103,6 +105,16 @@ class SettingsPage(QScrollArea):
             "cpioImpl",
             texts=cfg.cpioImpl.options
         )
+        # clean
+        self.cleanCacheCard = PrimaryPushSettingCard(
+            text="Clean",
+            icon=FluentIcon.DOWNLOAD,
+            title="CacheSize",
+            content=hum_convert(self.get_cache_size())
+        )
+        self.cleanCacheCard.clicked.connect(self.clean_cache)
+        self.scrollLayout.addWidget(self.cleanCacheCard)
+
         self.scrollLayout.addWidget(self.cpioImplCard)
         self.autoSaveCard = SwitchSettingCard(
             FluentIcon.SAVE,
@@ -145,3 +157,20 @@ class SettingsPage(QScrollArea):
             return
         cfg.set(cfg.workingFolder, folder)
         self.workingCard.setContent(cfg.workingFolder.value)
+
+    def get_cache_size(self):
+        size = 0
+        for root, _, files in os.walk(temp):
+            try:
+                size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
+                             not os.path.islink(os.path.join(root, name))])
+            except:
+                logging.exception("Bugs")
+        return size
+
+    def clean_cache(self):
+        try:
+            re_folder(temp)
+        except:
+            logging.exception("Bugs")
+        self.cleanCacheCard.setContent(hum_convert(self.get_cache_size()))
