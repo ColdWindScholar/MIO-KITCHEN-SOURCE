@@ -21,6 +21,9 @@ class Config(QConfig):
     language = OptionsConfigItem(
         "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
+    selinuxPatch = ConfigItem("Tool", 'selinuxPatch', False, BoolValidator())
+    autoUnpack = ConfigItem("Tool", 'autoUnpack', False, BoolValidator())
+    checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
     autoSaveProjects = ConfigItem("Projects", "AutoSave", True, BoolValidator())
@@ -124,6 +127,31 @@ class SettingsPage(QScrollArea):
             parent=self.scrollWidget
         )
         self.scrollLayout.addWidget(self.aiEngine)
+        #
+        self.selinuxPatch = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "selinuxPatch",
+            "selinuxPatch",
+            cfg.selinuxPatch,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.selinuxPatch)
+        self.autoUnpack = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "autoUnpack",
+            "autoUnpack",
+            cfg.autoUnpack,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.autoUnpack)
+        self.checkUpdate = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "checkUpdate",
+            "checkUpdate",
+            cfg.checkUpdate,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.checkUpdate)
 
         self.notificationCard = SwitchSettingCard(
             FluentIcon.RINGER,
