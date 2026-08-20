@@ -1535,13 +1535,6 @@ class Tool(TkinterEmbeddedPanel):
         tr2.bind('<Button-1>', lambda *x: dndfile([filedialog.askopenfilename()]))
         tr2.pack(padx=5, pady=5, side='top', fill=X)
 
-        self.scroll = ttk.Scrollbar(self.rzf)
-        self.show = Text(self.rzf)
-
-
-        self.scroll.config(command=self.show.yview)
-        self.show.config(yscrollcommand=self.scroll.set)
-
         self.rzf.pack(padx=5, pady=5, fill=BOTH, side=TOP)
         self.Clear_Load_canvas = Canvas(self.rzf)
         self.Clear_Load_canvas.config(highlightthickness=0)
