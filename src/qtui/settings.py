@@ -1,9 +1,10 @@
 import os
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
 from qfluentwidgets import (
-    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, qconfig
+    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, qconfig, OptionsSettingCard, ComboBoxSettingCard,
+    PushSettingCard
 )
 from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig, OptionsConfigItem, OptionsValidator
 from src.core.utils import prog_path
@@ -13,17 +14,19 @@ config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 
 class Config(QConfig):
     """ 应用配置类 """
-    #themeMode = OptionsConfigItem("Settings", 'theme', 'auto', OptionsValidator(['auto', 'dark', 'light']), restart=True)
+    allLanguages = [i[:-5] for i in os.listdir(os.path.join(prog_path, 'bin', 'languages'))]
+    workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
+    language = OptionsConfigItem(
+        "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
+    aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
     autoSaveProjects = ConfigItem("Projects", "AutoSave", True, BoolValidator())
     enableNotifications = ConfigItem("General", "EnableNotifications", True, BoolValidator())
 
 def load_config():
     """ 加载配置文件 """
     config = Config()
-    qconfig.load(config_file, cfg)
+    qconfig.load(config_file, config)
     return config
-
-
 
 # 初始化配置
 cfg = load_config()
@@ -56,6 +59,31 @@ class SettingsPage(QScrollArea):
         
         title = TitleLabel("设置", self.scrollWidget)
         self.scrollLayout.addWidget(title)
+        # theme
+        self.theme_card = OptionsSettingCard(
+            qconfig.themeMode,
+            FluentIcon.BRUSH,
+            "应用主题",
+            "调整你的应用外观",
+            texts=["浅色", "深色", "跟随系统设置"]
+        )
+        self.scrollLayout.addWidget(self.theme_card)
+        #languages
+        self.languageCard = ComboBoxSettingCard(
+            configItem=cfg.language,
+            icon=FluentIcon.LANGUAGE,
+            title="语言",
+            content="调整语言",
+            texts=cfg.allLanguages
+        )
+        self.scrollLayout.addWidget(self.languageCard)
+        #
+        self.workingCard = PushSettingCard(text="选择文件夹",
+                                           icon=FluentIcon.DOWNLOAD,
+                                           title="下载目录",
+                                           content=cfg.workingFolder.value)
+        self.workingCard.clicked.connect(self.change_working_folder)
+        self.scrollLayout.addWidget(self.workingCard)
 
         self.autoSaveCard = SwitchSettingCard(
             FluentIcon.SAVE,
@@ -92,3 +120,9 @@ class SettingsPage(QScrollArea):
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.NoFrame)
+
+    def change_working_folder(self):
+        if not (folder := QFileDialog.getExistingDirectory()):
+            return
+        cfg.set(cfg.workingFolder, folder)
+        self.workingCard.setContent(cfg.workingFolder.value)

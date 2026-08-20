@@ -33,6 +33,7 @@ try:
 except Exception as e:
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
+    raise e
     print(e)
     print("Sorry! We cannot init the tool.\nPlease report this error to developers.!")
     time.sleep(3)
