@@ -1473,7 +1473,6 @@ class Tool(TkinterEmbeddedPanel):
 
         # Attempt to get the current alpha value before the "shake".
         # This is important if user settings already include transparency by default.
-        initial_alpha = 1.0  # Default to fully opaque
         self.loops = []
         self.message_pop = warn_win
         init_tk(self)
