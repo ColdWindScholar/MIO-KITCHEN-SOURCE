@@ -4,7 +4,7 @@
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Native",
-        "Language": "Japanese",
+        "Language": "korean",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
         "selinuxPatch": false,
