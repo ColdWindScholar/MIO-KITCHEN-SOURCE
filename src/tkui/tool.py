@@ -1488,6 +1488,7 @@ class Tool(TkinterEmbeddedPanel):
 
     def start_loops(self):
         for i in self.loops:
+            print(i)
             create_thread(i)
 
     def gui(self):
@@ -7095,7 +7096,7 @@ def init_tk(windows_tk):
     states.inited = True
     win.tk_root.protocol("WM_DELETE_WINDOW", exit_tool)
     try:
-        win.tk_root.after(1000, win.start_loops)
+        win.start_loops()
     except KeyboardInterrupt:
         exit_tool()
 
