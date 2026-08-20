@@ -1524,7 +1524,6 @@ class Tool(TkinterEmbeddedPanel):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab6_content()
-        self.setting_tab()
 
         self.notepad.pack(fill=BOTH, expand=True)
         self.rzf = ttk.Frame(self.sub_win3)
