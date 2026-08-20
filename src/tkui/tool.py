@@ -89,13 +89,10 @@ from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
     JsonEdit, DevNull, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
+from tkinter import filedialog
 
 if os.name == 'nt':
     from ctypes import windll
-    from tkinter import filedialog
-else:
-    from src.core import mkc_filedialog as filedialog
-if os.name == 'nt':
     from multiprocessing.dummy import freeze_support
 
     freeze_support()
