@@ -1520,18 +1520,9 @@ class Tool(TkinterEmbeddedPanel):
         self.canvas1.create_window((0, 0), window=self.frame_bg, anchor='nw')
         self.canvas1.config(highlightthickness=0)
         self.tab6_content()
-
         self.notepad.pack(fill=BOTH, expand=True)
-        self.rzf = ttk.Frame(self.sub_win3)
-
-        self.rzf.pack(padx=5, pady=5, fill=BOTH, side=TOP)
-        self.Clear_Load_canvas = Canvas(self.rzf)
-        self.Clear_Load_canvas.config(highlightthickness=0)
-
-        self.gif_label = Label(self.Clear_Load_canvas)
+        self.gif_label = Label(self.tk_root)
         self.gif_label.pack(padx=10, pady=10, side=TOP)
-        self.Clear_Load_canvas.pack(side=RIGHT, anchor='ne')
-
         MpkMan().gui()
 
 
