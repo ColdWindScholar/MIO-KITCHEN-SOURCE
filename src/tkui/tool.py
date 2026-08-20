@@ -1527,7 +1527,7 @@ class Tool(Tk):
             try:
                 self.iconphoto(True, PhotoImage(data=images.icon_byte))
             except Exception as e_icon:
-                if 'logging' in globals(): logging.error(f"Failed to set application icon: {e_icon}")
+                logging.error(f"Failed to set application icon: {e_icon}")
 
         # --- Proposed fix for micro-freezes on Windows ---
         if os.name == 'nt':
@@ -2338,7 +2338,7 @@ class Welcome(ttk.Frame):
             # Handle missing globals if necessary, e.g., by disabling functionality or using defaults.
 
         self.oobe = 0  # Default value.
-        if _settings_obj and hasattr(_settings_obj, 'oobe'):
+        if _settings_obj:
             try:
                 self.oobe = int(_settings_obj.oobe)
             except (ValueError, TypeError):
@@ -2365,7 +2365,7 @@ class Welcome(ttk.Frame):
 
         back_text = lang.previous_step
         next_text = "Next"
-        if _lang_obj and hasattr(_lang_obj, 'text138'):
+        if _lang_obj:
             lang_next = lang.text138
             if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
                 next_text = lang_next
@@ -2433,13 +2433,13 @@ class Welcome(ttk.Frame):
 
         # Update button states and text
         finish_text = "Finish"
-        if _lang_obj and hasattr(_lang_obj, 'text34'):
+        if _lang_obj:
             lang_finish = lang.text34
             if isinstance(lang_finish, str) and lang_finish.strip().lower() != "none":
                 finish_text = lang_finish
 
         next_text = "Next"  # Default, defined in __init__
-        if _lang_obj and hasattr(_lang_obj, 'text138'):
+        if _lang_obj:
             lang_next = lang.text138
             if isinstance(lang_next, str) and lang_next.strip().lower() != "none":
                 next_text = lang_next
@@ -2815,7 +2815,7 @@ class IconGrid(tk.Frame):
                     delta = -1
                 elif event.num == 5:  # Linux scroll down
                     delta = 1
-                elif hasattr(event, 'delta') and event.delta != 0:  # Windows/macOS
+                elif event.delta != 0:  # Windows/macOS
                     delta = int(-1 * (event.delta / 120))
 
                 if delta != 0:
@@ -7361,12 +7361,6 @@ class UnpackGui(ttk.LabelFrame):
         ttk.Button(ck_, text=lang.ok, command=ck_.destroy).pack(padx=5, pady=5, fill=X)
 
     def hd(self):
-        """
-        Handler for mode change (Pack/Unpack). Updates the UI accordingly.
-        """
-        if not hasattr(self, 'fm'):
-            logging.debug("UnpackGui.hd() called before self.fm (Combobox) was initialized. Skipping UI update.")
-            return
 
         if self.ch.get():  # True = Unpack mode
             self.fm.configure(state='readonly')
