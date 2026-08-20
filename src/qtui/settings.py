@@ -1,53 +1,29 @@
-import json
 import os
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame
 from qfluentwidgets import (
-    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon
+    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, qconfig
 )
-from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig
+from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig, OptionsConfigItem, OptionsValidator
+from src.core.utils import prog_path
+
+config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 
 
 class Config(QConfig):
     """ 应用配置类 """
+    #themeMode = OptionsConfigItem("Settings", 'theme', 'auto', OptionsValidator(['auto', 'dark', 'light']), restart=True)
     autoSaveProjects = ConfigItem("Projects", "AutoSave", True, BoolValidator())
     enableNotifications = ConfigItem("General", "EnableNotifications", True, BoolValidator())
 
 def load_config():
     """ 加载配置文件 """
-    config_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "config.json"))
-    cfg = Config()
-    
-    if not os.path.exists(config_file) or os.path.getsize(config_file) == 0:
-        save_config(cfg)
-        return cfg
+    config = Config()
+    qconfig.load(config_file, cfg)
+    return config
 
-    try:
-        with open(config_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if "Projects/AutoSave" in data:
-            cfg.autoSaveProjects.value = data["Projects/AutoSave"]
-        if "General/EnableNotifications" in data:
-            cfg.enableNotifications.value = data["General/EnableNotifications"]
-        return cfg
-    except:
-        os.remove(config_file) if os.path.exists(config_file) else None
-        save_config(cfg)
-        return cfg
 
-def save_config(cfg):
-    """ 保存配置文件 """
-    config_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "config.json"))
-    try:
-        data = {
-            "Projects/AutoSave": cfg.autoSaveProjects.value,
-            "General/EnableNotifications": cfg.enableNotifications.value
-        }
-        with open(config_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-    except:
-        pass
 
 # 初始化配置
 cfg = load_config()
@@ -89,7 +65,6 @@ class SettingsPage(QScrollArea):
             parent=self.scrollWidget
         )
         self.autoSaveCard.setChecked(cfg.autoSaveProjects.value)
-        self.autoSaveCard.checkedChanged.connect(self.on_auto_save_changed)
         self.scrollLayout.addWidget(self.autoSaveCard)
 
         self.notificationCard = SwitchSettingCard(
@@ -100,7 +75,6 @@ class SettingsPage(QScrollArea):
             parent=self.scrollWidget
         )
         self.notificationCard.setChecked(cfg.enableNotifications.value)
-        self.notificationCard.checkedChanged.connect(self.on_notification_changed)
         self.scrollLayout.addWidget(self.notificationCard)
 
         self.helpCard = HyperlinkCard(
@@ -118,11 +92,3 @@ class SettingsPage(QScrollArea):
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setFrameShape(QFrame.NoFrame)
-
-    def on_auto_save_changed(self, checked):
-        cfg.autoSaveProjects.value = checked
-        save_config(cfg)
-
-    def on_notification_changed(self, checked):
-        cfg.enableNotifications.value = checked
-        save_config(cfg)
