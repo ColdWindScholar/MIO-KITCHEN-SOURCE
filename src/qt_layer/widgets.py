@@ -29,11 +29,6 @@ class Empty2(QWidget):
         self.setObjectName("e12")
 
 
-class Empty3(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setObjectName("e1122")
-
 
 class Empty4(QWidget):
     def __init__(self, parent=None):

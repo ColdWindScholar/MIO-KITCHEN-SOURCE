@@ -8,10 +8,12 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
                             FluentWindow, FluentIcon as FIF)
 
-from src.qt_layer.home import HomePage
+from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
-from src.qt_layer.widgets import Empty2, Empty3, Empty4
+from src.qt_layer.home import HomePage
+from src.qt_layer.widgets import Empty2
 from src.tkui.tool import Tool
+
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 
@@ -93,7 +95,7 @@ class MainWindow(FluentWindow):
         self.project_page = Tool()
         self.plugin_page = Empty2()
         self.about_page = AboutPage()
-        self.settings_page = Empty4()
+        self.settings_page = SettingsPage()
 
         # 初始化导航
         self.initNavigation()

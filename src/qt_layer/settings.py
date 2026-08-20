@@ -1,0 +1,186 @@
+import logging
+import os
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
+from qfluentwidgets import (
+    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, qconfig, OptionsSettingCard, ComboBoxSettingCard,
+    PushSettingCard, PrimaryPushSettingCard
+)
+from qfluentwidgets.common.config import ConfigItem, BoolValidator, QConfig, OptionsConfigItem, OptionsValidator
+from src.core.utils import prog_path, temp, re_folder, hum_convert
+
+config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
+
+
+class Config(QConfig):
+    """ 应用配置类 """
+    allLanguages = [i[:-5] for i in os.listdir(os.path.join(prog_path, 'bin', 'languages'))]
+    workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
+    pluginRepo = ConfigItem("Tool", "pluginRepo", "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/")
+    language = OptionsConfigItem(
+        "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
+    aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
+    selinuxPatch = ConfigItem("Tool", 'selinuxPatch', False, BoolValidator())
+    autoUnpack = ConfigItem("Tool", 'autoUnpack', False, BoolValidator())
+    checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
+    projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
+    cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
+config = Config()
+qconfig.load(config_file, config)
+cfg = config
+
+class SettingsPage(QScrollArea):
+    """ 设置页面 """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("SettingsPage")
+        self.initUI()
+        
+        self.setStyleSheet("""
+            QScrollArea {
+                background: transparent;
+                border: none;
+            }
+            QWidget#scrollWidget {
+                background: transparent;
+            }
+        """)
+
+    def initUI(self):
+        """ 初始化UI """
+        self.scrollWidget = QWidget()
+        self.scrollWidget.setObjectName("scrollWidget")
+        self.scrollLayout = QVBoxLayout(self.scrollWidget)
+        self.scrollLayout.setContentsMargins(40, 40, 40, 40)
+        self.scrollLayout.setSpacing(20)
+        self.scrollLayout.setAlignment(Qt.AlignTop)
+        
+        title = TitleLabel("设置", self.scrollWidget)
+        self.scrollLayout.addWidget(title)
+        # theme
+        self.theme_card = OptionsSettingCard(
+            qconfig.themeMode,
+            FluentIcon.BRUSH,
+            "应用主题",
+            "调整你的应用外观",
+            texts=["浅色", "深色", "跟随系统设置"]
+        )
+        self.scrollLayout.addWidget(self.theme_card)
+        #languages
+        self.languageCard = ComboBoxSettingCard(
+            configItem=cfg.language,
+            icon=FluentIcon.LANGUAGE,
+            title="语言",
+            content="调整语言",
+            texts=cfg.allLanguages
+        )
+        self.scrollLayout.addWidget(self.languageCard)
+        #
+        self.workingCard = PushSettingCard(text="选择文件夹",
+                                           icon=FluentIcon.DOWNLOAD,
+                                           title="下载目录",
+                                           content=cfg.workingFolder.value)
+        self.workingCard.clicked.connect(self.change_working_folder)
+        self.scrollLayout.addWidget(self.workingCard)
+
+        #
+        self.projectStructureCard = OptionsSettingCard(
+            cfg.projectStructure,
+            FluentIcon.PROJECTOR,
+            "projectStructureCard",
+            "projectStructureCard",
+            texts=cfg.projectStructure.options
+        )
+        self.scrollLayout.addWidget(self.projectStructureCard)
+        self.cpioImplCard = OptionsSettingCard(
+            cfg.cpioImpl,
+            FluentIcon.UNIT,
+            "cpioImpl",
+            "cpioImpl",
+            texts=cfg.cpioImpl.options
+        )
+        # clean
+        self.cleanCacheCard = PrimaryPushSettingCard(
+            text="Clean",
+            icon=FluentIcon.DOWNLOAD,
+            title="CacheSize",
+            content=hum_convert(self.get_cache_size())
+        )
+        self.cleanCacheCard.clicked.connect(self.clean_cache)
+        self.scrollLayout.addWidget(self.cleanCacheCard)
+        self.scrollLayout.addWidget(self.cpioImplCard)
+        #ai
+        self.aiEngine = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "AiEngine",
+            "AiEngine",
+            cfg.aiEngine,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.aiEngine)
+        #
+        self.selinuxPatch = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "selinuxPatch",
+            "selinuxPatch",
+            cfg.selinuxPatch,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.selinuxPatch)
+        self.autoUnpack = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "autoUnpack",
+            "autoUnpack",
+            cfg.autoUnpack,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.autoUnpack)
+        self.checkUpdate = SwitchSettingCard(
+            FluentIcon.SAVE,
+            "checkUpdate",
+            "checkUpdate",
+            cfg.checkUpdate,
+            parent=self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.checkUpdate)
+
+
+        self.helpCard = HyperlinkCard(
+            "#",
+            "打开帮助页面",
+            FluentIcon.HELP,
+            "帮助",
+            "发现 ROM Tools 的神奇用法",
+            self.scrollWidget
+        )
+        self.scrollLayout.addWidget(self.helpCard)
+
+        self.scrollLayout.addStretch()
+        self.setWidget(self.scrollWidget)
+        self.setWidgetResizable(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setFrameShape(QFrame.NoFrame)
+
+    def change_working_folder(self):
+        if not (folder := QFileDialog.getExistingDirectory()):
+            return
+        cfg.set(cfg.workingFolder, folder)
+        self.workingCard.setContent(cfg.workingFolder.value)
+
+    def get_cache_size(self):
+        size = 0
+        for root, _, files in os.walk(temp):
+            try:
+                size += sum([os.path.getsize(os.path.join(root, name)) for name in files if
+                             not os.path.islink(os.path.join(root, name))])
+            except:
+                logging.exception("Bugs")
+        return size
+
+    def clean_cache(self):
+        try:
+            re_folder(temp)
+        except:
+            logging.exception("Bugs")
+        self.cleanCacheCard.setContent(hum_convert(self.get_cache_size()))
