@@ -580,9 +580,7 @@ def move_center(master):
     :param master: Window
     :return:
     """
-    master.geometry(
-        f'+{int(master.winfo_screenwidth() / 2 - master.winfo_width() / 2)}+{int(master.winfo_screenheight() / 2 - master.winfo_height() / 2)}')
-    master.update()
+    pass
 
 
 # ----CLASSES
