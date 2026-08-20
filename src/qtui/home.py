@@ -1,7 +1,6 @@
 import datetime
 import random
 
-from PySide6.QtCore import QSize
 from PySide6.QtGui import Qt, QPixmap
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QFrame, QLabel
 from qfluentwidgets import setThemeColor
