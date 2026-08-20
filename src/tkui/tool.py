@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import argparse
 import datetime
 import gzip
 import json
@@ -2973,7 +2972,7 @@ class ModuleManager:
         for i in self.list_packages():
             self.register_plugin(i)
 
-    def get_info(self, id_: str, item: str, default: str = None) -> str | dict[Any, Any] | Any:
+    def get_info(self, id_: str, item: str, default: str | None = None) -> str | dict[Any, Any] | Any:
         if not default:
             default = {}
         info_file = f'{self.module_dir}/{id_}/info.json'
@@ -3541,15 +3540,12 @@ class ModuleManager:
             except tk.TclError:
                 logging.exception('Uninstall Mpk')
 
-            self.title(getattr(lang, "t6", "Uninstall Plugin"))
+            self.title(lang.t6)
 
             content_frame = ttk.Frame(self)
             content_frame.pack(padx=15, pady=15, fill=BOTH, expand=True)
 
-            plugin_display_name_for_message = self.value2 if self.value2 else self.value
-            if plugin_display_name_for_message is None:
-                plugin_display_name_for_message = getattr(lang, "unknown_plugin_name", "Unknown Plugin")
-
+            plugin_display_name_for_message = self.value2 or self.value
             if not self.value:
                 message_text = getattr(lang, "warn2", "Please select a plugin!")
             elif not self.check_pass:
@@ -4031,7 +4027,7 @@ class MpkMan(ttk.Frame):
 
 
 class InstallMpk(Toplevel):
-    def __init__(self, mpk_path: str = None):
+    def __init__(self, mpk_path: str):
         super().__init__()
         self.mconf: ConfigParser = ConfigParser()
         self.installable: bool = True
@@ -7039,7 +7035,7 @@ def rmdir(path: str, quiet: bool = False):
 
 
 @animation
-def pack_zip(input_dir: str = None, output_zip: str = None, silent: bool = False):
+def pack_zip(input_dir: str | None = None, output_zip: str = None, silent: bool = False):
     if input_dir is None:
         input_dir = project_manger.current_work_output_path()
         if not project_manger.exist():
