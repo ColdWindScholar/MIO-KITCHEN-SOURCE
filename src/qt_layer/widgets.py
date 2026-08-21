@@ -270,10 +270,11 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_layout.addLayout(erofs_row1)
 
         erofs_row2 = QHBoxLayout()
-        self.erofs_level_label = QLabel("EROFS等级: 0", erofs_container)
+        self.erofs_level_label = QLabel("EROFS等级: 8", erofs_container)
         self.erofs_level_label.setStyleSheet("color: #ffffff; font-size: 13px; min-width: 90px;")
         self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_container)
-        self.erofs_slider.setRange(0, 10)
+        self.erofs_slider.setRange(0, 20)
+        self.erofs_slider.setValue(8)
         self.erofs_slider.valueChanged.connect(lambda v: self.erofs_level_label.setText(f"EROFS等级: {v}"))
 
         erofs_row2.addWidget(self.erofs_level_label)

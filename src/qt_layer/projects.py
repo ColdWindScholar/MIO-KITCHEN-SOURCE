@@ -1075,7 +1075,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
-    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files, erofs_compress_format) -> bool | None:
+    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files, erofs_compress_format, scale_erofs) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1242,6 +1242,7 @@ class ProjectsPage(QWidget):
                                                         dialog.dest_fs_combo.currentText(),
                                                         dialog.sw_delete.isChecked(),
                                                         dialog.compress_algo_combo.currentText(),
+                                                        dialog.erofs_slider.value()
                                                         )
             else:
                 return
