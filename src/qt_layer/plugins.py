@@ -477,35 +477,25 @@ class InstallMpk(MessageBoxBase):
         self.prog.setRange(0, 0)
         self.prog.hide()  # 初始未点击安装时先隐藏隐藏
 
-        self.state = SubtitleLabel(lang.text40, self)
+        self.state = SubtitleLabel("准备就绪", self)
         self.state.setAlignment(Qt.AlignCenter)
 
-        # 替换原有的 ttk.Button
-        self.installb = PrimaryPushButton(lang.text41, self)
+        self.installb = PrimaryPushButton("安装", self)
         self.installb.setFixedHeight(36)
-        # 绑定点击事件，使用您原有的多线程包装方法：create_thread
         self.installb.clicked.connect(self.install)
 
         self.bottomLayout.addWidget(self.prog)
         self.bottomLayout.addWidget(self.state)
         self.bottomLayout.addWidget(self.installb)
-
-        # 5. 将搭建的所有子模块填充进基类视图中
         self.viewLayout.addLayout(self.centerLayout, stretch=1)
         self.viewLayout.addLayout(self.bottomLayout)
-
-        # 6. 执行业务流数据加载
         self.load()
-
-        # 7. 替代原 tkinter 的移动居中、等待与刷新通知
-        # 提示：MessageBoxBase 的 exec() 会自动调用模态并居中显示，无需外部 move_center
-        # 如果您需要在弹窗彻底关闭销毁后执行后续逻辑，请重写或使用 finished 信号：
         self.finished.connect(lambda: print("done"))
 
     def install(self):
         """核心安装逻辑与状态码转换"""
         # 逻辑 1：如果按钮字样变成了“完成/关闭”，则点击直接退出销毁
-        if self.installb.text() == lang.text34:
+        if self.installb.text() == "完成":
             self.accept()  # 对应原代码：self.destroy()
             return 0
 
@@ -520,18 +510,18 @@ class InstallMpk(MessageBoxBase):
         if ret == module_error_codes.ArchNotSupported:
             self.state.setText(reason)
         elif ret == module_error_codes.PlatformNotSupport:
-            self.state.setText(lang.warn15.format(platform.system()))
+            self.state.setText("不支持的系统 {}".format(platform.system()))
         elif ret == module_error_codes.DependsMissing:
-            self.state.setText(lang.text36 % (self.mconf.get('module', 'name'), reason, reason))
-            self.installb.setText(lang.text37)
+            self.state.setText("%s 依赖于 %s，但 %s 没有安装" % (self.mconf.get('module', 'name'), reason, reason))
+            self.installb.setText("重试")
             self.installb.setEnabled(True)
         elif ret == module_error_codes.IsBroken:
-            self.state.setText(lang.warn2)
-            self.installb.setText(lang.text37)
+            self.state.setText("请选择一个插件")
+            self.installb.setText("重试")
             self.installb.setEnabled(True)
         elif ret == module_error_codes.Normal:
-            self.state.setText(lang.text39)
-            self.installb.setText(lang.text34)
+            self.state.setText("安装完毕")
+            self.installb.setText("完成")
             self.installb.setEnabled(True)
 
         # 逻辑 5：安装动作完结，将进度条强行修正为 100% 满格静态长条
