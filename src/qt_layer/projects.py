@@ -143,7 +143,7 @@ class ProjectsPage(QWidget):
     def open_dir(self):
         name = self.project_combo.currentText()
         if not project_manger.exist(name):
-            show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
+            show_info_bar(self, "Warning", f"Cannot open folder:\n{name}", 2)
             return
 
         path = project_manger.get_work_path(name)
