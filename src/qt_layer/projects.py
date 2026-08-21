@@ -847,16 +847,16 @@ class ProjectsPage(QWidget):
             rmtree(f"{work}/config")
             return False
         if os.access(f"{work}/{part_name}.img", os.F_OK):
-            print(lang.text72 % part_name)
+            print("Repacked %s Done" % part_name)
             try:
                 rmtree(work + part_name)
                 for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config', '%s_fs_options']:
                     path_ = os.path.join(work, "config", i_ % part_name)
                     if os.access(path_, os.F_OK):
                         os.remove(path_)
-            except Exception:
-                logging.exception(lang.text73 % (part_name, 'E'))
-            print(lang.text3.format(part_name))
+            except Exception as e:
+                logging.exception(e)
+            print("Repacked %s Done" % part_name)
         else:
             show_info_bar(self, "Error", f"Failed to repack {part_name}")
         return True
@@ -901,7 +901,7 @@ class ProjectsPage(QWidget):
                     if mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
-                        print(lang.text75 % dname)
+                        print("Failed to repack %s [erofs]" % dname)
                     else:
                         if self.remove_source_files.get() == 1:
                             self.rdi(work, dname)
