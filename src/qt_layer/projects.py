@@ -196,7 +196,8 @@ class ProjectsPage(QWidget):
         self.filter_input.setPlaceholderText("根据名称快速检索...")
         self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
-        self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
+        self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
+                                   'update.app'])
         self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
         self.unpack_rb = RadioButton("解包", container)
         self.pack_rb = RadioButton("打包", container)
@@ -237,9 +238,11 @@ class ProjectsPage(QWidget):
         layout.addLayout(tools_layout)
 
         self.scroll_layout.addWidget(container)
+
     def refresh_repack(self):
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_repack_list())
+
     def refresh_repack_list(self):
         data = []
         work = project_manger.current_work_path()
@@ -249,11 +252,15 @@ class ProjectsPage(QWidget):
         parts_dict = utils.JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
-                data.append((folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'), "Source","rw"))
+                data.append(
+                    (folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'),
+                     "Source", "rw"))
         return data
+
     def refresh_unpack(self):
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
+
     def refresh_unpack_list(self):
         """The actual logic for refreshing the unpack list, runs in a separate thread."""
         data = []
@@ -266,7 +273,8 @@ class ProjectsPage(QWidget):
             if os.path.exists(f"{work}/payload.bin"):
                 with open(f"{work}/payload.bin", 'rb') as pay:
                     for i in utils.payload_reader(pay).partitions:
-                        data.append((i.partition_name, utils.hum_convert(i.new_partition_info.size), "Raw", "Unknown", "Unknown"))
+                        data.append((i.partition_name, utils.hum_convert(i.new_partition_info.size), "Raw", "Unknown",
+                                     "Unknown"))
 
         elif form == 'super':
             if os.path.exists(f"{work}/super.img"):
@@ -274,7 +282,7 @@ class ProjectsPage(QWidget):
                     print("The image is sparse, pls convert it to raw first.")
                     return data
                 for i in lpunpack.get_parts(f"{work}/super.img"):
-                    data.append((i, "Unknown","Raw", "Unknown", "Unknown"))
+                    data.append((i, "Unknown", "Raw", "Unknown", "Unknown"))
         elif form == 'update.app':
             if os.path.exists(f"{work}/UPDATE.APP"):
                 for i in splituapp.get_parts(f"{work}/UPDATE.APP"):
@@ -288,7 +296,9 @@ class ProjectsPage(QWidget):
                             f_type = form
                     else:
                         f_type = form
-                    data.append((file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(work + file_name)), f_type, "Image", "rw" if f_type == 'ext' else "ro",))
+                    data.append(
+                        (file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(work + file_name)), f_type,
+                         "Image", "rw" if f_type == 'ext' else "ro",))
         return data
 
     def _load_mock_partitions_table(self, mock_data):
