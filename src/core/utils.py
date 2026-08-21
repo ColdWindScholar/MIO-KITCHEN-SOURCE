@@ -365,6 +365,8 @@ def gettype(file) -> str:
     :param file: file path
     :return:
     """
+    if os.path.getsize(file) < 5:
+        return 'unknown'
     if not os.path.isfile(file):
         return 'fnf'
     if not os.path.exists(file):
