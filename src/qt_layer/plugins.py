@@ -520,13 +520,12 @@ class UninstallMpk(MessageBoxBase):
         # Standard button actions
         self.cancel_b = self.cancelButton
         self.cancel_b.clicked.connect(self.reject)
-        self.bottomLayout.addWidget(self.cancel_b)
 
         # Conditional binding for validation check-passes
         if self.check_pass and self.value and not module_manager.is_virtual(self.value):
             self.uninstall_b = self.yesButton
+            self.uninstall_b.setText("Uninstall")
             self.uninstall_b.clicked.connect(self.uninstall)
-            self.bottomLayout.addWidget(self.uninstall_b)
 
         self.viewLayout.addLayout(self.bottomLayout)
 
