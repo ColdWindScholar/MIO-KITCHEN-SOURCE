@@ -25,7 +25,7 @@ class New(Toplevel):
         super().__init__()
         self.title(lang.text115)
         if not hasattr(self, 'module_dir'):
-            self.module_dir = os.path.join(cwd_path, "bin", "module")
+            self.module_dir = os.path.join(prog_path, "bin", "module")
 
         if create_gui_on_init:
             self.gui()
