@@ -403,7 +403,7 @@ class ProjectsPage(QWidget):
             return
         # zip
         if ftype == 'zip':
-            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName,os.path.splitext(os.path.basename(ifile))[0])
             with zipfile.ZipFile(ifile, 'r') as fz:
                 for fi in fz.namelist():
                     try:
@@ -440,7 +440,7 @@ class ProjectsPage(QWidget):
             folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
-                current_project_name.set(os.path.basename(folder))
+                cfg.set(cfg.workingFolder, os.path.basename(folder))
                 os.mkdir(folder)
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
