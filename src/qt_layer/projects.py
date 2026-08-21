@@ -442,7 +442,7 @@ class ProjectsPage(QWidget):
                 if os.path.isdir(project_manger.current_work_path()):
                     self.refresh_projects()
                     self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
-                script2fs(project_manger.current_work_path())
+                self.script2fs(project_manger.current_work_path())
                 self.refresh_projects()
 
             if cfg.autoUnpack:
