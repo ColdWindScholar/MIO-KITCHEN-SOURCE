@@ -238,7 +238,11 @@ class ProjectsPage(QWidget):
 
         self.scroll_layout.addWidget(container)
     def refresh_repack(self):
-        pass
+        self.partition_table.clearContents()
+        self._load_mock_partitions_table(self.refresh_repack_list())
+    def refresh_repack_list(self):
+        data = []
+        return data
     def refresh_unpack(self):
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
