@@ -633,24 +633,6 @@ class UninstallMpk(MessageBoxBase):
             print(lang.text30.format(show_name if show_name else name))
             logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
 
-            # Trigger list plugin update via safe standalone execution invocation
-            if callable(list_pls_plugin):
-                list_pls_plugin()
-            else:
-                logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
-
-            # Update your existing Active MpkStore Instance safely using Qt properties
-            if hasattr(states, 'active_mpk_store_instance') and states.active_mpk_store_instance:
-                # Use standard object checks since Qt handles its own internal lifecycle tracking
-                try:
-                    logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
-                    states.active_mpk_store_instance.update_plugin_state(name)
-                except Exception as e_store:
-                    logging.debug(f"Failed to update active store UI instance: {e_store}")
-            else:
-                logging.debug(
-                    f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
-
         logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 
