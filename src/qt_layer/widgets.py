@@ -230,7 +230,7 @@ class PackSettingsDialog(MessageBoxBase):
 
         self.pack_method_label = self._create_field_label("打包方式：")
         self.pack_method_combo = ComboBox(ext4_container)
-        self.pack_method_combo.addItems(["make_ext4fs", "mke2fs"])
+        self.pack_method_combo.addItems(["make_ext4fs", "mke2fs+e2fsdroid"])
 
         self.size_handle_label = self._create_field_label("大小处理：")
         self.size_handle_combo = ComboBox(ext4_container)
