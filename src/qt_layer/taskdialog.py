@@ -42,6 +42,7 @@ class GenericTaskWorker(QThread):
             self.target_func(*self.args, **self.kwargs)
             self.task_finished.emit(True)
         except Exception as e:
+            raise e
             print(f"\n[ERROR] Core collapse: {str(e)}")
             self.task_finished.emit(False)
 
@@ -84,7 +85,7 @@ class StreamLogDialog(QDialog):
 
         # 精致微型小圆环
         self.progress_ring = IndeterminateProgressRing(self)
-        self.progress_ring.setFixedSize(18, 18)
+        self.progress_ring.setFixedSize(32, 32)
         self.progress_ring.setStrokeWidth(2.2)
         header_layout.addWidget(self.progress_ring)
         main_layout.addLayout(header_layout)
