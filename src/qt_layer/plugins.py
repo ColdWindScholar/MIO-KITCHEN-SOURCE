@@ -589,7 +589,7 @@ class ModuleManager:
             norm_main_sh_path = os.path.normpath(main_sh_path).replace(os.sep, '/')
             exports['tool_bin'] = norm_tool_bin
             exports['version'] = settings.version
-            exports['language'] = settings.language
+            exports['language'] = cfg.language.value
             exports['bin'] = norm_script_path
             exports['moddir'] = norm_module_dir
             exports['project_output'] = norm_project_output
