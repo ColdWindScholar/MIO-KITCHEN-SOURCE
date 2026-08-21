@@ -386,8 +386,8 @@ class ProjectsPage(QWidget):
         if ftype == 'pac':
             current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
             unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
-            if settings.auto_unpack == '1':
-                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+            if cfg.autoUnpack.value:
+                self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
         # NTPI
         if ftype == 'cpb':
@@ -436,8 +436,8 @@ class ProjectsPage(QWidget):
         # othters.
         if ftype != 'unknown':
             file_name: str = os.path.basename(ifile)
-            project_folder = os.path.join(settings.path, os.path.splitext(file_name)[0])
-            folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
+            project_folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0])
+            folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
                 current_project_name.set(os.path.basename(folder))
@@ -446,7 +446,7 @@ class ProjectsPage(QWidget):
                 project_manger.current_work_output_path()
             except Exception as e:
                 win.message_pop(str(e))
-            project_dir = str(folder) if settings.project_struct != 'split' else str(folder + '/Source/')
+            project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
             copy(ifile, project_dir)
             # File Rename
             if os.path.exists(os.path.join(project_dir, file_name)):
