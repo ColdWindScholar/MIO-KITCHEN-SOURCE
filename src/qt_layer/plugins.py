@@ -98,12 +98,12 @@ class ModuleManager:
         if not id_:
             return 0
         if not cfg.currentProjectName.value:
-            print(lang.warn1)
+            print("Please set a project")
             return 1
         if id_:
             value = id_
         else:
-            print(lang.warn2)
+            print("id is invaild")
             return 1
         script_path = os.path.join(self.module_dir, value)
 
@@ -549,5 +549,4 @@ class PluginPage(QWidget):
                 data["card_widget"].hide()
 
     def exec_plugin(self, plugin_id):
-        print("exec", plugin_id)
-        # module_manager.run(id_=plugin_id)
+        module_manager.run(plugin_id)
