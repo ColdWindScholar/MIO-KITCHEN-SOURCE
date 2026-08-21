@@ -793,7 +793,21 @@ class ProjectsPage(QWidget):
                      "Source", "rw"))
         return data
 
-    def packrom(self, chosen_parts) -> bool | None:
+    def logo_pack(self, origin_logo=None) -> int:
+        work = project_manger.current_work_path()
+        if not origin_logo:
+            origin_logo = utils.findfile('logo.img', work)
+        logo = f"{work}/logo-new.img"
+        if not os.path.exists(dir_ := f"{work}/logo") or not os.path.exists(origin_logo):
+            print("origin logo missing")
+            return 1
+        utils.LogoDumper(origin_logo, logo, dir_).repack()
+        os.remove(origin_logo)
+        os.rename(logo, origin_logo)
+        rmtree(dir_)
+        return 1
+
+    def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -840,7 +854,7 @@ class ProjectsPage(QWidget):
                             rdi(work, dname)
                         print(lang.text3.format(dname))
                         if self.format.get() in ["dat", "br", "sparse"]:
-                            img2simg(project_manger.current_work_output_path() + dname + ".img")
+                            utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
                             if self.format.get() == 'dat':
                                 datbr(project_manger.current_work_output_path(), dname, "dat",
                                       int(parts_dict.get('dat_ver', 4)))
@@ -929,7 +943,7 @@ class ProjectsPage(QWidget):
             elif parts_dict[i] == 'logo':
                 logo_pack()
             elif parts_dict[i] == 'guoke_logo':
-                GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
+                utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
