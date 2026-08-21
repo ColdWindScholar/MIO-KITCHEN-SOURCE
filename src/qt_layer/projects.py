@@ -460,7 +460,7 @@ class ProjectsPage(QWidget):
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
             except Exception as e:
-                win.message_pop(str(e))
+                print(e)
             project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
             copy(ifile, project_dir)
             # File Rename
