@@ -10,6 +10,7 @@ import uuid
 import zipfile
 from contextlib import suppress
 from shutil import copy
+from src.core.cpio import extract as cpio_extract, repack as cpio_repack
 
 import contextpatch
 import extra
@@ -984,6 +985,74 @@ class ProjectsPage(QWidget):
             os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
         return 0
 
+    def repack_boot(name: str = 'boot', source: str | None = None, boot: str | None = None):
+        work = project_manger.current_work_path()
+        flag = ''
+        if boot is None:
+            boot = findfile(f"{name}.img", work)
+            if not boot:
+                print("Origin boot is lost.Cannot repack boot.img.")
+                return
+        if source is None:
+            source = work + name
+        if not os.path.exists(source):
+            print(f"Cannot Find {name}...")
+            return
+        if os.path.isfile(f'{source}/second_order'):
+            print("Repack Rk resource...")
+            rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
+            print("Repack Rk resource successfully...")
+        if os.path.isdir(f"{source}/ramdisk") and settings.boot_skip_ramdisk == '0':
+            if settings.cpio_impl == 'python':
+                cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
+            else:
+                cpio = os.path.join(settings.tool_bin, 'cpio' if os.name != 'nt' else "cpio.exe")
+                cpio = os.path.realpath(cpio)
+                if os.name == 'nt':
+                    cpio = cpio.replace("\\", '/')
+
+                os.chdir(f"{source}/ramdisk")
+                call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
+            with open(f"{source}/comp", "r", encoding='utf-8') as compf:
+                comp = compf.read()
+            print(f"Compressing:{comp}")
+            os.chdir(source)
+            if comp != "unknown":
+                if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
+                    print("Failed to pack Ramdisk...")
+                    os.remove("ramdisk-new.cpio")
+                else:
+                    try:
+                        os.remove("ramdisk.cpio")
+                    except (Exception, BaseException):
+                        logging.exception('Bugs')
+                    if comp == 'gzip':
+                        comp = 'gz'
+                    os.rename(f"ramdisk-new.cpio.{comp.split('_')[0]}", "ramdisk.cpio")
+            else:
+                if os.path.exists('ramdisk.cpio'):
+                    os.remove("ramdisk.cpio")
+                if os.path.exists('ramdisk-new.cpio'):
+                    os.rename("ramdisk-new.cpio", "ramdisk.cpio")
+                else:
+                    print("Failed to repack ramdisk.")
+                    return 1
+            print(f"Ramdisk Compression:{comp}")
+            if comp == "unknown":
+                flag = "-n"
+            print("Successfully packed Ramdisk..")
+        if call(['magiskboot', 'repack', flag, boot]) != 0:
+            print("Failed to Pack boot...")
+            os.chdir(cwd_path)
+        else:
+            os.remove(boot)
+            os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
+            os.chdir(cwd_path)
+            try:
+                rmdir(source)
+            except (Exception, BaseException):
+                print(lang.warn11.format(name))
+            print("Successfully packed Boot...")
     def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
