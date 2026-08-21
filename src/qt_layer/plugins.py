@@ -480,13 +480,14 @@ class InstallMpk(MessageBoxBase):
         self.state = SubtitleLabel("准备就绪", self)
         self.state.setAlignment(Qt.AlignCenter)
 
-        self.installb = PrimaryPushButton("安装", self)
+        self.installb = self.yesButton
+        self.cancelButton.hide()
+        self.installb.setText("安装")
         self.installb.setFixedHeight(36)
         self.installb.clicked.connect(self.install)
 
         self.bottomLayout.addWidget(self.prog)
         self.bottomLayout.addWidget(self.state)
-        self.bottomLayout.addWidget(self.installb)
         self.viewLayout.addLayout(self.centerLayout, stretch=1)
         self.viewLayout.addLayout(self.bottomLayout)
         self.load()
