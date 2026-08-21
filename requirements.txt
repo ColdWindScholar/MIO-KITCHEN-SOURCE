@@ -6,7 +6,7 @@ sv_ttk
 pyinstaller
 chlorophyll
 future>=1.0.0
-pip>=25.3
+pip>=26.2.1
 Pygments
 zstandard
 asn1crypto
