@@ -635,7 +635,7 @@ class InstallMpk(MessageBoxBase):
 
     def __init__(self, mpk_path: str = None, parent=None):
         super().__init__(parent)
-
+        self.parent = parent
         # 1. 迁移原始状态变量与配置解析器
         # (假设 lang, module_manager, module_error_codes, images 等全局对象已在外部 import)
         self.mconf = ConfigParser()
@@ -705,7 +705,7 @@ class InstallMpk(MessageBoxBase):
         self.viewLayout.addLayout(self.centerLayout, stretch=1)
         self.viewLayout.addLayout(self.bottomLayout)
         self.load()
-        self.finished.connect(lambda: print("done"))
+        self.finished.connect(self.parent.load_plugin_cards)
 
     def install(self):
         """核心安装逻辑与状态码转换"""
@@ -863,7 +863,7 @@ class PluginPage(QWidget):
             dialog = InstallMpk(file_path, self)
             if dialog.exec_():
                 return
-            self.load_plugin_cards()
+
 
     def initUI(self):
         # 1. Main outer layout
@@ -922,6 +922,7 @@ class PluginPage(QWidget):
     def load_plugin_cards(self):
         # Clear out existing layout elements if re-loading
         self.cards_data.clear()
+        [i.deleteLater() for i in self.cards_layout.children()]
 
         for i in module_manager.list_packages():
             plugin = module_manager.get_info(i)
