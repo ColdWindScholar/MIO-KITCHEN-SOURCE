@@ -257,8 +257,8 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_row1 = QHBoxLayout()
         self.compress_algo_label = self._create_field_label("压缩算法：")
         self.compress_algo_combo = ComboBox(erofs_container)
-        self.compress_algo_combo.addItems(["lz4hc", "lz4", "none"])
-
+        self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
+        self.compress_algo_combo.setText("lz4hc")
         self.support_old_kernel_switch = SwitchButton(parent=erofs_container)
         self.support_old_kernel_label = QLabel("支持旧内核", erofs_container)
         self.support_old_kernel_label.setStyleSheet("color: #ffffff; font-size: 13px;")
