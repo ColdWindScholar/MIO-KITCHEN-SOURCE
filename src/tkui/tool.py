@@ -2353,177 +2353,233 @@ class New(Toplevel):
         self.editor_(iden)
 
 
-class IconGrid(tk.Frame):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
-        self.master = master
-        self.icons = []
-        self.apps = {}
+class UninstallMpk(Toplevel):
+    def __init__(self, id_: str, wait=False):
+        super().__init__()
+        self.arr = {}
+        self.uninstall_b = None
+        self.wait = wait
 
-        self.canvas = tk.Canvas(self, highlightthickness=0, bd=0)
-        # The scrollbar is now created here, alongside the canvas.
-        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.value = id_
+        self.value2 = None
+        self.check_pass = False
 
-        self.scrollable_frame = ttk.Frame(self.canvas)
+        self.module_dir = module_manager.module_dir
 
-        # Packing order: canvas on the left, scrollbar on the right (if needed).
-        self.canvas.pack(side="left", fill="both", expand=True)
-        # self.scrollbar.pack(side="right", fill="y") # Packed later, conditionally.
+        if id_ and module_manager.is_installed(id_):
+            self.check_pass = True
+            self.value2 = module_manager.get_name(id_)
+            self.lsdep()
+        elif id_:
+            self.value2 = id_
+            logging.warning(f"UninstallMpk init: Plugin with ID '{id_}' not found by module_manager.get_installed.")
 
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollable_frame_id = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.ask()
 
-        self.scrollable_frame.bind("<Configure>", self.on_frame_configure)
-        self.canvas.bind("<Configure>", self.on_canvas_configure)  # Separate handler for the canvas.
+    def ask(self):
+        try:
+            if self.winfo_exists():
+                self.attributes('-topmost', 'true')
+        except tk.TclError:
+            logging.exception('Uninstall Mpk')
 
-        # --- MODIFICATION: Bind scrolling directly to the Canvas ---
-        # This ensures that scrolling only triggers when
-        # the cursor is over this specific Canvas.
-        self.canvas.bind("<MouseWheel>", self._on_mousewheel)  # For Windows and macOS
-        self.canvas.bind("<Button-4>", self._on_mousewheel)  # For Linux (scroll up)
-        self.canvas.bind("<Button-5>", self._on_mousewheel)  # For Linux (scroll down)
+        self.title(lang.t6)
 
-        # Explicitly stop mouse wheel events on the scrollbar itself
-        # to prevent its default behavior, which might conflict.
-        self.scrollbar.bind("<MouseWheel>", lambda e: "break")
-        self.scrollbar.bind("<Button-4>", lambda e: "break")
-        self.scrollbar.bind("<Button-5>", lambda e: "break")
+        content_frame = ttk.Frame(self)
+        content_frame.pack(padx=15, pady=15, fill=BOTH, expand=True)
 
-        # For the Canvas to receive keyboard/mouse events, it might need to have focus.
-        # Typically, the Canvas gets focus when the cursor is over it.
-        # If not, self.canvas.focus_set() could be called under specific conditions,
-        # or one could ensure it can receive focus via takefocus=1 (though this is usually not needed for a Canvas).
-
-    def _on_mousewheel(self, event):
-        if not self.canvas.winfo_exists() or \
-                not self.scrollable_frame.winfo_exists() or \
-                not self.scrollbar.winfo_exists():
-            return
-
-        # If the event originated from the scrollbar widget itself, this handler (for the canvas)
-        # should do nothing. The scrollbar has its own binding (lambda e: "break") to handle this.
-        if hasattr(event, 'widget') and event.widget == self.scrollbar:
-            return "break"
-
-        # Check if the cursor is over the visible scrollbar.
-        if self.scrollbar.winfo_ismapped():
-            sb_x_abs = self.scrollbar.winfo_rootx()
-            sb_y_abs = self.scrollbar.winfo_rooty()
-            sb_w = self.scrollbar.winfo_width()
-            sb_h = self.scrollbar.winfo_height()
-
-            if (sb_x_abs <= event.x_root < sb_x_abs + sb_w and
-                    sb_y_abs <= event.y_root < sb_y_abs + sb_h):
-                # Cursor is over the scrollbar. Stop the event to prevent the canvas from scrolling.
-                return "break"
-
-        # If we're here, the cursor is NOT over the scrollbar (or the scrollbar isn't visible).
-        # Execute canvas scrolling logic only if the scrollbar is visible (i.e., there's content to scroll).
-        if self.scrollbar.winfo_ismapped():
-            content_h = self.scrollable_frame.winfo_reqheight()
-            canvas_h = self.canvas.winfo_height()
-
-            if content_h > canvas_h:
-                delta = 0
-                if event.num == 4:  # Linux scroll up
-                    delta = -1
-                elif event.num == 5:  # Linux scroll down
-                    delta = 1
-                elif event.delta != 0:  # Windows/macOS
-                    delta = int(-1 * (event.delta / 120))
-
-                if delta != 0:
-                    self.canvas.yview_scroll(delta, "units")
-                    return "break"  # Stop event propagation after our canvas scroll.
-        return  # If no canvas scrolling occurred (e.g., scrollbar is not visible or content fits within the canvas).
-
-    def on_canvas_configure(self, event=None):
-        """Updates the width of the scrollable_frame when the canvas is resized."""
-        if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists() and hasattr(self,
-                                                                                                'scrollable_frame_id')):
-            return
-
-        canvas_width = self.canvas.winfo_width()
-        self.canvas.itemconfig(self.scrollable_frame_id, width=canvas_width)
-        if self.scrollable_frame.winfo_exists():  # Ensure the frame still exists.
-            self.scrollable_frame.configure(width=canvas_width)
-            self.scrollable_frame.update_idletasks()
-
-        self.on_frame_configure()  # Call to update the scrollregion and scrollbar visibility.
-
-    def on_frame_configure(self, event=None):
-        """Updates the Canvas scrollregion and manages the scrollbar's visibility."""
-        if not (self.canvas.winfo_exists() and self.scrollable_frame.winfo_exists()):
-            return
-
-        self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-        # Manage scrollbar visibility.
-        self.scrollable_frame.update_idletasks()
-        self.canvas.update_idletasks()  # Ensure the canvas height is current.
-
-        canvas_height = self.canvas.winfo_height()
-        # Use `winfo_reqheight()` as it reflects the requested height of the content.
-        content_height = self.scrollable_frame.winfo_reqheight()
-
-        if content_height > canvas_height + 2:  # Added a small threshold to prevent flickering.
-            if not self.scrollbar.winfo_ismapped():  # If the scrollbar is not yet visible.
-                self.scrollbar.pack(side="right", fill="y")
+        plugin_display_name_for_message = self.value2 or self.value
+        if not self.value:
+            message_text = getattr(lang, "warn2", "Please select a plugin!")
+        elif not self.check_pass:
+            msg_template = getattr(lang, "plugin_not_found_for_uninstall",
+                                   "Plugin '{plugin_id}' not found or cannot be uninstalled.")
+            message_text = msg_template.format(plugin_id=plugin_display_name_for_message)
+        elif module_manager.is_virtual(self.value):
+            msg_template = getattr(lang, "plugin_virtual_cannot_uninstall",
+                                   "Plugin '{plugin_name}' is virtual and cannot be uninstalled this way.")
+            message_text = msg_template.format(plugin_name=plugin_display_name_for_message)
         else:
-            if self.scrollbar.winfo_ismapped():  # If the scrollbar is visible but no longer needed.
-                self.scrollbar.pack_forget()
+            msg_template = getattr(lang, "t7", "Are you sure you want to uninstall plugin '%s'?")
+            name_to_format = str(plugin_display_name_for_message)
+            try:
+                if "%s" in msg_template or "%S" in msg_template:
+                    message_text = msg_template % (name_to_format,)
+                elif "{0}" in msg_template:
+                    message_text = msg_template.format(name_to_format)
+                elif "{plugin_name}" in msg_template or "{name}" in msg_template:
+                    message_text = msg_template.format(plugin_name=name_to_format, name=name_to_format)
+                else:
+                    message_text = msg_template + f" ({name_to_format})"
+            except Exception as e_format:
+                logging.error(
+                    f"Error formatting message for t7: {e_format}. Template: '{msg_template}', Value: '{name_to_format}'")
+                message_text = msg_template
 
-    def add_icon(self, icon_widget, id_, num_columns=4):
-        if id_ in self.apps:
-            self.remove_icon(id_)
+        ttk.Label(content_frame, text=message_text, font=(None, 14), wraplength=380, justify=CENTER).pack(
+            pady=(5, 15), fill=X)
 
-        self.icons.append(icon_widget)
-        self.apps[id_] = icon_widget
+        if self.arr:
+            ttk.Separator(content_frame, orient=HORIZONTAL).pack(fill=X, pady=5)
+            ttk.Label(content_frame,
+                      text=getattr(lang, "t8", "The following dependent plugins will also be removed:"),
+                      font=(None, 12, 'bold')).pack(pady=(5, 2), anchor='nw', fill=X)
 
-        row = (len(self.icons) - 1) // num_columns
-        col = (len(self.icons) - 1) % num_columns
+            dependent_text_frame = ttk.Frame(content_frame, relief="groove", borderwidth=1)
+            dependent_text_frame.pack(fill=BOTH, expand=True, pady=5)
 
-        # Use grid layout within `self.scrollable_frame`.
-        icon_widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
+            dependent_text_widget = Text(dependent_text_frame, height=min(5, len(self.arr) + 1), width=45,
+                                         wrap=tk.WORD, relief="flat", borderwidth=0, takefocus=0,
+                                         font=(None, 10), padx=5, pady=5)
 
-        # After adding an item, update `scrollable_frame` and call `on_frame_configure`.
-        if self.scrollable_frame.winfo_exists():
-            self.scrollable_frame.update_idletasks()
-            self.on_frame_configure()  # To update the scrollregion and scrollbar visibility.
+            scrollbar_y_deps = ttk.Scrollbar(dependent_text_frame, orient="vertical",
+                                             command=dependent_text_widget.yview)
+            scrollbar_y_deps.pack(side="right", fill="y")
+            dependent_text_widget.pack(side="left", fill=BOTH, expand=True)
+            dependent_text_widget.config(yscrollcommand=scrollbar_y_deps.set)
 
-    def remove_icon(self, id_):
-        if id_ in self.apps:
-            widget_to_remove = self.apps.pop(id_)
-            if widget_to_remove in self.icons:
-                self.icons.remove(widget_to_remove)
-            if widget_to_remove.winfo_exists():  # Check if the widget still exists before calling destroy.
-                widget_to_remove.destroy()
-            self._rebuild_grid()  # Rebuild the grid layout.
-            if self.scrollable_frame.winfo_exists():
-                self.scrollable_frame.update_idletasks()
-                self.on_frame_configure()
+            for dep_id, dep_name in self.arr.items():
+                dependent_text_widget.insert(tk.END, f"• {dep_name} ({dep_id})\n")
+            dependent_text_widget.config(state=DISABLED)
 
-    def clean(self):
-        ids_to_remove = list(self.apps.keys())
-        for id_ in ids_to_remove:
-            self.remove_icon(id_)
-        # `on_frame_configure` will be called by `remove_icon`.
+        button_frame = ttk.Frame(content_frame)
+        button_frame.pack(fill=X, pady=(15, 0), side=BOTTOM)
 
-    def _rebuild_grid(self, num_columns=4):
-        if not self.scrollable_frame.winfo_exists(): return
+        ttk.Button(button_frame, text=getattr(lang, "cancel", "Cancel"), command=self.destroy).pack(fill=X,
+                                                                                                    expand=True,
+                                                                                                    side=LEFT,
+                                                                                                    padx=(0, 5))
 
-        for widget in self.scrollable_frame.winfo_children():
-            widget.grid_forget()  # First, remove all widgets from the grid layout.
+        if self.check_pass and self.value and not module_manager.is_virtual(self.value):
+            self.uninstall_b = ttk.Button(button_frame, text=getattr(lang, "ok", "OK"), command=self.uninstall,
+                                          style="Accent.TButton")
+            self.uninstall_b.pack(fill=X, expand=True, side=LEFT, padx=(5, 0))
 
-        # Then, re-add them in the correct order.
-        for i, widget in enumerate(self.icons):
-            if widget.winfo_exists():  # Ensure the widget hasn't been destroyed previously.
-                row = i // num_columns
-                col = i % num_columns
-                widget.grid(in_=self.scrollable_frame, row=row, column=col, padx=10, pady=10, sticky="nsew")
+        if self.winfo_exists():
+            move_center(self)
+        if self.wait and self.winfo_exists():
+            try:
+                self.wait_window()
+            except tk.TclError:
+                logging.exception("UninstallMpk.ask")
 
-        self.scrollable_frame.update_idletasks()  # Update dimensions after rebuilding the grid.
-        self.on_frame_configure()  # Update the scrollregion.
+    def lsdep(self, name_to_check_deps_for=None):
+        if not name_to_check_deps_for:
+            name_to_check_deps_for = self.value
+
+        if not name_to_check_deps_for: return
+
+        for installed_plugin_id in module_manager.list_packages():
+            if installed_plugin_id == name_to_check_deps_for: continue
+            if installed_plugin_id in self.arr: continue
+
+            dependencies_str: str = module_manager.get_info(installed_plugin_id, 'depend', '')
+            dependencies_list = dependencies_str.split()
+
+            if name_to_check_deps_for in dependencies_list:
+                dependent_plugin_name = module_manager.get_name(installed_plugin_id)
+                self.arr[installed_plugin_id] = dependent_plugin_name
+                self.lsdep(installed_plugin_id)
+
+    def uninstall(self):
+        if not (self.uninstall_b and self.uninstall_b.winfo_exists()):
+            if self.winfo_exists(): self.destroy()
+            return
+
+        self.uninstall_b.config(state='disabled')
+        if self.winfo_exists(): self.update_idletasks()
+
+        plugin_id_to_remove = self.value
+        plugin_show_name_to_remove = self.value2 if self.value2 else self.value
+
+        dependent_ids = list(self.arr.keys())
+        for dep_id in dependent_ids:
+            dep_name = self.arr.get(dep_id, dep_id)
+            self.remove(dep_id, dep_name)
+
+        self.remove(plugin_id_to_remove, plugin_show_name_to_remove)
+
+        if self.winfo_exists():
+            self.destroy()
+
+    def remove(self, name=None, show_name=''):
+        logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
+        if not name:
+            logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
+            win.message_pop(
+                getattr(lang, "internal_error_plugin_id_missing",
+                        "Internal error: Plugin ID missing for removal."),
+                title=getattr(lang, "error_title", "Error"), color="red"
+            )
+            return
+
+        module_path = os.path.join(self.module_dir, str(name))
+        plugin_successfully_removed_fs = False
+
+        if self.uninstall_b and self.uninstall_b.winfo_exists():
+            try:
+                self.uninstall_b.config(text=lang.text29.format(show_name if show_name else name))
+                if self.winfo_exists(): self.update_idletasks()
+            except tk.TclError:
+                logging.warning(f"TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
+
+        print(lang.text29.format(show_name if show_name else name))
+
+        if os.path.exists(module_path):
+            try:
+                rmtree(module_path)
+                if not os.path.exists(module_path):
+                    plugin_successfully_removed_fs = True
+                    logging.info(f"Successfully removed directory: {module_path}")
+                else:
+                    logging.warning(
+                        f"Directory {module_path} reported as existing after rmtree call for plugin '{name}', though no exception was raised.")
+                    if not os.path.exists(module_path):
+                        plugin_successfully_removed_fs = True
+                        logging.info(f"Re-check confirms directory {module_path} is actually gone.")
+
+            except PermissionError as e_perm:
+                logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
+                msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            except Exception as e_generic:
+                logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
+                msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+        else:
+            plugin_successfully_removed_fs = True
+            logging.info(
+                f"Module path '{module_path}' did not exist for plugin '{name}'. Assumed removed or not present on filesystem.")
+
+        if not plugin_successfully_removed_fs and os.path.exists(module_path):
+            win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange',
+                            title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
+        elif plugin_successfully_removed_fs:
+            if self.uninstall_b and self.uninstall_b.winfo_exists():
+                try:
+                    self.uninstall_b.config(text=lang.text30.format(show_name if show_name else name))
+                except tk.TclError:
+                    pass
+            print(lang.text30.format(show_name if show_name else name))
+            logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
+
+            if callable(list_pls_plugin):
+                win.after(10, list_pls_plugin)
+            else:
+                logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
+
+            if hasattr(states, 'active_mpk_store_instance') and \
+                    states.active_mpk_store_instance and \
+                    states.active_mpk_store_instance.winfo_exists():
+                logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
+                states.active_mpk_store_instance.update_plugin_state(name)
+            else:
+                logging.debug(
+                    f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
+        logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 
 module_error_codes = ModuleErrorCodes
@@ -2533,8 +2589,8 @@ class ModuleManager:
     def __init__(self):
         sys.stdout_origin = sys.stdout
         self.module_dir = os.path.join(cwd_path, "bin", "module")
-        self.uninstall_gui = self.UninstallMpk
-        self.new = self.New
+        self.uninstall_gui = UninstallMpk
+        self.new = New()
         self.new.module_dir = self.module_dir
         self.addon_loader = loader
         self.addon_entries = Entry
@@ -3032,235 +3088,6 @@ class ModuleManager:
                 side='bottom')
             move_center(self)
             self.wait_window()
-
-    class UninstallMpk(Toplevel):
-
-        def __init__(self, id_: str, wait=False):
-            super().__init__()
-            self.arr = {}
-            self.uninstall_b = None
-            self.wait = wait
-
-            self.value = id_
-            self.value2 = None
-            self.check_pass = False
-
-            self.module_dir = module_manager.module_dir
-
-            if id_ and module_manager.is_installed(id_):
-                self.check_pass = True
-                self.value2 = module_manager.get_name(id_)
-                self.lsdep()
-            elif id_:
-                self.value2 = id_
-                logging.warning(f"UninstallMpk init: Plugin with ID '{id_}' not found by module_manager.get_installed.")
-
-            self.ask()
-
-        def ask(self):
-            try:
-                if self.winfo_exists():
-                    self.attributes('-topmost', 'true')
-            except tk.TclError:
-                logging.exception('Uninstall Mpk')
-
-            self.title(lang.t6)
-
-            content_frame = ttk.Frame(self)
-            content_frame.pack(padx=15, pady=15, fill=BOTH, expand=True)
-
-            plugin_display_name_for_message = self.value2 or self.value
-            if not self.value:
-                message_text = getattr(lang, "warn2", "Please select a plugin!")
-            elif not self.check_pass:
-                msg_template = getattr(lang, "plugin_not_found_for_uninstall",
-                                       "Plugin '{plugin_id}' not found or cannot be uninstalled.")
-                message_text = msg_template.format(plugin_id=plugin_display_name_for_message)
-            elif module_manager.is_virtual(self.value):
-                msg_template = getattr(lang, "plugin_virtual_cannot_uninstall",
-                                       "Plugin '{plugin_name}' is virtual and cannot be uninstalled this way.")
-                message_text = msg_template.format(plugin_name=plugin_display_name_for_message)
-            else:
-                msg_template = getattr(lang, "t7", "Are you sure you want to uninstall plugin '%s'?")
-                name_to_format = str(plugin_display_name_for_message)
-                try:
-                    if "%s" in msg_template or "%S" in msg_template:
-                        message_text = msg_template % (name_to_format,)
-                    elif "{0}" in msg_template:
-                        message_text = msg_template.format(name_to_format)
-                    elif "{plugin_name}" in msg_template or "{name}" in msg_template:
-                        message_text = msg_template.format(plugin_name=name_to_format, name=name_to_format)
-                    else:
-                        message_text = msg_template + f" ({name_to_format})"
-                except Exception as e_format:
-                    logging.error(
-                        f"Error formatting message for t7: {e_format}. Template: '{msg_template}', Value: '{name_to_format}'")
-                    message_text = msg_template
-
-            ttk.Label(content_frame, text=message_text, font=(None, 14), wraplength=380, justify=CENTER).pack(
-                pady=(5, 15), fill=X)
-
-            if self.arr:
-                ttk.Separator(content_frame, orient=HORIZONTAL).pack(fill=X, pady=5)
-                ttk.Label(content_frame,
-                          text=getattr(lang, "t8", "The following dependent plugins will also be removed:"),
-                          font=(None, 12, 'bold')).pack(pady=(5, 2), anchor='nw', fill=X)
-
-                dependent_text_frame = ttk.Frame(content_frame, relief="groove", borderwidth=1)
-                dependent_text_frame.pack(fill=BOTH, expand=True, pady=5)
-
-                dependent_text_widget = Text(dependent_text_frame, height=min(5, len(self.arr) + 1), width=45,
-                                             wrap=tk.WORD, relief="flat", borderwidth=0, takefocus=0,
-                                             font=(None, 10), padx=5, pady=5)
-
-                scrollbar_y_deps = ttk.Scrollbar(dependent_text_frame, orient="vertical",
-                                                 command=dependent_text_widget.yview)
-                scrollbar_y_deps.pack(side="right", fill="y")
-                dependent_text_widget.pack(side="left", fill=BOTH, expand=True)
-                dependent_text_widget.config(yscrollcommand=scrollbar_y_deps.set)
-
-                for dep_id, dep_name in self.arr.items():
-                    dependent_text_widget.insert(tk.END, f"• {dep_name} ({dep_id})\n")
-                dependent_text_widget.config(state=DISABLED)
-
-            button_frame = ttk.Frame(content_frame)
-            button_frame.pack(fill=X, pady=(15, 0), side=BOTTOM)
-
-            ttk.Button(button_frame, text=getattr(lang, "cancel", "Cancel"), command=self.destroy).pack(fill=X,
-                                                                                                        expand=True,
-                                                                                                        side=LEFT,
-                                                                                                        padx=(0, 5))
-
-            if self.check_pass and self.value and not module_manager.is_virtual(self.value):
-                self.uninstall_b = ttk.Button(button_frame, text=getattr(lang, "ok", "OK"), command=self.uninstall,
-                                              style="Accent.TButton")
-                self.uninstall_b.pack(fill=X, expand=True, side=LEFT, padx=(5, 0))
-
-            if self.winfo_exists():
-                move_center(self)
-            if self.wait and self.winfo_exists():
-                try:
-                    self.wait_window()
-                except tk.TclError:
-                    logging.exception("UninstallMpk.ask")
-
-        def lsdep(self, name_to_check_deps_for=None):
-            if not name_to_check_deps_for:
-                name_to_check_deps_for = self.value
-
-            if not name_to_check_deps_for: return
-
-            for installed_plugin_id in module_manager.list_packages():
-                if installed_plugin_id == name_to_check_deps_for: continue
-                if installed_plugin_id in self.arr: continue
-
-                dependencies_str: str = module_manager.get_info(installed_plugin_id, 'depend', '')
-                dependencies_list = dependencies_str.split()
-
-                if name_to_check_deps_for in dependencies_list:
-                    dependent_plugin_name = module_manager.get_name(installed_plugin_id)
-                    self.arr[installed_plugin_id] = dependent_plugin_name
-                    self.lsdep(installed_plugin_id)
-
-        def uninstall(self):
-            if not (self.uninstall_b and self.uninstall_b.winfo_exists()):
-                if self.winfo_exists(): self.destroy()
-                return
-
-            self.uninstall_b.config(state='disabled')
-            if self.winfo_exists(): self.update_idletasks()
-
-            plugin_id_to_remove = self.value
-            plugin_show_name_to_remove = self.value2 if self.value2 else self.value
-
-            dependent_ids = list(self.arr.keys())
-            for dep_id in dependent_ids:
-                dep_name = self.arr.get(dep_id, dep_id)
-                self.remove(dep_id, dep_name)
-
-            self.remove(plugin_id_to_remove, plugin_show_name_to_remove)
-
-            if self.winfo_exists():
-                self.destroy()
-
-        def remove(self, name=None, show_name=''):
-            logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
-            if not name:
-                logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
-                win.message_pop(
-                    getattr(lang, "internal_error_plugin_id_missing",
-                            "Internal error: Plugin ID missing for removal."),
-                    title=getattr(lang, "error_title", "Error"), color="red"
-                )
-                return
-
-            module_path = os.path.join(self.module_dir, str(name))
-            plugin_successfully_removed_fs = False
-
-            if self.uninstall_b and self.uninstall_b.winfo_exists():
-                try:
-                    self.uninstall_b.config(text=lang.text29.format(show_name if show_name else name))
-                    if self.winfo_exists(): self.update_idletasks()
-                except tk.TclError:
-                    logging.warning(f"TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
-
-            print(lang.text29.format(show_name if show_name else name))
-
-            if os.path.exists(module_path):
-                try:
-                    rmtree(module_path)
-                    if not os.path.exists(module_path):
-                        plugin_successfully_removed_fs = True
-                        logging.info(f"Successfully removed directory: {module_path}")
-                    else:
-                        logging.warning(
-                            f"Directory {module_path} reported as existing after rmtree call for plugin '{name}', though no exception was raised.")
-                        if not os.path.exists(module_path):
-                            plugin_successfully_removed_fs = True
-                            logging.info(f"Re-check confirms directory {module_path} is actually gone.")
-
-                except PermissionError as e_perm:
-                    logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
-                    msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
-                    win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange',
-                                    title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-                except Exception as e_generic:
-                    logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
-                    msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
-                    win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange',
-                                    title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-            else:
-                plugin_successfully_removed_fs = True
-                logging.info(
-                    f"Module path '{module_path}' did not exist for plugin '{name}'. Assumed removed or not present on filesystem.")
-
-            if not plugin_successfully_removed_fs and os.path.exists(module_path):
-                win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange',
-                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
-                logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
-            elif plugin_successfully_removed_fs:
-                if self.uninstall_b and self.uninstall_b.winfo_exists():
-                    try:
-                        self.uninstall_b.config(text=lang.text30.format(show_name if show_name else name))
-                    except tk.TclError:
-                        pass
-                print(lang.text30.format(show_name if show_name else name))
-                logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
-
-                if callable(list_pls_plugin):
-                    win.after(10, list_pls_plugin)
-                else:
-                    logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
-
-                if hasattr(states, 'active_mpk_store_instance') and \
-                        states.active_mpk_store_instance and \
-                        states.active_mpk_store_instance.winfo_exists():
-                    logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
-                    states.active_mpk_store_instance.update_plugin_state(name)
-                else:
-                    logging.debug(
-                        f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
-            logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 
 module_manager = ModuleManager()
