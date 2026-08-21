@@ -1137,7 +1137,7 @@ class ProjectsPage(QWidget):
                                  compress=self.f2fs_compresion.get()) != 0:
                         print("Failed to pack %s!" % dname)
                     else:
-                        if self.remove_source_files.get() == 1:
+                        if remove_source_files:
                             self.rdi(work, dname)
                         print("Packed successfully: {}!".format(dname))
                         if format in ["dat", "br", "sparse"]:
