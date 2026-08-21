@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
                             FluentWindow, FluentIcon as FIF)
 
+from qt_layer.plugins import PluginPage
 from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
@@ -93,7 +94,7 @@ class MainWindow(FluentWindow):
         # 创建页面
         self.home_page = HomePage()
         self.project_page = Tool()
-        self.plugin_page = Empty2()
+        self.plugin_page = PluginPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
 
