@@ -8,6 +8,7 @@ import time
 
 import gzip
 import zipfile
+from src.core.unpac import MODE as PACMODE, unpac
 
 import mkdtboimg
 import ofp_mtk_decrypt
@@ -18,6 +19,7 @@ from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
 from undz import DZFileTools
 from src.core.unkdz import KDZFileTools
+from unpac import unpac
 
 if os.name == 'nt':
     from ctypes import windll
