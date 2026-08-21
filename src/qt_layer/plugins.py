@@ -457,7 +457,7 @@ class PluginPage(QWidget):
             plugin = module_manager.get_info(i)
             plugin_icon = os.path.join(module_manager.module_dir, i, 'icon')
             if not os.path.exists(plugin_icon):
-                pass #todo
+                plugin_icon = FluentIcon.APPLICATION
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin["name"],
