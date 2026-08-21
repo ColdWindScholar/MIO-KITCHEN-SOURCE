@@ -528,8 +528,8 @@ class ProjectsPage(QWidget):
                  f.startswith("dtbo.")]
         mkdtboimg.create_dtbo(project_manger.current_work_output_path() + "dtbo.img",
                               sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
-        rmdir(f"{work}/dtbo")
-        print(lang.text8)
+        rmtree(f"{work}/dtbo")
+        print("Pack dtbo done")
         return True
     def dndfile(self, files: list):
         task = None
