@@ -1003,8 +1003,8 @@ class ProjectsPage(QWidget):
             print("Repack Rk resource...")
             rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
             print("Repack Rk resource successfully...")
-        if os.path.isdir(f"{source}/ramdisk") and settings.boot_skip_ramdisk == '0':
-            if settings.cpio_impl == 'python':
+        if os.path.isdir(f"{source}/ramdisk"):
+            if cfg.cpioImpl.value == 'Python':
                 cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
             else:
                 cpio = os.path.join(settings.tool_bin, 'cpio' if os.name != 'nt' else "cpio.exe")
@@ -1050,9 +1050,9 @@ class ProjectsPage(QWidget):
             os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
             os.chdir(cwd_path)
             try:
-                rmdir(source)
+                rmtree(source)
             except (Exception, BaseException):
-                print(lang.warn11.format(name))
+                print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
     def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
