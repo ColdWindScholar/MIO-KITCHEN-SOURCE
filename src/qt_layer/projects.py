@@ -179,6 +179,7 @@ class ProjectsPage(QWidget):
             show_info_bar(self,"成功", f"项目{project_name}已删除", bar_type=3)
         except Exception as e:
             show_info_bar(self, "错误", f"删除项目失败: {str(e)}", bar_type=1)
+        self.refresh_projects()
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         container = QWidget(parent_widget)
