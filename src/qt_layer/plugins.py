@@ -21,7 +21,7 @@ from src.core import imp
 from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang, move_center
 from src.qt_layer.widgets import show_info_bar
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
-
+import _tkinter as tk
 module_error_codes = ModuleErrorCodes
 class New(Toplevel):
 
@@ -212,8 +212,7 @@ class UninstallMpk(Toplevel):
                                           style="Accent.TButton")
             self.uninstall_b.pack(fill=X, expand=True, side=LEFT, padx=(5, 0))
 
-        if self.winfo_exists():
-            move_center(self)
+
         if self.wait and self.winfo_exists():
             try:
                 self.wait_window()
