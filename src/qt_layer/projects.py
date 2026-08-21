@@ -1075,7 +1075,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
-    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files) -> bool | None:
+    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files, erofs_compress_format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1113,7 +1113,7 @@ class ProjectsPage(QWidget):
                     if parts_dict[dname] == origin_fs:
                         parts_dict[dname] = modify_fs
                 if parts_dict[dname] == 'erofs':
-                    if self.mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
+                    if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print("Failed to repack %s [erofs]" % dname)
@@ -1241,7 +1241,7 @@ class ProjectsPage(QWidget):
                                                         dialog.src_fs_combo.currentText(),
                                                         dialog.dest_fs_combo.currentText(),
                                                         dialog.sw_delete.isChecked(),
-                                                        
+                                                        dialog.compress_algo_combo.currentText(),
                                                         )
             else:
                 return
