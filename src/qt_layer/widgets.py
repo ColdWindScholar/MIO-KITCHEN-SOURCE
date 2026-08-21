@@ -108,8 +108,7 @@ class NewProjectDialog(MessageBoxBase):
             self.errorLabel.show()
             return False
 
-        if (project_name in self.existing_projects and
-                project_name != self.nameLineEdit.text().strip()):
+        if project_name in self.existing_projects:
             self.errorLabel.setText("项目名称已存在")
             self.errorLabel.show()
             return False
