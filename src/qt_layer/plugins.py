@@ -12,13 +12,13 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
-import utils
+from src.core import utils
 from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
 from src.core import imp
-from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
+from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
