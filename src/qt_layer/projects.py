@@ -115,6 +115,7 @@ class ProjectsPage(QWidget):
 
         # 底层弹性推力
         self.scroll_layout.addStretch(1)
+        self.refresh_projects()
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
