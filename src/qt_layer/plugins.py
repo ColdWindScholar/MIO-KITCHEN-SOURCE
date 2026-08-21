@@ -6,7 +6,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, Push
 
 class AppCard(CardWidget):
 
-    def __init__(self, icon, title, content, parent=None):
+    def __init__(self, icon, title:str, content:str, parent=None):
         super().__init__(parent)
         self.iconWidget = IconWidget(icon)
         self.titleLabel = BodyLabel(title, self)
@@ -54,3 +54,11 @@ class PluginPage(QWidget):
         title = TitleLabel("插件管理")
         title.setStyleSheet("font-size: 28px; color: #FFFFFF; font-weight: bold;")
         main_layout.addWidget(title)
+        card = AppCard(
+            icon=":/qfluentwidgets/images/logo.png",
+            title="PyQt-Fluent-Widgets",
+            content="Shokokawaii Inc."
+        )
+        card.clicked.connect(lambda: print("Card is clicked"))
+        main_layout.addWidget(card)
+        self.setLayout(main_layout)
