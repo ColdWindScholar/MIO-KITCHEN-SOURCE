@@ -841,6 +841,25 @@ class ProjectsPage(QWidget):
                 except Exception:
                     logging.exception('Bugs')
             print(f"Packing {name} to br done")
+
+    def rdi(self, work: str, part_name: str) -> bool:
+        if not os.listdir(f"{work}/config"):
+            rmtree(f"{work}/config")
+            return False
+        if os.access(f"{work}/{part_name}.img", os.F_OK):
+            print(lang.text72 % part_name)
+            try:
+                rmtree(work + part_name)
+                for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config', '%s_fs_options']:
+                    path_ = os.path.join(work, "config", i_ % part_name)
+                    if os.access(path_, os.F_OK):
+                        os.remove(path_)
+            except Exception:
+                logging.exception(lang.text73 % (part_name, 'E'))
+            print(lang.text3.format(part_name))
+        else:
+            show_info_bar(self, "Error", f"Failed to repack {part_name}")
+        return True
     def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
@@ -885,15 +904,15 @@ class ProjectsPage(QWidget):
                         print(lang.text75 % dname)
                     else:
                         if self.remove_source_files.get() == 1:
-                            rdi(work, dname)
+                            self.rdi(work, dname)
                         print(lang.text3.format(dname))
-                        if self.format.get() in ["dat", "br", "sparse"]:
+                        if format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if self.format.get() == 'dat':
-                                datbr(project_manger.current_work_output_path(), dname, "dat",
+                            if format == 'dat':
+                                self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                       int(parts_dict.get('dat_ver', 4)))
-                            elif self.format.get() == 'br':
-                                datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
+                            elif format == 'br':
+                                self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print(lang.text3.format(dname))

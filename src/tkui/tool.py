@@ -3923,8 +3923,6 @@ class PackPartition(Toplevel):
         move_center(ck)
         ck.wait_window()
 
-    @animation
-
 
 
 def rdi(work: str, part_name: str) -> bool:
