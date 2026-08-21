@@ -2582,7 +2582,6 @@ class UninstallMpk(Toplevel):
         logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 
-module_error_codes = ModuleErrorCodes
 
 
 class Parse(Toplevel):
