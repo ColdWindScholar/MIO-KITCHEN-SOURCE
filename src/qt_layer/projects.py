@@ -1231,18 +1231,17 @@ class ProjectsPage(QWidget):
                 if item.checkState() == Qt.CheckState.Checked:
                     pack_list.append(item.text())
             dialog = PackSettingsDialog(self)
-
             # Display modally. If the user clicks "打包" (Yes/Accept), exec() returns True/1
             if dialog.exec():
                 # 💡 Cleanly pull whatever data fields you need straight out of the inputs!
-                chosen_method = dialog.pack_method_combo.currentText()
+                chosen_method = dialog.pack_method_combo.currentText() # mke2fs+format
+
                 support_old_kernel = dialog.support_old_kernel_switch.isChecked()
                 brotli_level = dialog.brotli_slider.value()
                 utc_timestamp = dialog.utc_input.text()
-
-                print(
-                    f"Engaging Pack Pipeline with: {chosen_method}, Old Kernel={support_old_kernel}, Brotli={brotli_level}")
-
+                self.my_task_worker = GenericTaskWorker(self.packrom, pack_list)
+            else:
+                return
 
         log_dialog = StreamLogDialog("Running...", parent=self)
 
