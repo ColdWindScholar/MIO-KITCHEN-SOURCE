@@ -10,6 +10,8 @@ from qfluentwidgets import InfoBar, InfoBarPosition, LineEdit
 from qfluentwidgets import (MessageBoxBase, ComboBox, SwitchButton, Slider,
                             SubtitleLabel, CaptionLabel)
 
+from config_parser import ConfigParser
+
 
 class TkinterEmbeddedPanel(QWidget):
     def __init__(self, parent=None):

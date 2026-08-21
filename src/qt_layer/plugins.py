@@ -1,23 +1,20 @@
 import json
-import logging
 import os
-import platform
-import zipfile
-from io import BytesIO, StringIO
+from io import StringIO
 from shutil import rmtree
 from typing import Any
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
-from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, FluentIcon, ScrollArea, \
+from PySide6.QtWidgets import QWidget, QFileDialog
+from qfluentwidgets import IconWidget, CardWidget, BodyLabel, PushButton, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
-from src.core import utils
+import images
 from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
 from src.core import imp
+from src.core import utils
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
@@ -407,6 +404,198 @@ class ModuleManager:
 
 module_manager = ModuleManager()
 
+import zipfile
+import logging
+import platform
+from io import BytesIO
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap, QColor
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
+from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
+                            ProgressBar, PrimaryPushButton, ImageLabel, setTheme, Theme)
+
+
+
+class InstallMpk(MessageBoxBase):
+    """基于 PySide6 + Fluent-Widgets 的 MPK 插件安装器窗口"""
+
+    def __init__(self, mpk_path: str = None, parent=None):
+        super().__init__(parent)
+
+        # 1. 迁移原始状态变量与配置解析器
+        # (假设 lang, module_manager, module_error_codes, images 等全局对象已在外部 import)
+        self.mconf = ConfigParser()
+        self.installable = True
+        self.mpk = mpk_path
+
+        # 2. 初始化 Fluent 核心界面样式（无 QSS）
+        self.widget.setMinimumWidth(540)
+        self.widget.setMinimumHeight(420)
+        self.buttonLayout.deleteLater()  # 废弃默认按钮组，改用下方通栏布局
+
+        # 3. 构建左右分栏布局
+        self.centerLayout = QHBoxLayout()
+        self.centerLayout.setContentsMargins(10, 15, 10, 15)
+        self.centerLayout.setSpacing(24)
+
+        # 左侧面板 (元数据)
+        self.leftPanel = QVBoxLayout()
+        self.leftPanel.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        self.leftPanel.setSpacing(12)
+
+        self.logo = ImageLabel(self)
+        self.logo.setFixedSize(128, 128)  # 契合您原代码的 128x128 尺寸
+
+        # 初始化占位文本（防止 load 失败前读出空值引发视觉报错）
+        self.name_label = SubtitleLabel("", self)
+        self.version = CaptionLabel("", self)
+        self.author = CaptionLabel("", self)
+
+        self.version.setTextColor(QColor("#b0b0b0"), QColor("#b0b0b0"))
+        self.author.setTextColor(QColor("#b0b0b0"), QColor("#b0b0b0"))
+
+        self.leftPanel.addWidget(self.logo)
+        self.leftPanel.addWidget(self.name_label)
+        self.leftPanel.addWidget(self.version)
+        self.leftPanel.addWidget(self.author)
+
+        # 右侧面板 (详细介绍文本框)
+        self.text = TextBrowser(self)
+        self.text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.centerLayout.addLayout(self.leftPanel, stretch=2)
+        self.centerLayout.addWidget(self.text, stretch=5)
+
+        # 4. 底部控制布局 (进度条 + 状态标签 + 通栏按钮)
+        self.bottomLayout = QVBoxLayout()
+        self.bottomLayout.setContentsMargins(10, 0, 10, 10)
+        self.bottomLayout.setSpacing(12)
+
+        self.prog = ProgressBar(self)
+        self.prog.setFixedHeight(4)
+        # 对应 tkinter 初始态：mode='indeterminate'，这里通过设置 0-0 开启无限滑动跑马灯
+        self.prog.setRange(0, 0)
+        self.prog.hide()  # 初始未点击安装时先隐藏隐藏
+
+        self.state = SubtitleLabel(lang.text40, self)
+        self.state.setAlignment(Qt.AlignCenter)
+
+        # 替换原有的 ttk.Button
+        self.installb = PrimaryPushButton(lang.text41, self)
+        self.installb.setFixedHeight(36)
+        # 绑定点击事件，使用您原有的多线程包装方法：create_thread
+        self.installb.clicked.connect(self.install)
+
+        self.bottomLayout.addWidget(self.prog)
+        self.bottomLayout.addWidget(self.state)
+        self.bottomLayout.addWidget(self.installb)
+
+        # 5. 将搭建的所有子模块填充进基类视图中
+        self.viewLayout.addLayout(self.centerLayout, stretch=1)
+        self.viewLayout.addLayout(self.bottomLayout)
+
+        # 6. 执行业务流数据加载
+        self.load()
+
+        # 7. 替代原 tkinter 的移动居中、等待与刷新通知
+        # 提示：MessageBoxBase 的 exec() 会自动调用模态并居中显示，无需外部 move_center
+        # 如果您需要在弹窗彻底关闭销毁后执行后续逻辑，请重写或使用 finished 信号：
+        self.finished.connect(lambda: print("done"))
+
+    def install(self):
+        """核心安装逻辑与状态码转换"""
+        # 逻辑 1：如果按钮字样变成了“完成/关闭”，则点击直接退出销毁
+        if self.installb.text() == lang.text34:
+            self.accept()  # 对应原代码：self.destroy()
+            return 0
+
+        # 逻辑 2：启动无确定时长的跑马灯进度动画
+        self.prog.show()
+        self.installb.setEnabled(False)  # 对应原代码：state=DISABLED
+
+        # 逻辑 3：调用您的后端管理器执行具体业务
+        ret, reason = module_manager.install(self.mpk)
+
+        # 逻辑 4：原汁原味的状态码映射分支
+        if ret == module_error_codes.ArchNotSupported:
+            self.state.setText(reason)
+        elif ret == module_error_codes.PlatformNotSupport:
+            self.state.setText(lang.warn15.format(platform.system()))
+        elif ret == module_error_codes.DependsMissing:
+            self.state.setText(lang.text36 % (self.mconf.get('module', 'name'), reason, reason))
+            self.installb.setText(lang.text37)
+            self.installb.setEnabled(True)
+        elif ret == module_error_codes.IsBroken:
+            self.state.setText(lang.warn2)
+            self.installb.setText(lang.text37)
+            self.installb.setEnabled(True)
+        elif ret == module_error_codes.Normal:
+            self.state.setText(lang.text39)
+            self.installb.setText(lang.text34)
+            self.installb.setEnabled(True)
+
+        # 逻辑 5：安装动作完结，将进度条强行修正为 100% 满格静态长条
+        self.prog.setRange(0, 100)
+        self.prog.setValue(100)
+        return 0
+
+    def load(self):
+        """解析 MPK 压缩文件，在内存中提炼出数据与图标"""
+        if not self.mpk or not zipfile.is_zipfile(self.mpk):
+            self.unavailable()
+            return
+
+        try:
+            with zipfile.ZipFile(self.mpk, 'r') as myfile:
+                if 'info' not in myfile.namelist():
+                    self.unavailable()
+                    return
+                # 读取说明配置
+                with myfile.open('info') as info_file:
+                    self.mconf.read_string(info_file.read().decode('utf-8'))
+
+                # 读取并处理二进制图片
+                try:
+                    with myfile.open('icon') as myfi:
+                        self.icon_bytes = myfi.read()
+                        pixmap = QPixmap()
+                        # 利用 loadFromData 避开外部临时磁盘转存，实现内存高效加载
+                        if pixmap.loadFromData(self.icon_bytes):
+                            self.pyt = pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        else:
+                            raise Exception("QPixmap parse fail")
+                except Exception:
+                    logging.exception('Bugs')
+                    self.pyt = QPixmap()
+                    self.pyt.loadFromData(images.none_byte)
+        except (Exception, BaseException):
+            logging.exception('Bugs')
+            self.pyt = QPixmap()
+            self.pyt.loadFromData(images.none_byte)
+
+        # 更新 Fluent UI 组件展示
+        self.name_label.setText(self.mconf.get('module', 'name'))
+        self.logo.setPixmap(self.pyt)
+        self.author.setText(lang.text33.format(self.mconf.get('module', 'author')))
+        self.version.setText(lang.text32.format(self.mconf.get('module', 'version')))
+        self.text.setText(self.mconf.get('module', 'describe'))
+
+    def unavailable(self):
+        """异常和包损坏时的界面安全降级逻辑"""
+        self.pyt = QPixmap()
+        self.pyt.loadFromData(images.error_logo_byte)
+
+        self.name_label.setText("请选择一个插件")
+        # 模拟原 tkinter 设置黄色警示字体：
+        self.name_label.setTextColor(QColor("#ffcc00"), QColor("#ffcc00"))
+        self.logo.setPixmap(self.pyt)
+
+        # 安全隐藏无用组件，等同于原 tkinter 的 .destroy()
+        self.author.hide()
+        self.version.hide()
+        self.prog.hide()
+        self.installb.setEnabled(False)
+
 
 class AppCard(CardWidget):
 
@@ -454,6 +643,18 @@ class PluginPage(QWidget):
                    }
                   
                """)
+    def install_mpk(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            "",
+            "MPK Files (*.mpk);;Zip Files (*.zip)"
+        )
+        if file_path:
+            dialog = InstallMpk(file_path, self)
+            if dialog.exec_():
+                return
+
     def initUI(self):
         # 1. Main outer layout
         outer_layout = QVBoxLayout(self)
@@ -472,6 +673,7 @@ class PluginPage(QWidget):
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
         self.local_install_btn = PushButton(FluentIcon.ADD, "本地安装", self)
+        self.local_install_btn.clicked.connect(self.install_mpk)
         header_layout.addWidget(self.local_install_btn)
 
         # New Feature: Cloud Download Module Control Trigger
