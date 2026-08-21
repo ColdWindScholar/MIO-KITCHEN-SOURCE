@@ -1,22 +1,27 @@
 import logging
 import os
+import platform
 import zipfile
 
 import json
+from shutil import rmtree
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
     FluentIcon, TitleLabel
 
+from addon_register import loader, Entry
+from config_parser import ConfigParser
+from qt_layer.settings import cfg
 from src.core import imp
-from utils import create_thread, ModuleErrorCodes
+from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit
 
 module_error_codes = ModuleErrorCodes
 
 class ModuleManager:
     def __init__(self):
-        sys.stdout_origin = sys.stdout
-        self.module_dir = os.path.join(cwd_path, "bin", "module")
+        self.module_dir = os.path.join(prog_path, "bin", "module")
         self.uninstall_gui = UninstallMpk
         self.new = New()
         self.new.module_dir = self.module_dir
@@ -125,7 +130,7 @@ class ModuleManager:
 
         main_json_path = os.path.join(script_path, "main.json")
         if os.path.exists(main_json_path):
-            values_parser = self.Parse(main_json_path)
+            values_parser = Parse(main_json_path)
             if values_parser.cancel:
                 return 1
             values = values_parser.gavs
@@ -145,7 +150,7 @@ class ModuleManager:
                     if gva:
                         exports[va] = gva
 
-            norm_tool_bin = os.path.normpath(settings.tool_bin).replace(os.sep, '/')
+            norm_tool_bin = os.path.normpath(cfg.tool_bin).replace(os.sep, '/')
             norm_script_path = os.path.normpath(script_path).replace(os.sep, '/')
             norm_module_dir = os.path.normpath(self.module_dir).replace(os.sep, '/')
             norm_project_output = os.path.normpath(project_manger.current_work_output_path()).replace(os.sep, '/')
@@ -343,7 +348,6 @@ class ModuleManager:
         logging.info(f"ModuleManager.install: Successfully installed plugin '{install_id}' to '{install_target_path}'.")
         return module_error_codes.Normal, ""
 
-    @animation
     def export(self, id_: str):
 
         name: str = self.get_name(id_)
