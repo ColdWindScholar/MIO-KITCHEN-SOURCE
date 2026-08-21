@@ -997,9 +997,12 @@ class PluginPage(QWidget):
             plugin = module_manager.get_info(i)
             card = AppCard(
                 icon=":/qfluentwidgets/images/logo.png",
-                title="PyQt-Fluent-Widgets",
-                content="Shokokawaii Inc."
+                title=plugin["name"],
+                content=plugin['author']
             )
-            card.clicked.connect(lambda: print("Card is clicked"))
+            card.clicked.connect(lambda *x: self.exec_plugin(i))
             main_layout.addWidget(card)
         self.setLayout(main_layout)
+
+    def exec_plugin(self, plugin_id):
+        print(plugin_id)
