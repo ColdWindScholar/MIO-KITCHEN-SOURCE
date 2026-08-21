@@ -19,6 +19,7 @@ import os
 import os.path
 import platform
 import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -758,6 +759,34 @@ class GetFolderSize:
                                  f"# Grow partition {part_name}_a from 0 to {size}", content)
                 ff.write(content)
 
+def generate_bug_report():
+    output = prog_path
+    output = str(output)
+    if not output:
+        return
+    if not os.path.isdir(output) or not os.path.exists(output):
+        return
+    re_folder(inner := os.path.join(temp, v_code()))
+    shutil.copyfile(tool_log, os.path.join(inner, os.path.basename(tool_log)))
+    with open(os.path.join(inner, 'detail.txt'), 'w+', encoding='utf-8', newline='\n') as f:
+
+        f.write(f"""
+        ----BasicInfo-----
+        Python: {sys.version}
+        Platform: {sys.platform}
+        Exec Command: {sys.argv}
+        Tool Version: {settings.version}
+        Source code running: {states.run_source}
+        python Implementation: {platform.python_implementation()}
+        Uname: {platform.uname()}
+        ----Settings-------
+        """)
+        [f.write(f'\t{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}\n') for i in dir(settings)]
+    pack_zip(inner, bugreport := os.path.join(output,
+                                              f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
+             silent=True)
+    re_folder(inner)
+    print(f"\tThe Bug Report Was Saved:{bugreport}")
 class LogoDumper:
     def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.magic = None

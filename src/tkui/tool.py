@@ -2262,48 +2262,6 @@ def logo_pack(origin_logo=None) -> int:
     return 1
 
 
-
-
-
-
-
-
-
-
-
-def generate_bug_report():
-    if os.name == 'nt':
-        output = filedialog.askdirectory(title="Path To Save Bug Report")
-    else:
-        output = cwd_path
-    output = str(output)
-    if not output:
-        return
-    if not os.path.isdir(output) or not os.path.exists(output):
-        return
-    re_folder(inner := os.path.join(temp, v_code()))
-    shutil.copyfile(tool_log, os.path.join(inner, os.path.basename(tool_log)))
-    with open(os.path.join(inner, 'detail.txt'), 'w+', encoding='utf-8', newline='\n') as f:
-
-        f.write(f"""
-        ----BasicInfo-----
-        Python: {sys.version}
-        Platform: {sys.platform}
-        Exec Command: {sys.argv}
-        Tool Version: {settings.version}
-        Source code running: {states.run_source}
-        python Implementation: {platform.python_implementation()}
-        Uname: {platform.uname()}
-        ----Settings-------
-        """)
-        [f.write(f'\t{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}\n') for i in dir(settings)]
-    pack_zip(inner, bugreport := os.path.join(output,
-                                              f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
-             silent=True)
-    re_folder(inner, quiet=True)
-    print(f"\tThe Bug Report Was Saved:{bugreport}")
-
-
 class MpkStore(Toplevel):
     """A Toplevel window for managing and installing MPK (MIO Package) files.
 
