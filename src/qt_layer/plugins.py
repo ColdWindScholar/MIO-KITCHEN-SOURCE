@@ -4,6 +4,7 @@ import os
 import platform
 import zipfile
 from shutil import rmtree
+from tkinter import Toplevel
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
@@ -15,10 +16,437 @@ from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.settings import cfg
 from src.core import imp
-from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit
-
+from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang
+from src.qt_layer.widgets import show_info_bar
 module_error_codes = ModuleErrorCodes
+class New(Toplevel):
 
+    def __init__(self, create_gui_on_init=True):
+        super().__init__()
+        self.title(lang.text115)
+        if not hasattr(self, 'module_dir'):
+            self.module_dir = os.path.join(cwd_path, "bin", "module")
+
+        if create_gui_on_init:
+            self.gui()
+            move_center(self)
+
+    @staticmethod
+    def label_entry(master, text, side, value: str = ''):
+        frame = Frame(master)
+        ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
+        entry_value = tk.StringVar(value=value)
+        entry = ttk.Entry(frame, textvariable=entry_value)
+        entry.pack(padx=5, pady=5, side=RIGHT)
+        frame.pack(padx=5, pady=5, fill=X, side=side)
+        return entry_value
+
+    def editor_(self, id_=None):
+        if not id_:
+            win.message_pop(lang.warn2)
+            return False
+        if module_manager.is_virtual(id_):
+            print(f"{id_} is a virtual plugin.")
+            return False
+        path = os.path.join(self.module_dir, id_)
+        if os.path.exists(f"{path}/main.py"):
+            return editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
+        elif not os.path.exists(f'{path}/main.sh'):
+            with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
+                sh.write("echo 'MIO-KITCHEN'")
+        return editor.main(path, "main.sh")
+
+    def gui(self):
+        ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        f_b = ttk.Frame(self)
+        f = ttk.Frame(f_b)
+        self.name = self.label_entry(f, lang.t20, TOP, "example")
+        self.aou = self.label_entry(f, lang.t21, TOP, "MIO-KITCHEN")
+        self.ver = self.label_entry(f, lang.t22, TOP, "1.0")
+        self.dep = self.label_entry(f, lang.t23, TOP, '')
+        self.identifier = self.label_entry(f, lang.identifier, TOP, 'example.mio_kitchen.plugin')
+        #
+        self.system = self.label_entry(f, lang.supported_system, TOP, platform.system())
+        self.arch = self.label_entry(f, lang.supported_arch, TOP, platform.machine())
+        ###
+        f.pack(padx=5, pady=5, side=LEFT)
+        f = ttk.Frame(f_b)
+        ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
+        self.intro = Text(f, width=40, height=15)
+        self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
+        f.pack(padx=5, pady=5, side=LEFT)
+        f_b.pack(padx=5, pady=5)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5,
+                                                                                              pady=5)
+
+    def create(self):
+        if not self.identifier.get():
+            return
+        if module_manager.is_installed(self.identifier.get()):
+            info_win(lang.warn19 % self.identifier.get())
+            return
+        data = {
+            "name": self.name.get(),
+            "author": self.aou.get() or 'MIO-KITCHEN',
+            "version": self.ver.get(),
+            "identifier": (iden := self.identifier.get()),
+            "describe": self.intro.get(1.0, tk.END),
+            "depend": self.dep.get(),
+            "system": self.system.get(),
+            "arch": self.arch.get()
+        }
+        self.destroy()
+
+        os.makedirs(f'{self.module_dir}/{iden}', exist_ok=True)
+        with open(f"{self.module_dir}/{iden}/info.json", 'w+', encoding='utf-8',
+                  newline='\n') as js:
+            json.dump(data, js, ensure_ascii=False, indent=4)
+        if callable(list_pls_plugin):
+            list_pls_plugin()
+        self.editor_(iden)
+class UninstallMpk(Toplevel):
+    def __init__(self, id_: str, wait=False):
+        super().__init__()
+        self.arr = {}
+        self.uninstall_b = None
+        self.wait = wait
+
+        self.value = id_
+        self.value2 = None
+        self.check_pass = False
+
+        self.module_dir = module_manager.module_dir
+
+        if id_ and module_manager.is_installed(id_):
+            self.check_pass = True
+            self.value2 = module_manager.get_name(id_)
+            self.lsdep()
+        elif id_:
+            self.value2 = id_
+            logging.warning(f"UninstallMpk init: Plugin with ID '{id_}' not found by module_manager.get_installed.")
+
+        self.ask()
+
+    def ask(self):
+        try:
+            if self.winfo_exists():
+                self.attributes('-topmost', 'true')
+        except tk.TclError:
+            logging.exception('Uninstall Mpk')
+
+        self.title(lang.t6)
+
+        content_frame = ttk.Frame(self)
+        content_frame.pack(padx=15, pady=15, fill=BOTH, expand=True)
+
+        plugin_display_name_for_message = self.value2 or self.value
+        if not self.value:
+            message_text = getattr(lang, "warn2", "Please select a plugin!")
+        elif not self.check_pass:
+            msg_template = getattr(lang, "plugin_not_found_for_uninstall",
+                                   "Plugin '{plugin_id}' not found or cannot be uninstalled.")
+            message_text = msg_template.format(plugin_id=plugin_display_name_for_message)
+        elif module_manager.is_virtual(self.value):
+            msg_template = getattr(lang, "plugin_virtual_cannot_uninstall",
+                                   "Plugin '{plugin_name}' is virtual and cannot be uninstalled this way.")
+            message_text = msg_template.format(plugin_name=plugin_display_name_for_message)
+        else:
+            msg_template = getattr(lang, "t7", "Are you sure you want to uninstall plugin '%s'?")
+            name_to_format = str(plugin_display_name_for_message)
+            try:
+                if "%s" in msg_template or "%S" in msg_template:
+                    message_text = msg_template % (name_to_format,)
+                elif "{0}" in msg_template:
+                    message_text = msg_template.format(name_to_format)
+                elif "{plugin_name}" in msg_template or "{name}" in msg_template:
+                    message_text = msg_template.format(plugin_name=name_to_format, name=name_to_format)
+                else:
+                    message_text = msg_template + f" ({name_to_format})"
+            except Exception as e_format:
+                logging.error(
+                    f"Error formatting message for t7: {e_format}. Template: '{msg_template}', Value: '{name_to_format}'")
+                message_text = msg_template
+
+        ttk.Label(content_frame, text=message_text, font=(None, 14), wraplength=380, justify=CENTER).pack(
+            pady=(5, 15), fill=X)
+
+        if self.arr:
+            ttk.Separator(content_frame, orient=HORIZONTAL).pack(fill=X, pady=5)
+            ttk.Label(content_frame,
+                      text=getattr(lang, "t8", "The following dependent plugins will also be removed:"),
+                      font=(None, 12, 'bold')).pack(pady=(5, 2), anchor='nw', fill=X)
+
+            dependent_text_frame = ttk.Frame(content_frame, relief="groove", borderwidth=1)
+            dependent_text_frame.pack(fill=BOTH, expand=True, pady=5)
+
+            dependent_text_widget = Text(dependent_text_frame, height=min(5, len(self.arr) + 1), width=45,
+                                         wrap=tk.WORD, relief="flat", borderwidth=0, takefocus=0,
+                                         font=(None, 10), padx=5, pady=5)
+
+            scrollbar_y_deps = ttk.Scrollbar(dependent_text_frame, orient="vertical",
+                                             command=dependent_text_widget.yview)
+            scrollbar_y_deps.pack(side="right", fill="y")
+            dependent_text_widget.pack(side="left", fill=BOTH, expand=True)
+            dependent_text_widget.config(yscrollcommand=scrollbar_y_deps.set)
+
+            for dep_id, dep_name in self.arr.items():
+                dependent_text_widget.insert(tk.END, f"• {dep_name} ({dep_id})\n")
+            dependent_text_widget.config(state=DISABLED)
+
+        button_frame = ttk.Frame(content_frame)
+        button_frame.pack(fill=X, pady=(15, 0), side=BOTTOM)
+
+        ttk.Button(button_frame, text=getattr(lang, "cancel", "Cancel"), command=self.destroy).pack(fill=X,
+                                                                                                    expand=True,
+                                                                                                    side=LEFT,
+                                                                                                    padx=(0, 5))
+
+        if self.check_pass and self.value and not module_manager.is_virtual(self.value):
+            self.uninstall_b = ttk.Button(button_frame, text=getattr(lang, "ok", "OK"), command=self.uninstall,
+                                          style="Accent.TButton")
+            self.uninstall_b.pack(fill=X, expand=True, side=LEFT, padx=(5, 0))
+
+        if self.winfo_exists():
+            move_center(self)
+        if self.wait and self.winfo_exists():
+            try:
+                self.wait_window()
+            except tk.TclError:
+                logging.exception("UninstallMpk.ask")
+
+    def lsdep(self, name_to_check_deps_for=None):
+        if not name_to_check_deps_for:
+            name_to_check_deps_for = self.value
+
+        if not name_to_check_deps_for: return
+
+        for installed_plugin_id in module_manager.list_packages():
+            if installed_plugin_id == name_to_check_deps_for: continue
+            if installed_plugin_id in self.arr: continue
+
+            dependencies_str: str = module_manager.get_info(installed_plugin_id, 'depend', '')
+            dependencies_list = dependencies_str.split()
+
+            if name_to_check_deps_for in dependencies_list:
+                dependent_plugin_name = module_manager.get_name(installed_plugin_id)
+                self.arr[installed_plugin_id] = dependent_plugin_name
+                self.lsdep(installed_plugin_id)
+
+    def uninstall(self):
+        if not (self.uninstall_b and self.uninstall_b.winfo_exists()):
+            if self.winfo_exists(): self.destroy()
+            return
+
+        self.uninstall_b.config(state='disabled')
+        if self.winfo_exists(): self.update_idletasks()
+
+        plugin_id_to_remove = self.value
+        plugin_show_name_to_remove = self.value2 if self.value2 else self.value
+
+        dependent_ids = list(self.arr.keys())
+        for dep_id in dependent_ids:
+            dep_name = self.arr.get(dep_id, dep_id)
+            self.remove(dep_id, dep_name)
+
+        self.remove(plugin_id_to_remove, plugin_show_name_to_remove)
+
+        if self.winfo_exists():
+            self.destroy()
+
+    def remove(self, name=None, show_name=''):
+        logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
+        if not name:
+            logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
+            win.message_pop(
+                getattr(lang, "internal_error_plugin_id_missing",
+                        "Internal error: Plugin ID missing for removal."),
+                title=getattr(lang, "error_title", "Error"), color="red"
+            )
+            return
+
+        module_path = os.path.join(self.module_dir, str(name))
+        plugin_successfully_removed_fs = False
+
+        if self.uninstall_b and self.uninstall_b.winfo_exists():
+            try:
+                self.uninstall_b.config(text=lang.text29.format(show_name if show_name else name))
+                if self.winfo_exists(): self.update_idletasks()
+            except tk.TclError:
+                logging.warning(f"TclError updating uninstall_b text for '{name}'. Widget might be destroyed.")
+
+        print(lang.text29.format(show_name if show_name else name))
+
+        if os.path.exists(module_path):
+            try:
+                rmtree(module_path)
+                if not os.path.exists(module_path):
+                    plugin_successfully_removed_fs = True
+                    logging.info(f"Successfully removed directory: {module_path}")
+                else:
+                    logging.warning(
+                        f"Directory {module_path} reported as existing after rmtree call for plugin '{name}', though no exception was raised.")
+                    if not os.path.exists(module_path):
+                        plugin_successfully_removed_fs = True
+                        logging.info(f"Re-check confirms directory {module_path} is actually gone.")
+
+            except PermissionError as e_perm:
+                logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
+                msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            except Exception as e_generic:
+                logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
+                msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+        else:
+            plugin_successfully_removed_fs = True
+            logging.info(
+                f"Module path '{module_path}' did not exist for plugin '{name}'. Assumed removed or not present on filesystem.")
+
+        if not plugin_successfully_removed_fs and os.path.exists(module_path):
+            win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange',
+                            title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
+        elif plugin_successfully_removed_fs:
+            if self.uninstall_b and self.uninstall_b.winfo_exists():
+                try:
+                    self.uninstall_b.config(text=lang.text30.format(show_name if show_name else name))
+                except tk.TclError:
+                    pass
+            print(lang.text30.format(show_name if show_name else name))
+            logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
+
+            if callable(list_pls_plugin):
+                win.after(10, list_pls_plugin)
+            else:
+                logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
+
+            if hasattr(states, 'active_mpk_store_instance') and \
+                    states.active_mpk_store_instance and \
+                    states.active_mpk_store_instance.winfo_exists():
+                logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
+                states.active_mpk_store_instance.update_plugin_state(name)
+            else:
+                logging.debug(
+                    f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
+        logging.debug(f"UninstallMpk.remove completed for: {name}")
+
+
+
+
+class Parse(Toplevel):
+    gavs = {}
+    cancel = False
+
+    @staticmethod
+    def _text(master, text, fontsize, side):
+        ttk.Label(master, text=text,
+                  font=(None, int(fontsize))).pack(side=side, padx=5, pady=5)
+
+    @staticmethod
+    def _button(master, text, command):
+        ttk.Button(master, text=text,
+                   command=lambda: exec(command)).pack(side='left')
+
+    def _filechose(self, master, set, text):
+        ft = ttk.Frame(master)
+        ft.pack(fill=X)
+        self.gavs[set] = StringVar()
+        ttk.Label(ft, text=text).pack(side='left', padx=10, pady=10)
+        ttk.Entry(ft, textvariable=self.gavs[set]).pack(side='left', padx=5, pady=5)
+        ttk.Button(ft, text=lang.text28,
+                   command=lambda: self.gavs[set].set(
+                       filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+
+    def _radio(self, master, set, opins, side):
+        self.gavs[set] = StringVar()
+        pft1 = ttk.Frame(master)
+        pft1.pack(padx=10, pady=10)
+        for option in opins.split():
+            text, value = option.split('|')
+            self.gavs[set].set(value)
+            ttk.Radiobutton(pft1, text=text, variable=self.gavs[set],
+                            value=value).pack(side=side)
+
+    def _input(self, master, set, text):
+        input_frame = Frame(master)
+        input_frame.pack(fill=X, padx=5, pady=5)
+        self.gavs[set] = StringVar()
+        if text != 'None':
+            ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
+        ttk.Entry(input_frame, textvariable=self.gavs[set]).pack(side=LEFT, pady=5,
+                                                                 padx=5,
+                                                                 fill=X)
+
+    def _checkbutton(self, master, set, text):
+        self.gavs[set] = IntVar()
+        text = '' if text == 'None' else text
+        ttk.Checkbutton(master, text=text, variable=self.gavs[set], onvalue=1,
+                        offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+
+    def __unknown(self, master, type, side):
+        self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
+        self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
+
+    def _cancel(self):
+        self.cancel = True
+        self.destroy()
+
+    def __init__(self, jsons):
+        super().__init__()
+        self.protocol("WM_DELETE_WINDOW", lambda: self._cancel())
+        with open(jsons, 'r', encoding='UTF-8') as f:
+            try:
+                data = json.load(f)
+            except Exception as e:
+                win.message_pop(lang.text133 + str(e))
+                print(lang.text133 + str(e))
+                self.destroy()
+            self.title(data['main']['info']['title'])
+            height = data['main']['info']['height']
+            width = data['main']['info']['weight']
+            self.w_assert = data['main']['info'].get('assert', "False")
+            if height != 'none' and width != 'none':
+                self.geometry(f"{width}x{height}")
+            resizable = data['main']['info']['resize']
+            try:
+                self.attributes('-topmost', 'true')
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+            self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
+            for group_name, group_data in data['main'].items():
+                if group_name == 'info':
+                    continue
+                group_frame = ttk.LabelFrame(self, text=group_data['title'])
+                group_frame.pack(padx=10, pady=10)
+                for con in group_data['controls']:
+                    if hasattr(self, f'_{con["type"]}'):
+                        control = getattr(self, f'_{con["type"]}')
+                    else:
+                        control = self.__unknown
+                    try:
+                        varnames = control.__code__.co_varnames[:control.__code__.co_argcount]
+                    except AttributeError:
+                        logging.exception('Var')
+                        continue
+                    args = [group_frame]
+                    args += [con.get(i, 'None') for i in varnames if i not in ['master', 'self']]
+                    try:
+                        control(*args)
+                    except (AttributeError, TypeError):
+                        logging.exception('V!')
+                        print(con, args, varnames)
+        ttk.Button(self, text=lang.ok,
+                   command=lambda: self.destroy()).pack(
+            fill=X,
+            side='bottom')
+        move_center(self)
+        self.wait_window()
 class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(prog_path, "bin", "module")
