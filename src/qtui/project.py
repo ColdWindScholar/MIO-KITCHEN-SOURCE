@@ -10,8 +10,7 @@ from qfluentwidgets import (TitleLabel, PushButton, FluentIcon as FIF,
                             MessageBoxBase,
                             SubtitleLabel, CaptionLabel)
 
-
-
+from qt_layer.widgets import show_info_bar
 
 
 class ProjectCard(CardWidget):
@@ -336,7 +335,7 @@ class ProjectPage(QWidget):
     def delete_project(self):
         """删除选中的项目并显示提示"""
         if not self.selected_project:
-            self.show_info_bar("提示", "请先选择一个项目", bar_type=2)
+            show_info_bar(self, "提示", "请先选择一个项目", bar_type=2)
             return
 
         result = MessageBox(

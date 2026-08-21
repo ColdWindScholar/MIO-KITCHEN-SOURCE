@@ -2,10 +2,10 @@ import os
 from shutil import rmtree
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
+from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QListWidgetItem, QTableWidgetItem, QLabel, \
     QHeaderView
-from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox
+from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
+    SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget, MessageBox
 
 import lpunpack
 import splituapp
@@ -121,7 +121,7 @@ class ProjectsPage(QWidget):
         """统一生成无边框、无背景的纯文本全局大标题"""
         title = BodyLabel(text)
         title.setStyleSheet("""
-            font-size: 15px; 
+            font-size: 17px; 
             font-weight: 600; 
             color: #ffffff; 
             background: transparent; 
