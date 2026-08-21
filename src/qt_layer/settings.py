@@ -25,6 +25,7 @@ class Config(QConfig):
     language = OptionsConfigItem(
         "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
+    currentProjectName = ConfigItem("Tool", 'currentProjectName', "")
     selinuxPatch = ConfigItem("Tool", 'selinuxPatch', False, BoolValidator())
     autoUnpack = ConfigItem("Tool", 'autoUnpack', False, BoolValidator())
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
