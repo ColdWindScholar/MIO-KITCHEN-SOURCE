@@ -500,9 +500,9 @@ class ProjectsPage(QWidget):
                         if gettype(fi) == 'unknown':
                             editor.main(os.path.dirname(fi), os.path.basename(fi))
                         else:
-                            utils.create_thread(unpackrom, fi)
+                            utils.create_thread(self.unpackrom, fi)
                 elif os.path.isdir(fi):
-                    utils.create_thread(copy_project, fi)
+                    utils.create_thread(self.copy_project, fi)
             else:
                 print(fi + lang.text84)
 
