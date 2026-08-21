@@ -775,7 +775,7 @@ class ProjectsPage(QWidget):
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 data.append(
-                    (folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'),
+                    (folder, utils.hum_convert(utils.GetFolderSize(work + folder).rsize_v), parts_dict.get(folder, 'Unknown'),
                      "Source", "rw"))
         return data
 

@@ -715,8 +715,9 @@ class GetFolderSize:
                         file_path = os.path.join(root, name)
                         if not os.path.isfile(file_path):
                             self.size += len(name)
-                        self.size += os.path.getsize(file_path)
-                    except (PermissionError, BaseException, Exception):
+                        if os.path.exists(file_path):
+                            self.size += os.path.getsize(file_path)
+                    except (PermissionError, BaseException, Exception, FileNotFoundError):
                         logging.exception(f"Getsize {name}")
                         self.size += 1
             self.size += (self.size / 16384) * 256
