@@ -127,7 +127,6 @@ class ProjectsPage(QWidget):
 
         self.open_btn = PushButton("打开项目", card, FIF.FOLDER)
         # Deep blue accent for primary call to action
-        self.open_btn.setStyleSheet("background-color: #0078d4; color: white;")
 
         action_row.addWidget(self.project_combo, 1)
         action_row.addWidget(self.open_btn)
@@ -202,7 +201,6 @@ class ProjectsPage(QWidget):
 
         self.execute_btn = PushButton("执行任务", card, FIF.PLAY)
         self.execute_btn.setFixedWidth(110)
-        self.execute_btn.setStyleSheet("background-color: #25855a; color: white; font-weight: bold;")
 
         process_row.addWidget(self.format_combo)
         process_row.addWidget(self.execute_btn)
