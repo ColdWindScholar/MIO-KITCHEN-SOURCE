@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 
 from PySide6.QtCore import QTimer
@@ -338,7 +339,7 @@ class PackSettingsDialog(MessageBoxBase):
         utc_row = QHBoxLayout()
         self.utc_lbl = QLabel("UTC:", other_container)
         self.utc_lbl.setStyleSheet("color: #ffffff; font-size: 15px; min-width: 45px;")
-        self.utc_input = QLineEdit("1786516716", other_container)
+        self.utc_input = QLineEdit(str(int(time.time())), other_container)
         self.utc_input.setStyleSheet("""
             QLineEdit {
                 background-color: #2a2a2e;

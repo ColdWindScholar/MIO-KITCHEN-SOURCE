@@ -1077,7 +1077,7 @@ class ProjectsPage(QWidget):
             print("Successfully packed Boot...")
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
-                erofs_compress_format, scale_erofs, erofs_old_kernel) -> bool | None:
+                erofs_compress_format, scale_erofs, erofs_old_kernel, UTC) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1117,7 +1117,7 @@ class ProjectsPage(QWidget):
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
-                               old_kernel=erofs_old_kernel, UTC=self.UTC.get()) != 0:
+                               old_kernel=erofs_old_kernel, UTC=UTC) != 0:
                         print("Failed to repack %s [erofs]" % dname)
                     else:
                         if remove_source_files:
@@ -1135,7 +1135,7 @@ class ProjectsPage(QWidget):
                                 print("Packed successfully: {}!".format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
-                                 UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(),
+                                 UTC=UTC, readonly=self.f2fs_read_only.get(),
                                  compress=self.f2fs_compresion.get()) != 0:
                         print("Failed to pack %s!" % dname)
                     else:
@@ -1178,7 +1178,7 @@ class ProjectsPage(QWidget):
                                                 work_output=project_manger.current_work_output_path(),
                                                 sparse=self.format.get() in ["dat", "br", "sparse"],
                                                 size=ext4_size_value,
-                                                UTC=self.UTC.get(), has_contexts=os.path.exists(contexts_file))
+                                                UTC=UTC, has_contexts=os.path.exists(contexts_file))
 
                     else:
                         exit_code = self.mke2fs(
@@ -1189,7 +1189,7 @@ class ProjectsPage(QWidget):
                                 "br",
                                 "sparse"],
                             size=ext4_size_value,
-                            UTC=self.UTC.get())
+                            UTC=UTC)
                     if exit_code:
                         print("Failed to pack %s!" % dname)
                         continue
@@ -1245,7 +1245,8 @@ class ProjectsPage(QWidget):
                                                         dialog.sw_delete.isChecked(),
                                                         dialog.compress_algo_combo.currentText(),
                                                         dialog.erofs_slider.value()    ,
-                                                        dialog.support_old_kernel_switch.isChecked()
+                                                        dialog.support_old_kernel_switch.isChecked()  ,
+                                                        dialog.utc_input.currentText(),
                                                         )
             else:
                 return
