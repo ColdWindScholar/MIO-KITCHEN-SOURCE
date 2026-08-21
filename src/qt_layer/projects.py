@@ -376,6 +376,7 @@ class ProjectsPage(QWidget):
         frame = QHBoxLayout()
         frame.addWidget(self._create_section_title("分区"))
         self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
+        self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
@@ -473,6 +474,11 @@ class ProjectsPage(QWidget):
                     (folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'),
                      "Source", "rw"))
         return data
+    def exec_opera(self):
+        if self.unpack_rb.isChecked():
+            self.unpack()
+        else:
+            pass
 
     def refresh_unpack(self):
         self.format_combo.setDisabled(False)

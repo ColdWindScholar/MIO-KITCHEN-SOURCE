@@ -16,10 +16,10 @@ import logging
 import os
 import re
 import struct
-from .posix import symlink
+from src.core.posix import symlink
 from timeit import default_timer as dti
-from . import ext4
-from .utils import simg2img
+from src.core import ext4
+from src.core.utils import simg2img
 
 
 class Extractor:
