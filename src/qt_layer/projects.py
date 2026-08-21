@@ -1,6 +1,9 @@
+import logging
 import os
+import pathlib
 import subprocess
 import sys
+import time
 from shutil import rmtree
 
 from PySide6.QtCore import Qt
@@ -9,12 +12,19 @@ from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QL
 from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget, MessageBox
 
+import ext4
+import imgextractor
 import lpunpack
 import splituapp
 import utils
+from payload_extract import extract_partitions_from_payload
+from pygpt.gpt_reader import GPTReader
 from qt_layer.settings import cfg
 from qt_layer.widgets import NewProjectDialog, show_info_bar
+from romfs_parse import RomfsParse
+from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype
+from src.core.aml_image import main as aml_main
 
 
 class ProjectManager:
@@ -83,6 +93,229 @@ class ProjectManager:
 
 project_manger = ProjectManager()
 
+def unpack(chose: list | dict, form: str = '') -> bool:
+    if os.name == 'nt':
+        if windll.shell32.IsUserAnAdmin():
+            try:
+                ensure_dir_case_sensitive(project_manger.current_work_path())
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+    if not project_manger.exist():
+        win.message_pop(lang.warn1)
+        return False
+    elif not os.path.exists(project_manger.current_work_path()):
+        win.message_pop(lang.warn1, "red")
+        return False
+    json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
+    parts = json_.read()
+    if not chose:
+        return False
+    if form == 'payload':
+        time_start = time.time()
+        print(lang.text79 + "payload")
+        with open(f"{work}/payload.bin", "rb") as f:
+            extract_partitions_from_payload(
+                f,
+                (
+                    chose
+                ),
+                work,
+                os.cpu_count() or 2,
+            )
+        tooks = time.time() - time_start
+        print("Done! tooks: %.2f" % tooks)
+        return True
+    elif form == 'super':
+        print(lang.text79 + "Super")
+        file_type = gettype(f"{work}/super.img")
+        if file_type == "sparse":
+            print(lang.text79 + f"super.img [{file_type}]")
+            try:
+                utils.simg2img(f"{work}/super.img")
+            except (Exception, BaseException):
+                win.message_pop(lang.warn11.format("super.img"))
+        if gettype(f"{work}/super.img") == 'super':
+            # should get info here.
+            parts["super_info"] = lpunpack.get_info(os.path.join(work, "super.img"))
+            lpunpack.unpack(os.path.join(work, "super.img"), work, chose)
+            for file_name in os.listdir(work):
+                if file_name.endswith('_a.img') and not os.path.exists(work + file_name.replace('_a', '')):
+                    os.rename(work + file_name, work + file_name.replace('_a', ''))
+                if file_name.endswith('_b.img'):
+                    if not os.path.getsize(work + file_name):
+                        os.remove(work + file_name)
+            json_.write(parts)
+            parts.clear()
+        return True
+    elif form == 'update.app':
+        splituapp.extract(f"{work}/UPDATE.APP", work, chose)
+        return True
+    for i in chose:
+        if os.access(f"{work}/{i}.zst", os.F_OK):
+            print(f"{lang.text79} {i}.zst")
+            utils.call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
+            return True
+        if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
+            print(lang.text79 + f"{i}.new.dat.xz")
+            utils.Unxz(f"{work}/{i}.new.dat.xz")
+        if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
+            print(lang.text79 + f"{i}.new.dat.br")
+            utils.call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
+        if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
+            with open(f"{work}/{i}.new.dat", 'ab') as ofd:
+                for n in range(100):
+                    if os.access(f"{work}/{i}.new.dat.{n}", os.F_OK):
+                        print(lang.text83 % (i + f".new.dat.{n}", f"{i}.new.dat"))
+                        with open(f"{work}/{i}.new.dat.{n}", 'rb') as fd:
+                            ofd.write(fd.read())
+                        os.remove(f"{work}/{i}.new.dat.{n}")
+        if os.access(f"{work}/{i}.new.dat", os.F_OK):
+            print(lang.text79 + f"{work}/{i}.new.dat")
+            if os.path.getsize(f"{work}/{i}.new.dat") != 0:
+                transferfile = f"{work}/{i}.transfer.list"
+                if os.access(transferfile, os.F_OK):
+                    parts['dat_ver'] = Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
+                    if os.access(f"{work}/{i}.img", os.F_OK):
+                        os.remove(f"{work}/{i}.new.dat")
+                        os.remove(transferfile)
+                        try:
+                            os.remove(f'{work}/{i}.patch.dat')
+                        except (Exception, BaseException):
+                            logging.exception('Bugs')
+                    else:
+                        print("File May Not Extracted.")
+                else:
+                    print("transferfile" + lang.text84)
+        if os.access(f"{work}/{i}.img", os.F_OK):
+            try:
+                if i in parts:
+                    parts.pop(i)
+            except KeyError:
+                logging.exception('Key')
+            if gettype(f"{work}/{i}.img") != 'sparse':
+                parts[i] = gettype(f"{work}/{i}.img")
+            if gettype(f"{work}/{i}.img") == 'dtbo':
+                un_dtbo(i)
+            if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
+                unpack_boot(i)
+            if i == 'logo':
+                try:
+                    utils.LogoDumper(f"{work}/{i}.img", f'{work}/{i}').check_img(f"{work}/{i}.img")
+                except AssertionError:
+                    logging.exception('Bugs')
+                else:
+                    logo_dump(f"{work}/{i}.img", output_name=i)
+            if gettype(f"{work}/{i}.img") == 'vbmeta':
+                print(f"{lang.text85}AVB:{i}")
+                utils.Vbpatch(f"{work}/{i}.img").disavb()
+            file_type = gettype(f"{work}/{i}.img")
+            if file_type == "sparse":
+                print(lang.text79 + f"{i}.img[{file_type}]")
+                try:
+                    utils.simg2img(f"{work}/{i}.img")
+                except (Exception, BaseException) as e:
+                    logging.exception(e)
+                    win.message_pop(e)
+                    continue
+            if i not in parts.keys():
+                parts[i] = gettype(f"{work}/{i}.img")
+            print(lang.text79 + f"{i}.img[{file_type}]")
+            if gettype(f"{work}/{i}.img") == 'super':
+                parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
+                lpunpack.unpack(f"{work}/{i}.img", work)
+                for file_name in os.listdir(work):
+                    file_path = work + file_name
+                    if file_name.endswith('_a.img'):
+                        if os.path.exists(file_path) and os.path.exists(work + file_name.replace('_a', '')):
+                            if pathlib.Path(file_path).samefile(work + file_name.replace('_a', '')):
+                                os.remove(file_path)
+                            else:
+                                os.remove(work + file_name.replace('_a', ''))
+                                os.rename(file_path, work + file_name.replace('_a', ''))
+                        else:
+                            os.rename(file_path, work + file_name.replace('_a', ''))
+                    if file_name.endswith('_b.img'):
+                        if not os.path.getsize(file_path):
+                            os.remove(file_path)
+                json_.write(parts)
+                parts.clear()
+            if (file_type := gettype(f"{work}/{i}.img")) == "ext":
+                with open(f"{work}/{i}.img", 'rb+') as e:
+                    mount = ext4.Volume(e).get_mount_point
+                    if mount[:1] == '/':
+                        mount = mount[1:]
+                    if '/' in mount:
+                        mount = mount.split('/')
+                        mount = mount[len(mount) - 1]
+                    if mount != i and mount and i != 'mi_ext':
+                        parts[mount] = 'ext'
+                # libutils.ext4_extractor(f'{work}/config', f"/{mount}", project_manger.current_work_path() + i + ".img", f'{work}/{i}', 4096, 'e', False, i)
+                imgextractor.Extractor().main(project_manger.current_work_path() + f"{i}.img", f'{work}/{i}', work)
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except Exception as e:
+                        win.message_pop(lang.warn11.format(f"{i}.img:{e.__str__()}"))
+            if file_type == 'romfs':
+                fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
+                fs.extract(work)
+            if file_type in ['rkfw', 'rkaf']:
+                utils.call(['afptool', 'unpack', f"{project_manger.current_work_path()}/{i}.img", work])
+            if file_type == 'guoke_logo':
+                utils.GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'), f'{work}/{i}')
+            if file_type == 'splash':
+                if not os.path.exists(splash_out_dir := os.path.join(work, i)):
+                    os.makedirs(splash_out_dir, True)
+                process_splashimg(os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                                  f"{work}/{i}/splash.png")
+            if file_type == 'gpt':
+                reader = GPTReader(os.path.join(project_manger.current_work_path(), f'{i}.img'), sector_size=512)
+                for partition in reader.partition_table.valid_entries():
+                    print('guid/type={} first-block={} size={} name={}'.format(
+                        partition.partition_type, partition.first_block, partition.length, partition.name))
+                    if True:
+                        file_base_name = partition.name if partition.name else str(partition.partition_id)
+
+                        out_file = os.path.join(work, f'{file_base_name}.img')
+                        print(f'Writing partition to file {out_file}')
+
+                        with open(out_file, 'wb+') as fout:
+                            for block in reader.block_reader.blocks_in_range(partition.first_block, partition.length):
+                                fout.write(block)
+
+            if file_type == "erofs":
+                if utils.call(exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'), '-o',
+                                   work,
+                             '-x'],
+                              out=False) != 0:
+                    print('Unpack failed...')
+                    continue
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except (Exception, BaseException):
+                        win.message_pop(lang.warn11.format(i + ".img"))
+            if file_type == 'f2fs':
+                if utils.call(exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                             "-o", work],
+                              out=False) != 0:
+                    print('Unpack failed...')
+                    continue
+                if os.path.exists(f'{work}/{i}'):
+                    try:
+                        os.remove(f"{work}/{i}.img")
+                    except (Exception, BaseException):
+                        win.message_pop(lang.warn11.format(i + ".img"))
+            if file_type == 'amlogic':
+                aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
+            if file_type == 'unknown' and utils.is_empty_img(f"{work}/{i}.img"):
+                print(lang.text141)
+    if not os.path.exists(f"{work}/config"):
+        os.makedirs(f"{work}/config")
+    json_.write(parts)
+    parts.clear()
+    print(lang.text8)
+    return True
 
 class ProjectsPage(QWidget):
     def __init__(self, parent=None):
