@@ -1090,7 +1090,7 @@ class ProjectsPage(QWidget):
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
-                f2fs_read_only, f2fs_compresion, ext4_packer, scale) -> bool | None:
+                f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1167,8 +1167,7 @@ class ProjectsPage(QWidget):
                                 print("Packed successfully: {}!".format(dname))
 
                 else:
-                    ext4_size_value = self.custom_size.get(dname, 0)
-                    if self.ext4_method.get() == lang.t33 and not self.custom_size.get(dname, ''):
+                    if ext4_origin_size:
                         list_file = f"{work}/dynamic_partitions_op_list"
                         if os.path.exists(list_file):
                             with open(list_file, 'r', encoding='utf-8') as t:
@@ -1264,7 +1263,8 @@ class ProjectsPage(QWidget):
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
                                                         dialog.pack_method_combo.currentText(),
-                                                        dialog.brotli_slider.value()
+                                                        dialog.brotli_slider.value() ,
+                                                        dialog.size_handle_combo.currentText() == "手动固定",
                                                         )
             else:
                 return

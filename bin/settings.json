@@ -4,10 +4,12 @@
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Native",
+        "currentProjectName": "lineage-23.2-20260506-UNOFFICIAL-stone",
         "Language": "korean",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
         "selinuxPatch": false,
+        "updateURL": "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest",
         "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
     },
     "QFluentWidgets": {
