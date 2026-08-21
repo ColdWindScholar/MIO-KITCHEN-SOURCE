@@ -8,6 +8,8 @@ import time
 
 import gzip
 import zipfile
+
+import tarsafe
 from src.core.unpac import MODE as PACMODE, unpac
 from shutil import rmtree, copy, move
 
@@ -342,7 +344,7 @@ class ProjectsPage(QWidget):
             print(lang.text79 + ifile)
             current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
-                re_folder(project_manger.current_work_path())
+                utils.re_folder(project_manger.current_work_path())
             with tarsafe.TarSafe(ifile) as f:
                 f.extractall(project_manger.current_work_path())
             return
@@ -350,7 +352,7 @@ class ProjectsPage(QWidget):
         if ftype == 'kdz':
             current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
-                re_folder(project_manger.current_work_path())
+                utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
             for i in os.listdir(project_manger.current_work_path()):
                 file = project_manger.current_work_path() + os.sep + i
