@@ -38,7 +38,6 @@ from shutil import rmtree
 from subprocess import Popen
 from threading import Thread
 
-from qt_layer.settings import cfg
 from src.core import blockimgdiff
 from src.core import sparse_img
 from src.core import update_metadata_pb2 as um
@@ -798,7 +797,8 @@ def generate_bug_report():
         Uname: {platform.uname()}
         ----Settings-------
         """)
-        [f.write(f'\t{i}={getattr(cfg, i) if not hasattr(i, "value") else i.value()}\n') for i in dir(cfg)]
+        with open(os.path.join(prog_path, 'bin', "settings.json"), 'r', encoding='utf-8') as f2:
+            f.write(f2.read())
     pack_zip(inner, bugreport := os.path.join(output,
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"))
     re_folder(inner)

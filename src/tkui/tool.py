@@ -4296,7 +4296,7 @@ def unpackrom(ifile: str) -> None:
 
 
 
-
+from src.qt_layer.projects import ProjectManager
 project_manger = ProjectManager()
 
 
