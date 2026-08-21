@@ -1075,7 +1075,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
-    def packrom(self, chosen_parts, format, patch_vbmeta) -> bool | None:
+    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1109,7 +1109,7 @@ class ProjectsPage(QWidget):
                         rules.write(new_rules | rules.read())
 
                     utils.remove_duplicate(contexts_file)
-                if self.fs_conver.get():
+                if fs_conver:
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
@@ -1236,7 +1236,9 @@ class ProjectsPage(QWidget):
                 self.my_task_worker = GenericTaskWorker(self.packrom,
                                                         pack_list,
                                                         dialog.format_combo.currentText(),
-                                                        dialog.sw_vbmeta.isChecked(),)
+                                                        dialog.sw_vbmeta.isChecked(),
+                                                        dialog.sw_convert.isChecked(),
+                                                        )
             else:
                 return
 
