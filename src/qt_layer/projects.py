@@ -364,17 +364,17 @@ class ProjectsPage(QWidget):
             return
         # ofp
         if os.path.splitext(ifile)[1] == '.ofp':
-            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             if ask_win(lang.t12) == 1:
                 ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
             else:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
                 script2fs(project_manger.current_work_path())
-            unpackg.refs(True)
+            self.refresh_projects()
             return
         # ops
         if os.path.splitext(ifile)[1] == '.ops':
-            current_project_name.set(os.path.basename(ifile).split('.')[0])
+            cfg.set(cfg.currentProjectName,os.path.basename(ifile).split('.')[0])
             args = {'decrypt': True,
                     "<filename>": ifile,
                     'outdir': os.path.join(cfg.workingFolder.value, project_manger.current_work_path())}
