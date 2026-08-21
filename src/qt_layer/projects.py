@@ -307,13 +307,9 @@ class ProjectsPage(QWidget):
 
     def _toggle_select_all_partitions(self, state):
         """Toggles check state of all visible rows based on the Select All checkbox."""
-        # Determine the target check state based on the checkbox state
-        # state == Qt.Checked (2) means checked, otherwise unchecked
-        target_state = Qt.Checked if state == Qt.Checked else Qt.Unchecked
+        target_state = Qt.CheckState.Checked if state == Qt.CheckState.Checked.value else Qt.CheckState.Unchecked
 
-        # Loop through every row in the table
         for row_idx in range(self.partition_table.rowCount()):
-            # Smart Check: Only touch rows that are NOT hidden by the search filter
             if not self.partition_table.isRowHidden(row_idx):
                 name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
                 if name_item is not None:
