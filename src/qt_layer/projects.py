@@ -998,7 +998,7 @@ class ProjectsPage(QWidget):
         ret = call(
             ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
              f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
-             f'{work_output}/{name}_new.img'], out=not os.name == 'posix')
+             f'{work_output}/{name}_new.img'])
         if ret != 0:
             os.remove(f'{work}/{name}_new.img')
             print(f"packing {name} failed [e2fsdroid]")
