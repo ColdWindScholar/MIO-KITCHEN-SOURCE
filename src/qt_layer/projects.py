@@ -331,7 +331,7 @@ class ProjectsPage(QWidget):
             if not os.path.exists(decrypted):
                 print(f"{ifile} decrypt Fail!!!")
                 return
-            unpackrom(decrypted)
+            self.unpackrom(decrypted)
             try:
                 os.remove(decrypted)
             except:
@@ -435,7 +435,7 @@ class ProjectsPage(QWidget):
         if ftype != 'unknown':
             file_name: str = os.path.basename(ifile)
             project_folder = os.path.join(settings.path, os.path.splitext(file_name)[0])
-            folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + v_code()) if os.path.exists(
+            folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
                 current_project_name.set(os.path.basename(folder))
@@ -468,7 +468,7 @@ class ProjectsPage(QWidget):
             print('No Such Folder.')
             return 1
         if os.path.isfile(dir_path):
-            return unpackrom(dir_path)
+            return self.unpackrom(dir_path)
         if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name),
                                                                                    os.path.abspath(dir_path)):
             print("Same File!")
