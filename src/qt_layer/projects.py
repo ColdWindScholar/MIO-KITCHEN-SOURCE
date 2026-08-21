@@ -1177,7 +1177,7 @@ class ProjectsPage(QWidget):
                     if ext4_packer == "make_ext4fs":
                         exit_code = self.make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
-                                                sparse=self.format.get() in ["dat", "br", "sparse"],
+                                                sparse=format in ["dat", "br", "sparse"],
                                                 size=ext4_size_value,
                                                 UTC=UTC, has_contexts=os.path.exists(contexts_file))
 
