@@ -960,16 +960,16 @@ class ProjectsPage(QWidget):
                  name,
                  '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output}/{name}_new.img',
                  f'{int(size)}']) != 0:
-            rmdir(f'{work_output}/{name}_new.img')
-            print(lang.text75 % name)
+            os.remove(f'{work_output}/{name}_new.img')
+            print(f"packing {name} failed [mke2fs]")
             return 1
         ret = call(
             ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
              f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
              f'{work_output}/{name}_new.img'], out=not os.name == 'posix')
         if ret != 0:
-            rmdir(f'{work}/{name}_new.img')
-            print(lang.text75 % name)
+            os.remove(f'{work}/{name}_new.img')
+            print(f"packing {name} failed [e2fsdroid]")
             return 1
         if sparse:
             call(['img2simg', f'{work_output}/{name}_new.img', f'{work_output}/{name}.img'])
