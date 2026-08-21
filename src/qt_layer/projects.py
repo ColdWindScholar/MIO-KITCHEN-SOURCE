@@ -136,7 +136,7 @@ class ProjectsPage(QWidget):
         if projects:
             self.project_combo.setCurrentIndex(0)
             return
-        cfg.set(cfg.currentProjectName, '')
+        cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
     def show_create_dialog(self):
         """显示创建项目对话框"""
@@ -152,6 +152,10 @@ class ProjectsPage(QWidget):
 
     def show_rename_dialog(self):
         """显示创建项目对话框"""
+        project_name = cfg.currentProjectName.value
+        if not project_name or not self.project_combo.currentText():
+            show_info_bar(self, "提示", "请先选择一个项目", bar_type=2)
+            return
         dialog = NewProjectDialog(
             title="重命名项目",
             existing_projects=list(project_manger.get_projects()),
