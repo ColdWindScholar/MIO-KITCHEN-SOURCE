@@ -584,7 +584,7 @@ class UninstallMpk(MessageBoxBase):
 
         # 2. Update Button Text Dynamically (Uninstallation in progress)
         if self.uninstall_b:
-            self.uninstall_b.setText(lang.text29.format(show_name if show_name else name))
+            self.uninstall_b.setText(lang.text29.format(show_name or name))
             # Replaces self.update_idletasks() to instantly force visual updates to screen
             QApplication.processEvents()
 
