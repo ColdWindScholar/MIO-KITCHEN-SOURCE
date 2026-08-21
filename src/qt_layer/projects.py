@@ -197,6 +197,7 @@ class ProjectsPage(QWidget):
         self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
+        self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
         self.unpack_rb = RadioButton("解包", container)
         self.pack_rb = RadioButton("打包", container)
         self.unpack_rb.clicked.connect(self.refresh_unpack)
@@ -237,12 +238,11 @@ class ProjectsPage(QWidget):
         self.scroll_layout.addWidget(container)
 
     def refresh_unpack(self):
-        self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
+        self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
     def refresh_unpack_list(self):
         """The actual logic for refreshing the unpack list, runs in a separate thread."""
         data = []
-        self.partition_table.clear()
         work = project_manger.current_work_path()
         if not project_manger.exist():
             return data
