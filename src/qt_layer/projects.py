@@ -224,10 +224,9 @@ class ProjectsPage(QWidget):
         self.zip_btn = PushButton("打包ZIP", container, FIF.APPLICATION)
         self.super_btn = PushButton("打包Super", container, FIF.ALBUM)
         self.format_conv_btn = PushButton("格式转换", container, FIF.EMBED)
-        self.plugin_btn = PushButton("插件管理", container, FIF.APPLICATION)
         self.apk_mgr_btn = PushButton("APK 助手", container, FIF.DEVELOPER_TOOLS)
 
-        for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.plugin_btn, self.apk_mgr_btn]:
+        for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.apk_mgr_btn]:
             btn.setMinimumWidth(105)
             tools_layout.addWidget(btn)
 
