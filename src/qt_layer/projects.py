@@ -135,11 +135,9 @@ class ProjectsPage(QWidget):
         self.project_combo.addItems(projects)
         if projects:
             self.project_combo.setCurrentIndex(0)
-        else:
-            cfg.set(
-                cfg.currentProjectName, ''
-            )
-            cfg.save()
+            return
+        cfg.set(cfg.currentProjectName, '')
+        cfg.save()
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
