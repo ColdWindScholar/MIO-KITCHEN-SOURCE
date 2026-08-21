@@ -871,15 +871,6 @@ class ModuleManager:
                     pass
             return module_error_codes.GenericError, f"Extraction error: {e_extract}"
 
-        if callable(list_pls_plugin):
-            list_pls_plugin()
-
-        if hasattr(states, 'active_mpk_store_instance') and \
-                states.active_mpk_store_instance and \
-                states.active_mpk_store_instance.winfo_exists():
-            logging.debug(
-                f"ModuleManager.install: MpkStore is open. Calling update_plugin_state for installed plugin_id: '{install_id}'")
-            states.active_mpk_store_instance.update_plugin_state(install_id)
 
         logging.info(f"ModuleManager.install: Successfully installed plugin '{install_id}' to '{install_target_path}'.")
         return module_error_codes.Normal, ""
