@@ -1075,7 +1075,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
-    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver) -> bool | None:
+    def packrom(self, chosen_parts, format, patch_vbmeta, fs_conver, origin_fs, modify_fs) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1110,8 +1110,8 @@ class ProjectsPage(QWidget):
 
                     utils.remove_duplicate(contexts_file)
                 if fs_conver:
-                    if parts_dict[dname] == self.origin_fs.get():
-                        parts_dict[dname] = self.modify_fs.get()
+                    if parts_dict[dname] == origin_fs:
+                        parts_dict[dname] = modify_fs
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
@@ -1238,6 +1238,8 @@ class ProjectsPage(QWidget):
                                                         dialog.format_combo.currentText(),
                                                         dialog.sw_vbmeta.isChecked(),
                                                         dialog.sw_convert.isChecked(),
+                                                        dialog.src_fs_combo.currentText(),
+                                                        dialog.dest_fs_combo.currentText(),
                                                         )
             else:
                 return
