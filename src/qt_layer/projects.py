@@ -288,6 +288,7 @@ class ProjectsPage(QWidget):
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                    'update.app'])
+        self.format_combo.currentTextChanged.connect(self.refresh_unpack)
         self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
         self.unpack_rb = RadioButton("解包", container)
         self.pack_rb = RadioButton("打包", container)
