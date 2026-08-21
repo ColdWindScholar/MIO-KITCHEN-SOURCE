@@ -192,7 +192,7 @@ class ProjectsPage(QWidget):
         self.select_all_cb = CheckBox("全选所有", container)
         self.filter_input = SearchLineEdit(container)
         self.filter_input.setPlaceholderText("根据名称快速检索...")
-        self.filter_input.setFixedWidth(240)
+        self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
         self.unpack_rb = RadioButton("解包", container)
