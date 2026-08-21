@@ -27,6 +27,7 @@ import tarfile
 import tempfile
 import time
 import traceback
+import zipfile
 from difflib import SequenceMatcher
 from enum import IntEnum
 from lzma import LZMADecompressor
@@ -37,6 +38,7 @@ from shutil import rmtree
 from subprocess import Popen
 from threading import Thread
 
+from qt_layer.settings import cfg
 from src.core import blockimgdiff
 from src.core import sparse_img
 from src.core import update_metadata_pb2 as um
@@ -759,6 +761,21 @@ class GetFolderSize:
                                  f"# Grow partition {part_name}_a from 0 to {size}", content)
                 ff.write(content)
 
+
+def pack_zip(input_dir: str, output_zip: str):
+
+    with zipfile.ZipFile(output_zip, 'w',
+                         compression=zipfile.ZIP_DEFLATED) as zip_:
+        for file in get_all_file_paths(input_dir):
+            file = str(file)
+            arch_name = file.replace(input_dir, '')
+
+            try:
+                zip_.write(file, arcname=arch_name)
+            except Exception as e:
+                print(lang.text2.format(file, e))
+    if os.path.exists(output_zip):
+        print(lang.text3.format(output_zip))
 def generate_bug_report():
     output = prog_path
     output = str(output)
@@ -781,10 +798,9 @@ def generate_bug_report():
         Uname: {platform.uname()}
         ----Settings-------
         """)
-        [f.write(f'\t{i}={getattr(settings, i) if not hasattr(i, "get") else i.get()}\n') for i in dir(settings)]
+        [f.write(f'\t{i}={getattr(cfg, i) if not hasattr(i, "value") else i.value()}\n') for i in dir(cfg)]
     pack_zip(inner, bugreport := os.path.join(output,
-                                              f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"),
-             silent=True)
+                                              f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"))
     re_folder(inner)
     print(f"\tThe Bug Report Was Saved:{bugreport}")
 class LogoDumper:
