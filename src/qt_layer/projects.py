@@ -1029,7 +1029,7 @@ class ProjectsPage(QWidget):
                     else:
                         if self.remove_source_files.get() == 1:
                             self.rdi(work, dname)
-                        print(lang.text3.format(dname))
+                        print("Packed successfully:{}".format(dname))
                         if format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
                             if format == 'dat':
@@ -1039,7 +1039,7 @@ class ProjectsPage(QWidget):
                                 self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
-                                print(lang.text3.format(dname))
+                                print("Packed successfully: {}!".format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
                                  UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(),
@@ -1048,7 +1048,7 @@ class ProjectsPage(QWidget):
                     else:
                         if self.remove_source_files.get() == 1:
                             self.rdi(work, dname)
-                        print(lang.text3.format(dname))
+                        print("Packed successfully: {}!".format(dname))
                         if format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
                             if format == 'dat':
@@ -1058,7 +1058,7 @@ class ProjectsPage(QWidget):
                                 self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
-                                print(lang.text3.format(dname))
+                                print("Packed successfully: {}!".format(dname))
 
                 else:
                     ext4_size_value = self.custom_size.get(dname, 0)
