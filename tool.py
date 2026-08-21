@@ -13,33 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import sys
-
 sys_stdout = sys.stdout
 sys_stderr = sys.stderr
-
-
 class DevNull(object):
     def write(self, s):
         pass
-
     def flush(self):
         pass
-
-
 if not sys.stdout:
     sys.stdout = DevNull()
 import time
-
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8:
         input(
             f"Not supported: [{sys.version}] yet\nEnter to quit\nSorry for any inconvenience caused")
         sys.exit(1)
 try:
-    from src.tkui.tool import *
+    from src.qt_layer.tool import *
 except Exception as e:
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
+    raise e
     print(e)
     print("Sorry! We cannot init the tool.\nPlease report this error to developers.!")
     time.sleep(3)
