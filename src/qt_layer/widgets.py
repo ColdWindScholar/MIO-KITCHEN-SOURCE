@@ -61,7 +61,7 @@ def show_info_bar(parent, title, content, bar_type: int = 3, duration=3000):
                 parent=parent
             )
 
-class InputDialog(MessageBoxBase):
+class NewProjectDialog(MessageBoxBase):
     """自定义对话框，用于创建或重命名项目"""
     def __init__(self, title, existing_projects, initial_text="", parent=None):
         super().__init__(parent)
@@ -117,6 +117,54 @@ class InputDialog(MessageBoxBase):
         self.errorLabel.hide()
         return True
 
+class InputDialog(MessageBoxBase):
+    """自定义对话框，用于创建或重命名项目"""
+    def __init__(self, title, initial_text="", parent=None):
+        super().__init__(parent)
+
+        self.titleLabel = SubtitleLabel(title, self)
+        self.nameLineEdit = LineEdit(self)
+        self.nameLineEdit.setPlaceholderText('输入')
+        self.nameLineEdit.setClearButtonEnabled(True)
+        self.nameLineEdit.setText(initial_text)
+
+        self.errorLabel = CaptionLabel(text="无效")
+        self.errorLabel.setTextColor("#cf1010", QColor(255, 28, 32))
+
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.nameLineEdit)
+        self.viewLayout.addWidget(self.errorLabel)
+        self.errorLabel.hide()
+
+        self.widget.setMinimumWidth(350)
+        self.buttonLayout.addWidget(self.yesButton)
+        self.buttonLayout.addWidget(self.cancelButton)
+
+        self.yesButton.clicked.connect(self.__onYesButtonClicked)
+        self.cancelButton.clicked.connect(self.reject)
+        self.nameLineEdit.returnPressed.connect(self.yesButton.click)
+
+    def __onYesButtonClicked(self):
+        if self.validate():
+            self.accept()
+        else:
+            self.yesButton.setEnabled(True)
+
+    def validate(self):
+        project_name = self.nameLineEdit.text().strip()
+        if not project_name:
+            self.errorLabel.setText("不能为空")
+            self.errorLabel.show()
+            return False
+
+        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
+        if any(char in project_name for char in invalid_chars):
+            self.errorLabel.setText("包含非法字符")
+            self.errorLabel.show()
+            return False
+
+        self.errorLabel.hide()
+        return True
 #         if dialog.exec():
 #             project_name = dialog.nameLineEdit.text().strip()
 #             self.create_project(project_name)
