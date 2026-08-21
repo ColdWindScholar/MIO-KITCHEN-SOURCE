@@ -321,13 +321,13 @@ class ProjectsPage(QWidget):
             old_project_name = os.path.splitext(os.path.basename(ifile))[0]
             self.unpackrom(output_file_)
             if old_project_name != (new_project_name := cfg.currentProjectName.value):
-                current_project_name.set(old_project_name)
-                project_menu.remove()
-            current_project_name.set(new_project_name)
+                project_manger.remove(old_project_name)
+                self.refresh_projects()
+            cfg.set(cfg.customProjectName, new_project_name)
             return
         # ozip
         if ftype == "ozip":
-            print(lang.text78 + ifile)
+            print("Decrypting" + ifile)
             ozipdecrypt.main(ifile)
             decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
             if not os.path.exists(decrypted):
