@@ -1192,12 +1192,12 @@ class ProjectsPage(QWidget):
                         print("Failed to pack %s!" % dname)
                         continue
 
-                    if self.remove_source_files.get() == 1:
+                    if remove_source_files:
                         self.rdi(work, dname)
-                    if self.format.get() == "dat":
+                    if format == "dat":
                         self.datbr(project_manger.current_work_output_path(), dname, "dat",
                               int(parts_dict.get('dat_ver', '4')))
-                    elif self.format.get() == "br":
+                    elif format == "br":
                         self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                               int(parts_dict.get('dat_ver', '4')))
                     else:
