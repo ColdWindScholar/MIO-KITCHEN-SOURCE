@@ -1114,7 +1114,7 @@ class ProjectsPage(QWidget):
                         parts_dict[dname] = modify_fs
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
-                               work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
+                               work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print("Failed to repack %s [erofs]" % dname)
                     else:
