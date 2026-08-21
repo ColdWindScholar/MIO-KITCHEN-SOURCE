@@ -128,7 +128,12 @@ class ProjectsPage(QWidget):
             padding-bottom: 4px;
         """)
         return title
-
+    def refresh_projects(self):
+        self.project_combo.clear()
+        projects = project_manger.get_projects()
+        self.project_combo.addItems(projects)
+        if projects:
+            self.project_combo.setCurrentIndex(0)
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
@@ -139,6 +144,7 @@ class ProjectsPage(QWidget):
         if dialog.exec():
             project_name = dialog.nameLineEdit.text().strip()
             project_manger.new(project_name)
+            self.refresh_projects()
 
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
@@ -164,6 +170,7 @@ class ProjectsPage(QWidget):
         self.new_btn = PushButton("新建", container, FIF.ADD)
         self.new_btn.clicked.connect(self.show_create_dialog)
         self.refresh_btn = PushButton("刷新", container, FIF.SYNC)
+        self.refresh_btn.clicked.connect(self.refresh_projects)
         self.rename_btn = PushButton("重命名", container, FIF.EDIT)
         self.delete_btn = PushButton("删除", container, FIF.DELETE)
 
