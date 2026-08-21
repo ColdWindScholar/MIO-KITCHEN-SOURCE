@@ -1521,7 +1521,6 @@ tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code
 context_rule_file = os.path.join(cwd_path, 'bin', "context_rules.json")
 from src.core.utils import states, call
 
-module_exec = os.path.join(cwd_path, 'bin', "exec.sh").replace(os.sep, '/')
 
 
 def check_upgrade() -> bool:

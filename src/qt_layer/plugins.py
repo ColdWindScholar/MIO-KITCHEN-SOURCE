@@ -20,6 +20,8 @@ from qt_layer.settings import cfg
 from src.core import imp
 from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang, move_center
 from src.qt_layer.widgets import show_info_bar
+module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
+
 module_error_codes = ModuleErrorCodes
 class New(Toplevel):
 
