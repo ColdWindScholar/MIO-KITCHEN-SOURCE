@@ -10,7 +10,7 @@ from typing import Any
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
-    FluentIcon
+    FluentIcon, ScrollArea, SearchLineEdit, TitleLabel
 
 import utils
 from addon_register import loader, Entry
@@ -443,31 +443,106 @@ class AppCard(CardWidget):
 
         self.moreButton.setFixedSize(32, 32)
 
+
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("PluginPage")
+        self.cards_data = []  # Track card mappings for easy filtering
         self.initUI()
 
     def initUI(self):
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(40, 40, 40, 40)
-        main_layout.setSpacing(24)
+        # 1. Main outer layout
+        outer_layout = QVBoxLayout(self)
+        outer_layout.setContentsMargins(40, 40, 40, 40)
+        outer_layout.setSpacing(20)
+
+        # 2. Header Layout (Title and Description)
+        header_layout = QHBoxLayout()
+        text_header_layout = QVBoxLayout()
+        text_header_layout.setSpacing(4)
+
+        title = TitleLabel("插件", self)
+        description = CaptionLabel("单击右键以显示菜单，或在此启动您的功能模块", self)
+
+        text_header_layout.addWidget(title)
+        text_header_layout.addWidget(description)
+        header_layout.addLayout(text_header_layout)
+        header_layout.addStretch()
+
+        outer_layout.addLayout(header_layout)
+
+        # 3. Search Bar Integration
+        self.search_bar = SearchLineEdit(self)
+        self.search_bar.setPlaceholderText("搜索已安装的插件...")
+        self.search_bar.setClearButtonEnabled(True)
+        self.search_bar.textChanged.connect(self.filter_plugins)
+        outer_layout.addWidget(self.search_bar)
+
+        # 4. Scrollable Container for Cards
+        # Using QFluentWidgets' ScrollArea for seamless native scrolling look
+        self.scroll_area = ScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(ScrollArea.Shape.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        # Inner canvas widget holding the vertical stacked cards
+        self.scroll_content = QWidget()
+        self.scroll_content.setObjectName("ScrollContent")
+        self.cards_layout = QVBoxLayout(self.scroll_content)
+        self.cards_layout.setContentsMargins(0, 0, 10, 0)
+        self.cards_layout.setSpacing(12)
+        self.cards_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        # 5. Populate Plugin Cards dynamically
+        self.load_plugin_cards()
+
+        self.scroll_area.setWidget(self.scroll_content)
+        outer_layout.addWidget(self.scroll_area)
+
+    def load_plugin_cards(self):
+        # Clear out existing layout elements if re-loading
+        self.cards_data.clear()
+
         for i in module_manager.list_packages():
             plugin = module_manager.get_info(i)
             plugin_icon = os.path.join(module_manager.module_dir, i, 'icon')
             if not os.path.exists(plugin_icon):
                 plugin_icon = FluentIcon.APPLICATION
+
+            plugin_title = plugin.get("name", i)
+            plugin_author = plugin.get("author", "未知作者")
+
             card = AppCard(
                 icon=plugin_icon,
-                title=plugin["name"],
-                content=plugin['author']
+                title=plugin_title,
+                content=plugin_author
             )
-            exec_event = lambda plugin_id=i: self.exec_plugin(plugin_id)
+
+            # Setup execution bindings (Safe against the signal boolean emission)
             card.openButton.clicked.connect(lambda state, plugin_id=i: self.exec_plugin(plugin_id))
-            card.clicked.connect(exec_event)
-            main_layout.addWidget(card)
-        self.setLayout(main_layout)
+            card.clicked.connect(lambda plugin_id=i: self.exec_plugin(plugin_id))
+
+            self.cards_layout.addWidget(card)
+
+            # Store structural references for fast runtime filtering queries
+            self.cards_data.append({
+                "card_widget": card,
+                "title": plugin_title.lower(),
+                "author": plugin_author.lower()
+            })
+
+    def filter_plugins(self, text):
+        """
+        Dynamically filters plugin rows based on title or author lookups
+        """
+        query = text.strip().lower()
+        for data in self.cards_data:
+            if query in data["title"] or query in data["author"]:
+                data["card_widget"].show()
+            else:
+                data["card_widget"].hide()
 
     def exec_plugin(self, plugin_id):
         print("exec", plugin_id)
+        # module_manager.run(id_=plugin_id)
