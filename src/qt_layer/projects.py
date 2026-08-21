@@ -81,127 +81,155 @@ class ProjectsPage(QWidget):
         self.initUI()
 
     def initUI(self):
-        # 1. Main Layout & Scroll Area Setup
+        # Base setup with seamless background color
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
+        self.setStyleSheet("background-color: #1e1e1e; color: #e0e0e0;")
 
-        self.setStyleSheet("background-color: #202020;")
-
+        # Custom high-performance scroll wrapper
         scroll_area = ScrollArea(self)
         scroll_area.setWidgetResizable(True)
         main_layout.addWidget(scroll_area)
 
         scroll_content = QWidget()
         self.scroll_layout = QVBoxLayout(scroll_content)
-        self.scroll_layout.setContentsMargins(20, 20, 20, 20)
-        self.scroll_layout.setSpacing(15)
+        self.scroll_layout.setContentsMargins(24, 24, 24, 24)
+        self.scroll_layout.setSpacing(20)  # Generous modern breathing space
         scroll_area.setWidget(scroll_content)
 
-        # 2. Build Sections Modularly
-        self._build_project_section(scroll_content)
-        self._build_partition_section(scroll_content)
-        self._build_other_section(scroll_content)
+        # Build clean visual card modules
+        self._build_project_card(scroll_content)
+        self._build_partition_card(scroll_content)
+        self._build_tools_card(scroll_content)
 
-        # Push everything to the top
+        # Push elements upward cleanly
         self.scroll_layout.addStretch(1)
 
-    def _build_project_section(self, parent_widget):
-        """Creates the '项目' (Project) management section."""
+    def _build_project_card(self, parent_widget):
         card = SimpleCardWidget(parent_widget)
         layout = QVBoxLayout(card)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
-        layout.addWidget(BodyLabel("项目", card))
+        # Clean Typography Header
+        header = BodyLabel("项目管理 / Projects", card)
+        header.setStyleSheet("font-weight: bold; color: #ffffff;")
+        layout.addWidget(header)
 
-        # Row 1: Combo and Open
-        row1 = QHBoxLayout()
+        # Core Action Row (Integrated Form Design)
+        action_row = QHBoxLayout()
         self.project_combo = ComboBox(card)
-        self.project_combo.setPlaceholderText("选择项目...")
-        self.open_btn = PushButton("打开", card)
-        row1.addWidget(self.project_combo, 1)
-        row1.addWidget(self.open_btn)
-        layout.addLayout(row1)
+        self.project_combo.setPlaceholderText("请选择或输入目标项目...")
+        self.open_btn = PushButton("打开项目", card)
+        self.open_btn.setStyleSheet("background-color: #0078d4; color: white;")  # Tech blue accent
 
-        # Row 2: Action Buttons
-        row2 = QHBoxLayout()
-        self.refresh_btn = PushButton("刷新", card)
+        action_row.addWidget(self.project_combo, 1)
+        action_row.addWidget(self.open_btn)
+        layout.addLayout(action_row)
+
+        # Clean Grid-Aligned Operations Bar
+        mgmt_row = QHBoxLayout()
         self.new_btn = PushButton("新建", card)
-        self.delete_btn = PushButton("删除", card)
+        self.refresh_btn = PushButton("刷新", card)
         self.rename_btn = PushButton("重命名", card)
+        self.delete_btn = PushButton("删除", card)
 
-        for btn in [self.refresh_btn, self.new_btn, self.delete_btn, self.rename_btn]:
-            row2.addWidget(btn)
-        layout.addLayout(row2)
+        # Style destructive action subtly
+        self.delete_btn.setStyleSheet("color: #ff4d4f;")
+
+        for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
+            btn.setFixedWidth(85)
+            mgmt_row.addWidget(btn)
+        mgmt_row.addStretch(1)
+        layout.addLayout(mgmt_row)
 
         self.scroll_layout.addWidget(card)
         self.cards_data.append({"name": "project", "widget": card})
 
-    def _build_partition_section(self, parent_widget):
-        """Creates the '分区列表' (Partition List) operational section."""
+    def _build_partition_card(self, parent_widget):
         card = SimpleCardWidget(parent_widget)
         layout = QVBoxLayout(card)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(14)
 
-        layout.addWidget(BodyLabel("分区列表", card))
+        header = BodyLabel("分区控制 / Partitions", card)
+        header.setStyleSheet("font-weight: bold; color: #ffffff;")
+        layout.addWidget(header)
 
+        # Main List Widget with modern clean spacing styles
         self.partition_list = QListWidget(card)
-        self.partition_list.setFixedHeight(150)
+        self.partition_list.setFixedHeight(160)
+        self.partition_list.setStyleSheet("border: 1px solid #333333; background: #252526; border-radius: 4px;")
         layout.addWidget(self.partition_list)
 
-        # Row 1: Selection and Filtering
-        row1 = QHBoxLayout()
-        self.select_all_cb = CheckBox("全选", card)
+        # Structured configuration panel utilizing modern layout pairs
+        config_form = QHBoxLayout()
+
+        self.select_all_cb = CheckBox("全选所有", card)
         self.filter_combo = ComboBox(card)
-        row1.addWidget(self.select_all_cb)
-        row1.addWidget(self.filter_combo, 1)
-        layout.addLayout(row1)
+        self.filter_combo.setPlaceholderText("过滤规则...")
+        self.filter_combo.setFixedWidth(150)
 
-        # Row 2: Mode Radio Buttons
-        row2 = QHBoxLayout()
-        self.unpack_rb = RadioButton("解包", card)
-        self.pack_rb = RadioButton("打包", card)
+        config_form.addWidget(self.select_all_cb)
+        config_form.addSpacing(20)
+        config_form.addWidget(self.filter_combo)
+        config_form.addStretch(1)
+        layout.addLayout(config_form)
+
+        # Process Block: Actions + Output Format Selection
+        process_row = QHBoxLayout()
+
+        # Operational Mode Switches Toggle Group
+        mode_layout = QHBoxLayout()
+        self.unpack_rb = RadioButton("核心解包", card)
+        self.pack_rb = RadioButton("智能打包", card)
         self.unpack_rb.setChecked(True)
-        row2.addWidget(self.unpack_rb)
-        row2.addWidget(self.pack_rb)
-        row2.addStretch(1)
-        layout.addLayout(row2)
+        mode_layout.addWidget(self.unpack_rb)
+        mode_layout.addWidget(self.pack_rb)
+        process_row.addLayout(mode_layout)
+        process_row.addSpacing(40)
 
-        # Row 3: Format and Execution
-        row3 = QHBoxLayout()
+        # Target Extension selection config
         self.format_combo = ComboBox(card)
-        for i in ['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
-                                   'update.app']:
-            self.format_combo.addItem(i)
-        self.execute_btn = PushButton("执行", card)
-        row3.addWidget(self.format_combo, 1)
-        row3.addWidget(self.execute_btn)
-        layout.addLayout(row3)
+        self.format_combo.addItem("new.dat.br")
+        self.format_combo.setFixedWidth(130)
+
+        self.execute_btn = PushButton("开始执行", card)
+        self.execute_btn.setFixedWidth(100)
+        self.execute_btn.setStyleSheet(
+            "background-color: #25855a; color: white; font-weight: bold;")  # Cyber green success color
+
+        process_row.addWidget(self.format_combo)
+        process_row.addWidget(self.execute_btn)
+        layout.addLayout(process_row)
 
         self.scroll_layout.addWidget(card)
         self.cards_data.append({"name": "partition", "widget": card})
 
-    def _build_other_section(self, parent_widget):
-        """Creates the '其他' (Other) tools section."""
+    def _build_tools_card(self, parent_widget):
         card = SimpleCardWidget(parent_widget)
         layout = QVBoxLayout(card)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
-        layout.addWidget(BodyLabel("其他", card))
+        header = BodyLabel("扩展工具箱", card)
+        header.setStyleSheet("font-weight: bold; color: #ffffff;")
+        layout.addWidget(header)
 
-        # Row 1: Main Tools
-        row1 = QHBoxLayout()
-        self.zip_btn = PushButton("打包ZIP", card)
-        self.super_btn = PushButton("打包Super", card)
-        self.plugin_btn = PushButton("插件", card)
+        # Wrap everything inside a unified responsive wrapping system
+        tools_grid = QHBoxLayout()
+
+        self.zip_btn = PushButton("打包 ZIP", card)
+        self.super_btn = PushButton("打包 Super", card)
         self.format_conv_btn = PushButton("格式转换", card)
+        self.apk_mgr_btn = PushButton("Apk 管理器", card)
 
-        for btn in [self.zip_btn, self.super_btn, self.plugin_btn, self.format_conv_btn]:
-            row1.addWidget(btn)
-        layout.addLayout(row1)
+        for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.apk_mgr_btn]:
+            btn.setMinimumWidth(100)
+            tools_grid.addWidget(btn)
 
-        # Row 2: Secondary Tools
-        row2 = QHBoxLayout()
-        self.apk_mgr_btn = PushButton("Apk管理器", card)
-        row2.addWidget(self.apk_mgr_btn)
-        row2.addStretch(1)
-        layout.addLayout(row2)
+        tools_grid.addStretch(1)
+        layout.addLayout(tools_grid)
 
         self.scroll_layout.addWidget(card)
         self.cards_data.append({"name": "other", "widget": card})
