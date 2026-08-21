@@ -1,3 +1,4 @@
+import gzip
 import logging
 import os
 import pathlib
@@ -5,15 +6,17 @@ import shutil
 import subprocess
 import sys
 import time
-
-import gzip
 import zipfile
+from shutil import copy
 
 import extra
 import tarsafe
-from src.core.unpac import MODE as PACMODE, unpac
-from shutil import rmtree, copy, move
+from src.core.unpac import MODE as PACMODE
 
+try:
+    from cpb_file import extract as extract_cpb
+except ModuleNotFoundError:
+    pass
 import mkdtboimg
 import ofp_mtk_decrypt
 import ofp_qc_decrypt
@@ -28,14 +31,14 @@ from unpac import unpac
 if os.name == 'nt':
     from ctypes import windll
 from shutil import rmtree
-from src.core.cpio import extract as cpio_extract, repack as cpio_repack
-from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repack
+from src.core.cpio import extract as cpio_extract
+from src.core.rsceutil import unpack as rsceutil_unpack
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QListWidgetItem, QTableWidgetItem, QLabel, \
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
-from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget, MessageBox
+from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
+    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox
 
 import ext4
 import imgextractor
