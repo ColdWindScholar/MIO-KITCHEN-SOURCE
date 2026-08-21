@@ -609,7 +609,7 @@ class ModuleManager:
         for i in self.list_packages():
             self.register_plugin(i)
 
-    def get_info(self, id_: str, item: str, default: str | None = None) -> str | dict[Any, Any] | Any:
+    def get_info(self, id_: str, item: str | None = None, default: str | None = None) -> str | dict[Any, Any] | Any:
         if not default:
             default = {}
         info_file = f'{self.module_dir}/{id_}/info.json'
@@ -617,7 +617,7 @@ class ModuleManager:
             return default
         try:
             with open(info_file, 'r', encoding='UTF-8') as f:
-                return json.load(f).get(item, default)
+                return json.load(f).get(item, default) if item else json.load(f)
         except json.JSONDecodeError:
             logging.error(f"Error decoding JSON from {info_file} for plugin {id_}")
             return default
@@ -993,11 +993,13 @@ class PluginPage(QWidget):
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(40, 40, 40, 40)
         main_layout.setSpacing(24)
-        card = AppCard(
-            icon=":/qfluentwidgets/images/logo.png",
-            title="PyQt-Fluent-Widgets",
-            content="Shokokawaii Inc."
-        )
-        card.clicked.connect(lambda: print("Card is clicked"))
-        main_layout.addWidget(card)
+        for i in module_manager.list_packages():
+            plugin = module_manager.get_info(i)
+            card = AppCard(
+                icon=":/qfluentwidgets/images/logo.png",
+                title="PyQt-Fluent-Widgets",
+                content="Shokokawaii Inc."
+            )
+            card.clicked.connect(lambda: print("Card is clicked"))
+            main_layout.addWidget(card)
         self.setLayout(main_layout)
