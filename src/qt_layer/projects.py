@@ -808,6 +808,39 @@ class ProjectsPage(QWidget):
         rmtree(dir_)
         return 1
 
+    def datbr(self, work: str, name: str, brl: str | int, dat_ver: int = 4):
+        """
+
+        :param work: working dir
+        :param name: the name of the partitition
+        :param brl: if its a int , will convert the file to br, if "dat" just convert to dat
+        :param dat_ver: dat version
+        :return:None
+        """
+        print("[datbr] Packing %s" % (name, name))
+        if not os.path.exists(f"{work}/{name}.img"):
+            print(f"{work}/{name}.img is not exist")
+            return
+        else:
+            utils.img2sdat(f"{work}/{name}.img", work, dat_ver, name)
+        if os.access(f"{work}/{name}.new.dat", os.F_OK):
+            try:
+                os.remove(f"{work}/{name}.img")
+            except Exception:
+                logging.exception('Bugs')
+                os.remove(f"{work}/{name}.img")
+        if brl == "dat":
+            print(f"Packing {name} to dat done")
+        else:
+            print(f"Packing {name} to br")
+            call(['brotli', '-q', str(brl), '-j', '-w', '24', f"{work}/{name}.new.dat", '-o',
+                  f"{work}/{name}.new.dat.br"])
+            if os.access(f"{work}/{name}.new.dat", os.F_OK):
+                try:
+                    os.remove(f"{work}/{name}.new.dat")
+                except Exception:
+                    logging.exception('Bugs')
+            print(f"Packing {name} to br done")
     def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
