@@ -298,11 +298,8 @@ class ProjectsPage(QWidget):
 
             if file_paths:
                 # Call file target router processor
-                task = GenericTaskWorker(self.dndfile, file_paths)
-                log_dialog = StreamLogDialog("Running...", parent=self)
+                self.dndfile(file_paths)
 
-                log_dialog.start_redirected_task(task)
-                log_dialog.exec()
 
     def script2fs(self, path: str):
         if os.path.exists(os.path.join(path, "system", "app")):
@@ -506,6 +503,7 @@ class ProjectsPage(QWidget):
         return 0
 
     def dndfile(self, files: list):
+        task = None
         for fi in files:
             if fi.endswith('}') and fi.startswith('{'):
                 fi = fi[1:-1]
@@ -518,15 +516,23 @@ class ProjectsPage(QWidget):
                 if os.path.isfile(fi):
                     if fi.endswith(".mpk"):
                         InstallMpk(fi)
+                        return
                     else:
                         if gettype(fi) == 'unknown':
                             editor.main(os.path.dirname(fi), os.path.basename(fi))
+                            return
                         else:
-                            utils.create_thread(self.unpackrom, fi)
+                            task = GenericTaskWorker(self.unpackrom, fi)
                 elif os.path.isdir(fi):
-                    utils.create_thread(self.copy_project, fi)
+                    task = GenericTaskWorker(self.copy_project, fi)
             else:
                 print("file not exist")
+            if not task:
+                return
+            log_dialog = StreamLogDialog("Running...", parent=self)
+
+            log_dialog.start_redirected_task(task)
+            log_dialog.exec()
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
