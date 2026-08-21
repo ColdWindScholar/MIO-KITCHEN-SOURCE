@@ -850,6 +850,7 @@ class PluginPage(QWidget):
                """)
     def uninstall_plugin(self, plugin_id:str):
         UninstallMpk(plugin_id, True, self)
+        self.load_plugin_cards()
 
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -862,6 +863,7 @@ class PluginPage(QWidget):
             dialog = InstallMpk(file_path, self)
             if dialog.exec_():
                 return
+            self.load_plugin_cards()
 
     def initUI(self):
         # 1. Main outer layout
