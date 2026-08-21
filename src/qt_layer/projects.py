@@ -925,12 +925,12 @@ class ProjectsPage(QWidget):
                         if self.remove_source_files.get() == 1:
                             self.rdi(work, dname)
                         print(lang.text3.format(dname))
-                        if self.format.get() in ["dat", "br", "sparse"]:
-                            img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if self.format.get() == 'dat':
+                        if format in ["dat", "br", "sparse"]:
+                            utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
+                            if format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                       int(parts_dict.get('dat_ver', 4)))
-                            elif self.format.get() == 'br':
+                            elif format == 'br':
                                 self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                                       int(parts_dict.get('dat_ver', 4)))
                             else:
