@@ -25,6 +25,10 @@ from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype
 from src.core.aml_image import main as aml_main
+try:
+    from src.core.pycase import ensure_dir_case_sensitive
+except ImportError:
+    ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
 
 class ProjectManager:
