@@ -10,7 +10,8 @@ from typing import Any
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
-    FluentIcon, ScrollArea, SearchLineEdit, TitleLabel
+    FluentIcon, ScrollArea, SearchLineEdit, TitleLabel, DropDownToolButton, TransparentDropDownPushButton, \
+    TransparentDropDownToolButton, RoundMenu, Action
 
 import utils
 from addon_register import loader, Entry
@@ -399,9 +400,9 @@ class ModuleManager:
                 mpk_final_file.write(icon_path, 'icon')
 
         if os.path.exists(output_mpk_path):
-            print(lang.t15 % output_mpk_path)
+            print(output_mpk_path, "Done")
         else:
-            print(lang.t16 % output_mpk_path)
+            print(output_mpk_path, "Fail")
         return None
 
 
@@ -416,7 +417,7 @@ class AppCard(CardWidget):
         self.titleLabel = BodyLabel(title, self)
         self.contentLabel = CaptionLabel(content, self)
         self.openButton = PushButton('Open', self)
-        self.moreButton = TransparentToolButton(FluentIcon.MORE, self)
+        self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
 
         self.hBoxLayout = QHBoxLayout(self)
         self.vBoxLayout = QVBoxLayout()
@@ -440,8 +441,6 @@ class AppCard(CardWidget):
         self.hBoxLayout.addStretch(1)
         self.hBoxLayout.addWidget(self.openButton, 0, Qt.AlignRight)
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
-
-        self.moreButton.setFixedSize(32, 32)
 
 
 class PluginPage(QWidget):
@@ -523,7 +522,13 @@ class PluginPage(QWidget):
                 title=plugin_title,
                 content=plugin_author
             )
+            menu = RoundMenu(parent=card.moreButton)
+            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall', triggered=lambda plugin_id=i: module_manager))
+            menu.addAction(Action(FluentIcon.ZOOM_OUT, 'Export', triggered=lambda state, plugin_id=i:module_manager.export(plugin_id)))
+            menu.addAction(Action(FluentIcon.EDIT, 'Edit', triggered=lambda: print("Saved")))
 
+            # Add menu
+            card.moreButton.setMenu(menu)
             # Setup execution bindings (Safe against the signal boolean emission)
             card.openButton.clicked.connect(lambda state, plugin_id=i: self.exec_plugin(plugin_id))
             card.clicked.connect(lambda plugin_id=i: self.exec_plugin(plugin_id))
