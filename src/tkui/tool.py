@@ -25,6 +25,7 @@ from functools import wraps
 from tkinter.ttk import Scrollbar
 from typing import Optional, Any
 
+from qt_layer.plugins import InstallMpk
 from qt_layer.widgets import TkinterEmbeddedPanel
 from src.core import merge_sparse
 from src.core import tarsafe
