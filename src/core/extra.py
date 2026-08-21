@@ -13,9 +13,9 @@
 # limitations under the License.
 import os
 import re
-from .posix import symlink
-from . import contextpatch
-from . import fspatch
+from src.core.posix import symlink
+from src.core import contextpatch
+from src.core import fspatch
 def parse_update_script(fd):
     if not fd:
         raise IOError('fd isn\'t valid!')
