@@ -1078,7 +1078,7 @@ class ProjectsPage(QWidget):
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
-                f2fs_read_only, f2fs_compresion) -> bool | None:
+                f2fs_read_only, f2fs_compresion, ext4_packer) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1174,7 +1174,7 @@ class ProjectsPage(QWidget):
                                     ext4_size_value = int(f.read().strip())
                                 except ValueError:
                                     ext4_size_value = 0
-                    if self.ext4_packer.get() == "make_ext4fs":
+                    if ext4_packer == "make_ext4fs":
                         exit_code = self.make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
                                                 sparse=self.format.get() in ["dat", "br", "sparse"],
@@ -1250,6 +1250,7 @@ class ProjectsPage(QWidget):
                                                         dialog.utc_input.currentText(),
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
+                                                        dialog.pack_method_combo.currentText(),
                                                         )
             else:
                 return
