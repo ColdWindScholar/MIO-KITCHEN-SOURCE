@@ -506,16 +506,16 @@ class ProjectsPage(QWidget):
                 with open(f"{work}/{i}.new.dat", 'ab') as ofd:
                     for n in range(100):
                         if os.access(f"{work}/{i}.new.dat.{n}", os.F_OK):
-                            print(lang.text83 % (i + f".new.dat.{n}", f"{i}.new.dat"))
+                            print("Merging %s to %s" % (f"{i}.new.dat.{n}", f"{i}.new.dat"))
                             with open(f"{work}/{i}.new.dat.{n}", 'rb') as fd:
                                 ofd.write(fd.read())
                             os.remove(f"{work}/{i}.new.dat.{n}")
             if os.access(f"{work}/{i}.new.dat", os.F_OK):
-                print(lang.text79 + f"{work}/{i}.new.dat")
+                print(f"Unpacking {work}/{i}.new.dat")
                 if os.path.getsize(f"{work}/{i}.new.dat") != 0:
                     transferfile = f"{work}/{i}.transfer.list"
                     if os.access(transferfile, os.F_OK):
-                        parts['dat_ver'] = Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
+                        parts['dat_ver'] = utils.Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
                         if os.access(f"{work}/{i}.img", os.F_OK):
                             os.remove(f"{work}/{i}.new.dat")
                             os.remove(transferfile)
@@ -526,7 +526,7 @@ class ProjectsPage(QWidget):
                         else:
                             print("File May Not Extracted.")
                     else:
-                        print("transferfile" + lang.text84)
+                        print("transferfile's missing")
             if os.access(f"{work}/{i}.img", os.F_OK):
                 try:
                     if i in parts:
@@ -547,11 +547,11 @@ class ProjectsPage(QWidget):
                     else:
                         logo_dump(f"{work}/{i}.img", output_name=i)
                 if gettype(f"{work}/{i}.img") == 'vbmeta':
-                    print(f"{lang.text85}AVB:{i}")
+                    print(f"Patching AVB:{i}")
                     utils.Vbpatch(f"{work}/{i}.img").disavb()
                 file_type = gettype(f"{work}/{i}.img")
                 if file_type == "sparse":
-                    print(lang.text79 + f"{i}.img[{file_type}]")
+                    print(f"Unpacking {i}.img[{file_type}]")
                     try:
                         utils.simg2img(f"{work}/{i}.img")
                     except (Exception, BaseException) as e:
@@ -560,7 +560,7 @@ class ProjectsPage(QWidget):
                         continue
                 if i not in parts.keys():
                     parts[i] = gettype(f"{work}/{i}.img")
-                print(lang.text79 + f"{i}.img[{file_type}]")
+                print(f"Unpacking {i}.img[{file_type}]")
                 if gettype(f"{work}/{i}.img") == 'super':
                     parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                     lpunpack.unpack(f"{work}/{i}.img", work)
@@ -656,12 +656,12 @@ class ProjectsPage(QWidget):
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 if file_type == 'unknown' and utils.is_empty_img(f"{work}/{i}.img"):
-                    print(lang.text141)
+                    print(f"Unsupported file {i}.img [{file_type}]")
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
         parts.clear()
-        print(lang.text8)
+        print("Unpacking Done")
         return True
     def _load_mock_partitions_table(self, mock_data):
         """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
