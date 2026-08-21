@@ -1,15 +1,14 @@
+import json
 import logging
 import os
 import platform
 import zipfile
-
-import json
 from shutil import rmtree
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
-    FluentIcon, TitleLabel
+    FluentIcon
 
 from addon_register import loader, Entry
 from config_parser import ConfigParser
