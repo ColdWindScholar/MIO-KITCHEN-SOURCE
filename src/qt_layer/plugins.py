@@ -606,14 +606,10 @@ class UninstallMpk(MessageBoxBase):
 
             except PermissionError as e_perm:
                 logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
-                msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
-                win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange',
-                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+
             except Exception as e_generic:
                 logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
-                msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
-                win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange',
-                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+
         else:
             plugin_successfully_removed_fs = True
             logging.info(
@@ -621,8 +617,7 @@ class UninstallMpk(MessageBoxBase):
 
         # 4. Handle Post-Removal Interface Synchronization Updates
         if not plugin_successfully_removed_fs and os.path.exists(module_path):
-            win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange',
-                            title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+
             logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
 
         elif plugin_successfully_removed_fs:
