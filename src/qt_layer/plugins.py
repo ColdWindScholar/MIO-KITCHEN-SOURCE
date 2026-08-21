@@ -791,11 +791,9 @@ class InstallMpk(MessageBoxBase):
         self.pyt.loadFromData(images.error_logo_byte)
 
         self.name_label.setText("请选择一个插件")
-        # 模拟原 tkinter 设置黄色警示字体：
         self.name_label.setTextColor(QColor("#ffcc00"), QColor("#ffcc00"))
         self.logo.setPixmap(self.pyt)
 
-        # 安全隐藏无用组件，等同于原 tkinter 的 .destroy()
         self.author.hide()
         self.version.hide()
         self.prog.hide()
