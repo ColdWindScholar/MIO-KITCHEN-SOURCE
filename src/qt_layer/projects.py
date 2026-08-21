@@ -155,8 +155,7 @@ class ProjectsPage(QWidget):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(14)
 
-        header = BodyLabel("分区控制 / Partition Controller", card)
-        header.setStyleSheet("font-weight: 600; font-size: 14px; color: #ffffff;")
+        header = BodyLabel("分区", card)
         layout.addWidget(header)
 
         # Dynamic Core List Layout
