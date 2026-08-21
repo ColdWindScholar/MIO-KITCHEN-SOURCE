@@ -493,14 +493,14 @@ class ProjectsPage(QWidget):
             return True
         for i in chose:
             if os.access(f"{work}/{i}.zst", os.F_OK):
-                print(f"{lang.text79} {i}.zst")
+                print(f"Decompressing {i}.zst")
                 utils.call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
                 return True
             if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
-                print(lang.text79 + f"{i}.new.dat.xz")
+                print(f"Decompressing {i}.new.dat.xz")
                 utils.Unxz(f"{work}/{i}.new.dat.xz")
             if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
-                print(lang.text79 + f"{i}.new.dat.br")
+                print( f"Decompressing  {i}.new.dat.br")
                 utils.call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
             if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
                 with open(f"{work}/{i}.new.dat", 'ab') as ofd:
