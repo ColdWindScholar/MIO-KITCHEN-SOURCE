@@ -436,9 +436,8 @@ class ProjectsPage(QWidget):
                             os.rename(os.path.join(project_manger.current_work_path(), fi),
                                       os.path.join(project_manger.current_work_path(), member_name))
                     except Exception as e:
-                        print(lang.text80 % (member_name, e))
-                        win.message_pop(lang.warn4.format(member_name))
-                print(lang.text81)
+                        print("cannot rename %s %s" % (member_name, e))
+                print("unzip done")
                 if os.path.isdir(project_manger.current_work_path()):
                     self.refresh_projects()
                     self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
@@ -522,7 +521,7 @@ class ProjectsPage(QWidget):
                 elif os.path.isdir(fi):
                     utils.create_thread(self.copy_project, fi)
             else:
-                print(fi + lang.text84)
+                print("file not exist")
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
