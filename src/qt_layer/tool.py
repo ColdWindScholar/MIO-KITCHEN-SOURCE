@@ -13,7 +13,6 @@ from qt_layer.projects import ProjectsPage
 from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
-from src.tkui.tool import Tool
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 
