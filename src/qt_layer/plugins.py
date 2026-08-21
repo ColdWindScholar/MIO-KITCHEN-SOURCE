@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
     FluentIcon
 
+import images
 from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.settings import cfg
@@ -409,11 +410,8 @@ class ModuleManager:
 
 
 module_manager = ModuleManager()
-class MpkMan(ttk.Frame):
+class MpkMan(object):
     def __init__(self):
-        super().__init__(master=win.tab7)  # win.tab7 is the parent widget
-        self.pack(padx=10, pady=10, fill=BOTH, expand=True)  # expand=True, so MpkMan fills the available space
-        self.chosen = StringVar(value='')
         self.moduledir = module_manager.module_dir
         if not os.path.exists(self.moduledir):
             os.makedirs(self.moduledir)
@@ -455,7 +453,7 @@ class MpkMan(ttk.Frame):
             # Use a default icon for virtual plugins
             # Ensure PhotoImage is created only once or updated correctly
             if virtual_id not in self.images_ or not self.images_[virtual_id]:  # If PhotoImage doesn't exist or is None
-                self.images_[virtual_id] = PhotoImage(data=images.none_byte)
+                self.images_[virtual_id] = images.none_byte
             current_photo_image = self.images_[virtual_id]
 
             if virtual_id in self.pls.apps:
