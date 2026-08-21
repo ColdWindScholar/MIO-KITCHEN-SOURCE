@@ -342,7 +342,7 @@ class ProjectsPage(QWidget):
         # tar
         if ftype == 'tar':
             print("Unpacking" + ifile)
-            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
                 utils.re_folder(project_manger.current_work_path())
             with tarsafe.TarSafe(ifile) as f:
@@ -350,7 +350,7 @@ class ProjectsPage(QWidget):
             return
         # kdz
         if ftype == 'kdz':
-            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName,os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
                 utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
