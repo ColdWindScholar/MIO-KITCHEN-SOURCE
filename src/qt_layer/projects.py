@@ -1075,7 +1075,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
-    def packrom(self, chosen_parts, format) -> bool | None:
+    def packrom(self, chosen_parts, format, patch_vbmeta) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1084,7 +1084,7 @@ class ProjectsPage(QWidget):
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
                 parts_dict[dname] = 'unknown'
-            if self.spatchvb.get() == 1:
+            if patch_vbmeta:
                 for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
                     file = utils.findfile(j, work)
                     if gettype(file) == 'vbmeta':
@@ -1233,13 +1233,10 @@ class ProjectsPage(QWidget):
             dialog = PackSettingsDialog(self)
             # Display modally. If the user clicks "打包" (Yes/Accept), exec() returns True/1
             if dialog.exec():
-                # 💡 Cleanly pull whatever data fields you need straight out of the inputs!
-                chosen_method = dialog.pack_method_combo.currentText() # mke2fs+format
-
-                support_old_kernel = dialog.support_old_kernel_switch.isChecked()
-                brotli_level = dialog.brotli_slider.value()
-                utc_timestamp = dialog.utc_input.text()
-                self.my_task_worker = GenericTaskWorker(self.packrom, pack_list)
+                self.my_task_worker = GenericTaskWorker(self.packrom,
+                                                        pack_list,
+                                                        dialog.format_combo.currentText(),
+                                                        dialog.sw_vbmeta.isChecked(),)
             else:
                 return
 
