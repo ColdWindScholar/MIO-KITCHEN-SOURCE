@@ -450,7 +450,12 @@ class PluginPage(QWidget):
         self.setObjectName("PluginPage")
         self.cards_data = []  # Track card mappings for easy filtering
         self.initUI()
-
+        self.setStyleSheet("""
+                   QWidget#ScrollContent {
+                       background-color: #202020;
+                   }
+                  
+               """)
     def initUI(self):
         # 1. Main outer layout
         outer_layout = QVBoxLayout(self)
