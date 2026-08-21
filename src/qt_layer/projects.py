@@ -7,7 +7,11 @@ import subprocess
 import sys
 import time
 import zipfile
+from contextlib import suppress
 from shutil import copy
+
+import uuid
+
 from src.core.splash_editor.main import splash_repack
 
 import contextpatch
@@ -860,6 +864,128 @@ class ProjectsPage(QWidget):
         else:
             show_info_bar(self, "Error", f"Failed to repack {part_name}")
         return True
+
+    def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
+        if not UTC:
+            UTC = int(time.time())
+        print("[erofs] Repacking %s - %s - %s" % (name, format_ + f',{level}', "1.x"))
+        extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
+        other_ = ['-E', 'legacy-compress'] if old_kernel else []
+        cmd = ['mkfs.erofs', *other_, f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
+               f'--product-out={work}',
+               f'--fs-config-file={work}/config/{name}_fs_config',
+               f'--file-contexts={work}/config/{name}_file_contexts',
+               f'{work_output}/{name}.img', f'{work}/{name}/']
+        return call(cmd, out=True)
+
+    def make_ext4fs(self, name: str, work: str, work_output, sparse: bool = False, size: int = 0, UTC: int = None,
+                    has_contexts: bool = True):
+        if not has_contexts:
+            print('Warning:file_context not found!!!')
+        print("packing %s [ext]" % name)
+        if not UTC:
+            UTC = int(time.time())
+        if not size:
+            size = utils.GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
+        print(f"{name}:[{size}]")
+        context_cmd = ['-S', f'{work}/config/{name}_file_contexts'] if has_contexts else []
+        command = ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', *context_cmd, '-l',
+                   f'{size}',
+                   '-C', f'{work}/config/{name}_fs_config', '-L', name, '-a', f'/{name}', f"{work_output}/{name}.img",
+                   work + name]
+        return call(command)
+
+    def make_f2fs(self, name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False,
+                  compress: bool = False):
+        print("[f2fs] repacking %s"% name)
+        size = utils.GetFolderSize(work + name, 1, 1).rsize_v
+        part_uuid = str(uuid.uuid4())
+        print(f"{name} - {size} - {part_uuid}")
+
+        def align_to_4k(size):
+            # Align the size upwards to multiples of 4096 bytes.
+            return (size + 4095) // 4096 * 4096
+
+        # Set to 64MB to reserve space for F2FS Metadata
+        size_f2fs = (64 * 1024 * 1024) + size
+        # Apply a safety margin
+        size_f2fs = int(size_f2fs * 1.15)
+        # Align size to 4096-byte multiples.
+        # Android dynamic partitions require sector alignment.
+        # Mismatched block sizes will cause 'lpmake' read errors or mount failures.
+        size_f2fs = align_to_4k(size_f2fs)
+
+        if not UTC:
+            UTC = int(time.time())
+        with open(f"{work + name}.img", 'wb') as f:
+            f.truncate(size_f2fs)
+        # /usr/bin/make_f2fs -d 0 -l odm -O extra_attr,compression,ro -U d6112980-bd3b-4b9e-bf4c-fba453cfdb42 -T 1230768000 ./Projects/Project_name/Build/odm.img -f
+        #
+        if call(['mkfs.f2fs', '-d', '0', '-l', name, '-O',
+                 "extra_attr,compression,ro" if readonly else 'extra_attr,inode_checksum,sb_checksum,compression', "-U",
+                 part_uuid, '-T', str(UTC), f"{work_output}/{name}.img", '-f']):
+            return 1
+        # The efficiency of verifying and adding file contexts has been improved.
+        # Let's confirm that the basic context for the partition is present.
+        line_to_ensure = f'/{name}/{name} u:object_r:system_file:s0\n'
+        file_contexts_path = f'{work}/config/{name}_file_contexts'
+
+        found = False
+        with suppress(FileNotFoundError):
+            with open(file_contexts_path, 'r', encoding='utf-8') as f_read:
+                for line in f_read:
+                    if line.strip() == line_to_ensure.strip():
+                        found = True
+                        break
+
+        if not found:
+            with open(file_contexts_path, 'a', encoding='utf-8') as f_append:
+                f_append.write(line_to_ensure)
+        return call(['sload.f2fs', '-d', '0', '-c' if compress else '', '-r' if readonly else '', '-C',
+                     f'{work}/config/{name}_fs_config', '-f', work + name, '-p', f'{work_output}/{name}.img', '-s',
+                     f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC),
+                     f'{work_output}/{name}.img'])
+
+    def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
+        if isinstance(size, str): size = int(size)
+        print(lang.text91 % name)
+        size = utils.GetFolderSize(work + name, 4096, 3,
+                             f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
+        print(f"{name}:[{size}]")
+        if not UTC:
+            UTC = int(time.time())
+        if call(
+                ['mke2fs', '-O',
+                 '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L',
+                 name,
+                 '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output}/{name}_new.img',
+                 f'{int(size)}']) != 0:
+            rmdir(f'{work_output}/{name}_new.img')
+            print(lang.text75 % name)
+            return 1
+        ret = call(
+            ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
+             f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
+             f'{work_output}/{name}_new.img'], out=not os.name == 'posix')
+        if ret != 0:
+            rmdir(f'{work}/{name}_new.img')
+            print(lang.text75 % name)
+            return 1
+        if sparse:
+            call(['img2simg', f'{work_output}/{name}_new.img', f'{work_output}/{name}.img'])
+            try:
+                os.remove(f"{work_output}/{name}_new.img")
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+        else:
+            if os.path.isfile(f"{work_output}/{name}.img"):
+                try:
+                    os.remove(f"{work_output}/{name}.img")
+                except (Exception, BaseException):
+                    logging.exception('Bugs')
+            os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
+        return 0
+
     def packrom(self, chosen_parts, format) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
