@@ -5,7 +5,7 @@ from shutil import rmtree
 from typing import Any
 
 from PySide6.QtWidgets import QWidget, QFileDialog
-from qfluentwidgets import IconWidget, CardWidget, BodyLabel, PushButton, FluentIcon, ScrollArea, \
+from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
 import images
@@ -377,7 +377,7 @@ class ModuleManager:
                     continue
 
                 arcname = os.path.relpath(item_path_abs, plugin_dir_path)
-                print(f"{lang.text1}:{arcname}")
+                print(f"Adding:{arcname}")
                 try:
                     resource_zip_file.write(str(item_path_abs), arcname=arcname)
                 except Exception as e:
@@ -405,14 +405,177 @@ class ModuleManager:
 module_manager = ModuleManager()
 
 import zipfile
-import logging
 import platform
 from io import BytesIO
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QSizePolicy
+from qfluentwidgets import (ProgressBar, ImageLabel)
+
+import logging
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QColor
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QSizePolicy
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
 from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
-                            ProgressBar, PrimaryPushButton, ImageLabel, setTheme, Theme)
+                            PushButton)
+
+
+class UninstallMpk(MessageBoxBase):
+    def __init__(self, id_: str, wait=False, parent=None):
+        # We inherit MessageBoxBase which provides a beautifully engineered frameless window wrapper
+        super().__init__(parent)
+
+        self.arr = {}
+        self.uninstall_b = None
+        self.wait = wait
+
+        self.value = id_
+        self.value2 = None
+        self.check_pass = False
+
+        self.module_dir = module_manager.module_dir
+        # Execute your core backend validation checks
+        if id_ and module_manager.is_installed(id_):
+            self.check_pass = True
+            self.value2 = module_manager.get_name(id_)
+            self.lsdep()
+        elif id_:
+            self.value2 = id_
+            logging.warning(f"UninstallMpk init: Plugin with ID '{id_}' not found by module_manager.get_installed.")
+
+        # Dynamically build up components and text formats
+        self.ask()
+
+        # MessageBoxBase handles modal blocking natively with .exec() instead of wait_window()
+        # If wait parameter is required downstream, trigger it inside the initialization
+        if self.wait:
+            self.exec()
+
+    def ask(self):
+        # Apply window title
+        self.widget.setMinimumWidth(440)
+
+        # Delete default box buttons so we can insert custom full-width controls
+        self.buttonLayout.deleteLater()
+
+        # Build dynamic content warning strings
+        plugin_display_name_for_message = self.value2 if self.value2 else self.value
+        if plugin_display_name_for_message is None:
+            plugin_display_name_for_message = getattr(lang, "unknown_plugin_name", "Unknown Plugin")
+
+        if not self.value:
+            message_text = "Please select a plugin!"
+        elif not self.check_pass:
+            msg_template = "Plugin '{plugin_id}' not found or cannot be uninstalled."
+            message_text = msg_template.format(plugin_id=plugin_display_name_for_message)
+        elif module_manager.is_virtual(self.value):
+            msg_template = "Plugin '{plugin_name}' is virtual and cannot be uninstalled this way."
+            message_text = msg_template.format(plugin_name=plugin_display_name_for_message)
+        else:
+            msg_template = "Are you sure you want to uninstall plugin '%s'?"
+            name_to_format = str(plugin_display_name_for_message)
+            try:
+                if "%s" in msg_template or "%S" in msg_template:
+                    message_text = msg_template % (name_to_format,)
+                elif "{0}" in msg_template:
+                    message_text = msg_template.format(name_to_format)
+                elif "{plugin_name}" in msg_template or "{name}" in msg_template:
+                    message_text = msg_template.format(plugin_name=name_to_format, name=name_to_format)
+                else:
+                    message_text = msg_template + f" ({name_to_format})"
+            except Exception as e_format:
+                logging.error(
+                    f"Error formatting message for t7: {e_format}. Template: '{msg_template}', Value: '{name_to_format}'")
+                message_text = msg_template
+
+        # Primary warning header (Replaces Tkinter Label with auto-wrapping Fluent label)
+        self.msgLabel = SubtitleLabel(message_text, self)
+        self.msgLabel.setAlignment(Qt.AlignCenter)
+        self.msgLabel.setWordWrap(True)
+        self.viewLayout.addWidget(self.msgLabel)
+
+        # Dependencies sub-interface (Only visible if secondary broken dependencies exist)
+        if self.arr:
+            self.depHeader = CaptionLabel("The following dependent plugins will also be removed:",
+                                          self)
+            self.depHeader.setTextColor(QColor("#ffffff"), QColor("#ffffff"))
+            self.viewLayout.addWidget(self.depHeader)
+
+            # Elegant, borderless scrolling viewport inside Fluent ecosystem
+            self.dependent_text_widget = TextBrowser(self)
+            self.dependent_text_widget.setReadOnly(True)
+            self.dependent_text_widget.setMaximumHeight(120)
+
+            # Format and inject text lines
+            dep_content = ""
+            for dep_id, dep_name in self.arr.items():
+                dep_content += f"• {dep_name} ({dep_id})\n"
+            self.dependent_text_widget.setText(dep_content.strip())
+            self.viewLayout.addWidget(self.dependent_text_widget)
+
+        # Lower control bar setup
+        self.bottomLayout = QHBoxLayout()
+        self.bottomLayout.setContentsMargins(0, 10, 0, 0)
+        self.bottomLayout.setSpacing(12)
+
+        # Standard button actions
+        self.cancel_b = self.cancelButton
+        self.cancel_b.clicked.connect(self.reject)
+        self.bottomLayout.addWidget(self.cancel_b)
+
+        # Conditional binding for validation check-passes
+        if self.check_pass and self.value and not module_manager.is_virtual(self.value):
+            self.uninstall_b = self.yesButton
+            self.uninstall_b.clicked.connect(self.uninstall)
+            self.bottomLayout.addWidget(self.uninstall_b)
+
+        self.viewLayout.addLayout(self.bottomLayout)
+
+    def lsdep(self, name_to_check_deps_for=None):
+        """Recursive check module dependencies"""
+        if not name_to_check_deps_for:
+            name_to_check_deps_for = self.value
+
+        if not name_to_check_deps_for:
+            return
+
+        for installed_plugin_id in module_manager.list_packages():
+            if installed_plugin_id == name_to_check_deps_for:
+                continue
+            if installed_plugin_id in self.arr:
+                continue
+
+            dependencies_str: str = module_manager.get_info(installed_plugin_id, 'depend', '')
+            dependencies_list = dependencies_str.split()
+
+            if name_to_check_deps_for in dependencies_list:
+                dependent_plugin_name = module_manager.get_name(installed_plugin_id)
+                self.arr[installed_plugin_id] = dependent_plugin_name
+                self.lsdep(installed_plugin_id)
+
+    def uninstall(self):
+        if not self.uninstall_b:
+            self.reject()
+            return
+
+        self.uninstall_b.setEnabled(False)
+        # Replaces self.update_idletasks() to safely flush structural event frames instantly
+        QApplication.processEvents()
+
+        plugin_id_to_remove = self.value
+        plugin_show_name_to_remove = self.value2 if self.value2 else self.value
+
+        dependent_ids = list(self.arr.keys())
+        for dep_id in dependent_ids:
+            dep_name = self.arr.get(dep_id, dep_id)
+            self.remove(dep_id, dep_name)
+
+        self.remove(plugin_id_to_remove, plugin_show_name_to_remove)
+        self.accept()
+
+    def remove(self, name=None, show_name=''):
+        logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
+        if not name:
+            logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
 
 
 
@@ -634,6 +797,10 @@ class PluginPage(QWidget):
                    }
                   
                """)
+    def uninstall_plugin(self, plugin_id:str):
+        dialog = UninstallMpk(plugin_id, True, self)
+        if dialog.exec_():
+            return
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
@@ -719,7 +886,7 @@ class PluginPage(QWidget):
                 content=plugin_author
             )
             menu = RoundMenu(parent=card.moreButton)
-            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall', triggered=lambda plugin_id=i: module_manager))
+            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall', triggered=lambda state, plugin_id=i: self.uninstall_plugin(plugin_id)))
             menu.addAction(Action(FluentIcon.ZOOM_OUT, 'Export', triggered=lambda state, plugin_id=i:module_manager.export(plugin_id)))
             menu.addAction(Action(FluentIcon.EDIT, 'Edit', triggered=lambda: print("Saved")))
 

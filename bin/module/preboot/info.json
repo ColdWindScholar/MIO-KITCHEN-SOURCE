@@ -5,5 +5,5 @@
   "describe": "boot宽容",
   "resource": "main.zip",
   "identifier": "preboot",
-  "depend": ""
+  "depend": "MOOS"
 }
