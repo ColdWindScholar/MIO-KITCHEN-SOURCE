@@ -6,6 +6,7 @@ import tkinter
 import zipfile
 from shutil import rmtree
 from tkinter import Toplevel, ttk, HORIZONTAL, BOTH, TOP, X, Frame, RIGHT, LEFT
+from typing import Any
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
