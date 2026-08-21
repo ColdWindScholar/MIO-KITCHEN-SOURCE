@@ -1205,7 +1205,7 @@ class ProjectsPage(QWidget):
             elif parts_dict[i] in ['boot', 'vendor_boot']:
                 self.repack_boot(i)
             elif parts_dict[i] == 'dtbo':
-                pack_dtbo()
+                self.pack_dtbo()
             elif parts_dict[i] == 'splash':
                 splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             elif parts_dict[i] == 'logo':
