@@ -1,8 +1,8 @@
 import sys
 
 from PySide6.QtCore import Qt, QObject, Signal, QThread
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QTextEdit
-from qfluentwidgets import SubtitleLabel, IndeterminateProgressRing, PushButton, setTheme, Theme
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout
+from qfluentwidgets import SubtitleLabel, IndeterminateProgressRing, PushButton, PlainTextEdit
 
 
 # =========================================================================
@@ -66,11 +66,9 @@ class TaskWorker(QThread):
             self.task_finished.emit(False)
 
 
-
 class StreamLogDialog(QDialog):
     def __init__(self, title_text="正在处理核心流水线", parent=None):
         super().__init__(parent)
-        setTheme(Theme.DARK)
         self.setWindowTitle(title_text)
         self.resize(580, 420)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
@@ -98,7 +96,7 @@ class StreamLogDialog(QDialog):
         main_layout.addLayout(header_layout)
 
         # Consolas Monospace Cyberpunk Log Text Window Framework Frame
-        self.console_view = QTextEdit(self)
+        self.console_view = PlainTextEdit(self)
         self.console_view.setReadOnly(True)
         self.console_view.setUndoRedoEnabled(False)
 
@@ -141,19 +139,8 @@ class StreamLogDialog(QDialog):
         if not cleaned_text:
             return
 
-        # Smart color parser looking for status keywords in standard prints
-        text_color = "#e4e4e7"  # Default off-white text
-        if "[INFO]" in cleaned_text:
-            text_color = "#a1a1aa"  # Subtle neutral ash
-        elif "[WARNING]" in cleaned_text:
-            text_color = "#f59e0b"  # Glowing amber yellow
-        elif "[ERROR]" in cleaned_text:
-            text_color = "#ef4444"  # Warning alert red
-        elif "[SUCCESS]" in cleaned_text:
-            text_color = "#10b981"  # Operational victory green
-
-        html_formatted_line = f'<span style="color: {text_color};">{cleaned_text}</span>'
-        self.console_view.append(html_formatted_line)
+        self.console_view.moveCursor(self.console_view.textCursor().MoveOperation.End)
+        self.console_view.insertPlainText(cleaned_text)
         self.console_view.ensureCursorVisible()
 
     def _on_task_completed(self, success):
@@ -167,10 +154,10 @@ class StreamLogDialog(QDialog):
 
         if success:
             self.title_label.setText("任务执行成功")
-            self._append_redirected_text("[SUCCESS] Subprocess tracking completed cleanly without errors.")
+            self._append_redirected_text("[TASK] Done!")
         else:
             self.title_label.setText("任务执行中断")
-            self._append_redirected_text("[ERROR] Processing loop flagged unexpected termination parameters.")
+            self._append_redirected_text("[ERROR] Failed!")
 
     def closeEvent(self, event):
         """Safety check to ensure streams are restored even if user forces window closed."""
