@@ -554,7 +554,7 @@ class InstallMpk(MessageBoxBase):
                             self.pyt = pixmap.scaled(128, 128, Qt.KeepAspectRatio, Qt.SmoothTransformation)
                         else:
                             raise Exception("QPixmap parse fail")
-                except Exception:
+                except (Exception, KeyError):
                     logging.exception('Bugs')
                     self.pyt = QPixmap()
                     self.pyt.loadFromData(images.none_byte)
@@ -566,8 +566,8 @@ class InstallMpk(MessageBoxBase):
         # 更新 Fluent UI 组件展示
         self.name_label.setText(self.mconf.get('module', 'name'))
         self.logo.setPixmap(self.pyt)
-        self.author.setText(lang.text33.format(self.mconf.get('module', 'author')))
-        self.version.setText(lang.text32.format(self.mconf.get('module', 'version')))
+        self.author.setText("作者：{}".format(self.mconf.get('module', 'author')))
+        self.version.setText("版本：{}".format(self.mconf.get('module', 'version')))
         self.text.setText(self.mconf.get('module', 'describe'))
 
     def unavailable(self):
