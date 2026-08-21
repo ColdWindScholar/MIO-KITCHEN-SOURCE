@@ -474,9 +474,16 @@ class ProjectsPage(QWidget):
                     (folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'),
                      "Source", "rw"))
         return data
+
+
     def exec_opera(self):
         if self.unpack_rb.isChecked():
-            self.unpack()
+            unpack_list = []
+            for row_idx in range(self.partition_table.rowCount()):
+                item = self.partition_table.item(row_idx, 0)
+                if item.checkState() == Qt.CheckState.Checked:
+                    unpack_list.append(item.text())
+            self.unpack(unpack_list, self.format_combo.currentText())
         else:
             pass
 
