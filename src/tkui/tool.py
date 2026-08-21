@@ -84,7 +84,7 @@ import sv_ttk
 from PIL.Image import open as open_img
 from PIL.ImageTk import PhotoImage
 from src.core.utils import lang, LogoDumper, terminate_process, calculate_md5_file, calculate_sha256_file, \
-    JsonEdit, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path
+    JsonEdit, ModuleErrorCodes, hum_convert, GuoKeLogo, img2simg, prog_path, GetFolderSize
 from tkinter import filedialog
 
 if os.name == 'nt':
