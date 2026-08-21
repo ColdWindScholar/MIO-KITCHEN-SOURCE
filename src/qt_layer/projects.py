@@ -201,6 +201,7 @@ class ProjectsPage(QWidget):
         self.unpack_rb = RadioButton("解包", container)
         self.pack_rb = RadioButton("打包", container)
         self.unpack_rb.clicked.connect(self.refresh_unpack)
+        self.pack_rb.clicked.connect(self.refresh_repack)
         self.unpack_rb.setChecked(True)
         row1.addWidget(self.select_all_cb)
         row1.addWidget(self.pack_rb)
@@ -236,7 +237,8 @@ class ProjectsPage(QWidget):
         layout.addLayout(tools_layout)
 
         self.scroll_layout.addWidget(container)
-
+    def refresh_repack(self):
+        pass
     def refresh_unpack(self):
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
