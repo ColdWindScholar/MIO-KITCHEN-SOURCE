@@ -922,7 +922,10 @@ class PluginPage(QWidget):
     def load_plugin_cards(self):
         # Clear out existing layout elements if re-loading
         for data in self.cards_data:
+            data['card_widget'].hide()
+            self.cards_layout.removeWidget(data['card_widget'])
             data['card_widget'].destroy()
+        self.cards_layout.update()
         self.cards_data.clear()
 
         for i in module_manager.list_packages():
