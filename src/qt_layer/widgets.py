@@ -6,8 +6,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
                                QLabel, QLineEdit)
-from qfluentwidgets import InfoBar, InfoBarPosition, LineEdit, CheckBox
-from qfluentwidgets import (MessageBoxBase, ComboBox, Slider,
+from qfluentwidgets import InfoBar, InfoBarPosition, LineEdit
+from qfluentwidgets import (MessageBoxBase, ComboBox, SwitchButton, Slider,
                             SubtitleLabel, CaptionLabel)
 
 
@@ -259,7 +259,9 @@ class PackSettingsDialog(MessageBoxBase):
         self.compress_algo_combo = ComboBox(erofs_container)
         self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
         self.compress_algo_combo.setText("lz4hc")
-        self.support_old_kernel_switch = CheckBox(parent=erofs_container)
+        self.support_old_kernel_switch = SwitchButton(parent=erofs_container)
+        self.support_old_kernel_switch.setOffText("")
+        self.support_old_kernel_switch.setOnText("")
         self.support_old_kernel_label = QLabel("支持旧内核", erofs_container)
         self.support_old_kernel_label.setStyleSheet("color: #ffffff; font-size: 13px;")
 
@@ -296,11 +298,15 @@ class PackSettingsDialog(MessageBoxBase):
         f2fs_row = QHBoxLayout()
         f2fs_row.setSpacing(12)
 
-        self.f2fs_readonly_switch = CheckBox(f2fs_container)
+        self.f2fs_readonly_switch = SwitchButton(f2fs_container)
+        self.f2fs_readonly_switch.setOnText("")
+        self.f2fs_readonly_switch.setOffText("")
         self.f2fs_readonly_lbl = QLabel("只读", f2fs_container)
         self.f2fs_readonly_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
 
-        self.f2fs_compress_switch = CheckBox(f2fs_container)
+        self.f2fs_compress_switch = SwitchButton(f2fs_container)
+        self.f2fs_compress_switch.setOnText("")
+        self.f2fs_compress_switch.setOffText("")
         self.f2fs_compress_lbl = QLabel("压缩", f2fs_container)
         self.f2fs_compress_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
 
@@ -362,7 +368,9 @@ class PackSettingsDialog(MessageBoxBase):
         self.format_combo = ComboBox(other_container)
         self.format_combo.addItems(["raw", "sparse"])
 
-        self.sw_convert = CheckBox(other_container)
+        self.sw_convert = SwitchButton(other_container)
+        self.sw_convert.setOffText('')
+        self.sw_convert.setOnText('')
         self.lbl_convert = QLabel("文件系统转换", other_container)
         self.lbl_convert.setStyleSheet("color: #ffffff; font-size: 13px;")
 
@@ -380,13 +388,17 @@ class PackSettingsDialog(MessageBoxBase):
         self.dest_fs_combo.hide()
 
         # 🔗 核心信号槽：将文件系统转换开关绑定到可见性处理器上
-        self.sw_convert.checkStateChanged.connect(self._on_convert_toggled)
+        self.sw_convert.checkedChanged.connect(self._on_convert_toggled)
 
-        self.sw_vbmeta = CheckBox(other_container)
+        self.sw_vbmeta = SwitchButton(other_container)
+        self.sw_vbmeta.setOffText("")
+        self.sw_vbmeta.setOnText("")
         self.lbl_vbmeta = QLabel("处理Vbmeta", other_container)
         self.lbl_vbmeta.setStyleSheet("color: #ffffff; font-size: 13px;")
 
-        self.sw_delete = CheckBox(other_container)
+        self.sw_delete = SwitchButton(other_container)
+        self.sw_delete.setOffText("")
+        self.sw_delete.setOnText("")
         self.lbl_delete = QLabel("删除源文件", other_container)
         self.lbl_delete.setStyleSheet("color: #ffffff; font-size: 13px;")
 
