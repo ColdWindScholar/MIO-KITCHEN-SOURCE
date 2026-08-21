@@ -1076,8 +1076,7 @@ class MpkMan(object):
             InstallMpk(file_path)
 
     def gui(self):
-        global list_pls_plugin
-        list_pls_plugin = self.list_pls
+
 
         # Frame for the header and MpkStore button
         header_frame = ttk.Frame(self)
@@ -1096,8 +1095,6 @@ class MpkMan(object):
         plugins_label.pack(padx=5, pady=(5, 0), anchor='nw')  # Smaller top padding, align to northwest
 
         # IconGrid is now a child of self (MpkMan)
-        self.pls = IconGrid(self)
-        self.pls.pack(padx=5, pady=5, fill=BOTH, expand=True)  # expand=True, so IconGrid fills the space
 
         # Bind context menu to the "Available plugins" label and to IconGrid/Canvas itself
         rmenu = Menu(self, tearoff=False, borderwidth=0)  # Menu parent is self (MpkMan)
