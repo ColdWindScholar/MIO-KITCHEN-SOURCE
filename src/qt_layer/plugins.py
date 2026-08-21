@@ -459,7 +459,6 @@ class PluginPage(QWidget):
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
-
         # 2. Header Layout (Title and Description)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
