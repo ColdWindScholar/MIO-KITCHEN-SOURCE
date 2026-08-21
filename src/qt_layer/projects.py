@@ -111,7 +111,7 @@ class ProjectManager:
         return path if os.name == 'nt' else path.replace('\\', '/')
 
     def current_work_output_path(self):
-        if cfg.workingFolder.value == 'Single':
+        if cfg.projectStructure.value == 'Single':
             path = self.get_work_path(cfg.currentProjectName.value)
         else:
             path = os.path.join(self.get_work_path(cfg.currentProjectName.value), 'Output') + os.sep
@@ -1167,6 +1167,7 @@ class ProjectsPage(QWidget):
                                 print("Packed successfully: {}!".format(dname))
 
                 else:
+                    ext4_size_value = 0
                     if ext4_origin_size:
                         list_file = f"{work}/dynamic_partitions_op_list"
                         if os.path.exists(list_file):
@@ -1259,7 +1260,7 @@ class ProjectsPage(QWidget):
                                                         dialog.compress_algo_combo.currentText(),
                                                         dialog.erofs_slider.value(),
                                                         dialog.support_old_kernel_switch.isChecked(),
-                                                        dialog.utc_input.currentText(),
+                                                        dialog.utc_input.text(),
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
                                                         dialog.pack_method_combo.currentText(),
