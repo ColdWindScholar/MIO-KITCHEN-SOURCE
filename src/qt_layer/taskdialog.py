@@ -134,13 +134,8 @@ class StreamLogDialog(QDialog):
         self.worker.start()
 
     def _append_redirected_text(self, text):
-        """Parses stdout log text elements dynamically with modern color tags."""
-        cleaned_text = text.strip()
-        if not cleaned_text:
-            return
-
         self.console_view.moveCursor(self.console_view.textCursor().MoveOperation.End)
-        self.console_view.insertPlainText(cleaned_text)
+        self.console_view.insertPlainText(text)
         self.console_view.ensureCursorVisible()
 
     def _on_task_completed(self, success):
