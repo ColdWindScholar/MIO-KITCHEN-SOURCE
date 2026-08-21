@@ -424,13 +424,13 @@ class ProjectsPage(QWidget):
                         win.message_pop(lang.warn4.format(member_name))
                 print(lang.text81)
                 if os.path.isdir(project_manger.current_work_path()):
-                    project_menu.listdir()
-                    project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
+                    self.refresh_projects()
+                    self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
                 script2fs(project_manger.current_work_path())
                 unpackg.refs(True)
 
-            if settings.auto_unpack == '1':
-                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+            if cfg.autoUnpack:
+                self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
 
         # othters.
