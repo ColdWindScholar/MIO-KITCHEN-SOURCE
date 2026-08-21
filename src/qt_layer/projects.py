@@ -1044,7 +1044,7 @@ class ProjectsPage(QWidget):
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
                                  UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(),
                                  compress=self.f2fs_compresion.get()) != 0:
-                        print(lang.text75 % dname)
+                        print("Failed to pack %s!" % dname)
                     else:
                         if self.remove_source_files.get() == 1:
                             self.rdi(work, dname)
@@ -1091,14 +1091,14 @@ class ProjectsPage(QWidget):
                         exit_code = self.mke2fs(
                             name=dname, work=work,
                             work_output=project_manger.current_work_output_path(),
-                            sparse=self.format.get() in [
+                            sparse=format in [
                                 "dat",
                                 "br",
                                 "sparse"],
                             size=ext4_size_value,
                             UTC=self.UTC.get())
                     if exit_code:
-                        print(lang.text75 % dname)
+                        print("Failed to pack %s!" % dname)
                         continue
 
                     if self.remove_source_files.get() == 1:
