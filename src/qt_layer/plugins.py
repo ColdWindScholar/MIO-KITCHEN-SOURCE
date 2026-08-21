@@ -849,9 +849,8 @@ class PluginPage(QWidget):
                   
                """)
     def uninstall_plugin(self, plugin_id:str):
-        dialog = UninstallMpk(plugin_id, True, self)
-        if dialog.exec_():
-            return
+        UninstallMpk(plugin_id, True, self)
+
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
