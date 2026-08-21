@@ -74,7 +74,7 @@ class New(Toplevel):
         f.pack(padx=5, pady=5, side=LEFT)
         f = ttk.Frame(f_b)
         ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
-        self.intro = Text(f, width=40, height=15)
+        self.intro = tkinter.Text(f, width=40, height=15)
         self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
         f.pack(padx=5, pady=5, side=LEFT)
         f_b.pack(padx=5, pady=5)

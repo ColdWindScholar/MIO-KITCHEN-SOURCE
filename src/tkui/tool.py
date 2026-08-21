@@ -1504,7 +1504,6 @@ class Tool(TkinterEmbeddedPanel):
         self.notepad.pack(fill=BOTH, expand=True)
         self.gif_label = Label(self.tk_root)
         self.gif_label.pack(padx=10, pady=10, side=TOP)
-        MpkMan().gui()
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
