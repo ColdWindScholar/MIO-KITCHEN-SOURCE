@@ -22,3 +22,5 @@ configparser
 datetime
 androguard
 loguru
+PySide6-Fluent-Widgets[full]
+PySide6
