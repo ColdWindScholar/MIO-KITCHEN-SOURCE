@@ -1022,7 +1022,7 @@ class ProjectsPage(QWidget):
                     if parts_dict[dname] == self.origin_fs.get():
                         parts_dict[dname] = self.modify_fs.get()
                 if parts_dict[dname] == 'erofs':
-                    if mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
+                    if self.mkerofs(dname, str(self.erofs_compress_format.get()), work=work,
                                work_output=project_manger.current_work_output_path(), level=int(self.scale_erofs.get()),
                                old_kernel=self.erofs_old_kernel.get(), UTC=self.UTC.get()) != 0:
                         print("Failed to repack %s [erofs]" % dname)
@@ -1041,7 +1041,7 @@ class ProjectsPage(QWidget):
                             else:
                                 print(lang.text3.format(dname))
                 elif parts_dict[dname] == 'f2fs':
-                    if make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
+                    if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
                                  UTC=self.UTC.get(), readonly=self.f2fs_read_only.get(),
                                  compress=self.f2fs_compresion.get()) != 0:
                         print(lang.text75 % dname)
@@ -1081,14 +1081,14 @@ class ProjectsPage(QWidget):
                                 except ValueError:
                                     ext4_size_value = 0
                     if self.ext4_packer.get() == "make_ext4fs":
-                        exit_code = make_ext4fs(name=dname, work=work,
+                        exit_code = self.make_ext4fs(name=dname, work=work,
                                                 work_output=project_manger.current_work_output_path(),
                                                 sparse=self.format.get() in ["dat", "br", "sparse"],
                                                 size=ext4_size_value,
                                                 UTC=self.UTC.get(), has_contexts=os.path.exists(contexts_file))
 
                     else:
-                        exit_code = mke2fs(
+                        exit_code = self.mke2fs(
                             name=dname, work=work,
                             work_output=project_manger.current_work_output_path(),
                             sparse=self.format.get() in [
