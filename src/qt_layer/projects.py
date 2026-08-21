@@ -341,7 +341,7 @@ class ProjectsPage(QWidget):
             return
         # tar
         if ftype == 'tar':
-            print(lang.text79 + ifile)
+            print("Unpacking" + ifile)
             current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
                 utils.re_folder(project_manger.current_work_path())
