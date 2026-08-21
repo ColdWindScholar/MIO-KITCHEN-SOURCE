@@ -28,7 +28,7 @@ from qt_layer.settings import cfg
 from qt_layer.widgets import NewProjectDialog, show_info_bar
 from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
-from utils import gettype
+from utils import gettype, call
 from src.core.aml_image import main as aml_main
 
 try:
@@ -103,7 +103,55 @@ class ProjectManager:
 
 project_manger = ProjectManager()
 
-
+def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = None):
+    if not work:
+        work = project_manger.current_work_path()
+    if not boot:
+        if not (boot := utils.findfile(f"{name}.img", work)):
+            print(lang.warn3.format(name))
+            return
+    if not os.path.exists(boot):
+        win.message_pop(lang.warn3.format(name))
+        return
+    if os.path.exists(work + name):
+        if rmtree(work + name) != 0:
+            print(lang.text69)
+            return
+    utils.re_folder(work + name)
+    os.chdir(work + name)
+    if call(['magiskboot', 'unpack', '-h', '-n' if settings.magisk_not_decompress == '1' else '', boot]) != 0:
+        print(f"Unpack {boot} Fail...")
+        os.chdir(cfg.workingFolder.value)
+        rmtree(work + name)
+        return
+    if os.access(f"{work}/{name}/second", os.F_OK):
+        if gettype(f"{work}/{name}/second") == 'rk_rsce':
+            print("Unpack Rk resource...")
+            rsceutil_unpack(f"{work}/{name}/second", f"{work}/{name}/second_dump", f"{work}/{name}/second_order")
+            print("Unpack Rk resource successfully...")
+    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK) and settings.boot_skip_ramdisk == '0':
+        comp = gettype(f"{work}/{name}/ramdisk.cpio")
+        print(f"Ramdisk is {comp}")
+        with open(f"{work}/{name}/comp", "w", encoding='utf-8') as f:
+            f.write(comp)
+        if comp != "unknown":
+            os.rename(f"{work}/{name}/ramdisk.cpio", f"{work}/{name}/ramdisk.cpio.comp")
+            if call(["magiskboot", "decompress", f'{work}/{name}/ramdisk.cpio.comp',
+                     f'{work}/{name}/ramdisk.cpio']) != 0:
+                print("Failed to decompress Ramdisk...")
+                return
+        if not os.path.exists(f"{work}/{name}/ramdisk"):
+            os.mkdir(f"{work}/{name}/ramdisk")
+        print("Unpacking Ramdisk...")
+        if cfg.cpioImpl.value == 'python':
+            cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
+                         os.path.join(work, name, 'ramdisk.txt'))
+        else:
+            os.chdir(work + name)
+            utils.call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
+            os.chdir(cfg.workingFolder.value)
+    print("Unpack Done!")
+    os.chdir(cfg.workingFolder.value)
 def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     if output is None:
         output = project_manger.current_work_path()
