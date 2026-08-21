@@ -368,11 +368,11 @@ class PackSettingsDialog(MessageBoxBase):
 
         # 💡 创建隐藏的文件系统来源与目标下拉框组合
         self.src_fs_combo = ComboBox(other_container)
-        self.src_fs_combo.addItems(["f2fs", "ext4", "erofs"])
+        self.src_fs_combo.addItems(["ext", "f2fs", "erofs"])
         self.src_fs_combo.setFixedWidth(85)
 
         self.dest_fs_combo = ComboBox(other_container)
-        self.dest_fs_combo.addItems(["ext4", "f2fs", "erofs"])
+        self.dest_fs_combo.addItems(["ext", "f2fs", "erofs"])
         self.dest_fs_combo.setFixedWidth(85)
 
         # 初始默认状态必须完全隐藏
