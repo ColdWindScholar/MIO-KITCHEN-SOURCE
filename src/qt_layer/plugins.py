@@ -9,9 +9,8 @@ from typing import Any
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
-from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
-    FluentIcon, ScrollArea, SearchLineEdit, TitleLabel, DropDownToolButton, TransparentDropDownPushButton, \
-    TransparentDropDownToolButton, RoundMenu, Action
+from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, FluentIcon, ScrollArea, \
+    SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
 import utils
 from addon_register import loader, Entry
