@@ -138,7 +138,7 @@ class ProjectsPage(QWidget):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
             title="创建新项目",
-            existing_projects=project_manger.get_projects(),
+            existing_projects=list(project_manger.get_projects()),
             parent=self
         )
         if dialog.exec():
