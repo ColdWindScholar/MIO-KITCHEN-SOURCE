@@ -203,8 +203,8 @@ class ProjectsPage(QWidget):
 
         # 单选切换
         row2 = QHBoxLayout()
-        self.unpack_rb = RadioButton("核心解包 (Unpack)", container)
-        self.pack_rb = RadioButton("智能打包 (Pack)", container)
+        self.unpack_rb = RadioButton("解包", container)
+        self.pack_rb = RadioButton("打包", container)
         self.unpack_rb.setChecked(True)
 
         row2.addWidget(self.unpack_rb)
@@ -249,6 +249,30 @@ class ProjectsPage(QWidget):
             ("boot", "64.0 MB", "Raw", "Source", "read-write"),
             ("product", "877 MB", "EroFS", "Build", "read-only"),
             ("odm", "1.0 MB", "EroFS", "Source", "read-only"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
+            ("recovery", "128 MB", "Raw", "Build", "read-write"),
             ("recovery", "128 MB", "Raw", "Build", "read-write"),
         ]
         self.partition_table.setRowCount(len(mock_data))
