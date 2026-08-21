@@ -283,6 +283,7 @@ class ProjectsPage(QWidget):
         self.select_all_cb = CheckBox("全选所有", container)
         self.filter_input = SearchLineEdit(container)
         self.filter_input.setPlaceholderText("根据名称快速检索...")
+        self.filter_input.textChanged.connect(self.filter_tabview)
         self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
@@ -389,6 +390,19 @@ class ProjectsPage(QWidget):
                         (file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(work + file_name)), f_type,
                          "Image", "rw" if f_type == 'ext' else "ro",))
         return data
+
+    def filter_tabview(self, query:str):
+        search_query = query.strip().lower()
+        for row_idx in range(self.partition_table.rowCount()):
+            item = self.partition_table.item(row_idx, 0)
+            if item is not None:
+                cell_text = item.text().strip().lower()
+
+                if search_query in cell_text or not search_query:
+                    self.partition_table.setRowHidden(row_idx, False)
+                else:
+                    self.partition_table.setRowHidden(row_idx, True)
+
 
     def _load_mock_partitions_table(self, mock_data):
         """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
