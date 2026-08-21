@@ -381,7 +381,7 @@ class ProjectsPage(QWidget):
         # ofp
         if os.path.splitext(ifile)[1] == '.ofp':
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
-            if ask_win(lang.t12) == 1:
+            if self.ask_window("Question","Is it a mtk ofp"):
                 ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
             else:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
@@ -596,6 +596,14 @@ class ProjectsPage(QWidget):
             project_name = dialog.nameLineEdit.text().strip()
             project_manger.new(project_name)
             self.refresh_projects()
+
+    def ask_window(self, title, content):
+        result = MessageBox(
+            title,
+            content,
+            self
+        ).exec()
+        return result != 1
 
     def delete_project(self):
         """删除选中的项目并显示提示"""
