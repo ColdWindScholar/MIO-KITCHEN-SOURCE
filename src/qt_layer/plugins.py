@@ -856,7 +856,7 @@ class PluginPage(QWidget):
             self,
             "Open File",
             "",
-            "MPK Files (*.mpk);;Zip Files (*.zip)"
+            "MPK Files (*.mpk)"
         )
         if file_path:
             dialog = InstallMpk(file_path, self)
