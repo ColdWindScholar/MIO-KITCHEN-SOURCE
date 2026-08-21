@@ -2,9 +2,10 @@ import json
 import logging
 import os
 import platform
+import tkinter
 import zipfile
 from shutil import rmtree
-from tkinter import Toplevel
+from tkinter import Toplevel, ttk, HORIZONTAL, BOTH, TOP, X, Frame, RIGHT, LEFT
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
@@ -35,7 +36,7 @@ class New(Toplevel):
     def label_entry(master, text, side, value: str = ''):
         frame = Frame(master)
         ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
-        entry_value = tk.StringVar(value=value)
+        entry_value = tkinter.StringVar(value=value)
         entry = ttk.Entry(frame, textvariable=entry_value)
         entry.pack(padx=5, pady=5, side=RIGHT)
         frame.pack(padx=5, pady=5, fill=X, side=side)
