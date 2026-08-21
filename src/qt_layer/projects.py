@@ -1182,7 +1182,7 @@ class ProjectsPage(QWidget):
                     else:
                         print("Packed {}".format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                repack_boot(i)
+                self.repack_boot(i)
             elif parts_dict[i] == 'dtbo':
                 pack_dtbo()
             elif parts_dict[i] == 'splash':
