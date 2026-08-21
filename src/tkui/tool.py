@@ -5467,11 +5467,6 @@ def init_verify():
         ask_win(f"The path ({settings.path}) do not allow [space], please change the path!", is_top=True)
 
 
-def exit_tool():
-    module_manager.addon_loader.run_entry(module_manager.addon_entries.close)
-    win.destroy()
-
-
 def init_tk(windows_tk):
     global win
     win = windows_tk
