@@ -1077,7 +1077,8 @@ class ProjectsPage(QWidget):
             print("Successfully packed Boot...")
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
-                erofs_compress_format, scale_erofs, erofs_old_kernel, UTC) -> bool | None:
+                erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
+                f2fs_read_only, f2fs_compresion) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1135,8 +1136,8 @@ class ProjectsPage(QWidget):
                                 print("Packed successfully: {}!".format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
-                                 UTC=UTC, readonly=self.f2fs_read_only.get(),
-                                 compress=self.f2fs_compresion.get()) != 0:
+                                 UTC=UTC, readonly=f2fs_read_only,
+                                 compress=f2fs_compresion) != 0:
                         print("Failed to pack %s!" % dname)
                     else:
                         if remove_source_files:
@@ -1247,6 +1248,8 @@ class ProjectsPage(QWidget):
                                                         dialog.erofs_slider.value()    ,
                                                         dialog.support_old_kernel_switch.isChecked()  ,
                                                         dialog.utc_input.currentText(),
+                                                        dialog.f2fs_readonly_switch.isChecked(),
+                                                        dialog.f2fs_compress_switch.isChecked(),
                                                         )
             else:
                 return
