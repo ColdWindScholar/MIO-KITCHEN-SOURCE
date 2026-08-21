@@ -4,6 +4,9 @@ import pathlib
 import subprocess
 import sys
 import time
+
+import mkdtboimg
+
 if os.name == 'nt':
     from ctypes import windll
 from shutil import rmtree
@@ -27,6 +30,7 @@ from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype
 from src.core.aml_image import main as aml_main
+
 try:
     from src.core.pycase import ensure_dir_case_sensitive
 except ImportError:
@@ -100,6 +104,43 @@ class ProjectManager:
 project_manger = ProjectManager()
 
 
+def logo_dump(file_path, output: str = None, output_name: str = "logo"):
+    if output is None:
+        output = project_manger.current_work_path()
+    if not os.path.exists(file_path):
+        print(f"{file_path} does not exist")
+        return False
+    utils.re_folder(output + output_name)
+    utils.LogoDumper(file_path, output + output_name).unpack()
+
+
+def un_dtbo(bn: str = 'dtbo') -> None:
+    if not (dtboimg := utils.findfile(f"{bn}.img", work := project_manger.current_work_path())):
+        print(f"cannot find dtbo {bn}")
+        return
+    utils.re_folder(f"{work}/{bn}")
+    utils.re_folder(f"{work}/{bn}/dtbo")
+    utils.re_folder(f"{work}/{bn}/dts")
+    try:
+        mkdtboimg.dump_dtbo(dtboimg, f"{work}/{bn}/dtbo/dtbo")
+    except Exception as e:
+        logging.exception("Bugs")
+        print("making dtbo failed",e)
+        return
+    for dtbo in os.listdir(f"{work}/{bn}/dtbo"):
+        if dtbo.startswith("dtbo."):
+            print(f"Decompile {dtbo}")
+            utils.call(
+                exe=['dtc', '-@', '-I', 'dtb', '-O', 'dts', f'{work}/{bn}/dtbo/{dtbo}', '-o',
+                     os.path.join(work, bn, 'dts', 'dts.' + os.path.basename(dtbo).rsplit('.', 1)[1])],
+                out=False)
+    print(f"Unpack {bn} Done")
+    try:
+        os.remove(dtboimg)
+    except (Exception, BaseException):
+        logging.exception('Bugs')
+    rmtree(f"{work}/dtbo/dtbo")
+
 
 class ProjectsPage(QWidget):
     def __init__(self, parent=None):
@@ -148,6 +189,7 @@ class ProjectsPage(QWidget):
             padding-bottom: 4px;
         """)
         return title
+
     def refresh_projects(self):
         self.project_combo.clear()
         projects = project_manger.get_projects()
@@ -157,6 +199,7 @@ class ProjectsPage(QWidget):
             return
         cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
+
     def open_dir(self):
         name = self.project_combo.currentText()
         if not project_manger.exist(name):
@@ -178,6 +221,7 @@ class ProjectsPage(QWidget):
                 subprocess.Popen(['xdg-open', path])
         except Exception:
             show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
+
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
@@ -206,11 +250,12 @@ class ProjectsPage(QWidget):
             project_name = dialog.nameLineEdit.text().strip()
             project_manger.new(project_name)
             self.refresh_projects()
+
     def delete_project(self):
         """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self,"提示", "请先选择一个项目", bar_type=2)
+            show_info_bar(self, "提示", "请先选择一个项目", bar_type=2)
             return
 
         result = MessageBox(
@@ -224,10 +269,11 @@ class ProjectsPage(QWidget):
 
         try:
             project_manger.remove(project_name)
-            show_info_bar(self,"成功", f"项目{project_name}已删除", bar_type=3)
+            show_info_bar(self, "成功", f"项目{project_name}已删除", bar_type=3)
         except Exception as e:
             show_info_bar(self, "错误", f"删除项目失败: {str(e)}", bar_type=1)
         self.refresh_projects()
+
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         container = QWidget(parent_widget)
@@ -243,7 +289,8 @@ class ProjectsPage(QWidget):
         self.project_combo = ComboBox(container)
         self.project_combo.setPlaceholderText("选择或搜索目标项目...")
         self.project_combo.addItems(project_manger.get_projects())
-        self.project_combo.currentTextChanged.connect(lambda :cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
+        self.project_combo.currentTextChanged.connect(
+            lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
         self.open_btn = PushButton("打开", container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
         row1.addWidget(self.project_combo, 1)
@@ -305,7 +352,7 @@ class ProjectsPage(QWidget):
         self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
-                                   'update.app'])
+                                    'update.app'])
         self.format_combo.currentTextChanged.connect(self.refresh_unpack)
         self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
         self.unpack_rb = RadioButton("解包", container)
@@ -422,7 +469,7 @@ class ProjectsPage(QWidget):
                          "Image", "rw" if f_type == 'ext' else "ro",))
         return data
 
-    def filter_tabview(self, query:str):
+    def filter_tabview(self, query: str):
         search_query = query.strip().lower()
         for row_idx in range(self.partition_table.rowCount()):
             item = self.partition_table.item(row_idx, 0)
@@ -442,7 +489,7 @@ class ProjectsPage(QWidget):
                 except (Exception, BaseException):
                     logging.exception('Bugs')
         if not project_manger.exist():
-            show_info_bar(self, "warning", "project's not exist",2)
+            show_info_bar(self, "warning", "project's not exist", 2)
             return False
         elif not os.path.exists(project_manger.current_work_path()):
             show_info_bar(self, "warning", "project's not exist", 2)
@@ -500,7 +547,7 @@ class ProjectsPage(QWidget):
                 print(f"Decompressing {i}.new.dat.xz")
                 utils.Unxz(f"{work}/{i}.new.dat.xz")
             if os.access(f"{work}/{i}.new.dat.br", os.F_OK):
-                print( f"Decompressing  {i}.new.dat.br")
+                print(f"Decompressing  {i}.new.dat.br")
                 utils.call(['brotli', '-dj', f"{work}/{i}.new.dat.br"])
             if os.access(f"{work}/{i}.new.dat.1", os.F_OK):
                 with open(f"{work}/{i}.new.dat", 'ab') as ofd:
@@ -515,7 +562,8 @@ class ProjectsPage(QWidget):
                 if os.path.getsize(f"{work}/{i}.new.dat") != 0:
                     transferfile = f"{work}/{i}.transfer.list"
                     if os.access(transferfile, os.F_OK):
-                        parts['dat_ver'] = utils.Sdat2img(transferfile, f"{work}/{i}.new.dat", f"{work}/{i}.img").version
+                        parts['dat_ver'] = utils.Sdat2img(transferfile, f"{work}/{i}.new.dat",
+                                                          f"{work}/{i}.img").version
                         if os.access(f"{work}/{i}.img", os.F_OK):
                             os.remove(f"{work}/{i}.new.dat")
                             os.remove(transferfile)
@@ -663,6 +711,7 @@ class ProjectsPage(QWidget):
         parts.clear()
         print("Unpacking Done")
         return True
+
     def _load_mock_partitions_table(self, mock_data):
         """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
         self.partition_table.setRowCount(len(mock_data))
