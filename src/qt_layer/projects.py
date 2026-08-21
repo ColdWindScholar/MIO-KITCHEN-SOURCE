@@ -10,13 +10,14 @@ import uuid
 import zipfile
 from contextlib import suppress
 from shutil import copy
-from src.core.cpio import extract as cpio_extract, repack as cpio_repack
 
 import contextpatch
 import extra
 import fspatch
 import tarsafe
 from qt_layer.taskdialog import StreamLogDialog, GenericTaskWorker
+from src.core.cpio import repack as cpio_repack
+from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
 from src.core.unpac import MODE as PACMODE
 
@@ -985,11 +986,11 @@ class ProjectsPage(QWidget):
             os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
         return 0
 
-    def repack_boot(name: str = 'boot', source: str | None = None, boot: str | None = None):
+    def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None):
         work = project_manger.current_work_path()
         flag = ''
         if boot is None:
-            boot = findfile(f"{name}.img", work)
+            boot = utils.findfile(f"{name}.img", work)
             if not boot:
                 print("Origin boot is lost.Cannot repack boot.img.")
                 return
