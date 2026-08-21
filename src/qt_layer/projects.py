@@ -1,4 +1,5 @@
 import os
+from shutil import rmtree
 
 from qt_layer.settings import cfg
 
@@ -26,10 +27,10 @@ class ProjectManager:
 
     def current_work_path(self, mkdir=False):
         if cfg.projectStructure.value == 'Single':
-            path = self.get_work_path(current_project_name.get())
+            path = self.get_work_path(cfg.currentProjectName.value)
         else:
-            path = os.path.join(self.get_work_path(current_project_name.get()), 'Source') + os.sep
-            if not os.path.exists(path) and current_project_name.get():
+            path = os.path.join(self.get_work_path(cfg.currentProjectName.value), 'Source') + os.sep
+            if not os.path.exists(path) and cfg.currentProjectName.value:
                 os.makedirs(path, exist_ok=True)
         if mkdir:
             os.makedirs(path, exist_ok=True)
@@ -37,24 +38,24 @@ class ProjectManager:
 
     def current_origin_path(self):
         if cfg.projectStructure.value == 'Single':
-            path = self.get_work_path(current_project_name.get())
+            path = self.get_work_path(cfg.currentProjectName.value)
         else:
-            path = os.path.join(self.get_work_path(current_project_name.get()), 'Origin') + os.sep
-            if not os.path.exists(path) and current_project_name.get():
+            path = os.path.join(self.get_work_path(cfg.currentProjectName.value), 'Origin') + os.sep
+            if not os.path.exists(path) and cfg.currentProjectName.value:
                 os.makedirs(path, exist_ok=True)
         return path if os.name == 'nt' else path.replace('\\', '/')
 
     def current_work_output_path(self):
         if cfg.workingFolder.value == 'Single':
-            path = self.get_work_path(current_project_name.get())
+            path = self.get_work_path(cfg.currentProjectName.value)
         else:
-            path = os.path.join(self.get_work_path(current_project_name.get()), 'Output') + os.sep
-            if not os.path.exists(path) and current_project_name.get():
+            path = os.path.join(self.get_work_path(cfg.currentProjectName.value), 'Output') + os.sep
+            if not os.path.exists(path) and cfg.currentProjectName.value:
                 os.makedirs(path, exist_ok=True)
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def exist(self, name=None):
-        current_name = name or current_project_name.get()
+        current_name = name or cfg.currentProjectName.value
         if not current_name:
             return False
         return os.path.exists(self.get_work_path(current_name))
@@ -63,5 +64,5 @@ class ProjectManager:
         if not self.exist(name):
             return True
         else:
-            rmdir(self.get_work_path(name))
+            rmtree(self.get_work_path(name))
         return not self.exist(name)
