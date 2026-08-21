@@ -109,7 +109,6 @@ from src.core import utils
 from src.core.unpac import MODE as PACMODE, unpac
 from multiprocessing import cpu_count
 
-
 from src.core.extra import fspatch, re, contextpatch
 from src.core.utils import create_thread, move_center, v_code, gettype, is_empty_img, findfile, findfolder, Sdat2img, \
     Unxz
@@ -139,6 +138,7 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 
 cwd_path = utils.prog_path
+
 
 class LoadAnim:
     """Manages animated loading indicators for background tasks.
@@ -339,8 +339,6 @@ def warn_win(text: str = '', color: str = 'red', title: str | None = None,
     # This crucial line pauses the execution of the calling code until the
     # popup_window is destroyed, enforcing the modal behavior.
     parent.wait_window(popup_window)
-
-
 
 
 class CustomWidgets:
@@ -1471,7 +1469,6 @@ class Tool(TkinterEmbeddedPanel):
         self.message_pop = warn_win
         init_tk(self)
 
-
     def start_loops(self):
         for i in self.loops:
             create_thread(i)
@@ -1508,7 +1505,6 @@ class Tool(TkinterEmbeddedPanel):
         self.gif_label = Label(self.tk_root)
         self.gif_label.pack(padx=10, pady=10, side=TOP)
         MpkMan().gui()
-
 
     def tab6_content(self):
         ttk.Label(self.tab6, text=lang.toolbox, font=(None, 20)).pack(padx=10, pady=10, fill=BOTH)
@@ -1835,7 +1831,6 @@ class Updater(Toplevel):
 
 
 def error(code, desc="unknown error"):
-
     sv_ttk.use_dark_theme()
     er: Toplevel = Toplevel()
     er.protocol("WM_DELETE_WINDOW", win.destroy)
@@ -1881,7 +1876,7 @@ class Welcome(ttk.Frame):
         if not win:
             # This is a critical situation if Welcome expects 'win' to be its master.
             logging.critical(
-                    "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
+                "Welcome.__init__: Main application window 'win' is not available or not a Tk instance.")
             error(1, 'Missing Main Window.')
 
         super().__init__(master=win.tk_root)  # Explicitly pass master.
@@ -2099,7 +2094,10 @@ class Welcome(ttk.Frame):
         ttk.Label(self.frame, text=lang.t5, font=(None, 20)).pack(
             side='top', fill=BOTH, padx=10, pady=10, expand=True)
 
+
 from src.qt_layer.settings import cfg
+
+
 class SetUtils:
     def __init__(self, set_ini: str | None = None, load=True):
         self.project_struct = 'single'
@@ -2264,6 +2262,95 @@ def logo_pack(origin_logo=None) -> int:
     os.rename(logo, origin_logo)
     rmdir(dir_)
     return 1
+
+
+class New(Toplevel):
+
+    def __init__(self, create_gui_on_init=True):
+        super().__init__()
+        self.title(lang.text115)
+        if not hasattr(self, 'module_dir'):
+            self.module_dir = os.path.join(cwd_path, "bin", "module")
+
+        if create_gui_on_init:
+            self.gui()
+            move_center(self)
+
+    @staticmethod
+    def label_entry(master, text, side, value: str = ''):
+        frame = Frame(master)
+        ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
+        entry_value = tk.StringVar(value=value)
+        entry = ttk.Entry(frame, textvariable=entry_value)
+        entry.pack(padx=5, pady=5, side=RIGHT)
+        frame.pack(padx=5, pady=5, fill=X, side=side)
+        return entry_value
+
+    def editor_(self, id_=None):
+        if not id_:
+            win.message_pop(lang.warn2)
+            return False
+        if module_manager.is_virtual(id_):
+            print(f"{id_} is a virtual plugin.")
+            return False
+        path = os.path.join(self.module_dir, id_)
+        if os.path.exists(f"{path}/main.py"):
+            return editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
+        elif not os.path.exists(f'{path}/main.sh'):
+            with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
+                sh.write("echo 'MIO-KITCHEN'")
+        return editor.main(path, "main.sh")
+
+    def gui(self):
+        ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        f_b = ttk.Frame(self)
+        f = ttk.Frame(f_b)
+        self.name = self.label_entry(f, lang.t20, TOP, "example")
+        self.aou = self.label_entry(f, lang.t21, TOP, "MIO-KITCHEN")
+        self.ver = self.label_entry(f, lang.t22, TOP, "1.0")
+        self.dep = self.label_entry(f, lang.t23, TOP, '')
+        self.identifier = self.label_entry(f, lang.identifier, TOP, 'example.mio_kitchen.plugin')
+        #
+        self.system = self.label_entry(f, lang.supported_system, TOP, platform.system())
+        self.arch = self.label_entry(f, lang.supported_arch, TOP, platform.machine())
+        ###
+        f.pack(padx=5, pady=5, side=LEFT)
+        f = ttk.Frame(f_b)
+        ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
+        self.intro = Text(f, width=40, height=15)
+        self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
+        f.pack(padx=5, pady=5, side=LEFT)
+        f_b.pack(padx=5, pady=5)
+        ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
+        ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5,
+                                                                                              pady=5)
+
+    def create(self):
+        if not self.identifier.get():
+            return
+        if module_manager.is_installed(self.identifier.get()):
+            info_win(lang.warn19 % self.identifier.get())
+            return
+        data = {
+            "name": self.name.get(),
+            "author": self.aou.get() or 'MIO-KITCHEN',
+            "version": self.ver.get(),
+            "identifier": (iden := self.identifier.get()),
+            "describe": self.intro.get(1.0, tk.END),
+            "depend": self.dep.get(),
+            "system": self.system.get(),
+            "arch": self.arch.get()
+        }
+        self.destroy()
+
+        os.makedirs(f'{self.module_dir}/{iden}', exist_ok=True)
+        with open(f"{self.module_dir}/{iden}/info.json", 'w+', encoding='utf-8',
+                  newline='\n') as js:
+            json.dump(data, js, ensure_ascii=False, indent=4)
+        if callable(list_pls_plugin):
+            list_pls_plugin()
+        self.editor_(iden)
 
 
 class IconGrid(tk.Frame):
@@ -2833,94 +2920,6 @@ class ModuleManager:
         else:
             print(lang.t16 % output_mpk_path)
         return None
-
-    class New(Toplevel):
-
-        def __init__(self, create_gui_on_init=True):
-            super().__init__()
-            self.title(lang.text115)
-            if not hasattr(self, 'module_dir'):
-                self.module_dir = os.path.join(cwd_path, "bin", "module")
-
-            if create_gui_on_init:
-                self.gui()
-                move_center(self)
-
-        @staticmethod
-        def label_entry(master, text, side, value: str = ''):
-            frame = Frame(master)
-            ttk.Label(frame, text=text).pack(padx=5, pady=5, side=LEFT)
-            entry_value = tk.StringVar(value=value)
-            entry = ttk.Entry(frame, textvariable=entry_value)
-            entry.pack(padx=5, pady=5, side=RIGHT)
-            frame.pack(padx=5, pady=5, fill=X, side=side)
-            return entry_value
-
-        def editor_(self, id_=None):
-            if not id_:
-                win.message_pop(lang.warn2)
-                return False
-            if module_manager.is_virtual(id_):
-                print(f"{id_} is a virtual plugin.")
-                return False
-            path = os.path.join(self.module_dir, id_)
-            if os.path.exists(f"{path}/main.py"):
-                return editor.main(path, 'main.py', lexer=pygments.lexers.Python3Lexer)
-            elif not os.path.exists(f'{path}/main.sh'):
-                with open(f'{path}/main.sh', 'w+', encoding='utf-8', newline='\n') as sh:
-                    sh.write("echo 'MIO-KITCHEN'")
-            return editor.main(path, "main.sh")
-
-        def gui(self):
-            ttk.Label(self, text=lang.t19, font=(None, 25)).pack(fill=BOTH, expand=0, padx=10, pady=10)
-            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            f_b = ttk.Frame(self)
-            f = ttk.Frame(f_b)
-            self.name = self.label_entry(f, lang.t20, TOP, "example")
-            self.aou = self.label_entry(f, lang.t21, TOP, "MIO-KITCHEN")
-            self.ver = self.label_entry(f, lang.t22, TOP, "1.0")
-            self.dep = self.label_entry(f, lang.t23, TOP, '')
-            self.identifier = self.label_entry(f, lang.identifier, TOP, 'example.mio_kitchen.plugin')
-            #
-            self.system = self.label_entry(f, lang.supported_system, TOP, platform.system())
-            self.arch = self.label_entry(f, lang.supported_arch, TOP, platform.machine())
-            ###
-            f.pack(padx=5, pady=5, side=LEFT)
-            f = ttk.Frame(f_b)
-            ttk.Label(f, text=lang.t24).pack(padx=5, pady=5, expand=1)
-            self.intro = Text(f, width=40, height=15)
-            self.intro.pack(fill=BOTH, padx=5, pady=5, side=RIGHT)
-            f.pack(padx=5, pady=5, side=LEFT)
-            f_b.pack(padx=5, pady=5)
-            ttk.Separator(self, orient=HORIZONTAL).pack(padx=10, pady=10, fill=X)
-            ttk.Button(self, text=lang.text115, command=self.create, style='Accent.TButton').pack(fill=X, padx=5,
-                                                                                                  pady=5)
-
-        def create(self):
-            if not self.identifier.get():
-                return
-            if module_manager.is_installed(self.identifier.get()):
-                info_win(lang.warn19 % self.identifier.get())
-                return
-            data = {
-                "name": self.name.get(),
-                "author": self.aou.get() or 'MIO-KITCHEN',
-                "version": self.ver.get(),
-                "identifier": (iden := self.identifier.get()),
-                "describe": self.intro.get(1.0, tk.END),
-                "depend": self.dep.get(),
-                "system": self.system.get(),
-                "arch": self.arch.get()
-            }
-            self.destroy()
-
-            os.makedirs(f'{self.module_dir}/{iden}', exist_ok=True)
-            with open(f"{self.module_dir}/{iden}/info.json", 'w+', encoding='utf-8',
-                      newline='\n') as js:
-                json.dump(data, js, ensure_ascii=False, indent=4)
-            if callable(list_pls_plugin):
-                list_pls_plugin()
-            self.editor_(iden)
 
     class Parse(Toplevel):
 
@@ -3683,7 +3682,6 @@ def generate_bug_report():
              silent=True)
     re_folder(inner, quiet=True)
     print(f"\tThe Bug Report Was Saved:{bugreport}")
-
 
 
 class MpkStore(Toplevel):
@@ -4945,8 +4943,6 @@ def pack_super(sparse: bool, group_name: str, size: int, super_type, part_list: 
         return 1
 
 
-
-
 def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 2048576):
     """
     return percentage, speed, bytes_downloaded, file_size, elapsed
@@ -6089,8 +6085,6 @@ def info_win(text: str, ok: Optional[str] = None, master: Optional[tk.Wm] = None
     parent.wait_window(dialog)
 
 
-
-
 @animation
 def datbr(work: str, name: str, brl: str | int, dat_ver: int = 4):
     """
@@ -6498,9 +6492,9 @@ class UnpackGui(ttk.LabelFrame):
         It refreshes the list of items to reflect the contents of the new project.
         """
         # Check if the `hd` method exists and the widget itself is still valid before calling.
-        if self.winfo_exists() and hasattr(self,'hd'):
-                # Calling `hd()` will update the list of sections for the new project,
-                # taking into account the current mode (Unpack/Pack).
+        if self.winfo_exists() and hasattr(self, 'hd'):
+            # Calling `hd()` will update the list of sections for the new project,
+            # taking into account the current mode (Unpack/Pack).
             self.hd()
 
     def gui(self):

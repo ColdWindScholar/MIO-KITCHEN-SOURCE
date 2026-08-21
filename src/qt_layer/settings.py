@@ -17,7 +17,8 @@ config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 class Config(QConfig):
     """ 应用配置类 """
     allLanguages = [i[:-5] for i in os.listdir(os.path.join(prog_path, 'bin', 'languages'))]
-    tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
+    tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine())
+    module_dir = os.path.join(prog_path, "bin", "module")
     workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
     pluginRepo = ConfigItem("Tool", "pluginRepo", "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/")
     updateURL = ConfigItem("Tool", "updateURL", "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest")
