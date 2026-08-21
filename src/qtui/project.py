@@ -7,67 +7,11 @@ from PySide6.QtWidgets import (QVBoxLayout, QWidget, QHBoxLayout, QListWidgetIte
 from qfluentwidgets import (TitleLabel, PushButton, FluentIcon as FIF,
                             CardWidget, MessageBox, LineEdit, ComboBox,
                             ScrollArea as FluentScrollArea, ListWidget,
-                            InfoBar, InfoBarPosition, MessageBoxBase,
+                            MessageBoxBase,
                             SubtitleLabel, CaptionLabel)
 
-from .settings import cfg
 
 
-class CreateRenameDialog(MessageBoxBase):
-    """自定义对话框，用于创建或重命名项目"""
-    def __init__(self, title, existing_projects, initial_text="", parent=None):
-        super().__init__(parent)
-        self.existing_projects = existing_projects
-
-        self.titleLabel = SubtitleLabel(title, self)
-        self.nameLineEdit = LineEdit(self)
-        self.nameLineEdit.setPlaceholderText('输入项目名称')
-        self.nameLineEdit.setClearButtonEnabled(True)
-        self.nameLineEdit.setText(initial_text)
-
-        self.errorLabel = CaptionLabel(text="项目名称无效或已存在")
-        self.errorLabel.setTextColor("#cf1010", QColor(255, 28, 32))
-
-        self.viewLayout.addWidget(self.titleLabel)
-        self.viewLayout.addWidget(self.nameLineEdit)
-        self.viewLayout.addWidget(self.errorLabel)
-        self.errorLabel.hide()
-
-        self.widget.setMinimumWidth(350)
-        self.buttonLayout.addWidget(self.yesButton)
-        self.buttonLayout.addWidget(self.cancelButton)
-
-        self.yesButton.clicked.connect(self.__onYesButtonClicked)
-        self.cancelButton.clicked.connect(self.reject)
-        self.nameLineEdit.returnPressed.connect(self.yesButton.click)
-
-    def __onYesButtonClicked(self):
-        if self.validate():
-            self.accept()
-        else:
-            self.yesButton.setEnabled(True)
-
-    def validate(self):
-        project_name = self.nameLineEdit.text().strip()
-        if not project_name:
-            self.errorLabel.setText("项目名称不能为空")
-            self.errorLabel.show()
-            return False
-
-        invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
-        if any(char in project_name for char in invalid_chars):
-            self.errorLabel.setText("名称包含非法字符")
-            self.errorLabel.show()
-            return False
-
-        if (project_name in self.existing_projects and
-                project_name != self.nameLineEdit.text().strip()):
-            self.errorLabel.setText("项目名称已存在")
-            self.errorLabel.show()
-            return False
-
-        self.errorLabel.hide()
-        return True
 
 
 class ProjectCard(CardWidget):
