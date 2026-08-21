@@ -573,9 +573,85 @@ class UninstallMpk(MessageBoxBase):
 
     def remove(self, name=None, show_name=''):
         logging.debug(f"UninstallMpk.remove called for: {name} (shown as: {show_name})")
+
+        # 1. Parameter Validation Check
         if not name:
             logging.warning("UninstallMpk.remove: 'name' (plugin ID) is None or empty.")
+            return
 
+        module_path = os.path.join(self.module_dir, str(name))
+        plugin_successfully_removed_fs = False
+
+        # 2. Update Button Text Dynamically (Uninstallation in progress)
+        if self.uninstall_b:
+            self.uninstall_b.setText(lang.text29.format(show_name if show_name else name))
+            # Replaces self.update_idletasks() to instantly force visual updates to screen
+            QApplication.processEvents()
+
+        print(lang.text29.format(show_name if show_name else name))
+
+        # 3. File System Removal Process
+        if os.path.exists(module_path):
+            try:
+                rmtree(module_path)
+                if not os.path.exists(module_path):
+                    plugin_successfully_removed_fs = True
+                    logging.info(f"Successfully removed directory: {module_path}")
+                else:
+                    logging.warning(
+                        f"Directory {module_path} reported as existing after rmtree call for plugin '{name}', though no exception was raised.")
+                    if not os.path.exists(module_path):
+                        plugin_successfully_removed_fs = True
+                        logging.info(f"Re-check confirms directory {module_path} is actually gone.")
+
+            except PermissionError as e_perm:
+                logging.exception(f"PermissionError removing '{module_path}' for plugin '{name}': {e_perm}")
+                msg_template = getattr(lang, "warn9_permission", "Permission denied for '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_perm)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            except Exception as e_generic:
+                logging.exception(f"Generic error removing '{module_path}' for plugin '{name}': {e_generic}")
+                msg_template = getattr(lang, "warn9_generic", "Failed to remove '{path}'. Error: {error}")
+                win.message_pop(msg_template.format(path=module_path, error=str(e_generic)), 'orange',
+                                title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+        else:
+            plugin_successfully_removed_fs = True
+            logging.info(
+                f"Module path '{module_path}' did not exist for plugin '{name}'. Assumed removed or not present on filesystem.")
+
+        # 4. Handle Post-Removal Interface Synchronization Updates
+        if not plugin_successfully_removed_fs and os.path.exists(module_path):
+            win.message_pop(lang.warn9.format(show_name if show_name else name), 'orange',
+                            title=getattr(lang, "uninstall_error_title", "Uninstall Error"))
+            logging.warning(f"Directory '{module_path}' still exists after removal attempt for plugin '{name}'.")
+
+        elif plugin_successfully_removed_fs:
+            if self.uninstall_b:
+                self.uninstall_b.setText(lang.text30.format(show_name if show_name else name))
+                QApplication.processEvents()
+
+            print(lang.text30.format(show_name if show_name else name))
+            logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
+
+            # Trigger list plugin update via safe standalone execution invocation
+            if callable(list_pls_plugin):
+                list_pls_plugin()
+            else:
+                logging.warning("list_pls_plugin is NOT callable. MpkMan will not be updated from here.")
+
+            # Update your existing Active MpkStore Instance safely using Qt properties
+            if hasattr(states, 'active_mpk_store_instance') and states.active_mpk_store_instance:
+                # Use standard object checks since Qt handles its own internal lifecycle tracking
+                try:
+                    logging.debug(f"MpkStore is open. Calling update_plugin_state for plugin_id: '{name}'")
+                    states.active_mpk_store_instance.update_plugin_state(name)
+                except Exception as e_store:
+                    logging.debug(f"Failed to update active store UI instance: {e_store}")
+            else:
+                logging.debug(
+                    f"MpkStore is not open or instance not available. No update sent to MpkStore for plugin_id: '{name}'.")
+
+        logging.debug(f"UninstallMpk.remove completed for: {name}")
 
 
 class InstallMpk(MessageBoxBase):
