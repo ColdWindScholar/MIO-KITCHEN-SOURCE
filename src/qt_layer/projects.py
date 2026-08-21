@@ -9,6 +9,7 @@ import time
 import gzip
 import zipfile
 
+import extra
 import tarsafe
 from src.core.unpac import MODE as PACMODE, unpac
 from shutil import rmtree, copy, move
@@ -295,6 +296,18 @@ class ProjectsPage(QWidget):
                 # Call file target router processor
                 self.dndfile(file_paths)
 
+    def script2fs(self, path: str):
+        if os.path.exists(os.path.join(path, "system", "app")):
+            if not os.path.exists(path + "/config"):
+                os.makedirs(path + "/config")
+            extra.script2fs_context(utils.findfile("updater-script", f"{path}/META-INF"), f"{path}/config", path)
+            json_ = utils.JsonEdit(os.path.join(path, "config", "parts_info"))
+            parts = json_.read()
+            for v in os.listdir(path):
+                if os.path.exists(path + f"/config/{v}_fs_config"):
+                    if v not in parts.keys():
+                        parts[v] = 'ext'
+            json_.write(parts)
     def unpackrom(self, ifile: str) -> None:
         print("Unpacking" + ifile, f'Type:[{(ftype := gettype(ifile))}]')
         # gzip
@@ -369,7 +382,7 @@ class ProjectsPage(QWidget):
                 ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
             else:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
-                script2fs(project_manger.current_work_path())
+                self.script2fs(project_manger.current_work_path())
             self.refresh_projects()
             return
         # ops
