@@ -350,7 +350,7 @@ class ProjectsPage(QWidget):
         work = project_manger.current_work_path()
         if not os.path.exists(work):
             print("Work path does not exist")
-            return False
+            return data
         parts_dict = utils.JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
