@@ -495,8 +495,8 @@ class PluginPage(QWidget):
         self.scroll_content = QWidget()
         self.scroll_content.setObjectName("ScrollContent")
         self.cards_layout = QVBoxLayout(self.scroll_content)
-        self.cards_layout.setContentsMargins(0, 0, 10, 0)
-        self.cards_layout.setSpacing(12)
+        self.cards_layout.setContentsMargins(0, 5, 0, 0)
+        self.cards_layout.setSpacing(5)
         self.cards_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # 5. Populate Plugin Cards dynamically
