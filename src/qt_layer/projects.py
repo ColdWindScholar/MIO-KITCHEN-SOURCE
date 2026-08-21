@@ -242,6 +242,14 @@ class ProjectsPage(QWidget):
         self._load_mock_partitions_table(self.refresh_repack_list())
     def refresh_repack_list(self):
         data = []
+        work = project_manger.current_work_path()
+        if not os.path.exists(work):
+            print("Work path does not exist")
+            return False
+        parts_dict = utils.JsonEdit(f"{work}/config/parts_info").read()
+        for folder in os.listdir(work):
+            if os.path.isdir(work + folder) and folder in parts_dict.keys():
+                data.append((folder, utils.hum_convert(os.path.getsize(work + folder)), parts_dict.get(folder, 'Unknown'), "Source","rw"))
         return data
     def refresh_unpack(self):
         self.partition_table.clearContents()
