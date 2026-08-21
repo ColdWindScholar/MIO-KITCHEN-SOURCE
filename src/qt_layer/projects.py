@@ -5,13 +5,13 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QListWidgetItem, QTableWidgetItem, QLabel, \
     QHeaderView
 from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget
+    SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget, MessageBox
 
 import lpunpack
 import splituapp
 import utils
 from qt_layer.settings import cfg
-from qt_layer.widgets import NewProjectDialog
+from qt_layer.widgets import NewProjectDialog, show_info_bar
 from utils import gettype
 
 
@@ -158,7 +158,27 @@ class ProjectsPage(QWidget):
             project_name = dialog.nameLineEdit.text().strip()
             project_manger.new(project_name)
             self.refresh_projects()
+    def delete_project(self):
+        """删除选中的项目并显示提示"""
+        project_name = cfg.currentProjectName.value
+        if not project_name:
+            show_info_bar(self,"提示", "请先选择一个项目", bar_type=2)
+            return
 
+        result = MessageBox(
+            "确认删除",
+            f"确定要删除项目 '{project_name}' 吗?",
+            self
+        ).exec()
+
+        if result != 1:
+            return
+
+        try:
+            project_manger.remove(project_name)
+            show_info_bar(self,"成功", f"项目{project_name}已删除", bar_type=3)
+        except Exception as e:
+            show_info_bar(self, "错误", f"删除项目失败: {str(e)}", bar_type=1)
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         container = QWidget(parent_widget)
@@ -188,6 +208,7 @@ class ProjectsPage(QWidget):
         self.rename_btn = PushButton("重命名", container, FIF.EDIT)
         self.rename_btn.clicked.connect(self.show_rename_dialog)
         self.delete_btn = PushButton("删除", container, FIF.DELETE)
+        self.delete_btn.clicked.connect(self.delete_project)
 
         for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
             btn.setMinimumWidth(90)
