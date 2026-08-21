@@ -2,10 +2,10 @@ import os
 from shutil import rmtree
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QListWidgetItem, QTableWidgetItem, QLabel, \
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
-from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget, MessageBox
+from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
+    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox
 
 import lpunpack
 import splituapp
