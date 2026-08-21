@@ -1007,7 +1007,7 @@ class ProjectsPage(QWidget):
             if cfg.cpioImpl.value == 'Python':
                 cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
             else:
-                cpio = os.path.join(settings.tool_bin, 'cpio' if os.name != 'nt' else "cpio.exe")
+                cpio = os.path.join(cfg.tool_bin, 'cpio' if os.name != 'nt' else "cpio.exe")
                 cpio = os.path.realpath(cpio)
                 if os.name == 'nt':
                     cpio = cpio.replace("\\", '/')
