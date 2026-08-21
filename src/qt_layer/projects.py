@@ -169,6 +169,7 @@ class ProjectsPage(QWidget):
         frame = QHBoxLayout()
         frame.addWidget(self._create_section_title("分区"))
         self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
+        self.execute_btn.setFixedWidth(80)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
 
@@ -192,9 +193,11 @@ class ProjectsPage(QWidget):
         self.filter_input = SearchLineEdit(container)
         self.filter_input.setPlaceholderText("根据名称快速检索...")
         self.filter_input.setFixedWidth(240)
+        self.format_combo = ComboBox(container)
+        self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
 
         row1.addWidget(self.select_all_cb)
-        row1.addStretch(1)
+        row1.addWidget(self.format_combo)
         row1.addWidget(self.filter_input)
         layout.addLayout(row1)
 
@@ -203,19 +206,13 @@ class ProjectsPage(QWidget):
         self.unpack_rb = RadioButton("核心解包 (Unpack)", container)
         self.pack_rb = RadioButton("智能打包 (Pack)", container)
         self.unpack_rb.setChecked(True)
+
         row2.addWidget(self.unpack_rb)
         row2.addWidget(self.pack_rb)
+
         row2.addStretch(1)
         layout.addLayout(row2)
 
-        # 格式与执行
-        row3 = QHBoxLayout()
-        self.format_combo = ComboBox(container)
-        self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
-
-
-        row3.addWidget(self.format_combo, 1)
-        layout.addLayout(row3)
 
         self.scroll_layout.addWidget(container)
 
@@ -227,7 +224,7 @@ class ProjectsPage(QWidget):
         layout.setSpacing(12)
 
         # 标题放外面
-        layout.addWidget(self._create_section_title("高级工具箱 / Developer Tools"))
+        layout.addWidget(self._create_section_title("高级工具箱"))
 
         # 工具按钮行
         tools_layout = QHBoxLayout()
