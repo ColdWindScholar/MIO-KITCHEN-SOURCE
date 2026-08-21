@@ -466,7 +466,7 @@ class PluginPage(QWidget):
         text_header_layout = QVBoxLayout()
         text_header_layout.setSpacing(4)
 
-        title = TitleLabel("插件", self)
+        title = TitleLabel("插件")
         description = CaptionLabel("单击右键以显示菜单，或在此启动您的功能模块", self)
 
         text_header_layout.addWidget(title)
