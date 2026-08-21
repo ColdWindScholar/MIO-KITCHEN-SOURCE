@@ -16,7 +16,7 @@ from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.settings import cfg
 from src.core import imp
-from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang
+from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang, move_center
 from src.qt_layer.widgets import show_info_bar
 module_error_codes = ModuleErrorCodes
 class New(Toplevel):
