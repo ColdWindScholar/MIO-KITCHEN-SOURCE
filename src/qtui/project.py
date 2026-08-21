@@ -15,6 +15,7 @@ from qt_layer.widgets import show_info_bar
 
 class ProjectCard(CardWidget):
     """项目卡片，显示单个项目"""
+
     def __init__(self, project_name, project_page, parent=None):
         super().__init__(parent)
         self.project_name = project_name
@@ -79,6 +80,7 @@ class ProjectCard(CardWidget):
 
 class ProjectPage(QWidget):
     """项目页面，管理项目列表和镜像操作"""
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ProjectPage")
@@ -147,7 +149,7 @@ class ProjectPage(QWidget):
         self.cards_layout.setContentsMargins(0, 0, 10, 0)
         self.cards_layout.setSpacing(10)
 
-        #add new projects
+        # add new projects
         for project in self.projects:
             card = ProjectCard(project, self, self.cards_container)
             if card in self.projects_cards:
@@ -413,7 +415,8 @@ class ProjectPage(QWidget):
             if selected_format == 'payload.bin':
                 images = [f for f in os.listdir(project_path) if f.lower() == 'payload.bin']
             elif selected_format == 'super':
-                images = [f for f in os.listdir(project_path) if f.lower().startswith('super') and f.lower().endswith(('.img', '.bin'))]
+                images = [f for f in os.listdir(project_path) if
+                          f.lower().startswith('super') and f.lower().endswith(('.img', '.bin'))]
             else:
                 images = [f for f in os.listdir(project_path) if f.lower().endswith(f".{selected_format}")]
             if images:
@@ -466,4 +469,3 @@ class ProjectPage(QWidget):
             return
         print(f"准备分解的镜像文件: {', '.join(self.selected_images)}")
         self.show_info_bar("提示", f"准备分解: {', '.join(self.selected_images)}", bar_type=3)
-
