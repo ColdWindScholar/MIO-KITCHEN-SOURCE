@@ -1044,11 +1044,11 @@ class ProjectsPage(QWidget):
             print("Successfully packed Ramdisk..")
         if call(['magiskboot', 'repack', flag, boot]) != 0:
             print("Failed to Pack boot...")
-            os.chdir(cwd_path)
+            os.chdir(cfg.workingFolder.value)
         else:
             os.remove(boot)
             os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
-            os.chdir(cwd_path)
+            os.chdir(cfg.workingFolder.value)
             try:
                 rmtree(source)
             except (Exception, BaseException):
