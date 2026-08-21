@@ -476,7 +476,7 @@ class ProjectsPage(QWidget):
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
-            print(lang.text82 % ftype)
+            print("Unsupported %s" % ftype)
         self.refresh_projects()
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
