@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 from shutil import rmtree
 
 from PySide6.QtCore import Qt
@@ -138,6 +140,27 @@ class ProjectsPage(QWidget):
             return
         cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
+    def open_dir(self):
+        name = self.project_combo.currentText()
+        if not project_manger.exist(name):
+            show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
+            return
+
+        path = project_manger.get_work_path(name)
+        if not path or not os.path.exists(path):
+            show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
+            return
+
+        try:
+            path = os.path.normpath(path)
+            if os.name == 'nt':
+                os.startfile(path)  # type: ignore[attr-defined]
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', path])
+            else:
+                subprocess.Popen(['xdg-open', path])
+        except Exception:
+            show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
@@ -205,6 +228,7 @@ class ProjectsPage(QWidget):
         self.project_combo.addItems(project_manger.get_projects())
         self.project_combo.currentTextChanged.connect(lambda :cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
         self.open_btn = PushButton("打开", container, FIF.FOLDER)
+        self.open_btn.clicked.connect(self.open_dir)
         row1.addWidget(self.project_combo, 1)
         row1.addWidget(self.open_btn)
         layout.addLayout(row1)
