@@ -18,6 +18,7 @@ import images
 import utils
 from addon_register import loader, Entry
 from config_parser import ConfigParser
+from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
 from src.core import imp
 from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang, move_center
@@ -627,7 +628,7 @@ class ModuleManager:
     def run(self, id_=None) -> int:
         if not id_:
             return 0
-        if not current_project_name.get():
+        if not cfg.currentProjectName.value:
             print(lang.warn1)
             return 1
         if id_:
@@ -693,7 +694,7 @@ class ModuleManager:
             norm_module_exec = os.path.normpath(module_exec).replace(os.sep, '/')
             norm_main_sh_path = os.path.normpath(main_sh_path).replace(os.sep, '/')
             exports['tool_bin'] = norm_tool_bin
-            exports['version'] = settings.version
+            exports['version'] = "b"
             exports['language'] = cfg.language.value
             exports['bin'] = norm_script_path
             exports['moddir'] = norm_module_dir

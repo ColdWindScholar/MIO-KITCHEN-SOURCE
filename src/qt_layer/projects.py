@@ -66,3 +66,5 @@ class ProjectManager:
         else:
             rmtree(self.get_work_path(name))
         return not self.exist(name)
+
+project_manger = ProjectManager()
