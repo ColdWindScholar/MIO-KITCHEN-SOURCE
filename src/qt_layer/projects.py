@@ -11,6 +11,7 @@ import lpunpack
 import splituapp
 import utils
 from qt_layer.settings import cfg
+from qt_layer.widgets import NewProjectDialog
 from utils import gettype
 
 
@@ -128,6 +129,17 @@ class ProjectsPage(QWidget):
         """)
         return title
 
+    def show_create_dialog(self):
+        """显示创建项目对话框"""
+        dialog = NewProjectDialog(
+            title="创建新项目",
+            existing_projects=project_manger.get_projects(),
+            parent=self
+        )
+        if dialog.exec():
+            project_name = dialog.nameLineEdit.text().strip()
+            project_manger.new(project_name)
+
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         container = QWidget(parent_widget)
@@ -150,6 +162,7 @@ class ProjectsPage(QWidget):
 
         row2 = QHBoxLayout()
         self.new_btn = PushButton("新建", container, FIF.ADD)
+        self.new_btn.clicked.connect(self.show_create_dialog)
         self.refresh_btn = PushButton("刷新", container, FIF.SYNC)
         self.rename_btn = PushButton("重命名", container, FIF.EDIT)
         self.delete_btn = PushButton("删除", container, FIF.DELETE)
