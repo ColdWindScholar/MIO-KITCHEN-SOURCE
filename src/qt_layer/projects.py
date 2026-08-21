@@ -142,7 +142,7 @@ class ProjectsPage(QWidget):
         row1 = QHBoxLayout()
         self.project_combo = ComboBox(container)
         self.project_combo.setPlaceholderText("选择或搜索目标项目...")
-        self.project_combo.addItem("21212")
+        self.project_combo.addItems(project_manger.get_projects())
         self.open_btn = PushButton("打开", container, FIF.FOLDER)
         row1.addWidget(self.project_combo, 1)
         row1.addWidget(self.open_btn)
