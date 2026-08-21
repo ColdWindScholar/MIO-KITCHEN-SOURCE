@@ -137,16 +137,16 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
     if not os.path.exists(boot):
         print(f"cannot find boot:{name}")
         return
-    if os.path.exists(work + name):
-        if rmtree(work + name) != 0:
+    if os.path.exists(os.path.join(work, name)):
+        if rmtree(os.path.join(work, name)) != 0:
             print(f"remove tree failed:{name}")
             return
-    utils.re_folder(work + name)
-    os.chdir(work + name)
+    utils.re_folder(os.path.join(work, name))
+    os.chdir(os.path.join(work, name))
     if call(['magiskboot', 'unpack', '-h', '-n', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cfg.workingFolder.value)
-        rmtree(work + name)
+        rmtree(os.path.join(work, name))
         return
     if os.access(f"{work}/{name}/second", os.F_OK):
         if gettype(f"{work}/{name}/second") == 'rk_rsce':
