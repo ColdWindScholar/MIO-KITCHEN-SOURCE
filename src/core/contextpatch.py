@@ -17,7 +17,7 @@
 import os
 from re import escape, search
 from typing import Any, Generator, Union, Optional
-from .utils import JsonEdit
+from src.core.utils import JsonEdit
 
 
 def scan_context(file) -> dict:
