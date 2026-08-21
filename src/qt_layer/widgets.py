@@ -380,7 +380,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.dest_fs_combo.hide()
 
         # 🔗 核心信号槽：将文件系统转换开关绑定到可见性处理器上
-        self.sw_convert.checkedChanged.connect(self._on_convert_toggled)
+        self.sw_convert.checkStateChanged.connect(self._on_convert_toggled)
 
         self.sw_vbmeta = CheckBox(other_container)
         self.lbl_vbmeta = QLabel("处理Vbmeta", other_container)
