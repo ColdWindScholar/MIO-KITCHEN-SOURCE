@@ -2585,6 +2585,117 @@ class UninstallMpk(Toplevel):
 module_error_codes = ModuleErrorCodes
 
 
+class Parse(Toplevel):
+    gavs = {}
+    cancel = False
+
+    @staticmethod
+    def _text(master, text, fontsize, side):
+        ttk.Label(master, text=text,
+                  font=(None, int(fontsize))).pack(side=side, padx=5, pady=5)
+
+    @staticmethod
+    def _button(master, text, command):
+        ttk.Button(master, text=text,
+                   command=lambda: exec(command)).pack(side='left')
+
+    def _filechose(self, master, set, text):
+        ft = ttk.Frame(master)
+        ft.pack(fill=X)
+        self.gavs[set] = StringVar()
+        ttk.Label(ft, text=text).pack(side='left', padx=10, pady=10)
+        ttk.Entry(ft, textvariable=self.gavs[set]).pack(side='left', padx=5, pady=5)
+        ttk.Button(ft, text=lang.text28,
+                   command=lambda: self.gavs[set].set(
+                       filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
+
+    def _radio(self, master, set, opins, side):
+        self.gavs[set] = StringVar()
+        pft1 = ttk.Frame(master)
+        pft1.pack(padx=10, pady=10)
+        for option in opins.split():
+            text, value = option.split('|')
+            self.gavs[set].set(value)
+            ttk.Radiobutton(pft1, text=text, variable=self.gavs[set],
+                            value=value).pack(side=side)
+
+    def _input(self, master, set, text):
+        input_frame = Frame(master)
+        input_frame.pack(fill=X, padx=5, pady=5)
+        self.gavs[set] = StringVar()
+        if text != 'None':
+            ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
+        ttk.Entry(input_frame, textvariable=self.gavs[set]).pack(side=LEFT, pady=5,
+                                                                 padx=5,
+                                                                 fill=X)
+
+    def _checkbutton(self, master, set, text):
+        self.gavs[set] = IntVar()
+        text = '' if text == 'None' else text
+        ttk.Checkbutton(master, text=text, variable=self.gavs[set], onvalue=1,
+                        offvalue=0,
+                        style="Switch.TCheckbutton").pack(
+            padx=5, pady=5, fill=BOTH)
+
+    def __unknown(self, master, type, side):
+        self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
+        self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
+
+    def _cancel(self):
+        self.cancel = True
+        self.destroy()
+
+    def __init__(self, jsons):
+        super().__init__()
+        self.protocol("WM_DELETE_WINDOW", lambda: self._cancel())
+        with open(jsons, 'r', encoding='UTF-8') as f:
+            try:
+                data = json.load(f)
+            except Exception as e:
+                win.message_pop(lang.text133 + str(e))
+                print(lang.text133 + str(e))
+                self.destroy()
+            self.title(data['main']['info']['title'])
+            height = data['main']['info']['height']
+            width = data['main']['info']['weight']
+            self.w_assert = data['main']['info'].get('assert', "False")
+            if height != 'none' and width != 'none':
+                self.geometry(f"{width}x{height}")
+            resizable = data['main']['info']['resize']
+            try:
+                self.attributes('-topmost', 'true')
+            except (Exception, BaseException):
+                logging.exception('Bugs')
+            self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
+            for group_name, group_data in data['main'].items():
+                if group_name == 'info':
+                    continue
+                group_frame = ttk.LabelFrame(self, text=group_data['title'])
+                group_frame.pack(padx=10, pady=10)
+                for con in group_data['controls']:
+                    if hasattr(self, f'_{con["type"]}'):
+                        control = getattr(self, f'_{con["type"]}')
+                    else:
+                        control = self.__unknown
+                    try:
+                        varnames = control.__code__.co_varnames[:control.__code__.co_argcount]
+                    except AttributeError:
+                        logging.exception('Var')
+                        continue
+                    args = [group_frame]
+                    args += [con.get(i, 'None') for i in varnames if i not in ['master', 'self']]
+                    try:
+                        control(*args)
+                    except (AttributeError, TypeError):
+                        logging.exception('V!')
+                        print(con, args, varnames)
+        ttk.Button(self, text=lang.ok,
+                   command=lambda: self.destroy()).pack(
+            fill=X,
+            side='bottom')
+        move_center(self)
+        self.wait_window()
+
 class ModuleManager:
     def __init__(self):
         sys.stdout_origin = sys.stdout
@@ -2976,118 +3087,6 @@ class ModuleManager:
         else:
             print(lang.t16 % output_mpk_path)
         return None
-
-    class Parse(Toplevel):
-
-        gavs = {}
-        cancel = False
-
-        @staticmethod
-        def _text(master, text, fontsize, side):
-            ttk.Label(master, text=text,
-                      font=(None, int(fontsize))).pack(side=side, padx=5, pady=5)
-
-        @staticmethod
-        def _button(master, text, command):
-            ttk.Button(master, text=text,
-                       command=lambda: exec(command)).pack(side='left')
-
-        def _filechose(self, master, set, text):
-            ft = ttk.Frame(master)
-            ft.pack(fill=X)
-            self.gavs[set] = StringVar()
-            ttk.Label(ft, text=text).pack(side='left', padx=10, pady=10)
-            ttk.Entry(ft, textvariable=self.gavs[set]).pack(side='left', padx=5, pady=5)
-            ttk.Button(ft, text=lang.text28,
-                       command=lambda: self.gavs[set].set(
-                           filedialog.askopenfilename())).pack(side='left', padx=10, pady=10)
-
-        def _radio(self, master, set, opins, side):
-            self.gavs[set] = StringVar()
-            pft1 = ttk.Frame(master)
-            pft1.pack(padx=10, pady=10)
-            for option in opins.split():
-                text, value = option.split('|')
-                self.gavs[set].set(value)
-                ttk.Radiobutton(pft1, text=text, variable=self.gavs[set],
-                                value=value).pack(side=side)
-
-        def _input(self, master, set, text):
-            input_frame = Frame(master)
-            input_frame.pack(fill=X, padx=5, pady=5)
-            self.gavs[set] = StringVar()
-            if text != 'None':
-                ttk.Label(input_frame, text=text).pack(side=LEFT, padx=5, pady=5, fill=X)
-            ttk.Entry(input_frame, textvariable=self.gavs[set]).pack(side=LEFT, pady=5,
-                                                                     padx=5,
-                                                                     fill=X)
-
-        def _checkbutton(self, master, set, text):
-            self.gavs[set] = IntVar()
-            text = '' if text == 'None' else text
-            ttk.Checkbutton(master, text=text, variable=self.gavs[set], onvalue=1,
-                            offvalue=0,
-                            style="Switch.TCheckbutton").pack(
-                padx=5, pady=5, fill=BOTH)
-
-        def __unknown(self, master, type, side):
-            self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
-            self._text(master, lang.warn14.format(type), 10, side if side != 'None' else 'bottom')
-
-        def _cancel(self):
-            self.cancel = True
-            self.destroy()
-
-        def __init__(self, jsons):
-            super().__init__()
-            self.protocol("WM_DELETE_WINDOW", lambda: self._cancel())
-            with open(jsons, 'r', encoding='UTF-8') as f:
-                try:
-                    data = json.load(f)
-                except Exception as e:
-                    win.message_pop(lang.text133 + str(e))
-                    print(lang.text133 + str(e))
-                    self.destroy()
-                self.title(data['main']['info']['title'])
-                height = data['main']['info']['height']
-                width = data['main']['info']['weight']
-                self.w_assert = data['main']['info'].get('assert', "False")
-                if height != 'none' and width != 'none':
-                    self.geometry(f"{width}x{height}")
-                resizable = data['main']['info']['resize']
-                try:
-                    self.attributes('-topmost', 'true')
-                except (Exception, BaseException):
-                    logging.exception('Bugs')
-                self.resizable(True, True) if resizable == '1' else self.resizable(False, False)
-                for group_name, group_data in data['main'].items():
-                    if group_name == 'info':
-                        continue
-                    group_frame = ttk.LabelFrame(self, text=group_data['title'])
-                    group_frame.pack(padx=10, pady=10)
-                    for con in group_data['controls']:
-                        if hasattr(self, f'_{con["type"]}'):
-                            control = getattr(self, f'_{con["type"]}')
-                        else:
-                            control = self.__unknown
-                        try:
-                            varnames = control.__code__.co_varnames[:control.__code__.co_argcount]
-                        except AttributeError:
-                            logging.exception('Var')
-                            continue
-                        args = [group_frame]
-                        args += [con.get(i, 'None') for i in varnames if i not in ['master', 'self']]
-                        try:
-                            control(*args)
-                        except (AttributeError, TypeError):
-                            logging.exception('V!')
-                            print(con, args, varnames)
-            ttk.Button(self, text=lang.ok,
-                       command=lambda: self.destroy()).pack(
-                fill=X,
-                side='bottom')
-            move_center(self)
-            self.wait_window()
 
 
 module_manager = ModuleManager()
