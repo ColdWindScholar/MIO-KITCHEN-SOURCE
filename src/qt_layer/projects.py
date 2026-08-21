@@ -453,7 +453,7 @@ class ProjectsPage(QWidget):
             return False
         if form == 'payload':
             time_start = time.time()
-            print(lang.text79 + "payload")
+            print("Unpacking payload...")
             with open(f"{work}/payload.bin", "rb") as f:
                 extract_partitions_from_payload(
                     f,
