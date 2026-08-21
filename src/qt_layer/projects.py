@@ -167,7 +167,9 @@ class ProjectsPage(QWidget):
         # Row 3: Format and Execution
         row3 = QHBoxLayout()
         self.format_combo = ComboBox(card)
-        self.format_combo.addItem("new.dat.br")
+        for i in ['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
+                                   'update.app']:
+            self.format_combo.addItem(i)
         self.execute_btn = PushButton("执行", card)
         row3.addWidget(self.format_combo, 1)
         row3.addWidget(self.execute_btn)
