@@ -49,7 +49,7 @@ import utils
 from payload_extract import extract_partitions_from_payload
 from pygpt.gpt_reader import GPTReader
 from qt_layer.settings import cfg
-from qt_layer.widgets import NewProjectDialog, show_info_bar
+from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog
 from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype, call
@@ -800,7 +800,24 @@ class ProjectsPage(QWidget):
                     unpack_list.append(item.text())
             self.my_task_worker = GenericTaskWorker(self.unpack, unpack_list, self.format_combo.currentText())
         else:
-            pass
+            pack_list = []
+            for row_idx in range(self.partition_table.rowCount()):
+                item = self.partition_table.item(row_idx, 0)
+                if item.checkState() == Qt.CheckState.Checked:
+                    pack_list.append(item.text())
+            dialog = PackSettingsDialog(self)
+
+            # Display modally. If the user clicks "打包" (Yes/Accept), exec() returns True/1
+            if dialog.exec():
+                # 💡 Cleanly pull whatever data fields you need straight out of the inputs!
+                chosen_method = dialog.pack_method_combo.currentText()
+                support_old_kernel = dialog.support_old_kernel_switch.isChecked()
+                brotli_level = dialog.brotli_slider.value()
+                utc_timestamp = dialog.utc_input.text()
+
+                print(
+                    f"Engaging Pack Pipeline with: {chosen_method}, Old Kernel={support_old_kernel}, Brotli={brotli_level}")
+
 
         log_dialog = StreamLogDialog("Running...", parent=self)
 
