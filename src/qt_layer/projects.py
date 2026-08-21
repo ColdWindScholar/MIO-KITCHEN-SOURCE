@@ -467,7 +467,7 @@ class ProjectsPage(QWidget):
             print("Done! tooks: %.2f" % tooks)
             return True
         elif form == 'super':
-            print(lang.text79 + "Super")
+            print("Unpacking Super...")
             file_type = gettype(f"{work}/super.img")
             if file_type == "sparse":
                 print(lang.text79 + f"super.img [{file_type}]")
