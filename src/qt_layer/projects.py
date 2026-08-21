@@ -470,7 +470,7 @@ class ProjectsPage(QWidget):
             print("Unpacking Super...")
             file_type = gettype(f"{work}/super.img")
             if file_type == "sparse":
-                print(lang.text79 + f"super.img [{file_type}]")
+                print(f"Unpacking super.img [{file_type}]")
                 try:
                     utils.simg2img(f"{work}/super.img")
                 except (Exception, BaseException):
