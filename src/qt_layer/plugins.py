@@ -473,7 +473,12 @@ class PluginPage(QWidget):
         text_header_layout.addWidget(description)
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
+        self.local_install_btn = PushButton(FluentIcon.ADD, "本地安装", self)
+        header_layout.addWidget(self.local_install_btn)
 
+        # New Feature: Cloud Download Module Control Trigger
+        self.download_btn = PushButton(FluentIcon.DOWNLOAD, "网络下载", self)
+        header_layout.addWidget(self.download_btn)
         outer_layout.addLayout(header_layout)
 
         # 3. Search Bar Integration
