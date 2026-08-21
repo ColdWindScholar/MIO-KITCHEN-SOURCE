@@ -195,23 +195,16 @@ class ProjectsPage(QWidget):
         self.filter_input.setFixedWidth(240)
         self.format_combo = ComboBox(container)
         self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
-
+        self.unpack_rb = RadioButton("解包", container)
+        self.pack_rb = RadioButton("打包", container)
+        self.unpack_rb.setChecked(True)
         row1.addWidget(self.select_all_cb)
+        row1.addWidget(self.pack_rb)
+        row1.addWidget(self.unpack_rb)
         row1.addWidget(self.format_combo)
         row1.addWidget(self.filter_input)
         layout.addLayout(row1)
 
-        # 单选切换
-        row2 = QHBoxLayout()
-        self.unpack_rb = RadioButton("解包", container)
-        self.pack_rb = RadioButton("打包", container)
-        self.unpack_rb.setChecked(True)
-
-        row2.addWidget(self.unpack_rb)
-        row2.addWidget(self.pack_rb)
-
-        row2.addStretch(1)
-        layout.addLayout(row2)
 
 
         self.scroll_layout.addWidget(container)
