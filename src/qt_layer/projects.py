@@ -165,7 +165,7 @@ class ProjectsPage(QWidget):
     def delete_project(self):
         """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
-        if not project_name:
+        if not project_name or not self.project_combo.currentText():
             show_info_bar(self,"提示", "请先选择一个项目", bar_type=2)
             return
 
