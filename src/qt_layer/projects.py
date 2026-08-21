@@ -10,6 +10,8 @@ import mkdtboimg
 if os.name == 'nt':
     from ctypes import windll
 from shutil import rmtree
+from src.core.cpio import extract as cpio_extract, repack as cpio_repack
+from src.core.rsceutil import unpack as rsceutil_unpack, repack as rsceutil_repack
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QListWidgetItem, QTableWidgetItem, QLabel, \
@@ -108,18 +110,18 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
         work = project_manger.current_work_path()
     if not boot:
         if not (boot := utils.findfile(f"{name}.img", work)):
-            print(lang.warn3.format(name))
+            print(f"cannot find boot:{name}")
             return
     if not os.path.exists(boot):
-        win.message_pop(lang.warn3.format(name))
+        print(f"cannot find boot:{name}")
         return
     if os.path.exists(work + name):
         if rmtree(work + name) != 0:
-            print(lang.text69)
+            print(f"remove tree failed:{name}")
             return
     utils.re_folder(work + name)
     os.chdir(work + name)
-    if call(['magiskboot', 'unpack', '-h', '-n' if settings.magisk_not_decompress == '1' else '', boot]) != 0:
+    if call(['magiskboot', 'unpack', '-h', '-n', boot]) != 0:
         print(f"Unpack {boot} Fail...")
         os.chdir(cfg.workingFolder.value)
         rmtree(work + name)
@@ -129,7 +131,7 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
             print("Unpack Rk resource...")
             rsceutil_unpack(f"{work}/{name}/second", f"{work}/{name}/second_dump", f"{work}/{name}/second_order")
             print("Unpack Rk resource successfully...")
-    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK) and settings.boot_skip_ramdisk == '0':
+    if os.access(f"{work}/{name}/ramdisk.cpio", os.F_OK):
         comp = gettype(f"{work}/{name}/ramdisk.cpio")
         print(f"Ramdisk is {comp}")
         with open(f"{work}/{name}/comp", "w", encoding='utf-8') as f:
