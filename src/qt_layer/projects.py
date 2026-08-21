@@ -7,7 +7,11 @@ from PySide6.QtWidgets import QVBoxLayout, QListWidget, QHBoxLayout, QWidget, QL
 from qfluentwidgets import SimpleCardWidget, BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, ListWidget, PrimaryPushButton, SubtitleLabel, TableWidget
 
+import lpunpack
+import splituapp
+import utils
 from qt_layer.settings import cfg
+from utils import gettype
 
 
 class ProjectManager:
@@ -73,6 +77,7 @@ class ProjectManager:
             rmtree(self.get_work_path(name))
         return not self.exist(name)
 
+
 project_manger = ProjectManager()
 
 
@@ -109,7 +114,6 @@ class ProjectsPage(QWidget):
 
         # 底层弹性推力
         self.scroll_layout.addStretch(1)
-        self._load_mock_partitions_table()
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
@@ -176,9 +180,7 @@ class ProjectsPage(QWidget):
         # 高级现代列数据集表格（参照上一轮设计的现代化 List 样式）
         self.partition_table = TableWidget(container)
         self.partition_table.setColumnCount(5)
-        self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
         self.partition_table.setFixedHeight(240)
-
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
@@ -197,6 +199,7 @@ class ProjectsPage(QWidget):
         self.format_combo.addItems(["img", "new.dat.br", "new.dat.xz", "payload"])
         self.unpack_rb = RadioButton("解包", container)
         self.pack_rb = RadioButton("打包", container)
+        self.unpack_rb.clicked.connect(self.refresh_unpack)
         self.unpack_rb.setChecked(True)
         row1.addWidget(self.select_all_cb)
         row1.addWidget(self.pack_rb)
@@ -204,8 +207,6 @@ class ProjectsPage(QWidget):
         row1.addWidget(self.format_combo)
         row1.addWidget(self.filter_input)
         layout.addLayout(row1)
-
-
 
         self.scroll_layout.addWidget(container)
 
@@ -235,38 +236,49 @@ class ProjectsPage(QWidget):
 
         self.scroll_layout.addWidget(container)
 
-    def _load_mock_partitions_table(self):
+    def refresh_unpack(self):
+        self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
+        self._load_mock_partitions_table(self.refresh_unpack_list())
+    def refresh_unpack_list(self):
+        """The actual logic for refreshing the unpack list, runs in a separate thread."""
+        data = []
+        self.partition_table.clear()
+        work = project_manger.current_work_path()
+        if not project_manger.exist():
+            return data
+
+        form = self.format_combo.currentText()
+        if form == 'payload':
+            if os.path.exists(f"{work}/payload.bin"):
+                with open(f"{work}/payload.bin", 'rb') as pay:
+                    for i in utils.payload_reader(pay).partitions:
+                        data.append((i.partition_name, utils.hum_convert(i.new_partition_info.size), "Raw", "Unknown", "Unknown"))
+
+        elif form == 'super':
+            if os.path.exists(f"{work}/super.img"):
+                if gettype(f"{work}/super.img") == 'sparse':
+                    print("The image is sparse, pls convert it to raw first.")
+                    return data
+                for i in lpunpack.get_parts(f"{work}/super.img"):
+                    data.append((i, "Unknown","Raw", "Unknown", "Unknown"))
+        elif form == 'update.app':
+            if os.path.exists(f"{work}/UPDATE.APP"):
+                for i in splituapp.get_parts(f"{work}/UPDATE.APP"):
+                    data.append((i, "Unknown", "Raw", "Unknown", "Unknown"))
+        else:
+            for file_name in os.listdir(work):
+                if file_name.endswith(form):
+                    if file_name.endswith("img"):
+                        f_type = gettype(work + file_name)
+                        if f_type == 'unknown':
+                            f_type = form
+                    else:
+                        f_type = form
+                    data.append((file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(work + file_name)), f_type, "Image", "rw" if f_type == 'ext' else "ro",))
+        return data
+
+    def _load_mock_partitions_table(self, mock_data):
         """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
-        mock_data = [
-            ("boot", "64.0 MB", "Raw", "Source", "read-write"),
-            ("product", "877 MB", "EroFS", "Build", "read-only"),
-            ("odm", "1.0 MB", "EroFS", "Source", "read-only"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-            ("recovery", "128 MB", "Raw", "Build", "read-write"),
-        ]
         self.partition_table.setRowCount(len(mock_data))
         for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
             name_item = QTableWidgetItem(name)
