@@ -146,6 +146,19 @@ class ProjectsPage(QWidget):
             project_manger.new(project_name)
             self.refresh_projects()
 
+    def show_rename_dialog(self):
+        """显示创建项目对话框"""
+        dialog = NewProjectDialog(
+            title="重命名项目",
+            existing_projects=list(project_manger.get_projects()),
+            initial_text=self.project_combo.currentText(),
+            parent=self
+        )
+        if dialog.exec():
+            project_name = dialog.nameLineEdit.text().strip()
+            project_manger.new(project_name)
+            self.refresh_projects()
+
     def _build_project_section(self, parent_widget):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         container = QWidget(parent_widget)
@@ -172,6 +185,7 @@ class ProjectsPage(QWidget):
         self.refresh_btn = PushButton("刷新", container, FIF.SYNC)
         self.refresh_btn.clicked.connect(self.refresh_projects)
         self.rename_btn = PushButton("重命名", container, FIF.EDIT)
+        self.rename_btn.clicked.connect(self.show_rename_dialog)
         self.delete_btn = PushButton("删除", container, FIF.DELETE)
 
         for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
