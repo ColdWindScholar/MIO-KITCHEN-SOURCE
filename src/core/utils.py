@@ -791,7 +791,7 @@ def generate_bug_report():
         Python: {sys.version}
         Platform: {sys.platform}
         Exec Command: {sys.argv}
-        Tool Version: {settings.version}
+        Tool Version: qt
         Source code running: {states.run_source}
         python Implementation: {platform.python_implementation()}
         Uname: {platform.uname()}
