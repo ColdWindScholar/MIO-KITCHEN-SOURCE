@@ -455,11 +455,11 @@ class ProjectsPage(QWidget):
                 if file_name.endswith(".bin"):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
-            current_project_name.set(os.path.basename(folder))
-            project_menu.listdir()
-            project_menu.set_project(current_project_name.get())
-            if settings.auto_unpack == '1':
-                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+            cfg.set(cfg.workingFolder, os.path.basename(folder))
+            self.refresh_projects()
+            self.project_combo.setText(os.path.basename(folder))
+            if cfg.autoUnpack.value:
+                self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
             print(lang.text82 % ftype)
         unpackg.refs(True)
