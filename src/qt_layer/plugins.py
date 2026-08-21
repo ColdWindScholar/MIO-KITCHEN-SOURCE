@@ -49,11 +49,6 @@ class PluginPage(QWidget):
         main_layout = QVBoxLayout()
         main_layout.setContentsMargins(40, 40, 40, 40)
         main_layout.setSpacing(24)
-
-        # Page title
-        title = TitleLabel("插件管理")
-        title.setStyleSheet("font-size: 28px; color: #FFFFFF; font-weight: bold;")
-        main_layout.addWidget(title)
         card = AppCard(
             icon=":/qfluentwidgets/images/logo.png",
             title="PyQt-Fluent-Widgets",
