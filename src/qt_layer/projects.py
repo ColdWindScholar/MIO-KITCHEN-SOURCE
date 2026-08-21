@@ -384,7 +384,7 @@ class ProjectsPage(QWidget):
         # pac
         ftype = gettype(ifile)
         if ftype == 'pac':
-            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
@@ -392,12 +392,12 @@ class ProjectsPage(QWidget):
         # NTPI
         if ftype == 'cpb':
             prog_name = os.path.splitext(os.path.basename(ifile))[:1]
-            current_project_name.set("".join(prog_name))
+            cfg.set(cfg.currentProjectName,"".join(prog_name))
             extract_cpb(ifile, project_manger.current_work_path(mkdir=True))
             return
         if ftype == 'NTPI':
             prog_name = os.path.splitext(os.path.basename(ifile))[0]
-            current_project_name.set(prog_name)
+            cfg.set(cfg.currentProjectName,prog_name)
             ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path(mkdir=True))
             ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
             return
