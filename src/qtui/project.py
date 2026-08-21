@@ -524,37 +524,3 @@ class ProjectPage(QWidget):
         print(f"准备分解的镜像文件: {', '.join(self.selected_images)}")
         self.show_info_bar("提示", f"准备分解: {', '.join(self.selected_images)}", bar_type=3)
 
-    def show_info_bar(self, title, content, bar_type:int=3, duration=3000):
-        """bar_type: 1=error 2=warning 3=info"""
-        """显示提示条，根据配置决定是否显示"""
-        if True:
-            if bar_type == 1:
-                InfoBar.error(
-                    title=title,
-                    content=content,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.BOTTOM,
-                    duration=duration,
-                    parent=self
-                )
-            elif bar_type == 2:
-                InfoBar.warning(
-                    title=title,
-                    content=content,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.BOTTOM,
-                    duration=duration,
-                    parent=self
-                )
-            else:
-                InfoBar.success(
-                    title=title,
-                    content=content,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.BOTTOM,
-                    duration=duration,
-                    parent=self
-                )
