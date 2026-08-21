@@ -139,6 +139,7 @@ class ProjectsPage(QWidget):
             cfg.set(
                 cfg.currentProjectName, ''
             )
+            cfg.save()
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
