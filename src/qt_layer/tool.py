@@ -14,8 +14,9 @@ from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
 
-os.environ["QT_QPA_PLATFORM"] = "xcb"
-
+if sys.platform == "linux" or sys.platform == "linux2":
+    if os.environ.get("XDG_SESSION_TYPE") == "wayland":
+        os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 class TitleBarEventFilter(QObject):
     """Event filter for title bar dragging"""
