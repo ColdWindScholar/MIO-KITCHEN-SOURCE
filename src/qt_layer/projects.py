@@ -8,6 +8,7 @@ import sys
 import time
 import zipfile
 from shutil import copy
+from src.core.splash_editor.main import splash_repack
 
 import contextpatch
 import extra
@@ -941,7 +942,7 @@ class ProjectsPage(QWidget):
             elif parts_dict[i] == 'splash':
                 splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             elif parts_dict[i] == 'logo':
-                logo_pack()
+                self.logo_pack()
             elif parts_dict[i] == 'guoke_logo':
                 utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
