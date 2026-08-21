@@ -84,11 +84,9 @@ class StreamLogDialog(QDialog):
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(24, 24, 24, 24)
         main_layout.setSpacing(16)
-        #self.setStyleSheet("QDialog { background-color: #1c1c1c; }")
 
         header_layout = QHBoxLayout()
         self.title_label = SubtitleLabel(title_text, self)
-        self.title_label.setStyleSheet("color: #ffffff; font-weight: 600;")
 
         # High-tech loader indicator asset tracking state configurations
         self.progress_ring = IndeterminateProgressRing(self)
@@ -103,17 +101,7 @@ class StreamLogDialog(QDialog):
         self.console_view = QTextEdit(self)
         self.console_view.setReadOnly(True)
         self.console_view.setUndoRedoEnabled(False)
-        self.console_view.setStyleSheet("""
-            QTextEdit {
-                background-color: #0c0c0e;
-                border: 1px solid #27272a;
-                border-radius: 8px;
-                color: #e4e4e7;
-                font-family: 'Consolas', 'Fira Code', monospace;
-                font-size: 12px;
-                padding: 12px;
-            }
-        """)
+
         main_layout.addWidget(self.console_view)
 
         # Bottom Confirmation Layout Space Drawer
