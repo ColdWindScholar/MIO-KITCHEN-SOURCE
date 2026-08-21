@@ -348,7 +348,7 @@ class ModuleManager:
             print(f"{name} is a virtual plugin!")
             return 1
         if not id_:
-            win.message_pop(lang.warn2)
+            print("no such plugin!")
             return 1
 
         plugin_dir_path = os.path.join(self.module_dir, id_)
