@@ -9,6 +9,7 @@ import time
 import gzip
 import zipfile
 from src.core.unpac import MODE as PACMODE, unpac
+from shutil import rmtree, copy, move
 
 import mkdtboimg
 import ofp_mtk_decrypt
