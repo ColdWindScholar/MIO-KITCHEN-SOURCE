@@ -510,6 +510,27 @@ class ProjectsPage(QWidget):
         shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
         return 0
 
+    def pack_dtbo(self) -> bool:
+        work = project_manger.current_work_path()
+        if not os.path.exists(f"{work}/dtbo/dts") or not os.path.exists(f"{work}/dtbo"):
+            print("no source find")
+            return False
+        utils.re_folder(f"{work}/dtbo/dtbo")
+        for dts in os.listdir(f"{work}/dtbo/dts"):
+            if dts.startswith("dts."):
+                print(f"Compling:{dts}")
+                call(
+                    exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', os.path.join(work, 'dtbo', 'dts', dts), '-o',
+                         os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
+                    out=False)
+        print(f"Generating:dtbo.img")
+        list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(f"{work}/dtbo/dtbo") if
+                 f.startswith("dtbo.")]
+        mkdtboimg.create_dtbo(project_manger.current_work_output_path() + "dtbo.img",
+                              sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
+        rmdir(f"{work}/dtbo")
+        print(lang.text8)
+        return True
     def dndfile(self, files: list):
         task = None
         for fi in files:
