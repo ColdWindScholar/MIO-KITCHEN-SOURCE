@@ -2,11 +2,9 @@ import json
 import logging
 import os
 import platform
-import tkinter
 import zipfile
 from io import BytesIO, StringIO
 from shutil import rmtree
-from tkinter import Toplevel, ttk, HORIZONTAL, BOTH, TOP, X, Frame, RIGHT, LEFT
 from typing import Any
 
 from PySide6.QtCore import Qt
@@ -14,17 +12,15 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, PushButton, TransparentToolButton, \
     FluentIcon
 
-import images
 import utils
 from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
 from src.core import imp
-from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, JsonEdit, lang, move_center
-from src.qt_layer.widgets import show_info_bar
+from utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
+
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
-import _tkinter as tk
 module_error_codes = ModuleErrorCodes
 
 
