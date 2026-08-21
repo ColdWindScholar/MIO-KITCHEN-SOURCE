@@ -1090,7 +1090,7 @@ class ProjectsPage(QWidget):
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
-                f2fs_read_only, f2fs_compresion, ext4_packer) -> bool | None:
+                f2fs_read_only, f2fs_compresion, ext4_packer, scale) -> bool | None:
         if not project_manger.exist():
             show_info_bar(self, 'error', "project's not exist", 1)
             return False
@@ -1142,7 +1142,7 @@ class ProjectsPage(QWidget):
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
                             elif format == 'br':
-                                self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
+                                self.datbr(project_manger.current_work_output_path(), dname, scale,
                                            int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print("Packed successfully: {}!".format(dname))
@@ -1161,7 +1161,7 @@ class ProjectsPage(QWidget):
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
                             elif format == 'br':
-                                self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
+                                self.datbr(project_manger.current_work_output_path(), dname, scale,
                                            int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print("Packed successfully: {}!".format(dname))
@@ -1213,7 +1213,7 @@ class ProjectsPage(QWidget):
                         self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                    int(parts_dict.get('dat_ver', '4')))
                     elif format == "br":
-                        self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
+                        self.datbr(project_manger.current_work_output_path(), dname, scale,
                                    int(parts_dict.get('dat_ver', '4')))
                     else:
                         print("Packed {}".format(dname))
@@ -1264,6 +1264,7 @@ class ProjectsPage(QWidget):
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
                                                         dialog.pack_method_combo.currentText(),
+                                                        dialog.brotli_slider.value()
                                                         )
             else:
                 return
