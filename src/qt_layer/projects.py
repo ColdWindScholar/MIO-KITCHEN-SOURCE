@@ -1,11 +1,23 @@
 import logging
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import time
 
+import gzip
+import zipfile
+
 import mkdtboimg
+import ofp_mtk_decrypt
+import ofp_qc_decrypt
+import opscrypto
+import ozipdecrypt
+from src.core.ntpiutils import extractor as ntpiextractor
+from src.core.ntpiutils import parser as ntpiparser
+from undz import DZFileTools
+from src.core.unkdz import KDZFileTools
 
 if os.name == 'nt':
     from ctypes import windll
@@ -226,6 +238,270 @@ class ProjectsPage(QWidget):
         # 底层弹性推力
         self.scroll_layout.addStretch(1)
         self.refresh_projects()
+        self.setAcceptDrops(True)
+        self.initDropOverlay()
+    def initDropOverlay(self):
+        """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
+        self.drop_overlay = QLabel("Drop Here", self)
+        self.drop_overlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Modern semi-transparent dark tint design with a high-contrast accent border
+        self.drop_overlay.setStyleSheet("""
+            QLabel {
+                background-color: rgba(28, 28, 28, 0.85);
+                color: #0078d4;
+                font-size: 24px;
+                font-weight: bold;
+                border: 2px dashed #0078d4;
+                border-radius: 12px;
+            }
+        """)
+        self.drop_overlay.hide()
+    def resizeEvent(self, event):
+        """Ensures the drop overlay always scales to cover the exact canvas area."""
+        super().resizeEvent(event)
+        self.drop_overlay.setGeometry(0, 0, self.width(), self.height())
+    def dragEnterEvent(self, event):
+        """Triggers immediately when a file boundary crosses over the window application edge."""
+        # Validate that the object being dragged actually contains external file paths
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()  # Acknowledge copy/move acceptance
+            self.drop_overlay.show()  # Flash the visual 'Drop Here' target overlay
+            self.drop_overlay.raise_()  # Bring to front layer
+        else:
+            event.ignore()
+    def dragLeaveEvent(self, event):
+        """Hides the target overlay instantly if the cursor exits the window geometry frame."""
+        self.drop_overlay.hide()
+        event.accept()
+
+    def dropEvent(self, event):
+        """Executes processing workflows once the file gets physically dropped down."""
+        self.drop_overlay.hide()  # Clear overlay canvas
+
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+            # Extract local system file paths out of the mime data collection array
+            urls = event.mimeData().urls()
+            file_paths = [url.toLocalFile() for url in urls]
+
+            if file_paths:
+                # Call file target router processor
+                self.dndfile(file_paths)
+
+    def unpackrom(self, ifile: str) -> None:
+        print("Unpacking" + ifile, f'Type:[{(ftype := gettype(ifile))}]')
+        # gzip
+        if ftype == 'gzip':
+            print("Unpacking" + ifile)
+            name = os.path.splitext(os.path.basename(ifile))[0]
+            cfg.set(cfg.currentProjectName, name)
+            self.project_combo.setText(name)
+            if not project_manger.exist(name):
+                utils.re_folder(project_manger.current_work_path())
+            output_file_name = os.path.basename(ifile)
+            if ifile.endswith(".gz"):
+                output_file_name = output_file_name[:-3]
+
+            output_file_ = os.path.join(project_manger.current_work_path(), output_file_name)
+            with open(output_file_, "wb") as output, gzip.open(ifile, "rb") as input_file:
+                data = input_file.read(8192)
+                while len(data) == 8192:
+                    output.write(data)
+                    data = input_file.read(8192)
+                else:
+                    if len(data) > 0:
+                        output.write(data)
+            old_project_name = os.path.splitext(os.path.basename(ifile))[0]
+            self.unpackrom(output_file_)
+            if old_project_name != (new_project_name := cfg.currentProjectName.value):
+                current_project_name.set(old_project_name)
+                project_menu.remove()
+            current_project_name.set(new_project_name)
+            return
+        # ozip
+        if ftype == "ozip":
+            print(lang.text78 + ifile)
+            ozipdecrypt.main(ifile)
+            decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
+            if not os.path.exists(decrypted):
+                print(f"{ifile} decrypt Fail!!!")
+                return
+            unpackrom(decrypted)
+            try:
+                os.remove(decrypted)
+            except:
+                print(f"{ifile} remove Fail!!!")
+            return
+        # tar
+        if ftype == 'tar':
+            print(lang.text79 + ifile)
+            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            if not project_manger.exist():
+                re_folder(project_manger.current_work_path())
+            with tarsafe.TarSafe(ifile) as f:
+                f.extractall(project_manger.current_work_path())
+            return
+        # kdz
+        if ftype == 'kdz':
+            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            if not project_manger.exist():
+                re_folder(project_manger.current_work_path())
+            KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
+            for i in os.listdir(project_manger.current_work_path()):
+                file = project_manger.current_work_path() + os.sep + i
+                if not os.path.isfile(file):
+                    continue
+                if i.endswith('.dz') and gettype(file) == 'dz':
+                    DZFileTools(file, project_manger.current_work_path(),
+                                extract_all=True)
+            return
+        # ofp
+        if os.path.splitext(ifile)[1] == '.ofp':
+            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            if ask_win(lang.t12) == 1:
+                ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
+            else:
+                ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
+                script2fs(project_manger.current_work_path())
+            unpackg.refs(True)
+            return
+        # ops
+        if os.path.splitext(ifile)[1] == '.ops':
+            current_project_name.set(os.path.basename(ifile).split('.')[0])
+            args = {'decrypt': True,
+                    "<filename>": ifile,
+                    'outdir': os.path.join(cfg.workingFolder.value, project_manger.current_work_path())}
+            opscrypto.main(args)
+            unpackg.refs(True)
+            return
+        # pac
+        ftype = gettype(ifile)
+        if ftype == 'pac':
+            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
+            if settings.auto_unpack == '1':
+                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+            return
+        # NTPI
+        if ftype == 'cpb':
+            prog_name = os.path.splitext(os.path.basename(ifile))[:1]
+            current_project_name.set("".join(prog_name))
+            extract_cpb(ifile, project_manger.current_work_path(mkdir=True))
+            return
+        if ftype == 'NTPI':
+            prog_name = os.path.splitext(os.path.basename(ifile))[0]
+            current_project_name.set(prog_name)
+            ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path(mkdir=True))
+            ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
+            return
+        # zip
+        if ftype == 'zip':
+            current_project_name.set(os.path.splitext(os.path.basename(ifile))[0])
+            with zipfile.ZipFile(ifile, 'r') as fz:
+                for fi in fz.namelist():
+                    try:
+                        member_name = fi.encode('cp437').decode('gbk')
+                    except (Exception, BaseException):
+                        try:
+                            member_name = fi.encode('cp437').decode('utf-8')
+                        except (Exception, BaseException):
+                            member_name = fi
+                    print(lang.text79 + member_name)
+                    try:
+                        fz.extract(fi, project_manger.current_work_path())
+                        if fi != member_name:
+                            os.rename(os.path.join(project_manger.current_work_path(), fi),
+                                      os.path.join(project_manger.current_work_path(), member_name))
+                    except Exception as e:
+                        print(lang.text80 % (member_name, e))
+                        win.message_pop(lang.warn4.format(member_name))
+                print(lang.text81)
+                if os.path.isdir(project_manger.current_work_path()):
+                    project_menu.listdir()
+                    project_menu.set_project(os.path.splitext(os.path.basename(ifile))[0])
+                script2fs(project_manger.current_work_path())
+                unpackg.refs(True)
+
+            if settings.auto_unpack == '1':
+                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+            return
+
+        # othters.
+        if ftype != 'unknown':
+            file_name: str = os.path.basename(ifile)
+            project_folder = os.path.join(settings.path, os.path.splitext(file_name)[0])
+            folder = os.path.join(settings.path, os.path.splitext(file_name)[0] + v_code()) if os.path.exists(
+                project_folder) else project_folder
+            try:
+                current_project_name.set(os.path.basename(folder))
+                os.mkdir(folder)
+                project_manger.current_work_path()
+                project_manger.current_work_output_path()
+            except Exception as e:
+                win.message_pop(str(e))
+            project_dir = str(folder) if settings.project_struct != 'split' else str(folder + '/Source/')
+            copy(ifile, project_dir)
+            # File Rename
+            if os.path.exists(os.path.join(project_dir, file_name)):
+                if not '.' in file_name:
+                    shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name + ".img"))
+                if file_name.endswith(".bin"):
+                    shutil.move(os.path.join(project_dir, file_name),
+                                os.path.join(project_dir, file_name[:-4] + ".img"))
+            current_project_name.set(os.path.basename(folder))
+            project_menu.listdir()
+            project_menu.set_project(current_project_name.get())
+            if settings.auto_unpack == '1':
+                unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
+        else:
+            print(lang.text82 % ftype)
+        unpackg.refs(True)
+    def copy_project(self, dir_path: str):
+        name = os.path.basename(dir_path)
+        print("Copying", name)
+        if not os.path.exists(dir_path):
+            print('No Such Folder.')
+            return 1
+        if os.path.isfile(dir_path):
+            return unpackrom(dir_path)
+        if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name),
+                                                                                   os.path.abspath(dir_path)):
+            print("Same File!")
+            return 1
+
+        if project_manger.exist(name):
+            name += utils.v_code()
+        project_path = project_manger.new(name)
+        cfg.set(cfg.currentProjectName, name)
+        self.refresh_projects()
+        self.project_combo.setText(name)
+        shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
+        return 0
+
+    def dndfile(self, files: list):
+        for fi in files:
+            if fi.endswith('}') and fi.startswith('{'):
+                fi = fi[1:-1]
+            try:
+                if hasattr(fi, 'decode'):
+                    fi = fi.decode('gbk')
+            except (Exception, BaseException):
+                logging.exception('fI')
+            if os.path.exists(fi):
+                if os.path.isfile(fi):
+                    if fi.endswith(".mpk"):
+                        InstallMpk(fi)
+                    else:
+                        if gettype(fi) == 'unknown':
+                            editor.main(os.path.dirname(fi), os.path.basename(fi))
+                        else:
+                            utils.create_thread(unpackrom, fi)
+                elif os.path.isdir(fi):
+                    utils.create_thread(copy_project, fi)
+            else:
+                print(fi + lang.text84)
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
