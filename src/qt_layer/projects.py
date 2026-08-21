@@ -6,19 +6,17 @@ import shutil
 import subprocess
 import sys
 import time
+import uuid
 import zipfile
 from contextlib import suppress
 from shutil import copy
-
-import uuid
-
-from src.core.splash_editor.main import splash_repack
 
 import contextpatch
 import extra
 import fspatch
 import tarsafe
-from qt_layer.taskdialog import TaskWorker, StreamLogDialog, GenericTaskWorker
+from qt_layer.taskdialog import StreamLogDialog, GenericTaskWorker
+from src.core.splash_editor.main import splash_repack
 from src.core.unpac import MODE as PACMODE
 
 try:
