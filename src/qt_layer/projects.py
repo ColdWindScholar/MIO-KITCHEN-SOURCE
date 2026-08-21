@@ -135,6 +135,7 @@ class ProjectManager:
 
 project_manger = ProjectManager()
 
+
 def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = None):
     if not work:
         work = project_manger.current_work_path()
@@ -184,6 +185,8 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
             os.chdir(cfg.workingFolder.value)
     print("Unpack Done!")
     os.chdir(cfg.workingFolder.value)
+
+
 def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     if output is None:
         output = project_manger.current_work_path()
@@ -205,7 +208,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
         mkdtboimg.dump_dtbo(dtboimg, f"{work}/{bn}/dtbo/dtbo")
     except Exception as e:
         logging.exception("Bugs")
-        print("making dtbo failed",e)
+        print("making dtbo failed", e)
         return
     for dtbo in os.listdir(f"{work}/{bn}/dtbo"):
         if dtbo.startswith("dtbo."):
@@ -258,6 +261,7 @@ class ProjectsPage(QWidget):
         self.refresh_projects()
         self.setAcceptDrops(True)
         self.initDropOverlay()
+
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
         self.drop_overlay = QLabel("Drop Here", self)
@@ -275,10 +279,12 @@ class ProjectsPage(QWidget):
             }
         """)
         self.drop_overlay.hide()
+
     def resizeEvent(self, event):
         """Ensures the drop overlay always scales to cover the exact canvas area."""
         super().resizeEvent(event)
         self.drop_overlay.setGeometry(0, 0, self.width(), self.height())
+
     def dragEnterEvent(self, event):
         """Triggers immediately when a file boundary crosses over the window application edge."""
         # Validate that the object being dragged actually contains external file paths
@@ -288,6 +294,7 @@ class ProjectsPage(QWidget):
             self.drop_overlay.raise_()  # Bring to front layer
         else:
             event.ignore()
+
     def dragLeaveEvent(self, event):
         """Hides the target overlay instantly if the cursor exits the window geometry frame."""
         self.drop_overlay.hide()
@@ -308,7 +315,6 @@ class ProjectsPage(QWidget):
                 # Call file target router processor
                 self.dndfile(file_paths)
 
-
     def script2fs(self, path: str):
         if os.path.exists(os.path.join(path, "system", "app")):
             if not os.path.exists(path + "/config"):
@@ -321,6 +327,7 @@ class ProjectsPage(QWidget):
                     if v not in parts.keys():
                         parts[v] = 'ext'
             json_.write(parts)
+
     def unpackrom(self, ifile: str) -> None:
         print("Unpacking" + ifile, f'Type:[{(ftype := gettype(ifile))}]')
         # gzip
@@ -376,7 +383,7 @@ class ProjectsPage(QWidget):
             return
         # kdz
         if ftype == 'kdz':
-            cfg.set(cfg.currentProjectName,os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
                 utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
@@ -391,7 +398,7 @@ class ProjectsPage(QWidget):
         # ofp
         if os.path.splitext(ifile)[1] == '.ofp':
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
-            if self.ask_window("Question","Is it a mtk ofp"):
+            if self.ask_window("Question", "Is it a mtk ofp"):
                 ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
             else:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
@@ -400,7 +407,7 @@ class ProjectsPage(QWidget):
             return
         # ops
         if os.path.splitext(ifile)[1] == '.ops':
-            cfg.set(cfg.currentProjectName,os.path.basename(ifile).split('.')[0])
+            cfg.set(cfg.currentProjectName, os.path.basename(ifile).split('.')[0])
             args = {'decrypt': True,
                     "<filename>": ifile,
                     'outdir': os.path.join(cfg.workingFolder.value, project_manger.current_work_path())}
@@ -418,18 +425,18 @@ class ProjectsPage(QWidget):
         # NTPI
         if ftype == 'cpb':
             prog_name = os.path.splitext(os.path.basename(ifile))[:1]
-            cfg.set(cfg.currentProjectName,"".join(prog_name))
+            cfg.set(cfg.currentProjectName, "".join(prog_name))
             extract_cpb(ifile, project_manger.current_work_path(mkdir=True))
             return
         if ftype == 'NTPI':
             prog_name = os.path.splitext(os.path.basename(ifile))[0]
-            cfg.set(cfg.currentProjectName,prog_name)
+            cfg.set(cfg.currentProjectName, prog_name)
             ntpiparser.parse_ntpi_file(ifile, project_manger.current_work_path(mkdir=True))
             ntpiextractor.stage2_extract_files(project_manger.current_work_path(), project_manger.current_work_path())
             return
         # zip
         if ftype == 'zip':
-            cfg.set(cfg.currentProjectName,os.path.splitext(os.path.basename(ifile))[0])
+            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             with zipfile.ZipFile(ifile, 'r') as fz:
                 for fi in fz.namelist():
                     try:
@@ -439,7 +446,7 @@ class ProjectsPage(QWidget):
                             member_name = fi.encode('cp437').decode('utf-8')
                         except (Exception, BaseException):
                             member_name = fi
-                    print("Extracting"+ member_name)
+                    print("Extracting" + member_name)
                     try:
                         fz.extract(fi, project_manger.current_work_path())
                         if fi != member_name:
@@ -462,7 +469,8 @@ class ProjectsPage(QWidget):
         if ftype != 'unknown':
             file_name: str = os.path.basename(ifile)
             project_folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0])
-            folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
+            folder = os.path.join(cfg.workingFolder.value,
+                                  os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
                 cfg.set(cfg.workingFolder, os.path.basename(folder))
@@ -488,6 +496,7 @@ class ProjectsPage(QWidget):
         else:
             print("Unsupported %s" % ftype)
         self.refresh_projects()
+
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
         print("Copying", name)
@@ -531,6 +540,7 @@ class ProjectsPage(QWidget):
         rmtree(f"{work}/dtbo")
         print("Pack dtbo done")
         return True
+
     def dndfile(self, files: list):
         task = None
         for fi in files:
@@ -815,7 +825,8 @@ class ProjectsPage(QWidget):
         for folder in os.listdir(work):
             if os.path.isdir(work + folder) and folder in parts_dict.keys():
                 data.append(
-                    (folder, utils.hum_convert(utils.GetFolderSize(work + folder).rsize_v), parts_dict.get(folder, 'Unknown'),
+                    (folder, utils.hum_convert(utils.GetFolderSize(work + folder).rsize_v),
+                     parts_dict.get(folder, 'Unknown'),
                      "Source", "rw"))
         return data
 
@@ -918,7 +929,7 @@ class ProjectsPage(QWidget):
 
     def make_f2fs(self, name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False,
                   compress: bool = False):
-        print("[f2fs] repacking %s"% name)
+        print("[f2fs] repacking %s" % name)
         size = utils.GetFolderSize(work + name, 1, 1).rsize_v
         part_uuid = str(uuid.uuid4())
         print(f"{name} - {size} - {part_uuid}")
@@ -971,7 +982,7 @@ class ProjectsPage(QWidget):
         if isinstance(size, str): size = int(size)
         print("[ext] repacking %s" % name)
         size = utils.GetFolderSize(work + name, 4096, 3,
-                             f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
+                                   f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
         if not UTC:
             UTC = int(time.time())
@@ -1075,6 +1086,7 @@ class ProjectsPage(QWidget):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print("Successfully packed Boot...")
+
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
@@ -1117,8 +1129,8 @@ class ProjectsPage(QWidget):
                         parts_dict[dname] = modify_fs
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
-                               work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
-                               old_kernel=erofs_old_kernel, UTC=UTC) != 0:
+                                    work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
+                                    old_kernel=erofs_old_kernel, UTC=UTC) != 0:
                         print("Failed to repack %s [erofs]" % dname)
                     else:
                         if remove_source_files:
@@ -1128,16 +1140,16 @@ class ProjectsPage(QWidget):
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
                             if format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
-                                      int(parts_dict.get('dat_ver', 4)))
+                                           int(parts_dict.get('dat_ver', 4)))
                             elif format == 'br':
                                 self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
-                                      int(parts_dict.get('dat_ver', 4)))
+                                           int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print("Packed successfully: {}!".format(dname))
                 elif parts_dict[dname] == 'f2fs':
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
-                                 UTC=UTC, readonly=f2fs_read_only,
-                                 compress=f2fs_compresion) != 0:
+                                      UTC=UTC, readonly=f2fs_read_only,
+                                      compress=f2fs_compresion) != 0:
                         print("Failed to pack %s!" % dname)
                     else:
                         if remove_source_files:
@@ -1147,10 +1159,10 @@ class ProjectsPage(QWidget):
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
                             if format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
-                                      int(parts_dict.get('dat_ver', 4)))
+                                           int(parts_dict.get('dat_ver', 4)))
                             elif format == 'br':
                                 self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
-                                      int(parts_dict.get('dat_ver', 4)))
+                                           int(parts_dict.get('dat_ver', 4)))
                             else:
                                 print("Packed successfully: {}!".format(dname))
 
@@ -1176,10 +1188,10 @@ class ProjectsPage(QWidget):
                                     ext4_size_value = 0
                     if ext4_packer == "make_ext4fs":
                         exit_code = self.make_ext4fs(name=dname, work=work,
-                                                work_output=project_manger.current_work_output_path(),
-                                                sparse=format in ["dat", "br", "sparse"],
-                                                size=ext4_size_value,
-                                                UTC=UTC, has_contexts=os.path.exists(contexts_file))
+                                                     work_output=project_manger.current_work_output_path(),
+                                                     sparse=format in ["dat", "br", "sparse"],
+                                                     size=ext4_size_value,
+                                                     UTC=UTC, has_contexts=os.path.exists(contexts_file))
 
                     else:
                         exit_code = self.mke2fs(
@@ -1199,10 +1211,10 @@ class ProjectsPage(QWidget):
                         self.rdi(work, dname)
                     if format == "dat":
                         self.datbr(project_manger.current_work_output_path(), dname, "dat",
-                              int(parts_dict.get('dat_ver', '4')))
+                                   int(parts_dict.get('dat_ver', '4')))
                     elif format == "br":
                         self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
-                              int(parts_dict.get('dat_ver', '4')))
+                                   int(parts_dict.get('dat_ver', '4')))
                     else:
                         print("Packed {}".format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
@@ -1219,6 +1231,7 @@ class ProjectsPage(QWidget):
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
                 logging.warning(f"{i} Not Supported.")
+
     def exec_opera(self):
         if self.unpack_rb.isChecked():
             unpack_list = []
@@ -1245,8 +1258,8 @@ class ProjectsPage(QWidget):
                                                         dialog.dest_fs_combo.currentText(),
                                                         dialog.sw_delete.isChecked(),
                                                         dialog.compress_algo_combo.currentText(),
-                                                        dialog.erofs_slider.value()    ,
-                                                        dialog.support_old_kernel_switch.isChecked()  ,
+                                                        dialog.erofs_slider.value(),
+                                                        dialog.support_old_kernel_switch.isChecked(),
                                                         dialog.utc_input.currentText(),
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
