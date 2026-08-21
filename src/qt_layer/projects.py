@@ -379,7 +379,7 @@ class ProjectsPage(QWidget):
                     "<filename>": ifile,
                     'outdir': os.path.join(cfg.workingFolder.value, project_manger.current_work_path())}
             opscrypto.main(args)
-            unpackg.refs(True)
+            self.refresh_projects()
             return
         # pac
         ftype = gettype(ifile)
@@ -427,7 +427,7 @@ class ProjectsPage(QWidget):
                     self.refresh_projects()
                     self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
                 script2fs(project_manger.current_work_path())
-                unpackg.refs(True)
+                self.refresh_projects()
 
             if cfg.autoUnpack:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
@@ -462,7 +462,7 @@ class ProjectsPage(QWidget):
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
             print(lang.text82 % ftype)
-        unpackg.refs(True)
+        self.refresh_projects()
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
         print("Copying", name)
