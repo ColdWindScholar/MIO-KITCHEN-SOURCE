@@ -12,7 +12,6 @@ from qt_layer.plugins import PluginPage
 from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
-from src.qt_layer.widgets import Empty2
 from src.tkui.tool import Tool
 
 os.environ["QT_QPA_PLATFORM"] = "xcb"
