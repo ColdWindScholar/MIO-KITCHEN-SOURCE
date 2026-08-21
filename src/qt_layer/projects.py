@@ -280,7 +280,8 @@ class ProjectsPage(QWidget):
 
         # 全选与搜索框
         row1 = QHBoxLayout()
-        self.select_all_cb = CheckBox("全选所有", container)
+        self.select_all_cb = CheckBox("全选", container)
+        self.select_all_cb.stateChanged.connect(self._toggle_select_all_partitions)
         self.filter_input = SearchLineEdit(container)
         self.filter_input.setPlaceholderText("根据名称快速检索...")
         self.filter_input.textChanged.connect(self.filter_tabview)
@@ -303,6 +304,20 @@ class ProjectsPage(QWidget):
         layout.addLayout(row1)
 
         self.scroll_layout.addWidget(container)
+
+    def _toggle_select_all_partitions(self, state):
+        """Toggles check state of all visible rows based on the Select All checkbox."""
+        # Determine the target check state based on the checkbox state
+        # state == Qt.Checked (2) means checked, otherwise unchecked
+        target_state = Qt.Checked if state == Qt.Checked else Qt.Unchecked
+
+        # Loop through every row in the table
+        for row_idx in range(self.partition_table.rowCount()):
+            # Smart Check: Only touch rows that are NOT hidden by the search filter
+            if not self.partition_table.isRowHidden(row_idx):
+                name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
+                if name_item is not None:
+                    name_item.setCheckState(target_state)
 
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
