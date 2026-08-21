@@ -995,11 +995,15 @@ class PluginPage(QWidget):
         main_layout.setSpacing(24)
         for i in module_manager.list_packages():
             plugin = module_manager.get_info(i)
+            plugin_icon = os.path.join(module_manager.module_dir, i, 'icon')
+            if not os.path.exists(plugin_icon):
+                pass #todo
             card = AppCard(
-                icon=":/qfluentwidgets/images/logo.png",
+                icon=plugin_icon,
                 title=plugin["name"],
                 content=plugin['author']
             )
+            card.openButton.clicked.connect(lambda *x: self.exec_plugin(i))
             card.clicked.connect(lambda *x: self.exec_plugin(i))
             main_layout.addWidget(card)
         self.setLayout(main_layout)
