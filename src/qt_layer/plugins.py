@@ -180,9 +180,8 @@ class ModuleManager:
         elif self.is_virtual(id_):
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif not os.path.exists(os.path.join(self.module_dir, value)):
-            win.message_pop(lang.warn7.format(value))
-            list_pls_plugin()
-            win.tab7.lift()
+            print("{} 未完全安装或损坏".format(value))
+
         else:
             print(lang.warn8.format(self.get_name(id_)))
         return 0
