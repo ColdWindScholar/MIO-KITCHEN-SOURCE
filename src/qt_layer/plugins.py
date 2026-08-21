@@ -1003,8 +1003,8 @@ class PluginPage(QWidget):
                 title=plugin["name"],
                 content=plugin['author']
             )
-            card.openButton.clicked.connect(lambda i: self.exec_plugin(i))
-            card.clicked.connect(lambda i: self.exec_plugin(i))
+            card.openButton.clicked.connect(lambda plugin_id=i: self.exec_plugin(plugin_id))
+            card.clicked.connect(lambda plugin_id=i: self.exec_plugin(plugin_id))
             main_layout.addWidget(card)
         self.setLayout(main_layout)
 
