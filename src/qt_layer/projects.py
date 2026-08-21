@@ -11,6 +11,7 @@ from shutil import copy
 
 import extra
 import tarsafe
+from qt_layer.taskdialog import TaskWorker, StreamLogDialog, GenericTaskWorker
 from src.core.unpac import MODE as PACMODE
 
 try:
@@ -297,7 +298,11 @@ class ProjectsPage(QWidget):
 
             if file_paths:
                 # Call file target router processor
-                self.dndfile(file_paths)
+                task = GenericTaskWorker(self.dndfile, file_paths)
+                log_dialog = StreamLogDialog("Running...", parent=self)
+
+                log_dialog.start_redirected_task(task)
+                log_dialog.exec()
 
     def script2fs(self, path: str):
         if os.path.exists(os.path.join(path, "system", "app")):
@@ -787,9 +792,14 @@ class ProjectsPage(QWidget):
                 item = self.partition_table.item(row_idx, 0)
                 if item.checkState() == Qt.CheckState.Checked:
                     unpack_list.append(item.text())
-            self.unpack(unpack_list, self.format_combo.currentText())
+            self.my_task_worker = GenericTaskWorker(self.unpack, unpack_list, self.format_combo.currentText())
         else:
             pass
+
+        log_dialog = StreamLogDialog("Running...", parent=self)
+
+        log_dialog.start_redirected_task(self.my_task_worker)
+        log_dialog.exec()
 
     def refresh_unpack(self):
         self.format_combo.setDisabled(False)
