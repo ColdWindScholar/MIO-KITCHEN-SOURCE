@@ -4,6 +4,7 @@ import os
 import platform
 import tkinter
 import zipfile
+from io import BytesIO, StringIO
 from shutil import rmtree
 from tkinter import Toplevel, ttk, HORIZONTAL, BOTH, TOP, X, Frame, RIGHT, LEFT
 from typing import Any
@@ -14,6 +15,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, CaptionLabel, Push
     FluentIcon
 
 import images
+import utils
 from addon_register import loader, Entry
 from config_parser import ConfigParser
 from qt_layer.settings import cfg
