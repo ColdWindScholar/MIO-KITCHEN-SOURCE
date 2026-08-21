@@ -1110,7 +1110,7 @@ class ProjectsPage(QWidget):
                         self.datbr(project_manger.current_work_output_path(), dname, self.scale.get(),
                               int(parts_dict.get('dat_ver', '4')))
                     else:
-                        print(lang.text3.format(dname))
+                        print("Packed {}".format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
                 repack_boot(i)
             elif parts_dict[i] == 'dtbo':
