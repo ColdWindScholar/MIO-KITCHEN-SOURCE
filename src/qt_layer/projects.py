@@ -969,7 +969,7 @@ class ProjectsPage(QWidget):
         :param dat_ver: dat version
         :return:None
         """
-        print("[datbr] Packing %s" % (name, name))
+        print("[datbr] Packing %s %s" % (name, name))
         if not os.path.exists(f"{work}/{name}.img"):
             print(f"{work}/{name}.img is not exist")
             return
