@@ -1064,7 +1064,8 @@ class ProjectsPage(QWidget):
                     return
             input_dir = project_manger.current_work_output_path()
             output_zip = f"{cfg.workingFolder.value}/{cfg.currentProjectName.value}.zip"
-            utils.pack_zip(input_dir, output_zip)
+            self.pack_zip_task = GenericTaskWorker(utils.pack_zip, input_dir, output_zip)
+            self.start_job(self.pack_zip_task)
 
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
