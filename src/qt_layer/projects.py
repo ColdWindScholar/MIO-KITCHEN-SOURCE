@@ -722,7 +722,6 @@ class ProjectsPage(QWidget):
         frame = QHBoxLayout()
         self.log_line = BodyLabel()
         frame.addWidget(self._create_section_title("分区"))
-        frame.addWidget(self.log_line)
         self.log_line.setText("Ready")
         self.ring = IndeterminateProgressRing(self)
         self.ring.setFixedSize(16, 16)
@@ -731,6 +730,7 @@ class ProjectsPage(QWidget):
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
         frame.addWidget(self.ring)
+        frame.addWidget(self.log_line)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
 
@@ -1235,8 +1235,8 @@ class ProjectsPage(QWidget):
         sys.stdout_old = sys.stdout
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
-        self.stdout_redirector.text_written.connect(self._clean_and_render_text)
-        self.stderr_redirector.text_written.connect(self._clean_and_render_text)
+        self.stdout_redirector.text_written.connect(self.log_line.setText)
+        self.stderr_redirector.text_written.connect(self.log_line.setText)
         sys.stdout = self.stdout_redirector
         sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
