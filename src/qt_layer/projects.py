@@ -1233,6 +1233,9 @@ class ProjectsPage(QWidget):
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
         self.stdout_redirector.text_written.connect(self._clean_and_render_text)
+        self.stderr_redirector.text_written.connect(self._clean_and_render_text)
+        sys.stdout = self.stdout_redirector
+        sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
         self.ring.show()
         self.ring.start()
@@ -1283,6 +1286,8 @@ class ProjectsPage(QWidget):
     def job_is_done(self):
         self.ring.stop()
         self.ring.hide()
+        sys.stderr = sys.stderr_old
+        sys.stdout = sys.stdout_old
         self.execute_btn.setEnabled(True)
 
     def refresh_unpack(self):
