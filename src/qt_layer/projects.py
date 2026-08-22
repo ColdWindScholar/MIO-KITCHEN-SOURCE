@@ -493,7 +493,7 @@ class ProjectsPage(QWidget):
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
-            show_info_bar(self, "warning", "Unsupported %s [%s]" % (ifile, ftype), 2)
+            print(':info_bar:', "Unsupported %s [%s]" % (ifile, ftype))
         self.refresh_projects()
 
     def copy_project(self, dir_path: str):
@@ -1231,7 +1231,11 @@ class ProjectsPage(QWidget):
                     print(f"Unsupported {i}:{parts_dict[i]}")
                 logging.warning(f"{i} Not Supported.")
     def log_processer(self, text):
-        self.log_line.setText(text)
+
+        if text.startswith(":info_bar:"):
+            show_info_bar(self, "warning", text, 2)
+        else:
+            self.log_line.setText(text)
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
         sys.stdout_old = sys.stdout
