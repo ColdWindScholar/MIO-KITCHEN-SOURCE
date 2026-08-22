@@ -1230,13 +1230,15 @@ class ProjectsPage(QWidget):
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
                 logging.warning(f"{i} Not Supported.")
+    def log_processer(self, text):
+        self.log_line.setText(text)
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
         sys.stdout_old = sys.stdout
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
-        self.stdout_redirector.text_written.connect(self.log_line.setText)
-        self.stderr_redirector.text_written.connect(self.log_line.setText)
+        self.stdout_redirector.text_written.connect(self.log_processer)
+        self.stderr_redirector.text_written.connect(self.log_processer)
         sys.stdout = self.stdout_redirector
         sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
