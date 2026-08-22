@@ -541,7 +541,7 @@ class ProjectsPage(QWidget):
         return True
 
     def dndfile(self, files: list):
-        task = None
+        self.dnd_task = None
         for fi in files:
             if fi.endswith('}') and fi.startswith('{'):
                 fi = fi[1:-1]
