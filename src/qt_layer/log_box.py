@@ -27,11 +27,9 @@ class LogMessageBoxBase(QWidget):
         # 底部按钮布局
         self.button_layout = QHBoxLayout()
         self.clear_btn = PushButton("清空", self)
-        self.close_btn = PushButton("关闭", self)
 
         self.button_layout.addStretch()
         self.button_layout.addWidget(self.clear_btn)
-        self.button_layout.addWidget(self.close_btn)
         self.layout.addLayout(self.button_layout)
 
         # 绑定按钮事件
