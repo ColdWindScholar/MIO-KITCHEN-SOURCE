@@ -906,7 +906,85 @@ class ProjectsPage(QWidget):
             return
         dialog = PackSuperMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
-            pass
+            self.pack_super_task = GenericTaskWorker(
+                self.pack_super_exec,dialog.switch_sparse.isChecked(),
+                dialog.show_group_name.currentText(),
+                int(dialog.super_size_edit.text()),
+                dialog.type_group.checkedId(),
+                dialog.get_selected_items(),
+                dialog.switch_delete.isChecked(),
+                0, dialog.attrib_group.checkedId(),None, None,dialog._block_device_name
+            )
+            self.start_job(self.pack_super_task)
+
+    def pack_super_exec(self, sparse: bool,
+                        group_name: str, size: int,
+                        super_type, part_list: list, del_: bool = False,
+                   return_cmd=0,
+                   attrib='readonly',
+                   output_dir: str = None, work: str = None, block_device_name: str = 'None'):
+        if not block_device_name:
+            block_device_name = 'super'
+        if not work:
+            work = project_manger.current_work_path()
+        if not output_dir:
+            output_dir = project_manger.current_work_output_path()
+        lb_c = []
+        for part in part_list:
+            if part.endswith('_b') or part.endswith('_a'):
+                part = part[:-2]
+            if part not in lb_c:
+                lb_c.append(part)
+        part_list = lb_c
+        for part in part_list:
+            if not os.path.exists(f'{work}/{part}.img') and os.path.exists(f'{work}/{part}_a.img'):
+                try:
+                    os.rename(f'{work}/{part}_a.img', f'{work}/{part}.img')
+                except:
+                    logging.exception('Bugs')
+        command = ['lpmake', '--metadata-size', '65536', '-super-name', block_device_name, '-metadata-slots']
+        if super_type == 1:
+            command += ['2', '-device', f'{block_device_name}:{size}', "--group", f"{group_name}:{size}"]
+            for part in part_list:
+                command += ['--partition', f"{part}:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}",
+                            '--image', f'{part}={work}/{part}.img']
+        else:
+            command += ["3", '-device', f'super:{size}', '--group', f"{group_name}_a:{size}"]
+            for part in part_list:
+                command += ['--partition',
+                            f"{part}_a:{attrib}:{os.path.getsize(f'{work}/{part}.img')}:{group_name}_a",
+                            '--image', f'{part}_a={work + part}.img']
+            command += ["--group", f"{group_name}_b:{size}"]
+            for part in part_list:
+                if not os.path.exists(f"{work + part}_b.img"):
+                    command += ['--partition', f"{part}_b:{attrib}:0:{group_name}_b"]
+                else:
+                    command += ['--partition',
+                                f"{part}_b:{attrib}:{os.path.getsize(f'{work}/{part}_b.img')}:{group_name}_b",
+                                '--image', f'{part}_b={work}/{part}_b.img']
+            if super_type == 2:
+                command += ["--virtual-ab"]
+        if sparse: command += ["--sparse"]
+        output_super_path = f'{output_dir}/super.img'
+        command += ['--out', output_super_path]
+        if return_cmd == 1:
+            return command
+        if call(command, debug_binary=False) == 0:
+            if os.access(output_super_path, os.F_OK):
+                print("打包成功！输出：%s" % output_super_path)
+                if del_:
+                    for img in part_list:
+                        if os.path.exists(f"{work}/{img}.img"):
+                            try:
+                                os.remove(f"{work}/{img}.img")
+                            except Exception:
+                                logging.exception('Bugs')
+            else:
+                print("很抱歉，打包失败！")
+            return 1
+        else:
+            print("很抱歉，打包失败！")
+            return 1
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)
