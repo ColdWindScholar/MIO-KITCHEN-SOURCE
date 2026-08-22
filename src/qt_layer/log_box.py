@@ -1,9 +1,9 @@
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import PushButton, TextEdit
 
-class LogMessageBoxBase(QDialog):
+class LogMessageBoxBase(QWidget):
     """
     一个通用的日志弹窗基础类
     支持展示不同颜色的日志（Info, Warning, Error）
@@ -35,7 +35,6 @@ class LogMessageBoxBase(QDialog):
         self.layout.addLayout(self.button_layout)
 
         # 绑定按钮事件
-        self.close_btn.clicked.connect(self.accept)
         self.clear_btn.clicked.connect(self.text_edit.clear)
 
         # 预设不同日志级别的颜色格式

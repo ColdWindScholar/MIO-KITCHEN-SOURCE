@@ -233,23 +233,28 @@ class ProjectsPage(QWidget):
 
     def initUI(self):
         # 1. 基础布局与极简深色背景
-        main_layout = QVBoxLayout(self)
+        main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         self.setStyleSheet("background-color: #00202020; color: #ffffff;")
 
         # 使用 QFluentWidgets 原生滚动区域
         scroll_area = ScrollArea(self)
         scroll_area.setWidgetResizable(True)
+        scroll_log_area = ScrollArea(self)
+        scroll_log_area.setWidgetResizable(True)
         main_layout.addWidget(scroll_area)
+        main_layout.addWidget(scroll_log_area)
 
         # 核心滚动容器
         scroll_content = QWidget()
+        self.scroll_log_content = LogMessageBoxBase()
         self.scroll_layout = QVBoxLayout(scroll_content)
 
         # 【关键优化：增加顶部与四周间距】把原本紧凑的区域整体下调，留出透气的空间
         self.scroll_layout.setContentsMargins(32, 40, 32, 32)
-        self.scroll_layout.setSpacing(35)  # 模块与模块之间拉开足够的高级感间距
+        self.scroll_layout.setSpacing(15)  # 模块与模块之间拉开足够的高级感间距
         scroll_area.setWidget(scroll_content)
+        scroll_log_area.setWidget(self.scroll_log_content)
 
         # 2. 依次构建去背景、去卡片的扁平化模块
         self._build_project_section(scroll_content)
@@ -728,7 +733,6 @@ class ProjectsPage(QWidget):
         self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
-        self.log_box = LogMessageBoxBase("系统日志", self)
         frame.addWidget(self.ring)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
@@ -1233,11 +1237,10 @@ class ProjectsPage(QWidget):
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
         sys.stdout_old = sys.stdout
-        self.log_box.show()
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
-        self.stdout_redirector.text_written.connect(lambda text:self.log_box.append_log("INFO", text))
-        self.stderr_redirector.text_written.connect(lambda text:self.log_box.append_log("ERROR", text))
+        self.stdout_redirector.text_written.connect(lambda text:self.scroll_log_content.append_log("INFO", text))
+        self.stderr_redirector.text_written.connect(lambda text:self.scroll_log_content.append_log("ERROR", text))
         sys.stdout = self.stdout_redirector
         sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
