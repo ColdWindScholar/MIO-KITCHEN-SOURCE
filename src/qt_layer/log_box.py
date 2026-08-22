@@ -1,7 +1,7 @@
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QTextEdit, QVBoxLayout
-from qfluentwidgets import PushButton
+from PySide6.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout
+from qfluentwidgets import PushButton, TextEdit
 
 class LogMessageBoxBase(QDialog):
     """
@@ -20,7 +20,7 @@ class LogMessageBoxBase(QDialog):
         self.layout = QVBoxLayout(self)
 
         # 文本显示区域（只读）
-        self.text_edit = QTextEdit(self)
+        self.text_edit = TextEdit(self)
         self.text_edit.setReadOnly(True)
         self.layout.addWidget(self.text_edit)
 
