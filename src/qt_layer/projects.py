@@ -69,7 +69,72 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.json")
 
+class PackHybridRom:
+    def __init__(self, right_device):
+        if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
+            os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
+        if not os.path.exists(f"{dir_}/images"):
+            os.makedirs(f'{dir_}/images')
+        if os.path.exists(os.path.join(project_manger.current_work_output_path(), 'payload.bin')):
+            print("Found payload.bin ,Stop!")
+            return
+        if os.path.exists(f'{dir_}/META-INF'):
+            rmtree(f'{dir_}/META-INF')
+        shutil.copytree(f"{utils.prog_path}/bin/extra_flash", dir_, dirs_exist_ok=True)
+        with open(f"{dir_}/bin/right_device", 'w', encoding='gbk') as rd:
+            rd.write(right_device + "\n")
+        with open(
+                f'{dir_}/META-INF/com/google/android/update-binary',
+                'r+', encoding='utf-8', newline='\n') as script:
+            lines = script.readlines()
+            lines.insert(45, f'right_device="{right_device}"\n')
+            add_line = self.get_line_num(lines, '#Other images')
+            for t in os.listdir(f"{dir_}/images"):
+                if t.endswith('.img') and not os.path.isdir(dir_ + t):
+                    print(f"Add Flash method {t} to update-binary")
+                    if os.path.getsize(os.path.join(f'{dir_}/images', t)) > 209715200:
+                        self.zstd_compress(os.path.join(f'{dir_}/images', t))
+                        lines.insert(add_line,
+                                     f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
+                    else:
+                        lines.insert(add_line,
+                                     f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
+            for t in os.listdir(dir_):
+                if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
+                    print(f"Add Flash method {t} to update-binary")
+                    if os.path.getsize(dir_ + t) > 209715200:
+                        self.zstd_compress(dir_ + t)
+                        shutil.move(os.path.join(dir_, f"{t}.zst"), os.path.join(f"{dir_}/images", f"{t}.zst"))
+                        lines.insert(add_line,
+                                     f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
+                    else:
+                        lines.insert(add_line,
+                                     f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
+                        shutil.move(os.path.join(dir_, t), os.path.join(f"{dir_}/images", t))
+            script.seek(0)
+            script.truncate()
+            script.writelines(lines)
 
+    @staticmethod
+    def get_line_num(data, text):
+        for i, t_ in enumerate(data):
+            if text in t_:
+                return i
+        raise ValueError("The line u looking for isn't exist.")
+
+    @staticmethod
+    def zstd_compress(path):
+        basename = os.path.basename(path)
+        if os.path.exists(path):
+            if gettype(path) == "sparse":
+                print(f"[INFO] {basename} is (sparse), converting to (raw)")
+                utils.simg2img(path)
+            try:
+                print(f"[Compress] {basename}...")
+                call(['zstd', '-5', '--rm', path, '-o', f'{path}.zst'])
+            except Exception as e:
+                logging.exception('Bugs')
+                print(f"[Fail] Compress {basename} Fail:{e}")
 class ProjectManager:
     def __init__(self):
         self.hide_items = ['bin', 'src', 'readmes']
@@ -991,7 +1056,16 @@ class ProjectsPage(QWidget):
             return
         dialog = RepackZipMessageBox(self)
         if dialog.exec_():
-            pass
+            if dialog.is_add_tools_checked():
+                if not dialog.get_device_code():
+                    show_info_bar(self, "warn", "device code's empty", 3)
+                    return
+                if PackHybridRom(dialog.get_device_code()):
+                    return
+            input_dir = project_manger.current_work_output_path()
+            output_zip = f"{cfg.workingFolder.value}/{cfg.currentProjectName.value}.zip"
+            utils.pack_zip(input_dir, output_zip)
+
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)
