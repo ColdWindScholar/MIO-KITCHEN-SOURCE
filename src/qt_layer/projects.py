@@ -177,7 +177,7 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
         if not os.path.exists(f"{work}/{name}/ramdisk"):
             os.mkdir(f"{work}/{name}/ramdisk")
         print("Unpacking Ramdisk...")
-        if cfg.cpioImpl.value == 'python':
+        if cfg.cpioImpl.value == 'Python':
             cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
                          os.path.join(work, name, 'ramdisk.txt'))
         else:
