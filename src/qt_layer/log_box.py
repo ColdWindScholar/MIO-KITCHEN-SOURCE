@@ -9,12 +9,10 @@ class LogMessageBoxBase(QWidget):
     支持展示不同颜色的日志（Info, Warning, Error）
     """
 
-    def __init__(self, title="日志详情", parent=None):
+    def __init__(self,  parent=None):
         # 确保 parent 和当前窗口在同一个线程（通常是主线程）
         super().__init__(parent)
 
-        self.setWindowTitle(title)
-        self.resize(500, 350)
 
         # 初始化布局
         self.layout = QVBoxLayout(self)

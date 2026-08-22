@@ -248,7 +248,7 @@ class ProjectsPage(QWidget):
 
         # 核心滚动容器
         scroll_content = QWidget()
-        self.scroll_log_content = LogMessageBoxBase()
+        self.scroll_log_content = LogMessageBoxBase(self)
         self.scroll_layout = QVBoxLayout(scroll_content)
 
         # 【关键优化：增加顶部与四周间距】把原本紧凑的区域整体下调，留出透气的空间
