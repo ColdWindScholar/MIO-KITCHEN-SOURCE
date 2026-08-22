@@ -1,7 +1,7 @@
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextEdit, QVBoxLayout
-
+from PySide6.QtWidgets import QDialog, QHBoxLayout, QTextEdit, QVBoxLayout
+from qfluentwidgets import PushButton
 
 class LogMessageBoxBase(QDialog):
     """
@@ -26,8 +26,8 @@ class LogMessageBoxBase(QDialog):
 
         # 底部按钮布局
         self.button_layout = QHBoxLayout()
-        self.clear_btn = QPushButton("清空", self)
-        self.close_btn = QPushButton("关闭", self)
+        self.clear_btn = PushButton("清空", self)
+        self.close_btn = PushButton("关闭", self)
 
         self.button_layout.addStretch()
         self.button_layout.addWidget(self.clear_btn)
