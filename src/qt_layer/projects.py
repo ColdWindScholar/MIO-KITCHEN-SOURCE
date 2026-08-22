@@ -1284,7 +1284,7 @@ class ProjectsPage(QWidget):
                                                         )
             else:
                 return
-            self.start_job(self.my_task_worker)
+        self.start_job(self.my_task_worker)
 
 
     def job_is_done(self):
