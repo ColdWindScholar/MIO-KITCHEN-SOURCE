@@ -478,7 +478,7 @@ class ProjectsPage(QWidget):
                                   os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
-                cfg.set(cfg.workingFolder, os.path.basename(folder))
+                cfg.set(cfg.workingFolder.value, os.path.basename(folder))
                 os.mkdir(folder)
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
@@ -493,7 +493,7 @@ class ProjectsPage(QWidget):
                 if file_name.endswith(".bin"):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
-            cfg.set(cfg.workingFolder, os.path.basename(folder))
+            cfg.set(cfg.currentProjectName, os.path.basename(folder))
             self.refresh_projects()
             self.project_combo.setText(os.path.basename(folder))
             if cfg.autoUnpack.value:
