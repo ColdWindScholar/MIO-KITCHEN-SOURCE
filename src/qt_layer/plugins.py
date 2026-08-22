@@ -836,7 +836,7 @@ class AppCard(CardWidget):
 class BuiltInPlugins(object):
     def __init__(self):
         self.plugins = (
-            {"id":"download_rom", "name":"Download ROM", "entry":lambda:None},
+            {"id":"download_rom", "name":"Download ROM", "entry":lambda:print(1)},
             {"id":"get_file_info", "name":"Get File Info", "entry":lambda:None},
             {"id":"byte_calculator", "name":"Byte Calculator", "entry":lambda:None},
             {"id":"allow_selinux_audit", "name":"Allow Selinux Audit", "entry":lambda:None},
@@ -849,6 +849,7 @@ class BuiltInPlugins(object):
             {"id":"decrypt_xtc_xml", "name":"Decrypt xtc xml", "entry":lambda:None},
             {"id":"mtk_port_tool", "name":"Mtk Port Tool", "entry":lambda:None},
         )
+
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
