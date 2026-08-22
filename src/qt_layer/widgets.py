@@ -1,18 +1,19 @@
-import logging
 import os
 import time
 import tkinter as tk
 
-from PySide6.QtCore import QTimer
+import logging
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
-                               QLabel, QLineEdit)
-from qfluentwidgets import InfoBar, InfoBarPosition, BodyLabel, SimpleCardWidget
+                               QLabel, QLineEdit, QHBoxLayout, QButtonGroup)
+from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
+    RadioButton, PushButton
 from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
                             CaptionLabel)
 
 import utils
-from utils import gettype, is_empty_img
+from utils import gettype
 
 
 class TkinterEmbeddedPanel(QWidget):
@@ -597,332 +598,323 @@ class PackSettingsDialog(MessageBoxBase):
         self.widget.adjustSize()
 
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QHBoxLayout, QListWidgetItem
-from qfluentwidgets import (
-    CheckBox,
-    ComboBox,
-    LineEdit,
-    ListWidget,
-    MessageBoxBase,
-    PushButton,
-    RadioButton,
-    SubtitleLabel,
-)
-
-
 class PackSuperMessageBox(MessageBoxBase):
     def __init__(self, work_path, parent=None):
         super().__init__(parent)
         self.work = work_path
-
-        self._super_size = 9126805504
-        self._is_sparse = False
-        self._super_type = 1
-        self._attrib = 'readonly'
-        self._group_name = "qti_dynamic_partitions"
-        self._delete_source_file = False
-        self._block_device_name = 'super'
         self.selected = []
+        self._block_device_name = 'super'
 
-        self.setup_ui()
+        # Window styling configuration
+        self.widget.setMinimumWidth(450)
 
-        QTimer.singleShot(50, self._delayed_init)
+        # 1. Main Header Title
+        self.titleLabel = SubtitleLabel("Pack Super", self)
+        self.viewLayout.addWidget(self.titleLabel)
 
-    def _delayed_init(self):
+        # 2. Partition Type Section
+        self.viewLayout.addWidget(SubtitleLabel("分区类型", self))
+        lf1_layout = QHBoxLayout()
+        self.type_group = QButtonGroup(self)
+        radios = [("A-only", 1), ("Virtual-ab", 2), ("A/B", 3)]
+        for text, value in radios:
+            rb = RadioButton(text, self)
+            self.type_group.addButton(rb, value)
+            lf1_layout.addWidget(rb)
+        if self.type_group.button(1):
+            self.type_group.button(1).setChecked(True)
+        self.viewLayout.addLayout(lf1_layout)
+
+        # 3. Attributes Section
+        self.viewLayout.addWidget(SubtitleLabel("属性", self))
+        lf1_r_layout = QHBoxLayout()
+        self.attrib_group = QButtonGroup(self)
+        self.rb_readonly = RadioButton("Readonly", self)
+        self.rb_none = RadioButton("None", self)
+        self.attrib_group.addButton(self.rb_readonly, 0)
+        self.attrib_group.addButton(self.rb_none, 1)
+        self.rb_readonly.setChecked(True)
+        lf1_r_layout.addWidget(self.rb_readonly)
+        lf1_r_layout.addWidget(self.rb_none)
+        self.viewLayout.addLayout(lf1_r_layout)
+
+        # 4. Settings Section
+        self.viewLayout.addWidget(SubtitleLabel("设置", self))
+        lf2_layout = QHBoxLayout()
+
+        lf2_layout.addWidget(SubtitleLabel("簇名", self))
+        self.show_group_name = ComboBox(self)
+        self.show_group_name.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
+        self.show_group_name.setCurrentIndex(0)
+        lf2_layout.addWidget(self.show_group_name)
+
+        lf2_layout.addWidget(SubtitleLabel("Super大小", self))
+        self.super_size_edit = LineEdit(self)
+        self.super_size_edit.setText("9126805504")
+        self.super_size_edit.textChanged.connect(self.validate_digits)
+        lf2_layout.addWidget(self.super_size_edit)
+        self.viewLayout.addLayout(lf2_layout)
+
+        # 5. Pack Partitions Section
+        self.viewLayout.addWidget(SubtitleLabel("打包分区", self))
+        self.tl = ListWidget(self)
+        self.tl.setMinimumHeight(180)
+        self.viewLayout.addWidget(self.tl)
+
+        # 6. Checkboxes & Action Layout Configurations
+        self.switch_sparse = SwitchButton(self)
+        self.switch_sparse.setOffText("Sparse压缩")
+        self.switch_sparse.setOnText("Sparse压缩")
+        self.viewLayout.addWidget(self.switch_sparse)
+
+        t_frame_layout = QHBoxLayout()
+        self.switch_delete = SwitchButton(self)
+        self.switch_delete.setOffText("删除源文件")
+        self.switch_delete.setOnText("删除源文件")
+        t_frame_layout.addWidget(self.switch_delete)
+
+        refresh_text = "刷新"
+        self.btn_refresh = PushButton(refresh_text, self)
+        self.btn_refresh.clicked.connect(self.refresh)
+        t_frame_layout.addWidget(self.btn_refresh)
+
+        self.g_b = PushButton("生成LIST", self)
+        self.g_b.clicked.connect(self.generate)
+        t_frame_layout.addWidget(self.g_b)
+        self.viewLayout.addLayout(t_frame_layout)
+
+        # 7. Bottom Accept/Cancel Bar configuration setups
+        self.yesButton.setText("Pack")
+        self.yesButton.clicked.disconnect()  # Disconnect base window close trigger
+        self.yesButton.clicked.connect(self.start_)
+        self.cancelButton.setText("取消")
+
+        # Runtime initialization execution signals
         self.read_list()
         self.refresh()
 
-    def setup_ui(self):
-        self.widget.setMinimumWidth(650)
-        self.viewLayout.setSpacing(16)
-        self.viewLayout.setContentsMargins(0, 10, 0, 10)
+    def validate_digits(self, text):
+        """Sanitizes line edit inputs to keep digit formatting clean."""
+        if not text.isdigit() and text != "":
+            clean_text = "".join(filter(str.isdigit, text))
+            self.super_size_edit.setText(clean_text)
 
-        # Combined split row for Partition Type (Left) and Attribute Selection (Right)
-        top_row_panel = QWidget(self.widget)
-        top_row_layout = QHBoxLayout(top_row_panel)
-        top_row_layout.setContentsMargins(0, 0, 0, 0)
-        top_row_layout.setSpacing(16)
+    def get_selected_items(self):
+        """Extracts current checkable choices context keys from list layout directly."""
+        checked_names = []
+        for i in range(self.tl.count()):
+            item = self.tl.item(i)
+            if item.checkState() == Qt.Checked:
+                checked_names.append(item.data(Qt.UserRole))
+        return checked_names
 
-        # 1. Super Partition Type Card Container (Left Component)
-        type_card = SimpleCardWidget(top_row_panel)
-        type_card_layout = QVBoxLayout(type_card)
-        type_card_layout.setContentsMargins(16, 14, 16, 14)
-        type_card_layout.setSpacing(12)
-
-        type_title = SubtitleLabel("Super Partition Type", type_card)
-        type_title.setStyleSheet("font-size: 14px; font-weight: 600;")
-        type_card_layout.addWidget(type_title)
-
-        type_controls = QWidget(type_card)
-        type_layout = QHBoxLayout(type_controls)
-        type_layout.setContentsMargins(0, 0, 0, 0)
-        type_layout.setSpacing(16)
-        self.radio_a = RadioButton("A-only", type_controls)
-        self.radio_vab = RadioButton("Virtual-ab", type_controls)
-        self.radio_ab = RadioButton("A/B", type_controls)
-        for rb in (self.radio_a, self.radio_vab, self.radio_ab):
-            type_layout.addWidget(rb)
-        type_layout.addStretch()
-        type_card_layout.addWidget(type_controls)
-        top_row_layout.addWidget(type_card, stretch=3)
-
-        # 2. Attribute Settings Card Container (Right Component)
-        attr_card = SimpleCardWidget(top_row_panel)
-        attr_card_layout = QVBoxLayout(attr_card)
-        attr_card_layout.setContentsMargins(16, 14, 16, 14)
-        attr_card_layout.setSpacing(12)
-
-        attr_title = SubtitleLabel("Attribute", attr_card)
-        attr_title.setStyleSheet("font-size: 14px; font-weight: 600;")
-        attr_card_layout.addWidget(attr_title)
-
-        attr_controls = QWidget(attr_card)
-        attr_layout = QHBoxLayout(attr_controls)
-        attr_layout.setContentsMargins(0, 0, 0, 0)
-        attr_layout.setSpacing(16)
-        self.radio_ro = RadioButton("Readonly", attr_controls)
-        self.radio_none = RadioButton("None", attr_controls)
-        attr_layout.addWidget(self.radio_ro)
-        attr_layout.addWidget(self.radio_none)
-        attr_layout.addStretch()
-        attr_card_layout.addWidget(attr_controls)
-        top_row_layout.addWidget(attr_card, stretch=2)
-
-        self.viewLayout.addWidget(top_row_panel)
-
-        # 3. Form Configurations Card Container
-        settings_card = SimpleCardWidget(self.widget)
-        settings_card_layout = QVBoxLayout(settings_card)
-        settings_card_layout.setContentsMargins(16, 14, 16, 14)
-        settings_card_layout.setSpacing(12)
-
-        settings_title = SubtitleLabel("Configuration Settings", settings_card)
-        settings_title.setStyleSheet("font-size: 14px; font-weight: 600;")
-        settings_card_layout.addWidget(settings_title)
-
-        settings_controls = QWidget(settings_card)
-        settings_layout = QGridLayout(settings_controls)
-        settings_layout.setContentsMargins(0, 4, 0, 4)
-        settings_layout.setHorizontalSpacing(16)
-        settings_layout.setVerticalSpacing(12)
-        settings_layout.setColumnStretch(0, 1)
-        settings_layout.setColumnStretch(1, 3)
-
-        lbl_group = BodyLabel("Group Name:", settings_controls)
-        settings_layout.addWidget(lbl_group, 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
-        self.group_combo = ComboBox(settings_controls)
-        self.group_combo.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
-        self.group_combo.setSizePolicy(self.group_combo.sizePolicy().Policy.Expanding,
-                                       self.group_combo.sizePolicy().Policy.Fixed)
-        settings_layout.addWidget(self.group_combo, 0, 1)
-
-        lbl_size = BodyLabel("Super Size (Bytes):", settings_controls)
-        settings_layout.addWidget(lbl_size, 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
-        self.size_entry = LineEdit(settings_controls)
-        self.size_entry.textChanged.connect(self.validate_size_input)
-        settings_layout.addWidget(self.size_entry, 1, 1)
-
-        settings_card_layout.addWidget(settings_controls)
-        self.viewLayout.addWidget(settings_card)
-
-        # 4. Partition File Selection Card Container
-        list_card = SimpleCardWidget(self.widget)
-        list_card_layout = QVBoxLayout(list_card)
-        list_card_layout.setContentsMargins(16, 14, 16, 14)
-        list_card_layout.setSpacing(12)
-
-        list_title = SubtitleLabel("Select Partitions", list_card)
-        list_title.setStyleSheet("font-size: 14px; font-weight: 600;")
-        list_card_layout.addWidget(list_title)
-
-        self.partition_listview = ListWidget(list_card)
-        self.partition_listview.setSelectionMode(ListWidget.MultiSelection)
-        self.partition_listview.setMinimumHeight(180)
-        self.partition_listview.setStyleSheet("border-radius: 6px; padding: 4px;")
-        list_card_layout.addWidget(self.partition_listview)
-        self.viewLayout.addWidget(list_card)
-
-        # 5. Global Action Options Layout
-        options_panel = QWidget(self.widget)
-        options_layout = QVBoxLayout(options_panel)
-        options_layout.setContentsMargins(4, 4, 4, 4)
-        options_layout.setSpacing(12)
-
-        self.sparse_check = CheckBox("Sparse Image Output", options_panel)
-        options_layout.addWidget(self.sparse_check)
-
-        tools_layout = QHBoxLayout()
-        tools_layout.setContentsMargins(0, 0, 0, 0)
-        self.del_source_check = CheckBox("Delete Source Image Files", options_panel)
-        tools_layout.addWidget(self.del_source_check)
-        tools_layout.addStretch()
-
-        self.refresh_btn = PushButton("Refresh List", options_panel)
-        self.refresh_btn.clicked.connect(self.refresh)
-        tools_layout.addWidget(self.refresh_btn)
-
-        self.g_b = PushButton("Generate Script", options_panel)
-        self.g_b.clicked.connect(self.generate)
-        tools_layout.addWidget(self.g_b)
-        options_layout.addLayout(tools_layout)
-
-        self.viewLayout.addWidget(options_panel)
-
-        self.yesButton.setText("Pack")
-
-    def validate_size_input(self, text):
-        has_error = not text.isdigit()
-        self.size_entry.setProperty("hasError", has_error)
-        self.size_entry.style().polish(self.size_entry)
-
-    def sync_vars_from_ui(self):
-        if self.radio_a.isChecked():
-            self._super_type = 1
-        elif self.radio_vab.isChecked():
-            self._super_type = 2
-        elif self.radio_ab.isChecked():
-            self._super_type = 3
-
-        self._attrib = 'readonly' if self.radio_ro.isChecked() else 'none'
-        self._group_name = self.group_combo.currentText()
-
+    def start_(self):
         try:
-            self._super_size = int(self.size_entry.text())
-        except ValueError:
-            self._super_size = 0
+            size_val = int(self.super_size_edit.text() or "0")
+        except Exception:
+            self.super_size_edit.setText("0")
+            logging.exception('Bugs')
 
-        self._is_sparse = self.sparse_check.isChecked()
-        self._delete_source_file = self.del_source_check.isChecked()
+        if not self.verify_size():
+            InfoBar.warning(
+                title="警告",
+                content=f"Super大小太小。\n请重新设置大小。\n已为您填入参考值: {self.super_size_edit.text()}",
+                orient=Qt.Horizontal,
+                isClosable=True,
+                position=InfoBarPosition.TOP,
+                duration=3500,
+                parent=self
+            )
+            return False
 
-    def update_ui_from_vars(self):
-        self.radio_a.setChecked(self._super_type == 1)
-        self.radio_vab.setChecked(self._super_type == 2)
-        self.radio_ab.setChecked(self._super_type == 3)
-        self.radio_ro.setChecked(self._attrib == 'readonly')
-        self.radio_none.setChecked(self._attrib == 'none')
+        lbs = self.get_selected_items()
+        sc = self.switch_delete.isChecked()
+        self.close()
 
-        self.group_combo.setCurrentText(str(self._group_name))
-        self.size_entry.setText(str(self._super_size))
-        self.sparse_check.setChecked(self._is_sparse)
-        self.del_source_check.setChecked(self._delete_source_file)
+        if not project_manger.exist():
+            if self.parent():
+                InfoBar.error(title="错误", content="请选择一个项目", parent=self.parent())
+            return False
 
-    def get_selected_partitions(self):
-        return [item.data(Qt.UserRole) for item in self.partition_listview.selectedItems()]
+        attrib_val = "readonly" if self.rb_readonly.isChecked() else "none"
+
+        pack_super(
+            sparse=self.switch_sparse.isChecked(),
+            group_name=self.show_group_name.currentText(),
+            size=int(self.super_size_edit.text() or "0"),
+            super_type=self.type_group.checkedId(),
+            part_list=lbs,
+            del_=sc,
+            attrib=attrib_val,
+            block_device_name=self._block_device_name
+        )
+        return None
 
     def verify_size(self):
-        lbs = self.get_selected_partitions()
-        size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in lbs if os.path.exists(f"{self.work}/{i}.img")])
+        selected_lbs = self.get_selected_items()
+        size = sum(
+            [os.path.getsize(f"{self.work}/{i}.img") for i in selected_lbs if os.path.exists(f"{self.work}/{i}.img")])
 
-        if size > self._super_size:
+        try:
+            current_size = int(self.super_size_edit.text() or "0")
+        except ValueError:
+            current_size = 0
+
+        if size > current_size:
             diff_size = size
-            for i in range(1, 20):
-                factor = i - 0.25
-                t = (1024 ** 3) * factor - size
+            for i in range(20):
+                if not i:
+                    continue
+                i -= 0.25
+                t = (1024 ** 3) * i - size
                 if t < 0:
                     continue
                 if t < diff_size:
                     diff_size = t
                 else:
-                    size = factor * (1024 ** 3)
+                    size = i * (1024 ** 3)
                     break
-            self._super_size = int(size)
-            self.size_entry.setText(str(self._super_size))
+            self.super_size_edit.setText(str(int(size)))
             return False
         return True
 
     def generate(self):
-        self.sync_vars_from_ui()
+        self.g_b.setText("正在执行")
         self.g_b.setEnabled(False)
-        self.g_b.setText("Generating...")
+        self.g_b.repaint()
+
+        try:
+            size_val = int(self.super_size_edit.text() or "0")
+        except ValueError:
+            size_val = 0
 
         utils.generate_dynamic_list(
-            group_name=self._group_name, size=self._super_size,
-            super_type=self._super_type, part_list=self.get_selected_partitions(), work=self.work
+            group_name=self.show_group_name.currentText(),
+            size=size_val,
+            super_type=self.type_group.checkedId(),
+            part_list=self.get_selected_items(),
+            work=self.work
         )
+        self.g_b.setText("完成")
+        QTimer.singleShot(1000, self._reset_generate_button)
 
-        self.g_b.setText("Done!")
-        time.sleep(1)
-        self.g_b.setText("Generate Script")
-        self.g_b.setEnabled(True)
+    def _reset_generate_button(self):
+        try:
+            self.g_b.setText("生成LIST")
+            self.g_b.setEnabled(True)
+        except Exception:
+            logging.exception('Bugs')
 
     def refresh(self):
-        self.partition_listview.clear()
+        self.tl.clear()
         if not os.path.exists(self.work):
             return
 
         for file_name in os.listdir(self.work):
             if file_name.endswith(".img"):
-                full_path = os.path.join(self.work, file_name)
+                img_path = os.path.join(self.work, file_name)
                 name = file_name[:-4]
-                display_text = ""
+                is_checked = name in self.selected
+                item_text = ""
 
-                if is_empty_img(full_path):
-                    display_text = f"{name} [empty]"
-                elif (file_type := gettype(full_path)) in ["ext", "erofs", 'f2fs', 'sparse']:
-                    display_text = f"{name} [{file_type}]"
+                if utils.is_empty_img(img_path):
+                    item_text = f"{name} [empty]"
+                else:
+                    file_type = gettype(img_path)
+                    if file_type in ["ext", "erofs", 'f2fs', 'sparse']:
+                        item_text = f"{name} [{file_type}]"
 
-                if display_text:
-                    item = QListWidgetItem(display_text)
+                if item_text:
+                    item = QListWidgetItem(item_text)
                     item.setData(Qt.UserRole, name)
-                    self.partition_listview.addItem(item)
-                    if name in self.selected:
-                        item.setSelected(True)
+                    item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                    item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
+                    self.tl.addItem(item)
 
     def read_list(self):
+        # Read parts_config
         parts_info = f"{self.work}/config/parts_info"
         if os.path.exists(parts_info):
             try:
                 data: dict = utils.JsonEdit(parts_info).read().get('super_info')
                 if data is None:
-                    raise AttributeError()
+                    raise AttributeError("super_info is not dict")
             except Exception:
                 logging.exception('PackSupper:read_parts_info')
             else:
+                # get block device name
                 for i in data.get('block_devices', []):
                     self._block_device_name = i.get('name', 'super')
                     if isinstance(i.get('size'), int):
-                        self._super_size = i.get('size', self._super_size)
+                        self.super_size_edit.setText(str(i.get('size')))
 
                 for i in data.get('group_table', []):
                     name = i.get('name')
                     if isinstance(name, str) and name != 'default':
-                        self._group_name = name
+                        index = self.show_group_name.findText(name)
+                        if index >= 0:
+                            self.show_group_name.setCurrentIndex(index)
+                        else:
+                            self.show_group_name.addItem(name)
+                            self.show_group_name.setCurrentText(name)
 
-                self.selected = [
-                    i.get('name') for i in data.get('partition_table', [])
-                    if isinstance(i.get('name'), str)
-                ]
+                selected = []
+                for i in data.get('partition_table', []):
+                    name = i.get('name')
+                    if isinstance(name, str) and name not in selected:
+                        selected.append(name)
+                self.selected = selected
 
+        # Read dynamic_partitions_op_list
         list_file = f"{self.work}/dynamic_partitions_op_list"
         if os.path.exists(list_file):
             try:
                 data = utils.dynamic_list_reader(list_file)
             except Exception:
                 logging.exception('Bugs')
-                self.update_ui_from_vars()
                 return
 
-            if len(data) > 1:
-                keys = list(data.keys())
-                fir, sec = keys[0], keys[1]
+            if not isinstance(data, dict) or not data:
+                return
+
+            keys = list(data.keys())
+
+            if len(keys) > 1:
+                fir = keys[0]
+                sec = keys[1]
                 if fir[:-2] == sec[:-2]:
-                    self._group_name = fir[:-2]
-                    self._super_type = 2
-                    self._super_size = int(data[fir]['size'])
+                    g_name = fir[:-2]
+                    index = self.show_group_name.findText(g_name)
+                    if index >= 0:
+                        self.show_group_name.setCurrentIndex(index)
+                    else:
+                        self.show_group_name.addItem(g_name)
+                        self.show_group_name.setCurrentText(g_name)
 
-                    raw_parts = data[fir].get('parts', [])
-                    selected = raw_parts.copy()
-                    for i in raw_parts:
+                    if self.type_group.button(2):
+                        self.type_group.button(2).setChecked(True)
+
+                    self.super_size_edit.setText(str(int(data[fir]['size'])))
+                    self.selected = data[fir].get('parts', [])
+
+                    selected_copy = self.selected.copy()
+                    for i in self.selected:
                         name = i[:-2] if i.endswith('_a') or i.endswith('_b') else i
-                        if name not in selected:
-                            selected.append(name)
-                    self.selected = selected
-            elif len(data) == 1:
-                group_name = list(data.keys())[0]
-                self._group_name = group_name
-                self._super_size = int(data[group_name]['size'])
-                self.selected = data[group_name].get('parts', [])
-                self._super_type = 1
+                        if name not in selected_copy:
+                            selected_copy.append(name)
+                    self.selected = selected_copy
 
-        self.update_ui_from_vars()
+            elif len(keys) == 1:
+                group_name = keys[0]
+                index = self.show_group_name.findText(group_name)
+                if index >= 0:
+                    self.show_group_name.setCurrentIndex(index)
+                else:
+                    self.show_group_name.addItem(group_name)
+                    self.show_group_name.setCurrentText(group_name)
+
+                self.super_size_edit.setText(str(int(data[group_name]['size'])))
+                self.selected = data[group_name].get('parts', [])
+
+                if self.type_group.button(1):
+                    self.type_group.button(1).setChecked(True)
