@@ -943,7 +943,7 @@ class PluginPage(QWidget):
             data['card_widget'].destroy()
         self.cards_layout.update()
         self.cards_data.clear()
-        for plugin_id in self.built_in_plugins.plugins:
+        for plugin_id in self.built_in_plugins.plugins.keys():
             plugin_icon = FluentIcon.APPLICATION
             plugin_info = self.built_in_plugins.plugins[plugin_id]
             plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
