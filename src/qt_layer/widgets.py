@@ -1,16 +1,16 @@
+import os
 import time
 import tkinter as tk
 
 from PySide6.QtCore import QTimer
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLabel, QLineEdit)
-from qfluentwidgets import InfoBar, InfoBarPosition, LineEdit
-from qfluentwidgets import (MessageBoxBase, ComboBox, SwitchButton, Slider,
-                            SubtitleLabel, CaptionLabel)
+from qfluentwidgets import InfoBar, InfoBarPosition
+from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
+                            CaptionLabel)
 
-from config_parser import ConfigParser
+from utils import gettype
 
 
 class TkinterEmbeddedPanel(QWidget):
@@ -176,6 +176,183 @@ class InputDialog(MessageBoxBase):
 #             self.create_project(project_name)
 
 
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QHBoxLayout, QListWidgetItem
+from qfluentwidgets import (
+    CheckBox,
+    ComboBox,
+    LineEdit,
+    ListWidget,
+    MessageBoxBase,
+    SubtitleLabel,
+)
+
+
+class ConvertImageMessageBox(MessageBoxBase):
+
+    def __init__(self, path: str, parent=None):
+        """
+        :param items: 传入要在列表中显示的文件名列表，例如 ["odm.img", "vendor.img", "system.img"]
+        """
+        super().__init__(parent)
+        self.path = path  # 保存原始完整列表，用于搜索过滤
+
+        # 1. 设置标准对话框标题与底层按钮文本
+        self.titleLabel = SubtitleLabel("Convert image", self)
+        self.yesButton.setText("OK")
+        self.cancelButton.setText("Cancel")
+
+        # 2. 创建源与目标格式下拉框
+        self.src_combo = ComboBox(self)
+        self.src_combo.addItems(["raw", "sparse", "dat", "br", "xz"])
+        self.src_combo.currentTextChanged.connect(self.refresh_list)
+        self.src_combo.setFixedWidth(160)
+
+        self.arrow_label = SubtitleLabel(">>>>>>", self)
+        self.arrow_label.setStyleSheet("color: gray;")
+
+        self.dst_combo = ComboBox(self)
+        self.dst_combo.addItems(["raw", "sparse", "dat", "br", "xz"])
+        self.dst_combo.setFixedWidth(160)
+
+        # 3. 创建核心文件多选列表 (使用 Fluent 风格的 ListWidget)
+        self.list_widget = ListWidget(self)
+        self.list_widget.setMinimumHeight(120)
+        self.list_widget.setMaximumHeight(200)
+
+        # 4. 创建底部控制部件：全选复选框 & 搜索输入框
+        self.select_all_checkbox = CheckBox("Select all", self)
+        self.search_input = LineEdit(self)
+        self.search_input.setPlaceholderText("search...")
+        self.search_input.setClearButtonEnabled(True)
+
+        # 5. 构建布局结构
+        # 顶部的转换格式选择水平布局
+        self.combo_layout = QHBoxLayout()
+        self.combo_layout.setSpacing(15)
+        self.combo_layout.addWidget(self.src_combo)
+        self.combo_layout.addWidget(self.arrow_label, 0, Qt.AlignmentFlag.AlignCenter)
+        self.combo_layout.addWidget(self.dst_combo)
+
+        # 底部的全选与搜索框水平布局
+        self.bottom_control_layout = QHBoxLayout()
+        self.bottom_control_layout.setSpacing(10)
+        self.bottom_control_layout.addWidget(self.select_all_checkbox)
+        self.bottom_control_layout.addWidget(self.search_input, 1)
+
+        # 将所有部件顺次组合到 MessageBoxBase 的主视图容器中
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addLayout(self.combo_layout)
+        self.viewLayout.addWidget(self.list_widget)  # 插入中间的多选列表
+        self.viewLayout.addLayout(self.bottom_control_layout)
+
+        # 设置对话框的整体宽度
+        self.widget.setMinimumWidth(450)
+
+        # 6. 绑定内部交互信号槽
+        self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
+        self.search_input.textChanged.connect(self._on_search_text_changed)
+        self.list_widget.itemChanged.connect(self._on_item_changed)
+        self.refresh_list()
+
+    def refile(self, f):
+        for i in os.listdir(self.path):
+            if i.endswith(f) and os.path.isfile(f'{self.path}/{i}'):
+                yield i
+    def refresh_list(self):
+        work = self.path
+        file_list = []
+        if self.src_combo.currentText() == "br":
+            for i in self.refile(".new.dat.br"):
+                file_list.append(i)
+        elif self.src_combo.currentText() == 'xz':
+            for i in self.refile(".new.dat.xz"):
+                file_list.append(i)
+        elif self.src_combo.currentText() == 'dat':
+            for i in self.refile(".new.dat"):
+                file_list.append(i)
+        elif self.src_combo.currentText() == 'sparse':
+            for i in os.listdir(work):
+                if os.path.isfile(f'{work}/{i}') and gettype(f'{work}/{i}') == 'sparse':
+                    file_list.append(i)
+        elif self.src_combo.currentText() == 'raw':
+            for i in os.listdir(work):
+                if os.path.isfile(f'{work}/{i}'):
+                    if gettype(f'{work}/{i}') in ['ext', 'erofs', 'super', 'f2fs']:
+                        file_list.append(i)
+        print(file_list)
+        self._populate_list(file_list)
+    def _populate_list(self, items_to_show: list[str]):
+        """根据传入的列表渲染 QListWidget 项（带复选框）"""
+        self.list_widget.blockSignals(True)  # 渲染时暂时阻塞信号，防止触发频繁回调
+        self.list_widget.clear()
+        for item_text in items_to_show:
+            item = QListWidgetItem(item_text)
+            # 设置该项为可勾选状态，并默认不勾选
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.list_widget.addItem(item)
+        self.list_widget.blockSignals(False)
+
+    @Slot(int)
+    def _on_select_all_changed(self, state: int):
+        """处理点击 'Select all' 时的全选/全不选逻辑"""
+        self.list_widget.blockSignals(True)
+        # 根据 Select all 的状态决定列表中每一项的勾选状态
+        check_state = Qt.CheckState.Checked if state == 2 else Qt.CheckState.Unchecked
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            # 只有在列表当前可见的情况下才受全选影响
+            if not self.list_widget.isRowHidden(i):
+                item.setCheckState(check_state)
+        self.list_widget.blockSignals(False)
+
+    @Slot(QListWidgetItem)
+    def _on_item_changed(self, item: QListWidgetItem):
+        """如果用户手动取消勾选了某一项，自动让底部的 'Select all' 变成未完全勾选状态"""
+        self.select_all_checkbox.blockSignals(True)
+        total_visible = 0
+        total_checked = 0
+        for i in range(self.list_widget.count()):
+            if not self.list_widget.isRowHidden(i):
+                total_visible += 1
+                if self.list_widget.item(i).checkState() == Qt.CheckState.Checked:
+                    total_checked += 1
+
+        # 联动更新全选框的状态
+        if total_checked == total_visible and total_visible > 0:
+            self.select_all_checkbox.setCheckState(Qt.CheckState.Checked)
+        elif total_checked == 0:
+            self.select_all_checkbox.setCheckState(Qt.CheckState.Unchecked)
+        else:
+            # 部分勾选状态 (PartiallyChecked)
+            self.select_all_checkbox.setCheckState(Qt.CheckState.PartiallyChecked)
+        self.select_all_checkbox.blockSignals(False)
+
+    @Slot(str)
+    def _on_search_text_changed(self, text: str):
+        """处理搜索框文本变化，实时过滤隐藏不匹配的项"""
+        search_text = text.strip().lower()
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            # 模糊匹配：如果文件名包含输入字符则显示，否则隐藏
+            is_match = search_text in item.text().lower()
+            self.list_widget.setRowHidden(i, not is_match)
+
+    def get_result(self) -> dict:
+        """获取用户当前在对话框中选择和输入的最终数据"""
+        selected_files = []
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item.checkState() == Qt.CheckState.Checked:
+                selected_files.append(item.text())
+
+        return {
+            "src_format": self.src_combo.currentText(),
+            "dst_format": self.dst_combo.currentText(),
+            "selected_files": selected_files,  # 返回所有被勾选的文件列表
+            "search_keyword": self.search_input.text(),
+        }
 
 
 class PackSettingsDialog(MessageBoxBase):

@@ -56,7 +56,7 @@ import utils
 from payload_extract import extract_partitions_from_payload
 from pygpt.gpt_reader import GPTReader
 from qt_layer.settings import cfg
-from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog
+from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox
 from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype, call
@@ -787,7 +787,14 @@ class ProjectsPage(QWidget):
                 name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
                 if name_item is not None:
                     name_item.setCheckState(target_state)
-
+    #functions for it
+    def convert_image(self):
+        if not project_manger.exist(cfg.currentProjectName.value):
+            show_info_bar(self, "warn", "project's not exist", 2)
+            return
+        dialog = ConvertImageMessageBox(project_manger.current_work_path(), self)
+        if dialog.exec_():
+            result = dialog.get_result()
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)
@@ -803,6 +810,7 @@ class ProjectsPage(QWidget):
         self.zip_btn = PushButton("打包ZIP", container, FIF.APPLICATION)
         self.super_btn = PushButton("打包Super", container, FIF.ALBUM)
         self.format_conv_btn = PushButton("格式转换", container, FIF.EMBED)
+        self.format_conv_btn.clicked.connect(self.convert_image)
         self.apk_mgr_btn = PushButton("APK 助手", container, FIF.DEVELOPER_TOOLS)
 
         for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.apk_mgr_btn]:
