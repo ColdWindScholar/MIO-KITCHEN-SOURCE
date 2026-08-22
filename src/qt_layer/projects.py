@@ -242,8 +242,9 @@ class ProjectsPage(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_log_area = ScrollArea(self)
         scroll_log_area.setWidgetResizable(True)
-        main_layout.addWidget(scroll_area)
+
         main_layout.addWidget(scroll_log_area)
+        main_layout.addWidget(scroll_area)
 
         # 核心滚动容器
         scroll_content = QWidget()
@@ -1619,7 +1620,9 @@ class StreamToSignal(QObject):
         self.original_stream = original_stream
 
     def write(self, text):
-        self.original_stream.write(text)
+        if not text.strip():
+            return
+        logging.info(text)
         self.text_written.emit(text)
 
     def flush(self):
