@@ -1622,9 +1622,7 @@ class StreamToSignal(QObject):
 
     def write(self, text):
         self.original_stream.write(text)
-        cleaned = text.strip()
-        if cleaned:
-            self.text_written.emit(cleaned.split('\n')[-1].strip())
+        self.text_written.emit(text)
 
     def flush(self):
         self.original_stream.flush()
