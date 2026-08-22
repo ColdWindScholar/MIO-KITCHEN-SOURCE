@@ -807,7 +807,7 @@ class AppCard(CardWidget):
         self.iconWidget = IconWidget(icon)
         self.titleLabel = BodyLabel(title, self)
         self.contentLabel = CaptionLabel(content, self)
-        self.openButton = PushButton('Open', self)
+        self.openButton = PushButton('Run', self)
         self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
 
         self.hBoxLayout = QHBoxLayout(self)
@@ -833,11 +833,27 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.openButton, 0, Qt.AlignRight)
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
-
+class BuiltInPlugins(object):
+    def __init__(self):
+        self.plugins = (
+            {"id":"download_rom", "name":"Download ROM", "entry":lambda:None},
+            {"id":"get_file_info", "name":"Get File Info", "entry":lambda:None},
+            {"id":"byte_calculator", "name":"Byte Calculator", "entry":lambda:None},
+            {"id":"allow_selinux_audit", "name":"Allow Selinux Audit", "entry":lambda:None},
+            {"id":"dis_avb_in_fstab", "name":"Disable avb in fstab", "entry":lambda:None},
+            {"id":"dis_encryption", "name":"Disable Encryption", "entry":lambda:None},
+            {"id":"trim_raw_image", "name":"Trim Raw Image", "entry":lambda:None},
+            {"id":"magisk_patch", "name":"Magisk Patch", "entry":lambda:None},
+            {"id":"merge_qualcomm_image", "name":"Merge Qualcomm Image", "entry":lambda:None},
+            {"id":"merge_super", "name":"Merge Super", "entry":lambda:None},
+            {"id":"decrypt_xtc_xml", "name":"Decrypt xtc xml", "entry":lambda:None},
+            {"id":"mtk_port_tool", "name":"Mtk Port Tool", "entry":lambda:None},
+        )
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("PluginPage")
+        self.built_in_plugins = BuiltInPlugins()
         self.cards_data = []  # Track card mappings for easy filtering
         self.initUI()
         self.setStyleSheet("""
@@ -925,6 +941,29 @@ class PluginPage(QWidget):
             data['card_widget'].destroy()
         self.cards_layout.update()
         self.cards_data.clear()
+        for i in self.built_in_plugins.plugins:
+            plugin_icon = FluentIcon.APPLICATION
+            plugin_title = i.get("name", i.get("id", "Unknown"))
+            plugin_author = "Mio-kitchen"
+
+            card = AppCard(
+                icon=plugin_icon,
+                title=plugin_title,
+                content=plugin_author
+            )
+            card.moreButton.hide()
+            # Setup execution bindings (Safe against the signal boolean emission)
+            card.openButton.clicked.connect(lambda state, plugin_id=i: i.get("entry"))
+            card.clicked.connect(lambda plugin_id=i: i.get("entry"))
+
+            self.cards_layout.addWidget(card)
+
+            # Store structural references for fast runtime filtering queries
+            self.cards_data.append({
+                "card_widget": card,
+                "title": plugin_title.lower(),
+                "author": plugin_author.lower()
+            })
 
         for i in module_manager.list_packages():
             plugin = module_manager.get_info(i)
