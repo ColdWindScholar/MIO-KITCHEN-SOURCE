@@ -7,7 +7,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLabel, QLineEdit)
-from qfluentwidgets import InfoBar, InfoBarPosition
+from qfluentwidgets import InfoBar, InfoBarPosition, BodyLabel, SimpleCardWidget
 from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
                             CaptionLabel)
 
@@ -626,85 +626,150 @@ class PackSuperMessageBox(MessageBoxBase):
         self.selected = []
 
         self.setup_ui()
-        self.read_list()
 
+        QTimer.singleShot(50, self._delayed_init)
+
+    def _delayed_init(self):
+        self.read_list()
         self.refresh()
 
     def setup_ui(self):
-        self.viewLayout.setSpacing(12)
+        self.widget.setMinimumWidth(650)
+        self.viewLayout.setSpacing(16)
+        self.viewLayout.setContentsMargins(0, 10, 0, 10)
 
-        type_card = CaptionLabel(self)
-        type_card.setText("Super Partition Type")
-        type_layout = QHBoxLayout()
-        type_layout.setContentsMargins(12, 12, 12, 12)
-        self.radio_a = RadioButton("A-only", type_card)
-        self.radio_vab = RadioButton("Virtual-ab", type_card)
-        self.radio_ab = RadioButton("A/B", type_card)
+        # Combined split row for Partition Type (Left) and Attribute Selection (Right)
+        top_row_panel = QWidget(self.widget)
+        top_row_layout = QHBoxLayout(top_row_panel)
+        top_row_layout.setContentsMargins(0, 0, 0, 0)
+        top_row_layout.setSpacing(16)
+
+        # 1. Super Partition Type Card Container (Left Component)
+        type_card = SimpleCardWidget(top_row_panel)
+        type_card_layout = QVBoxLayout(type_card)
+        type_card_layout.setContentsMargins(16, 14, 16, 14)
+        type_card_layout.setSpacing(12)
+
+        type_title = SubtitleLabel("Super Partition Type", type_card)
+        type_title.setStyleSheet("font-size: 14px; font-weight: 600;")
+        type_card_layout.addWidget(type_title)
+
+        type_controls = QWidget(type_card)
+        type_layout = QHBoxLayout(type_controls)
+        type_layout.setContentsMargins(0, 0, 0, 0)
+        type_layout.setSpacing(16)
+        self.radio_a = RadioButton("A-only", type_controls)
+        self.radio_vab = RadioButton("Virtual-ab", type_controls)
+        self.radio_ab = RadioButton("A/B", type_controls)
         for rb in (self.radio_a, self.radio_vab, self.radio_ab):
             type_layout.addWidget(rb)
-        type_card.setLayout(type_layout)
-        self.viewLayout.addWidget(type_card)
+        type_layout.addStretch()
+        type_card_layout.addWidget(type_controls)
+        top_row_layout.addWidget(type_card, stretch=3)
 
-        attr_card = CaptionLabel(self)
-        attr_card.setText("Attribute")
-        attr_layout = QHBoxLayout()
-        attr_layout.setContentsMargins(12, 12, 12, 12)
-        self.radio_ro = RadioButton("Readonly", attr_card)
-        self.radio_none = RadioButton("None", attr_card)
+        # 2. Attribute Settings Card Container (Right Component)
+        attr_card = SimpleCardWidget(top_row_panel)
+        attr_card_layout = QVBoxLayout(attr_card)
+        attr_card_layout.setContentsMargins(16, 14, 16, 14)
+        attr_card_layout.setSpacing(12)
+
+        attr_title = SubtitleLabel("Attribute", attr_card)
+        attr_title.setStyleSheet("font-size: 14px; font-weight: 600;")
+        attr_card_layout.addWidget(attr_title)
+
+        attr_controls = QWidget(attr_card)
+        attr_layout = QHBoxLayout(attr_controls)
+        attr_layout.setContentsMargins(0, 0, 0, 0)
+        attr_layout.setSpacing(16)
+        self.radio_ro = RadioButton("Readonly", attr_controls)
+        self.radio_none = RadioButton("None", attr_controls)
         attr_layout.addWidget(self.radio_ro)
         attr_layout.addWidget(self.radio_none)
-        attr_card.setLayout(attr_layout)
-        self.viewLayout.addWidget(attr_card)
+        attr_layout.addStretch()
+        attr_card_layout.addWidget(attr_controls)
+        top_row_layout.addWidget(attr_card, stretch=2)
 
-        settings_card = CaptionLabel(self)
-        settings_card.setText("Configuration Settings")
-        settings_layout = QGridLayout()
-        settings_layout.setContentsMargins(12, 12, 12, 12)
+        self.viewLayout.addWidget(top_row_panel)
 
-        settings_layout.addWidget(CaptionLabel("Group Name:", settings_card), 0, 0)
-        self.group_combo = ComboBox(settings_card)
+        # 3. Form Configurations Card Container
+        settings_card = SimpleCardWidget(self.widget)
+        settings_card_layout = QVBoxLayout(settings_card)
+        settings_card_layout.setContentsMargins(16, 14, 16, 14)
+        settings_card_layout.setSpacing(12)
+
+        settings_title = SubtitleLabel("Configuration Settings", settings_card)
+        settings_title.setStyleSheet("font-size: 14px; font-weight: 600;")
+        settings_card_layout.addWidget(settings_title)
+
+        settings_controls = QWidget(settings_card)
+        settings_layout = QGridLayout(settings_controls)
+        settings_layout.setContentsMargins(0, 4, 0, 4)
+        settings_layout.setHorizontalSpacing(16)
+        settings_layout.setVerticalSpacing(12)
+        settings_layout.setColumnStretch(0, 1)
+        settings_layout.setColumnStretch(1, 3)
+
+        lbl_group = BodyLabel("Group Name:", settings_controls)
+        settings_layout.addWidget(lbl_group, 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.group_combo = ComboBox(settings_controls)
         self.group_combo.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
+        self.group_combo.setSizePolicy(self.group_combo.sizePolicy().Policy.Expanding,
+                                       self.group_combo.sizePolicy().Policy.Fixed)
         settings_layout.addWidget(self.group_combo, 0, 1)
 
-        settings_layout.addWidget(CaptionLabel("Super Size (Bytes):", settings_card), 1, 0)
-        self.size_entry = LineEdit(settings_card)
+        lbl_size = BodyLabel("Super Size (Bytes):", settings_controls)
+        settings_layout.addWidget(lbl_size, 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.size_entry = LineEdit(settings_controls)
         self.size_entry.textChanged.connect(self.validate_size_input)
         settings_layout.addWidget(self.size_entry, 1, 1)
 
-        settings_card.setLayout(settings_layout)
+        settings_card_layout.addWidget(settings_controls)
         self.viewLayout.addWidget(settings_card)
 
-        list_card = CaptionLabel(self)
-        list_card.setText("Select Partitions")
-        list_layout = QVBoxLayout()
-        list_layout.setContentsMargins(12, 12, 12, 12)
+        # 4. Partition File Selection Card Container
+        list_card = SimpleCardWidget(self.widget)
+        list_card_layout = QVBoxLayout(list_card)
+        list_card_layout.setContentsMargins(16, 14, 16, 14)
+        list_card_layout.setSpacing(12)
+
+        list_title = SubtitleLabel("Select Partitions", list_card)
+        list_title.setStyleSheet("font-size: 14px; font-weight: 600;")
+        list_card_layout.addWidget(list_title)
 
         self.partition_listview = ListWidget(list_card)
         self.partition_listview.setSelectionMode(ListWidget.MultiSelection)
-        self.partition_listview.setMinimumHeight(200)
-        list_layout.addWidget(self.partition_listview)
-        list_card.setLayout(list_layout)
+        self.partition_listview.setMinimumHeight(180)
+        self.partition_listview.setStyleSheet("border-radius: 6px; padding: 4px;")
+        list_card_layout.addWidget(self.partition_listview)
         self.viewLayout.addWidget(list_card)
 
-        self.sparse_check = CheckBox("Sparse Image Output", self)
-        self.viewLayout.addWidget(self.sparse_check)
+        # 5. Global Action Options Layout
+        options_panel = QWidget(self.widget)
+        options_layout = QVBoxLayout(options_panel)
+        options_layout.setContentsMargins(4, 4, 4, 4)
+        options_layout.setSpacing(12)
+
+        self.sparse_check = CheckBox("Sparse Image Output", options_panel)
+        options_layout.addWidget(self.sparse_check)
 
         tools_layout = QHBoxLayout()
-        self.del_source_check = CheckBox("Delete Source Image Files", self)
+        tools_layout.setContentsMargins(0, 0, 0, 0)
+        self.del_source_check = CheckBox("Delete Source Image Files", options_panel)
         tools_layout.addWidget(self.del_source_check)
         tools_layout.addStretch()
 
-        self.refresh_btn = PushButton("Refresh List", self)
+        self.refresh_btn = PushButton("Refresh List", options_panel)
         self.refresh_btn.clicked.connect(self.refresh)
         tools_layout.addWidget(self.refresh_btn)
 
-        self.g_b = PushButton("Generate Script", self)
+        self.g_b = PushButton("Generate Script", options_panel)
         self.g_b.clicked.connect(self.generate)
         tools_layout.addWidget(self.g_b)
-        self.viewLayout.addLayout(tools_layout)
+        options_layout.addLayout(tools_layout)
+
+        self.viewLayout.addWidget(options_panel)
 
         self.yesButton.setText("Pack")
-        self.cancelButton.setText("Cancel")
 
     def validate_size_input(self, text):
         has_error = not text.isdigit()
@@ -744,8 +809,6 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def get_selected_partitions(self):
         return [item.data(Qt.UserRole) for item in self.partition_listview.selectedItems()]
-
-
 
     def verify_size(self):
         lbs = self.get_selected_partitions()
