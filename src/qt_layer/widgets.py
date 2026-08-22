@@ -761,7 +761,6 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def refresh(self):
         self.tl.clear()
-        self.verify_size()
         if not os.path.exists(self.work):
             return
 
@@ -785,6 +784,7 @@ class PackSuperMessageBox(MessageBoxBase):
                     item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
                     item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
                     self.tl.addItem(item)
+        self.verify_size()
 
     def read_list(self):
         # Read parts_config
