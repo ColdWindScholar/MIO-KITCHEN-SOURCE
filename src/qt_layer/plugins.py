@@ -944,17 +944,15 @@ class PluginPage(QWidget):
         for i in self.built_in_plugins.plugins:
             plugin_icon = FluentIcon.APPLICATION
             plugin_title = i.get("name", i.get("id", "Unknown"))
-            plugin_author = "Mio-kitchen"
-
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin_title,
-                content=plugin_author
+                content='Built-In Plugin'
             )
-            card.moreButton.hide()
+            card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=i: i.get("entry"))
-            card.clicked.connect(lambda plugin_id=i: i.get("entry"))
+            card.openButton.clicked.connect(lambda state, plugin_id=i: plugin_id.get("entry"))
+            card.clicked.connect(lambda plugin_id=i: plugin_id.get("entry"))
 
             self.cards_layout.addWidget(card)
 
@@ -962,7 +960,7 @@ class PluginPage(QWidget):
             self.cards_data.append({
                 "card_widget": card,
                 "title": plugin_title.lower(),
-                "author": plugin_author.lower()
+                "author": "Mio-Kitchen"
             })
 
         for i in module_manager.list_packages():
