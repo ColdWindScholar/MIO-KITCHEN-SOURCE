@@ -563,10 +563,10 @@ class ProjectsPage(QWidget):
                 print("file not exist")
             if not task:
                 return
-            log_dialog = StreamLogDialog("Running...", parent=self)
 
-            log_dialog.start_redirected_task(task)
-            log_dialog.exec()
+
+
+
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
