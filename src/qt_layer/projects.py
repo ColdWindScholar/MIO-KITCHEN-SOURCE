@@ -905,7 +905,7 @@ class ProjectsPage(QWidget):
             show_info_bar(self, "warn", "project's not exist", 2)
             return
         dialog = PackSuperMessageBox(project_manger.current_work_path(), self)
-        if dialog:
+        if dialog.exec_():
             pass
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
