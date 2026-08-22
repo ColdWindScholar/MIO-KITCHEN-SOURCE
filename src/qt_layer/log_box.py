@@ -4,33 +4,19 @@ from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import PushButton, TextEdit
 
 class LogMessageBoxBase(QWidget):
-    """
-    一个通用的日志弹窗基础类
-    支持展示不同颜色的日志（Info, Warning, Error）
-    """
 
     def __init__(self,  parent=None):
-        # 确保 parent 和当前窗口在同一个线程（通常是主线程）
         super().__init__(parent)
-
-
-        # 初始化布局
         self.layout = QVBoxLayout(self)
-
-        # 文本显示区域（只读）
         self.text_edit = TextEdit(self)
         self.text_edit.setReadOnly(True)
         self.layout.addWidget(self.text_edit)
-
-        # 底部按钮布局
         self.button_layout = QHBoxLayout()
         self.clear_btn = PushButton("清空", self)
 
         self.button_layout.addStretch()
         self.button_layout.addWidget(self.clear_btn)
         self.layout.addLayout(self.button_layout)
-
-        # 绑定按钮事件
         self.clear_btn.clicked.connect(self.text_edit.clear)
 
         # 预设不同日志级别的颜色格式
