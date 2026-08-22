@@ -15,7 +15,6 @@ import contextpatch
 import extra
 import fspatch
 import tarsafe
-from qt_layer.taskdialog import StreamLogDialog, GenericTaskWorker, StreamToSignal
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
@@ -42,7 +41,7 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
 from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
@@ -1598,3 +1597,38 @@ class ProjectsPage(QWidget):
 
             attr_item = QTableWidgetItem(attrs)
             self.partition_table.setItem(row_idx, 4, attr_item)
+
+
+class StreamToSignal(QObject):
+    text_written = Signal(str)
+
+    def __init__(self, original_stream):
+        super().__init__()
+        self.original_stream = original_stream
+
+    def write(self, text):
+        self.original_stream.write(text)
+        cleaned = text.strip()
+        if cleaned:
+            self.text_written.emit(cleaned.split('\n')[-1].strip())
+
+    def flush(self):
+        self.original_stream.flush()
+
+
+class GenericTaskWorker(QThread):
+    task_finished = Signal(bool)
+
+    def __init__(self, target_func, *args, **kwargs):
+        super().__init__()
+        self.target_func = target_func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        try:
+            self.target_func(*self.args, **self.kwargs)
+            self.task_finished.emit(True)
+        except Exception as e:
+            print(f"\n[ERROR] {e}")
+            self.task_finished.emit(False)
