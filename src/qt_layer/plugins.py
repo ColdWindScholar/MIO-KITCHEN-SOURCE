@@ -850,7 +850,14 @@ class BuiltInPlugins(object):
             "mtk_port_tool":{ "name":"Mtk Port Tool", "entry":lambda:None},
         }
     def exec_plugin(self, plugin_id:str):
-        print(plugin_id)
+        if plugin_id in self.plugins:
+            print(f"No such plugin!{plugin_id}")
+            return
+        entry = self.plugins[plugin_id]["entry"]
+        if not callable(entry):
+            print(f"{plugin_id} is not callable!")
+            return
+        entry()
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
