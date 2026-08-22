@@ -849,7 +849,8 @@ class BuiltInPlugins(object):
             {"id":"decrypt_xtc_xml", "name":"Decrypt xtc xml", "entry":lambda:None},
             {"id":"mtk_port_tool", "name":"Mtk Port Tool", "entry":lambda:None},
         )
-
+    def exec_plugin(self, plugin_id:str):
+        print(plugin_id)
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -952,8 +953,8 @@ class PluginPage(QWidget):
             )
             card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=i: plugin_id.get("entry"))
-            card.clicked.connect(lambda plugin_id=i: plugin_id.get("entry"))
+            card.openButton.clicked.connect(lambda state, plugin_id=i: self.built_in_plugins.exec_plugin(plugin_id.get("id")))
+            card.clicked.connect(lambda plugin_id=i: self.built_in_plugins.exec_plugin(plugin_id.get("id")))
 
             self.cards_layout.addWidget(card)
 
