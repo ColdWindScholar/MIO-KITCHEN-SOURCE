@@ -1231,7 +1231,6 @@ class ProjectsPage(QWidget):
                     print(f"Unsupported {i}:{parts_dict[i]}")
                 logging.warning(f"{i} Not Supported.")
     def log_processer(self, text):
-
         if text.startswith(":info_bar:"):
             show_info_bar(self, "warning", text, 2)
         else:
