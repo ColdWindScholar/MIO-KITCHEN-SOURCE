@@ -56,7 +56,8 @@ import utils
 from payload_extract import extract_partitions_from_payload
 from pygpt.gpt_reader import GPTReader
 from qt_layer.settings import cfg
-from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox
+from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox, \
+    PackSuperMessageBox
 from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype, call
@@ -899,6 +900,13 @@ class ProjectsPage(QWidget):
             src, dst, files = dialog.get_result()
             self.format_task = GenericTaskWorker(self.conversion, src, dst, files)
             self.start_job(self.format_task)
+    def pack_super(self):
+        if not project_manger.exist(cfg.currentProjectName.value):
+            show_info_bar(self, "warn", "project's not exist", 2)
+            return
+        dialog = PackSuperMessageBox(project_manger.current_work_path(), self)
+        if dialog:
+            pass
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)
@@ -913,6 +921,7 @@ class ProjectsPage(QWidget):
         tools_layout = QHBoxLayout()
         self.zip_btn = PushButton("打包ZIP", container, FIF.APPLICATION)
         self.super_btn = PushButton("打包Super", container, FIF.ALBUM)
+        self.super_btn.clicked.connect(self.pack_super)
         self.format_conv_btn = PushButton("格式转换", container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
         self.apk_mgr_btn = PushButton("APK 助手", container, FIF.DEVELOPER_TOOLS)

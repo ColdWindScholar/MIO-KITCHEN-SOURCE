@@ -599,3 +599,215 @@ class PackSettingsDialog(MessageBoxBase):
         self.content_widget.adjustSize()
         self.widget.adjustSize()
 
+
+import sys
+from PySide6.QtCore import Qt, Slot
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QListWidgetItem, QMainWindow, QPushButton
+from qfluentwidgets import (
+    CheckBox,
+    ComboBox,
+    LineEdit,
+    ListWidget,
+    MessageBoxBase,
+    PushButton,
+    RadioButton,
+    SubtitleLabel,
+)
+
+
+class PackSuperMessageBox(MessageBoxBase):
+    """
+    基于 QFluentWidgets 实现的 "Pack super" 高级自定义弹窗
+    """
+
+    def __init__(self, path: str, parent=None):
+        """
+        :param partition_items: 传入多选列表中要显示的分区文件名列表
+        """
+        super().__init__(parent)
+        self.path = path
+
+        # 1. 设置弹窗基础信息与底部标准动作按钮
+        self.titleLabel = SubtitleLabel("Pack super", self)
+        self.yesButton.setText("Pack")
+        self.cancelButton.setText("Cancel")
+
+        # 2. 区域一：Partition layout (单选组)
+        self.layout_label = SubtitleLabel("Partition layout", self)
+        self.layout_label.setStyleSheet("font-size: 13px; color: gray; margin-top: 5px;")
+        self.ra_only = RadioButton("A-only", self)
+        self.rvirtual_ab = RadioButton("Virtual-ab", self)
+        self.rab = RadioButton("A/B", self)
+        self.ra_only.setChecked(True)  # 默认选中第一个
+
+        self.layout_group_box = QHBoxLayout()
+        self.layout_group_box.addWidget(self.ra_only)
+        self.layout_group_box.addWidget(self.rvirtual_ab)
+        self.layout_group_box.addWidget(self.rab)
+        self.layout_group_box.addStretch()
+
+        # 3. 区域二：Attribute (单选组)
+        self.attr_label = SubtitleLabel("Attribute", self)
+        self.attr_label.setStyleSheet("font-size: 13px; color: gray; margin-top: 5px;")
+        self.r_readonly = RadioButton("Readonly", self)
+        self.r_none = RadioButton("None", self)
+        self.r_readonly.setChecked(True)
+
+        self.attr_group_box = QHBoxLayout()
+        self.attr_group_box.addWidget(self.r_readonly)
+        self.attr_group_box.addWidget(self.r_none)
+        self.attr_group_box.addStretch()
+
+        # 4. 区域三：Settings (下拉框与输入框同行排版)
+        self.settings_label = SubtitleLabel("Settings", self)
+        self.settings_label.setStyleSheet("font-size: 13px; color: gray; margin-top: 5px;")
+
+        self.group_name_label = SubtitleLabel("Group name", self)
+        self.group_name_label.setStyleSheet("font-size: 12px;")
+        self.group_combo = ComboBox(self)
+        self.group_combo.addItems(["qti_dynamic_partitions"])
+        self.group_combo.setFixedWidth(180)
+
+        self.size_label = SubtitleLabel("Super size", self)
+        self.size_label.setStyleSheet("font-size: 12px;")
+        self.size_input = LineEdit(self)
+        self.size_input.setText("9126805504")
+
+        self.settings_layout = QHBoxLayout()
+        self.settings_layout.addWidget(self.group_name_label)
+        self.settings_layout.addWidget(self.group_combo)
+        self.settings_layout.addSpacing(15)
+        self.settings_layout.addWidget(self.size_label)
+        self.settings_layout.addWidget(self.size_input, 1)
+
+        # 5. 区域四：Include partition(s) (中央带滚动条的多选列表)
+        self.include_label = SubtitleLabel("Include partition(s)", self)
+        self.include_label.setStyleSheet("font-size: 13px; color: gray; margin-top: 5px;")
+
+        self.list_widget = ListWidget(self)
+        self.list_widget.setMinimumHeight(130)
+        self._populate_list(self.all_items)
+
+        # 6. 区域五：全选与搜索框控制行
+        self.select_all_checkbox = CheckBox("Select all", self)
+        self.search_input = LineEdit(self)
+        self.search_input.setPlaceholderText("search...")
+        self.search_input.setClearButtonEnabled(True)
+
+        self.search_layout = QHBoxLayout()
+        self.search_layout.addWidget(self.select_all_checkbox)
+        self.search_layout.addWidget(self.search_input, 1)
+
+        # 7. 区域六：底部辅助复选框与额外功能按钮
+        self.sparse_checkbox = CheckBox("Create a sparse image", self)
+        self.sparse_checkbox.setChecked(True)
+        self.remove_checkbox = CheckBox("Remove the Original File", self)
+
+        self.gen_list_btn = PushButton("Generate list", self)
+        self.refresh_btn = PushButton("Refresh", self)
+
+        self.bottom_options_layout = QHBoxLayout()
+        self.bottom_options_layout.addWidget(self.sparse_checkbox)
+        self.bottom_options_layout.addStretch()
+
+        self.bottom_actions_layout = QHBoxLayout()
+        self.bottom_actions_layout.addWidget(self.remove_checkbox)
+        self.bottom_actions_layout.addWidget(self.gen_list_btn)
+        self.bottom_actions_layout.addStretch()
+        self.bottom_actions_layout.addWidget(self.refresh_btn)
+
+        # 8. 将所有模块顺次推入到主布局中
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addWidget(self.layout_label)
+        self.viewLayout.addLayout(self.layout_group_box)
+        self.viewLayout.addWidget(self.attr_label)
+        self.viewLayout.addLayout(self.attr_group_box)
+        self.viewLayout.addWidget(self.settings_label)
+        self.viewLayout.addLayout(self.settings_layout)
+        self.viewLayout.addWidget(self.include_label)
+        self.viewLayout.addWidget(self.list_widget)
+        self.viewLayout.addLayout(self.search_layout)
+        self.viewLayout.addLayout(self.bottom_options_layout)
+        self.viewLayout.addLayout(self.bottom_actions_layout)
+
+        # 限制弹窗整体的最小与最大显示宽度
+        self.widget.setMinimumWidth(560)
+
+        # 9. 绑定联动交互信号
+        self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
+        self.search_input.textChanged.connect(self._on_search_text_changed)
+        self.list_widget.itemChanged.connect(self._on_item_changed)
+
+    def _populate_list(self, items_to_show: list[str]):
+        """加载多选列表项"""
+        self.list_widget.blockSignals(True)
+        self.list_widget.clear()
+        for item_text in items_to_show:
+            item = QListWidgetItem(item_text)
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            self.list_widget.addItem(item)
+        self.list_widget.blockSignals(False)
+
+    @Slot(int)
+    def _on_select_all_changed(self, state: int):
+        """全选与取消全选控制"""
+        self.list_widget.blockSignals(True)
+        check_state = Qt.CheckState.Checked if state == 2 else Qt.CheckState.Unchecked
+        for i in range(self.list_widget.count()):
+            if not self.list_widget.isRowHidden(i):
+                self.list_widget.item(i).setCheckState(check_state)
+        self.list_widget.blockSignals(False)
+
+    @Slot(QListWidgetItem)
+    def _on_item_changed(self, item: QListWidgetItem):
+        """列表单项勾选改变时，反向联动底部的全选按钮状态"""
+        self.select_all_checkbox.blockSignals(True)
+        total_visible = 0
+        total_checked = 0
+        for i in range(self.list_widget.count()):
+            if not self.list_widget.isRowHidden(i):
+                total_visible += 1
+                if self.list_widget.item(i).checkState() == Qt.CheckState.Checked:
+                    total_checked += 1
+
+        if total_checked == total_visible and total_visible > 0:
+            self.select_all_checkbox.setCheckState(Qt.CheckState.Checked)
+        elif total_checked == 0:
+            self.select_all_checkbox.setCheckState(Qt.CheckState.Unchecked)
+        else:
+            self.select_all_checkbox.setCheckState(Qt.CheckState.PartiallyChecked)
+        self.select_all_checkbox.blockSignals(False)
+
+    @Slot(str)
+    def _on_search_text_changed(self, text: str):
+        """根据搜索输入框实时过滤列表中的元素"""
+        search_text = text.strip().lower()
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            is_match = search_text in item.text().lower()
+            self.list_widget.setRowHidden(i, not is_match)
+
+    def get_result(self) -> dict:
+        """收集当前弹窗内的所有用户配置输入数据"""
+        # 获取选中的单选配置
+        layout_mode = "A-only" if self.ra_only.isChecked() else (
+            "Virtual-ab" if self.rvirtual_ab.isChecked() else "A/B")
+        attribute_mode = "Readonly" if self.r_readonly.isChecked() else "None"
+
+        # 统计被选中的分区
+        selected_partitions = []
+        for i in range(self.list_widget.count()):
+            item = self.list_widget.item(i)
+            if item.checkState() == Qt.CheckState.Checked:
+                selected_partitions.append(item.text())
+
+        return {
+            "partition_layout": layout_mode,
+            "attribute": attribute_mode,
+            "group_name": self.group_combo.currentText(),
+            "super_size": self.size_input.text(),
+            "selected_partitions": selected_partitions,
+            "create_sparse": self.sparse_checkbox.isChecked(),
+            "remove_original": self.remove_checkbox.isChecked(),
+        }
