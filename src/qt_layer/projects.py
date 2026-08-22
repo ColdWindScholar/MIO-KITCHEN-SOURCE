@@ -720,9 +720,7 @@ class ProjectsPage(QWidget):
 
         # 标题放外面
         frame = QHBoxLayout()
-        self.log_line = BodyLabel()
         frame.addWidget(self._create_section_title("分区"))
-        self.log_line.setText("Ready")
         self.ring = IndeterminateProgressRing(self)
         self.ring.setFixedSize(16, 16)
         self.ring.hide()
@@ -730,7 +728,6 @@ class ProjectsPage(QWidget):
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
         frame.addWidget(self.ring)
-        frame.addWidget(self.log_line)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
 
