@@ -850,8 +850,8 @@ class BuiltInPlugins(object):
             "mtk_port_tool":{ "name":"Mtk Port Tool", "entry":lambda:None},
         }
     def exec_plugin(self, plugin_id:str):
-        if plugin_id in self.plugins:
-            print(f"No such plugin!{plugin_id}")
+        if plugin_id in self.plugins.keys():
+            print(f"No such plugin: {plugin_id}")
             return
         entry = self.plugins[plugin_id]["entry"]
         if not callable(entry):
