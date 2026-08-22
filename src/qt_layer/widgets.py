@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 import tkinter as tk
@@ -10,6 +11,7 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
                             CaptionLabel)
 
+import utils
 from utils import gettype, is_empty_img
 
 
@@ -176,15 +178,10 @@ class InputDialog(MessageBoxBase):
 #             self.create_project(project_name)
 
 
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QHBoxLayout, QListWidgetItem
+from PySide6.QtCore import Slot
+from PySide6.QtWidgets import QListWidgetItem
 from qfluentwidgets import (
-    CheckBox,
-    ComboBox,
-    LineEdit,
-    ListWidget,
     MessageBoxBase,
-    SubtitleLabel,
 )
 
 
@@ -600,9 +597,8 @@ class PackSettingsDialog(MessageBoxBase):
         self.widget.adjustSize()
 
 
-import sys
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QApplication, QHBoxLayout, QListWidgetItem, QMainWindow, QPushButton
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QHBoxLayout, QListWidgetItem
 from qfluentwidgets import (
     CheckBox,
     ComboBox,
@@ -616,13 +612,254 @@ from qfluentwidgets import (
 
 
 class PackSuperMessageBox(MessageBoxBase):
-    """
-    基于 QFluentWidgets 实现的 "Pack super" 高级自定义弹窗
-    """
-
-    def __init__(self, path: str, parent=None):
-        """
-        :param partition_items: 传入多选列表中要显示的分区文件名列表
-        """
+    def __init__(self, work_path, parent=None):
         super().__init__(parent)
-        self.path = path
+        self.work = work_path
+
+        self._super_size = 9126805504
+        self._is_sparse = False
+        self._super_type = 1
+        self._attrib = 'readonly'
+        self._group_name = "qti_dynamic_partitions"
+        self._delete_source_file = False
+        self._block_device_name = 'super'
+        self.selected = []
+
+        self.setup_ui()
+        self.read_list()
+
+        self.refresh()
+
+    def setup_ui(self):
+        self.viewLayout.setSpacing(12)
+
+        type_card = CaptionLabel(self)
+        type_card.setText("Super Partition Type")
+        type_layout = QHBoxLayout()
+        type_layout.setContentsMargins(12, 12, 12, 12)
+        self.radio_a = RadioButton("A-only", type_card)
+        self.radio_vab = RadioButton("Virtual-ab", type_card)
+        self.radio_ab = RadioButton("A/B", type_card)
+        for rb in (self.radio_a, self.radio_vab, self.radio_ab):
+            type_layout.addWidget(rb)
+        type_card.setLayout(type_layout)
+        self.viewLayout.addWidget(type_card)
+
+        attr_card = CaptionLabel(self)
+        attr_card.setText("Attribute")
+        attr_layout = QHBoxLayout()
+        attr_layout.setContentsMargins(12, 12, 12, 12)
+        self.radio_ro = RadioButton("Readonly", attr_card)
+        self.radio_none = RadioButton("None", attr_card)
+        attr_layout.addWidget(self.radio_ro)
+        attr_layout.addWidget(self.radio_none)
+        attr_card.setLayout(attr_layout)
+        self.viewLayout.addWidget(attr_card)
+
+        settings_card = CaptionLabel(self)
+        settings_card.setText("Configuration Settings")
+        settings_layout = QGridLayout()
+        settings_layout.setContentsMargins(12, 12, 12, 12)
+
+        settings_layout.addWidget(CaptionLabel("Group Name:", settings_card), 0, 0)
+        self.group_combo = ComboBox(settings_card)
+        self.group_combo.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
+        settings_layout.addWidget(self.group_combo, 0, 1)
+
+        settings_layout.addWidget(CaptionLabel("Super Size (Bytes):", settings_card), 1, 0)
+        self.size_entry = LineEdit(settings_card)
+        self.size_entry.textChanged.connect(self.validate_size_input)
+        settings_layout.addWidget(self.size_entry, 1, 1)
+
+        settings_card.setLayout(settings_layout)
+        self.viewLayout.addWidget(settings_card)
+
+        list_card = CaptionLabel(self)
+        list_card.setText("Select Partitions")
+        list_layout = QVBoxLayout()
+        list_layout.setContentsMargins(12, 12, 12, 12)
+
+        self.partition_listview = ListWidget(list_card)
+        self.partition_listview.setSelectionMode(ListWidget.MultiSelection)
+        self.partition_listview.setMinimumHeight(200)
+        list_layout.addWidget(self.partition_listview)
+        list_card.setLayout(list_layout)
+        self.viewLayout.addWidget(list_card)
+
+        self.sparse_check = CheckBox("Sparse Image Output", self)
+        self.viewLayout.addWidget(self.sparse_check)
+
+        tools_layout = QHBoxLayout()
+        self.del_source_check = CheckBox("Delete Source Image Files", self)
+        tools_layout.addWidget(self.del_source_check)
+        tools_layout.addStretch()
+
+        self.refresh_btn = PushButton("Refresh List", self)
+        self.refresh_btn.clicked.connect(self.refresh)
+        tools_layout.addWidget(self.refresh_btn)
+
+        self.g_b = PushButton("Generate Script", self)
+        self.g_b.clicked.connect(self.generate)
+        tools_layout.addWidget(self.g_b)
+        self.viewLayout.addLayout(tools_layout)
+
+        self.yesButton.setText("Pack")
+        self.cancelButton.setText("Cancel")
+
+    def validate_size_input(self, text):
+        has_error = not text.isdigit()
+        self.size_entry.setProperty("hasError", has_error)
+        self.size_entry.style().polish(self.size_entry)
+
+    def sync_vars_from_ui(self):
+        if self.radio_a.isChecked():
+            self._super_type = 1
+        elif self.radio_vab.isChecked():
+            self._super_type = 2
+        elif self.radio_ab.isChecked():
+            self._super_type = 3
+
+        self._attrib = 'readonly' if self.radio_ro.isChecked() else 'none'
+        self._group_name = self.group_combo.currentText()
+
+        try:
+            self._super_size = int(self.size_entry.text())
+        except ValueError:
+            self._super_size = 0
+
+        self._is_sparse = self.sparse_check.isChecked()
+        self._delete_source_file = self.del_source_check.isChecked()
+
+    def update_ui_from_vars(self):
+        self.radio_a.setChecked(self._super_type == 1)
+        self.radio_vab.setChecked(self._super_type == 2)
+        self.radio_ab.setChecked(self._super_type == 3)
+        self.radio_ro.setChecked(self._attrib == 'readonly')
+        self.radio_none.setChecked(self._attrib == 'none')
+
+        self.group_combo.setCurrentText(str(self._group_name))
+        self.size_entry.setText(str(self._super_size))
+        self.sparse_check.setChecked(self._is_sparse)
+        self.del_source_check.setChecked(self._delete_source_file)
+
+    def get_selected_partitions(self):
+        return [item.data(Qt.UserRole) for item in self.partition_listview.selectedItems()]
+
+
+
+    def verify_size(self):
+        lbs = self.get_selected_partitions()
+        size = sum([os.path.getsize(f"{self.work}/{i}.img") for i in lbs if os.path.exists(f"{self.work}/{i}.img")])
+
+        if size > self._super_size:
+            diff_size = size
+            for i in range(1, 20):
+                factor = i - 0.25
+                t = (1024 ** 3) * factor - size
+                if t < 0:
+                    continue
+                if t < diff_size:
+                    diff_size = t
+                else:
+                    size = factor * (1024 ** 3)
+                    break
+            self._super_size = int(size)
+            self.size_entry.setText(str(self._super_size))
+            return False
+        return True
+
+    def generate(self):
+        self.sync_vars_from_ui()
+        self.g_b.setEnabled(False)
+        self.g_b.setText("Generating...")
+
+        utils.generate_dynamic_list(
+            group_name=self._group_name, size=self._super_size,
+            super_type=self._super_type, part_list=self.get_selected_partitions(), work=self.work
+        )
+
+        self.g_b.setText("Done!")
+        time.sleep(1)
+        self.g_b.setText("Generate Script")
+        self.g_b.setEnabled(True)
+
+    def refresh(self):
+        self.partition_listview.clear()
+        if not os.path.exists(self.work):
+            return
+
+        for file_name in os.listdir(self.work):
+            if file_name.endswith(".img"):
+                full_path = os.path.join(self.work, file_name)
+                name = file_name[:-4]
+                display_text = ""
+
+                if is_empty_img(full_path):
+                    display_text = f"{name} [empty]"
+                elif (file_type := gettype(full_path)) in ["ext", "erofs", 'f2fs', 'sparse']:
+                    display_text = f"{name} [{file_type}]"
+
+                if display_text:
+                    item = QListWidgetItem(display_text)
+                    item.setData(Qt.UserRole, name)
+                    self.partition_listview.addItem(item)
+                    if name in self.selected:
+                        item.setSelected(True)
+
+    def read_list(self):
+        parts_info = f"{self.work}/config/parts_info"
+        if os.path.exists(parts_info):
+            try:
+                data: dict = utils.JsonEdit(parts_info).read().get('super_info')
+                if data is None:
+                    raise AttributeError()
+            except Exception:
+                logging.exception('PackSupper:read_parts_info')
+            else:
+                for i in data.get('block_devices', []):
+                    self._block_device_name = i.get('name', 'super')
+                    if isinstance(i.get('size'), int):
+                        self._super_size = i.get('size', self._super_size)
+
+                for i in data.get('group_table', []):
+                    name = i.get('name')
+                    if isinstance(name, str) and name != 'default':
+                        self._group_name = name
+
+                self.selected = [
+                    i.get('name') for i in data.get('partition_table', [])
+                    if isinstance(i.get('name'), str)
+                ]
+
+        list_file = f"{self.work}/dynamic_partitions_op_list"
+        if os.path.exists(list_file):
+            try:
+                data = utils.dynamic_list_reader(list_file)
+            except Exception:
+                logging.exception('Bugs')
+                self.update_ui_from_vars()
+                return
+
+            if len(data) > 1:
+                keys = list(data.keys())
+                fir, sec = keys[0], keys[1]
+                if fir[:-2] == sec[:-2]:
+                    self._group_name = fir[:-2]
+                    self._super_type = 2
+                    self._super_size = int(data[fir]['size'])
+
+                    raw_parts = data[fir].get('parts', [])
+                    selected = raw_parts.copy()
+                    for i in raw_parts:
+                        name = i[:-2] if i.endswith('_a') or i.endswith('_b') else i
+                        if name not in selected:
+                            selected.append(name)
+                    self.selected = selected
+            elif len(data) == 1:
+                group_name = list(data.keys())[0]
+                self._group_name = group_name
+                self._super_size = int(data[group_name]['size'])
+                self.selected = data[group_name].get('parts', [])
+                self._super_type = 1
+
+        self.update_ui_from_vars()
