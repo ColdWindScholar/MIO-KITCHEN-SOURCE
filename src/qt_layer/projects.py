@@ -46,7 +46,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
 from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox
+    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing
 
 import ext4
 import imgextractor
@@ -725,9 +725,13 @@ class ProjectsPage(QWidget):
         # 标题放外面
         frame = QHBoxLayout()
         frame.addWidget(self._create_section_title("分区"))
+        self.ring = IndeterminateProgressRing(self)
+        self.ring.setFixedSize(16, 16)
+        self.ring.hide()
         self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
+        frame.addWidget(self.ring)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
 
