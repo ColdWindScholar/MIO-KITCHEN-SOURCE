@@ -954,8 +954,8 @@ class PluginPage(QWidget):
             )
             card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=plugin_info: self.built_in_plugins.exec_plugin(plugin_id))
-            card.clicked.connect(lambda plugin_id=plugin_info: self.built_in_plugins.exec_plugin(plugin_id))
+            card.openButton.clicked.connect(lambda state, plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
+            card.clicked.connect(lambda plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
 
             self.cards_layout.addWidget(card)
 
