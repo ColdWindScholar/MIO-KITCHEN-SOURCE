@@ -1043,7 +1043,7 @@ class ProjectsPage(QWidget):
         if not UTC:
             UTC = int(time.time())
         if not size:
-            size = utils.GetFolderSize(work + name, 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
+            size = utils.GetFolderSize(os.path.join(work, name), 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
         print(f"{name}:[{size}]")
         context_cmd = ['-S', f'{work}/config/{name}_file_contexts'] if has_contexts else []
         command = ['make_ext4fs', '-J', '-T', f'{UTC}', '-s' if sparse else '', *context_cmd, '-l',

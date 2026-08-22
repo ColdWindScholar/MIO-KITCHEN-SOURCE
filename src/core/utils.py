@@ -747,7 +747,7 @@ class GetFolderSize:
     @staticmethod
     def rsizelist(part_name, size, file):
         if os.access(file, os.F_OK):
-            print(lang.text74 % (part_name, size))
+            print("将 %s 大小调整为 %s" % (part_name, size))
             with open(file, 'r', encoding='utf-8') as f:
                 content = f.read()
             with open(file, 'w', encoding='utf-8', newline='\n') as ff:
