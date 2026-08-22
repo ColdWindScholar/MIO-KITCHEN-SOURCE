@@ -147,7 +147,8 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
         print(f"cannot find boot:{name}")
         return
     if os.path.exists(os.path.join(work, name)):
-        if rmtree(os.path.join(work, name)) != 0:
+        rmtree(os.path.join(work, name))
+        if os.path.exists(os.path.join(work, name)):
             print(f"remove tree failed:{name}")
             return
     utils.re_folder(os.path.join(work, name))
