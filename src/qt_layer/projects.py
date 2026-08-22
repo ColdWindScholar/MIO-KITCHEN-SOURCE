@@ -788,13 +788,117 @@ class ProjectsPage(QWidget):
                 if name_item is not None:
                     name_item.setCheckState(target_state)
     #functions for it
+    def conversion(self, src_format:str, dst_format:str, selection):
+        work = project_manger.current_work_output_path()
+
+        if dst_format == src_format:
+            return
+        for i in selection:
+            print(f'[{src_format}->{dst_format}]{i}')
+            if dst_format == 'sparse':
+                basename = os.path.basename(i).split('.')[0]
+                if src_format == 'br':
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print("正在解包：" + i)
+                        call(['brotli', '-dj', f'{work}/{i}'])
+                if src_format == 'xz':
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print("正在解包：" + i)
+                        utils.Unxz(f'{work}/{i}')
+                if src_format == 'dat':
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print("正在解包：" + f'{work}/{i}')
+                        transferfile = os.path.abspath(
+                            os.path.dirname(work)) + f"/{basename}.transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
+                            utils.Sdat2img(transferfile, f'{work}/{i}', f"{work}/{basename}.img")
+                            if os.access(f"{work}/{basename}.img", os.F_OK):
+                                os.remove(f'{work}/{i}')
+                                os.remove(transferfile)
+                                try:
+                                    os.remove(f'{work}/{basename}.patch.dat')
+                                except (IOError, PermissionError, FileNotFoundError):
+                                    logging.exception('Bugs')
+                        else:
+                            print("transferpath 不存在")
+                    if os.path.exists(f'{work}/{basename}.img'):
+                        utils.img2simg(f'{work}/{basename}.img')
+                if src_format == 'raw':
+                    if os.path.exists(f'{work}/{basename}.img'):
+                        utils.img2simg(f'{work}/{basename}.img')
+            elif dst_format == 'raw':
+                basename = os.path.basename(i).split('.')[0]
+                if src_format == 'br':
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print("正在解包：" + i)
+                        call(['brotli', '-dj', f'{work}/{i}'])
+                if src_format == 'xz':
+                    if os.access(f'{work}/{i}', os.F_OK):
+                        print("正在解包：" + i)
+                        utils.Unxz(f'{work}/{i}')
+                if src_format in ['dat', 'br', 'xz']:
+                    if os.path.exists(work):
+                        if src_format == 'br':
+                            i = i.replace('.br', '')
+                        if src_format == 'xz':
+                            i = i.replace('.xz', '')
+                        print("正在解包：" + f'{work}/{i}')
+                        transferfile = os.path.abspath(
+                            os.path.dirname(work)) + f"/{basename}.transfer.list"
+                        if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
+                            utils.Sdat2img(transferfile, f'{work}/{i}', f"{work}/{basename}.img")
+                            if os.access(f"{work}/{basename}.img", os.F_OK):
+                                try:
+                                    os.remove(f'{work}/{i}')
+                                    os.remove(transferfile)
+                                    if not os.path.getsize(f'{work}/{basename}.patch.dat'):
+                                        os.remove(f'{work}/{basename}.patch.dat')
+                                except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
+                                    logging.exception('Bugs')
+                        else:
+                            print("transferfile 不存在")
+                if src_format == 'sparse':
+                    utils.simg2img(f'{work}/{i}')
+            elif dst_format == 'dat':
+                if src_format == 'raw':
+                    utils.img2simg(f'{work}/{i}')
+                if src_format in ['raw', 'sparse']:
+                    self.datbr(work, os.path.basename(i).split('.')[0], "dat")
+                if src_format == 'br':
+                    print("正在解包：" + i)
+                    call(['brotli', '-dj', f'{work}/{i}'])
+                if src_format == 'xz':
+                    print("正在解包：" + i)
+                    utils.Unxz(f'{work}/{i}')
+
+            elif dst_format == 'br':
+                if src_format == 'raw':
+                    utils.img2simg(f'{work}/{i}')
+                if src_format in ['raw', 'sparse']:
+                    self.datbr(work, os.path.basename(i).split('.')[0], 0)
+                if src_format in ['dat', 'xz']:
+                    if src_format == 'xz':
+                        print("正在解包：" + i)
+                        utils.Unxz(f'{work}/{i}')
+                        i = i.rsplit('.xz', 1)[0]
+
+                    print("开始打包%s.new.dat.%s" % (os.path.basename(i).split('.')[0], 'br'))
+                    call(['brotli', '-q', '0', '-j', '-w', '24', f'{work}/{i}', '-o', f'{work}/{i}.br'])
+                    if os.access(f'{work}/{i}.br', os.F_OK):
+                        try:
+                            os.remove(f'{work}/{i}')
+                        except Exception:
+                            logging.exception('Bugs')
+        print("成功！")
     def convert_image(self):
         if not project_manger.exist(cfg.currentProjectName.value):
             show_info_bar(self, "warn", "project's not exist", 2)
             return
         dialog = ConvertImageMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
-            result = dialog.get_result()
+            src, dst, files = dialog.get_result()
+            self.format_task = GenericTaskWorker(self.conversion, src, dst, files)
+            self.start_job(self.format_task)
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)

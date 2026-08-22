@@ -338,7 +338,7 @@ class ConvertImageMessageBox(MessageBoxBase):
             is_match = search_text in item.text().lower()
             self.list_widget.setRowHidden(i, not is_match)
 
-    def get_result(self) -> dict:
+    def get_result(self):
         """获取用户当前在对话框中选择和输入的最终数据"""
         selected_files = []
         for i in range(self.list_widget.count()):
@@ -346,12 +346,8 @@ class ConvertImageMessageBox(MessageBoxBase):
             if item.checkState() == Qt.CheckState.Checked:
                 selected_files.append(item.text())
 
-        return {
-            "src_format": self.src_combo.currentText(),
-            "dst_format": self.dst_combo.currentText(),
-            "selected_files": selected_files,  # 返回所有被勾选的文件列表
-            "search_keyword": self.search_input.text(),
-        }
+        return self.src_combo.currentText(),self.dst_combo.currentText(),selected_files
+
 
 
 class PackSettingsDialog(MessageBoxBase):
