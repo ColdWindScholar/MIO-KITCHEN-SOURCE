@@ -835,20 +835,20 @@ class AppCard(CardWidget):
 
 class BuiltInPlugins(object):
     def __init__(self):
-        self.plugins = (
-            {"id":"download_rom", "name":"Download ROM", "entry":lambda:print(1)},
-            {"id":"get_file_info", "name":"Get File Info", "entry":lambda:None},
-            {"id":"byte_calculator", "name":"Byte Calculator", "entry":lambda:None},
-            {"id":"allow_selinux_audit", "name":"Allow Selinux Audit", "entry":lambda:None},
-            {"id":"dis_avb_in_fstab", "name":"Disable avb in fstab", "entry":lambda:None},
-            {"id":"dis_encryption", "name":"Disable Encryption", "entry":lambda:None},
-            {"id":"trim_raw_image", "name":"Trim Raw Image", "entry":lambda:None},
-            {"id":"magisk_patch", "name":"Magisk Patch", "entry":lambda:None},
-            {"id":"merge_qualcomm_image", "name":"Merge Qualcomm Image", "entry":lambda:None},
-            {"id":"merge_super", "name":"Merge Super", "entry":lambda:None},
-            {"id":"decrypt_xtc_xml", "name":"Decrypt xtc xml", "entry":lambda:None},
-            {"id":"mtk_port_tool", "name":"Mtk Port Tool", "entry":lambda:None},
-        )
+        self.plugins = {
+            "download_rom":{"name":"Download ROM", "entry":lambda:print(1)},
+            "get_file_info":{"name":"Get File Info", "entry":lambda:None},
+            "byte_calculator": {"name":"Byte Calculator", "entry":lambda:None},
+            "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
+            "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
+            "dis_encryption":{"name":"Disable Encryption", "entry":lambda:None},
+            "trim_raw_image": {"name":"Trim Raw Image", "entry":lambda:None},
+            "magisk_patch":{"name":"Magisk Patch", "entry":lambda:None},
+            "merge_qualcomm_image":{"name":"Merge Qualcomm Image", "entry":lambda:None},
+            "merge_super":{"name":"Merge Super", "entry":lambda:None},
+            "decrypt_xtc_xml":{ "name":"Decrypt xtc xml", "entry":lambda:None},
+            "mtk_port_tool":{ "name":"Mtk Port Tool", "entry":lambda:None},
+        }
     def exec_plugin(self, plugin_id:str):
         print(plugin_id)
 class PluginPage(QWidget):
@@ -943,9 +943,10 @@ class PluginPage(QWidget):
             data['card_widget'].destroy()
         self.cards_layout.update()
         self.cards_data.clear()
-        for i in self.built_in_plugins.plugins:
+        for plugin_id in self.built_in_plugins.plugins:
             plugin_icon = FluentIcon.APPLICATION
-            plugin_title = i.get("name", i.get("id", "Unknown"))
+            plugin_info = self.built_in_plugins.plugins[plugin_id]
+            plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin_title,
@@ -953,8 +954,8 @@ class PluginPage(QWidget):
             )
             card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=i: self.built_in_plugins.exec_plugin(plugin_id.get("id")))
-            card.clicked.connect(lambda plugin_id=i: self.built_in_plugins.exec_plugin(plugin_id.get("id")))
+            card.openButton.clicked.connect(lambda state, plugin_id=plugin_info: self.built_in_plugins.exec_plugin(plugin_id))
+            card.clicked.connect(lambda plugin_id=plugin_info: self.built_in_plugins.exec_plugin(plugin_id))
 
             self.cards_layout.addWidget(card)
 
