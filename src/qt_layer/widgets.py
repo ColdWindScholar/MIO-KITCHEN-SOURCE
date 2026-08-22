@@ -280,7 +280,6 @@ class ConvertImageMessageBox(MessageBoxBase):
                 if os.path.isfile(f'{work}/{i}'):
                     if gettype(f'{work}/{i}') in ['ext', 'erofs', 'super', 'f2fs']:
                         file_list.append(i)
-        print(file_list)
         self._populate_list(file_list)
     def _populate_list(self, items_to_show: list[str]):
         """根据传入的列表渲染 QListWidget 项（带复选框）"""
