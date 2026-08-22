@@ -1,7 +1,9 @@
 import os
 import sys
+import time
 import warnings
 
+import logging
 from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject
 from PySide6.QtGui import QIcon, QGuiApplication, QCursor
 from PySide6.QtWidgets import QApplication
@@ -13,6 +15,7 @@ from qt_layer.projects import ProjectsPage
 from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
+from utils import temp, v_code
 
 if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
@@ -126,6 +129,7 @@ class MainWindow(FluentWindow):
 
 
 def __init__qt(args):
+    tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
@@ -133,6 +137,8 @@ def __init__qt(args):
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     app = QApplication(args)
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
+                        filename=tool_log, filemode='w')
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

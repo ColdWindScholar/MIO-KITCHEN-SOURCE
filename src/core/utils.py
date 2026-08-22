@@ -731,7 +731,6 @@ class GetFolderSize:
             self.rsize(self.size, self.num)
 
     def rsize(self, size: int, num: int):
-        print(f"{self.dname} Size : {hum_convert(size)}")
         if size <= 2097152:
             self.rsize_v = 2097152
         elif size <= 1048576:
