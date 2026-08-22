@@ -559,6 +559,7 @@ class ProjectsPage(QWidget):
                 print("file not exist")
             if not task:
                 return
+            self.start_job(task)
 
 
 
