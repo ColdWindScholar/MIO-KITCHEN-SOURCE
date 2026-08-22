@@ -57,7 +57,7 @@ from payload_extract import extract_partitions_from_payload
 from pygpt.gpt_reader import GPTReader
 from qt_layer.settings import cfg
 from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox, \
-    PackSuperMessageBox
+    PackSuperMessageBox, RepackZipMessageBox
 from romfs_parse import RomfsParse
 from splash_editor.src.logo_gen_decoder import process_splashimg
 from utils import gettype, call
@@ -985,6 +985,13 @@ class ProjectsPage(QWidget):
         else:
             print("很抱歉，打包失败！")
             return 1
+    def pack_zip(self):
+        if not project_manger.exist(cfg.currentProjectName.value):
+            show_info_bar(self, "warn", "project's not exist", 2)
+            return
+        dialog = RepackZipMessageBox(self)
+        if dialog.exec_():
+            pass
     def _build_tools_section(self, parent_widget):
         """高级工具箱：纯扁平化工具栏，取消卡片框"""
         container = QWidget(parent_widget)
@@ -998,6 +1005,7 @@ class ProjectsPage(QWidget):
         # 工具按钮行
         tools_layout = QHBoxLayout()
         self.zip_btn = PushButton("打包ZIP", container, FIF.APPLICATION)
+        self.zip_btn.clicked.connect(self.pack_zip)
         self.super_btn = PushButton("打包Super", container, FIF.ALBUM)
         self.super_btn.clicked.connect(self.pack_super)
         self.format_conv_btn = PushButton("格式转换", container, FIF.EMBED)

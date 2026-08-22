@@ -8,7 +8,7 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLabel, QLineEdit, QHBoxLayout, QButtonGroup)
 from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
-    RadioButton, PushButton
+    RadioButton, PushButton, BodyLabel
 from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
                             CaptionLabel)
 
@@ -872,3 +872,60 @@ class PackSuperMessageBox(MessageBoxBase):
 
                 if self.type_group.button(1):
                     self.type_group.button(1).setChecked(True)
+
+
+class RepackZipMessageBox(MessageBoxBase):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWindowTitle("Pack ZIP")
+        self.widget.setMinimumWidth(550)
+
+        # 1. Title
+        self.titleLabel = SubtitleLabel("Repack ZIP?", self)
+        self.titleLabel.setAlignment(Qt.AlignCenter)
+        self.viewLayout.addWidget(self.titleLabel)
+
+        # 2. CheckBox & Content Text Layout
+        self.checkbox_layout = QHBoxLayout()
+        self.checkbox = CheckBox(self)
+
+        msg_text = (
+            "Pack Hybrid Rom?"
+        )
+        self.contentLabel = BodyLabel(msg_text, self)
+        self.contentLabel.setWordWrap(True)
+
+        self.checkbox_layout.addWidget(self.checkbox, 0, Qt.AlignTop)
+        self.checkbox_layout.addWidget(self.contentLabel, 1)
+        self.viewLayout.addLayout(self.checkbox_layout)
+
+        # 3. Dynamic Device Code Input LineEdit
+        self.device_code_edit = LineEdit(self)
+        self.device_code_edit.setPlaceholderText("Enter device code")
+        self.device_code_edit.setClearButtonEnabled(True)
+        self.device_code_edit.hide()  # Hidden by default
+        self.viewLayout.addWidget(self.device_code_edit)
+
+        # Connect toggle action to state visibility switch
+        self.checkbox.stateChanged.connect(self.toggle_input_visibility)
+
+        # 4. Standard action button text overrides
+        self.yesButton.setText("OK")
+        self.cancelButton.setText("Cancel")
+
+    def toggle_input_visibility(self, state):
+        """Hides or reveals the LineEdit depending on the checkbox check state."""
+        is_checked = (state == Qt.Checked or state == 2)  # Handles PySide6 integer/enum variants
+        self.device_code_edit.setVisible(is_checked)
+
+        # Force the Fluent MessageBox to smoothly recalculate layout sizing constraints
+        self.widget.adjustSize()
+
+    def is_add_tools_checked(self) -> bool:
+        """Returns True if the check box tool integration option is selected."""
+        return self.checkbox.isChecked()
+
+    def get_device_code(self) -> str:
+        """Returns the trimmed input text string from the device code line entry."""
+        return self.device_code_edit.text().strip()
