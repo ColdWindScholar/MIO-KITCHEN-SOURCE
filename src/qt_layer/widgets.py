@@ -10,7 +10,7 @@ from qfluentwidgets import InfoBar, InfoBarPosition
 from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
                             CaptionLabel)
 
-from utils import gettype
+from utils import gettype, is_empty_img
 
 
 class TkinterEmbeddedPanel(QWidget):
@@ -686,7 +686,7 @@ class PackSuperMessageBox(MessageBoxBase):
 
         self.list_widget = ListWidget(self)
         self.list_widget.setMinimumHeight(130)
-        self._populate_list(self.all_items)
+        self.refresh_list()
 
         # 6. 区域五：全选与搜索框控制行
         self.select_all_checkbox = CheckBox("Select all", self)
@@ -737,7 +737,18 @@ class PackSuperMessageBox(MessageBoxBase):
         self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
         self.search_input.textChanged.connect(self._on_search_text_changed)
         self.list_widget.itemChanged.connect(self._on_item_changed)
-
+    def refresh_list(self):
+        parts = []
+        for file_name in os.listdir(self.path):
+            if file_name.endswith(".img"):
+                if is_empty_img(f"{self.path}/{file_name}"):
+                    name = file_name[:-4]
+                    parts.append(name)
+                    continue
+                if (file_type := gettype(f"{self.path}/{file_name}")) in ["ext", "erofs", 'f2fs', 'sparse']:
+                    name = file_name[:-4]
+                    parts.append(name)
+        self._populate_list(parts)
     def _populate_list(self, items_to_show: list[str]):
         """加载多选列表项"""
         self.list_widget.blockSignals(True)
