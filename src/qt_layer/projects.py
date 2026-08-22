@@ -913,7 +913,7 @@ class ProjectsPage(QWidget):
                 dialog.type_group.checkedId(),
                 dialog.get_selected_items(),
                 dialog.switch_delete.isChecked(),
-                0, dialog.attrib_group.checkedId(),None, None,dialog._block_device_name
+                0, "none" if dialog.attrib_group.checkedId() else "readonly",None, None,dialog._block_device_name
             )
             self.start_job(self.pack_super_task)
 
