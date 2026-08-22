@@ -882,7 +882,7 @@ class ProjectsPage(QWidget):
                         utils.Unxz(f'{work}/{i}')
                         i = i.rsplit('.xz', 1)[0]
 
-                    print("开始打包%s.new.dat.%s" % (os.path.basename(i).split('.')[0], 'br'))
+                    print(f"开始打包 {os.path.basename(i).split('.')[0]}.new.dat.br")
                     call(['brotli', '-q', '0', '-j', '-w', '24', f'{work}/{i}', '-o', f'{work}/{i}.br'])
                     if os.access(f'{work}/{i}.br', os.F_OK):
                         try:
