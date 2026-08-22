@@ -1,8 +1,4 @@
-import sys
-
-from PySide6.QtCore import Qt, QObject, Signal, QThread, QElapsedTimer
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QFrame
-from qfluentwidgets import SubtitleLabel, BodyLabel, IndeterminateProgressRing, PushButton
+from PySide6.QtCore import QObject, Signal, QThread
 
 
 class StreamToSignal(QObject):
@@ -16,18 +12,12 @@ class StreamToSignal(QObject):
         self.original_stream.write(text)
         cleaned = text.strip()
         if cleaned:
-            # 优雅清洗进度条和换行符干扰
-            cleaned = cleaned.replace('\r', '\n').split('\n')[-1].strip()
-            if cleaned:
-                self.text_written.emit(cleaned)
+            self.text_written.emit(cleaned.split('\n')[-1].strip())
 
     def flush(self):
         self.original_stream.flush()
 
 
-# =========================================================================
-# ⚙️ 2. 泛用性高并发后台线程 (Production Generic Worker)
-# =========================================================================
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
 
@@ -42,8 +32,7 @@ class GenericTaskWorker(QThread):
             self.target_func(*self.args, **self.kwargs)
             self.task_finished.emit(True)
         except Exception as e:
-            raise e
-            print(f"\n[ERROR] Core collapse: {str(e)}")
+            print(f"\n[ERROR] {e}")
             self.task_finished.emit(False)
 
 

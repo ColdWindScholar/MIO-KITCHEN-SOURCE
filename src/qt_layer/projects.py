@@ -15,7 +15,7 @@ import contextpatch
 import extra
 import fspatch
 import tarsafe
-from qt_layer.taskdialog import StreamLogDialog, GenericTaskWorker
+from qt_layer.taskdialog import StreamLogDialog, GenericTaskWorker, StreamToSignal
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
@@ -1233,6 +1233,12 @@ class ProjectsPage(QWidget):
                 logging.warning(f"{i} Not Supported.")
 
     def exec_opera(self):
+        sys.stderr_old =  sys.stderr
+        sys.stdout_old = sys.stdout
+        self.stdout_redirector = StreamToSignal(sys.stdout)
+        self.stderr_redirector = StreamToSignal(sys.stderr)
+        self.stdout_redirector.text_written.connect(self._clean_and_render_text)
+        # then set sys.stdout
         if self.unpack_rb.isChecked():
             unpack_list = []
             for row_idx in range(self.partition_table.rowCount()):
@@ -1269,11 +1275,16 @@ class ProjectsPage(QWidget):
                                                         )
             else:
                 return
+        self.ring.show()
+        self.ring.start()
+        self.my_task_worker.task_finished.connect(self.job_is_done)   
+        self.my_task_worker.start()
+        self.execute_btn.setEnabled(False)
 
-        log_dialog = StreamLogDialog("Running...", parent=self)
-
-        log_dialog.start_redirected_task(self.my_task_worker)
-        log_dialog.exec()
+    def job_is_done(self):
+        self.ring.stop()
+        self.ring.hide()
+        self.execute_btn.setEnabled(True)
 
     def refresh_unpack(self):
         self.format_combo.setDisabled(False)
