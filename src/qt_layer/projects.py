@@ -493,7 +493,7 @@ class ProjectsPage(QWidget):
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
-            print("Unsupported %s" % ftype)
+            show_info_bar(self, "warning", "Unsupported %s [%s]" % (ifile, ftype), 2)
         self.refresh_projects()
 
     def copy_project(self, dir_path: str):
@@ -1573,7 +1573,7 @@ class ProjectsPage(QWidget):
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 if file_type == 'unknown' and utils.is_empty_img(f"{work}/{i}.img"):
-                    print(f"Unsupported file {i}.img [{file_type}]")
+                    show_info_bar(self, "warning", f"Unsupported file {i}.img [{file_type}]", 2)
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
