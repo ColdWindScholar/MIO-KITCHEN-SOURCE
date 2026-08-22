@@ -552,14 +552,14 @@ class ProjectsPage(QWidget):
                 logging.exception('fI')
             if os.path.exists(fi):
                 if os.path.isfile(fi):
-                    task = GenericTaskWorker(self.unpackrom, fi)
+                    self.dnd_task  = GenericTaskWorker(self.unpackrom, fi)
                 elif os.path.isdir(fi):
-                    task = GenericTaskWorker(self.copy_project, fi)
+                    self.dnd_task = GenericTaskWorker(self.copy_project, fi)
             else:
                 print("file not exist")
-            if not task:
+            if not self.dnd_task :
                 return
-            self.start_job(task)
+            self.start_job(self.dnd_task)
 
 
 
