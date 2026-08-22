@@ -770,13 +770,14 @@ def pack_zip(input_dir: str, output_zip: str):
         for file in get_all_file_paths(input_dir):
             file = str(file)
             arch_name = file.replace(input_dir, '')
-
+            print(f"adding: {arch_name}")
             try:
                 zip_.write(file, arcname=arch_name)
             except Exception as e:
-                print(lang.text2.format(file, e))
+                print("写入 {} 时出现错误 ：{}".format(file, e))
     if os.path.exists(output_zip):
-        print(lang.text3.format(output_zip))
+        print("打包 {} 成功！".format(output_zip))
+
 def generate_bug_report():
     output = prog_path
     output = str(output)
