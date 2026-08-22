@@ -15,6 +15,7 @@ import contextpatch
 import extra
 import fspatch
 import tarsafe
+from qt_layer.log_box import LogMessageBoxBase
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
@@ -727,6 +728,7 @@ class ProjectsPage(QWidget):
         self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
+        self.log_box = LogMessageBoxBase("系统日志", self)
         frame.addWidget(self.ring)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
@@ -1227,15 +1229,15 @@ class ProjectsPage(QWidget):
                 if os.path.exists(os.path.join(work, i)):
                     print(f"Unsupported {i}:{parts_dict[i]}")
                 logging.warning(f"{i} Not Supported.")
-    def log_processer(self, text):
-        self.log_line.setText(text)
+
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
         sys.stdout_old = sys.stdout
+        self.log_box.show()
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
-        self.stdout_redirector.text_written.connect(self.log_processer)
-        self.stderr_redirector.text_written.connect(self.log_processer)
+        self.stdout_redirector.text_written.connect(lambda text:self.log_box.append_log("INFO", text))
+        self.stderr_redirector.text_written.connect(lambda text:self.log_box.append_log("ERROR", text))
         sys.stdout = self.stdout_redirector
         sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
