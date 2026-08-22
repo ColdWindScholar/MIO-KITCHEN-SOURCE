@@ -1039,7 +1039,7 @@ class ProjectsPage(QWidget):
                     has_contexts: bool = True):
         if not has_contexts:
             print('Warning:file_context not found!!!')
-        print("packing %s [ext]" % name)
+        print(f"packing {name} [ext]")
         if not UTC:
             UTC = int(time.time())
         if not size:
