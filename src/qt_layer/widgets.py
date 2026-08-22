@@ -673,8 +673,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.switch_delete.setOnText("删除源文件")
         t_frame_layout.addWidget(self.switch_delete)
 
-        refresh_text = "刷新"
-        self.btn_refresh = PushButton(refresh_text, self)
+        self.btn_refresh = PushButton("刷新", self)
         self.btn_refresh.clicked.connect(self.refresh)
         t_frame_layout.addWidget(self.btn_refresh)
 
@@ -686,10 +685,7 @@ class PackSuperMessageBox(MessageBoxBase):
         # 7. Bottom Accept/Cancel Bar configuration setups
         self.yesButton.setText("Pack")
         self.yesButton.clicked.disconnect()  # Disconnect base window close trigger
-        self.yesButton.clicked.connect(self.start_)
         self.cancelButton.setText("取消")
-
-        # Runtime initialization execution signals
         self.read_list()
         self.refresh()
 
@@ -707,48 +703,6 @@ class PackSuperMessageBox(MessageBoxBase):
             if item.checkState() == Qt.Checked:
                 checked_names.append(item.data(Qt.UserRole))
         return checked_names
-
-    def start_(self):
-        try:
-            size_val = int(self.super_size_edit.text() or "0")
-        except Exception:
-            self.super_size_edit.setText("0")
-            logging.exception('Bugs')
-
-        if not self.verify_size():
-            InfoBar.warning(
-                title="警告",
-                content=f"Super大小太小。\n请重新设置大小。\n已为您填入参考值: {self.super_size_edit.text()}",
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.TOP,
-                duration=3500,
-                parent=self
-            )
-            return False
-
-        lbs = self.get_selected_items()
-        sc = self.switch_delete.isChecked()
-        self.close()
-
-        if not project_manger.exist():
-            if self.parent():
-                InfoBar.error(title="错误", content="请选择一个项目", parent=self.parent())
-            return False
-
-        attrib_val = "readonly" if self.rb_readonly.isChecked() else "none"
-
-        pack_super(
-            sparse=self.switch_sparse.isChecked(),
-            group_name=self.show_group_name.currentText(),
-            size=int(self.super_size_edit.text() or "0"),
-            super_type=self.type_group.checkedId(),
-            part_list=lbs,
-            del_=sc,
-            attrib=attrib_val,
-            block_device_name=self._block_device_name
-        )
-        return None
 
     def verify_size(self):
         selected_lbs = self.get_selected_items()
@@ -807,6 +761,7 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def refresh(self):
         self.tl.clear()
+        self.verify_size()
         if not os.path.exists(self.work):
             return
 
