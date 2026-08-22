@@ -684,7 +684,6 @@ class PackSuperMessageBox(MessageBoxBase):
 
         # 7. Bottom Accept/Cancel Bar configuration setups
         self.yesButton.setText("Pack")
-        self.yesButton.clicked.disconnect()  # Disconnect base window close trigger
         self.cancelButton.setText("取消")
         self.read_list()
         self.refresh()
