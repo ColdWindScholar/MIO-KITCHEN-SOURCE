@@ -552,11 +552,7 @@ class ProjectsPage(QWidget):
                 logging.exception('fI')
             if os.path.exists(fi):
                 if os.path.isfile(fi):
-                   if gettype(fi) == 'unknown':
-                         editor.main(os.path.dirname(fi), os.path.basename(fi))
-                         return
-                   else:
-                        task = GenericTaskWorker(self.unpackrom, fi)
+                    task = GenericTaskWorker(self.unpackrom, fi)
                 elif os.path.isdir(fi):
                     task = GenericTaskWorker(self.copy_project, fi)
             else:
