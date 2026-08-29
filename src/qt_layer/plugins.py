@@ -9,6 +9,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
 
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
+from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
@@ -19,6 +20,7 @@ from src.core import utils
 from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
+from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
@@ -847,7 +849,7 @@ class BuiltInPlugins(object):
             "magisk_patch": {"name": "Magisk Patch", "entry": lambda: None},
             "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: None},
             "merge_super": {"name": "Merge Super", "entry": lambda: None},
-            "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: None},
+            "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: self.decrypt_xtc_xml()},
             "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: None},
         }
 
@@ -860,7 +862,18 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
-
+    def decrypt_xtc_xml(self):
+        dialog = DecryptXtcXmlMessageBox(self.master)
+        if dialog.exec():
+            path = dialog.file_path_edit.text()
+            if not os.path.exists(path) or not path.strip():
+                InfoBar.warning('Please choose a path.', self.master)
+                return
+            for root, _, files in os.walk(path, topdown=True):
+                for f in files:
+                    if f.endswith('.xml'):
+                        print(f"Decrypting {f}")
+                        decrypt_xtc(os.path.join(root, f))
     def trim_raw_image(self):
         dialog = TrimRawImageMessageBox(self.master)
         if dialog.exec():
