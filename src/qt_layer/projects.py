@@ -148,6 +148,9 @@ class ProjectManager:
         return path if os.name != 'nt' else path.replace('\\', '/')
 
     def get_projects(self):
+        if not os.path.exists(cfg.workingFolder.value):
+            # fix wrong project path
+            cfg.set(cfg.workingFolder, cfg.workingFolder.defaultValue)
         for f in os.listdir(cfg.workingFolder.value):
             if os.path.isdir(f'{cfg.workingFolder.value}/{f}') and f not in self.hide_items and not f.startswith('.'):
                 yield f
