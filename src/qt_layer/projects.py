@@ -403,10 +403,10 @@ class ProjectsPage(QWidget):
             json_.write(parts)
 
     def unpackrom(self, ifile: str) -> None:
-        print("Unpacking" + ifile, f'Type:[{(ftype := gettype(ifile))}]')
+        print(f"Unpacking {ifile}", f'Type:[{(ftype := gettype(ifile))}]')
         # gzip
         if ftype == 'gzip':
-            print("Unpacking" + ifile)
+            print("Unpacking " + ifile)
             name = os.path.splitext(os.path.basename(ifile))[0]
             cfg.set(cfg.currentProjectName, name)
             self.project_combo.setText(name)
