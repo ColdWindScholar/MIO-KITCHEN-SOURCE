@@ -29,7 +29,6 @@ class DisableAvbMessageBox(MessageBoxBase):
         )
         self.hintLabel = BodyLabel(hint_text, self)
         self.hintLabel.setWordWrap(True)
-        self.hintLabel.setStyleSheet("color: rgba(255, 255, 255, 0.85); line-height: 1.4;")
 
         self.list_header = BodyLabel("Available Partitions")
         self.list_header.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 12px;")
@@ -37,13 +36,7 @@ class DisableAvbMessageBox(MessageBoxBase):
         # Card container box panel
         self.container_panel = QWidget()
         self.container_panel.setObjectName("ContainerPanel")
-        self.container_panel.setStyleSheet("""
-            #ContainerPanel {
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 6px;
-                background: rgba(255, 255, 255, 0.02);
-            }
-        """)
+
 
         # ─── UPDATED: Using qfluentwidgets.TableWidget for native Fluent style ───
         self.table_widget = TableWidget()
@@ -63,7 +56,6 @@ class DisableAvbMessageBox(MessageBoxBase):
 
         self.line_separator = QWidget()
         self.line_separator.setFixedHeight(1)
-        self.line_separator.setStyleSheet("background-color: rgba(255, 255, 255, 0.08);")
 
         self.select_all_checkbox = CheckBox("Select all")
         self.select_all_checkbox.stateChanged.connect(self.toggle_all_items)
@@ -111,6 +103,7 @@ class DisableAvbMessageBox(MessageBoxBase):
         self.search_edit.clear()
 
         # Partition data database list tuples (Name, Extension Type)
+
         partitions_data = [
             ("vendor", "ext"), ("system", "erofs"), ("product", "ext"),
             ("boot", "raw"), ("odm", "erofs")
