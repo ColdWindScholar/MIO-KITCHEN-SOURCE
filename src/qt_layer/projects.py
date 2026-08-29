@@ -1930,5 +1930,5 @@ class GenericTaskWorker(QThread):
             self.target_func(*self.args, **self.kwargs)
             self.task_finished.emit(True)
         except Exception as e:
-            print(f"\n[ERROR] {e}")
+            print(f"[ERROR] {e}")
             self.task_finished.emit(False)
