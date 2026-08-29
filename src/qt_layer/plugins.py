@@ -844,7 +844,7 @@ class BuiltInPlugins(object):
             "download_rom": {"name": "Download ROM", "entry": lambda: print(1)},
             "get_file_info": {"name": "Get File Info", "entry": lambda: FileInfoMessageBox(self.master).exec()},
             "byte_calculator": {"name": "Byte Calculator", "entry": lambda: FileBytesMessageBox(self.master).exec()},
-            "allow_selinux_audit": {"name": "Allow Selinux Audit", "entry": lambda: None},
+            "allow_selinux_audit": {"name": "Allow Selinux Audit", "entry": lambda: self.allow_selinux_audit()},
             "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": lambda: None},
             "dis_encryption": {"name": "Disable Encryption", "entry": lambda: None},
             "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
