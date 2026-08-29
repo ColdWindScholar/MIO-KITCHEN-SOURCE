@@ -9,6 +9,8 @@ from qfluentwidgets import (
     BodyLabel, LineEdit, PushButton, MessageBoxBase
 )
 
+from utils import gettype, hum_convert, calculate_md5_file, calculate_sha256_file
+
 
 class DropWidget(QWidget):
     """Custom drag & drop card that allows file drop or click-to-select."""
@@ -138,25 +140,14 @@ class FileInfoMessageBox(MessageBoxBase):
         stat_info = os.stat(file_path)
         file_name = os.path.basename(file_path)
         file_size_bytes = stat_info.st_size
-        file_size_kb = round(file_size_bytes / 1024, 2)
-
-        formatted_time = time.strftime("%a %b %d %H:%M:%S %Y", time.localtime(stat_info.st_mtime))
-
-        _, ext = os.path.splitext(file_name)
-        file_type = ext.strip('.').lower() if ext else "unknown"
-
-        md5_hash = hashlib.md5()
-        sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            for byte_block in iter(lambda: f.read(4096), b""):
-                md5_hash.update(byte_block)
-                sha256_hash.update(byte_block)
+        file_size_hum = hum_convert(file_size_bytes)
+        file_type = gettype(file_path)
 
         self.rows["Name"].set_value(file_name)
         self.rows["Path"].set_value(file_path)
         self.rows["Type"].set_value(file_type)
-        self.rows["Size"].set_value(f"{file_size_kb}KB")
+        self.rows["Size"].set_value(file_size_hum)
         self.rows["Size(B)"].set_value(str(file_size_bytes))
-        self.rows["Time"].set_value(formatted_time)
-        self.rows["MD5"].set_value(md5_hash.hexdigest())
-        self.rows["SHA256"].set_value(sha256_hash.hexdigest())
+        self.rows["Time"].set_value( time.ctime(os.path.getctime(file_path)))
+        self.rows["MD5"].set_value(calculate_md5_file(file_path))
+        self.rows["SHA256"].set_value(calculate_sha256_file(file_path))

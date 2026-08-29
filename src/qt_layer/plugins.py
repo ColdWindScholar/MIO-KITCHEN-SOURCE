@@ -839,7 +839,7 @@ class BuiltInPlugins(object):
         self.master = master
         self.plugins = {
             "download_rom":{"name":"Download ROM", "entry":lambda:print(1)},
-            "get_file_info":{"name":"Get File Info", "entry":lambda: FileInfoMessageBox(master).exec()},
+            "get_file_info":{"name":"Get File Info", "entry":lambda: FileInfoMessageBox(self.master).exec()},
             "byte_calculator": {"name":"Byte Calculator", "entry":lambda:None},
             "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
             "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
