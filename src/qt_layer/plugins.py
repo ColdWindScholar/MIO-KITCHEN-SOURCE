@@ -6,7 +6,7 @@ from typing import Any
 
 from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
-    SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
+    SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
 
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
@@ -22,9 +22,6 @@ from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, tem
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
-
-
-
 
 
 class ModuleManager:
@@ -338,7 +335,6 @@ class ModuleManager:
                 except:
                     pass
             return module_error_codes.GenericError, f"Extraction error: {e_extract}"
-
 
         logging.info(f"ModuleManager.install: Successfully installed plugin '{install_id}' to '{install_target_path}'.")
         return module_error_codes.Normal, ""
@@ -805,7 +801,7 @@ class InstallMpk(MessageBoxBase):
 
 class AppCard(CardWidget):
 
-    def __init__(self, icon, title:str, content:str, parent=None):
+    def __init__(self, icon, title: str, content: str, parent=None):
         super().__init__(parent)
         self.iconWidget = IconWidget(icon)
         self.titleLabel = BodyLabel(title, self)
@@ -836,24 +832,26 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.openButton, 0, Qt.AlignRight)
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
+
 class BuiltInPlugins(object):
     def __init__(self, master):
         self.master = master
         self.plugins = {
-            "download_rom":{"name":"Download ROM", "entry":lambda:print(1)},
-            "get_file_info":{"name":"Get File Info", "entry":lambda: FileInfoMessageBox(self.master).exec()},
-            "byte_calculator": {"name":"Byte Calculator", "entry":lambda: FileBytesMessageBox(self.master).exec()},
-            "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
-            "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
-            "dis_encryption":{"name":"Disable Encryption", "entry":lambda:None},
-            "trim_raw_image": {"name":"Trim Raw Image", "entry":lambda: self.trim_raw_image()},
-            "magisk_patch":{"name":"Magisk Patch", "entry":lambda:None},
-            "merge_qualcomm_image":{"name":"Merge Qualcomm Image", "entry":lambda:None},
-            "merge_super":{"name":"Merge Super", "entry":lambda:None},
-            "decrypt_xtc_xml":{ "name":"Decrypt xtc xml", "entry":lambda:None},
-            "mtk_port_tool":{ "name":"Mtk Port Tool", "entry":lambda:None},
+            "download_rom": {"name": "Download ROM", "entry": lambda: print(1)},
+            "get_file_info": {"name": "Get File Info", "entry": lambda: FileInfoMessageBox(self.master).exec()},
+            "byte_calculator": {"name": "Byte Calculator", "entry": lambda: FileBytesMessageBox(self.master).exec()},
+            "allow_selinux_audit": {"name": "Allow Selinux Audit", "entry": lambda: None},
+            "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": lambda: None},
+            "dis_encryption": {"name": "Disable Encryption", "entry": lambda: None},
+            "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
+            "magisk_patch": {"name": "Magisk Patch", "entry": lambda: None},
+            "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: None},
+            "merge_super": {"name": "Merge Super", "entry": lambda: None},
+            "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: None},
+            "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: None},
         }
-    def exec_plugin(self, plugin_id:str):
+
+    def exec_plugin(self, plugin_id: str):
         if plugin_id not in self.plugins.keys():
             print(f"No such plugin: {plugin_id}")
             return
@@ -862,19 +860,29 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
     def trim_raw_image(self):
         dialog = TrimRawImageMessageBox(self.master)
         if dialog.exec():
             file_path = dialog.file_path_edit.text()
             if not os.path.exists(file_path):
                 return
-            def do_trim(buff_size: int = 8192, file_path: str |None = None):
+
+            def do_trim(buff_size: int = 8192, file_path: str | None = None):
                 if not file_path:
                     return
                 orig_size = file_size = os.path.getsize(file_path)
                 zeros_ = bytearray(buff_size)
+                progress_bar = InfoBar.info(
+                    title="Processing File",
+                    content="Running - 0%",
+                    orient=Qt.Horizontal,
+                    isClosable=False,
+                    duration=-1,  # Kept active indefinitely
+                    position=InfoBarPosition.TOP,
+                    parent=self.master
+                )
                 with open(file_path, 'rb') as f:
-                    self.button.configure(text=lang.running + ' - 0%')
                     update_ui = 3000
                     while file_size:
                         n = min(file_size, buff_size)
@@ -895,12 +903,19 @@ class BuiltInPlugins(object):
                         if update_ui == 0:
                             update_ui = 3000
                             percentage = 100 - file_size * 100 // orig_size
-                            self.button.configure(text=lang.running + f' - {percentage}%')
-                            self.update_idletasks()
+                            progress_bar.contentLabel.setText(f"Running - {percentage}%")
                 os.truncate(file_path, file_size)
                 c = orig_size - file_size
-                info_win(lang.trim_image_summary % (c, utils.hum_convert(c)))
+                progress_bar.close()
+                InfoBar.success(
+                    title="Success",
+                    content="总共从文件末尾截去了 %d 个零字节（约 %s）" % (c, utils.hum_convert(c)),
+                    position=InfoBarPosition.TOP,
+                    duration=4000,
+                    parent=self
+                )
             do_trim(file_path=file_path)
+
 
 class PluginPage(QWidget):
     def __init__(self, parent=None):
@@ -915,7 +930,8 @@ class PluginPage(QWidget):
                    }
                   
                """)
-    def uninstall_plugin(self, plugin_id:str):
+
+    def uninstall_plugin(self, plugin_id: str):
         UninstallMpk(plugin_id, True, self)
         self.load_plugin_cards()
 
@@ -930,7 +946,6 @@ class PluginPage(QWidget):
             dialog = InstallMpk(file_path, self)
             if dialog.exec_():
                 return
-
 
     def initUI(self):
         # 1. Main outer layout
@@ -1005,7 +1020,8 @@ class PluginPage(QWidget):
             )
             card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
+            card.openButton.clicked.connect(
+                lambda state, plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
             card.clicked.connect(lambda plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
 
             self.cards_layout.addWidget(card)
@@ -1032,8 +1048,10 @@ class PluginPage(QWidget):
                 content=plugin_author
             )
             menu = RoundMenu(parent=card.moreButton)
-            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall', triggered=lambda state, plugin_id=i: self.uninstall_plugin(plugin_id)))
-            menu.addAction(Action(FluentIcon.ZOOM_OUT, 'Export', triggered=lambda state, plugin_id=i:module_manager.export(plugin_id)))
+            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall',
+                                  triggered=lambda state, plugin_id=i: self.uninstall_plugin(plugin_id)))
+            menu.addAction(Action(FluentIcon.ZOOM_OUT, 'Export',
+                                  triggered=lambda state, plugin_id=i: module_manager.export(plugin_id)))
             menu.addAction(Action(FluentIcon.EDIT, 'Edit', triggered=lambda: print("Saved")))
 
             # Add menu
