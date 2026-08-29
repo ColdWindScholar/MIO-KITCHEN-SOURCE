@@ -912,7 +912,7 @@ class BuiltInPlugins(object):
                     content="总共从文件末尾截去了 %d 个零字节（约 %s）" % (c, utils.hum_convert(c)),
                     position=InfoBarPosition.TOP,
                     duration=4000,
-                    parent=self
+                    parent=self.master
                 )
             do_trim(file_path=file_path)
 
