@@ -127,7 +127,7 @@ class ModuleManager:
             dependencies = data.get('depend', '')
             for n in dependencies.split():
                 if n and not os.path.exists(os.path.join(self.module_dir, n)):
-                    print(lang.text36 % (name, n, n))
+                    print("%s 依赖于 %s，但 %s 没有安装" % (name, n, n))
                     return 2
 
         main_json_path = os.path.join(script_path, "main.json")

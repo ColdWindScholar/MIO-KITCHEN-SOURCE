@@ -309,6 +309,7 @@ class ProjectsPage(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_log_area = ScrollArea(self)
         scroll_log_area.setWidgetResizable(True)
+        scroll_log_area.setFixedWidth(300)
 
         main_layout.addWidget(scroll_log_area)
         main_layout.addWidget(scroll_area)

@@ -65,7 +65,7 @@ class MainWindow(FluentWindow):
         warnings.filterwarnings('ignore', message='.*opacity.*')
 
         # 设置主题
-        setTheme(Theme.DARK)
+        setTheme(Theme.AUTO)
 
         self.setWindowIcon(QIcon('icon.ico'))
         
