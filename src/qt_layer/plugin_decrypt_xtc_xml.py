@@ -38,9 +38,6 @@ class DecryptXtcXmlMessageBox(MessageBoxBase):
         self.yesButton.setText("Run")
         self.cancelButton.setText("Close")
 
-        # Disconnect default auto-dismiss functionality
-        self.yesButton.clicked.disconnect()
-        self.yesButton.clicked.connect(self.do_decrypt)
 
         # Enforce dialog dimensions to match the reference look
         self.widget.setMinimumWidth(460)
