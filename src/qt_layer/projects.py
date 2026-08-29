@@ -11,10 +11,10 @@ import zipfile
 from contextlib import suppress
 from shutil import copy
 
-import contextpatch
-import extra
-import fspatch
-import tarsafe
+from src.core import contextpatch
+from src.core import extra
+from src.core import fspatch
+from src.core import tarsafe
 from qt_layer.log_box import LogMessageBoxBase
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
