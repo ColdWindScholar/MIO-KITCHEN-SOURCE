@@ -11,6 +11,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
 from qt_layer.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
+from qt_layer.plugin_dis_avb_in_fstab import DisableAvbMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
@@ -845,7 +846,7 @@ class BuiltInPlugins(object):
             "get_file_info": {"name": "Get File Info", "entry": lambda: FileInfoMessageBox(self.master).exec()},
             "byte_calculator": {"name": "Byte Calculator", "entry": lambda: FileBytesMessageBox(self.master).exec()},
             "allow_selinux_audit": {"name": "Allow Selinux Audit", "entry": lambda: self.allow_selinux_audit()},
-            "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": lambda: None},
+            "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": lambda: self.disable_avb()},
             "dis_encryption": {"name": "Disable Encryption", "entry": lambda: None},
             "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
             "magisk_patch": {"name": "Magisk Patch", "entry": lambda: None},
@@ -864,6 +865,10 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+    def disable_avb(self):
+        dialog = DisableAvbMessageBox(self.master)
+        if dialog.exec():
+            pass
     def allow_selinux_audit(self):
         dialog = AllowSELinuxAuditMessageBox(self.master)
         if dialog.exec():
