@@ -32,9 +32,9 @@ import opscrypto
 import ozipdecrypt
 from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
-from undz import DZFileTools
+from src.core.undz import DZFileTools
 from src.core.unkdz import KDZFileTools
-from unpac import unpac
+from src.core.unpac import unpac
 
 if os.name == 'nt':
     from ctypes import windll
