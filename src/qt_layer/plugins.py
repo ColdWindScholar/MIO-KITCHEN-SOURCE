@@ -20,7 +20,7 @@ from src.core import utils
 from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
-from ..core.xtc_recovery_helper import decrypt as decrypt_xtc
+from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
