@@ -573,7 +573,7 @@ class ProjectsPage(QWidget):
 
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
-        print("Copying", name)
+        print("Copying ", name)
         if not os.path.exists(dir_path):
             print('No Such Folder.')
             return 1
