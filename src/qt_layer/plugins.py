@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
+from qt_layer.plugin_get_file_info import FileInfoMessageBox
 from src.core import images
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
@@ -834,10 +835,11 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
 class BuiltInPlugins(object):
-    def __init__(self):
+    def __init__(self, master):
+        self.master = master
         self.plugins = {
             "download_rom":{"name":"Download ROM", "entry":lambda:print(1)},
-            "get_file_info":{"name":"Get File Info", "entry":lambda:None},
+            "get_file_info":{"name":"Get File Info", "entry":lambda: FileInfoMessageBox(master).exec()},
             "byte_calculator": {"name":"Byte Calculator", "entry":lambda:None},
             "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
             "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
@@ -862,7 +864,7 @@ class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("PluginPage")
-        self.built_in_plugins = BuiltInPlugins()
+        self.built_in_plugins = BuiltInPlugins(self)
         self.cards_data = []  # Track card mappings for easy filtering
         self.initUI()
         self.setStyleSheet("""
