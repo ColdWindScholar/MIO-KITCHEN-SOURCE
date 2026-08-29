@@ -1,4 +1,3 @@
-import hashlib
 import os
 import time
 
@@ -9,7 +8,7 @@ from qfluentwidgets import (
     BodyLabel, LineEdit, PushButton, MessageBoxBase
 )
 
-from utils import gettype, hum_convert, calculate_md5_file, calculate_sha256_file
+from src.core.utils import gettype, hum_convert, calculate_md5_file, calculate_sha256_file
 
 
 class DropWidget(QWidget):
