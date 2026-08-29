@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
 
+from qt_layer.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
@@ -21,6 +22,7 @@ from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
 from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
+from src.core.selinux_audit_allow import main as selinux_audit_allow
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
@@ -862,6 +864,22 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+    def allow_selinux_audit(self):
+        dialog = AllowSELinuxAuditMessageBox(self.master)
+        if dialog.exec():
+            input_log = dialog.log_path_edit.text()
+            output_dir = dialog.output_path_edit.text()
+            selinux_audit_allow(input_log, output_dir)
+            InfoBar.info(
+                title="Processing File",
+                content=f"Allowed {input_log}",
+                orient=Qt.Horizontal,
+                isClosable=False,
+                duration=3000,  # Kept active indefinitely
+                position=InfoBarPosition.TOP,
+                parent=self.master
+            )
+
 
     def decrypt_xtc_xml(self):
         dialog = DecryptXtcXmlMessageBox(self.master)
@@ -873,7 +891,15 @@ class BuiltInPlugins(object):
             for root, _, files in os.walk(path, topdown=True):
                 for f in files:
                     if f.endswith('.xml'):
-                        print(f"Decrypting {f}")
+                        InfoBar.info(
+                            title="Processing File",
+                            content=f"Decrypting {f}",
+                            orient=Qt.Horizontal,
+                            isClosable=False,
+                            duration=3000,  # Kept active indefinitely
+                            position=InfoBarPosition.TOP,
+                            parent=self.master
+                        )
                         decrypt_xtc(os.path.join(root, f))
 
     def trim_raw_image(self):
