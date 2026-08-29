@@ -10,6 +10,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
 
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
+from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
@@ -845,7 +846,7 @@ class BuiltInPlugins(object):
             "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
             "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
             "dis_encryption":{"name":"Disable Encryption", "entry":lambda:None},
-            "trim_raw_image": {"name":"Trim Raw Image", "entry":lambda:None},
+            "trim_raw_image": {"name":"Trim Raw Image", "entry":lambda: self.trim_raw_image()},
             "magisk_patch":{"name":"Magisk Patch", "entry":lambda:None},
             "merge_qualcomm_image":{"name":"Merge Qualcomm Image", "entry":lambda:None},
             "merge_super":{"name":"Merge Super", "entry":lambda:None},
@@ -861,6 +862,46 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+    def trim_raw_image(self):
+        dialog = TrimRawImageMessageBox(self.master)
+        if dialog.exec():
+            file_path = dialog.file_path_edit.text()
+            if not os.path.exists(file_path):
+                return
+            def do_trim(buff_size: int = 8192, file_path: str |None = None):
+                if not file_path:
+                    return
+                orig_size = file_size = os.path.getsize(file_path)
+                zeros_ = bytearray(buff_size)
+                with open(file_path, 'rb') as f:
+                    self.button.configure(text=lang.running + ' - 0%')
+                    update_ui = 3000
+                    while file_size:
+                        n = min(file_size, buff_size)
+                        file_size_ = file_size - n
+                        f.seek(file_size_)
+                        buf = f.read(n)
+                        assert len(buf) == n
+                        if n != len(zeros_):
+                            zeros_ = bytearray(n)
+                        if buf != zeros_:
+                            for i, b in enumerate(reversed(buf)):
+                                if b != 0: break
+                            file_size -= i
+                            break
+                        file_size = file_size_
+
+                        update_ui -= 1
+                        if update_ui == 0:
+                            update_ui = 3000
+                            percentage = 100 - file_size * 100 // orig_size
+                            self.button.configure(text=lang.running + f' - {percentage}%')
+                            self.update_idletasks()
+                os.truncate(file_path, file_size)
+                c = orig_size - file_size
+                info_win(lang.trim_image_summary % (c, utils.hum_convert(c)))
+            do_trim(file_path=file_path)
+
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
