@@ -69,6 +69,7 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.json")
 
+
 class PackHybridRom:
     def __init__(self, right_device):
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
@@ -135,6 +136,8 @@ class PackHybridRom:
             except Exception as e:
                 logging.exception('Bugs')
                 print(f"[Fail] Compress {basename} Fail:{e}")
+
+
 class ProjectManager:
     def __init__(self):
         self.hide_items = ['bin', 'src', 'readmes']
@@ -627,18 +630,14 @@ class ProjectsPage(QWidget):
                 logging.exception('fI')
             if os.path.exists(fi):
                 if os.path.isfile(fi):
-                    self.dnd_task  = GenericTaskWorker(self.unpackrom, fi)
+                    self.dnd_task = GenericTaskWorker(self.unpackrom, fi)
                 elif os.path.isdir(fi):
                     self.dnd_task = GenericTaskWorker(self.copy_project, fi)
             else:
                 print("file not exist")
-            if not self.dnd_task :
+            if not self.dnd_task:
                 return
             self.start_job(self.dnd_task)
-
-
-
-
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
@@ -854,8 +853,9 @@ class ProjectsPage(QWidget):
                 name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
                 if name_item is not None:
                     name_item.setCheckState(target_state)
+
     #functions for it
-    def conversion(self, src_format:str, dst_format:str, selection):
+    def conversion(self, src_format: str, dst_format: str, selection):
         work = project_manger.current_work_output_path()
 
         if dst_format == src_format:
@@ -957,6 +957,7 @@ class ProjectsPage(QWidget):
                         except Exception:
                             logging.exception('Bugs')
         print("成功！")
+
     def convert_image(self):
         if not project_manger.exist(cfg.currentProjectName.value):
             show_info_bar(self, "warn", "project's not exist", 2)
@@ -966,6 +967,7 @@ class ProjectsPage(QWidget):
             src, dst, files = dialog.get_result()
             self.format_task = GenericTaskWorker(self.conversion, src, dst, files)
             self.start_job(self.format_task)
+
     def pack_super(self):
         if not project_manger.exist(cfg.currentProjectName.value):
             show_info_bar(self, "warn", "project's not exist", 2)
@@ -973,22 +975,22 @@ class ProjectsPage(QWidget):
         dialog = PackSuperMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
             self.pack_super_task = GenericTaskWorker(
-                self.pack_super_exec,dialog.switch_sparse.isChecked(),
+                self.pack_super_exec, dialog.switch_sparse.isChecked(),
                 dialog.show_group_name.currentText(),
                 int(dialog.super_size_edit.text()),
                 dialog.type_group.checkedId(),
                 dialog.get_selected_items(),
                 dialog.switch_delete.isChecked(),
-                0, "none" if dialog.attrib_group.checkedId() else "readonly",None, None,dialog._block_device_name
+                0, "none" if dialog.attrib_group.checkedId() else "readonly", None, None, dialog._block_device_name
             )
             self.start_job(self.pack_super_task)
 
     def pack_super_exec(self, sparse: bool,
                         group_name: str, size: int,
                         super_type, part_list: list, del_: bool = False,
-                   return_cmd=0,
-                   attrib='readonly',
-                   output_dir: str = None, work: str = None, block_device_name: str = 'None'):
+                        return_cmd=0,
+                        attrib='readonly',
+                        output_dir: str = None, work: str = None, block_device_name: str = 'None'):
         if not block_device_name:
             block_device_name = 'super'
         if not work:
@@ -1051,6 +1053,7 @@ class ProjectsPage(QWidget):
         else:
             print("很抱歉，打包失败！")
             return 1
+
     def pack_zip(self):
         if not project_manger.exist(cfg.currentProjectName.value):
             show_info_bar(self, "warn", "project's not exist", 2)
@@ -1524,8 +1527,8 @@ class ProjectsPage(QWidget):
         sys.stdout_old = sys.stdout
         self.stdout_redirector = StreamToSignal(sys.stdout)
         self.stderr_redirector = StreamToSignal(sys.stderr)
-        self.stdout_redirector.text_written.connect(lambda text:self.scroll_log_content.append_log("INFO", text))
-        self.stderr_redirector.text_written.connect(lambda text:self.scroll_log_content.append_log("ERROR", text))
+        self.stdout_redirector.text_written.connect(lambda text: self.scroll_log_content.append_log("INFO", text))
+        self.stderr_redirector.text_written.connect(lambda text: self.scroll_log_content.append_log("ERROR", text))
         sys.stdout = self.stdout_redirector
         sys.stderr = self.stderr_redirector
         # # then set sys.stdout and back
@@ -1534,6 +1537,7 @@ class ProjectsPage(QWidget):
         worker.task_finished.connect(self.job_is_done)
         worker.start()
         self.execute_btn.setEnabled(False)
+
     def exec_opera(self):
         # then set sys.stdout
         if self.unpack_rb.isChecked():
@@ -1567,13 +1571,12 @@ class ProjectsPage(QWidget):
                                                         dialog.f2fs_readonly_switch.isChecked(),
                                                         dialog.f2fs_compress_switch.isChecked(),
                                                         dialog.pack_method_combo.currentText(),
-                                                        dialog.brotli_slider.value() ,
+                                                        dialog.brotli_slider.value(),
                                                         dialog.size_handle_combo.currentText() == "手动固定",
                                                         )
             else:
                 return
         self.start_job(self.my_task_worker)
-
 
     def job_is_done(self):
         self.ring.stop()
