@@ -666,13 +666,13 @@ class ProjectsPage(QWidget):
         self.project_combo.addItems(projects)
         if projects:
             self.project_combo.setCurrentIndex(0)
+            if self.unpack_rb.isChecked():
+                self.refresh_unpack()
+            else:
+                self.refresh_repack()
             return
         cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
-        if self.unpack_rb.isChecked():
-            self.refresh_unpack()
-        else:
-            self.refresh_repack()
 
     def open_dir(self):
         name = self.project_combo.currentText()
