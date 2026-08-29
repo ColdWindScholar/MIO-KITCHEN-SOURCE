@@ -31,7 +31,7 @@ class DropWidget(QWidget):
             }
         """)
 
-        self.label = BodyLabel("Drop\nDrag and drop the file(s) here\nor click to select a file", self)
+        self.label = BodyLabel("Drag and drop the file(s) here\nor click to select a file", self)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         layout = QVBoxLayout(self)
