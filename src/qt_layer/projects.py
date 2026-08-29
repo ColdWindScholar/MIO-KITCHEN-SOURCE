@@ -1929,5 +1929,6 @@ class GenericTaskWorker(QThread):
         try:
             self.target_func(*self.args, **self.kwargs)
         except Exception as e:
+            self.task_finished.emit(True)
             raise e
         self.task_finished.emit(True)
