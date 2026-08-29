@@ -669,6 +669,10 @@ class ProjectsPage(QWidget):
             return
         cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
+        if self.unpack_rb.isChecked():
+            self.refresh_unpack()
+        else:
+            self.refresh_repack()
 
     def open_dir(self):
         name = self.project_combo.currentText()
