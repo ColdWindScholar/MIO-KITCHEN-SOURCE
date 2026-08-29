@@ -555,7 +555,7 @@ class ProjectsPage(QWidget):
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
             except Exception as e:
-                print(e)
+                raise e
             project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
             copy(ifile, project_dir)
             # File Rename
@@ -1928,7 +1928,6 @@ class GenericTaskWorker(QThread):
     def run(self):
         try:
             self.target_func(*self.args, **self.kwargs)
-            self.task_finished.emit(True)
         except Exception as e:
-            print(f"[ERROR] {e}")
-            self.task_finished.emit(False)
+            raise e
+        self.task_finished.emit(True)
