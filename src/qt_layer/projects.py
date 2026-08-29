@@ -545,15 +545,20 @@ class ProjectsPage(QWidget):
         # othters.
         if ftype != 'unknown':
             file_name: str = os.path.basename(ifile)
-            project_folder = os.path.join(cfg.workingFolder.value, os.path.splitext(file_name)[0])
-            folder = os.path.join(cfg.workingFolder.value,
-                                  os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
-                project_folder) else project_folder
+            base_name = os.path.splitext(file_name)[0]
+            project_folder = os.path.join(cfg.workingFolder.value, base_name)
+            if os.path.exists(project_folder):
+                base_name += utils.v_code()
+                folder = os.path.join(cfg.workingFolder.value,
+                                  base_name)
+            else:
+                folder = project_folder
             try:
-                cfg.set(cfg.workingFolder, os.path.basename(folder))
+                cfg.set(cfg.currentProjectName, base_name)
                 os.mkdir(folder)
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
+                self.refresh_projects()
             except Exception as e:
                 raise e
             project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
@@ -565,9 +570,9 @@ class ProjectsPage(QWidget):
                 if file_name.endswith(".bin"):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
-            cfg.set(cfg.currentProjectName, os.path.basename(folder))
+            cfg.set(cfg.currentProjectName, base_name)
             self.refresh_projects()
-            self.project_combo.setText(os.path.basename(folder))
+            self.project_combo.setText(base_name)
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
