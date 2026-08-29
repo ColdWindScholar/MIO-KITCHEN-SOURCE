@@ -869,6 +869,8 @@ class BuiltInPlugins(object):
         if dialog.exec():
             input_log = dialog.log_path_edit.text()
             output_dir = dialog.output_path_edit.text()
+            if not os.path.exists(input_log) or not os.path.exists(output_dir):
+                return
             selinux_audit_allow(input_log, output_dir)
             InfoBar.info(
                 title="Processing File",
