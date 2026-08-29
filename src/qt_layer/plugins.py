@@ -8,13 +8,13 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
-import src.core.images
-from src.core.addon_register import loader, Entry
-from src.core.config_parser import ConfigParser
+from src.core import images
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
 from src.core import imp
 from src.core import utils
+from src.core.addon_register import loader, Entry
+from src.core.config_parser import ConfigParser
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
