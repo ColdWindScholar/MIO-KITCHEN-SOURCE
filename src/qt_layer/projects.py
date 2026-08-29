@@ -570,7 +570,7 @@ class ProjectsPage(QWidget):
             if os.path.exists(os.path.join(project_dir, file_name)):
                 if not '.' in file_name:
                     shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name + ".img"))
-                if file_name.endswith(".bin"):
+                if file_name.endswith(".bin") or file_name.endswith(".IMG") or file_name.endswith(".BIN"):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
             cfg.set(cfg.currentProjectName, base_name)
