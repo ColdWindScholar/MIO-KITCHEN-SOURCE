@@ -862,6 +862,7 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
     def decrypt_xtc_xml(self):
         dialog = DecryptXtcXmlMessageBox(self.master)
         if dialog.exec():
@@ -874,6 +875,7 @@ class BuiltInPlugins(object):
                     if f.endswith('.xml'):
                         print(f"Decrypting {f}")
                         decrypt_xtc(os.path.join(root, f))
+
     def trim_raw_image(self):
         dialog = TrimRawImageMessageBox(self.master)
         if dialog.exec():
@@ -927,6 +929,7 @@ class BuiltInPlugins(object):
                     duration=4000,
                     parent=self.master
                 )
+
             do_trim(file_path=file_path)
 
 
