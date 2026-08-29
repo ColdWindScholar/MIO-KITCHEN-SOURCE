@@ -550,7 +550,7 @@ class ProjectsPage(QWidget):
                                   os.path.splitext(file_name)[0] + utils.v_code()) if os.path.exists(
                 project_folder) else project_folder
             try:
-                cfg.set(cfg.workingFolder.value, os.path.basename(folder))
+                cfg.set(cfg.workingFolder, os.path.basename(folder))
                 os.mkdir(folder)
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
