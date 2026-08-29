@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action
 
+from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
 from src.core import images
 from qt_layer.projects import project_manger
@@ -840,7 +841,7 @@ class BuiltInPlugins(object):
         self.plugins = {
             "download_rom":{"name":"Download ROM", "entry":lambda:print(1)},
             "get_file_info":{"name":"Get File Info", "entry":lambda: FileInfoMessageBox(self.master).exec()},
-            "byte_calculator": {"name":"Byte Calculator", "entry":lambda:None},
+            "byte_calculator": {"name":"Byte Calculator", "entry":lambda: FileBytesMessageBox(self.master).exec()},
             "allow_selinux_audit":{"name":"Allow Selinux Audit", "entry":lambda:None},
             "dis_avb_in_fstab": {"name":"Disable avb in fstab", "entry":lambda:None},
             "dis_encryption":{"name":"Disable Encryption", "entry":lambda:None},
