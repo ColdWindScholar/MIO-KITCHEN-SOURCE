@@ -9,6 +9,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
 
 from avb_disabler import process_fstab
+from encryption_disabler import process_fstab_for_encryption
 from qt_layer.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
@@ -871,7 +872,13 @@ class BuiltInPlugins(object):
     def dis_encryption(self):
         dialog = DisableEncryptionMessageBox(self.master)
         if dialog.exec():
-            return
+            fstab_files = dialog.partitions_with_fstab
+            selected_parts = dialog.get_selected_partitions()
+            for name in selected_parts:
+                if name in fstab_files:
+                    for fstab_path in fstab_files[name]:
+                        process_fstab_for_encryption(fstab_path)
+                        InfoBar.success("Disabled encryption", f"Patched fstab at {name}", parent=self.master)
 
     def disable_avb(self):
         dialog = DisableAvbMessageBox(self.master)
