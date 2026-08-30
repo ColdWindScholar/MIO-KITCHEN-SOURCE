@@ -333,6 +333,8 @@ class ModuleManager:
                 if values_parser.cancel:
                     return 2
                 values = values_parser.gavs
+            else:
+                return 2
         else:
             logging.warning("Cannot exec gui plugin, bcs master not set or json not exists.")
 
