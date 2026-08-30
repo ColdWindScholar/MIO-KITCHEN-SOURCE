@@ -347,7 +347,7 @@ class ModuleManager:
             exports: dict = dict()
             if values:
                 for va, string_var in values.items():
-                    gva = string_var.get()
+                    gva = string_var
                     if gva:
                         exports[va] = gva
 
