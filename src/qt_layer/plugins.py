@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
 
+from avb_disabler import process_fstab
 from qt_layer.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
 from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
@@ -865,10 +866,18 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
     def disable_avb(self):
         dialog = DisableAvbMessageBox(self.master)
         if dialog.exec():
-            pass
+            fstab_files = dialog.partitions_with_fstab
+            selected_parts = dialog.get_selected_partitions()
+            for name in selected_parts:
+                if name in fstab_files:
+                    for fstab_path in fstab_files[name]:
+                        process_fstab(fstab_path)
+                        InfoBar.success("Disabled Avb", f"Patched fstab at {name}")
+
     def allow_selinux_audit(self):
         dialog = AllowSELinuxAuditMessageBox(self.master)
         if dialog.exec():

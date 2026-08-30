@@ -1,3 +1,5 @@
+import os
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
@@ -6,6 +8,8 @@ from qfluentwidgets import (
     BodyLabel, PushButton, CheckBox, SearchLineEdit,
     MessageBoxBase, TableWidget
 )
+from src.qt_layer.settings_cfg import cfg
+from utils import JsonEdit
 
 
 class DisableAvbMessageBox(MessageBoxBase):
@@ -14,8 +18,8 @@ class DisableAvbMessageBox(MessageBoxBase):
 
         self.__init_ui()
         self.__init_layout()
+        self.partitions_with_fstab = dict()
         self.populate_partitions()
-
         self.widget.setMinimumWidth(520)
 
     def __init_ui(self):
@@ -103,11 +107,28 @@ class DisableAvbMessageBox(MessageBoxBase):
         self.search_edit.clear()
 
         # Partition data database list tuples (Name, Extension Type)
+        path = os.path.join(cfg.workingFolder.value, cfg.currentProjectName.value)
+        if not os.path.exists(path):
+            return
+        parts_info_path = os.path.join(path, "config", "parts_info")
+        parts_dict = dict()
+        if os.path.exists(parts_info_path):
+            parts_dict = JsonEdit(parts_info_path).read()
 
-        partitions_data = [
-            ("vendor", "ext"), ("system", "erofs"), ("product", "ext"),
-            ("boot", "raw"), ("odm", "erofs")
-        ]
+        for item_name in sorted(os.listdir(path)):
+            item_path = os.path.join(path, item_name)
+            if os.path.isdir(item_path):
+                for root, _, files in os.walk(item_path):
+                    for file in files:
+                        if 'fstab' in file.lower():
+                            if item_name not in self.partitions_with_fstab:
+                                self.partitions_with_fstab[item_name] = []
+                            self.partitions_with_fstab[item_name].append(os.path.join(root, file))
+        partitions_data = []
+        for partition_name in self.partitions_with_fstab.keys():
+            fs_type = parts_dict.get(partition_name, 'unknown')
+            partitions_data.append((partition_name, fs_type))
+
         self.table_widget.setRowCount(len(partitions_data))
 
         for row, (name, ext) in enumerate(partitions_data):
