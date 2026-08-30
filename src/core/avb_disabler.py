@@ -10,10 +10,9 @@ custom ROM development to disable verity checks, allowing modified system
 partitions to boot.
 """
 
+import logging
 import os
 import re
-import logging
-from src.core.utils import lang # Assuming 'lang' is a module for localized strings
 
 # Set up a logger for this module
 logger = logging.getLogger(__name__)
@@ -99,8 +98,7 @@ def process_fstab(fstab_path: str) -> bool:
     """
     if not os.path.isfile(fstab_path):
         # Use getattr for safe access to localized strings, with a fallback.
-        msg = getattr(lang, 'file_not_found', 'File not found')
-        print(f"[AVB Disabler] {msg}: {fstab_path}")
+        print(f"[AVB Disabler] File not found: {fstab_path}")
         return False
 
     try:
@@ -116,9 +114,7 @@ def process_fstab(fstab_path: str) -> bool:
         except UnicodeDecodeError:
             content = raw_content.decode('latin-1')
             encoding = 'latin-1'
-            msg = getattr(lang, 'encoding_warning', 
-                          "Warning: File '{file}' is not UTF-8. Using {encoding}.")
-            print(f"[AVB Disabler] {msg.format(file=os.path.basename(fstab_path), encoding=encoding)}")
+            print(f"[AVB Disabler] {'Warning: File {file} is not UTF-8. Using {encoding}.'.format(file=os.path.basename(fstab_path), encoding=encoding)}")
 
         original_lines = content.splitlines()
         modified_lines = []
@@ -162,7 +158,7 @@ def process_fstab(fstab_path: str) -> bool:
 
         base_name = os.path.basename(fstab_path)
         if file_was_modified:
-            msg = getattr(lang, 'avb_flags_removed', "AVB flags removed in {file}.")
+            msg = "AVB flags removed in {file}."
             print(f"[AVB Disabler] {msg.format(file=base_name)}")
             
             new_content = "\n".join(modified_lines)
@@ -174,13 +170,13 @@ def process_fstab(fstab_path: str) -> bool:
             with open(fstab_path, 'wb') as f:
                 f.write(new_content.encode(encoding))
         else:
-            msg = getattr(lang, 'avb_flags_not_found', "No AVB flags found in {file}.")
+            msg = "No AVB flags found in {file}."
             print(f"[AVB Disabler] {msg.format(file=base_name)}")
             
         return True
 
     except Exception as e:
-        msg = getattr(lang, 'error_processing_file', "Error processing {file}: {error}")
+        msg = "Error processing {file}: {error}"
         print(f"[AVB Disabler] {msg.format(file=fstab_path, error=e)}")
         # For debugging, print the full traceback of the exception.
         import traceback
