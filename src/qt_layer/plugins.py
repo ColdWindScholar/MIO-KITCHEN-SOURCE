@@ -27,7 +27,7 @@ from src.core import imp
 from src.core import utils
 from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
-from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder, lang
+from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder
 from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
 from src.core.selinux_audit_allow import main as selinux_audit_allow
 
@@ -61,7 +61,7 @@ class ParseMessageBox(MessageBoxBase):
                 data = json.load(f)
         except Exception as e:
             logging.exception("JSON 加载失败")
-            print(f"{lang.text133}{e}")
+            print(f"{e}")
             self.reject()
             return
 
@@ -136,7 +136,7 @@ class ParseMessageBox(MessageBoxBase):
         # 输入框与浏览按钮水平并排
         h_row = QHBoxLayout()
         line_edit = LineEdit()
-        btn = PushButton(lang.text28)
+        btn = PushButton("浏览")
         btn.setFixedWidth(85)
 
         line_edit.textChanged.connect(lambda text: self.gavs.__setitem__(key, text))
@@ -209,7 +209,7 @@ class ParseMessageBox(MessageBoxBase):
     def __unknown(self, layout, config):
         self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
         con_type = config.get('type', 'Unknown')
-        label = BodyLabel(lang.warn14.format(con_type))
+        label = BodyLabel("不支持的控件：{}".format(con_type))
         label.setStyleSheet("color: #ff4d4f; font-weight: bold;")
         layout.addWidget(label)
 
@@ -381,7 +381,7 @@ class ModuleManager:
             print("{} 未完全安装或损坏".format(value))
 
         else:
-            print(lang.warn8.format(self.get_name(id_)))
+            print("此插件不可运行".format(self.get_name(id_)))
         return 0
 
     @staticmethod
@@ -578,7 +578,7 @@ class ModuleManager:
                     resource_zip_file.write(str(item_path_abs), arcname=arcname)
                 except Exception as e:
                     logging.exception(f'Error writing {item_path_abs} to resource zip')
-                    print(lang.text2.format(item_path_abs, e))
+                    print("写入 {} 时出现错误 ：{}".format(item_path_abs, e))
 
         resource_zip_content = buffer_resource_zip.getvalue()
         buffer_resource_zip.close()
@@ -780,11 +780,11 @@ class UninstallMpk(MessageBoxBase):
 
         # 2. Update Button Text Dynamically (Uninstallation in progress)
         if self.uninstall_b:
-            self.uninstall_b.setText(lang.text29.format(show_name or name))
+            self.uninstall_b.setText("正在卸载：{}".format(show_name or name))
             # Replaces self.update_idletasks() to instantly force visual updates to screen
             QApplication.processEvents()
 
-        print(lang.text29.format(show_name if show_name else name))
+        print("正在卸载：{}".format(show_name if show_name else name))
 
         # 3. File System Removal Process
         if os.path.exists(module_path):
@@ -818,10 +818,10 @@ class UninstallMpk(MessageBoxBase):
 
         elif plugin_successfully_removed_fs:
             if self.uninstall_b:
-                self.uninstall_b.setText(lang.text30.format(show_name if show_name else name))
+                self.uninstall_b.setText("卸载完成！".format(show_name if show_name else name))
                 QApplication.processEvents()
 
-            print(lang.text30.format(show_name if show_name else name))
+            print("卸载完成！".format(show_name if show_name else name))
             logging.info(f"Plugin '{name}' (DisplayName: '{show_name}') considered removed from filesystem.")
 
         logging.debug(f"UninstallMpk.remove completed for: {name}")
