@@ -223,6 +223,7 @@ class ModuleManager:
         self.module_dir = os.path.join(prog_path, "bin", "module")
         self.addon_loader = loader
         self.addon_entries = Entry
+        self.master = None
         create_thread(self.load_plugins)
 
     def is_installed(self, id_) -> bool:
@@ -326,12 +327,14 @@ class ModuleManager:
 
         main_json_path = os.path.join(script_path, "main.json")
         values = {}
-        if os.path.exists(main_json_path):
-            values_parser = ParseMessageBox(main_json_path)
+        if os.path.exists(main_json_path) and self.master:
+            values_parser = ParseMessageBox(main_json_path, self.master)
             if values_parser.exec():
                 if values_parser.cancel:
                     return 2
                 values = values_parser.gavs
+        else:
+            logging.warning("Cannot exec gui plugin, bcs master not set or json not exists.")
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
@@ -1206,6 +1209,7 @@ class PluginPage(QWidget):
                    }
                   
                """)
+        module_manager.master = self
 
     def uninstall_plugin(self, plugin_id: str):
         UninstallMpk(plugin_id, True, self)
