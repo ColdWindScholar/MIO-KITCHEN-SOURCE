@@ -347,9 +347,8 @@ class ModuleManager:
             exports: dict = dict()
             if values:
                 for va, string_var in values.items():
-                    gva = string_var
-                    if gva:
-                        exports[va] = gva
+                    if string_var:
+                        exports[va] = string_var
 
             norm_tool_bin = os.path.normpath(cfg.tool_bin).replace(os.sep, '/')
             norm_script_path = os.path.normpath(script_path).replace(os.sep, '/')
