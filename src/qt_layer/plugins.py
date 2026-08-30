@@ -38,7 +38,8 @@ class Parse(MessageBoxBase):
     def __init__(self, json_file, parent=None):
         super().__init__(parent=parent)
         self.json_file = json_file
-        self.gavs = []
+        self.gavs = dict()
+
 class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(prog_path, "bin", "module")
