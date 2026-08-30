@@ -878,6 +878,7 @@ class BuiltInPlugins(object):
             xml_path = result['xml_path']
             partition = result['partition']
             output_path = result['output_path']
+            if not os.path.exists(output_path): os.makedirs(output_path, exist_ok=True)
             try:
                 process_by_xml(xml_path, partition, output_path)
                 # I inform the user of success.
