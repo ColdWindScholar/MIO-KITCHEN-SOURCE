@@ -70,15 +70,12 @@ class DisableAvbMessageBox(MessageBoxBase):
 
         # Dialog control action buttons re-mapping configs
         self.yesButton.setText("Run")
-        self.cancelButton.hide()
 
         self.refresh_btn = PushButton("Refresh", self)
         self.refresh_btn.setFixedWidth(80)
         self.refresh_btn.clicked.connect(self.populate_partitions)
         self.buttonLayout.insertWidget(0, self.refresh_btn)
 
-        self.yesButton.clicked.disconnect()
-        self.yesButton.clicked.connect(self.on_run_clicked)
 
     def __init_layout(self):
         """Assembles components structural alignments layout framework hierarchy."""
@@ -173,10 +170,3 @@ class DisableAvbMessageBox(MessageBoxBase):
                 ext = ext_item.text().strip('[]') if ext_item else ""
                 selected_targets.append({"name": name, "ext": ext})
         return selected_targets
-
-    def on_run_clicked(self):
-        """Triggered when the Run button is pressed."""
-        selected = self.get_selected_partitions()
-        print(f"Run triggered with selections: {selected}")
-
-
