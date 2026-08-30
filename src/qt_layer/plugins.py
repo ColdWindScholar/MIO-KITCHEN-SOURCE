@@ -16,6 +16,7 @@ from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
 from qt_layer.plugin_dis_avb_in_fstab import DisableAvbMessageBox
 from qt_layer.plugin_dis_encryption_in_fstab import DisableEncryptionMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
+from qt_layer.plugin_merge_qcom_partitions import MergeQualcommImageMessageBox
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
 from qt_layer.projects import project_manger
@@ -853,7 +854,7 @@ class BuiltInPlugins(object):
             "dis_encryption": {"name": "Disable Encryption", "entry": lambda: self.dis_encryption()},
             "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
             "magisk_patch": {"name": "Magisk Patch", "entry": lambda: None},
-            "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: None},
+            "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: self.merge_qcom_images()},
             "merge_super": {"name": "Merge Super", "entry": lambda: None},
             "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: self.decrypt_xtc_xml()},
             "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: None},
@@ -868,6 +869,11 @@ class BuiltInPlugins(object):
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
+    def merge_qcom_images(self):
+        dialog = MergeQualcommImageMessageBox(self.master)
+        if dialog.exec():
+            pass
 
     def dis_encryption(self):
         dialog = DisableEncryptionMessageBox(self.master)
