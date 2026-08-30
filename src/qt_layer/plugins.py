@@ -6,7 +6,8 @@ from typing import Any
 
 from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
-    SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition
+    SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
+    MessageBoxBase
 
 from avb_disabler import process_fstab
 from encryption_disabler import process_fstab_for_encryption
@@ -33,7 +34,11 @@ from src.core.selinux_audit_allow import main as selinux_audit_allow
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
 
-
+class Parse(MessageBoxBase):
+    def __init__(self, json_file, parent=None):
+        super().__init__(parent=parent)
+        self.json_file = json_file
+        self.gavs = []
 class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(prog_path, "bin", "module")
@@ -141,13 +146,11 @@ class ModuleManager:
                     return 2
 
         main_json_path = os.path.join(script_path, "main.json")
+        values = {}
         if os.path.exists(main_json_path):
             values_parser = Parse(main_json_path)
-            if values_parser.cancel:
-                return 1
-            values = values_parser.gavs
-        else:
-            values = {}
+            if values_parser.exec():
+                values = values_parser.gavs
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
