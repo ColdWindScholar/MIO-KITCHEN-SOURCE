@@ -843,7 +843,7 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
 
-class BuiltInPlugins(object):
+class BuiltInPlugins:
     def __init__(self, master):
         self.master = master
         self.plugins = {
