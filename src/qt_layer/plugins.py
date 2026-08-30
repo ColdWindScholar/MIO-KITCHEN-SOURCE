@@ -7,7 +7,7 @@ from typing import Any
 from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
-    MessageBoxBase
+    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton
 
 from avb_disabler import process_fstab
 from encryption_disabler import process_fstab_for_encryption
@@ -34,11 +34,189 @@ from src.core.selinux_audit_allow import main as selinux_audit_allow
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
 
-class Parse(MessageBoxBase):
-    def __init__(self, json_file, parent=None):
-        super().__init__(parent=parent)
-        self.json_file = json_file
-        self.gavs = dict()
+
+class ParseMessageBox(MessageBoxBase):
+    def __init__(self, json_file_path, parent=None):
+        super().__init__(parent)
+        self.gavs = {}
+        self.cancel = False
+        self.w_assert = "False"
+
+        # ─── 主布局结构 (严格垂直排列) ───
+        main_widget = QWidget(self)
+        self.main_layout = QVBoxLayout(main_widget)
+        self.main_layout.setContentsMargins(16, 16, 16, 16)
+        self.main_layout.setSpacing(12)
+
+
+        # 解析并生成动态 UI
+        self.load_json_schema(json_file_path)
+
+        self.viewLayout.addWidget(main_widget)
+        self.widget.setMinimumWidth(500)
+
+    def load_json_schema(self, path):
+        try:
+            with open(path, 'r', encoding='UTF-8') as f:
+                data = json.load(f)
+        except Exception as e:
+            logging.exception("JSON 加载失败")
+            print(f"{lang.text133}{e}")
+            self.reject()
+            return
+
+        info = data['main']['info']
+        self.w_assert = info.get('assert', "False")
+
+        # 1. 顶部主标题 (从主布局垂直向下排)
+        self.custom_title = BodyLabel(info.get('title', 'Dynamic Panel'), self)
+        self.custom_title.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.main_layout.addWidget(self.custom_title)
+
+        # 2. 遍历生成卡片组 (容器内部也采用严格垂直布局)
+        for group_name, group_data in data['main'].items():
+            if group_name == 'info':
+                continue
+
+            card = GroupHeaderCardWidget(self)
+            card.setContentsMargins(5,5,5,5)
+            card.setTitle(group_data.get('title', 'Group Panel'))
+
+            # 使用干净的垂直布局引擎包裹卡片内部的组件
+            v_container = QWidget()
+            card_v_layout = QVBoxLayout(v_container)
+            card_v_layout.setContentsMargins(0, 0, 0, 0)
+            card_v_layout.setSpacing(14)  # 控制垂直组件之间的间距
+
+            # 遍历动态解析 controls 内部的各项组件
+            for con in group_data.get('controls', []):
+                con_type = con.get('type')
+                method_name = f"_{con_type}"
+
+                if hasattr(self, method_name):
+                    control_factory = getattr(self, method_name)
+                else:
+                    control_factory = self.__unknown
+
+                control_factory(card_v_layout, con)
+
+            card.viewLayout.addWidget(v_container)
+            self.main_layout.addWidget(card)
+
+        # 3. 底部操作按钮栏 (铺满底部的 OK 按钮)
+        button_row = QHBoxLayout()
+        button_row.setContentsMargins(0, 8, 0, 0)
+
+        self.custom_ok_btn = self.yesButton
+        self.custom_ok_btn.setText("run")
+        self.custom_ok_btn.clicked.connect(self.accept)
+
+        self.main_layout.addLayout(button_row)
+
+    # ─── 严格垂直流（VBox）动态组件工厂 ───
+
+    def _text(self, layout, config):
+        """对应 JSON 中的文本组件，居中对齐"""
+        label = BodyLabel(config.get('text', ''))
+        fontsize = int(config.get('fontsize', 14))
+        label.setStyleSheet(f"font-size: {fontsize}px;")
+        label.setAlignment(Qt.AlignCenter)  # 居中对齐，契合解包界面样式
+        layout.addWidget(label)
+
+    def _filechose(self, layout, config):
+        """对应 JSON 中的文件选择组件（垂直排布：标签在上，输入框与浏览按钮在下）"""
+        v_box = QVBoxLayout()
+        v_box.setSpacing(6)
+
+        key = config.get('set')
+        self.gavs[key] = ""
+
+        label = BodyLabel(config.get('text', 'File:'))
+
+        # 输入框与浏览按钮水平并排
+        h_row = QHBoxLayout()
+        line_edit = LineEdit()
+        btn = PushButton(lang.text28)
+        btn.setFixedWidth(85)
+
+        line_edit.textChanged.connect(lambda text: self.gavs.__setitem__(key, text))
+
+        def pick_file():
+            path, _ = QFileDialog.getOpenFileName(self, "选择镜像文件")
+            if path:
+                line_edit.setText(path)
+
+        btn.clicked.connect(pick_file)
+
+        h_row.addWidget(line_edit, 1)
+        h_row.addWidget(btn)
+
+        v_box.addWidget(label)
+        v_box.addLayout(h_row)
+        layout.addLayout(v_box)
+
+    def _input(self, layout, config):
+        """对应 JSON 中的输入框组件（垂直排布：标签在上，输入框在下）"""
+        v_box = QVBoxLayout()
+        v_box.setSpacing(6)
+
+        key = config.get('set')
+        self.gavs[key] = ""
+
+        text = config.get('text', 'None')
+        if text != 'None':
+            label = BodyLabel(text)
+            v_box.addWidget(label)
+
+        line_edit = LineEdit()
+        line_edit.textChanged.connect(lambda val: self.gavs.__setitem__(key, val))
+
+        v_box.addWidget(line_edit)
+        layout.addLayout(v_box)
+
+    def _button(self, layout, config):
+        btn = PushButton(config.get('text', 'Button'))
+        command_str = config.get('command', '')
+        btn.clicked.connect(lambda: exec(command_str, globals(), locals()))
+        layout.addWidget(btn)
+
+    def _radio(self, layout, config):
+        v_box = QVBoxLayout()
+        v_box.setSpacing(6)
+        key = config.get('set')
+        options = config.get('opins', '').split()
+        self.gavs[key] = ""
+
+        for op in options:
+            if '|' not in op:
+                continue
+            text, val = op.split('|')
+            rb = RadioButton(text)
+            rb.toggled.connect(lambda checked, v=val: self.gavs.__setitem__(key, v) if checked else None)
+            v_box.addWidget(rb)
+        layout.addLayout(v_box)
+
+    def _checkbutton(self, layout, config):
+        key = config.get('set')
+        self.gavs[key] = 0
+        text = config.get('text', '')
+        text = '' if text == 'None' else text
+
+        switch = SwitchButton(text)
+        switch.checkedChanged.connect(lambda checked: self.gavs.__setitem__(key, 1 if checked else 0))
+        layout.addWidget(switch)
+
+    def __unknown(self, layout, config):
+        self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
+        con_type = config.get('type', 'Unknown')
+        label = BodyLabel(lang.warn14.format(con_type))
+        label.setStyleSheet("color: #ff4d4f; font-weight: bold;")
+        layout.addWidget(label)
+
+    def closeEvent(self, event):
+        self.cancel = True
+        super().closeEvent(event)
+
 
 class ModuleManager:
     def __init__(self):
@@ -149,8 +327,10 @@ class ModuleManager:
         main_json_path = os.path.join(script_path, "main.json")
         values = {}
         if os.path.exists(main_json_path):
-            values_parser = Parse(main_json_path)
+            values_parser = ParseMessageBox(main_json_path)
             if values_parser.exec():
+                if values_parser.cancel:
+                    return 2
                 values = values_parser.gavs
 
         main_sh_path = os.path.join(script_path, "main.sh")
@@ -886,12 +1066,13 @@ class BuiltInPlugins:
             try:
                 process_by_xml(xml_path, partition, output_path)
                 # I inform the user of success.
-                InfoBar.success("Merged",'Image merging completed successfully!', parent=self.master)
+                InfoBar.success("Merged", 'Image merging completed successfully!', parent=self.master)
             except Exception as e:
                 # I log the error and inform the user of failure.
                 print(f'Merge failed: {e}')
                 logging.exception('MergeQC RAWPROGRAM error')
-                InfoBar.warning("Warning",f'Image merging failed: {str(e)}', parent=self.master)  # Displaying the error message to the user.
+                InfoBar.warning("Warning", f'Image merging failed: {str(e)}',
+                                parent=self.master)  # Displaying the error message to the user.
             # No explicit return None needed here as the function naturally returns None if no other return is hit.
 
     def dis_encryption(self):
@@ -933,7 +1114,6 @@ class BuiltInPlugins:
                 position=InfoBarPosition.TOP,
                 parent=self.master
             )
-
 
     def decrypt_xtc_xml(self):
         dialog = DecryptXtcXmlMessageBox(self.master)
