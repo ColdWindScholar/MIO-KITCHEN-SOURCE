@@ -161,12 +161,7 @@ class DisableAvbMessageBox(MessageBoxBase):
 
     def get_selected_partitions(self):
         """Helper method to easily extract checked rows from your external scripts."""
-        selected_targets = []
         for row in range(self.table_widget.rowCount()):
             checkbox = self.table_widget.cellWidget(row, 0)
-            ext_item = self.table_widget.item(row, 1)
             if isinstance(checkbox, CheckBox) and checkbox.isChecked():
-                name = checkbox.text()
-                ext = ext_item.text().strip('[]') if ext_item else ""
-                selected_targets.append({"name": name, "ext": ext})
-        return selected_targets
+                yield checkbox.text()
