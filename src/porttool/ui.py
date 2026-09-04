@@ -1,200 +1,234 @@
-import os.path
+import os
 from multiprocessing.dummy import DummyProcess
-from tkinter import (
-    ttk,
-    Toplevel,
-    StringVar,
-    BooleanVar,
-    Canvas, )
-from tkinter.filedialog import askopenfilename
-
-from .configs import *
 from pathlib import Path
+
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QVBoxLayout, QFileDialog, QScrollArea
+from qfluentwidgets import (
+    MessageBoxBase,
+    SubtitleLabel,
+    BodyLabel,
+    LineEdit,
+    PushButton,
+    ComboBox,
+    CheckBox,
+    RadioButton
+)
+
+from .configs import support_chipset, support_chipset_portstep, prog_path
 from .utils import portutils
 
 
-class FileChooser(Toplevel):
-    def __init__(self, parent):
+class FileChooser(MessageBoxBase):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.title("Please choose boot, system from device and the port rom")
+        self.titleLabel = SubtitleLabel("Please choose boot, system from device and the port rom", self)
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addSpacing(10)
 
-        self.portzip = StringVar()
-        self.basesys = StringVar()
-        self.baseboot = StringVar()
+        self.portzip_edit = LineEdit(self)
+        self.portzip_edit.setPlaceholderText("Select Port Rom...")
+        self.portzip_btn = PushButton("Choose...", self)
+
+        self.baseboot_edit = LineEdit(self)
+        self.baseboot_edit.setPlaceholderText("Select Boot from device...")
+        self.baseboot_btn = PushButton("Choose...", self)
+
+        self.basesys_edit = LineEdit(self)
+        self.basesys_edit.setPlaceholderText("Select System from device...")
+        self.basesys_btn = PushButton("Choose...", self)
 
         basesys = Path("base/system.img")
         baseboot = Path("base/boot.img")
         if basesys.exists():
-            self.basesys.set(basesys.absolute())
+            self.basesys_edit.setText(str(basesys.absolute()))
         if baseboot.exists():
-            self.baseboot.set(baseboot.absolute())
+            self.baseboot_edit.setText(str(baseboot.absolute()))
 
-        self.frame = []
-        self.__setup_widgets()
-        self.focus()
+        self.portzip_btn.clicked.connect(
+            lambda: self.__choose_file(self.portzip_edit, "Zip Rom (*.zip);;All Files (*)"))
+        self.baseboot_btn.clicked.connect(
+            lambda: self.__choose_file(self.baseboot_edit, "Boot Image (*.img);;All Files (*)"))
+        self.basesys_btn.clicked.connect(
+            lambda: self.__choose_file(self.basesys_edit, "System Image (*.img);;All Files (*)"))
 
-    def __setup_widgets(self):
-        __match = {
-            0: "Port Rom",
-            1: "Boot from device",
-            2: "System from device",
-        }
+        grid = QGridLayout()
+        grid.setSpacing(10)
+        grid.addWidget(BodyLabel("Port Rom:", self), 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(self.portzip_edit, 0, 1)
+        grid.addWidget(self.portzip_btn, 0, 2)
 
-        def __choose_file(val: StringVar):
-            val.set(askopenfilename(initialdir=prog_path))
-            self.focus()
+        grid.addWidget(BodyLabel("Boot from device:", self), 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(self.baseboot_edit, 1, 1)
+        grid.addWidget(self.baseboot_btn, 1, 2)
 
-        for index, current in enumerate((self.portzip, self.baseboot, self.basesys)):
-            frame = ttk.Frame(self)
-            self.frame.append([frame, ttk.Label(frame, text=__match.get(index, ''), width=16),
-                               ttk.Entry(frame, textvariable=current, width=40),
-                               ttk.Button(frame, text="Choose...", command=lambda x=current: __choose_file(x))])
-        for i in self.frame:
-            for index, widget in enumerate(i):
-                if index == 0:  # frame
-                    widget.pack(side='top', fill='x', padx=5, pady=5)
-                elif index == 2:  # entry
-                    widget.pack(side='left', fill='x', padx=5, pady=5)
-                else:
-                    widget.pack(side='left', padx=5, pady=5)
-        bottom_frame = ttk.Frame(self)
-        ttk.Button(bottom_frame, text='OK', command=self.destroy).pack(side='right', padx=5, pady=5)
-        bottom_frame.pack(side='bottom', fill='x', padx=5, pady=5)
+        grid.addWidget(BodyLabel("System from device:", self), 2, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(self.basesys_edit, 2, 1)
+        grid.addWidget(self.basesys_btn, 2, 2)
+        self.viewLayout.addLayout(grid)
+
+        self.yesButton.setText("OK")
+        self.cancelButton.setText("Cancel")
+        self.widget.setMinimumWidth(500)
+
+    def __choose_file(self, edit: LineEdit, file_filter: str):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Choose File", prog_path, file_filter)
+        if file_path:
+            edit.setText(file_path)
 
     def get(self) -> list:
-        """
-        return boot.img, system.img, portzip.zip path
-        """
-        self.wait_window(self)
-        return [
-            self.baseboot.get(),
-            self.basesys.get(),
-            self.portzip.get(),
-        ]
+        if self.exec_():
+            return [
+                self.baseboot_edit.text(),
+                self.basesys_edit.text(),
+                self.portzip_edit.text()
+            ]
+        return ["", "", ""]
 
 
+class MyUI(MessageBoxBase):
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
-class MyUI(ttk.Labelframe):
-    def __init__(self, parent):
-        super().__init__(parent, text="MTK LowLevel Machines Port Tool")
-        self.chipset_select = StringVar(value='mt65')
-        self.pack_type = StringVar(value='zip')
         self.item = []
-        self.item_box = []  # save Checkbutton
+        self.item_box = []
 
-        self.patch_magisk = BooleanVar(value=False)
-        self.target_arch = StringVar(value='arm64')
-        self.magisk_apk = StringVar(value="magisk.apk")
-        self.__setup_widgets()
+        self.titleLabel = SubtitleLabel("MTK LowLevel Machines Port Tool", self)
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addSpacing(10)
+
+        soc_layout = QHBoxLayout()
+        soc_layout.addWidget(BodyLabel("SOC Type:", self), 0, Qt.AlignLeft | Qt.AlignVCenter)
+        self.chipset_combo = ComboBox(self)
+        self.chipset_combo.addItems(support_chipset)
+
+        default_index = support_chipset.index('mt65') if 'mt65' in support_chipset else 0
+        self.chipset_combo.setCurrentIndex(default_index)
+        self.chipset_combo.currentTextChanged.connect(self.__load_port_item)
+        soc_layout.addWidget(self.chipset_combo, 1)
+        self.viewLayout.addLayout(soc_layout)
+        self.viewLayout.addSpacing(10)
+
+        self.viewLayout.addWidget(BodyLabel("Supported port item", self))
+
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setMinimumHeight(160)
+        self.scroll_area.setMaximumHeight(200)
+        self.scroll_area.setStyleSheet(
+            "QScrollArea { border: 1px solid #3c3c3c; border-radius: 4px; background: transparent; }")
+
+        self.scroll_content = QWidget()
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setContentsMargins(10, 10, 10, 10)
+        self.scroll_layout.setSpacing(8)
+        self.scroll_layout.addStretch(1)
+        self.scroll_area.setWidget(self.scroll_content)
+        self.viewLayout.addWidget(self.scroll_area)
+        self.viewLayout.addSpacing(10)
+
+        pack_layout = QHBoxLayout()
+        self.radio_zip = RadioButton("Output to a zip rom", self)
+        self.radio_img = RadioButton("Output to a image", self)
+        self.radio_zip.setChecked(True)
+        pack_layout.addWidget(self.radio_zip)
+        pack_layout.addWidget(self.radio_img)
+        self.viewLayout.addLayout(pack_layout)
+        self.viewLayout.addSpacing(10)
+
+        self.magisk_check = CheckBox("Patch magisk", self)
+        self.viewLayout.addWidget(self.magisk_check)
+
+        self.magisk_sub_container = QWidget(self)
+        sub_layout = QVBoxLayout(self.magisk_sub_container)
+        sub_layout.setContentsMargins(15, 5, 0, 5)
+        sub_layout.setSpacing(8)
+
+        sub_layout.addWidget(BodyLabel("Target Arch:", self))
+        self.magisk_arch_combo = ComboBox(self)
+        self.magisk_arch_combo.addItems(["arm64-v8a", "armeabi-v7a", "x86", "x86_64"])
+        self.magisk_arch_combo.setCurrentText("arm64-v8a")
+        sub_layout.addWidget(self.magisk_arch_combo)
+
+        sub_layout.addWidget(BodyLabel("Magisk APK:", self))
+        apk_row = QHBoxLayout()
+        self.magisk_apk_edit = LineEdit(self)
+        self.magisk_apk_edit.setText("magisk.apk")
+
+        self.magisk_apk_edit.mousePressEvent = lambda event: self.__browse_magisk_apk()
+        self.magisk_browse_btn = PushButton("Browse...", self)
+        self.magisk_browse_btn.clicked.connect(self.__browse_magisk_apk)
+        apk_row.addWidget(self.magisk_apk_edit, 1)
+        apk_row.addWidget(self.magisk_browse_btn, 0)
+        sub_layout.addLayout(apk_row)
+
+        self.viewLayout.addWidget(self.magisk_sub_container)
+
+        self.magisk_sub_container.setVisible(False)
+        self.magisk_check.stateChanged.connect(lambda state: self.magisk_sub_container.setVisible(state == Qt.Checked))
+        self.viewLayout.addSpacing(15)
+
+        self.yesButton.setText("Port")
+        self.cancelButton.setText("Cancel")
+        self.widget.setMinimumWidth(460)
+
+        self.yesButton.clicked.disconnect()
+        self.yesButton.clicked.connect(self.__start_port)
+
+        self.__load_port_item(self.chipset_combo.currentText())
+
+    def __browse_magisk_apk(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Magisk APK", prog_path,
+                                                   "Android Package (*.apk);;All Files (*)")
+        if file_path:
+            self.magisk_apk_edit.setText(file_path)
+
+    def __load_port_item(self, select):
+        print(f"Port method:{select}...")
+
+        for cb_widget in self.item_box:
+            self.scroll_layout.removeWidget(cb_widget)
+            cb_widget.deleteLater()
+        self.item.clear()
+        self.item_box.clear()
+
+        item_dict = support_chipset_portstep.get(select, {}).get('flags', {})
+
+        for index, (current_flag, default_bool) in enumerate(item_dict.items()):
+            cb = CheckBox(current_flag, self.scroll_content)
+            cb.setChecked(default_bool)
+            self.scroll_layout.insertWidget(index, cb)
+
+            self.item.append([current_flag, cb])
+            self.item_box.append(cb)
 
     def __start_port(self):
-        # item check not 0
         if not self.item:
             print("Error: 移植条目为0，请先加载移植条目！")
             return
-        files = boot, system, portzip = FileChooser(self).get()
-        for i in boot, system, portzip:
-            if not os.path.exists(i) or not i:
-                print(f"File{i} Not chosen or not exists")
+
+        boot, system, portzip = FileChooser(self).get()
+        files = [boot, system, portzip]
+
+        for i in files:
+            if not i or not os.path.exists(i):
+                print(f"File {i} Not chosen or not exists")
                 return
+
         print(f"Boot from baserom：{boot}\n"
               f"System from baserom：{system}\n"
               f"Port Rom：{portzip}")
-        # config items
-        newdict = support_chipset_portstep[self.chipset_select.get()]
-        for key, tkbool in self.item:
-            newdict[key] = tkbool.get()
 
-        # magisk stuff
-        newdict['patch_magisk'] = self.patch_magisk.get()
-        newdict['magisk_apk'] = self.magisk_apk.get()
-        newdict['target_arch'] = self.target_arch.get()
+        newdict = support_chipset_portstep[self.chipset_combo.currentText()]
+        for key, cb_widget in self.item:
+            newdict[key] = cb_widget.isChecked()
 
-        # start to port
-        p = portutils(
-            newdict, *files, self.pack_type.get() == 'img',
-        ).start
+        newdict['patch_magisk'] = self.magisk_check.isChecked()
+        newdict['magisk_apk'] = self.magisk_apk_edit.text()
+        newdict['target_arch'] = self.magisk_arch_combo.currentText()
+
+        is_img_mode = self.radio_img.isChecked()
+        p = portutils(newdict, *files, is_img_mode).start
         DummyProcess(target=p).start()
 
-    def __setup_widgets(self):
-
-        def __create_cv_frame():
-            self.actcvframe = ttk.Frame(actcanvas)
-            actcanvas.create_window(0, 0, window=self.actcvframe, anchor='nw')
-            self.actcvframe.bind("<Configure>",
-                                 lambda *x: actcanvas.configure(scrollregion=actcanvas.bbox("all"), width=300,
-                                                                height=180))
-            actcanvas.update()
-
-        def __load_port_item(select):
-            # select = self.chipset_select.get()
-            print(f"Port method:{select}...")
-            item = support_chipset_portstep[select]['flags']
-            # Destory last items
-            self.item = []
-            self.item_box = []
-            try:
-                self.actcvframe.destroy()
-            except (Exception, BaseException):
-                ...
-            __create_cv_frame()
-
-            for index, current in enumerate(item):
-                self.item.append([current, BooleanVar(value=item[current])])  # flagname, flag[True, False]
-                self.item_box.append(ttk.Checkbutton(self.actcvframe, text=current, variable=self.item[index][1]))
-
-            for i in self.item_box:
-                i.pack(side='top', fill='x', padx=5)
-
-        # label of support devices
-        optframe = ttk.Frame(self)
-        optlabel = ttk.Label(optframe)
-
-        ttk.Label(optlabel, text="SOC Type", anchor='e').pack(side='left', padx=5, pady=5, expand=False)
-        ttk.OptionMenu(optlabel, self.chipset_select, support_chipset[0], *support_chipset,
-                       command=__load_port_item).pack(side='left', fill='x', padx=5, pady=5, expand=False)
-        optlabel.pack(side='top', fill='x')
-
-        # Frame of support action
-        actframe = ttk.Labelframe(optframe, text="Supported port item", height=180)
-
-        actcanvas = Canvas(actframe)
-        actscroll = ttk.Scrollbar(actframe, orient='vertical', command=actcanvas.yview)
-
-        actcanvas.configure(yscrollcommand=actscroll.set)
-        actcanvas.configure(scrollregion=(0, 0, 300, 180))
-        actcanvas.configure(yscrollincrement=1)
-        actcanvas.bind("<MouseWheel>", lambda event: actcanvas.yview_scroll(int(-event.delta / 2), 'units'))
-
-        actscroll.pack(side='right', fill='y')
-        actcanvas.pack(side='right', fill='x', expand=True, anchor='e')
-        actframe.pack(side='top', fill='x', expand=True)
-        __create_cv_frame()
-
-        # label of buttons
-        buttonlabel = ttk.Label(optframe)
-        ttk.Button(optframe, text="Port", command=self.__start_port).pack(side='top', fill='both', padx=5, pady=5,
-                                                                              expand=True)
-        ttk.Radiobutton(buttonlabel, text="Output to a zip rom", variable=self.pack_type, value='zip',
-                        ).grid(column=0, row=0, padx=5, pady=5)
-        ttk.Radiobutton(buttonlabel, text="Output to a image", variable=self.pack_type, value='img',
-                        ).grid(column=1, row=0, padx=5, pady=5)
-
-        magiskarch = ttk.OptionMenu(buttonlabel, self.target_arch, "arm64-v8a",
-                                    *["arm64-v8a", "armeabi-v7a", "x86", "x86_64"])
-
-        magiskapkentry = ttk.Entry(buttonlabel, textvariable=self.magisk_apk)
-        magiskapkentry.bind("<Button-1>", lambda x: self.magisk_apk.set(askopenfilename()))
-
-        ttk.Checkbutton(buttonlabel, text="Patch magisk", variable=self.patch_magisk, onvalue=True,
-                        offvalue=False, command=lambda: (
-                magiskapkentry.grid_forget(),
-                magiskarch.grid_forget(),
-            ) if not self.patch_magisk.get() else (  # 你在点的时候是函数还是没变的，所以反着来
-                magiskapkentry.grid(column=0, row=3, padx=5, pady=5, sticky='nsew', columnspan=2),
-                magiskarch.grid(column=0, row=2, padx=5, pady=5, sticky='nsew', columnspan=2)
-            )).grid(column=0, row=1, padx=5, pady=5, sticky='w')
-        buttonlabel.pack(side='top', padx=5, pady=5, fill='x', expand=True)
-        optframe.pack(side='left', padx=5, pady=5, fill='y', expand=False)
-        # log label
-        __load_port_item(self.chipset_select.get())
+        self.accept()
