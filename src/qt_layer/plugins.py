@@ -12,6 +12,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
 from Magisk import Magisk_patch
 from avb_disabler import process_fstab
 from encryption_disabler import process_fstab_for_encryption
+from porttool import MyUI
 from qsb_imger import process_by_xml
 from qt_layer.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from qt_layer.plugin_byte_calc import FileBytesMessageBox
@@ -23,6 +24,7 @@ from qt_layer.plugin_magisk_patch import MagiskPatchDialog
 from qt_layer.plugin_merge_qcom_partitions import MergeQualcommImageMessageBox
 from qt_layer.plugin_merge_super import MergeImageDialog
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
+from qt_layer.widgets import TkinterEmbeddedBox
 from src.core import images
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
@@ -1048,7 +1050,7 @@ class BuiltInPlugins:
             "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: self.merge_qcom_images()},
             "merge_super": {"name": "Merge Super", "entry": lambda: self.merge_super()},
             "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: self.decrypt_xtc_xml()},
-            "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: None},
+            "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: self.mtk_port_tool()},
         }
 
     def exec_plugin(self, plugin_id: str):
@@ -1060,6 +1062,7 @@ class BuiltInPlugins:
             print(f"{plugin_id} is not callable!")
             return
         entry()
+    def mtk_port_tool(self):
 
     def merge_super(self):
         dialog = MergeImageDialog(self.master, os.path.join(cfg.workingFolder.value, cfg.currentProjectName.value))

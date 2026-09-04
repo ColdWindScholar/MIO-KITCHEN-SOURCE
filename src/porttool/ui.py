@@ -89,7 +89,7 @@ class MyUI(ttk.Labelframe):
 
     def __start_port(self):
         # item check not 0
-        if self.item.__len__() == 0:
+        if not self.item:
             print("Error: 移植条目为0，请先加载移植条目！")
             return
         files = boot, system, portzip = FileChooser(self).get()
@@ -117,8 +117,6 @@ class MyUI(ttk.Labelframe):
         DummyProcess(target=p).start()
 
     def __setup_widgets(self):
-        def __scroll_event(event):
-            actcanvas.yview_scroll(int(-event.delta / 2), 'units')
 
         def __create_cv_frame():
             self.actcvframe = ttk.Frame(actcanvas)
@@ -166,7 +164,7 @@ class MyUI(ttk.Labelframe):
         actcanvas.configure(yscrollcommand=actscroll.set)
         actcanvas.configure(scrollregion=(0, 0, 300, 180))
         actcanvas.configure(yscrollincrement=1)
-        actcanvas.bind("<MouseWheel>", __scroll_event)
+        actcanvas.bind("<MouseWheel>", lambda event: actcanvas.yview_scroll(int(-event.delta / 2), 'units'))
 
         actscroll.pack(side='right', fill='y')
         actcanvas.pack(side='right', fill='x', expand=True, anchor='e')

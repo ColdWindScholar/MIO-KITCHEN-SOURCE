@@ -16,16 +16,14 @@ import utils
 from utils import gettype
 
 
-class TkinterEmbeddedPanel(QWidget):
+class TkinterEmbeddedBox(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
 
         # 1. Force Qt to create a native window handle/X11 ID for THIS specific widget
-        self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
-        layout = QVBoxLayout()
+       # self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
         self.widget = QWidget()
-        layout.addWidget(self.widget)
-        self.setLayout(layout)
+        self.viewLayout.addWidget(self.widget)
         # 2. Bind Tkinter root directly into the Qt Widget's handle
         # The 'use' parameter forces Tkinter to render inside the Qt boundary
         self.tk_root = tk.Tk(use=hex(self.widget.winId()))
