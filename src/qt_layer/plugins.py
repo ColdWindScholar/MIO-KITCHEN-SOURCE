@@ -1043,7 +1043,7 @@ class BuiltInPlugins:
             "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": lambda: self.disable_avb()},
             "dis_encryption": {"name": "Disable Encryption", "entry": lambda: self.dis_encryption()},
             "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
-            "magisk_patch": {"name": "Magisk Patch", "entry": lambda: None},
+            "magisk_patch": {"name": "Magisk Patch", "entry": lambda: self.magisk_patch()},
             "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: self.merge_qcom_images()},
             "merge_super": {"name": "Merge Super", "entry": lambda: None},
             "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: self.decrypt_xtc_xml()},
