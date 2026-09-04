@@ -21,6 +21,7 @@ from qt_layer.plugin_dis_encryption_in_fstab import DisableEncryptionMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
 from qt_layer.plugin_magisk_patch import MagiskPatchDialog
 from qt_layer.plugin_merge_qcom_partitions import MergeQualcommImageMessageBox
+from qt_layer.plugin_merge_super import MergeImageDialog
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
 from qt_layer.projects import project_manger
@@ -1045,7 +1046,7 @@ class BuiltInPlugins:
             "trim_raw_image": {"name": "Trim Raw Image", "entry": lambda: self.trim_raw_image()},
             "magisk_patch": {"name": "Magisk Patch", "entry": lambda: self.magisk_patch()},
             "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": lambda: self.merge_qcom_images()},
-            "merge_super": {"name": "Merge Super", "entry": lambda: None},
+            "merge_super": {"name": "Merge Super", "entry": lambda: self.merge_super()},
             "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": lambda: self.decrypt_xtc_xml()},
             "mtk_port_tool": {"name": "Mtk Port Tool", "entry": lambda: None},
         }
@@ -1059,7 +1060,10 @@ class BuiltInPlugins:
             print(f"{plugin_id} is not callable!")
             return
         entry()
-
+    def merge_super(self):
+        dialog = MergeImageDialog(self.master, os.path.join(cfg.workingFolder.value, cfg.currentProjectName.value))
+        if dialog.exec():
+            pass
     def magisk_patch(self):
         dialog = MagiskPatchDialog(self.master)
         # print("Patch sequence initiated!")
