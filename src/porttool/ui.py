@@ -95,7 +95,7 @@ class MyUI(MessageBoxBase):
 
         self.titleLabel = SubtitleLabel("MTK LowLevel Machines Port Tool", self)
         self.viewLayout.addWidget(self.titleLabel)
-        self.viewLayout.addSpacing(10)
+        self.viewLayout.addSpacing(5)
 
         soc_layout = QHBoxLayout()
         soc_layout.addWidget(BodyLabel("SOC Type:", self), 0, Qt.AlignLeft | Qt.AlignVCenter)
@@ -134,7 +134,7 @@ class MyUI(MessageBoxBase):
         pack_layout.addWidget(self.radio_zip)
         pack_layout.addWidget(self.radio_img)
         self.viewLayout.addLayout(pack_layout)
-        self.viewLayout.addSpacing(10)
+        self.viewLayout.addSpacing(5)
 
         self.magisk_check = CheckBox("Patch magisk", self)
         self.viewLayout.addWidget(self.magisk_check)
@@ -142,7 +142,7 @@ class MyUI(MessageBoxBase):
         self.magisk_sub_container = QWidget(self)
         sub_layout = QVBoxLayout(self.magisk_sub_container)
         sub_layout.setContentsMargins(15, 5, 0, 5)
-        sub_layout.setSpacing(8)
+        sub_layout.setSpacing(3)
 
         sub_layout.addWidget(BodyLabel("Target Arch:", self))
         self.magisk_arch_combo = ComboBox(self)
@@ -165,8 +165,8 @@ class MyUI(MessageBoxBase):
         self.viewLayout.addWidget(self.magisk_sub_container)
 
         self.magisk_sub_container.setVisible(False)
-        self.magisk_check.stateChanged.connect(lambda state: self.magisk_sub_container.setVisible(state == Qt.Checked))
-        self.viewLayout.addSpacing(15)
+        self.magisk_check.stateChanged.connect(lambda state: self.magisk_sub_container.setVisible(state == Qt.Checked.value))
+        self.viewLayout.addSpacing(5)
 
         self.yesButton.setText("Port")
         self.cancelButton.setText("Cancel")
