@@ -1060,10 +1060,13 @@ class BuiltInPlugins:
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
     def merge_super(self):
         dialog = MergeImageDialog(self.master, os.path.join(cfg.workingFolder.value, cfg.currentProjectName.value))
         if dialog.exec():
             pass
+        #todo: rewrite in a good way.
+
     def magisk_patch(self):
         dialog = MagiskPatchDialog(self.master)
         # print("Patch sequence initiated!")
@@ -1090,9 +1093,11 @@ class BuiltInPlugins:
                 )
                 return
             try:
-                with Magisk_patch(boot_path, None, f"{cfg.tool_bin}/magiskboot", local_path, dialog.is64bitCheck.isChecked(),
-                                  dialog.keepVerityCheck.isChecked(), dialog.keepForceEncryptCheck.isChecked(), dialog.recoveryModeCheck.isChecked(),
-                    magisk_path, dialog.archComboBox.currentText()
+                with Magisk_patch(boot_path, None, f"{cfg.tool_bin}/magiskboot", local_path,
+                                  dialog.is64bitCheck.isChecked(),
+                                  dialog.keepVerityCheck.isChecked(), dialog.keepForceEncryptCheck.isChecked(),
+                                  dialog.recoveryModeCheck.isChecked(),
+                                  magisk_path, dialog.archComboBox.currentText()
                                   ) as m:
                     m.auto_patch()  # Perform the automated patching process.
                     if m.output:
@@ -1114,7 +1119,8 @@ class BuiltInPlugins:
                         print(f"Done! Patched Boot: {output_file}")
                         InfoBar.success("Magisk Patch", f"Patched Boot:\n{output_file}", parent=self.master)
                     else:
-                        InfoBar.warning("Magisk Patch", "Magisk patching process did not produce an output file.", parent=self.master)
+                        InfoBar.warning("Magisk Patch", "Magisk patching process did not produce an output file.",
+                                        parent=self.master)
             except Exception as e:
                 # I log any exceptions during patching and inform the user.
                 logging.exception("Magisk patching error")
