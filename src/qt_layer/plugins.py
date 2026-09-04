@@ -9,6 +9,7 @@ from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, Scroll
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
     MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton
 
+from Magisk import Magisk_patch
 from avb_disabler import process_fstab
 from encryption_disabler import process_fstab_for_encryption
 from qsb_imger import process_by_xml
@@ -18,6 +19,7 @@ from qt_layer.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
 from qt_layer.plugin_dis_avb_in_fstab import DisableAvbMessageBox
 from qt_layer.plugin_dis_encryption_in_fstab import DisableEncryptionMessageBox
 from qt_layer.plugin_get_file_info import FileInfoMessageBox
+from qt_layer.plugin_magisk_patch import MagiskPatchDialog
 from qt_layer.plugin_merge_qcom_partitions import MergeQualcommImageMessageBox
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.core import images
@@ -47,7 +49,6 @@ class ParseMessageBox(MessageBoxBase):
         self.main_layout = QVBoxLayout(main_widget)
         self.main_layout.setContentsMargins(16, 16, 16, 16)
         self.main_layout.setSpacing(12)
-
 
         # 解析并生成动态 UI
         self.load_json_schema(json_file_path)
@@ -79,7 +80,7 @@ class ParseMessageBox(MessageBoxBase):
                 continue
 
             card = GroupHeaderCardWidget(self)
-            card.setContentsMargins(5,5,5,5)
+            card.setContentsMargins(5, 5, 5, 5)
             card.setTitle(group_data.get('title', 'Group Panel'))
 
             # 使用干净的垂直布局引擎包裹卡片内部的组件
@@ -1058,6 +1059,62 @@ class BuiltInPlugins:
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
+    def magisk_patch(self):
+        dialog = MagiskPatchDialog(self.master)
+        # print("Patch sequence initiated!")
+        #             print(f"Boot Path: {dialog.bootFileLineEdit.text()}")
+        #             print(f"APK Path: {dialog.magiskApkLineEdit.text()}")
+        #             print(f"Arch Mode: {dialog.archComboBox.currentText()}")
+        #             print(f"IS64BIT: {dialog.is64bitCheck.isChecked()}")
+        #             print(f"KEEPVERITY: {dialog.keepVerityCheck.isChecked()}")
+        #             print(f"KEEPFORCEENCRYPT: {dialog.keepForceEncryptCheck.isChecked()}")
+        #             print(f"RECOVERYMODE: {dialog.recoveryModeCheck.isChecked()}")
+        if dialog.exec():
+            local_path = str(os.path.join(temp, utils.v_code()))  # Generate a unique temporary working directory.
+            re_folder(local_path)  # I ensure the temporary folder is clean or created.
+            boot_path = dialog.bootFileLineEdit.text()
+            magisk_path = dialog.magiskApkLineEdit.text()
+            if not boot_path or not os.path.exists(boot_path):
+                InfoBar.warning(
+                    "Magisk Patch", f"{boot_path}'s not exist", parent=self.master
+                )
+                return
+            if not magisk_path or not os.path.exists(magisk_path):
+                InfoBar.warning(
+                    "Magisk Patch", f"{magisk_path}'s not exist", parent=self.master
+                )
+                return
+            try:
+                with Magisk_patch(boot_path, None, f"{cfg.tool_bin}/magiskboot", local_path, dialog.is64bitCheck.isChecked(),
+                                  dialog.keepVerityCheck.isChecked(), dialog.keepForceEncryptCheck.isChecked(), dialog.recoveryModeCheck.isChecked(),
+                    magisk_path, dialog.archComboBox.currentText()
+                                  ) as m:
+                    m.auto_patch()  # Perform the automated patching process.
+                    if m.output:
+                        # I construct a unique output file name to avoid overwriting existing files.
+                        base_name = os.path.basename(boot_path)
+                        # Handle common image extensions like .img and .bin for name stripping.
+                        name_part = base_name
+                        for ext in ('.img', '.bin'):  # I check for common extensions.
+                            if base_name.lower().endswith(ext):
+                                name_part = base_name[:-len(ext)]
+                                break
+                        output_file = os.path.join(prog_path,
+                                                   f"{name_part}_magisk_patched.img")
+                        if os.path.exists(output_file):
+                            # If the default patched name exists, I add a unique code to the new one.
+                            output_file = os.path.join(prog_path,
+                                                       f"{name_part}_{utils.v_code()}_magisk_patched.img")
+                        os.rename(m.output, output_file)  # Move the patched file to the final destination.
+                        print(f"Done! Patched Boot: {output_file}")
+                        InfoBar.success("Magisk Patch", f"Patched Boot:\n{output_file}", parent=self.master)
+                    else:
+                        InfoBar.warning("Magisk Patch", "Magisk patching process did not produce an output file.", parent=self.master)
+            except Exception as e:
+                # I log any exceptions during patching and inform the user.
+                logging.exception("Magisk patching error")
+                InfoBar.warning("Magisk Patch", f"Magisk patching failed: {str(e)}", parent=self.master)
 
     def merge_qcom_images(self):
         dialog = MergeQualcommImageMessageBox(self.master)
