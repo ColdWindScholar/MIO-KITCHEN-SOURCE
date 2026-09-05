@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QFileDialog
+from PySide6.QtWidgets import QGridLayout, QFileDialog
 from qfluentwidgets import (
     MessageBoxBase,
     SubtitleLabel,
