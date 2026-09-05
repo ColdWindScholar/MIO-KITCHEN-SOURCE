@@ -1,14 +1,13 @@
 import logging
 import os
 import time
-import tkinter as tk
 
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtCore import QTimer
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
-                               QLabel, QLineEdit, QHBoxLayout, QButtonGroup)
+                               QLineEdit, QHBoxLayout, QButtonGroup)
 from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
     RadioButton, PushButton, BodyLabel
 from qfluentwidgets import (
@@ -19,24 +18,6 @@ from qfluentwidgets import (SwitchButton, Slider,
 
 from src.core import utils
 from src.core.utils import gettype
-
-
-class TkinterEmbeddedBox(MessageBoxBase):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        # 1. Force Qt to create a native window handle/X11 ID for THIS specific widget
-       # self.setAttribute(Qt.WidgetAttribute.WA_NativeWindow, True)
-        self.widget = QWidget()
-        self.viewLayout.addWidget(self.widget)
-        # 2. Bind Tkinter root directly into the Qt Widget's handle
-        # The 'use' parameter forces Tkinter to render inside the Qt boundary
-        self.tk_root = tk.Tk(use=hex(self.widget.winId()))
-        self.tk_root.willdispatch()
-        self.timer = QTimer(self)
-        self.timer.setInterval(20)
-        self.timer.timeout.connect(self.tk_root.update)
-        self.timer.start()
 
 
 def show_info_bar(parent, title, content, bar_type: int = 3, duration=3000):
