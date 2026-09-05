@@ -97,7 +97,7 @@ def process_fstab_for_encryption(fstab_path: str) -> bool:
     :rtype: bool
     """
     if not os.path.isfile(fstab_path):
-        print(f"[Enc Disabler] {lang.file_not_found.format(file=fstab_path)}")
+        print(f"[Enc Disabler] file_not_found {fstab_path}")
         return False
 
     try:
@@ -113,7 +113,7 @@ def process_fstab_for_encryption(fstab_path: str) -> bool:
         except UnicodeDecodeError:
             content = raw_content.decode('latin-1')
             encoding = 'latin-1'
-            print(f"[Enc Disabler] {lang.encoding_warning.format(file=os.path.basename(fstab_path), encoding=encoding)}")
+            print(f"[Enc Disabler] encoding_warning {encoding}")
 
         original_lines = content.splitlines()
         modified_lines = []
@@ -154,7 +154,7 @@ def process_fstab_for_encryption(fstab_path: str) -> bool:
                 # Reconstruct the modified line, ensuring a single space separator.
                 modified_line = f"{fields_part} {new_options}"
                 modified_lines.append(modified_line)
-                print(f"[Enc Disabler] {lang.line_processed.format(line=line_num, mount=mount_point)}")
+                print(f"[Enc Disabler] line_processed {line_num} {mount_point}")
             else:
                 # If the line was not modified, add the original line back.
                 modified_lines.append(line)
@@ -171,15 +171,15 @@ def process_fstab_for_encryption(fstab_path: str) -> bool:
             with open(fstab_path, 'wb') as f:
                 f.write(new_content.encode(encoding))
 
-            print(f"[Enc Disabler] {lang.enc_flags_removed.format(file=base_name)}")
+            print(f"[Enc Disabler] enc_flags_removed {base_name}")
         else:
-            print(f"[Enc Disabler] {lang.enc_flags_not_found.format(file=base_name)}")
+            print(f"[Enc Disabler] enc_flags_not_found {base_name}")
 
         return True
 
     except Exception as e:
         # Catch any unexpected errors during file processing.
-        print(f"[Enc Disabler] {lang.error_processing_file.format(file=fstab_path, error=str(e))}")
+        print(f"[Enc Disabler] error_processing_file {e} {fstab_path}")
         import traceback
         traceback.print_exc()
         return False
