@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import json
 import os
 import platform
 import shutil
@@ -70,9 +71,9 @@ class Builder:
     def generate_release_body(self):
         print('Generating Release Body...')
         # load config
-        with open('bin/setting.ini', 'r', encoding='utf-8') as f:
-            ver = [line for line in f.readlines() if 'version' in line]
-            ver = ver[0].strip().split(' = ')[1]
+        with open('bin/settings.json', 'r', encoding='utf-8') as f:
+            ver = json.load(f)
+            ver = ver['Tool']['Version']
         with open('body.md', 'w', encoding='utf-8', newline='\n') as f:
             f.write(f"Build times: {os.getenv('GITHUB_RUN_NUMBER')}\n")
             f.write(f"Actor: {os.getenv('GITHUB_TRIGGERING_ACTOR')}\n")
