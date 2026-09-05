@@ -24,17 +24,16 @@ from qt_layer.plugin_magisk_patch import MagiskPatchDialog
 from qt_layer.plugin_merge_qcom_partitions import MergeQualcommImageMessageBox
 from qt_layer.plugin_merge_super import MergeImageDialog
 from qt_layer.plugin_trim_raw_image import TrimRawImageMessageBox
-from qt_layer.widgets import TkinterEmbeddedBox
-from src.core import images
 from qt_layer.projects import project_manger
 from qt_layer.settings import cfg
+from src.core import images
 from src.core import imp
 from src.core import utils
 from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
+from src.core.selinux_audit_allow import main as selinux_audit_allow
 from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder
 from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
-from src.core.selinux_audit_allow import main as selinux_audit_allow
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
