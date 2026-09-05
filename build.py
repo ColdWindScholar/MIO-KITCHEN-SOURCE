@@ -48,14 +48,18 @@ class Builder:
         self.pyinstaller_build()
         self.config_folder()
         self.pack_zip(f'{self.local}/dist', self.name)
+
     def patch_libs(self):
+        print("Patching libs")
         spec = importlib.util.find_spec('qfluentwidgets')
         target_file = os.path.join(os.path.dirname(spec.origin), "common", "config.py")
         with open(target_file, "r", encoding="utf-8", newline="\n") as f:
-            data = f.read()
-            data = data.replace('ALERT = "\n\033[1;33m📢 Tips:\033[0m QFluentWidgets Pro is now released. Click \033[1;96mhttps://qfluentwidgets.com/pages/pro\033[0m to learn more about it.\n"', "ALERT = ''")
+            data = f.readlines()
+            data_index = 14
+            data[data_index] = "ALERT = None"
         with open(target_file, "w", encoding="utf-8", newline="\n") as f:
-            f.write(data)
+            f.writelines(data)
+
     def run_command(self, command: list[str], strip: bool = False):
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True)
