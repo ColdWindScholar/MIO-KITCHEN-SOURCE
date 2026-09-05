@@ -395,16 +395,16 @@ class PackSettingsDialog(MessageBoxBase):
         ext4_layout.setContentsMargins(0, 0, 0, 0)
         ext4_layout.setSpacing(8)
 
-        ext4_layout.addWidget(self._create_group_title("EXT4设置"))
+        ext4_layout.addWidget(self._create_group_title(self.tr("EXT4 Settings")))
 
         ext4_grid = QHBoxLayout()
         ext4_grid.setSpacing(16)
 
-        self.pack_method_label = self._create_field_label("打包方式：")
+        self.pack_method_label = self._create_field_label(self.tr("Packing with:"))
         self.pack_method_combo = ComboBox(ext4_container)
         self.pack_method_combo.addItems(["make_ext4fs", "mke2fs+e2fsdroid"])
 
-        self.size_handle_label = self._create_field_label("大小处理：")
+        self.size_handle_label = self._create_field_label(self.tr("Size Handle:"))
         self.size_handle_combo = ComboBox(ext4_container)
         self.size_handle_combo.addItems(["自动读取", "手动固定"])
 
@@ -423,10 +423,10 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_layout.setContentsMargins(0, 0, 0, 0)
         erofs_layout.setSpacing(10)
 
-        erofs_layout.addWidget(self._create_group_title("EROFS打包"))
+        erofs_layout.addWidget(self._create_group_title(self.tr("EROFS Settings")))
 
         erofs_row1 = QHBoxLayout()
-        self.compress_algo_label = self._create_field_label("压缩算法：")
+        self.compress_algo_label = self._create_field_label(self.tr("Compression Method:"))
         self.compress_algo_combo = ComboBox(erofs_container)
         self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
         self.compress_algo_combo.setText("lz4hc")
@@ -444,12 +444,12 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_layout.addLayout(erofs_row1)
 
         erofs_row2 = QHBoxLayout()
-        self.erofs_level_label = QLabel("EROFS等级: 8", erofs_container)
+        self.erofs_level_label = QLabel(self.tr("EROFS Level: 8"), erofs_container)
         self.erofs_level_label.setStyleSheet("color: #ffffff; font-size: 13px; min-width: 90px;")
         self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_container)
         self.erofs_slider.setRange(0, 20)
         self.erofs_slider.setValue(8)
-        self.erofs_slider.valueChanged.connect(lambda v: self.erofs_level_label.setText(f"EROFS等级: {v}"))
+        self.erofs_slider.valueChanged.connect(lambda v: self.erofs_level_label.setText(self.tr("EROFS Level: {}".format(v))))
 
         erofs_row2.addWidget(self.erofs_level_label)
         erofs_row2.addWidget(self.erofs_slider, 1)
@@ -464,7 +464,7 @@ class PackSettingsDialog(MessageBoxBase):
         f2fs_layout.setContentsMargins(0, 0, 0, 0)
         f2fs_layout.setSpacing(8)
 
-        f2fs_layout.addWidget(self._create_group_title("F2FS设置"))
+        f2fs_layout.addWidget(self._create_group_title(self.tr("F2FS Settings")))
 
         f2fs_row = QHBoxLayout()
         f2fs_row.setSpacing(12)
@@ -498,7 +498,7 @@ class PackSettingsDialog(MessageBoxBase):
         other_layout.setContentsMargins(0, 0, 0, 0)
         other_layout.setSpacing(12)
 
-        other_layout.addWidget(self._create_group_title("其他设置"))
+        other_layout.addWidget(self._create_group_title(self.tr("Others")))
 
         # Brotli 等级滑动条区域
         brotli_row = QHBoxLayout()
@@ -506,7 +506,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.brotli_lbl.setStyleSheet("color: #ffffff; font-size: 15px; font-weight: 500; min-width: 100px;")
         self.brotli_slider = Slider(Qt.Orientation.Horizontal, other_container)
         self.brotli_slider.setRange(0, 11)
-        self.brotli_slider.valueChanged.connect(lambda v: self.brotli_lbl.setText(f"Brotli等级: {v}"))
+        self.brotli_slider.valueChanged.connect(lambda v: self.brotli_lbl.setText(self.tr("Brotli Level: {}").format(v)))
 
         brotli_row.addWidget(self.brotli_lbl)
         brotli_row.addWidget(self.brotli_slider, 1)
@@ -535,7 +535,7 @@ class PackSettingsDialog(MessageBoxBase):
         grid_matrix = QGridLayout()
         grid_matrix.setSpacing(12)
 
-        self.format_label = self._create_field_label("打包格式：")
+        self.format_label = self._create_field_label(self.tr("Format:"))
         self.format_combo = ComboBox(other_container)
         self.format_combo.addItems(["raw", "sparse"])
 
@@ -570,7 +570,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.sw_delete = SwitchButton(other_container)
         self.sw_delete.setOffText("")
         self.sw_delete.setOnText("")
-        self.lbl_delete = QLabel("删除源文件", other_container)
+        self.lbl_delete = QLabel(self.tr("Remove source files"), other_container)
         self.lbl_delete.setStyleSheet("color: #ffffff; font-size: 13px;")
 
         # 将所有控制元素对齐组装入 QGridLayout 矩阵中
