@@ -1281,12 +1281,7 @@ class PluginPage(QWidget):
         self.built_in_plugins = BuiltInPlugins(self)
         self.cards_data = []  # Track card mappings for easy filtering
         self.initUI()
-        self.setStyleSheet("""
-                   QWidget#ScrollContent {
-                       background-color: #202020;
-                   }
-                  
-               """)
+
         module_manager.master = self
 
     def uninstall_plugin(self, plugin_id: str):

@@ -308,7 +308,6 @@ class ProjectsPage(QWidget):
         # 1. 基础布局与极简深色背景
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        self.setStyleSheet("background-color: #00202020; color: #ffffff;")
 
         # 使用 QFluentWidgets 原生滚动区域
         scroll_area = ScrollArea(self)
