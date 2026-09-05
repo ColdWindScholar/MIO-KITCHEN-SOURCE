@@ -812,7 +812,7 @@ class ProjectsPage(QWidget):
         self.ring.hide()
         self.execute_btn = PrimaryPushButton(self.tr("Execute"), container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
-        self.execute_btn.setFixedWidth(80)
+        self.execute_btn.setFixedWidth(100)
         frame.addWidget(self.ring)
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
