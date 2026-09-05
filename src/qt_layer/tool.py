@@ -9,7 +9,7 @@ from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject, QTranslat
 from PySide6.QtGui import QIcon, QGuiApplication, QCursor
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
-                            FluentWindow, FluentIcon as FIF)
+                            FluentWindow, FluentIcon as FIF, SplitFluentWindow)
 
 from src.qt_layer.plugins import PluginPage
 from src.qt_layer.projects import ProjectsPage
@@ -67,7 +67,7 @@ class TitleBarEventFilter(QObject):
         return False
 
 
-class MainWindow(FluentWindow):
+class MainWindow(SplitFluentWindow):
     def __init__(self):
         super().__init__()
 
@@ -77,8 +77,6 @@ class MainWindow(FluentWindow):
         # 设置主题
         setTheme(Theme.AUTO)
 
-        self.setWindowIcon(QIcon('icon.ico'))
-        
         # Create splash screen with error handling
         try:
             self.splashScreen = SplashScreen(self.windowIcon(), self)
@@ -90,8 +88,6 @@ class MainWindow(FluentWindow):
         
         self.show()
 
-        # 设置窗口标题
-        self.setWindowTitle("MIO-KITCHEN")
 
         # 设置窗口大小
         self.resize(1000, 700)
