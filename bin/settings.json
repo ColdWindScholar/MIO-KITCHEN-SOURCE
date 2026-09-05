@@ -1,11 +1,11 @@
 {
     "Tool": {
         "Version": "5.0.0-prewiew",
-        "AiEngine": false,
+        "AiEngine": true,
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Native",
-        "currentProjectName": "lineage-23.2-20260506-UNOFFICIAL-stone",
+        "currentProjectName": "kemiaojiang",
         "Language": "app_en_US.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
