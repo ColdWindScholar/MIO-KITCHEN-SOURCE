@@ -5,7 +5,7 @@ from PySide6.QtGui import Qt, QPixmap
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QHBoxLayout, QFrame, QLabel
 from qfluentwidgets import setThemeColor
 
-from src.qtui.widgets import ClickableLabel
+from src.qt_layer.widgets import ClickableLabel
 
 
 class HomePage(QWidget):
