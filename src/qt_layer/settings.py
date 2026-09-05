@@ -28,15 +28,6 @@ class SettingsPage(QScrollArea):
             }
         """)
 
-    def load_language(self):
-        app = QApplication.instance()
-        translator = QTranslator()
-        if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
-            if not app:
-                return
-            if app.removeTranslator(app.translator):
-                if app.installTranslator(translator):
-                    app.translator = translator
 
     def initUI(self):
         """ 初始化UI """
