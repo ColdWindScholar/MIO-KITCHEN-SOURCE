@@ -70,7 +70,7 @@ class SettingsPage(QScrollArea):
             cfg.projectStructure,
             FluentIcon.CONSTRACT,
             self.tr("Project Structure"),
-            "project StructureCard",
+            "project Structure",
             texts=cfg.projectStructure.options
         )
         self.scrollLayout.addWidget(self.projectStructureCard)
