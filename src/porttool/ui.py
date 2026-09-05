@@ -22,16 +22,16 @@ from .utils import portutils
 class FileChooser(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.titleLabel = SubtitleLabel("Please choose boot, system from device and the port rom", self)
+        self.titleLabel = SubtitleLabel(self.tr("Please choose boot, system from device and the port rom"), self)
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.addSpacing(10)
 
         self.portzip_edit = LineEdit(self)
-        self.portzip_edit.setPlaceholderText("Select Port Rom...")
-        self.portzip_btn = PushButton("Choose...", self)
+        self.portzip_edit.setPlaceholderText(self.tr("Select Port Rom..."))
+        self.portzip_btn = PushButton(self.tr("Choose..."), self)
 
         self.baseboot_edit = LineEdit(self)
-        self.baseboot_edit.setPlaceholderText("Select Boot from device...")
+        self.baseboot_edit.setPlaceholderText(self.tr("Select Boot from device..."))
         self.baseboot_btn = PushButton("Choose...", self)
 
         self.basesys_edit = LineEdit(self)
@@ -54,7 +54,7 @@ class FileChooser(MessageBoxBase):
 
         grid = QGridLayout()
         grid.setSpacing(10)
-        grid.addWidget(BodyLabel("Port Rom:", self), 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(BodyLabel(self.tr("Port Rom:"), self), 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid.addWidget(self.portzip_edit, 0, 1)
         grid.addWidget(self.portzip_btn, 0, 2)
 
@@ -67,8 +67,8 @@ class FileChooser(MessageBoxBase):
         grid.addWidget(self.basesys_btn, 2, 2)
         self.viewLayout.addLayout(grid)
 
-        self.yesButton.setText("OK")
-        self.cancelButton.setText("Cancel")
+        self.yesButton.setText(self.tr("OK"))
+        self.cancelButton.setText(self.tr("Cancel"))
         self.widget.setMinimumWidth(500)
 
     def __choose_file(self, edit: LineEdit, file_filter: str):
@@ -93,12 +93,12 @@ class MyUI(MessageBoxBase):
         self.item = []
         self.item_box = []
 
-        self.titleLabel = SubtitleLabel("MTK LowLevel Machines Port Tool", self)
+        self.titleLabel = SubtitleLabel(self.tr("MTK LowLevel Machines Port Tool"), self)
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.addSpacing(5)
 
         soc_layout = QHBoxLayout()
-        soc_layout.addWidget(BodyLabel("SOC Type:", self), 0, Qt.AlignLeft | Qt.AlignVCenter)
+        soc_layout.addWidget(BodyLabel(self.tr("SOC Type:"), self), 0, Qt.AlignLeft | Qt.AlignVCenter)
         self.chipset_combo = ComboBox(self)
         self.chipset_combo.addItems(support_chipset)
 
@@ -109,7 +109,7 @@ class MyUI(MessageBoxBase):
         self.viewLayout.addLayout(soc_layout)
         self.viewLayout.addSpacing(10)
 
-        self.viewLayout.addWidget(BodyLabel("Supported port item", self))
+        self.viewLayout.addWidget(BodyLabel(self.tr("Supported port item"), self))
 
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
@@ -128,15 +128,15 @@ class MyUI(MessageBoxBase):
         self.viewLayout.addSpacing(10)
 
         pack_layout = QHBoxLayout()
-        self.radio_zip = RadioButton("Output to a zip rom", self)
-        self.radio_img = RadioButton("Output to a image", self)
+        self.radio_zip = RadioButton(self.tr("Output to a zip rom"), self)
+        self.radio_img = RadioButton(self.tr("Output to a image"), self)
         self.radio_zip.setChecked(True)
         pack_layout.addWidget(self.radio_zip)
         pack_layout.addWidget(self.radio_img)
         self.viewLayout.addLayout(pack_layout)
         self.viewLayout.addSpacing(5)
 
-        self.magisk_check = CheckBox("Patch magisk", self)
+        self.magisk_check = CheckBox(self.tr("Patch magisk"), self)
         self.viewLayout.addWidget(self.magisk_check)
 
         self.magisk_sub_container = QWidget(self)
@@ -144,7 +144,7 @@ class MyUI(MessageBoxBase):
         sub_layout.setContentsMargins(15, 5, 0, 5)
         sub_layout.setSpacing(3)
 
-        sub_layout.addWidget(BodyLabel("Target Arch:", self))
+        sub_layout.addWidget(BodyLabel(self.tr("Target Arch:"), self))
         self.magisk_arch_combo = ComboBox(self)
         self.magisk_arch_combo.addItems(["arm64-v8a", "armeabi-v7a", "x86", "x86_64"])
         self.magisk_arch_combo.setCurrentText("arm64-v8a")
@@ -156,7 +156,7 @@ class MyUI(MessageBoxBase):
         self.magisk_apk_edit.setText("magisk.apk")
 
         self.magisk_apk_edit.mousePressEvent = lambda event: self.__browse_magisk_apk()
-        self.magisk_browse_btn = PushButton("Browse...", self)
+        self.magisk_browse_btn = PushButton(self.tr("Browse..."), self)
         self.magisk_browse_btn.clicked.connect(self.__browse_magisk_apk)
         apk_row.addWidget(self.magisk_apk_edit, 1)
         apk_row.addWidget(self.magisk_browse_btn, 0)
@@ -168,8 +168,8 @@ class MyUI(MessageBoxBase):
         self.magisk_check.stateChanged.connect(lambda state: self.magisk_sub_container.setVisible(state == Qt.Checked.value))
         self.viewLayout.addSpacing(5)
 
-        self.yesButton.setText("Port")
-        self.cancelButton.setText("Cancel")
+        self.yesButton.setText(self.tr("Port"))
+        self.cancelButton.setText(self.tr("Cancel"))
         self.widget.setMinimumWidth(460)
 
         self.yesButton.clicked.disconnect()
