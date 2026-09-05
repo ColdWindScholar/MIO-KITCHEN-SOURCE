@@ -1062,10 +1062,12 @@ class BuiltInPlugins:
             print(f"{plugin_id} is not callable!")
             return
         entry()
+
     def mtk_port_tool(self):
         dialog = MyUI(self.master)
         if dialog.exec():
             pass
+
     def merge_super(self):
         dialog = MergeImageDialog(self.master, os.path.join(cfg.workingFolder.value, cfg.currentProjectName.value))
         if dialog.exec():
