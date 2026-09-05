@@ -672,18 +672,18 @@ class PackSuperMessageBox(MessageBoxBase):
         self.switch_delete.setOnText("删除源文件")
         t_frame_layout.addWidget(self.switch_delete)
 
-        self.btn_refresh = PushButton("刷新", self)
+        self.btn_refresh = PushButton(self.tr("Refresh"), self)
         self.btn_refresh.clicked.connect(self.refresh)
         t_frame_layout.addWidget(self.btn_refresh)
 
-        self.g_b = PushButton("生成LIST", self)
+        self.g_b = PushButton(self.tr("Generate LIST"), self)
         self.g_b.clicked.connect(self.generate)
         t_frame_layout.addWidget(self.g_b)
         self.viewLayout.addLayout(t_frame_layout)
 
         # 7. Bottom Accept/Cancel Bar configuration setups
-        self.yesButton.setText("Pack")
-        self.cancelButton.setText("取消")
+        self.yesButton.setText(self.tr("Pack"))
+        self.cancelButton.setText(self.tr("Cancel"))
         self.read_list()
         self.refresh()
 
@@ -731,7 +731,7 @@ class PackSuperMessageBox(MessageBoxBase):
         return True
 
     def generate(self):
-        self.g_b.setText("正在执行")
+        self.g_b.setText(self.tr("Running"))
         self.g_b.setEnabled(False)
         self.g_b.repaint()
 
@@ -747,12 +747,12 @@ class PackSuperMessageBox(MessageBoxBase):
             part_list=self.get_selected_items(),
             work=self.work
         )
-        self.g_b.setText("完成")
+        self.g_b.setText(self.tr("Done"))
         QTimer.singleShot(1000, self._reset_generate_button)
 
     def _reset_generate_button(self):
         try:
-            self.g_b.setText("生成LIST")
+            self.g_b.setText(self.tr("Generate LIST"))
             self.g_b.setEnabled(True)
         except Exception:
             logging.exception('Bugs')
@@ -877,11 +877,11 @@ class RepackZipMessageBox(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("Pack ZIP")
+        self.setWindowTitle(self.tr("Pack ZIP"))
         self.widget.setMinimumWidth(550)
 
         # 1. Title
-        self.titleLabel = SubtitleLabel("Repack ZIP?", self)
+        self.titleLabel = SubtitleLabel(self.tr("Repack ZIP?"), self)
         self.titleLabel.setAlignment(Qt.AlignCenter)
         self.viewLayout.addWidget(self.titleLabel)
 
@@ -889,7 +889,7 @@ class RepackZipMessageBox(MessageBoxBase):
         self.checkbox_layout = QHBoxLayout()
         self.checkbox = CheckBox(self)
 
-        msg_text = (
+        msg_text = self.tr(
             "Pack Hybrid Rom?"
         )
         self.contentLabel = BodyLabel(msg_text, self)
@@ -901,7 +901,7 @@ class RepackZipMessageBox(MessageBoxBase):
 
         # 3. Dynamic Device Code Input LineEdit
         self.device_code_edit = LineEdit(self)
-        self.device_code_edit.setPlaceholderText("Enter device code")
+        self.device_code_edit.setPlaceholderText(self.tr("Enter device code"))
         self.device_code_edit.setClearButtonEnabled(True)
         self.device_code_edit.hide()  # Hidden by default
         self.viewLayout.addWidget(self.device_code_edit)
@@ -910,8 +910,8 @@ class RepackZipMessageBox(MessageBoxBase):
         self.checkbox.stateChanged.connect(self.toggle_input_visibility)
 
         # 4. Standard action button text overrides
-        self.yesButton.setText("OK")
-        self.cancelButton.setText("Cancel")
+        self.yesButton.setText(self.tr("OK"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
     def toggle_input_visibility(self, state):
         """Hides or reveals the LineEdit depending on the checkbox check state."""
