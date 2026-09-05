@@ -14,19 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
-import gzip
+import json
 import os
 import platform
+import re
 import tarfile
+import warnings
 import zipfile
 from functools import wraps
 from os import getcwd
 from sys import exit
 from time import strftime, time
-import json
+
 import requests
-import warnings
-import re
 
 warnings.warn = lambda *args: ...
 temp = 'bin/temp'
