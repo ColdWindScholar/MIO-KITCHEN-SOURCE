@@ -1,4 +1,7 @@
+import os.path
+import platform
 import random
+import sys
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QCursor
@@ -7,6 +10,8 @@ from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
     CardWidget
 )
+
+from utils import JsonEdit, prog_path
 
 
 class ClickableTitleLabel(TitleLabel):
@@ -61,7 +66,7 @@ class AboutPage(QWidget):
         self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header_layout.addWidget(self.title)
 
-        subtitle = BodyLabel("- 专注于安卓ROM修改 -")
+        subtitle = BodyLabel(self.tr("- Focus on Android ROM modification -"))
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header_layout.addWidget(subtitle)
 
@@ -81,15 +86,15 @@ class AboutPage(QWidget):
         left_layout.setContentsMargins(32, 32, 32, 32)
         left_layout.setSpacing(20)
 
-        sys_header = CaptionLabel("系统信息")
+        sys_header = CaptionLabel(self.tr("System Info"))
         sys_header.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 14px;")
         left_layout.addWidget(sys_header)
 
         sys_info_data = [
-            ("工具版本", "4.2.1"),
-            ("Python库版本", "3.14.6"),
-            ("操作系统", "Linux"),
-            ("指令集", "x86_64")
+            (self.tr("Tool Version"), "4.2.1"),
+            (self.tr("Python Version"), f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"),
+            (self.tr("Operating system"), "Linux"),
+            (self.tr("Architecture"), platform.machine())
         ]
 
         sys_grid = QGridLayout()
@@ -120,7 +125,7 @@ class AboutPage(QWidget):
         right_layout.setContentsMargins(32, 32, 32, 32)
         right_layout.setSpacing(20)
 
-        dep_header = CaptionLabel("依赖项")
+        dep_header = CaptionLabel(self.tr("Dependencies"))
         dep_header.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 14px;")
         right_layout.addWidget(dep_header)
 
@@ -129,16 +134,10 @@ class AboutPage(QWidget):
         dep_grid.setVerticalSpacing(12)
         dep_grid.setColumnStretch(0, 1)
         dep_grid.setColumnStretch(1, 1)
+        dependencies_version = JsonEdit(os.path.join(prog_path, "bin", "update.json")).read()
 
-        dependencies = [
-            ("erofs_utils", "v1.9.3"),
-            ("apftool", "v1.2.3"),
-            ("apftool-loongarch", "1.1.0"),
-            ("ImgKit", "v1.2.5"),
-            ("android-tools", "37.0.0")
-        ]
 
-        for row, (name, version) in enumerate(dependencies):
+        for row, (name, version) in enumerate(dependencies_version.items()):
             name_lbl = BodyLabel(name)
             name_lbl.setStyleSheet("color: #A0A0A0; font-size: 11px;")
 
@@ -160,10 +159,10 @@ class AboutPage(QWidget):
         footer_layout.setSpacing(10)
         footer_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        credit_lbl = BodyLabel("Chinese-Simplified By 寒风居士")
+        credit_lbl = BodyLabel(self.tr("Chinese-Simplified By ColdWindScholar"))
         credit_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        slogan_lbl = BodyLabel("开源 / 自由 / 极速")
+        slogan_lbl = BodyLabel(self.tr("Open Source / Free / faster"))
         slogan_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         slogan_lbl.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 13px;")
 
@@ -171,7 +170,7 @@ class AboutPage(QWidget):
         github_lbl.setText("GitHub: MIO-KITCHEN-SOURCE")
         github_lbl.setUrl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
 
-        copyright_lbl = CaptionLabel("© 2026 寒风居士版权所有")
+        copyright_lbl = CaptionLabel(self.tr("© 2026 ColdWindScholar All Rights Reserved."))
         copyright_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         footer_layout.addWidget(credit_lbl)
