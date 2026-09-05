@@ -957,7 +957,7 @@ class ProjectsPage(QWidget):
                     self.datbr(work, os.path.basename(i).split('.')[0], 0)
                 if src_format in ['dat', 'xz']:
                     if src_format == 'xz':
-                        print("正在解包：" + i)
+                        print(self.tr("Decompressing:") + i)
                         utils.Unxz(f'{work}/{i}')
                         i = i.rsplit('.xz', 1)[0]
 
@@ -968,11 +968,11 @@ class ProjectsPage(QWidget):
                             os.remove(f'{work}/{i}')
                         except Exception:
                             logging.exception('Bugs')
-        print("成功！")
+        print(self.tr("Done!"))
 
     def convert_image(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self, "warn", "project's not exist", 2)
+            show_info_bar(self, "warn", self.tr("project's not exist"), 2)
             return
         dialog = ConvertImageMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
@@ -1051,7 +1051,7 @@ class ProjectsPage(QWidget):
             return command
         if call(command, debug_binary=False) == 0:
             if os.access(output_super_path, os.F_OK):
-                print("打包成功！输出：%s" % output_super_path)
+                print(self.tr("Pack Done！Output：%s") % output_super_path)
                 if del_:
                     for img in part_list:
                         if os.path.exists(f"{work}/{img}.img"):
@@ -1138,7 +1138,7 @@ class ProjectsPage(QWidget):
             origin_logo = utils.findfile('logo.img', work)
         logo = f"{work}/logo-new.img"
         if not os.path.exists(dir_ := f"{work}/logo") or not os.path.exists(origin_logo):
-            print("origin logo missing")
+            print(self.tr("origin logo missing"))
             return 1
         utils.LogoDumper(origin_logo, logo, dir_).repack()
         os.remove(origin_logo)
@@ -1194,7 +1194,7 @@ class ProjectsPage(QWidget):
                         os.remove(path_)
             except Exception as e:
                 logging.exception(e)
-            print("Repacked %s Done" % part_name)
+            print(self.tr("Repacked %s Done") % part_name)
         else:
             show_info_bar(self, "Error", f"Failed to repack {part_name}")
         return True
@@ -1215,7 +1215,7 @@ class ProjectsPage(QWidget):
     def make_ext4fs(self, name: str, work: str, work_output, sparse: bool = False, size: int = 0, UTC: int = None,
                     has_contexts: bool = True):
         if not has_contexts:
-            print('Warning:file_context not found!!!')
+            print("make_ext4fs", self.tr('Warning:file_context not found!!!'))
         print(f"packing {name} [ext]")
         if not UTC:
             UTC = int(time.time())
@@ -1747,7 +1747,7 @@ class ProjectsPage(QWidget):
                         else:
                             print("File May Not Extracted.")
                     else:
-                        print("transferfile's missing")
+                        print(self.tr("transferfile's missing"))
             if os.access(f"{work}/{i}.img", os.F_OK):
                 try:
                     if i in parts:
