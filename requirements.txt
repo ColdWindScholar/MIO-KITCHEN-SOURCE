@@ -6,7 +6,6 @@ sv_ttk
 pyinstaller
 future>=1.0.0
 pip>=26.2.1
-Pygments
 zstandard
 asn1crypto
 lxml
