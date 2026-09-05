@@ -21,7 +21,7 @@ class Config(QConfig):
     updateURL = ConfigItem("Tool", "updateURL",
                            "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest")
     language = OptionsConfigItem(
-        "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
+        "Tool", "Language", "app_en_US.qm", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
     currentProjectName = ConfigItem("Tool", 'currentProjectName', "")
     selinuxPatch = ConfigItem("Tool", 'selinuxPatch', False, BoolValidator())
