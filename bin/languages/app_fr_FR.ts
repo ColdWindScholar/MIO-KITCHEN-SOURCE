@@ -487,27 +487,27 @@ or click to select a file</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../src/qt_layer/tool.py" line="121"/>
+        <location filename="../../src/qt_layer/tool.py" line="131"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/tool.py" line="122"/>
+        <location filename="../../src/qt_layer/tool.py" line="132"/>
         <source>Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/tool.py" line="123"/>
+        <location filename="../../src/qt_layer/tool.py" line="133"/>
         <source>Plugins</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/tool.py" line="124"/>
+        <location filename="../../src/qt_layer/tool.py" line="134"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/tool.py" line="125"/>
+        <location filename="../../src/qt_layer/tool.py" line="135"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -661,7 +661,131 @@ or click to select a file</source>
     </message>
 </context>
 <context>
+    <name>PackSettingsDialog</name>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="367"/>
+        <source>Pack</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="368"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="398"/>
+        <source>EXT4 Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="403"/>
+        <source>Packing with:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="407"/>
+        <source>Size Handle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="426"/>
+        <source>EROFS Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="429"/>
+        <source>Compression Method:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="436"/>
+        <source>Support old kernel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="447"/>
+        <source>EROFS Level: 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="452"/>
+        <source>EROFS Level: {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="467"/>
+        <source>F2FS Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="475"/>
+        <source>Readonly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="481"/>
+        <source>Compression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="501"/>
+        <source>Others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="509"/>
+        <source>Brotli Level: {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="538"/>
+        <source>Format:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="567"/>
+        <source>Process Vbmeta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="573"/>
+        <source>Remove source files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PackSuperMessageBox</name>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="615"/>
+        <source>Super Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="628"/>
+        <source>Attribute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="641"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="644"/>
+        <source>Group Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="650"/>
+        <source>Super Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qt_layer/widgets.py" line="665"/>
+        <location filename="../../src/qt_layer/widgets.py" line="666"/>
+        <source>Enable Sparse</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../../src/qt_layer/widgets.py" line="675"/>
         <source>Refresh</source>
@@ -1018,103 +1142,103 @@ or click to select a file</source>
 <context>
     <name>SettingsPage</name>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="50"/>
+        <location filename="../../src/qt_layer/settings.py" line="41"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="56"/>
+        <location filename="../../src/qt_layer/settings.py" line="47"/>
         <source>Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="57"/>
+        <location filename="../../src/qt_layer/settings.py" line="48"/>
         <source>Set Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="58"/>
+        <location filename="../../src/qt_layer/settings.py" line="49"/>
         <source>Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="58"/>
+        <location filename="../../src/qt_layer/settings.py" line="49"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="58"/>
+        <location filename="../../src/qt_layer/settings.py" line="49"/>
         <source>Follow System Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="65"/>
+        <location filename="../../src/qt_layer/settings.py" line="56"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="66"/>
+        <location filename="../../src/qt_layer/settings.py" line="57"/>
         <source>Change Language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="72"/>
+        <location filename="../../src/qt_layer/settings.py" line="62"/>
         <source>Choose</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="74"/>
+        <location filename="../../src/qt_layer/settings.py" line="64"/>
         <source>Working Folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="83"/>
+        <location filename="../../src/qt_layer/settings.py" line="73"/>
         <source>Project Structure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="97"/>
+        <location filename="../../src/qt_layer/settings.py" line="87"/>
         <source>Clean</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="99"/>
+        <location filename="../../src/qt_layer/settings.py" line="89"/>
         <source>Cache Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="108"/>
+        <location filename="../../src/qt_layer/settings.py" line="98"/>
         <source>Ai Engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="109"/>
+        <location filename="../../src/qt_layer/settings.py" line="99"/>
         <source>An smart assistance for you</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="117"/>
+        <location filename="../../src/qt_layer/settings.py" line="107"/>
         <source>Context Patch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="118"/>
+        <location filename="../../src/qt_layer/settings.py" line="108"/>
         <source>Patch selinux context before repacking.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="125"/>
+        <location filename="../../src/qt_layer/settings.py" line="115"/>
         <source>Auto Unpack</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="126"/>
+        <location filename="../../src/qt_layer/settings.py" line="116"/>
         <source>Unpack images directly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qt_layer/settings.py" line="133"/>
-        <location filename="../../src/qt_layer/settings.py" line="134"/>
+        <location filename="../../src/qt_layer/settings.py" line="123"/>
+        <location filename="../../src/qt_layer/settings.py" line="124"/>
         <source>Check Update</source>
         <translation type="unfinished"></translation>
     </message>
