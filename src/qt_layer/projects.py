@@ -648,15 +648,8 @@ class ProjectsPage(QWidget):
 
     def _create_section_title(self, text):
         """统一生成无边框、无背景的纯文本全局大标题"""
-        title = BodyLabel(text)
-        title.setStyleSheet("""
-            font-size: 17px; 
-            font-weight: 600; 
-            color: #ffffff; 
-            background: transparent; 
-            border: none;
-            padding-bottom: 4px;
-        """)
+        title = QLabel(text)
+
         return title
 
     def refresh_projects(self):
