@@ -17,35 +17,35 @@ class MergeQualcommImageMessageBox(MessageBoxBase):
     def __init_ui(self):
         """Instantiates all form elements and controls."""
         # Main Dialog Header Title
-        self.titleLabel = BodyLabel("Merge Qualcomm Image", self)
+        self.titleLabel = BodyLabel(self.tr("Merge Qualcomm Image"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
 
         # ─── Row 1: RawProgram Xml ───
-        self.raw_label = BodyLabel("RawProgram Xml :")
+        self.raw_label = BodyLabel(self.tr("RawProgram Xml :"))
         self.raw_label.setFixedWidth(130)
         self.raw_path_edit = LineEdit()
-        self.raw_browse_btn = PushButton("Browse")
+        self.raw_browse_btn = PushButton(self.tr("Browse"))
         self.raw_browse_btn.setFixedWidth(85)
         self.raw_browse_btn.clicked.connect(self.browse_raw_xml)
 
         # ─── Row 2: Partition Name ───
-        self.partition_label = BodyLabel("Partition Name:")
+        self.partition_label = BodyLabel(self.tr("Partition Name:"))
         self.partition_label.setFixedWidth(130)
         self.partition_combo = EditableComboBox()
         # Populating standard mock items; user can type custom partitions too
-        self.partition_combo.addItems(["userdata", "system", "vendor", "boot"])
+        self.partition_combo.addItems(["userdata", "system", "vendor", "cache"])
         self.partition_combo.setCurrentText("userdata")
 
         # ─── Row 3: OutPut Path ───
-        self.output_label = BodyLabel("OutPut Path:")
+        self.output_label = BodyLabel(self.tr("OutPut Path:"))
         self.output_label.setFixedWidth(130)
         self.output_path_edit = LineEdit()
-        self.output_browse_btn = PushButton("Browse")
+        self.output_browse_btn = PushButton(self.tr("Browse"))
         self.output_browse_btn.setFixedWidth(85)
         self.output_browse_btn.clicked.connect(self.browse_output_folder)
 
         # ─── Action Buttons ───
-        self.yesButton.setText("Run")
+        self.yesButton.setText(self.tr("Run"))
 
 
     def __init_layout(self):
@@ -83,14 +83,14 @@ class MergeQualcommImageMessageBox(MessageBoxBase):
     def browse_raw_xml(self):
         """Picks a single XML configuration targets stream."""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select RawProgram XML File", "", "XML Files (*.xml);;All Files (*)"
+            self, self.tr("Select RawProgram XML File"), "", "XML Files (*.xml);;All Files (*)"
         )
         if file_path:
             self.raw_path_edit.setText(file_path)
 
     def browse_output_folder(self):
         """Targets directory files creation destination paths hooks."""
-        folder_path = QFileDialog.getExistingDirectory(self, "Select Output Directory", "")
+        folder_path = QFileDialog.getExistingDirectory(self, self.tr("Select Output Directory"), "")
         if folder_path:
             self.output_path_edit.setText(folder_path)
 

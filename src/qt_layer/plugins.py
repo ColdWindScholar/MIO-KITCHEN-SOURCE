@@ -63,8 +63,8 @@ class ParseMessageBox(MessageBoxBase):
             with open(path, 'r', encoding='UTF-8') as f:
                 data = json.load(f)
         except Exception as e:
-            logging.exception("JSON 加载失败")
-            print(f"{e}")
+            logging.exception("Parser")
+            InfoBar.error("Parser", self.tr("JSON load failed"), parent=self.parent())
             self.reject()
             return
 
@@ -72,7 +72,7 @@ class ParseMessageBox(MessageBoxBase):
         self.w_assert = info.get('assert', "False")
 
         # 1. 顶部主标题 (从主布局垂直向下排)
-        self.custom_title = BodyLabel(info.get('title', 'Dynamic Panel'), self)
+        self.custom_title = BodyLabel(info.get('title', self.tr('Dynamic Panel')), self)
         self.custom_title.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.main_layout.addWidget(self.custom_title)
 
@@ -83,7 +83,7 @@ class ParseMessageBox(MessageBoxBase):
 
             card = GroupHeaderCardWidget(self)
             card.setContentsMargins(5, 5, 5, 5)
-            card.setTitle(group_data.get('title', 'Group Panel'))
+            card.setTitle(group_data.get('title', self.tr('Group Panel')))
 
             # 使用干净的垂直布局引擎包裹卡片内部的组件
             v_container = QWidget()
@@ -111,7 +111,7 @@ class ParseMessageBox(MessageBoxBase):
         button_row.setContentsMargins(0, 8, 0, 0)
 
         self.custom_ok_btn = self.yesButton
-        self.custom_ok_btn.setText("run")
+        self.custom_ok_btn.setText(self.tr("Run"))
         self.custom_ok_btn.clicked.connect(self.accept)
 
         self.main_layout.addLayout(button_row)
@@ -139,13 +139,13 @@ class ParseMessageBox(MessageBoxBase):
         # 输入框与浏览按钮水平并排
         h_row = QHBoxLayout()
         line_edit = LineEdit()
-        btn = PushButton("浏览")
+        btn = PushButton(self.tr("Choose"))
         btn.setFixedWidth(85)
 
         line_edit.textChanged.connect(lambda text: self.gavs.__setitem__(key, text))
 
         def pick_file():
-            path, _ = QFileDialog.getOpenFileName(self, "选择镜像文件")
+            path, _ = QFileDialog.getOpenFileName(self, self.tr("Choose a file"))
             if path:
                 line_edit.setText(path)
 
@@ -212,7 +212,7 @@ class ParseMessageBox(MessageBoxBase):
     def __unknown(self, layout, config):
         self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
         con_type = config.get('type', 'Unknown')
-        label = BodyLabel("不支持的控件：{}".format(con_type))
+        label = BodyLabel(self.tr("不支持的控件：{}").format(con_type))
         label.setStyleSheet("color: #ff4d4f; font-weight: bold;")
         layout.addWidget(label)
 
@@ -261,8 +261,11 @@ class ModuleManager:
                 elif hasattr(module, 'main'):
                     self.addon_loader.register(id_, self.addon_entries.main, module.main)
                 else:
-                    print(
-                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
+                    if self.master:
+                        InfoBar.warning("Manager",
+                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.", parent=self.master)
+                    else:
+                        logging.warning(f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
             except Exception as e:
                 logging.error(f"Load Failed '{self.get_name(id_)}' path '{script_path}/main.py': {e}")
                 logging.exception('Bugs')
@@ -293,12 +296,12 @@ class ModuleManager:
         if not id_:
             return 0
         if not cfg.currentProjectName.value:
-            print("Please set a project")
+            InfoBar.warning("Run Plugin", "Please set a project", parent=self.master)
             return 1
         if id_:
             value = id_
         else:
-            print("id is invaild")
+            InfoBar.warning("Run Plugin", "id is invalid", parent=self.master)
             return 1
         script_path = os.path.join(self.module_dir, value)
 
@@ -325,7 +328,7 @@ class ModuleManager:
             dependencies = data.get('depend', '')
             for n in dependencies.split():
                 if n and not os.path.exists(os.path.join(self.module_dir, n)):
-                    print("%s 依赖于 %s，但 %s 没有安装" % (name, n, n))
+                    print("%s depends on %s，but %s is not installed" % (name, n, n))
                     return 2
 
         main_json_path = os.path.join(script_path, "main.json")

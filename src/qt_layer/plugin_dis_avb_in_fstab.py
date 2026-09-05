@@ -24,17 +24,17 @@ class DisableAvbMessageBox(MessageBoxBase):
 
     def __init_ui(self):
         """Instantiates all interface components cleanly using Fluent widgets."""
-        self.titleLabel = BodyLabel("Disable AVB in fstab", self)
+        self.titleLabel = BodyLabel(self.tr("Disable AVB in fstab"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
 
-        hint_text = (
+        hint_text = self.tr(
             "Select the partition(s) where you want to disable the AVB check.\n"
             "The tool will automatically find and edit the fstab files."
         )
         self.hintLabel = BodyLabel(hint_text, self)
         self.hintLabel.setWordWrap(True)
 
-        self.list_header = BodyLabel("Available Partitions")
+        self.list_header = BodyLabel(self.tr("Available Partitions"))
         self.list_header.setStyleSheet("color: rgba(255, 255, 255, 0.6); font-size: 12px;")
 
         # Card container box panel
@@ -45,7 +45,7 @@ class DisableAvbMessageBox(MessageBoxBase):
         # ─── UPDATED: Using qfluentwidgets.TableWidget for native Fluent style ───
         self.table_widget = TableWidget()
         self.table_widget.setColumnCount(2)
-        self.table_widget.setHorizontalHeaderLabels(["Name", "Type"])
+        self.table_widget.setHorizontalHeaderLabels([self.tr("Name"), self.tr("Type")])
         self.table_widget.setSelectionMode(QAbstractItemView.NoSelection)
         self.table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
@@ -61,17 +61,17 @@ class DisableAvbMessageBox(MessageBoxBase):
         self.line_separator = QWidget()
         self.line_separator.setFixedHeight(1)
 
-        self.select_all_checkbox = CheckBox("Select all")
+        self.select_all_checkbox = CheckBox(self.tr("Select all"))
         self.select_all_checkbox.stateChanged.connect(self.toggle_all_items)
 
         self.search_edit = SearchLineEdit()
-        self.search_edit.setPlaceholderText("Search partitions...")
+        self.search_edit.setPlaceholderText(self.tr("Search partitions..."))
         self.search_edit.textChanged.connect(self.filter_partitions)
 
         # Dialog control action buttons re-mapping configs
-        self.yesButton.setText("Run")
+        self.yesButton.setText(self.tr("Run"))
 
-        self.refresh_btn = PushButton("Refresh", self)
+        self.refresh_btn = PushButton(self.tr("Refresh"), self)
         self.refresh_btn.setFixedWidth(80)
         self.refresh_btn.clicked.connect(self.populate_partitions)
         self.buttonLayout.insertWidget(0, self.refresh_btn)

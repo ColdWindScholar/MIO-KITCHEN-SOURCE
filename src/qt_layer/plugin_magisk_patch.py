@@ -17,16 +17,16 @@ class MagiskPatchDialog(MessageBoxBase):
         super().__init__(parent)
 
         # 1. Custom Title Setup
-        self.titleLabel = SubtitleLabel("Magisk Patch", self)
+        self.titleLabel = SubtitleLabel(self.tr("Magisk Patch"), self)
 
         # 2. Main Input Controls
         self.bootFileLineEdit = LineEdit(self)
-        self.bootFileLineEdit.setPlaceholderText("Select Boot file (.img)...")
-        self.bootBrowseBtn = PushButton("Browse", self)
+        self.bootFileLineEdit.setPlaceholderText(self.tr("Select Boot file (.img)..."))
+        self.bootBrowseBtn = PushButton(self.tr("Browse"), self)
 
         self.magiskApkLineEdit = LineEdit(self)
-        self.magiskApkLineEdit.setPlaceholderText("Select Magisk APK (.apk)...")
-        self.magiskBrowseBtn = PushButton("Browse", self)
+        self.magiskApkLineEdit.setPlaceholderText(self.tr("Select Magisk APK (.apk)..."))
+        self.magiskBrowseBtn = PushButton(self.tr("Browse"), self)
 
         self.archComboBox = ComboBox(self)
         self.archComboBox.addItems(["arm64-v8a", "armeabi-v7a", "x86", "x86_64"])
@@ -50,7 +50,7 @@ class MagiskPatchDialog(MessageBoxBase):
         # 5. Integrate into Dialog View Layout
         self.initLayout()
 
-        self.yesButton.setText("Patch")
+        self.yesButton.setText(self.tr("Patch"))
         self.cancelButton.hide()
         self.widget.setMinimumWidth(420)
 
@@ -62,21 +62,21 @@ class MagiskPatchDialog(MessageBoxBase):
         grid_layout.setSpacing(12)
 
         # Row 0: Boot File Selection
-        boot_lbl = SubtitleLabel("Boot file:", self)
+        boot_lbl = SubtitleLabel(self.tr("Boot file:"), self)
         boot_lbl.setStyleSheet("font-size: 14px;")
         grid_layout.addWidget(boot_lbl, 0, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid_layout.addWidget(self.bootFileLineEdit, 0, 1)
         grid_layout.addWidget(self.bootBrowseBtn, 0, 2)
 
         # Row 1: Magisk APK Selection
-        apk_lbl = SubtitleLabel("Magisk APK:", self)
+        apk_lbl = SubtitleLabel(self.tr("Magisk APK:"), self)
         apk_lbl.setStyleSheet("font-size: 14px;")
         grid_layout.addWidget(apk_lbl, 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid_layout.addWidget(self.magiskApkLineEdit, 1, 1)
         grid_layout.addWidget(self.magiskBrowseBtn, 1, 2)
 
         # Row 2: Architecture Dropdown
-        arch_lbl = SubtitleLabel("Arch:", self)
+        arch_lbl = SubtitleLabel(self.tr("Arch:"), self)
         arch_lbl.setStyleSheet("font-size: 14px;")
         grid_layout.addWidget(arch_lbl, 2, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid_layout.addWidget(self.archComboBox, 2, 1, 1, 2)
@@ -99,7 +99,7 @@ class MagiskPatchDialog(MessageBoxBase):
         # Open file dialog limited to image files (.img)
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Select Boot Image",
+            self.tr("Select Boot Image"),
             os.getcwd(),
             "Boot Image (*.img);;All Files (*)"
         )
@@ -110,7 +110,7 @@ class MagiskPatchDialog(MessageBoxBase):
         # Open file dialog limited to Android package files (.apk)
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Select Magisk APK",
+            self.tr("Select Magisk APK"),
             os.getcwd(),
             "Android Package (*.apk);;All Files (*)"
         )

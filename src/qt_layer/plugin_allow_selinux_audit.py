@@ -9,7 +9,7 @@ class AllowSELinuxAuditMessageBox(MessageBoxBase):
         super().__init__(parent)
 
         # 1. Dialog Header Title
-        self.titleLabel = BodyLabel("Allow SELinux audit", self)
+        self.titleLabel = BodyLabel(self.tr("Allow SELinux audit"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.setSpacing(16)
@@ -18,12 +18,12 @@ class AllowSELinuxAuditMessageBox(MessageBoxBase):
         log_layout = QHBoxLayout()
         log_layout.setSpacing(10)
 
-        self.log_label = BodyLabel("Log file:")
+        self.log_label = BodyLabel(self.tr("Log file:"))
         self.log_label.setFixedWidth(100)
 
         self.log_path_edit = LineEdit()
 
-        self.choose_log_btn = PushButton("Choose")
+        self.choose_log_btn = PushButton(self.tr("Choose"))
         self.choose_log_btn.setFixedWidth(85)
         self.choose_log_btn.clicked.connect(self.open_file_dialog)
 
@@ -36,12 +36,12 @@ class AllowSELinuxAuditMessageBox(MessageBoxBase):
         output_layout = QHBoxLayout()
         output_layout.setSpacing(10)
 
-        self.output_label = BodyLabel("Output folder:")
+        self.output_label = BodyLabel(self.tr("Output folder:"))
         self.output_label.setFixedWidth(100)
 
         self.output_path_edit = LineEdit()
 
-        self.choose_output_btn = PushButton("Choose")
+        self.choose_output_btn = PushButton(self.tr("Choose"))
         self.choose_output_btn.setFixedWidth(85)
         self.choose_output_btn.clicked.connect(self.open_folder_dialog)
 
@@ -51,8 +51,8 @@ class AllowSELinuxAuditMessageBox(MessageBoxBase):
         self.viewLayout.addLayout(output_layout)
 
         # 4. Action Buttons Configuration
-        self.yesButton.setText("Run")
-        self.cancelButton.setText("Close")
+        self.yesButton.setText(self.tr("Run"))
+        self.cancelButton.setText(self.tr("Close"))
 
 
 
@@ -62,14 +62,14 @@ class AllowSELinuxAuditMessageBox(MessageBoxBase):
     def open_file_dialog(self):
         """Opens native file picker to target the audit log file."""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select SELinux Log File", "", "Log Files (*.log *.txt);;All Files (*)"
+            self, self.tr("Select SELinux Log File"), "", "Log Files (*.log *.txt);;All Files (*)"
         )
         if file_path:
             self.log_path_edit.setText(file_path)
 
     def open_folder_dialog(self):
         """Opens native directory picker to target the output folder."""
-        folder_path = QFileDialog.getExistingDirectory(self, "Select Output Directory", "")
+        folder_path = QFileDialog.getExistingDirectory(self, self.tr("Select Output Directory"), "")
         if folder_path:
             self.output_path_edit.setText(folder_path)
 

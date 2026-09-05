@@ -32,7 +32,7 @@ class DropWidget(QWidget):
             }
         """)
 
-        self.label = BodyLabel("Drag and drop the file(s) here\nor click to select a file", self)
+        self.label = BodyLabel(self.tr("Drag and drop the file(s) here\nor click to select a file"), self)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
         layout = QVBoxLayout(self)
@@ -43,7 +43,7 @@ class DropWidget(QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            file_path, _ = QFileDialog.getOpenFileName(self, "Select File")
+            file_path, _ = QFileDialog.getOpenFileName(self, self.tr("Select File"))
             if file_path and self.file_selected_callback:
                 self.file_selected_callback(file_path)
 
@@ -70,7 +70,7 @@ class FileInfoRow(QHBoxLayout):
         self.line_edit = LineEdit()
         self.line_edit.setReadOnly(True)
 
-        self.copy_btn = PushButton("Copy")
+        self.copy_btn = PushButton(self.tr("Copy"))
         self.copy_btn.setFixedWidth(75)
         self.copy_btn.clicked.connect(self.copy_to_clipboard)
 
@@ -92,7 +92,7 @@ class FileInfoMessageBox(MessageBoxBase):
     """Custom Dialog Box inheriting from MessageBoxBase."""
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.titleLabel = BodyLabel("Get file info", self)
+        self.titleLabel = BodyLabel(self.tr("Get file info"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
 
         # Add components to viewLayout (provided automatically by MessageBoxBase)
@@ -105,7 +105,7 @@ class FileInfoMessageBox(MessageBoxBase):
         self.viewLayout.addWidget(self.drop_widget)
 
         # 2. Section Header
-        self.info_header = BodyLabel("INFO")
+        self.info_header = BodyLabel(self.tr("INFO"))
         self.info_header.setStyleSheet("font-weight: bold; color: rgba(255, 255, 255, 0.6);")
         self.viewLayout.addWidget(self.info_header)
 

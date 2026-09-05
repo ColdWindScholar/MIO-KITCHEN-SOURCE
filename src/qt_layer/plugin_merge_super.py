@@ -14,12 +14,11 @@ class MergeImageDialog(MessageBoxBase):
         super().__init__(parent)
 
         # 1. Custom Title
-        self.titleLabel = SubtitleLabel("Merge Image Segments", self)
+        self.titleLabel = SubtitleLabel(self.tr("Merge Image Segments"), self)
 
         # 2. Description Text Block
-        self.descriptionLabel = BodyLabel(
-            "This utility will find and merge file segments (e.g., `super.img.0`, "
-            "`super.img.1`) in your project to create a single, complete image.",
+        self.descriptionLabel = BodyLabel(self.tr(
+            "This utility will find and merge file segments (e.g., `super.img.0`, `super.img.1`) in your project to create a single, complete image."),
             self
         )
         self.descriptionLabel.setWordWrap(True)
@@ -27,11 +26,11 @@ class MergeImageDialog(MessageBoxBase):
         self.descriptionLabel.setStyleSheet("color: #b0b0b0; font-size: 13px; line-height: 1.4;")
 
         # 3. Project Path Display
-        self.pathLabel = BodyLabel(f"Project Path: {project_path}", self)
+        self.pathLabel = BodyLabel(self.tr("Project Path: ") + project_path, self)
         self.pathLabel.setStyleSheet("color: #808080; font-size: 13px;")
 
         # 4. Form Controls
-        self.outputFileNameLabel = BodyLabel("Output File Name:", self)
+        self.outputFileNameLabel = BodyLabel(self.tr("Output File Name:"), self)
         self.outputFileNameLabel.setStyleSheet("font-size: 14px;")
 
         self.outputFileNameLineEdit = LineEdit(self)
@@ -39,14 +38,14 @@ class MergeImageDialog(MessageBoxBase):
 
         # 5. Toggle Switch
         self.deleteSegmentsSwitch = SwitchButton(self)
-        self.switchLabel = BodyLabel("Delete source segments after merging", self)
+        self.switchLabel = BodyLabel(self.tr("Delete source segments after merging"), self)
         self.switchLabel.setStyleSheet("font-size: 13px;")
 
         # 6. Build Layout Structure
         self.initLayout()
 
         # 7. Configure Bottom Main Button
-        self.yesButton.setText("Create Super Image")
+        self.yesButton.setText(self.tr("Create Super Image"))
         self.cancelButton.hide()  # Hiding the default secondary button
 
         self.widget.setMinimumWidth(440)

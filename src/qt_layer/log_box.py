@@ -12,7 +12,7 @@ class LogMessageBoxBase(QWidget):
         self.text_edit.setReadOnly(True)
         self.layout.addWidget(self.text_edit)
         self.button_layout = QHBoxLayout()
-        self.clear_btn = PushButton("清空", self)
+        self.clear_btn = PushButton(self.tr("Clear"), self)
 
         self.button_layout.addStretch()
         self.button_layout.addWidget(self.clear_btn)

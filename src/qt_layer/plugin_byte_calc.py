@@ -19,7 +19,7 @@ class FileBytesMessageBox(MessageBoxBase):
         self._is_calculating = False  # Flag to prevent recursion
 
         # 1. Dialog title configuration
-        self.titleLabel = BodyLabel("Byte calculator", self)
+        self.titleLabel = BodyLabel(self.tr("Byte calculator"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.setSpacing(15)
@@ -64,7 +64,7 @@ class FileBytesMessageBox(MessageBoxBase):
         self.viewLayout.addLayout(calc_layout)
 
         # 3. Handle base action buttons
-        self.yesButton.setText("Close")
+        self.yesButton.setText(self.tr("Close"))
         self.cancelButton.hide()  # Hide default cancel action button
 
         # Set modal window constraint boundaries

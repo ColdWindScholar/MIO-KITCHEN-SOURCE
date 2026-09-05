@@ -9,7 +9,7 @@ class DecryptXtcXmlMessageBox(MessageBoxBase):
         super().__init__(parent)
 
         # 1. Dialog Header Config
-        self.titleLabel = BodyLabel("Decrypt Xtc Xml", self)
+        self.titleLabel = BodyLabel(self.tr("Decrypt Xtc Xml"), self)
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.setSpacing(16)
@@ -18,13 +18,13 @@ class DecryptXtcXmlMessageBox(MessageBoxBase):
         path_layout = QHBoxLayout()
         path_layout.setSpacing(12)
 
-        self.path_label = BodyLabel("Path")
+        self.path_label = BodyLabel(self.tr("Path"))
         self.path_label.setFixedWidth(50)
 
         self.file_path_edit = LineEdit()
         self.file_path_edit.setPlaceholderText("")
 
-        self.browse_btn = PushButton("Browse")
+        self.browse_btn = PushButton(self.tr("Browse"))
         self.browse_btn.setFixedWidth(85)
         self.browse_btn.clicked.connect(self.open_file_dialog)
 
@@ -35,8 +35,8 @@ class DecryptXtcXmlMessageBox(MessageBoxBase):
         self.viewLayout.addLayout(path_layout)
 
         # 3. Action Buttons Configuration
-        self.yesButton.setText("Run")
-        self.cancelButton.setText("Close")
+        self.yesButton.setText(self.tr("Run"))
+        self.cancelButton.setText(self.tr("Close"))
 
 
         # Enforce dialog dimensions to match the reference look
@@ -45,7 +45,7 @@ class DecryptXtcXmlMessageBox(MessageBoxBase):
     def open_file_dialog(self):
         """Opens native file picker targeted at XML logs/files."""
         file_path, _ = QFileDialog.getExistingDirectory(
-            self, "Select Encrypted XML File"
+            self, self.tr("Select Encrypted XML File")
         )
         if file_path:
             self.file_path_edit.setText(file_path)
