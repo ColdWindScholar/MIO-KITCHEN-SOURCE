@@ -46,7 +46,7 @@ from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
 from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing
+    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar
 
 import ext4
 import imgextractor
@@ -1068,13 +1068,13 @@ class ProjectsPage(QWidget):
 
     def pack_zip(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self, "warn", "project's not exist", 2)
+            show_info_bar(self, "warn", self.tr("project's not exist"), 2)
             return
         dialog = RepackZipMessageBox(self)
         if dialog.exec_():
             if dialog.is_add_tools_checked():
                 if not dialog.get_device_code():
-                    show_info_bar(self, "warn", "device code's empty", 3)
+                    show_info_bar(self, "warn", self.tr("device code's empty"), 3)
                     return
                 if PackHybridRom(dialog.get_device_code()):
                     return
@@ -1091,17 +1091,17 @@ class ProjectsPage(QWidget):
         layout.setSpacing(12)
 
         # 标题放外面
-        layout.addWidget(self._create_section_title("高级工具箱"))
+        layout.addWidget(self._create_section_title(self.tr("Others")))
 
         # 工具按钮行
         tools_layout = QHBoxLayout()
-        self.zip_btn = PushButton("打包ZIP", container, FIF.APPLICATION)
+        self.zip_btn = PushButton(self.tr("Pack Zip"), container, FIF.APPLICATION)
         self.zip_btn.clicked.connect(self.pack_zip)
-        self.super_btn = PushButton("打包Super", container, FIF.ALBUM)
+        self.super_btn = PushButton(self.tr("Pack Super"), container, FIF.ALBUM)
         self.super_btn.clicked.connect(self.pack_super)
-        self.format_conv_btn = PushButton("格式转换", container, FIF.EMBED)
+        self.format_conv_btn = PushButton(self.tr("Format Convertion"), container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
-        self.apk_mgr_btn = PushButton("APK 助手", container, FIF.DEVELOPER_TOOLS)
+        self.apk_mgr_btn = PushButton(self.tr("APK Manager"), container, FIF.DEVELOPER_TOOLS)
 
         for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.apk_mgr_btn]:
             btn.setMinimumWidth(105)
@@ -1121,7 +1121,7 @@ class ProjectsPage(QWidget):
         data = []
         work = project_manger.current_work_path()
         if not os.path.exists(work):
-            print("Work path does not exist")
+            InfoBar.warning("Projects", self.tr("Work path does not exist"), parent=self)
             return data
         parts_dict = utils.JsonEdit(f"{work}/config/parts_info").read()
         for folder in os.listdir(work):
