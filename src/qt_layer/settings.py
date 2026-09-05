@@ -1,7 +1,7 @@
 import logging
 
-from PySide6.QtCore import Qt, QTranslator
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog, QApplication
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
 from qfluentwidgets import (
     TitleLabel, SwitchSettingCard, FluentIcon, OptionsSettingCard, ComboBoxSettingCard,
     PushSettingCard, PrimaryPushSettingCard
@@ -18,16 +18,6 @@ class SettingsPage(QScrollArea):
         self.setObjectName("SettingsPage")
         self.initUI()
         
-        self.setStyleSheet("""
-            QScrollArea {
-                background: transparent;
-                border: none;
-            }
-            QWidget#scrollWidget {
-                background: transparent;
-            }
-        """)
-
 
     def initUI(self):
         """ 初始化UI """
