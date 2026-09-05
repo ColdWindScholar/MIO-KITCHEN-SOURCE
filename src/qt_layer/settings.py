@@ -3,7 +3,7 @@ import logging
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
 from qfluentwidgets import (
-    HyperlinkCard, TitleLabel, SwitchSettingCard, FluentIcon, OptionsSettingCard, ComboBoxSettingCard,
+    TitleLabel, SwitchSettingCard, FluentIcon, OptionsSettingCard, ComboBoxSettingCard,
     PushSettingCard, PrimaryPushSettingCard
 )
 
