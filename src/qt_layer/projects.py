@@ -315,7 +315,7 @@ class ProjectsPage(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_log_area = ScrollArea(self)
         scroll_log_area.setWidgetResizable(True)
-        scroll_log_area.setFixedWidth(300)
+        scroll_log_area.setFixedWidth(250)
 
         main_layout.addWidget(scroll_log_area)
         main_layout.addWidget(scroll_area)
@@ -327,7 +327,7 @@ class ProjectsPage(QWidget):
 
         # 【关键优化：增加顶部与四周间距】把原本紧凑的区域整体下调，留出透气的空间
         self.scroll_layout.setContentsMargins(32, 40, 32, 32)
-        self.scroll_layout.setSpacing(15)  # 模块与模块之间拉开足够的高级感间距
+        self.scroll_layout.setSpacing(10)  # 模块与模块之间拉开足够的高级感间距
         scroll_area.setWidget(scroll_content)
         scroll_log_area.setWidget(self.scroll_log_content)
 
