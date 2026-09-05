@@ -98,7 +98,6 @@ class MainWindow(FluentWindow):
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
         self.plugin_page = PluginPage()
-        self.task_page = TaskPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
 
