@@ -1,23 +1,22 @@
+import logging
 import os
 import platform
 import sys
 import time
-import warnings
 
-import logging
-from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject, QTranslator
-from PySide6.QtGui import QIcon, QGuiApplication, QCursor
+from PySide6.QtCore import Qt, QSize, QTranslator
+from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
-from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
-                            FluentWindow, FluentIcon as FIF, SplitFluentWindow)
+from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, SplitFluentWindow)
 
+from src.core.utils import temp, v_code, prog_path
+from src.qt_layer.about import AboutPage
+from src.qt_layer.home import HomePage
 from src.qt_layer.plugins import PluginPage
 from src.qt_layer.projects import ProjectsPage
 from src.qt_layer.settings import SettingsPage
-from src.qt_layer.about import AboutPage
-from src.qt_layer.home import HomePage
-from src.core.utils import temp, v_code, prog_path
 from src.qt_layer.settings_cfg import cfg
+
 pyi_splash_available = False
 if platform.system() != 'Darwin':
     try:
@@ -31,55 +30,16 @@ if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-class TitleBarEventFilter(QObject):
-    """Event filter for title bar dragging"""
-    
-    def __init__(self, window):
-        super().__init__()
-        self.window = window
-        self.m_drag = False
-        self.m_dragPosition = QPoint()
-    
-    def eventFilter(self, obj, event):
-        if event.type() == QEvent.MouseButtonPress:
-            if event.button() == Qt.MouseButton.LeftButton:
-                self.m_drag = True
-                self.m_dragPosition = event.globalPos() - self.window.frameGeometry().topLeft()
-                obj.setCursor(QCursor(Qt.CursorShape.ClosedHandCursor))
-                return True
-        
-        elif event.type() == QEvent.MouseMove:
-            if self.m_drag and event.buttons() == Qt.MouseButton.LeftButton:
-                self.window.move(event.globalPos() - self.m_dragPosition)
-                return True
-            else:
-                obj.setCursor(QCursor(Qt.CursorShape.OpenHandCursor))
-        
-        elif event.type() == QEvent.MouseButtonRelease:
-            if event.button() == Qt.MouseButton.LeftButton:
-                self.m_drag = False
-                obj.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-                return True
-        
-        elif event.type() == QEvent.Leave:
-            obj.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
-        
-        return False
 
 
 class MainWindow(SplitFluentWindow):
     def __init__(self):
         super().__init__()
 
-        # Suppress window opacity warnings on Linux
-        warnings.filterwarnings('ignore', message='.*opacity.*')
-
-        # 设置主题
-        setTheme(Theme.AUTO)
 
         # Create splash screen with error handling
         try:
-            self.splashScreen = SplashScreen(self.windowIcon(), self)
+            self.splashScreen = SplashScreen(QIcon('icon.ico'), self)
             self.splashScreen.setIconSize(QSize(140, 140))
         except Exception as e:
             # If splash screen fails due to opacity, just continue
@@ -96,9 +56,6 @@ class MainWindow(SplitFluentWindow):
         self.center()
 
         # Install event filter on title bar for dragging
-        self.title_bar_filter = TitleBarEventFilter(self)
-        self.titleBar.installEventFilter(self.title_bar_filter)
-        self.titleBar.setMouseTracking(True)
         self.translator = QTranslator()
         # 创建页面
         self.home_page = HomePage()
@@ -113,7 +70,7 @@ class MainWindow(SplitFluentWindow):
 
         # Finish splash screen if it was created
         if self.splashScreen:
-            QTimer.singleShot(1000, self.splashScreen.finish)
+            self.splashScreen.finish()
 
     def load_language(self):
         app = QApplication.instance()
