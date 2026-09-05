@@ -22,7 +22,6 @@ class DevNull(object):
         pass
 if not sys.stdout:
     sys.stdout = DevNull()
-import time
 if sys.version_info.major == 3:
     if sys.version_info.minor < 8:
         input(
@@ -34,10 +33,7 @@ except Exception as e:
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
     raise e
-    print(e)
-    print("Sorry! We cannot init the tool.\nPlease report this error to developers.!")
-    time.sleep(3)
-    sys.exit(1)
+
 
 if __name__ == "__main__":
     init(sys.argv)
