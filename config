@@ -218,12 +218,13 @@ def update(args):
                 downloaded_file = os.path.join(temp, name)
                 groups = None
                 for g in content.get('name_pattern', ["*$"]):
-                    groups = re.search(g, name)
+                    groups = re.search(g, name).groups()
+                    print(g, name)
                     if groups:
-                        groups = groups.groups()
-                    else:
-                        continue
+                        break
+
                 if not groups:
+                    print(f"Cannot Update {name}")
                     return
                 if len(groups) == 2:
                     version, gitid, build_time = ['U', 'U', 'U']
