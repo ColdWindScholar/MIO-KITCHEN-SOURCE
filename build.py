@@ -23,7 +23,6 @@ import zipfile
 from platform import system
 import importlib.util
 from pip._internal.cli.main import main as _main
-from nuitka import __main__
 
 class Builder:
     def __init__(self):

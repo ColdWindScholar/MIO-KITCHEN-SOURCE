@@ -1,6 +1,5 @@
 import logging
 import os
-import platform
 import sys
 import time
 
@@ -17,15 +16,6 @@ from src.qt_layer.projects import ProjectsPage
 from src.qt_layer.settings import SettingsPage
 from src.qt_layer.settings_cfg import cfg
 
-pyi_splash_available = False
-if platform.system() != 'Darwin':
-    try:
-        import pyi_splash
-
-        pyi_splash.update_text('Loading ...')
-        pyi_splash_available = True
-    except ModuleNotFoundError:
-        ...
 if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -117,8 +107,6 @@ def __init__qt(args):
     window = MainWindow()
     window.load_language()
     window.show()
-    if pyi_splash_available:
-        pyi_splash.close()
     sys.exit(app.exec())
 
 
