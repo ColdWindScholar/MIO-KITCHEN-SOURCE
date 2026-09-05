@@ -69,7 +69,7 @@ class SettingsPage(QScrollArea):
         self.projectStructureCard = OptionsSettingCard(
             cfg.projectStructure,
             FluentIcon.CONSTRACT,
-            self.tr("Project StructureCard"),
+            self.tr("Project Structure"),
             "project StructureCard",
             texts=cfg.projectStructure.options
         )
