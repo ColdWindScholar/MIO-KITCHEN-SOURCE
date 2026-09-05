@@ -11,6 +11,7 @@ from qfluentwidgets import (
     CardWidget, FluentIcon
 )
 
+from qt_layer.settings_cfg import cfg
 from utils import JsonEdit, prog_path
 
 
@@ -91,7 +92,7 @@ class AboutPage(QWidget):
         left_layout.addWidget(sys_header)
 
         sys_info_data = [
-            (self.tr("Tool Version"), "4.2.1"),
+            (self.tr("Tool Version"), cfg.Version),
             (self.tr("Python Version"), f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"),
             (self.tr("Operating system"), "Linux"),
             (self.tr("Architecture"), platform.machine())
