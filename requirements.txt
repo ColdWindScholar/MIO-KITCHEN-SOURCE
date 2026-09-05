@@ -2,7 +2,7 @@ Pillow>=10.0.1
 pycryptodome>=3.19.1
 Requests>2.31.0
 protobuf>=7.36.1
-nuitka
+pyinstaller
 future>=1.0.0
 pip>=26.2.1
 zstandard
