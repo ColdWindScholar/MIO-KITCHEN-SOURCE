@@ -192,7 +192,7 @@ system_list = {
 @caller
 def get_tr(args):
     files = " ".join([f"{getcwd()}/src/qt_layer/{i}" for i in os.listdir("src/qt_layer")])
-    os.system(f"pyside6-lupdate {files} -ts bin/qt_languages/English.ts")
+    os.system(f"pyside6-lupdate {files} -ts bin/languages/English.ts")
 
 @caller
 def tr_to_qm(args):
