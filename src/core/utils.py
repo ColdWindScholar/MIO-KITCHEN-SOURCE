@@ -491,31 +491,7 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-threads: int = 0
 
-def func_wrapper(func, *args):
-    global threads
-    func(*args)
-    threads -= 1
-def create_thread(func, *args, join=False):
-    """
-    Multithreaded running tasks
-    :param deamon:
-    :param func: Function
-    :param args:Args for the task
-    :param join:if wait the task
-    :return:
-    """
-    global threads
-    if threads >= cpu_count():
-        print(f"Cannot create thread {func.__name__} with {args}")
-        return
-    threads += 1
-    thread = Thread(target=func_wrapper, args=(func, *args), daemon=True)
-    thread.start()
-    if join:
-        thread.join()
-        threads -= 1
 
 
 def simg2img(path: str):
