@@ -94,7 +94,7 @@ class AboutPage(QWidget):
         sys_info_data = [
             (self.tr("Tool Version"), cfg.Version),
             (self.tr("Python Version"), f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"),
-            (self.tr("Operating system"), "Linux"),
+            (self.tr("Operating system"), platform.system()),
             (self.tr("Architecture"), platform.machine())
         ]
 
