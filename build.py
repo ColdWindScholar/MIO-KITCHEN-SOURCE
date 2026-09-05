@@ -154,8 +154,12 @@ class Builder:
                 'icon.ico',
                 '--collect-data',
                 'androguard',
+                '--collect-data',
+                'pywin32',
                 "--hidden-import",
                 "win32api",
+                "--hidden-import",
+                "pywin32",
                 '--splash',
                 'splash.png'
             ])
