@@ -86,9 +86,9 @@ class Builder:
             f.write(f'```\n')
 
     def move_artifacts(self):
-        with open('bin/setting.ini', 'r', encoding='utf-8') as f:
-            ver = [line for line in f.readlines() if 'version' in line]
-            ver = ver[0].strip().split(' = ')[1]
+        with open('bin/settings.json', 'r', encoding='utf-8') as f:
+            ver = json.load(f)
+            ver = ver['Tool']['Version']
         for i in ['MIO-KITCHEN-win', 'MIO-KITCHEN-linux', 'MIO-KITCHEN-macos', 'MIO-KITCHEN-macos-intel']:
             name_list = i.rsplit('-')
             name_list.insert(2, ver)
