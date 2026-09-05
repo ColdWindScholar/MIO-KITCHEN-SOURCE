@@ -57,7 +57,6 @@ class SettingsPage(QScrollArea):
             content=self.tr("Change Language"),
             texts=cfg.allLanguagesHum
         )
-        cfg.language.valueChanged.connect(self.load_language)
         self.scrollLayout.addWidget(self.languageCard)
         #
         self.workingCard = PushSettingCard(text=self.tr("Choose"),

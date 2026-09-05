@@ -93,7 +93,7 @@ class MainWindow(FluentWindow):
         self.title_bar_filter = TitleBarEventFilter(self)
         self.titleBar.installEventFilter(self.title_bar_filter)
         self.titleBar.setMouseTracking(True)
-
+        self.translator = QTranslator()
         # 创建页面
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
@@ -103,10 +103,20 @@ class MainWindow(FluentWindow):
 
         # 初始化导航
         self.initNavigation()
+        cfg.language.valueChanged.connect(self.load_language)
 
         # Finish splash screen if it was created
         if self.splashScreen:
             QTimer.singleShot(1000, self.splashScreen.finish)
+
+    def load_language(self):
+        app = QApplication.instance()
+        app.removeTranslator(self.translator)
+        if self.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+            if not app:
+                return
+            app.installTranslator(self.translator)
+
 
     def center(self):
         desktop = QGuiApplication.primaryScreen().availableGeometry()
@@ -137,9 +147,6 @@ def __init__qt(args):
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     app = QApplication(args)
-    app.translator = QTranslator()
-    if app.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
-        app.installTranslator(app.translator)
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()
