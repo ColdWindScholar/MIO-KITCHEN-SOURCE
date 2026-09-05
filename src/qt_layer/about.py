@@ -6,7 +6,7 @@ import sys
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QCursor
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout, QFrame
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
     CardWidget
@@ -45,7 +45,7 @@ class ClickableTitleLabel(TitleLabel):
         super().mousePressEvent(event)
 
 
-class AboutPage(QWidget):
+class AboutPage(QFrame):
     """Modern About page with left and right sections using qfluentwidgets."""
 
     def __init__(self, parent=None):

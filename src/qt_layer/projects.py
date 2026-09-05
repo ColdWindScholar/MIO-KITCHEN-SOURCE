@@ -44,7 +44,7 @@ from src.core.rsceutil import unpack as rsceutil_unpack
 
 from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
-    QHeaderView
+    QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar
 
@@ -331,7 +331,7 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     rmtree(f"{work}/dtbo/dtbo")
 
 
-class ProjectsPage(QWidget):
+class ProjectsPage(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ProjectsPage")
