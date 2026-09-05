@@ -160,6 +160,8 @@ class Builder:
                 "win32api",
                 "--hidden-import",
                 "pywin32",
+                "--hidden-import",
+                "pywintypes",
                 '--splash',
                 'splash.png'
             ])
