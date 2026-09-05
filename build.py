@@ -121,17 +121,9 @@ class Builder:
                 '-i',
                 'icon.ico',
                 '--collect-data',
-                'sv_ttk',
-                '--collect-data',
-                'chlorophyll',
-                '--collect-data',
                 'androguard',
                 '--hidden-import',
-                'tkinter',
-                '--hidden-import',
                 'PIL',
-                '--hidden-import',
-                'PIL._tkinter_finder'
             ])
         elif os.name == 'posix':
             if self.ostype == 'Linux':
@@ -149,17 +141,9 @@ class Builder:
                 '-i',
                 'icon.ico',
                 '--collect-data',
-                'sv_ttk',
-                '--collect-data',
-                'chlorophyll',
-                '--collect-data',
                 'androguard',
                 '--hidden-import',
-                'tkinter',
-                '--hidden-import',
                 'PIL',
-                '--hidden-import',
-                'PIL._tkinter_finder',
                 '--splash',
                 'splash_loongarch.png' if platform.machine() == 'loongarch64' else 'splash.png'
             ])
@@ -179,10 +163,6 @@ class Builder:
                 'numpy',
                 '-i',
                 'icon.ico',
-                '--collect-data',
-                'sv_ttk',
-                '--collect-data',
-                'chlorophyll',
                 '--collect-data',
                 'androguard',
                 '--splash',
