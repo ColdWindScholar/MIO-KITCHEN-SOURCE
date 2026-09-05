@@ -1011,7 +1011,7 @@ class AppCard(CardWidget):
         self.iconWidget = IconWidget(icon)
         self.titleLabel = BodyLabel(title, self)
         self.contentLabel = CaptionLabel(content, self)
-        self.openButton = PushButton('Run', self)
+        self.openButton = PushButton(self.tr('Run'), self)
         self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
 
         self.hBoxLayout = QHBoxLayout(self)
@@ -1042,18 +1042,18 @@ class BuiltInPlugins:
     def __init__(self, master):
         self.master = master
         self.plugins = {
-            "download_rom": {"name": "Download ROM", "entry": lambda: print(1)},
-            "get_file_info": {"name": "Get File Info", "entry": lambda: FileInfoMessageBox(self.master).exec()},
-            "byte_calculator": {"name": "Byte Calculator", "entry": lambda: FileBytesMessageBox(self.master).exec()},
-            "allow_selinux_audit": {"name": "Allow Selinux Audit", "entry": self.allow_selinux_audit},
-            "dis_avb_in_fstab": {"name": "Disable avb in fstab", "entry": self.disable_avb},
-            "dis_encryption": {"name": "Disable Encryption", "entry": self.dis_encryption},
-            "trim_raw_image": {"name": "Trim Raw Image", "entry": self.trim_raw_image},
-            "magisk_patch": {"name": "Magisk Patch", "entry": self.magisk_patch},
-            "merge_qualcomm_image": {"name": "Merge Qualcomm Image", "entry": self.merge_qcom_images},
-            "merge_super": {"name": "Merge Super", "entry": self.merge_super},
-            "decrypt_xtc_xml": {"name": "Decrypt xtc xml", "entry": self.decrypt_xtc_xml},
-            "mtk_port_tool": {"name": "Mtk Port Tool", "entry": self.mtk_port_tool},
+            "download_rom": {"name": self.master.tr("Download ROM"), "entry": lambda: print(1)},
+            "get_file_info": {"name": self.master.tr("Get File Info"), "entry": lambda: FileInfoMessageBox(self.master).exec()},
+            "byte_calculator": {"name": self.master.tr("Byte Calculator"), "entry": lambda: FileBytesMessageBox(self.master).exec()},
+            "allow_selinux_audit": {"name": self.master.tr("Allow Selinux Audit"), "entry": self.allow_selinux_audit},
+            "dis_avb_in_fstab": {"name": self.master.tr("Disable avb in fstab"), "entry": self.disable_avb},
+            "dis_encryption": {"name": self.master.tr("Disable Encryption"), "entry": self.dis_encryption},
+            "trim_raw_image": {"name": self.master.tr("Trim Raw Image"), "entry": self.trim_raw_image},
+            "magisk_patch": {"name": self.master.tr("Magisk Patch"), "entry": self.magisk_patch},
+            "merge_qualcomm_image": {"name": self.master.tr("Merge Qualcomm Image"), "entry": self.merge_qcom_images},
+            "merge_super": {"name": self.master.tr("Merge Super"), "entry": self.merge_super},
+            "decrypt_xtc_xml": {"name": self.master.tr("Decrypt xtc xml"), "entry": self.decrypt_xtc_xml},
+            "mtk_port_tool": {"name": self.master.tr("Mtk Port Tool"), "entry": self.mtk_port_tool},
         }
 
     def exec_plugin(self, plugin_id: str):
@@ -1315,25 +1315,25 @@ class PluginPage(QWidget):
         text_header_layout = QVBoxLayout()
         text_header_layout.setSpacing(4)
 
-        title = TitleLabel("插件")
-        description = CaptionLabel("单击右键以显示菜单，或在此启动您的功能模块", self)
+        title = TitleLabel(self.tr("Plugin"))
+        description = CaptionLabel(self.tr("Manage your additions"), self)
 
         text_header_layout.addWidget(title)
         text_header_layout.addWidget(description)
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
-        self.local_install_btn = PushButton(FluentIcon.ADD, "本地安装", self)
+        self.local_install_btn = PushButton(FluentIcon.ADD, self.tr("Install"), self)
         self.local_install_btn.clicked.connect(self.install_mpk)
         header_layout.addWidget(self.local_install_btn)
 
         # New Feature: Cloud Download Module Control Trigger
-        self.download_btn = PushButton(FluentIcon.DOWNLOAD, "网络下载", self)
+        self.download_btn = PushButton(FluentIcon.DOWNLOAD, self.tr("Mpk Store"), self)
         header_layout.addWidget(self.download_btn)
         outer_layout.addLayout(header_layout)
 
         # 3. Search Bar Integration
         self.search_bar = SearchLineEdit(self)
-        self.search_bar.setPlaceholderText("搜索已安装的插件...")
+        self.search_bar.setPlaceholderText(self.tr("Search plugins..."))
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.textChanged.connect(self.filter_plugins)
         outer_layout.addWidget(self.search_bar)
@@ -1374,7 +1374,7 @@ class PluginPage(QWidget):
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin_title,
-                content='Built-In Plugin'
+                content=self.tr('Built-In Plugin')
             )
             card.moreButton.clicked.connect(lambda: print("None"))
             # Setup execution bindings (Safe against the signal boolean emission)
@@ -1406,11 +1406,11 @@ class PluginPage(QWidget):
                 content=plugin_author
             )
             menu = RoundMenu(parent=card.moreButton)
-            menu.addAction(Action(FluentIcon.CLOSE, 'Uninstall',
+            menu.addAction(Action(FluentIcon.CLOSE, self.tr('Uninstall'),
                                   triggered=lambda state, plugin_id=i: self.uninstall_plugin(plugin_id)))
-            menu.addAction(Action(FluentIcon.ZOOM_OUT, 'Export',
+            menu.addAction(Action(FluentIcon.ZOOM_OUT, self.tr('Export'),
                                   triggered=lambda state, plugin_id=i: module_manager.export(plugin_id)))
-            menu.addAction(Action(FluentIcon.EDIT, 'Edit', triggered=lambda: print("Saved")))
+            menu.addAction(Action(FluentIcon.EDIT, self.tr('Edit'), triggered=lambda: print("Saved")))
 
             # Add menu
             card.moreButton.setMenu(menu)
