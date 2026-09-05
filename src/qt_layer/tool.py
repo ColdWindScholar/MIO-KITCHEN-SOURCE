@@ -137,9 +137,9 @@ def __init__qt(args):
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     app = QApplication(args)
-    translator = QTranslator()
-    if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
-        app.installTranslator(translator)
+    app.translator = QTranslator()
+    if app.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+        app.installTranslator(app.translator)
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()

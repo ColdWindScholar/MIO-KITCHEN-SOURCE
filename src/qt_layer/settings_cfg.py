@@ -27,6 +27,7 @@ class Config(QConfig):
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
+
 config = Config()
 qconfig.load(config_file, config)
 cfg = config

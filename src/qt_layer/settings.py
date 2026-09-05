@@ -1,7 +1,7 @@
 import logging
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
+from PySide6.QtCore import Qt, QTranslator
+from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog, QApplication
 from qfluentwidgets import (
     TitleLabel, SwitchSettingCard, FluentIcon, OptionsSettingCard, ComboBoxSettingCard,
     PushSettingCard, PrimaryPushSettingCard
@@ -27,7 +27,16 @@ class SettingsPage(QScrollArea):
                 background: transparent;
             }
         """)
-
+    def load_language(self):
+        app = QApplication.instance()
+        translator = QTranslator()
+        if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+            if not app:
+                return
+            if app.removeTranslator(app.translator):
+                if app.installTranslator(translator):
+                    print(2)
+                app.translator = translator
     def initUI(self):
         """ 初始化UI """
         self.scrollWidget = QWidget()
@@ -56,6 +65,7 @@ class SettingsPage(QScrollArea):
             content=self.tr("Change Language"),
             texts=cfg.allLanguagesHum
         )
+        cfg.language.valueChanged.connect(self.load_language)
         self.scrollLayout.addWidget(self.languageCard)
         #
         self.workingCard = PushSettingCard(text=self.tr("Choose"),
