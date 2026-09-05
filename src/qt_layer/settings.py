@@ -37,30 +37,30 @@ class SettingsPage(QScrollArea):
         self.scrollLayout.setSpacing(20)
         self.scrollLayout.setAlignment(Qt.AlignTop)
         
-        title = TitleLabel("设置", self.scrollWidget)
+        title = TitleLabel(self.tr("Settings"), self.scrollWidget)
         self.scrollLayout.addWidget(title)
         # theme
         self.theme_card = OptionsSettingCard(
             qconfig.themeMode,
             FluentIcon.BRUSH,
-            "应用主题",
-            "调整你的应用外观",
-            texts=["浅色", "深色", "跟随系统设置"]
+            self.tr("Theme"),
+            self.tr("Set Theme"),
+            texts=[self.tr("Light"), self.tr("Dark"), self.tr("Follow System Settings")]
         )
         self.scrollLayout.addWidget(self.theme_card)
         #languages
         self.languageCard = ComboBoxSettingCard(
             configItem=cfg.language,
             icon=FluentIcon.LANGUAGE,
-            title="语言",
-            content="调整语言",
+            title=self.tr("Language"),
+            content=self.tr("Change Language"),
             texts=cfg.allLanguages
         )
         self.scrollLayout.addWidget(self.languageCard)
         #
-        self.workingCard = PushSettingCard(text="选择文件夹",
+        self.workingCard = PushSettingCard(text=self.tr("Choose"),
                                            icon=FluentIcon.DOWNLOAD,
-                                           title="下载目录",
+                                           title=self.tr("Working Folder"),
                                            content=cfg.workingFolder.value)
         self.workingCard.clicked.connect(self.change_working_folder)
         self.scrollLayout.addWidget(self.workingCard)
@@ -68,9 +68,9 @@ class SettingsPage(QScrollArea):
         #
         self.projectStructureCard = OptionsSettingCard(
             cfg.projectStructure,
-            FluentIcon.PROJECTOR,
-            "projectStructureCard",
-            "projectStructureCard",
+            FluentIcon.CONSTRACT,
+            self.tr("Project StructureCard"),
+            "project StructureCard",
             texts=cfg.projectStructure.options
         )
         self.scrollLayout.addWidget(self.projectStructureCard)
@@ -83,9 +83,9 @@ class SettingsPage(QScrollArea):
         )
         # clean
         self.cleanCacheCard = PrimaryPushSettingCard(
-            text="Clean",
+            text=self.tr("Clean"),
             icon=FluentIcon.DOWNLOAD,
-            title="CacheSize",
+            title=self.tr("Cache Size"),
             content=hum_convert(self.get_cache_size())
         )
         self.cleanCacheCard.clicked.connect(self.clean_cache)
@@ -94,8 +94,8 @@ class SettingsPage(QScrollArea):
         #ai
         self.aiEngine = SwitchSettingCard(
             FluentIcon.SAVE,
-            "AiEngine",
-            "AiEngine",
+            self.tr("Ai Engine"),
+            self.tr("An smart assistance for you"),
             cfg.aiEngine,
             parent=self.scrollWidget
         )
@@ -103,39 +103,29 @@ class SettingsPage(QScrollArea):
         #
         self.selinuxPatch = SwitchSettingCard(
             FluentIcon.SAVE,
-            "selinuxPatch",
-            "selinuxPatch",
+            self.tr("Context Patch"),
+            self.tr("Patch selinux context before repacking."),
             cfg.selinuxPatch,
             parent=self.scrollWidget
         )
         self.scrollLayout.addWidget(self.selinuxPatch)
         self.autoUnpack = SwitchSettingCard(
             FluentIcon.SAVE,
-            "autoUnpack",
-            "autoUnpack",
+            self.tr("Auto Unpack"),
+            self.tr("Unpack images directly."),
             cfg.autoUnpack,
             parent=self.scrollWidget
         )
         self.scrollLayout.addWidget(self.autoUnpack)
         self.checkUpdate = SwitchSettingCard(
             FluentIcon.SAVE,
-            "checkUpdate",
-            "checkUpdate",
+            self.tr("Check Update"),
+            self.tr("Check Update"),
             cfg.checkUpdate,
             parent=self.scrollWidget
         )
         self.scrollLayout.addWidget(self.checkUpdate)
 
-
-        self.helpCard = HyperlinkCard(
-            "#",
-            "打开帮助页面",
-            FluentIcon.HELP,
-            "帮助",
-            "发现 ROM Tools 的神奇用法",
-            self.scrollWidget
-        )
-        self.scrollLayout.addWidget(self.helpCard)
 
         self.scrollLayout.addStretch()
         self.setWidget(self.scrollWidget)
