@@ -15,11 +15,11 @@ from src.core import contextpatch
 from src.core import extra
 from src.core import fspatch
 from src.core import tarsafe
-from src.qt_layer.log_box import LogMessageBoxBase
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
 from src.core.unpac import MODE as PACMODE
+from src.qt_layer.log_box import LogMessageBoxBase
 
 try:
     from cpb_file import extract as extract_cpb
@@ -45,7 +45,7 @@ from src.core.rsceutil import unpack as rsceutil_unpack
 from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView
-from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
+from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar
 
 from src.core import ext4
@@ -69,6 +69,39 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.json")
 
+class StreamToSignal(QObject):
+    text_written = Signal(str)
+
+    def __init__(self, original_stream):
+        super().__init__()
+        self.original_stream = original_stream
+
+    def write(self, text):
+        if not text.strip():
+            return
+        logging.info(text)
+        self.text_written.emit(text)
+
+    def flush(self):
+        self.original_stream.flush()
+
+
+class GenericTaskWorker(QThread):
+    task_finished = Signal(bool)
+
+    def __init__(self, target_func, *args, **kwargs):
+        super().__init__()
+        self.target_func = target_func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        try:
+            self.target_func(*self.args, **self.kwargs)
+        except Exception as e:
+            self.task_finished.emit(True)
+            raise e
+        self.task_finished.emit(True)
 
 class PackHybridRom:
     def __init__(self, right_device):
@@ -1903,36 +1936,3 @@ class ProjectsPage(QWidget):
             self.partition_table.setItem(row_idx, 4, attr_item)
 
 
-class StreamToSignal(QObject):
-    text_written = Signal(str)
-
-    def __init__(self, original_stream):
-        super().__init__()
-        self.original_stream = original_stream
-
-    def write(self, text):
-        if not text.strip():
-            return
-        logging.info(text)
-        self.text_written.emit(text)
-
-    def flush(self):
-        self.original_stream.flush()
-
-
-class GenericTaskWorker(QThread):
-    task_finished = Signal(bool)
-
-    def __init__(self, target_func, *args, **kwargs):
-        super().__init__()
-        self.target_func = target_func
-        self.args = args
-        self.kwargs = kwargs
-
-    def run(self):
-        try:
-            self.target_func(*self.args, **self.kwargs)
-        except Exception as e:
-            self.task_finished.emit(True)
-            raise e
-        self.task_finished.emit(True)

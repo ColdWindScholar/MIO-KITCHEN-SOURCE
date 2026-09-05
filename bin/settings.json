@@ -6,7 +6,7 @@
         "checkUpdate": false,
         "CpioImpl": "Native",
         "currentProjectName": "lineage-23.2-20260506-UNOFFICIAL-stone",
-        "Language": "app_en_US.qm",
+        "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
         "selinuxPatch": false,
@@ -20,6 +20,6 @@
             "PingFang SC"
         ],
         "ThemeColor": "#ff0078d4",
-        "ThemeMode": "Light"
+        "ThemeMode": "Auto"
     }
 }
