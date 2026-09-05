@@ -110,7 +110,11 @@ class MainWindow(FluentWindow):
             QTimer.singleShot(1000, self.splashScreen.finish)
 
     def load_language(self):
-        pass
+        app = QApplication.instance()
+        if self.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+            if not app:
+                return
+            app.installTranslator(self.translator)
 
 
     def center(self):
@@ -142,6 +146,9 @@ def __init__qt(args):
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     app = QApplication(args)
+    translator = QTranslator()
+    if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+        app.installTranslator(translator)
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()
