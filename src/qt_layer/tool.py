@@ -118,11 +118,11 @@ class MainWindow(FluentWindow):
 
     def initNavigation(self):
         # 添加导航项
-        self.addSubInterface(self.home_page, FIF.HOME, '主页')
-        self.addSubInterface(self.project_page, FIF.DOCUMENT, '项目')
-        self.addSubInterface(self.plugin_page, FIF.APPLICATION, '插件')
-        self.addSubInterface(self.about_page, FIF.INFO, '关于', NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.settings_page, FIF.SETTING, '设置', NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.home_page, FIF.HOME, self.tr('Home'))
+        self.addSubInterface(self.project_page, FIF.DOCUMENT, self.tr('Project'))
+        self.addSubInterface(self.plugin_page, FIF.APPLICATION, self.tr('Plugins'))
+        self.addSubInterface(self.about_page, FIF.INFO, self.tr('About'), NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.settings_page, FIF.SETTING, self.tr("Settings"), NavigationItemPosition.BOTTOM)
 
         # 默认显示主页
         self.switchTo(self.home_page)
