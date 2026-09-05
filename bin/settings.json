@@ -2,14 +2,14 @@
     "Tool": {
         "Version": "5.0.0-prewiew",
         "AiEngine": true,
-        "autoUnpack": false,
-        "checkUpdate": false,
+        "autoUnpack": true,
+        "checkUpdate": true,
         "CpioImpl": "Native",
-        "currentProjectName": "kemiaojiang",
+        "currentProjectName": "lineage-23.2-20260506-UNOFFICIAL-stone",
         "Language": "app_en_US.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
-        "selinuxPatch": false,
+        "selinuxPatch": true,
         "updateURL": "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest",
         "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
     },

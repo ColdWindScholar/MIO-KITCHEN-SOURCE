@@ -1661,10 +1661,10 @@ class ProjectsPage(QWidget):
                 except (Exception, BaseException):
                     logging.exception('Bugs')
         if not project_manger.exist():
-            show_info_bar(self, "warning", "project's not exist", 2)
+            print("project's not exist")
             return False
         elif not os.path.exists(project_manger.current_work_path()):
-            show_info_bar(self, "warning", "project's not exist", 2)
+            print("project's not exist")
             return False
         json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
         parts = json_.read()
