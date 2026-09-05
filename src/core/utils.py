@@ -579,29 +579,6 @@ def findfolder(dir__, folder_name):
     return None
 
 
-def move_center(master):
-    """
-    Replace Toplevel or Tk to Center
-    :param master: Window
-    :return:
-    """
-    pass
-
-
-# ----CLASSES
-class LangUtils:
-    def __init__(self):
-        self.second = {}
-
-    def __getattr__(self, item):
-        try:
-            return self.__getattribute__(item)
-        except (AttributeError,):
-            return self.second.get(item, 'None')
-
-
-lang = LangUtils()
-
 u64 = lambda x: struct.unpack('>Q', x)[0]
 
 
