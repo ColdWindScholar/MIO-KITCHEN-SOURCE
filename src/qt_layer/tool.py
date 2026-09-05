@@ -13,6 +13,7 @@ from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Them
 from qt_layer.plugins import PluginPage
 from qt_layer.projects import ProjectsPage
 from qt_layer.settings import SettingsPage
+from qt_layer.tasks import TaskPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
 from utils import temp, v_code
@@ -98,6 +99,7 @@ class MainWindow(FluentWindow):
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
         self.plugin_page = PluginPage()
+        self.task_page = TaskPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
 
@@ -121,6 +123,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.home_page, FIF.HOME, '主页')
         self.addSubInterface(self.project_page, FIF.DOCUMENT, '项目')
         self.addSubInterface(self.plugin_page, FIF.APPLICATION, '插件')
+        self.addSubInterface(self.task_page, FIF.TILES, 'Tasks')
         self.addSubInterface(self.about_page, FIF.INFO, '关于', NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.settings_page, FIF.SETTING, '设置', NavigationItemPosition.BOTTOM)
 
