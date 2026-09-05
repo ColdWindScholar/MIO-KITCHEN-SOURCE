@@ -35,8 +35,8 @@ class FileChooser(MessageBoxBase):
         self.baseboot_btn = PushButton("Choose...", self)
 
         self.basesys_edit = LineEdit(self)
-        self.basesys_edit.setPlaceholderText("Select System from device...")
-        self.basesys_btn = PushButton("Choose...", self)
+        self.basesys_edit.setPlaceholderText(self.tr("Select System from device..."))
+        self.basesys_btn = PushButton(self.tr("Choose..."), self)
 
         basesys = Path("base/system.img")
         baseboot = Path("base/boot.img")
@@ -58,11 +58,11 @@ class FileChooser(MessageBoxBase):
         grid.addWidget(self.portzip_edit, 0, 1)
         grid.addWidget(self.portzip_btn, 0, 2)
 
-        grid.addWidget(BodyLabel("Boot from device:", self), 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(BodyLabel(self.tr("Boot from device:"), self), 1, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid.addWidget(self.baseboot_edit, 1, 1)
         grid.addWidget(self.baseboot_btn, 1, 2)
 
-        grid.addWidget(BodyLabel("System from device:", self), 2, 0, Qt.AlignLeft | Qt.AlignVCenter)
+        grid.addWidget(BodyLabel(self.tr("System from device:"), self), 2, 0, Qt.AlignLeft | Qt.AlignVCenter)
         grid.addWidget(self.basesys_edit, 2, 1)
         grid.addWidget(self.basesys_btn, 2, 2)
         self.viewLayout.addLayout(grid)
