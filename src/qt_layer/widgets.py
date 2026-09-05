@@ -1,15 +1,20 @@
+import logging
 import os
 import time
 import tkinter as tk
 
-import logging
 from PySide6.QtCore import QTimer, Qt
+from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLabel, QLineEdit, QHBoxLayout, QButtonGroup)
 from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
     RadioButton, PushButton, BodyLabel
-from qfluentwidgets import (MessageBoxBase, SwitchButton, Slider,
+from qfluentwidgets import (
+    MessageBoxBase,
+)
+from qfluentwidgets import (SwitchButton, Slider,
                             CaptionLabel)
 
 import utils
@@ -77,11 +82,11 @@ class NewProjectDialog(MessageBoxBase):
 
         self.titleLabel = SubtitleLabel(title, self)
         self.nameLineEdit = LineEdit(self)
-        self.nameLineEdit.setPlaceholderText('输入项目名称')
+        self.nameLineEdit.setPlaceholderText(self.tr('Enter project name'))
         self.nameLineEdit.setClearButtonEnabled(True)
         self.nameLineEdit.setText(initial_text)
 
-        self.errorLabel = CaptionLabel(text="项目名称无效或已存在")
+        self.errorLabel = CaptionLabel(text=self.tr('Project name is invalid or already exists.'))
         self.errorLabel.setTextColor("#cf1010", QColor(255, 28, 32))
 
         self.viewLayout.addWidget(self.titleLabel)
@@ -106,7 +111,7 @@ class NewProjectDialog(MessageBoxBase):
     def validate(self):
         project_name = self.nameLineEdit.text().strip()
         if not project_name:
-            self.errorLabel.setText("项目名称不能为空")
+            self.errorLabel.setText(self.tr("The project name cannot be empty."))
             self.errorLabel.show()
             return False
 
@@ -177,11 +182,7 @@ class InputDialog(MessageBoxBase):
 #             self.create_project(project_name)
 
 
-from PySide6.QtCore import Slot
-from PySide6.QtWidgets import QListWidgetItem
-from qfluentwidgets import (
-    MessageBoxBase,
-)
+
 
 
 class ConvertImageMessageBox(MessageBoxBase):
