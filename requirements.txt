@@ -17,6 +17,7 @@ cryptography>=49.0.0
 toml
 lz4
 python-lzo; sys_platform == 'linux'
+pywin32; sys_platform == 'win32'
 configparser
 datetime
 androguard
