@@ -196,9 +196,9 @@ def get_tr(args):
 
 @caller
 def tr_to_qm(args):
-    for f in os.listdir("bin/qt_languages"):
+    for f in os.listdir("bin/languages"):
         print(f"Converting {f} to qm")
-        os.system(f"pyside6-lrelease {getcwd()}/bin/qt_languages/{f} -qm {getcwd()}/bin/languages/{f[:-3]}.qm")
+        os.system(f"pyside6-lrelease {getcwd()}/bin/languages/{f} -qm {getcwd()}/bin/languages/{f[:-3]}.qm")
 
 @caller
 def update(args):
