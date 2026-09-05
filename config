@@ -192,9 +192,10 @@ system_list = {
 @caller
 def get_tr(args):
     files = " ".join([f"{getcwd()}/src/qt_layer/{i}" for i in os.listdir("src/qt_layer")])
+    files2 = " ".join([f"{getcwd()}/src/porttool/{i}" for i in os.listdir("src/porttool")])
     languages = ['pt_BR', "zh_CN", "de_DE", "en_US", 'fr_FR', 'hu_HU', 'id_ID', 'ja_JP', 'lt_LT', 'ru_RU', 'es_ES', 'th_TH', 'tr_TR', 'vi_VN', 'ko_KR', 'zh_TW']
     languages = " ".join(f"bin/languages/app_{i}.ts" for i in languages)
-    os.system(f"pyside6-lupdate {files} -ts {languages}")
+    os.system(f"pyside6-lupdate {files} {files2} -ts {languages}")
 
 @caller
 def tr_to_qm(args):
