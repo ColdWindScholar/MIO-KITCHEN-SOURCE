@@ -364,8 +364,8 @@ class PackSettingsDialog(MessageBoxBase):
         self.viewLayout.addWidget(self.content_widget)
 
         # 3. 配置底部的标准基础控制按钮文本
-        self.yesButton.setText("打包")
-        self.cancelButton.setText("取消")
+        self.yesButton.setText(self.tr("Pack"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
         # 强制约束合理的现代弹出视窗比例范围，留足横向扩展空间
         self.widget.setMinimumWidth(580)
@@ -433,7 +433,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.support_old_kernel_switch = SwitchButton(parent=erofs_container)
         self.support_old_kernel_switch.setOffText("")
         self.support_old_kernel_switch.setOnText("")
-        self.support_old_kernel_label = QLabel("支持旧内核", erofs_container)
+        self.support_old_kernel_label = QLabel(self.tr("Support old kernel"), erofs_container)
         self.support_old_kernel_label.setStyleSheet("color: #ffffff; font-size: 13px;")
 
         erofs_row1.addWidget(self.compress_algo_label)
@@ -472,13 +472,13 @@ class PackSettingsDialog(MessageBoxBase):
         self.f2fs_readonly_switch = SwitchButton(f2fs_container)
         self.f2fs_readonly_switch.setOnText("")
         self.f2fs_readonly_switch.setOffText("")
-        self.f2fs_readonly_lbl = QLabel("只读", f2fs_container)
+        self.f2fs_readonly_lbl = QLabel(self.tr("Readonly"), f2fs_container)
         self.f2fs_readonly_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
 
         self.f2fs_compress_switch = SwitchButton(f2fs_container)
         self.f2fs_compress_switch.setOnText("")
         self.f2fs_compress_switch.setOffText("")
-        self.f2fs_compress_lbl = QLabel("压缩", f2fs_container)
+        self.f2fs_compress_lbl = QLabel(self.tr("Compression"), f2fs_container)
         self.f2fs_compress_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
 
         f2fs_row.addWidget(self.f2fs_readonly_switch)
@@ -564,7 +564,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.sw_vbmeta = SwitchButton(other_container)
         self.sw_vbmeta.setOffText("")
         self.sw_vbmeta.setOnText("")
-        self.lbl_vbmeta = QLabel("处理Vbmeta", other_container)
+        self.lbl_vbmeta = QLabel(self.tr("Process Vbmeta"), other_container)
         self.lbl_vbmeta.setStyleSheet("color: #ffffff; font-size: 13px;")
 
         self.sw_delete = SwitchButton(other_container)
@@ -612,7 +612,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.viewLayout.addWidget(self.titleLabel)
 
         # 2. Partition Type Section
-        self.viewLayout.addWidget(SubtitleLabel("分区类型", self))
+        self.viewLayout.addWidget(SubtitleLabel(self.tr("Super Type"), self))
         lf1_layout = QHBoxLayout()
         self.type_group = QButtonGroup(self)
         radios = [("A-only", 1), ("Virtual-ab", 2), ("A/B", 3)]
@@ -625,7 +625,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.viewLayout.addLayout(lf1_layout)
 
         # 3. Attributes Section
-        self.viewLayout.addWidget(SubtitleLabel("属性", self))
+        self.viewLayout.addWidget(SubtitleLabel(self.tr("Attribute"), self))
         lf1_r_layout = QHBoxLayout()
         self.attrib_group = QButtonGroup(self)
         self.rb_readonly = RadioButton("Readonly", self)
@@ -641,13 +641,13 @@ class PackSuperMessageBox(MessageBoxBase):
         self.viewLayout.addWidget(SubtitleLabel("设置", self))
         lf2_layout = QHBoxLayout()
 
-        lf2_layout.addWidget(SubtitleLabel("簇名", self))
+        lf2_layout.addWidget(SubtitleLabel(self.tr("Group Name"), self))
         self.show_group_name = ComboBox(self)
         self.show_group_name.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
         self.show_group_name.setCurrentIndex(0)
         lf2_layout.addWidget(self.show_group_name)
 
-        lf2_layout.addWidget(SubtitleLabel("Super大小", self))
+        lf2_layout.addWidget(SubtitleLabel(self.tr("Super Size"), self))
         self.super_size_edit = LineEdit(self)
         self.super_size_edit.setText("9126805504")
         self.super_size_edit.textChanged.connect(self.validate_digits)
@@ -662,8 +662,8 @@ class PackSuperMessageBox(MessageBoxBase):
 
         # 6. Checkboxes & Action Layout Configurations
         self.switch_sparse = SwitchButton(self)
-        self.switch_sparse.setOffText("Sparse压缩")
-        self.switch_sparse.setOnText("Sparse压缩")
+        self.switch_sparse.setOffText(self.tr("Enable Sparse"))
+        self.switch_sparse.setOnText(self.tr("Enable Sparse"))
         self.viewLayout.addWidget(self.switch_sparse)
 
         t_frame_layout = QHBoxLayout()
