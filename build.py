@@ -20,7 +20,7 @@ import subprocess
 import sys
 import zipfile
 from platform import system
-
+import importlib.util
 from pip._internal.cli.main import main as _main
 
 
@@ -44,10 +44,18 @@ class Builder:
         print('Building...')
         self.install_package()
         self.unit_test()
+        self.patch_libs()
         self.pyinstaller_build()
         self.config_folder()
         self.pack_zip(f'{self.local}/dist', self.name)
-
+    def patch_libs(self):
+        spec = importlib.util.find_spec('qfluentwidgets')
+        target_file = os.path.join(os.path.dirname(spec.origin), "common", "config.py")
+        with open(target_file, "r", encoding="utf-8", newline="\n") as f:
+            data = f.read()
+            data = data.replace('ALERT = "\n\033[1;33m📢 Tips:\033[0m QFluentWidgets Pro is now released. Click \033[1;96mhttps://qfluentwidgets.com/pages/pro\033[0m to learn more about it.\n"', "ALERT = ''")
+        with open(target_file, "w", encoding="utf-8", newline="\n") as f:
+            f.write(data)
     def run_command(self, command: list[str], strip: bool = False):
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True)
