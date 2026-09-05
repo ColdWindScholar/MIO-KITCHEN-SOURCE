@@ -894,9 +894,7 @@ class InstallMpk(MessageBoxBase):
 
         self.state = SubtitleLabel("准备就绪", self)
         self.state.setAlignment(Qt.AlignCenter)
-
         self.installb = self.yesButton
-        self.cancelButton.hide()
         self.installb.setText("安装")
         self.installb.setFixedHeight(36)
         self.installb.clicked.connect(self.install)
@@ -907,6 +905,9 @@ class InstallMpk(MessageBoxBase):
         self.viewLayout.addLayout(self.bottomLayout)
         self.load()
         self.finished.connect(self.parent.load_plugin_cards)
+
+    def validate(self):
+        return self.installb.text() == "完成"
 
     def install(self):
         """核心安装逻辑与状态码转换"""
