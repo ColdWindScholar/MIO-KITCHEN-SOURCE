@@ -110,11 +110,7 @@ class MainWindow(FluentWindow):
             QTimer.singleShot(1000, self.splashScreen.finish)
 
     def load_language(self):
-        app = QApplication.instance()
-        if self.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
-            if not app:
-                return
-            app.installTranslator(self.translator)
+        pass
 
 
     def center(self):
