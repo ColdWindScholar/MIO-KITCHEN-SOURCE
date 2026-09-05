@@ -150,6 +150,7 @@ def __init__qt(args):
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()
+    window.load_language()
     window.show()
     sys.exit(app.exec())
 
