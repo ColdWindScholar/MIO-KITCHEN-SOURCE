@@ -154,7 +154,8 @@ class Builder:
                 'icon.ico',
                 '--collect-data',
                 'androguard',
-                "--hidden-import=win32api"
+                "--hidden-import",
+                "win32api",
                 '--splash',
                 'splash.png'
             ])
