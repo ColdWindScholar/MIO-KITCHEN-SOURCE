@@ -753,7 +753,7 @@ class ProjectsPage(QWidget):
             project_manger.remove(project_name)
             show_info_bar(self, self.tr("Success"), f"项目{project_name}已删除", bar_type=3)
         except Exception as e:
-            show_info_bar(self, "错误", f"删除项目失败: {str(e)}", bar_type=1)
+            show_info_bar(self, self.tr("Error"), f"删除项目失败: {str(e)}", bar_type=1)
         self.refresh_projects()
 
     def _build_project_section(self, parent_widget):
