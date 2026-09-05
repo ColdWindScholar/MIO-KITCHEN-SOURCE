@@ -164,7 +164,7 @@ class Builder:
     def config_folder(self):
         if not os.path.exists('dist/bin'):
             os.makedirs('dist/bin', exist_ok=True)
-        while_list = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'setting.ini', self.ostype,
+        while_list = ['images', 'languages', 'licenses', 'module', 'temp', 'extra_flash', 'settings.json', self.ostype,
                       'kemiaojiang.png', 'License_kemiaojiang.txt', 'help_document.json', "exec.sh", 'update.json']
         for i in os.listdir(self.local + "/bin"):
             if i in while_list:
