@@ -537,7 +537,7 @@ class PackSettingsDialog(MessageBoxBase):
 
         self.format_label = self._create_field_label(self.tr("Format:"))
         self.format_combo = ComboBox(other_container)
-        self.format_combo.addItems(["raw", "sparse"])
+        self.format_combo.addItems(["raw", "sparse", "br" ,"dat"])
 
         self.sw_convert = SwitchButton(other_container)
         self.sw_convert.setOffText('')
