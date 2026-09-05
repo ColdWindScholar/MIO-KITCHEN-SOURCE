@@ -111,7 +111,6 @@ class MainWindow(FluentWindow):
 
     def load_language(self):
         app = QApplication.instance()
-        app.removeTranslator(self.translator)
         if self.translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
             if not app:
                 return
