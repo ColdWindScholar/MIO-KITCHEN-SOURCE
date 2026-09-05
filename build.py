@@ -145,9 +145,6 @@ class Builder:
                 'splash_loongarch.png' if platform.machine() == 'loongarch64' else 'splash.png'
             ])
         elif os.name == 'nt':
-            mach_ = platform.machine()
-            platform.machine = lambda: 'x86' if platform.architecture()[0] == '32bit' and mach_ == 'AMD64' else mach_
-
             PyInstaller.__main__.run([
                 'tool.py',
                 '-Fw',
@@ -157,6 +154,7 @@ class Builder:
                 'icon.ico',
                 '--collect-data',
                 'androguard',
+                "--hidden-import=win32api"
                 '--splash',
                 'splash.png'
             ])
