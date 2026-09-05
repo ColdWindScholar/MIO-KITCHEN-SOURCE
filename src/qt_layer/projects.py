@@ -751,7 +751,7 @@ class ProjectsPage(QWidget):
 
         try:
             project_manger.remove(project_name)
-            show_info_bar(self, "成功", f"项目{project_name}已删除", bar_type=3)
+            show_info_bar(self, self.tr("Success"), f"项目{project_name}已删除", bar_type=3)
         except Exception as e:
             show_info_bar(self, "错误", f"删除项目失败: {str(e)}", bar_type=1)
         self.refresh_projects()
@@ -764,29 +764,29 @@ class ProjectsPage(QWidget):
         layout.setSpacing(12)
 
         # 标题放外面
-        layout.addWidget(self._create_section_title("项目管理"))
+        layout.addWidget(self._create_section_title(self.tr("Project Manage")))
 
         # 下半部分控件区域
         row1 = QHBoxLayout()
         self.project_combo = ComboBox(container)
-        self.project_combo.setPlaceholderText("选择或搜索目标项目...")
+        self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
         self.project_combo.currentTextChanged.connect(
             lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
-        self.open_btn = PushButton("打开", container, FIF.FOLDER)
+        self.open_btn = PushButton(self.tr("Open"), container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
         row1.addWidget(self.project_combo, 1)
         row1.addWidget(self.open_btn)
         layout.addLayout(row1)
 
         row2 = QHBoxLayout()
-        self.new_btn = PushButton("新建", container, FIF.ADD)
+        self.new_btn = PushButton(self.tr("New"), container, FIF.ADD)
         self.new_btn.clicked.connect(self.show_create_dialog)
-        self.refresh_btn = PushButton("刷新", container, FIF.SYNC)
+        self.refresh_btn = PushButton(self.tr("Refresh"), container, FIF.SYNC)
         self.refresh_btn.clicked.connect(self.refresh_projects)
-        self.rename_btn = PushButton("重命名", container, FIF.EDIT)
+        self.rename_btn = PushButton(self.tr("Rename"), container, FIF.EDIT)
         self.rename_btn.clicked.connect(self.show_rename_dialog)
-        self.delete_btn = PushButton("删除", container, FIF.DELETE)
+        self.delete_btn = PushButton(self.tr("Delete"), container, FIF.DELETE)
         self.delete_btn.clicked.connect(self.delete_project)
 
         for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
@@ -806,11 +806,11 @@ class ProjectsPage(QWidget):
 
         # 标题放外面
         frame = QHBoxLayout()
-        frame.addWidget(self._create_section_title("分区"))
+        frame.addWidget(self._create_section_title(self.tr("Partition(s)")))
         self.ring = IndeterminateProgressRing(self)
         self.ring.setFixedSize(16, 16)
         self.ring.hide()
-        self.execute_btn = PrimaryPushButton("执行", container, FIF.PLAY)
+        self.execute_btn = PrimaryPushButton(self.tr("Execute"), container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(80)
         frame.addWidget(self.ring)
@@ -831,10 +831,10 @@ class ProjectsPage(QWidget):
 
         # 全选与搜索框
         row1 = QHBoxLayout()
-        self.select_all_cb = CheckBox("全选", container)
+        self.select_all_cb = CheckBox(self.tr("Select All"), container)
         self.select_all_cb.stateChanged.connect(self._toggle_select_all_partitions)
         self.filter_input = SearchLineEdit(container)
-        self.filter_input.setPlaceholderText("根据名称快速检索...")
+        self.filter_input.setPlaceholderText(self.tr("Search partitions..."))
         self.filter_input.textChanged.connect(self.filter_tabview)
         self.filter_input.setFixedWidth(230)
         self.format_combo = ComboBox(container)
@@ -842,8 +842,8 @@ class ProjectsPage(QWidget):
                                     'update.app'])
         self.format_combo.currentTextChanged.connect(self.refresh_unpack)
         self.partition_table.setHorizontalHeaderLabels(["NAME", "SIZE", "FS", "IMAGE", "ATTRIBUTES"])
-        self.unpack_rb = RadioButton("解包", container)
-        self.pack_rb = RadioButton("打包", container)
+        self.unpack_rb = RadioButton(self.tr("Unpack"), container)
+        self.pack_rb = RadioButton(self.tr("Repack"), container)
         self.unpack_rb.clicked.connect(self.refresh_unpack)
         self.pack_rb.clicked.connect(self.refresh_repack)
         self.unpack_rb.setChecked(True)
@@ -1882,7 +1882,7 @@ class ProjectsPage(QWidget):
             os.makedirs(f"{work}/config")
         json_.write(parts)
         parts.clear()
-        print("Unpacking Done")
+        print(self.tr("Unpacking Done"))
         return True
 
     def _load_mock_partitions_table(self, mock_data):
