@@ -8,7 +8,7 @@ from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
-    CardWidget
+    CardWidget, FluentIcon
 )
 
 from utils import JsonEdit, prog_path
@@ -167,7 +167,7 @@ class AboutPage(QWidget):
         slogan_lbl.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 13px;")
 
         github_lbl = HyperlinkLabel()
-        github_lbl.setText("GitHub: MIO-KITCHEN-SOURCE")
+        github_lbl.setText(self.tr("GitHub: MIO-KITCHEN-SOURCE"))
         github_lbl.setUrl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
 
         copyright_lbl = CaptionLabel(self.tr("© 2026 ColdWindScholar All Rights Reserved."))
