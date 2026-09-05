@@ -4,7 +4,7 @@ import time
 import warnings
 
 import logging
-from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject
+from PySide6.QtCore import Qt, QTimer, QSize, QPoint, QEvent, QObject, QTranslator
 from PySide6.QtGui import QIcon, QGuiApplication, QCursor
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
@@ -15,8 +15,8 @@ from qt_layer.projects import ProjectsPage
 from qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
-from utils import temp, v_code
-
+from utils import temp, v_code, prog_path
+from src.qt_layer.settings_cfg import cfg
 if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
@@ -137,6 +137,9 @@ def __init__qt(args):
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)
 
     app = QApplication(args)
+    translator = QTranslator()
+    if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
+        app.installTranslator(translator)
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()
