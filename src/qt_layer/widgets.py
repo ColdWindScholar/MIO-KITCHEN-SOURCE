@@ -638,7 +638,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.viewLayout.addLayout(lf1_r_layout)
 
         # 4. Settings Section
-        self.viewLayout.addWidget(SubtitleLabel("设置", self))
+        self.viewLayout.addWidget(SubtitleLabel(self.tr("Settings"), self))
         lf2_layout = QHBoxLayout()
 
         lf2_layout.addWidget(SubtitleLabel(self.tr("Group Name"), self))
