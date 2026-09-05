@@ -27,6 +27,7 @@ class SettingsPage(QScrollArea):
                 background: transparent;
             }
         """)
+
     def load_language(self):
         app = QApplication.instance()
         translator = QTranslator()
@@ -35,8 +36,8 @@ class SettingsPage(QScrollArea):
                 return
             if app.removeTranslator(app.translator):
                 if app.installTranslator(translator):
-                    print(2)
-                app.translator = translator
+                    app.translator = translator
+
     def initUI(self):
         """ 初始化UI """
         self.scrollWidget = QWidget()
