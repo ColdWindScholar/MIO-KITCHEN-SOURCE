@@ -22,5 +22,5 @@ configparser
 datetime
 androguard
 loguru
-PySide6-Fluent-Widgets[full]>=1.11.3
+PySide6-Fluent-Widgets[full]==1.11.2
 PySide6>=6.11.2
