@@ -11,12 +11,12 @@ from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, setTheme, Theme,
                             FluentWindow, FluentIcon as FIF)
 
-from qt_layer.plugins import PluginPage
-from qt_layer.projects import ProjectsPage
-from qt_layer.settings import SettingsPage
+from src.qt_layer.plugins import PluginPage
+from src.qt_layer.projects import ProjectsPage
+from src.qt_layer.settings import SettingsPage
 from src.qt_layer.about import AboutPage
 from src.qt_layer.home import HomePage
-from utils import temp, v_code, prog_path
+from src.core.utils import temp, v_code, prog_path
 from src.qt_layer.settings_cfg import cfg
 pyi_splash_available = False
 if platform.system() != 'Darwin':
