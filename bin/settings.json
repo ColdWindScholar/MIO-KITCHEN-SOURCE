@@ -5,7 +5,7 @@
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Native",
-        "currentProjectName": "build",
+        "currentProjectName": "dist",
         "Language": "app_en_US.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",

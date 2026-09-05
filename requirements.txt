@@ -1,7 +1,7 @@
 Pillow>=10.0.1
 pycryptodome>=3.19.1
 Requests>2.31.0
-protobuf>7
+protobuf>=7.36.1
 sv_ttk
 pyinstaller
 future>=1.0.0
@@ -12,7 +12,7 @@ lxml
 wmi; sys_platform == 'win32'
 six
 httpx
-cryptography>=46.0.5
+cryptography>=49.0.0
 toml
 lz4
 python-lzo; sys_platform == 'linux'
@@ -20,5 +20,5 @@ configparser
 datetime
 androguard
 loguru
-PySide6-Fluent-Widgets[full]
-PySide6
+PySide6-Fluent-Widgets[full]>=1.11.3
+PySide6>=6.11.2
