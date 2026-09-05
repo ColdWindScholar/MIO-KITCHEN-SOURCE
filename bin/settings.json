@@ -1,0 +1,25 @@
+{
+    "Tool": {
+        "Version": "5.0.0-prewiew",
+        "AiEngine": false,
+        "autoUnpack": false,
+        "checkUpdate": false,
+        "CpioImpl": "Native",
+        "currentProjectName": "lineage-23.2-20260506-UNOFFICIAL-stone",
+        "Language": "app_zh_CN.qm",
+        "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
+        "ProjectStructure": "Single",
+        "selinuxPatch": false,
+        "updateURL": "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest",
+        "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
+    },
+    "QFluentWidgets": {
+        "FontFamilies": [
+            "Segoe UI",
+            "Microsoft YaHei",
+            "PingFang SC"
+        ],
+        "ThemeColor": "#ff0078d4",
+        "ThemeMode": "Auto"
+    }
+}
