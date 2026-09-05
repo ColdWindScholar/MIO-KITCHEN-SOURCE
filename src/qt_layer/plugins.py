@@ -8,7 +8,19 @@ from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
     MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton
+import zipfile
+import platform
+from io import BytesIO
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QSizePolicy
+from qfluentwidgets import (ProgressBar, ImageLabel)
 
+import logging
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
+from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
+                            PushButton)
 from Magisk import Magisk_patch
 from avb_disabler import process_fstab
 from encryption_disabler import process_fstab_for_encryption
@@ -212,7 +224,7 @@ class ParseMessageBox(MessageBoxBase):
     def __unknown(self, layout, config):
         self.cancel = self.w_assert in ['true', 'True', '1', 'Yes', 'yes']
         con_type = config.get('type', 'Unknown')
-        label = BodyLabel(self.tr("不支持的控件：{}").format(con_type))
+        label = BodyLabel(self.tr("Unsupported Widget：{}").format(con_type))
         label.setStyleSheet("color: #ff4d4f; font-weight: bold;")
         layout.addWidget(label)
 
@@ -606,19 +618,7 @@ class ModuleManager:
 
 module_manager = ModuleManager()
 
-import zipfile
-import platform
-from io import BytesIO
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QSizePolicy
-from qfluentwidgets import (ProgressBar, ImageLabel)
 
-import logging
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
-from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
-                            PushButton)
 
 
 class UninstallMpk(MessageBoxBase):
