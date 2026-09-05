@@ -54,7 +54,7 @@ class SettingsPage(QScrollArea):
             icon=FluentIcon.LANGUAGE,
             title=self.tr("Language"),
             content=self.tr("Change Language"),
-            texts=cfg.allLanguages
+            texts=cfg.allLanguagesHum
         )
         self.scrollLayout.addWidget(self.languageCard)
         #

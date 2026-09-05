@@ -1,5 +1,6 @@
 import platform
 
+from PySide6.QtCore import QLocale
 from qfluentwidgets import QConfig, ConfigItem, BoolValidator, OptionsValidator, OptionsConfigItem, qconfig
 import os
 
@@ -11,6 +12,7 @@ config_file = os.path.abspath(os.path.join(prog_path, 'bin', "settings.json"))
 class Config(QConfig):
     """ 应用配置类 """
     allLanguages = [i[:-3] for i in os.listdir(os.path.join(prog_path, 'bin', 'languages')) if i.endswith(".qm")]
+    allLanguagesHum = [QLocale(i[4:]).nativeLanguageName() for i in allLanguages]
     tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine())
     module_dir = os.path.join(prog_path, "bin", "module")
     workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
