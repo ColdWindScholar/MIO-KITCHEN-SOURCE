@@ -10,6 +10,7 @@ zstandard
 asn1crypto
 lxml
 wmi; sys_platform == 'win32'
+win32api; sys_platform == 'win32'
 six
 httpx
 cryptography>=49.0.0
