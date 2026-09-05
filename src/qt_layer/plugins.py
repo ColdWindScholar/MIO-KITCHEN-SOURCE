@@ -2,6 +2,7 @@ import json
 import os
 from io import StringIO
 from shutil import rmtree
+from threading import Thread
 from typing import Any
 
 from PySide6.QtWidgets import QWidget, QFileDialog
@@ -44,7 +45,7 @@ from src.core import utils
 from src.core.addon_register import loader, Entry
 from src.core.config_parser import ConfigParser
 from src.core.selinux_audit_allow import main as selinux_audit_allow
-from src.core.utils import create_thread, ModuleErrorCodes, prog_path, call, temp, re_folder
+from src.core.utils import ModuleErrorCodes, prog_path, call, temp, re_folder
 from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
@@ -233,13 +234,14 @@ class ParseMessageBox(MessageBoxBase):
         super().closeEvent(event)
 
 
+
 class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(prog_path, "bin", "module")
         self.addon_loader = loader
         self.addon_entries = Entry
         self.master = None
-        create_thread(self.load_plugins)
+        Thread(target=self.load_plugins, daemon=True).start()
 
     def is_installed(self, id_) -> bool:
         path = os.path.join(self.module_dir, id_)
