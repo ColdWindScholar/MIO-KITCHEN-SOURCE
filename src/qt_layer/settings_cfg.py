@@ -18,7 +18,8 @@ class Config(QConfig):
     workingFolder = ConfigItem("Tool", "WorkingFolder", prog_path)
     Version = ConfigItem("Tool", "Version", "5.0.0-prewiew")
     pluginRepo = ConfigItem("Tool", "pluginRepo", "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/")
-    updateURL = ConfigItem("Tool", "updateURL", "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest")
+    updateURL = ConfigItem("Tool", "updateURL",
+                           "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest")
     language = OptionsConfigItem(
         "Tool", "Language", "English", OptionsValidator(allLanguages), restart=True)
     aiEngine = ConfigItem("Tool", 'AiEngine', False, BoolValidator())
@@ -28,6 +29,7 @@ class Config(QConfig):
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
+
 
 cfg = Config()
 qconfig.load(config_file, cfg)
