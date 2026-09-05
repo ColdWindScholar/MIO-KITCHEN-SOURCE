@@ -17,8 +17,8 @@ from qfluentwidgets import (
 from qfluentwidgets import (SwitchButton, Slider,
                             CaptionLabel)
 
-import utils
-from utils import gettype
+from src.core import utils
+from src.core.utils import gettype
 
 
 class TkinterEmbeddedBox(MessageBoxBase):

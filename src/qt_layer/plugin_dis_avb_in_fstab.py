@@ -9,7 +9,7 @@ from qfluentwidgets import (
     MessageBoxBase, TableWidget
 )
 from src.qt_layer.settings_cfg import cfg
-from utils import JsonEdit
+from src.core.utils import JsonEdit
 
 
 class DisableAvbMessageBox(MessageBoxBase):

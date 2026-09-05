@@ -15,7 +15,7 @@ from src.core import contextpatch
 from src.core import extra
 from src.core import fspatch
 from src.core import tarsafe
-from qt_layer.log_box import LogMessageBoxBase
+from src.qt_layer.log_box import LogMessageBoxBase
 from src.core.cpio import repack as cpio_repack
 from src.core.rsceutil import repack as rsceutil_repack
 from src.core.splash_editor.main import splash_repack
@@ -25,11 +25,11 @@ try:
     from cpb_file import extract as extract_cpb
 except ModuleNotFoundError:
     pass
-import mkdtboimg
-import ofp_mtk_decrypt
-import ofp_qc_decrypt
-import opscrypto
-import ozipdecrypt
+from src.core import mkdtboimg
+from src.core import ofp_mtk_decrypt
+from src.core import ofp_qc_decrypt
+from src.core import opscrypto
+from src.core import ozipdecrypt
 from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
 from src.core.undz import DZFileTools
@@ -48,19 +48,19 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetIte
 from qfluentwidgets import BodyLabel, CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar
 
-import ext4
-import imgextractor
-import lpunpack
-import splituapp
-import utils
-from payload_extract import extract_partitions_from_payload
-from pygpt.gpt_reader import GPTReader
-from qt_layer.settings import cfg
-from qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox, \
+from src.core import ext4
+from src.core import imgextractor
+from src.core import lpunpack
+from src.core import splituapp
+from src.core import utils
+from src.core.payload_extract import extract_partitions_from_payload
+from src.core.pygpt.gpt_reader import GPTReader
+from src.qt_layer.settings import cfg
+from src.qt_layer.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox, \
     PackSuperMessageBox, RepackZipMessageBox
-from romfs_parse import RomfsParse
-from splash_editor.src.logo_gen_decoder import process_splashimg
-from utils import gettype, call
+from src.core.romfs_parse import RomfsParse
+from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
+from src.core.utils import gettype, call
 from src.core.aml_image import main as aml_main
 
 try:

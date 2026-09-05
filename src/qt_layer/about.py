@@ -12,7 +12,7 @@ from qfluentwidgets import (
     CardWidget
 )
 
-from utils import JsonEdit, prog_path
+from src.core.utils import JsonEdit, prog_path
 
 
 class ClickableTitleLabel(TitleLabel):
