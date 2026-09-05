@@ -20,6 +20,7 @@ import platform
 import tarfile
 import zipfile
 from functools import wraps
+from os import getcwd
 from sys import exit
 from time import strftime, time
 import json
@@ -188,6 +189,16 @@ system_list = {
     'windows': "Windows"
 }
 
+@caller
+def get_tr(args):
+    files = " ".join([f"{getcwd()}/src/qt_layer/{i}" for i in os.listdir("src/qt_layer")])
+    os.system(f"pyside6-lupdate {files} -ts bin/qt_languages/English.ts")
+
+@caller
+def tr_to_qm(args):
+    for f in os.listdir("bin/qt_languages"):
+        print(f"Converting {f} to qm")
+        os.system(f"pyside6-lrelease {getcwd()}/bin/qt_languages/{f} -qm {getcwd()}/bin/languages/{f[:-3]}.qm")
 
 @caller
 def update(args):
@@ -332,8 +343,11 @@ if __name__ == '__main__':
                                       description='Valid subcommands')
     unpack_rom_parser = subparser.add_parser('upbin', help="update binary")
     unpack_rom_parser.set_defaults(func=update)
+
     check_support = subparser.add_parser('check', help='check if supported this machine')
     check_support.set_defaults(func=check_supported)
+    get_tr_ =  subparser.add_parser('get_tr', help='get all items for translation')
+    get_tr_.set_defaults(func=get_tr)
     help_support = subparser.add_parser('help', help='print help info')
     help_support.set_defaults(func=lambda *_: parser.print_help(
     ))
