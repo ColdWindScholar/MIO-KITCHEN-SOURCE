@@ -14,8 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import gzip
 import os
 import platform
+import tarfile
 import zipfile
 from functools import wraps
 from sys import exit
@@ -71,7 +73,7 @@ links = {
         "github_json": True,
         'rename_pattern':"",
         # erofs-utils-v1.8.4-gc9629116-Android_arm64-v8a-2501262050.zip
-        "name_pattern": r"erofs-utils-(.*?)-(.*?)-(.*?)-(\D+?)_(.*)?.zip$"
+        "name_pattern": [r"erofs-utils-(.*?)-(.*?)-(.*?)-(\D+?)_(.*)?.zip$"]
     },
     "apftool":{
         "link": 'https://api.github.com/repos/suyulin/apftool-rs/releases/latest',
@@ -79,7 +81,7 @@ links = {
         #afptool-rs-linux-aarch64.zip
         'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
         'name':'afptool',
-        "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
+        "name_pattern":[r'afptool-rs-(.*?)-(.*?)?.tar.gz$', r'afptool-rs-(.*?)-(.*?)?.zip$']
     },
     "apftool-loongarch":{
         "link": 'https://api.github.com/repos/WeiguangTWK/apftool-rs-loongarch64/releases/latest',
@@ -87,14 +89,14 @@ links = {
         #afptool-rs-linux-aarch64.zip
         'rename_pattern':"afptool-rs-(.*?)-(.*?)$",
         'name':'afptool',
-        "name_pattern":r'afptool-rs-(.*?)-(.*?)?.zip$'
+        "name_pattern":[r'afptool-rs-(.*?)-(.*?)?.zip$']
     },
     "ImgKit":{
         "link":"https://api.github.com/repos/Kindness-Kismet/ImgKit-Scuti/releases/latest",
         "github_json":True,
         "rename_pattern": "imgkit_scuti-(.*?)-(.*?)(?:\\.exe)?$",
         "name":'imgkit',
-        "name_pattern":r"imgkit_scuti-(.*?)-(.*?)(?:\.exe)?$",
+        "name_pattern":[r"imgkit_scuti-(.*?)-(.*?)(?:\.exe)?$"],
         "is_binary":True
     }
 }
@@ -164,6 +166,7 @@ class Caller:
                     ret = func(*args, **kwargs)
                 except Exception as e:
                     LOGE(f'\nRetry {total_times - self.retry_times} / {total_times} because of {e}')
+                    raise e
                     continue
                 else:
                     return ret
@@ -212,7 +215,15 @@ def update(args):
                 for percentage, speed, _, _, _ in download_api(url=browser_download_url, name=name, size_=size, path=temp):
                     green_1(f"\rSpeed {speed}\tPercentage:{percentage} %", end='')
                 downloaded_file = os.path.join(temp, name)
-                groups = re.search(content.get('name_pattern', "*$"), name).groups()
+                groups = None
+                for g in content.get('name_pattern', ["*$"]):
+                    groups = re.search(g, name)
+                    if groups:
+                        groups = groups.groups()
+                    else:
+                        continue
+                if not groups:
+                     return
                 if len(groups) == 2:
                     version, gitid, build_time = ['U', 'U', 'U']
                     system, arch = groups
@@ -250,6 +261,24 @@ def update(args):
                             os.remove(f'bin/{system}/{arch}/{real_name}')
                         os.rename(downloaded_file, f'bin/{system}/{arch}/{real_name}')
                         green(f"Update {z_name}")
+                elif downloaded_file.endswith(".tar.gz"):
+                    with tarfile.open(downloaded_file, "r:gz") as tar:
+                        for t_info in tar.getmembers():
+                            t_name = t_info.name
+                            if content.get('rename_pattern'):
+                                real_name = content.get('name')
+                                if system == 'Windows' and not real_name.endswith('.exe'):
+                                    real_name += '.exe'
+                                caught_name = re.search(content.get('rename_pattern', "*$"), t_name).groups()
+                                if not len(caught_name):
+                                    return
+                                caught_name = caught_name[0]
+                                if caught_name:
+                                    log(f'Will rename {t_name} to {real_name}')
+                                    t_info.name = real_name
+                            if os.path.exists(f'bin/{system}/{arch}/{t_name}'):
+                                tar.extract(t_info, path=f'bin/{system}/{arch}')
+                                green(f"Update {t_name}")
                 else:
                     with zipfile.ZipFile(downloaded_file) as z:
                         for z_info in z.infolist():
