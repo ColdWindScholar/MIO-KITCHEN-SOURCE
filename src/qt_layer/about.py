@@ -8,7 +8,7 @@ from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QGridLayout, QHBoxLayout
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
-    CardWidget, FluentIcon
+    CardWidget
 )
 
 from qt_layer.settings_cfg import cfg
