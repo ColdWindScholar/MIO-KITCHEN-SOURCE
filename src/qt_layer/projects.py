@@ -344,7 +344,7 @@ class ProjectsPage(QWidget):
 
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
-        self.drop_overlay = QLabel("Drop Here", self)
+        self.drop_overlay = QLabel(self.tr("Drop Here"), self)
         self.drop_overlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Modern semi-transparent dark tint design with a high-contrast accent border
@@ -586,7 +586,7 @@ class ProjectsPage(QWidget):
         name = os.path.basename(dir_path)
         print("Copying ", name)
         if not os.path.exists(dir_path):
-            print('No Such Folder.')
+            print(self.tr('No Such Folder.'))
             return 1
         if os.path.isfile(dir_path):
             return self.unpackrom(dir_path)
@@ -642,7 +642,7 @@ class ProjectsPage(QWidget):
                 elif os.path.isdir(fi):
                     self.dnd_task = GenericTaskWorker(self.copy_project, fi)
             else:
-                print("file not exist")
+                print(self.tr("file not exist"))
             if not self.dnd_task:
                 return
             self.start_job(self.dnd_task)
@@ -677,12 +677,12 @@ class ProjectsPage(QWidget):
     def open_dir(self):
         name = self.project_combo.currentText()
         if not project_manger.exist(name):
-            show_info_bar(self, "Warning", f"Cannot open folder:\n{name}", 2)
+            show_info_bar(self, self.tr("Warning"), f"Cannot open folder:\n{name}", 2)
             return
 
         path = project_manger.get_work_path(name)
         if not path or not os.path.exists(path):
-            show_info_bar(self, "Warning", f"Cannot open folder:\n{path}", 2)
+            show_info_bar(self, self.tr("Warning"), f"Cannot open folder:\n{path}", 2)
             return
 
         try:
@@ -699,7 +699,7 @@ class ProjectsPage(QWidget):
     def show_create_dialog(self):
         """显示创建项目对话框"""
         dialog = NewProjectDialog(
-            title="创建新项目",
+            title=self.tr("New Project"),
             existing_projects=list(project_manger.get_projects()),
             parent=self
         )
@@ -712,10 +712,10 @@ class ProjectsPage(QWidget):
         """显示创建项目对话框"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self, "提示", "请先选择一个项目", bar_type=2)
+            show_info_bar(self, "Warning", self.tr("Select a project first"), bar_type=2)
             return
         dialog = NewProjectDialog(
-            title="重命名项目",
+            title=self.tr("Rename Project"),
             existing_projects=list(project_manger.get_projects()),
             initial_text=self.project_combo.currentText(),
             parent=self
@@ -737,11 +737,11 @@ class ProjectsPage(QWidget):
         """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self, "提示", "请先选择一个项目", bar_type=2)
+            show_info_bar(self, self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
 
         result = MessageBox(
-            "确认删除",
+            self.tr('Confirm Delete'),
             f"确定要删除项目 '{project_name}' 吗?",
             self
         ).exec()
