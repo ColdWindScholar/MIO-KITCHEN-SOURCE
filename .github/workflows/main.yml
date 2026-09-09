@@ -77,6 +77,7 @@ jobs:
       - name: Install Packages
         run: |
             python3 -m pip install -U --force-reinstall pip
+            sudo apt install liblzo2-dev
       - name: Pack Tool
         run: python3 build.py
       - name: Upload Linux Build
