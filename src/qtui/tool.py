@@ -20,7 +20,7 @@ import time
 from PySide6.QtCore import Qt, QSize, QTranslator
 from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
-from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, SplitFluentWindow)
+from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, SplitFluentWindow ,FluentWindow)
 
 from src.core.utils import temp, v_code, prog_path
 from src.qtui.about import AboutPage
@@ -44,14 +44,16 @@ if sys.platform == "linux" or sys.platform == "linux2":
 
 
 
-class MainWindow(SplitFluentWindow):
+class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowIcon(QIcon('icon.ico'))
+        self.setWindowTitle('MIO-KITCHEN')
 
 
         # Create splash screen with error handling
         try:
-            self.splashScreen = SplashScreen(QIcon('icon.ico'), self)
+            self.splashScreen = SplashScreen(self.windowIcon(), self)
             self.splashScreen.setIconSize(QSize(140, 140))
         except Exception as e:
             # If splash screen fails due to opacity, just continue
