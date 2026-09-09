@@ -117,7 +117,8 @@ class Builder:
         if self.ostype == 'Darwin':
             PyInstaller.__main__.run([
                 'tool.py',
-                '-Fw',
+                '-Dw',
+                '--exclude-module', 'tkinter',
                 '--exclude-module',
                 'numpy',
                 '-i',
@@ -131,7 +132,8 @@ class Builder:
 
             PyInstaller.__main__.run([
                 'tool.py',
-                '-Fw',
+                '-Dw',
+                '--exclude-module', 'tkinter',
                 '--exclude-module',
                 'numpy',
                 '-i',
@@ -146,9 +148,9 @@ class Builder:
         elif os.name == 'nt':
             PyInstaller.__main__.run([
                 'tool.py',
-                '-Fw',
-                '--exclude-module',
-                'numpy',
+                '-Dw',
+                '--exclude-module', 'numpy',
+                '--exclude-module', 'tkinter',
                 '-i',
                 'icon.ico',
                 '--collect-data',
@@ -185,10 +187,13 @@ class Builder:
                     shutil.rmtree(f'{self.local}/dist/bin/Linux/aarch64')
                 except Exception as e:
                     print(e)
-            for root, dirs, files in os.walk(f'{self.local}/dist', topdown=True):
+            for root, dirs, files in os.walk(f'{self.local}/dist/bin', topdown=True):
                 for i in files:
                     print(f"Chmod {os.path.join(root, i)}")
                     os.chmod(os.path.join(root, i), 0o7777, follow_symlinks=False)
+        os.rename(f'{self.local}/dist/tool', f'{self.local}/dist/tool_built')
+        shutil.copytree(f'{self.local}/dist/tool_built', f'{self.local}/dist', dirs_exist_ok=True)
+        shutil.rmtree(f'{self.local}/dist/tool_built')
 
     def pack_zip(self, source, name):
         abs_folder_path = os.path.abspath(source)

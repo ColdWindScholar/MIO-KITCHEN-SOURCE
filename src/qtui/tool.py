@@ -20,7 +20,7 @@ import time
 from PySide6.QtCore import Qt, QSize, QTranslator
 from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
-from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, SplitFluentWindow ,FluentWindow)
+from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.core.utils import temp, v_code, prog_path
 from src.qtui.about import AboutPage
@@ -29,6 +29,7 @@ from src.qtui.plugins import PluginPage
 from src.qtui.projects import ProjectsPage
 from src.qtui.settings import SettingsPage
 from src.qtui.settings_cfg import cfg
+
 pyi_splash_available = False
 if platform.system() != 'Darwin':
     try:
