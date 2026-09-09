@@ -65,14 +65,14 @@ jobs:
           name: MIO-KITCHEN-win
           path: './MIO-KITCHEN-win.zip'
   build-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           # Semantic version range syntax or exact version of a Python version
-          python-version: '3.13'
+          python-version: '3.14'
           # Optional - x64 or x86 architecture, defaults to x64
       - name: Install Packages
         run: |
