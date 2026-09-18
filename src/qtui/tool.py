@@ -80,7 +80,7 @@ class MainWindow(FluentWindow):
         self.initNavigation()
         cfg.language.valueChanged.connect(self.load_language)
         panel = self.project_page.build_project_section(self.titleBar)
-        self.titleBar.layout().insertWidget(1, panel)
+        self.titleBar.layout().insertWidget(1, panel, alignment=Qt.AlignmentFlag.AlignCenter)
         self.project_page.refresh_projects()
 
         # Finish splash screen if it was created
