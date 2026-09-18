@@ -364,13 +364,11 @@ class ProjectsPage(QFrame):
         scroll_log_area.setWidget(self.scroll_log_content)
 
         # 2. 依次构建去背景、去卡片的扁平化模块
-        self._build_project_section(scroll_content)
         self._build_partition_section(scroll_content)
         self._build_tools_section(scroll_content)
 
         # 底层弹性推力
         self.scroll_layout.addStretch(1)
-        self.refresh_projects()
         self.setAcceptDrops(True)
         self.initDropOverlay()
         self.setStyleSheet("background: transparent")
@@ -778,37 +776,33 @@ class ProjectsPage(QFrame):
             show_info_bar(self, self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e), bar_type=1)
         self.refresh_projects()
 
-    def _build_project_section(self, parent_widget):
+    def build_project_section(self):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
-        container = QWidget(parent_widget)
-        layout = QVBoxLayout(container)
+        self.project_container = QWidget()
+        layout = QVBoxLayout(self.project_container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
-
-        # 标题放外面
-        layout.addWidget(QLabel(self.tr("Project Manage")))
-
         # 下半部分控件区域
         row1 = QHBoxLayout()
-        self.project_combo = ComboBox(container)
+        self.project_combo = ComboBox(self.project_container)
         self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
         self.project_combo.currentTextChanged.connect(
             lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
-        self.open_btn = PushButton(self.tr("Open"), container, FIF.FOLDER)
+        self.open_btn = PushButton(self.tr("Open"), self.project_container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
         row1.addWidget(self.project_combo, 1)
         row1.addWidget(self.open_btn)
         layout.addLayout(row1)
 
         row2 = QHBoxLayout()
-        self.new_btn = PushButton(self.tr("New"), container, FIF.ADD)
+        self.new_btn = PushButton(self.tr("New"), self.project_container, FIF.ADD)
         self.new_btn.clicked.connect(self.show_create_dialog)
-        self.refresh_btn = PushButton(self.tr("Refresh"), container, FIF.SYNC)
+        self.refresh_btn = PushButton(self.tr("Refresh"), self.project_container, FIF.SYNC)
         self.refresh_btn.clicked.connect(self.refresh_projects)
-        self.rename_btn = PushButton(self.tr("Rename"), container, FIF.EDIT)
+        self.rename_btn = PushButton(self.tr("Rename"), self.project_container, FIF.EDIT)
         self.rename_btn.clicked.connect(self.show_rename_dialog)
-        self.delete_btn = PushButton(self.tr("Delete"), container, FIF.DELETE)
+        self.delete_btn = PushButton(self.tr("Delete"), self.project_container, FIF.DELETE)
         self.delete_btn.clicked.connect(self.delete_project)
 
         for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
@@ -817,7 +811,8 @@ class ProjectsPage(QFrame):
         row2.addStretch(1)
         layout.addLayout(row2)
 
-        self.scroll_layout.addWidget(container)
+        #self.scroll_layout.addWidget(container)
+        return self.project_container
 
     def _build_partition_section(self, parent_widget):
         """分区控制模块：标题完全独立，仅保留核心高级列表的内部深色背板"""

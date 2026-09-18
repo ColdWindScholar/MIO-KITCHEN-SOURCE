@@ -49,7 +49,7 @@ class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon('icon.ico'))
-        self.setWindowTitle('MIO-KITCHEN')
+        #self.setWindowTitle('MIO-KITCHEN')
 
 
         # Create splash screen with error handling
@@ -75,6 +75,8 @@ class MainWindow(FluentWindow):
         # 创建页面
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
+        self.setTitleBar(self.project_page.build_project_section())
+
         self.plugin_page = PluginPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
@@ -82,6 +84,7 @@ class MainWindow(FluentWindow):
         # 初始化导航
         self.initNavigation()
         cfg.language.valueChanged.connect(self.load_language)
+        self.project_page.refresh_projects()
 
         # Finish splash screen if it was created
         if self.splashScreen:
