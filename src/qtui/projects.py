@@ -776,9 +776,9 @@ class ProjectsPage(QFrame):
             show_info_bar(self, self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e), bar_type=1)
         self.refresh_projects()
 
-    def build_project_section(self):
+    def build_project_section(self, parent):
         """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
-        self.project_container = QWidget()
+        self.project_container = QWidget(parent)
         layout = QVBoxLayout(self.project_container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)

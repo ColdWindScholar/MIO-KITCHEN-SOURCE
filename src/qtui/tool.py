@@ -19,7 +19,7 @@ import time
 
 from PySide6.QtCore import Qt, QSize, QTranslator
 from PySide6.QtGui import QIcon, QGuiApplication
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QLabel
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.core.utils import temp, v_code, prog_path
@@ -49,8 +49,6 @@ class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon('icon.ico'))
-        #self.setWindowTitle('MIO-KITCHEN')
-
 
         # Create splash screen with error handling
         try:
@@ -62,8 +60,6 @@ class MainWindow(FluentWindow):
             self.splashScreen = None
         
         self.show()
-
-
         # 设置窗口大小
         self.resize(1000, 700)
 
@@ -75,15 +71,16 @@ class MainWindow(FluentWindow):
         # 创建页面
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
-        self.setTitleBar(self.project_page.build_project_section())
-
         self.plugin_page = PluginPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
 
+
         # 初始化导航
         self.initNavigation()
         cfg.language.valueChanged.connect(self.load_language)
+        panel = self.project_page.build_project_section(self.titleBar)
+        self.titleBar.layout().insertWidget(1, panel)
         self.project_page.refresh_projects()
 
         # Finish splash screen if it was created
