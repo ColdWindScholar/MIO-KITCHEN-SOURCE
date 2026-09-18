@@ -1672,12 +1672,10 @@ class ProjectsPage(QFrame):
                     ensure_dir_case_sensitive(project_manger.current_work_path())
                 except (Exception, BaseException):
                     logging.exception('Bugs')
-        if not project_manger.exist():
+        if not project_manger.exist() or not os.path.exists(project_manger.current_work_path()):
             print("project's not exist")
             return False
-        elif not os.path.exists(project_manger.current_work_path()):
-            print("project's not exist")
-            return False
+
         json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
         parts = json_.read()
         if not chose:
