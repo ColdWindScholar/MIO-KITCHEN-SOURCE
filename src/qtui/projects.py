@@ -46,7 +46,8 @@ from PySide6.QtCore import Qt, QThread, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
-    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar
+    SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
+    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action
 
 from src.core import ext4
 from src.core import imgextractor
@@ -791,25 +792,19 @@ class ProjectsPage(QFrame):
             lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
         self.open_btn = PushButton(self.tr("Open"), self.project_container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
+        self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
         row1.addWidget(self.project_combo, 1)
         row1.addWidget(self.open_btn)
+        row1.addWidget(self.moreButton)
         layout.addLayout(row1)
 
-        row2 = QHBoxLayout()
-        self.new_btn = PushButton(self.tr("New"), self.project_container, FIF.ADD)
-        self.new_btn.clicked.connect(self.show_create_dialog)
-        self.refresh_btn = PushButton(self.tr("Refresh"), self.project_container, FIF.SYNC)
-        self.refresh_btn.clicked.connect(self.refresh_projects)
-        self.rename_btn = PushButton(self.tr("Rename"), self.project_container, FIF.EDIT)
-        self.rename_btn.clicked.connect(self.show_rename_dialog)
-        self.delete_btn = PushButton(self.tr("Delete"), self.project_container, FIF.DELETE)
-        self.delete_btn.clicked.connect(self.delete_project)
-
-        for btn in [self.new_btn, self.refresh_btn, self.rename_btn, self.delete_btn]:
-            btn.setMinimumWidth(90)
-            row2.addWidget(btn)
-        row2.addStretch(1)
-        layout.addLayout(row2)
+        menu = RoundMenu(parent=self.moreButton)
+        menu.addAction(Action(FluentIcon.ADD, self.tr('New'),triggered=self.show_create_dialog))
+        menu.addAction(Action(FluentIcon.SYNC, self.tr('Refresh'),triggered=self.refresh_projects))
+        menu.addAction(Action(FluentIcon.EDIT, self.tr('Rename'),triggered=self.show_rename_dialog))
+        menu.addAction(Action(FluentIcon.EDIT, self.tr('Delete'),triggered=self.delete_project))
+        # Add menu
+        self.moreButton.setMenu(menu)
 
         #self.scroll_layout.addWidget(container)
         return self.project_container
