@@ -1659,11 +1659,8 @@ class ProjectsPage(QFrame):
             item = self.partition_table.item(row_idx, 0)
             if item is not None:
                 cell_text = item.text().strip().lower()
+                self.partition_table.setRowHidden(row_idx, not (search_query in cell_text or not search_query))
 
-                if search_query in cell_text or not search_query:
-                    self.partition_table.setRowHidden(row_idx, False)
-                else:
-                    self.partition_table.setRowHidden(row_idx, True)
 
     def unpack(self, chose: list | dict, form: str = '') -> bool:
         if os.name == 'nt':
