@@ -22,6 +22,7 @@ from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
+from qtui.apk_manager import ApkManagerPage
 from src.core.utils import temp, v_code, prog_path
 from src.qtui.about import AboutPage
 from src.qtui.home import HomePage
@@ -72,6 +73,7 @@ class MainWindow(FluentWindow):
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
         self.plugin_page = PluginPage()
+        self.apk_manager = ApkManagerPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
 
@@ -108,6 +110,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.home_page, FIF.HOME, self.tr('Home'))
         self.addSubInterface(self.project_page, FIF.DOCUMENT, self.tr('Project'))
         self.addSubInterface(self.plugin_page, FIF.APPLICATION, self.tr('Plugins'))
+        self.addSubInterface(self.apk_manager, FIF.DELETE, self.tr('ApkManager'))
         self.addSubInterface(self.about_page, FIF.INFO, self.tr('About'), NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.settings_page, FIF.SETTING, self.tr("Settings"), NavigationItemPosition.BOTTOM)
 
