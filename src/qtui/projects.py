@@ -70,6 +70,7 @@ except ImportError:
     ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.json")
 
+
 class StreamToSignal(QObject):
     text_written = Signal(str)
 
@@ -104,6 +105,7 @@ class GenericTaskWorker(QThread):
             self.task_finished.emit(True)
             raise e
         self.task_finished.emit(True)
+
 
 class PackHybridRom:
     def __init__(self, right_device):
@@ -586,7 +588,7 @@ class ProjectsPage(QFrame):
             if os.path.exists(project_folder):
                 base_name += utils.v_code()
                 folder = os.path.join(cfg.workingFolder.value,
-                                  base_name)
+                                      base_name)
             else:
                 folder = project_folder
             try:
@@ -680,8 +682,6 @@ class ProjectsPage(QFrame):
                 return
             self.start_job(self.dnd_task)
 
-
-
     def refresh_projects(self):
         self.project_combo.clear()
         projects = project_manger.get_projects()
@@ -773,9 +773,11 @@ class ProjectsPage(QFrame):
 
         try:
             project_manger.remove(project_name)
-            show_info_bar(self.parent(), self.tr("Success"), self.tr("Project {} Removed.").format(project_name), bar_type=3)
+            show_info_bar(self.parent(), self.tr("Success"), self.tr("Project {} Removed.").format(project_name),
+                          bar_type=3)
         except Exception as e:
-            show_info_bar(self.parent(), self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e), bar_type=1)
+            show_info_bar(self.parent(), self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e),
+                          bar_type=1)
         self.refresh_projects()
 
     def build_project_section(self, parent):
@@ -801,10 +803,10 @@ class ProjectsPage(QFrame):
         layout.addLayout(row1)
 
         menu = RoundMenu(parent=self.moreButton)
-        menu.addAction(Action(FluentIcon.ADD, self.tr('New'),triggered=self.show_create_dialog))
-        menu.addAction(Action(FluentIcon.SYNC, self.tr('Refresh'),triggered=self.refresh_projects))
-        menu.addAction(Action(FluentIcon.EDIT, self.tr('Rename'),triggered=self.show_rename_dialog))
-        menu.addAction(Action(FluentIcon.EDIT, self.tr('Delete'),triggered=self.delete_project))
+        menu.addAction(Action(FluentIcon.ADD, self.tr('New'), triggered=self.show_create_dialog))
+        menu.addAction(Action(FluentIcon.SYNC, self.tr('Refresh'), triggered=self.refresh_projects))
+        menu.addAction(Action(FluentIcon.EDIT, self.tr('Rename'), triggered=self.show_rename_dialog))
+        menu.addAction(Action(FluentIcon.EDIT, self.tr('Delete'), triggered=self.delete_project))
         # Add menu
         self.moreButton.setMenu(menu)
 
@@ -854,7 +856,8 @@ class ProjectsPage(QFrame):
         self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                                     'update.app'])
         self.format_combo.currentTextChanged.connect(self.refresh_unpack)
-        self.partition_table.setHorizontalHeaderLabels([self.tr("NAME"), self.tr("SIZE"), self.tr("FS"), self.tr("IMAGE"), self.tr("ATTRIBUTES")])
+        self.partition_table.setHorizontalHeaderLabels(
+            [self.tr("NAME"), self.tr("SIZE"), self.tr("FS"), self.tr("IMAGE"), self.tr("ATTRIBUTES")])
         self.unpack_rb = RadioButton(self.tr("Unpack"), container)
         self.pack_rb = RadioButton(self.tr("Repack"), container)
         self.unpack_rb.clicked.connect(self.refresh_unpack)
@@ -1595,7 +1598,8 @@ class ProjectsPage(QFrame):
                                                         dialog.f2fs_compress_switch.isChecked(),
                                                         dialog.pack_method_combo.currentText(),
                                                         dialog.brotli_slider.value(),
-                                                        dialog.size_handle_combo.currentText() == self.tr("Origin Size"),
+                                                        dialog.size_handle_combo.currentText() == self.tr(
+                                                            "Origin Size"),
                                                         )
             else:
                 return
@@ -1660,7 +1664,6 @@ class ProjectsPage(QFrame):
             if item is not None:
                 cell_text = item.text().strip().lower()
                 self.partition_table.setRowHidden(row_idx, not (search_query in cell_text or not search_query))
-
 
     def unpack(self, chose: list | dict, form: str = '') -> bool:
         if os.name == 'nt':
@@ -1915,5 +1918,3 @@ class ProjectsPage(QFrame):
 
             attr_item = QTableWidgetItem(attrs)
             self.partition_table.setItem(row_idx, 4, attr_item)
-
-
