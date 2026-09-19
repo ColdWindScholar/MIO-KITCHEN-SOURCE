@@ -69,8 +69,8 @@ class SettingsPage(QScrollArea):
         self.cpioImplCard = OptionsSettingCard(
             cfg.cpioImpl,
             FluentIcon.UNIT,
-            "cpio",
-            self.tr("cpioImpl"),
+            self.tr("Cpio Implement"),
+            self.tr("Native's binary, another's built-in func."),
             texts=cfg.cpioImpl.options
         )
         # clean
