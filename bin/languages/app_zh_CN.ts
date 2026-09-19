@@ -136,7 +136,7 @@
     <message>
         <location filename="../../src/qtui/widgets.py" line="204"/>
         <source>search...</source>
-        <translation>搜索。。。</translation>
+        <translation>搜索...</translation>
     </message>
 </context>
 <context>
@@ -209,7 +209,7 @@ The tool will automatically find and edit the fstab files.</source>
     <message>
         <location filename="../../src/qtui/plugin_dis_avb_in_fstab.py" line="68"/>
         <source>Search partitions...</source>
-        <translation>搜索分区。。。</translation>
+        <translation>搜索分区...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_dis_avb_in_fstab.py" line="72"/>
@@ -259,7 +259,7 @@ The tool will automatically find and edit the fstab files.</source>
     <message>
         <location filename="../../src/qtui/plugin_dis_encryption_in_fstab.py" line="68"/>
         <source>Search partitions...</source>
-        <translation>搜索分区。。。</translation>
+        <translation>搜索分区...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_dis_encryption_in_fstab.py" line="72"/>
@@ -310,24 +310,24 @@ or click to select a file</source>
     <message>
         <location filename="../../src/porttool/ui.py" line="30"/>
         <source>Select Port Rom...</source>
-        <translation>选择移植ROM。。。</translation>
+        <translation>选择移植ROM</translation>
     </message>
     <message>
         <location filename="../../src/porttool/ui.py" line="31"/>
         <location filename="../../src/porttool/ui.py" line="35"/>
         <location filename="../../src/porttool/ui.py" line="39"/>
         <source>Choose...</source>
-        <translation>选择。。。</translation>
+        <translation>选择</translation>
     </message>
     <message>
         <location filename="../../src/porttool/ui.py" line="34"/>
         <source>Select Boot from device...</source>
-        <translation>选择来自设备的BOOT。。。</translation>
+        <translation>选择来自设备的BOOT</translation>
     </message>
     <message>
         <location filename="../../src/porttool/ui.py" line="38"/>
         <source>Select System from device...</source>
-        <translation>选择来自设备的System。。。</translation>
+        <translation>选择来自设备的System</translation>
     </message>
     <message>
         <location filename="../../src/porttool/ui.py" line="57"/>
@@ -455,7 +455,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="144"/>
         <source>Unpacking roms...</source>
-        <translation>正在解包ROM。。。</translation>
+        <translation>正在解包ROM...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="145"/>
@@ -470,7 +470,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="152"/>
         <source>System Overload! Going to sleep... 💤</source>
-        <translation>系统过载！准备休眠。。。💤</translation>
+        <translation>系统过载！准备休眠...💤</translation>
     </message>
 </context>
 <context>
@@ -575,7 +575,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugin_magisk_patch.py" line="24"/>
         <source>Select Boot file (.img)...</source>
-        <translation>选择BOOT文件（img）。。。</translation>
+        <translation>选择BOOT文件(img)</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_magisk_patch.py" line="25"/>
@@ -586,7 +586,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugin_magisk_patch.py" line="28"/>
         <source>Select Magisk APK (.apk)...</source>
-        <translation>选择Magisk Apk（apk）。。。</translation>
+        <translation>选择Magisk Apk</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_magisk_patch.py" line="53"/>
@@ -1052,7 +1052,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1314"/>
         <source>Search plugins...</source>
-        <translation>搜索插件。。。</translation>
+        <translation>搜索插件...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1356"/>
@@ -1212,7 +1212,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="849"/>
         <source>Search partitions...</source>
-        <translation>搜索分区。。。</translation>
+        <translation>搜索分区...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="856"/>
@@ -1284,6 +1284,12 @@ or click to select a file</source>
         <translation>打包完成！输出：%s</translation>
     </message>
     <message>
+        <location filename="../../src/qtui/projects.py" line="1073"/>
+        <location filename="../../src/qtui/projects.py" line="1076"/>
+        <source>Failed to pack super!</source>
+        <translation>打包Super出错！</translation>
+    </message>
+    <message>
         <location filename="../../src/qtui/projects.py" line="1087"/>
         <source>device code&apos;s empty</source>
         <translation>设备代号不能为空</translation>
@@ -1337,6 +1343,21 @@ or click to select a file</source>
         <location filename="../../src/qtui/projects.py" line="1228"/>
         <source>Warning:file_context not found!!!</source>
         <translation>警告：file_context 不存在</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1479"/>
+        <source>Packed successfully: {}!</source>
+        <translation>成功打包: {}!</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1519"/>
+        <source>Failed to pack %s!</source>
+        <translation>无法打包 %s!</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1531"/>
+        <source>Packed {}</source>
+        <translation>已打包 {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1597"/>

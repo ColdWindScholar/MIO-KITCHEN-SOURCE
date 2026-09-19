@@ -1272,6 +1272,12 @@ or click to select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../src/qtui/projects.py" line="1073"/>
+        <location filename="../../src/qtui/projects.py" line="1076"/>
+        <source>Failed to pack super!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../src/qtui/projects.py" line="1087"/>
         <source>device code&apos;s empty</source>
         <translation type="unfinished"></translation>
@@ -1324,6 +1330,21 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1228"/>
         <source>Warning:file_context not found!!!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1479"/>
+        <source>Packed successfully: {}!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1519"/>
+        <source>Failed to pack %s!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1531"/>
+        <source>Packed {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
