@@ -1397,7 +1397,7 @@ class ProjectsPage(QFrame):
                 rmtree(source)
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
-            print("Successfully packed Boot...")
+            print(self.tr("Successfully packed Boot..."))
 
     def packrom(self, chosen_parts,
                 format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
