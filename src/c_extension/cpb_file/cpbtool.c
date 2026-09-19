@@ -3,9 +3,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if _WIN32
 #include <direct.h>
+#else
+    #include <unistd.h>
+    #include <sys/stat.h>
+    // Linux mkdir requires permissions mask (e.g., 0777)
+    #define make_dir(path) mkdir(path, 0777)
+#endif
 #include <stddef.h>
- 
+#ifndef _WIN32
+#include <stdint.h>
+typedef int64_t __int64;
+#endif
 typedef char int8 ;
 typedef unsigned char uint8 ;
 typedef short int16 ;
@@ -13,7 +23,14 @@ typedef unsigned short uint16 ;
 typedef int int32 ;
 typedef unsigned int uint32 ;
 typedef __int64 int64 ;
-typedef unsigned __int64 uint64 ;
+
+#ifndef _WIN32
+  typedef int64_t __int64;
+  typedef uint64_t uint64;
+#else
+typedef unsigned __int64 uint64;
+#endif
+
  
 typedef struct tagCPBHEADER
 {
@@ -128,13 +145,21 @@ int32 MkdirRecursive( char* path )
 			*p = 0;
 			if( access( path, 0 ) != 0 )
 			{
+#if _WIN32
 				if( mkdir( path ) != 0 )
+#else
+				if( make_dir( path ) != 0 )
+#endif
 					return -1;
 			}
 			*p = ch ;
 		}
 	}
+#if _WIN32
 	return mkdir( path );
+#else
+    return make_dir( path );
+#endif
 }
  
 void usage(void)
@@ -164,7 +189,7 @@ void PrintCpbHeader(LPCPBHEADER pHdr)
 	printf("checkSum:0x%08X\n\n", pHdr->checkSum) ;
 }
  
-void CreateListFile(const char *lpszCpb, const char *lpszList)
+int CreateListFile(const char *lpszCpb, const char *lpszList)
 {
 	FILE *fcpb = NULL ;
 	FILE *flst = NULL ;
@@ -190,7 +215,7 @@ void CreateListFile(const char *lpszCpb, const char *lpszList)
 	if(cpbHdr.cp_version[0] != 0x01 || cpbHdr.cp_version[1] != 0x07)
 	{
 		printf("1.7 not detected.header should be \"CP\\x01\\x07\".\n") ;
-		return ;
+		return 0;
 	}
 	PrintCpbHeader(&cpbHdr) ;
 	nImgSize = cpbHdr.imgHdrEndPos - sizeof(CPBHEADER) ;
@@ -451,7 +476,7 @@ uint32 WriteImageHeaders(FILE *fcpb, LPIMAGEHEADER pImgHdrs, int32 nCount, uint3
 	{
 		uiOffset = pImgHdrs[i].imageOffset ;
 		uiSize = pImgHdrs[i].imageSize ;
-		uiCrc = CRC16(&pImgHdrs[i], sizeof(IMAGEHEADER), uiCrc) ;
+		uiCrc = CRC16((uint8 *)&pImgHdrs[i], sizeof(IMAGEHEADER), uiCrc) ;
 		ImageHeaderCorrectPosSize(&pImgHdrs[i], i, uiCorrect) ;
 		fwrite(&pImgHdrs[i], sizeof(IMAGEHEADER), 1, fcpb) ;
 		pImgHdrs[i].imageOffset = uiOffset ;
