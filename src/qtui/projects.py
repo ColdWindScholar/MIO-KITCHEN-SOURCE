@@ -1476,7 +1476,7 @@ class ProjectsPage(QFrame):
                                 self.datbr(project_manger.current_work_output_path(), dname, scale,
                                            int(parts_dict.get('dat_ver', 4)))
                             else:
-                                print("Packed successfully: {}!".format(dname))
+                                print(self.tr("Packed successfully: {}!").format(dname))
 
                 else:
                     ext4_size_value = 0
@@ -1516,7 +1516,7 @@ class ProjectsPage(QFrame):
                             size=ext4_size_value,
                             UTC=UTC)
                     if exit_code:
-                        print("Failed to pack %s!" % dname)
+                        print(self.tr("Failed to pack %s!") % dname)
                         continue
 
                     if remove_source_files:
@@ -1528,7 +1528,7 @@ class ProjectsPage(QFrame):
                         self.datbr(project_manger.current_work_output_path(), dname, scale,
                                    int(parts_dict.get('dat_ver', '4')))
                     else:
-                        print("Packed {}".format(dname))
+                        print(self.tr("Packed {}").format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
                 self.repack_boot(i)
             elif parts_dict[i] == 'dtbo':
