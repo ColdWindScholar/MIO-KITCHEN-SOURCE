@@ -1,4 +1,4 @@
-name: "Build Tool"
+name: "Build Tool Nightly"
 permissions:
   contents: write
   discussions: write
