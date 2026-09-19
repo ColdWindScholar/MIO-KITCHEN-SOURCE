@@ -806,7 +806,7 @@ class ProjectsPage(QFrame):
         menu.addAction(Action(FluentIcon.ADD, self.tr('New'), triggered=self.show_create_dialog))
         menu.addAction(Action(FluentIcon.SYNC, self.tr('Refresh'), triggered=self.refresh_projects))
         menu.addAction(Action(FluentIcon.EDIT, self.tr('Rename'), triggered=self.show_rename_dialog))
-        menu.addAction(Action(FluentIcon.EDIT, self.tr('Delete'), triggered=self.delete_project))
+        menu.addAction(Action(FluentIcon.REMOVE, self.tr('Delete'), triggered=self.delete_project))
         # Add menu
         self.moreButton.setMenu(menu)
 
