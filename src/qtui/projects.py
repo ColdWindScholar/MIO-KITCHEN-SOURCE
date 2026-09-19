@@ -1195,7 +1195,7 @@ class ProjectsPage(QFrame):
             rmtree(f"{work}/config")
             return False
         if os.access(f"{work}/{part_name}.img", os.F_OK):
-            print("Repacked %s Done" % part_name)
+            print(self.tr("Repacked %s Done") % part_name)
             try:
                 rmtree(work + part_name)
                 for i_ in ["%s_size.txt", "%s_file_contexts", '%s_fs_config', '%s_fs_options']:
@@ -1206,7 +1206,7 @@ class ProjectsPage(QFrame):
                 logging.exception(e)
             print(self.tr("Repacked %s Done") % part_name)
         else:
-            show_info_bar(self, "Error", f"Failed to repack {part_name}")
+            show_info_bar(self, self.tr("Error"), f"Failed to repack {part_name}")
         return True
 
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
@@ -1336,7 +1336,7 @@ class ProjectsPage(QFrame):
         if boot is None:
             boot = utils.findfile(f"{name}.img", work)
             if not boot:
-                print("Origin boot is lost.Cannot repack boot.img.")
+                print(self.tr("Origin boot is lost.Cannot repack boot.img."))
                 return
         if source is None:
             source = work + name
