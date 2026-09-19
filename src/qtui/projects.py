@@ -890,15 +890,15 @@ class ProjectsPage(QFrame):
                 basename = os.path.basename(i).split('.')[0]
                 if src_format == 'br':
                     if os.access(f'{work}/{i}', os.F_OK):
-                        print("正在解包：" + i)
+                        print(self.tr("Unpacking:") + i)
                         call(['brotli', '-dj', f'{work}/{i}'])
                 if src_format == 'xz':
                     if os.access(f'{work}/{i}', os.F_OK):
-                        print("正在解包：" + i)
+                        print(self.tr("Unpacking:") + i)
                         utils.Unxz(f'{work}/{i}')
                 if src_format == 'dat':
                     if os.access(f'{work}/{i}', os.F_OK):
-                        print("正在解包：" + f'{work}/{i}')
+                        print(self.tr("Unpacking:") + f'{work}/{i}')
                         transferfile = os.path.abspath(
                             os.path.dirname(work)) + f"/{basename}.transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
@@ -921,11 +921,11 @@ class ProjectsPage(QFrame):
                 basename = os.path.basename(i).split('.')[0]
                 if src_format == 'br':
                     if os.access(f'{work}/{i}', os.F_OK):
-                        print("正在解包：" + i)
+                        print(self.tr("Unpacking:") + i)
                         call(['brotli', '-dj', f'{work}/{i}'])
                 if src_format == 'xz':
                     if os.access(f'{work}/{i}', os.F_OK):
-                        print("正在解包：" + i)
+                        print(self.tr("Unpacking:") + i)
                         utils.Unxz(f'{work}/{i}')
                 if src_format in ['dat', 'br', 'xz']:
                     if os.path.exists(work):
@@ -933,7 +933,7 @@ class ProjectsPage(QFrame):
                             i = i.replace('.br', '')
                         if src_format == 'xz':
                             i = i.replace('.xz', '')
-                        print("正在解包：" + f'{work}/{i}')
+                        print(self.tr("Unpacking:") + f'{work}/{i}')
                         transferfile = os.path.abspath(
                             os.path.dirname(work)) + f"/{basename}.transfer.list"
                         if os.access(transferfile, os.F_OK) and os.path.getsize(f'{work}/{i}') != 0:
@@ -956,10 +956,10 @@ class ProjectsPage(QFrame):
                 if src_format in ['raw', 'sparse']:
                     self.datbr(work, os.path.basename(i).split('.')[0], "dat")
                 if src_format == 'br':
-                    print("正在解包：" + i)
+                    print(self.tr("Unpacking:") + i)
                     call(['brotli', '-dj', f'{work}/{i}'])
                 if src_format == 'xz':
-                    print("正在解包：" + i)
+                    print(self.tr("Unpacking:") + i)
                     utils.Unxz(f'{work}/{i}')
 
             elif dst_format == 'br':
