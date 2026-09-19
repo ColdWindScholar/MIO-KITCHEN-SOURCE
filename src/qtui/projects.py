@@ -89,6 +89,7 @@ class StreamToSignal(QObject):
 
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
+    send_message = Signal(str, str, int)
 
     def __init__(self, target_func, *args, **kwargs):
         super().__init__()
