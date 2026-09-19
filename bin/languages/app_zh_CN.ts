@@ -1148,7 +1148,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="775"/>
         <source>Project {} Removed.</source>
-        <translation>项目 {} 已删除。.</translation>
+        <translation>项目 {} 已删除。</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="777"/>
