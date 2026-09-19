@@ -1,0 +1,120 @@
+name: "Build Tool"
+permissions:
+  contents: write
+  discussions: write
+on:
+  schedule:
+      - cron: '0 2 * * *'
+  push:
+    paths:
+      - "bin/update.json"
+  workflow_dispatch:
+jobs:
+  build:
+    needs: [build-win,build-linux,build-macos]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12.6"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.13'
+          # Optional - x64 or x86 architecture, defaults to x64
+      - name: Install Packages
+        run: |
+          python3 -m pip install -U --force-reinstall pip
+          sudo apt install git -y
+      - name: Generate Release Content
+        run: |
+          python3 build.py grb
+          python3 build.py ma
+      - name: Upload release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          removeArtifacts: true
+          name: "MIO-KITCHEN-${{ env.ver }}"
+          tag: "CI_BUILD_${{ github.run_number }}"
+          bodyFile: "body.md"
+          artifacts: "*.zip"
+
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.13.7
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.13.7'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+      # You can test your matrix by printing the current Python version
+      - name: Update pip
+        run:  python -m pip install -U --force-reinstall pip
+      - name: Pack tool
+        run: python build.py
+      - name: Upload Win Build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIO-KITCHEN-win
+          path: './MIO-KITCHEN-win.zip'
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.14'
+          # Optional - x64 or x86 architecture, defaults to x64
+      - name: Install Packages
+        run: |
+            python3 -m pip install -U --force-reinstall pip
+            sudo apt install liblzo2-dev
+      - name: Pack Tool
+        run: python3 build.py
+      - name: Upload Linux Build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIO-KITCHEN-linux
+          path: './MIO-KITCHEN-linux.zip'
+  build-macos:
+    strategy:
+      matrix:
+        os: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.13'
+          # Optional - x64 or x86 architecture, defaults to x64
+      - name: Install Packages
+        run: |
+          python3 -m pip install -U --force-reinstall pip
+      - name: Pack Tool
+        run: python3 build.py
+      - name: Upload Arm64 Macos Build
+        if: success() && matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIO-KITCHEN-macos
+          path: './MIO-KITCHEN-macos.zip'
+      - name: Upload x86_64 Macos Build
+        if: success() && matrix.os == 'macos-15-intel'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIO-KITCHEN-macos-intel
+          path: './MIO-KITCHEN-macos-intel.zip'
