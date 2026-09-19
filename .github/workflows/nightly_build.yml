@@ -40,7 +40,7 @@ jobs:
           prerelease: true
           omitBodyDuringUpdate: true
           removeArtifacts: true
-          name: "MIO-KITCHEN-${{ env.ver }}"
+          name: "MIO-KITCHEN-${{ env.ver }}-Nightly"
           tag: "CI_BUILD_${{ github.run_number }}"
           bodyFile: "body.md"
           artifacts: "*.zip"
