@@ -807,7 +807,6 @@ class ProjectsPage(QFrame):
         # Add menu
         self.moreButton.setMenu(menu)
 
-        #self.scroll_layout.addWidget(container)
         return self.project_container
 
     def _build_partition_section(self, parent_widget):
@@ -833,7 +832,7 @@ class ProjectsPage(QFrame):
         # 高级现代列数据集表格（参照上一轮设计的现代化 List 样式）
         self.partition_table = TableWidget(container)
         self.partition_table.setColumnCount(5)
-        self.partition_table.setFixedHeight(240)
+        self.partition_table.setMinimumHeight(370)
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
