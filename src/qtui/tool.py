@@ -19,7 +19,7 @@ import time
 
 from PySide6.QtCore import Qt, QSize, QTranslator
 from PySide6.QtGui import QIcon, QGuiApplication
-from PySide6.QtWidgets import QApplication, QLabel
+from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.core.utils import temp, v_code, prog_path
