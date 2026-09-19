@@ -163,7 +163,6 @@ class Builder:
                 "--hidden-import", "win32api",
                 "--hidden-import", "win32com",
                 "--hidden-import", "win32",
-                "--hidden-import", "pythoncom",
                 '--splash',
                 'splash.png'
             ])
