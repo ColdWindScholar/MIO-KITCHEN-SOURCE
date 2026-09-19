@@ -1070,10 +1070,10 @@ class ProjectsPage(QFrame):
                             except Exception:
                                 logging.exception('Bugs')
             else:
-                print("很抱歉，打包失败！")
+                print(self.tr("Failed to pack super!"))
             return 1
         else:
-            print("很抱歉，打包失败！")
+            print(self.tr("Failed to pack super!"))
             return 1
 
     def pack_zip(self):
