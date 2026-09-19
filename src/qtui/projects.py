@@ -722,7 +722,7 @@ class ProjectsPage(QFrame):
         dialog = NewProjectDialog(
             title=self.tr("New Project"),
             existing_projects=list(project_manger.get_projects()),
-            parent=self
+            parent=self.parent()
         )
         if dialog.exec():
             project_name = dialog.nameLineEdit.text().strip()
@@ -739,7 +739,7 @@ class ProjectsPage(QFrame):
             title=self.tr("Rename Project"),
             existing_projects=list(project_manger.get_projects()),
             initial_text=self.project_combo.currentText(),
-            parent=self
+            parent=self.parent()
         )
         if dialog.exec():
             project_name = dialog.nameLineEdit.text().strip()
@@ -758,13 +758,13 @@ class ProjectsPage(QFrame):
         """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self, self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
+            show_info_bar(self.parent(), self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
 
         result = MessageBox(
             self.tr('Confirm Delete'),
             self.tr("Remove '{}' ?").format(project_name),
-            self
+            self.parent()
         ).exec()
 
         if result != 1:
@@ -772,9 +772,9 @@ class ProjectsPage(QFrame):
 
         try:
             project_manger.remove(project_name)
-            show_info_bar(self, self.tr("Success"), self.tr("Project {} Removed.").format(project_name), bar_type=3)
+            show_info_bar(self.parent(), self.tr("Success"), self.tr("Project {} Removed.").format(project_name), bar_type=3)
         except Exception as e:
-            show_info_bar(self, self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e), bar_type=1)
+            show_info_bar(self.parent(), self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e), bar_type=1)
         self.refresh_projects()
 
     def build_project_section(self, parent):
