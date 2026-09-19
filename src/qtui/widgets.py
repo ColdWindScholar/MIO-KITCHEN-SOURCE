@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLineEdit, QHBoxLayout, QButtonGroup)
 from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
-    RadioButton, PushButton, BodyLabel
+    RadioButton, PushButton, BodyLabel, EditableComboBox
 from qfluentwidgets import (
     MessageBoxBase,
 )
@@ -650,7 +650,7 @@ class PackSuperMessageBox(MessageBoxBase):
         lf2_layout = QHBoxLayout()
 
         lf2_layout.addWidget(BodyLabel(self.tr("Group Name"), self))
-        self.show_group_name = ComboBox(self)
+        self.show_group_name = EditableComboBox(self)
         self.show_group_name.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
         self.show_group_name.setCurrentIndex(0)
         lf2_layout.addWidget(self.show_group_name)
