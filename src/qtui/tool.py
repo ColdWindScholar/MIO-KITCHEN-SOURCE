@@ -110,7 +110,7 @@ class MainWindow(FluentWindow):
         self.addSubInterface(self.home_page, FIF.HOME, self.tr('Home'))
         self.addSubInterface(self.project_page, FIF.DOCUMENT, self.tr('Project'))
         self.addSubInterface(self.plugin_page, FIF.APPLICATION, self.tr('Plugins'))
-        self.addSubInterface(self.apk_manager, FIF.DELETE, self.tr('ApkManager'))
+        self.addSubInterface(self.apk_manager, FIF.DEVELOPER_TOOLS, self.tr('ApkManager'))
         self.addSubInterface(self.about_page, FIF.INFO, self.tr('About'), NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.settings_page, FIF.SETTING, self.tr("Settings"), NavigationItemPosition.BOTTOM)
 

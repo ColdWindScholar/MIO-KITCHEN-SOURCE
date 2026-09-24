@@ -781,7 +781,6 @@ class ProjectsPage(QFrame):
         self.refresh_projects()
 
     def build_project_section(self, parent):
-        """项目管理模块：去掉 Card 容器，直接将控件平铺在主背景上"""
         self.project_container = QWidget(parent)
         layout = QVBoxLayout(self.project_container)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -806,7 +805,8 @@ class ProjectsPage(QFrame):
         menu.addAction(Action(FluentIcon.ADD, self.tr('New'), triggered=self.show_create_dialog))
         menu.addAction(Action(FluentIcon.SYNC, self.tr('Refresh'), triggered=self.refresh_projects))
         menu.addAction(Action(FluentIcon.EDIT, self.tr('Rename'), triggered=self.show_rename_dialog))
-        menu.addAction(Action(FluentIcon.REMOVE, self.tr('Delete'), triggered=self.delete_project))
+        menu.addAction(Action(FluentIcon.DELETE, self.tr('Delete'), triggered=self.delete_project))
+        menu.addAction(Action(FluentIcon.ZIP_FOLDER, self.tr("Pack Zip"), triggered=self.pack_zip))
         # Add menu
         self.moreButton.setMenu(menu)
 
@@ -1109,15 +1109,13 @@ class ProjectsPage(QFrame):
 
         # 工具按钮行
         tools_layout = QHBoxLayout()
-        self.zip_btn = PushButton(self.tr("Pack Zip"), container, FIF.APPLICATION)
-        self.zip_btn.clicked.connect(self.pack_zip)
+
         self.super_btn = PushButton(self.tr("Pack Super"), container, FIF.ALBUM)
         self.super_btn.clicked.connect(self.pack_super)
         self.format_conv_btn = PushButton(self.tr("Format Convertion"), container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
-        self.apk_mgr_btn = PushButton(self.tr("APK Manager"), container, FIF.DEVELOPER_TOOLS)
 
-        for btn in [self.zip_btn, self.super_btn, self.format_conv_btn, self.apk_mgr_btn]:
+        for btn in [self.super_btn, self.format_conv_btn]:
             btn.setMinimumWidth(105)
             tools_layout.addWidget(btn)
 
