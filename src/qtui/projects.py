@@ -1296,7 +1296,7 @@ class ProjectsPage(QFrame):
     def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
         if isinstance(size, str): size = int(size)
         print("[ext] repacking %s" % name)
-        size = utils.GetFolderSize(work + name, 4096, 3,
+        size = utils.GetFolderSize(os.path.join(work ,name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
         if not UTC:
@@ -1342,7 +1342,7 @@ class ProjectsPage(QFrame):
                 print(self.tr("Origin boot is lost.Cannot repack boot.img."))
                 return 1
         if source is None:
-            source = work + name
+            source = os.path.join(work, name)
         if not os.path.exists(source):
             print(f"Cannot Find {name}...")
             return 1
@@ -1429,7 +1429,7 @@ class ProjectsPage(QFrame):
                                   folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception:
                         logging.exception('Bugs')
-                fspatch.main(work + dname, os.path.join(f"{work}/config", f"{dname}_fs_config"))
+                fspatch.main(os.path.join(work , dname), os.path.join(f"{work}/config", f"{dname}_fs_config"))
                 utils.remove_duplicate(f"{work}/config/{dname}_fs_config")
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
@@ -1646,13 +1646,13 @@ class ProjectsPage(QFrame):
             for file_name in os.listdir(work):
                 if file_name.endswith(form):
                     if file_name.endswith("img"):
-                        f_type = gettype(work + file_name)
+                        f_type = gettype(os.path.join(work ,file_name))
                         if f_type == 'unknown':
                             f_type = form
                     else:
                         f_type = form
                     data.append(
-                        (file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(work + file_name)), f_type,
+                        (file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(os.path.join(work , file_name))), f_type,
                          "Image", "rw" if f_type == 'ext' else "ro",))
         return data
 
