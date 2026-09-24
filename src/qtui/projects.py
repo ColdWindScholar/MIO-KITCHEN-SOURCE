@@ -1215,7 +1215,7 @@ class ProjectsPage(QFrame):
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
         if not UTC:
             UTC = int(time.time())
-        print("[erofs] Repacking %s - %s - %s" % (name, format_ + f',{level}', "1.x"))
+        print("[erofs] Repacking %s - %s" % (name, f'{format_},{level}'))
         extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
         other_ = ['-E', 'legacy-compress'] if old_kernel else []
         cmd = ['mkfs.erofs', *other_, f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
