@@ -290,7 +290,7 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
             cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
                          os.path.join(work, name, 'ramdisk.txt'))
         else:
-            os.chdir(work + name)
+            os.chdir(os.path.join(work , name))
             utils.call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
             os.chdir(cfg.workingFolder.value)
     print("Unpack Done!")
@@ -1794,7 +1794,7 @@ class ProjectsPage(QFrame):
                     parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                     lpunpack.unpack(f"{work}/{i}.img", work)
                     for file_name in os.listdir(work):
-                        file_path = work + file_name
+                        file_path = os.path.join(work , file_name)
                         if file_name.endswith('_a.img'):
                             if os.path.exists(file_path) and os.path.exists(work + file_name.replace('_a', '')):
                                 if pathlib.Path(file_path).samefile(work + file_name.replace('_a', '')):
