@@ -1084,13 +1084,13 @@ class ProjectsPage(QFrame):
 
     def pack_zip(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self, self.tr("Warning"), self.tr("project's not exist"), 2)
+            show_info_bar(self.parent(), self.tr("Warning"), self.tr("project's not exist"), 2)
             return
-        dialog = RepackZipMessageBox(self)
+        dialog = RepackZipMessageBox(self.parent())
         if dialog.exec_():
             if dialog.is_add_tools_checked():
                 if not dialog.get_device_code():
-                    show_info_bar(self, self.tr("Warning"), self.tr("device code's empty"), 3)
+                    show_info_bar(self.parent(), self.tr("Warning"), self.tr("device code's empty"), 3)
                     return
                 if PackHybridRom(dialog.get_device_code()):
                     return
