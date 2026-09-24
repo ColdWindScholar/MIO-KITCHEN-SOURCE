@@ -62,7 +62,7 @@ class MainWindow(FluentWindow):
         
         self.show()
         # 设置窗口大小
-        self.resize(1000, 700)
+        self.resize(1000, 730)
 
         # 窗口居中显示
         self.center()
