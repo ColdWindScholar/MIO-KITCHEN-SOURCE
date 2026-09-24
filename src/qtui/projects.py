@@ -47,7 +47,7 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetIte
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
-    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action
+    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget
 
 from src.core import ext4
 from src.core import imgextractor
@@ -822,6 +822,12 @@ class ProjectsPage(QFrame):
         # 标题放外面
         frame = QHBoxLayout()
         frame.addWidget(QLabel(self.tr("Partition(s)")))
+        self.format_widget = SegmentedWidget(container)
+        for c in ['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
+                                    'update.app']:
+            self.format_widget.addItem(c, c, onClick=self.refresh_unpack)
+        self.format_widget.setCurrentItem("new.dat.br")
+        layout.addWidget(self.format_widget)
         self.ring = IndeterminateProgressRing(self)
         self.ring.setFixedSize(16, 16)
         self.ring.hide()
@@ -852,10 +858,7 @@ class ProjectsPage(QFrame):
         self.filter_input.setPlaceholderText(self.tr("Search partitions..."))
         self.filter_input.textChanged.connect(self.filter_tabview)
         self.filter_input.setFixedWidth(230)
-        self.format_combo = ComboBox(container)
-        self.format_combo.addItems(['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
-                                    'update.app'])
-        self.format_combo.currentTextChanged.connect(self.refresh_unpack)
+
         self.partition_table.setHorizontalHeaderLabels(
             [self.tr("NAME"), self.tr("SIZE"), self.tr("FS"), self.tr("IMAGE"), self.tr("ATTRIBUTES")])
         self.unpack_rb = RadioButton(self.tr("Unpack"), container)
@@ -866,7 +869,6 @@ class ProjectsPage(QFrame):
         row1.addWidget(self.select_all_cb)
         row1.addWidget(self.pack_rb)
         row1.addWidget(self.unpack_rb)
-        row1.addWidget(self.format_combo)
         row1.addWidget(self.filter_input)
         layout.addLayout(row1)
 
@@ -1125,7 +1127,7 @@ class ProjectsPage(QFrame):
         self.scroll_layout.addWidget(container)
 
     def refresh_repack(self):
-        self.format_combo.setDisabled(True)
+        self.format_widget.setDisabled(True)
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_repack_list())
 
@@ -1571,7 +1573,7 @@ class ProjectsPage(QFrame):
                 item = self.partition_table.item(row_idx, 0)
                 if item.checkState() == Qt.CheckState.Checked:
                     unpack_list.append(item.text())
-            self.my_task_worker = GenericTaskWorker(self.unpack, unpack_list, self.format_combo.currentText())
+            self.my_task_worker = GenericTaskWorker(self.unpack, unpack_list, self.format_widget.currentItem().text())
         else:
             pack_list = []
             for row_idx in range(self.partition_table.rowCount()):
@@ -1612,7 +1614,7 @@ class ProjectsPage(QFrame):
         self.execute_btn.setEnabled(True)
 
     def refresh_unpack(self):
-        self.format_combo.setDisabled(False)
+        self.format_widget.setDisabled(False)
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
 
@@ -1623,7 +1625,7 @@ class ProjectsPage(QFrame):
         if not project_manger.exist():
             return data
 
-        form = self.format_combo.currentText()
+        form = self.format_widget.currentItem().text()
         if form == 'payload':
             if os.path.exists(f"{work}/payload.bin"):
                 with open(f"{work}/payload.bin", 'rb') as pay:
