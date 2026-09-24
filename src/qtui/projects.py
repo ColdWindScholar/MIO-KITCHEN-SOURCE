@@ -1862,7 +1862,7 @@ class ProjectsPage(QFrame):
                                  '-o',
                                  work,
                                  '-x'],
-                            out=False) != 0:
+                            out=True) != 0:
                         print('Unpack failed...')
                         continue
                     if os.path.exists(f'{work}/{i}'):
@@ -1874,7 +1874,7 @@ class ProjectsPage(QFrame):
                     if utils.call(
                             exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                  "-o", work],
-                            out=False) != 0:
+                            out=True) != 0:
                         print('Unpack failed...')
                         continue
                     if os.path.exists(f'{work}/{i}'):
