@@ -34,7 +34,7 @@ class LogMessageBoxBase(QWidget):
 
         # 预设不同日志级别的颜色格式
         self._formats = {
-            "INFO": self._create_format(QColor("#2ECC71")),  # 绿色
+            "INFO": self._create_format(QColor("#00BCD4")),  # 绿色
             "WARN": self._create_format(QColor("#F1C40F")),  # 黄色
             "ERROR": self._create_format(QColor("#E74C3C")),  # 红色
             "DEBUG": self._create_format(QColor("#95A5A6")),  # 灰色
