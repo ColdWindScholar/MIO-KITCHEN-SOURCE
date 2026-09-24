@@ -303,8 +303,8 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     if not os.path.exists(file_path):
         print(f"{file_path} does not exist")
         return False
-    utils.re_folder(output + output_name)
-    utils.LogoDumper(file_path, output + output_name).unpack()
+    utils.re_folder(os.path.join(output, output_name))
+    return utils.LogoDumper(file_path, output + output_name).unpack()
 
 
 def un_dtbo(bn: str = 'dtbo') -> None:
