@@ -1127,7 +1127,6 @@ class ProjectsPage(QFrame):
         self.scroll_layout.addWidget(container)
 
     def refresh_repack(self):
-        self.format_widget.setDisabled(True)
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_repack_list())
 
@@ -1614,7 +1613,6 @@ class ProjectsPage(QFrame):
         self.execute_btn.setEnabled(True)
 
     def refresh_unpack(self):
-        self.format_widget.setDisabled(False)
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
 
