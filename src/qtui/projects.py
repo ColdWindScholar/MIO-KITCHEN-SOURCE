@@ -1334,19 +1334,19 @@ class ProjectsPage(QFrame):
             os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
         return 0
 
-    def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None):
+    def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None) -> int:
         work = project_manger.current_work_path()
         flag = ''
         if boot is None:
             boot = utils.findfile(f"{name}.img", work)
             if not boot:
                 print(self.tr("Origin boot is lost.Cannot repack boot.img."))
-                return
+                return 1
         if source is None:
             source = work + name
         if not os.path.exists(source):
             print(f"Cannot Find {name}...")
-            return
+            return 1
         if os.path.isfile(f'{source}/second_order'):
             print("Repack Rk resource...")
             rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
@@ -1402,9 +1402,10 @@ class ProjectsPage(QFrame):
             except (Exception, BaseException):
                 print(f"Failed to remove {name}")
             print(self.tr("Successfully packed Boot..."))
+        return 0
 
     def packrom(self, chosen_parts,
-                format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
+                pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
         if not project_manger.exist():
@@ -1452,12 +1453,12 @@ class ProjectsPage(QFrame):
                         if remove_source_files:
                             self.rdi(work, dname)
                         print("Packed successfully:{}".format(dname))
-                        if format in ["dat", "br", "sparse"]:
+                        if pack_format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if format == 'dat':
+                            if pack_format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
-                            elif format == 'br':
+                            elif pack_format == 'br':
                                 self.datbr(project_manger.current_work_output_path(), dname, scale,
                                            int(parts_dict.get('dat_ver', 4)))
                             else:
@@ -1471,12 +1472,12 @@ class ProjectsPage(QFrame):
                         if remove_source_files:
                             self.rdi(work, dname)
                         print("Packed successfully: {}!".format(dname))
-                        if format in ["dat", "br", "sparse"]:
+                        if pack_format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
-                            if format == 'dat':
+                            if pack_format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
-                            elif format == 'br':
+                            elif pack_format == 'br':
                                 self.datbr(project_manger.current_work_output_path(), dname, scale,
                                            int(parts_dict.get('dat_ver', 4)))
                             else:
@@ -1505,7 +1506,7 @@ class ProjectsPage(QFrame):
                     if ext4_packer == "make_ext4fs":
                         exit_code = self.make_ext4fs(name=dname, work=work,
                                                      work_output=project_manger.current_work_output_path(),
-                                                     sparse=format in ["dat", "br", "sparse"],
+                                                     sparse=pack_format in ["dat", "br", "sparse"],
                                                      size=ext4_size_value,
                                                      UTC=UTC, has_contexts=os.path.exists(contexts_file))
 
@@ -1513,7 +1514,7 @@ class ProjectsPage(QFrame):
                         exit_code = self.mke2fs(
                             name=dname, work=work,
                             work_output=project_manger.current_work_output_path(),
-                            sparse=format in [
+                            sparse=pack_format in [
                                 "dat",
                                 "br",
                                 "sparse"],
@@ -1525,10 +1526,10 @@ class ProjectsPage(QFrame):
 
                     if remove_source_files:
                         self.rdi(work, dname)
-                    if format == "dat":
+                    if pack_format == "dat":
                         self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                    int(parts_dict.get('dat_ver', '4')))
-                    elif format == "br":
+                    elif pack_format == "br":
                         self.datbr(project_manger.current_work_output_path(), dname, scale,
                                    int(parts_dict.get('dat_ver', '4')))
                     else:
