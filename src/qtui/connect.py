@@ -21,7 +21,7 @@ from qfluentwidgets import (
 from src.core.utils import v_code
 
 class NetworkBridge(QObject):
-    trigger_signal = Signal(str)
+    trigger_signal = Signal(dict)
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
 
@@ -273,7 +273,7 @@ class ConnectPage(QWidget):
         self.console_log_view.setTextCursor(cursor)
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
-    def execute_desktop_function(self, action_id):
+    def execute_desktop_function(self, action_id:dict):
         if action_id == "hello":
             self.append_native_console_log("INFO", "Executed 'hello' logic loop successfully.")
         elif action_id == "minimize":
