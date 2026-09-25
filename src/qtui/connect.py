@@ -41,7 +41,7 @@ ACTIVE_SESSION = {
 def handle_handshake():
     if ACTIVE_SESSION["token"]:
         return "Connected by another device.", 403
-    device_name = request.headers.get('X-Device-Name')
+    device_name = request.headers.get('X-Device-Name', "Device")
     request_data = request.get_json() or {}
     if request_data['verify_code'] != ACTIVE_SESSION["verify_code"]:
         return "Invalid verification code.", 403
