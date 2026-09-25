@@ -78,7 +78,7 @@ def handle_disconnect():
 
     return "Disconnected already.", 200
 
-@flask_backend.route('/action/<action_name>', methods=['GET'])
+@flask_backend.route('/action', methods=['GET'])
 def handle_incoming_phone_action(action_name):
     auth_header = request.headers.get('Authorization', None)
     if not auth_header or not auth_header.startswith('MioKey'):
