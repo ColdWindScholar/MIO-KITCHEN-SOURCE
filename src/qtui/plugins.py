@@ -5,6 +5,7 @@ from shutil import rmtree
 from threading import Thread
 from typing import Any
 
+import requests
 from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
@@ -1263,6 +1264,7 @@ class PluginPage(QWidget):
         super().__init__(parent)
         self.setObjectName("PluginPage")
         self.built_in_plugins = BuiltInPlugins(self)
+        self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
         self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
         self.initUI()
 
@@ -1429,12 +1431,8 @@ class PluginPage(QWidget):
                 "type": "Installed"
             })
 
-        # 4. Populate REPO Page: Store Registry Mock Data Placeholder
-        mock_repo_data = [
-            {"id": "ext_theme", "name": "Fluent Theme Pack", "author": "Community Studio"},
-            {"id": "ext_logger", "name": "Advanced Log Terminal", "author": "DevTools Lab"}
-        ]
-        for item in mock_repo_data:
+
+        for item in self.get_repo_plugins():
             card = AppCard(
                 icon=FluentIcon.DOWNLOAD,
                 title=item["name"],
@@ -1468,7 +1466,17 @@ class PluginPage(QWidget):
     def uninstall_plugin(self, plugin_id: str):
         UninstallMpk(plugin_id, True, self)
         self.load_plugin_cards()
-
+    def get_repo_plugins(self, force_update:bool= False):
+        if not os.path.exists(self.local_db_path) or force_update:
+            url_response = requests.get(cfg.pluginRepo + 'plugin.json', timeout=10)
+            url_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx).
+            data = url_response.json()  # Parse JSON response.
+            utils.JsonEdit(self.local_db_path).write(data)
+        else:
+            data = utils.JsonEdit(self.local_db_path).read()
+            if not data:
+                self.get_repo_plugins(force_update=True)
+        return data
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self, self.tr("Choose a mpk file"), "", "MPK Files (*.mpk)"
