@@ -1521,7 +1521,7 @@ class PluginPage(QWidget):
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                 card_widget.openButton.setText(f"{percentage} %")
-                print(percentage)
+            module_manager.install(os.path.join(temp, file))
         card_widget.openButton.setDisabled(False)
         card_widget.openButton.setText(origin_text)
 
