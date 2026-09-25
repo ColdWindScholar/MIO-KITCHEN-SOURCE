@@ -1478,7 +1478,7 @@ class PluginPage(QWidget):
                     author=item['author'],
                     parent=self.scroll_content_repo,
                     description=item['desc'],
-                    tags=["Windows", "v1.2.0"]
+                    tags=[item['system'], item['version']]
                 )
                 card.openButton.setText(self.tr("Download"))
                 card.openButton.clicked.connect(
@@ -1491,7 +1491,8 @@ class PluginPage(QWidget):
                     "author": item["author"].lower(),
                     "type": "Repo"
                 })
-
+    def download_plugin(self, plugin_id):
+        pass
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
         query = text.strip().lower()
