@@ -1302,8 +1302,8 @@ class PluginPage(QWidget):
         # New Feature: Cloud Download Module Control Trigger
         self.SegmentedWidget = SegmentedWidget(self)
         self.SegmentedWidget.setMaximumHeight(25)
-        self.SegmentedWidget.addItem(routeKey="Installed", text=self.tr("Installed"), onClick=lambda: print("Song"))
-        self.SegmentedWidget.addItem(routeKey="Repo", text=self.tr("Repo"), onClick=lambda: print("Album"))
+        self.SegmentedWidget.addItem(routeKey="Installed", text=self.tr("Installed"))
+        self.SegmentedWidget.addItem(routeKey="Repo", text=self.tr("Repo"))
         self.SegmentedWidget.setCurrentItem("Installed")
         header_layout.addWidget(self.SegmentedWidget)
         outer_layout.addLayout(header_layout)
@@ -1322,7 +1322,11 @@ class PluginPage(QWidget):
         self.scroll_area_installed.setWidgetResizable(True)
         self.scroll_area_installed.setFrameShape(ScrollArea.Shape.NoFrame)
         self.scroll_area_installed.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
+        #
+        self.scroll_area_repo = ScrollArea(self)
+        self.scroll_area_repo.setWidgetResizable(True)
+        self.scroll_area_repo.setFrameShape(ScrollArea.Shape.NoFrame)
+        self.scroll_area_repo.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         # Inner canvas widget holding the vertical stacked cards
         self.scroll_content_installed = QWidget()
         self.scroll_content_installed.setObjectName("ScrollContentPlugin")
@@ -1336,6 +1340,9 @@ class PluginPage(QWidget):
 
         self.scroll_area_installed.setWidget(self.scroll_content_installed)
         self.scroll_area_installed.setStyleSheet("background: transparent")
+        self.stacked_widget.addWidget(self.scroll_area_installed)
+        self.stacked_widget.addWidget(self.scroll_area_repo)
+        self.SegmentedWidget.currentItemChanged.connect(lambda page_index:self.stacked_widget.setCurrentWidget(self.scroll_area_installed if page_index == 'Installed' else self.scroll_area_repo))
         outer_layout.addWidget(self.stacked_widget)
 
 
