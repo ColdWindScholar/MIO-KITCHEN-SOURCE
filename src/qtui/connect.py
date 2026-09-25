@@ -85,9 +85,7 @@ def handle_incoming_phone_action():
         network_bridge.log_signal.emit("ERROR", f"Refused unauthenticated client request.")
         return "Unauthorized: Missing header", 401
 
-    extracted_token = auth_header[6:]
-
-    if ACTIVE_SESSION["token"] is None or extracted_token != ACTIVE_SESSION["token"]:
+    if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
         network_bridge.log_signal.emit("ERROR", "Request dropped. Bad verification signature.")
         return "Unauthorized: Invalid key token", 403
 
