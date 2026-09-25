@@ -1470,7 +1470,7 @@ class PluginPage(QWidget):
                 "type": "Installed"
             })
 
-        if self.SegmentedWidget.currentItem().text() == 'Repo':
+        if self.SegmentedWidget.currentRouteKey() == 'Repo':
             for item in self.get_repo_plugins():
                 card = AppCardRich(
                     icon=FluentIcon.DOWNLOAD,
@@ -1495,7 +1495,7 @@ class PluginPage(QWidget):
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
         query = text.strip().lower()
-        current_view_key = self.SegmentedWidget.currentItem().text()
+        current_view_key = self.SegmentedWidget.currentRouteKey()
 
         for data in self.cards_data:
             if data["type"] == current_view_key:
