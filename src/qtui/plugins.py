@@ -1542,7 +1542,7 @@ class PluginPage(QWidget):
 
     def get_repo_plugins(self, force_update: bool = False):
         if not os.path.exists(self.local_db_path) or force_update:
-            url_response = requests.get(cfg.pluginRepo + 'plugin.json', timeout=10)
+            url_response = requests.get(cfg.pluginRepo.value + 'plugin.json', timeout=10)
             url_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx).
             data = url_response.json()  # Parse JSON response.
             utils.JsonEdit(self.local_db_path).write(data)
