@@ -41,8 +41,8 @@ ACTIVE_SESSION = {
 def handle_handshake():
     if ACTIVE_SESSION["token"]:
         return "Connected by another device.", 403
-    device_name = request.headers.get('X-Device-Name', "Device")
     request_data = request.get_json() or {}
+    device_name = request_data.get("DeviceName", 'Device')
     if request_data['verify_code'] != ACTIVE_SESSION["verify_code"]:
         return "Invalid verification code.", 403
     device_ip = request.remote_addr
@@ -58,6 +58,23 @@ def handle_handshake():
 
     return jsonify({"token": generated_token}), 200
 
+@flask_backend.route('/disconnect', methods=['POST'])
+def handle_disconnect():
+    if not ACTIVE_SESSION["token"]:
+        return "Disconnected already.", 200
+    auth_header = request.headers.get('Authorization', None)
+    if not auth_header or not auth_header != 'Bearer ' + ACTIVE_SESSION["token"]:
+        return f"Unauthorized: Missing header {auth_header}", 401
+    device_ip = request.remote_addr
+
+    ACTIVE_SESSION["token"] = None
+    ACTIVE_SESSION["device_name"] = None
+    ACTIVE_SESSION["device_ip"] = None
+
+    network_bridge.connection_status_signal.emit(False, {})
+    network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
+
+    return "Disconnected already.", 200
 
 @flask_backend.route('/action/<action_name>', methods=['GET'])
 def handle_incoming_phone_action(action_name):
@@ -215,10 +232,7 @@ class ConnectPage(QWidget):
             self.address_label.show()
 
     def manually_terminate_session(self):
-        ACTIVE_SESSION["token"] = None
-        ACTIVE_SESSION["device_name"] = None
-        ACTIVE_SESSION["device_ip"] = None
-        ACTIVE_SESSION["verify_code"] = v_code(4)
+        handle_disconnect()
         self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
         self.toggle_workspace_ui_state(False)
