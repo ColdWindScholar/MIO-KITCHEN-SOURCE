@@ -12,10 +12,16 @@ on:
 jobs:
   build:
     needs: [build-win,build-linux,build-macos]
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12.6"]
+        include:
+            - arch: amd64
+              runner: ubuntu-latest
+              arch_suffix: amd64
+            - arch: arm64
+              runner: ubuntu-latest-arm
+              arch_suffix: arm64
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
