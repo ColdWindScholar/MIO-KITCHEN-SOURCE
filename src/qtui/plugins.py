@@ -1263,49 +1263,36 @@ class PluginPage(QWidget):
         super().__init__(parent)
         self.setObjectName("PluginPage")
         self.built_in_plugins = BuiltInPlugins(self)
-        self.cards_data = []  # Track card mappings for easy filtering
+        self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
         self.initUI()
 
         module_manager.master = self
-
-    def uninstall_plugin(self, plugin_id: str):
-        UninstallMpk(plugin_id, True, self)
-        self.load_plugin_cards()
-
-    def install_mpk(self):
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            self.tr("Choose a mpk file"),
-            "",
-            "MPK Files (*.mpk)"
-        )
-        if file_path:
-            dialog = InstallMpk(file_path, self)
-            if dialog.exec_():
-                return
 
     def initUI(self):
         # 1. Main outer layout
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
-        # 2. Header Layout (Title and Description)
+
+        # 2. Header Layout (Title and Navigation)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
         title = TitleLabel(self.tr("Plugin"))
         text_header_layout.addWidget(title)
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
-        self.local_install_btn = PushButton(FluentIcon.ADD, self.tr("Install"), self)
-        self.local_install_btn.clicked.connect(self.install_mpk)
 
-        # New Feature: Cloud Download Module Control Trigger
+        # Navigation Controller
         self.SegmentedWidget = SegmentedWidget(self)
         self.SegmentedWidget.setMaximumHeight(25)
         self.SegmentedWidget.addItem(routeKey="Installed", text=self.tr("Installed"))
         self.SegmentedWidget.addItem(routeKey="Repo", text=self.tr("Repo"))
         self.SegmentedWidget.setCurrentItem("Installed")
         header_layout.addWidget(self.SegmentedWidget)
+
+        self.local_install_btn = PushButton(FluentIcon.ADD, self.tr("Install"), self)
+        self.local_install_btn.clicked.connect(self.install_mpk)
+        header_layout.addWidget(self.local_install_btn)
         outer_layout.addLayout(header_layout)
 
         # 3. Search Bar Integration
@@ -1314,74 +1301,100 @@ class PluginPage(QWidget):
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.textChanged.connect(self.filter_plugins)
         outer_layout.addWidget(self.search_bar)
-        header_layout.addWidget(self.local_install_btn)
+
+        # 4. View Presentation Stacked Management
         self.stacked_widget = QStackedWidget(self)
-        # 4. Scrollable Container for Cards
-        # Using QFluentWidgets' ScrollArea for seamless native scrolling look
+
+        # Setup Scroll Area for Installed Tab
         self.scroll_area_installed = ScrollArea(self)
         self.scroll_area_installed.setWidgetResizable(True)
         self.scroll_area_installed.setFrameShape(ScrollArea.Shape.NoFrame)
         self.scroll_area_installed.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        #
+        self.scroll_area_installed.setStyleSheet("background: transparent")
+
+        self.scroll_content_installed = QWidget()
+        self.scroll_content_installed.setObjectName("ScrollContentPlugin")
+        self.installed_layout = QVBoxLayout(self.scroll_content_installed)
+        self.installed_layout.setContentsMargins(0, 5, 0, 0)
+        self.installed_layout.setSpacing(5)
+        self.installed_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scroll_area_installed.setWidget(self.scroll_content_installed)
+
+        # Setup Scroll Area for Repo Tab
         self.scroll_area_repo = ScrollArea(self)
         self.scroll_area_repo.setWidgetResizable(True)
         self.scroll_area_repo.setFrameShape(ScrollArea.Shape.NoFrame)
         self.scroll_area_repo.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # Inner canvas widget holding the vertical stacked cards
-        self.scroll_content_installed = QWidget()
-        self.scroll_content_installed.setObjectName("ScrollContentPlugin")
-        self.scroll_content_repo= QWidget()
-        self.scroll_content_repo.setObjectName("ScrollContentPluginRepo")
-        self.cards_layout = QVBoxLayout(self.scroll_content_installed)
-        self.cards_layout.setContentsMargins(0, 5, 0, 0)
-        self.cards_layout.setSpacing(5)
-        self.cards_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-        # 5. Populate Plugin Cards dynamically
-        self.load_plugin_cards()
-
-        self.scroll_area_installed.setWidget(self.scroll_content_installed)
-        self.scroll_area_installed.setWidget(self.scroll_content_repo)
-        self.scroll_area_installed.setStyleSheet("background: transparent")
         self.scroll_area_repo.setStyleSheet("background: transparent")
+
+        self.scroll_content_repo = QWidget()
+        self.scroll_content_repo.setObjectName("ScrollContentPluginRepo")
+        self.repo_layout = QVBoxLayout(self.scroll_content_repo)
+        self.repo_layout.setContentsMargins(0, 5, 0, 0)
+        self.repo_layout.setSpacing(5)
+        self.repo_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scroll_area_repo.setWidget(self.scroll_content_repo)
+
+        # Register components onto structural views
         self.stacked_widget.addWidget(self.scroll_area_installed)
         self.stacked_widget.addWidget(self.scroll_area_repo)
-        self.SegmentedWidget.currentItemChanged.connect(lambda page_index:self.stacked_widget.setCurrentWidget(self.scroll_area_installed if page_index == 'Installed' else self.scroll_area_repo))
         outer_layout.addWidget(self.stacked_widget)
 
+        # Connect Navigation to Page Stacking Management
+        self.SegmentedWidget.currentItemChanged.connect(self.on_tab_changed)
+
+        # 5. Populate Cards Dynamically
+        self.load_plugin_cards()
+
+    def on_tab_changed(self, route_key):
+        """Manages stacked views changing and applies active filtering rules"""
+        if route_key == 'Installed':
+            self.stacked_widget.setCurrentWidget(self.scroll_area_installed)
+        else:
+            self.stacked_widget.setCurrentWidget(self.scroll_area_repo)
+        # Apply the current search filter context immediately to the new screen focus
+        self.filter_plugins(self.search_bar.text())
+
+    def _clear_layout(self, layout):
+        """Safely disposes components out of layout nodes to avoid leakage memory states"""
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
 
     def load_plugin_cards(self):
-        # Clear out existing layout elements if re-loading
-        for data in self.cards_data:
-            data['card_widget'].hide()
-            self.cards_layout.removeWidget(data['card_widget'])
-            data['card_widget'].destroy()
-        self.cards_layout.update()
+        # 1. Memory Cleanups for Layout Hierarchies
+        self._clear_layout(self.installed_layout)
+        self._clear_layout(self.repo_layout)
         self.cards_data.clear()
+
+        # 2. Populate INSTALLED Page: Built-In Modules
         for plugin_id in self.built_in_plugins.plugins.keys():
             plugin_icon = FluentIcon.APPLICATION
             plugin_info = self.built_in_plugins.plugins[plugin_id]
             plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
+
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin_title,
-                content=self.tr('Built-In Plugin')
+                content=self.tr('Built-In Plugin'),
+                parent=self.scroll_content_installed
             )
             card.moreButton.clicked.connect(lambda: print("None"))
-            # Setup execution bindings (Safe against the signal boolean emission)
             card.openButton.clicked.connect(
-                lambda state, plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
-            card.clicked.connect(lambda plugin_id=plugin_id: self.built_in_plugins.exec_plugin(plugin_id))
+                lambda state, pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
+            card.clicked.connect(lambda pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
 
-            self.cards_layout.addWidget(card)
-
-            # Store structural references for fast runtime filtering queries
+            self.installed_layout.addWidget(card)
             self.cards_data.append({
                 "card_widget": card,
                 "title": plugin_title.lower(),
-                "author": "Mio-Kitchen"
+                "author": "mio-kitchen",
+                "type": "Installed"
             })
 
+        # 3. Populate INSTALLED Page: Downloaded Local Directory Packages
         for i in module_manager.list_packages():
             plugin = module_manager.get_info(i)
             plugin_icon = os.path.join(module_manager.module_dir, i, 'icon')
@@ -1394,40 +1407,76 @@ class PluginPage(QWidget):
             card = AppCard(
                 icon=plugin_icon,
                 title=plugin_title,
-                content=plugin_author
+                content=plugin_author,
+                parent=self.scroll_content_installed
             )
             menu = RoundMenu(parent=card.moreButton)
             menu.addAction(Action(FluentIcon.CLOSE, self.tr('Uninstall'),
-                                  triggered=lambda state, plugin_id=i: self.uninstall_plugin(plugin_id)))
+                                  triggered=lambda state, pid=i: self.uninstall_plugin(pid)))
             menu.addAction(Action(FluentIcon.ZOOM_OUT, self.tr('Export'),
-                                  triggered=lambda state, plugin_id=i: module_manager.export(plugin_id)))
+                                  triggered=lambda state, pid=i: module_manager.export(pid)))
             menu.addAction(Action(FluentIcon.EDIT, self.tr('Edit'), triggered=lambda: print("Saved")))
 
-            # Add menu
             card.moreButton.setMenu(menu)
-            # Setup execution bindings (Safe against the signal boolean emission)
-            card.openButton.clicked.connect(lambda state, plugin_id=i: self.exec_plugin(plugin_id))
-            card.clicked.connect(lambda plugin_id=i: self.exec_plugin(plugin_id))
+            card.openButton.clicked.connect(lambda state, pid=i: self.exec_plugin(pid))
+            card.clicked.connect(lambda pid=i: self.exec_plugin(pid))
 
-            self.cards_layout.addWidget(card)
-
-            # Store structural references for fast runtime filtering queries
+            self.installed_layout.addWidget(card)
             self.cards_data.append({
                 "card_widget": card,
                 "title": plugin_title.lower(),
-                "author": plugin_author.lower()
+                "author": plugin_author.lower(),
+                "type": "Installed"
+            })
+
+        # 4. Populate REPO Page: Store Registry Mock Data Placeholder
+        mock_repo_data = [
+            {"id": "ext_theme", "name": "Fluent Theme Pack", "author": "Community Studio"},
+            {"id": "ext_logger", "name": "Advanced Log Terminal", "author": "DevTools Lab"}
+        ]
+        for item in mock_repo_data:
+            card = AppCard(
+                icon=FluentIcon.DOWNLOAD,
+                title=item["name"],
+                content=item["author"],
+                parent=self.scroll_content_repo
+            )
+            card.openButton.setText(self.tr("Download"))
+            card.openButton.clicked.connect(
+                lambda state, pid=item["id"]: print(f"Downloading: {pid}"))
+
+            self.repo_layout.addWidget(card)
+            self.cards_data.append({
+                "card_widget": card,
+                "title": item["name"].lower(),
+                "author": item["author"].lower(),
+                "type": "Repo"
             })
 
     def filter_plugins(self, text):
-        """
-        Dynamically filters plugin rows based on title or author lookups
-        """
+        """Dynamically filters plugin records aligned exactly with active context view keys"""
         query = text.strip().lower()
+        current_view_key = self.SegmentedWidget.currentItem().text()
+
         for data in self.cards_data:
-            if query in data["title"] or query in data["author"]:
-                data["card_widget"].show()
+            if data["type"] == current_view_key:
+                visible = not query or (query in data["title"] or query in data["author"])
+                data["card_widget"].setVisible(visible)
             else:
                 data["card_widget"].hide()
+
+    def uninstall_plugin(self, plugin_id: str):
+        UninstallMpk(plugin_id, True, self)
+        self.load_plugin_cards()
+
+    def install_mpk(self):
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, self.tr("Choose a mpk file"), "", "MPK Files (*.mpk)"
+        )
+        if file_path:
+            dialog = InstallMpk(file_path, self)
+            if dialog.exec_():
+                self.load_plugin_cards()
 
     def exec_plugin(self, plugin_id):
         module_manager.run(plugin_id)
