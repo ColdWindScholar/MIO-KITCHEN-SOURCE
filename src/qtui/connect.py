@@ -275,12 +275,4 @@ class ConnectPage(QWidget):
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
     def execute_desktop_function(self, action_id:dict):
-        if action_id == "hello":
-            self.append_native_console_log("INFO", "Executed 'hello' logic loop successfully.")
-        elif action_id == "minimize":
-            self.append_native_console_log("INFO", "Processing window state tracking minimization sequence.")
-            main_window = self.window()
-            if main_window:
-                main_window.showMinimized()
-        else:
-            self.append_native_console_log("WARN", f"Unrecognized command reference called: '{action_id}'")
+        print(action_id)
