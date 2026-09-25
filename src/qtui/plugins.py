@@ -1498,7 +1498,7 @@ class PluginPage(QWidget):
 
     def download_plugin(self, plugin_info:dict):
         files = plugin_info.get("files", [])
-        size = plugin_info.get("size")
+        size = plugin_info.get("size", 0)
         depend = plugin_info.get('depend', [])
         card_widget = None
         for d in depend:
@@ -1507,13 +1507,17 @@ class PluginPage(QWidget):
                     if depend_info['id'] == d:
                         self.download_plugin(depend_info)
         for data in self.cards_data:
-            if data['id'] == plugin_info['id']:
+            if "id" not in data:
+                continue
+            if data['id'] == plugin_info['id'] and data['type'] == 'Repo':
                 card_widget = data["card_widget"]
         if not card_widget:
             return 1
         card_widget.openButton.setDisabled(True)
-        for i in files:
-            print(i)
+        for file in files:
+            download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size)
+            for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
+                card_widget.openButton.setText(f"{percentage} %")
         card_widget.openButton.setDisabled(False)
 
     def filter_plugins(self, text):
