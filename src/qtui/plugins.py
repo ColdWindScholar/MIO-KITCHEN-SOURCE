@@ -1482,7 +1482,7 @@ class PluginPage(QWidget):
                     description=item['desc'],
                     tags=[item['system'], item['version']]
                 )
-                card.openButton.setText(self.tr("Download"))
+                card.openButton.setText(self.tr("Download") if not module_manager.is_installed(item['id']) else self.tr("Reinstall"))
                 card.openButton.clicked.connect(
                     lambda state, plugin_info=item: self.download_plugin(plugin_info))
 
