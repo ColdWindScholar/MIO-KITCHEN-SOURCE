@@ -1,3 +1,4 @@
+import json
 import socket
 import uuid
 from datetime import datetime
@@ -170,11 +171,11 @@ class ConnectPage(QWidget):
 
         # ==================== INITIALIZATION ====================
         self.lan_ip = fetch_linux_lan_ip()
-        self.connection_url = f"http://{self.lan_ip}:5000"
-        self.address_label.setText(self.connection_url)
+        json_text = json.dumps({"url":f"http://{self.lan_ip}:5000", "verify_code":ACTIVE_SESSION["verify_code"]}, ensure_ascii=True)
+        self.address_label.setText(f"http://{self.lan_ip}:5000")
         self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
-        self.render_qr_matrix(self.connection_url)
+        self.render_qr_matrix(json_text)
 
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute_desktop_function)
@@ -222,6 +223,7 @@ class ConnectPage(QWidget):
         ACTIVE_SESSION["device_name"] = None
         ACTIVE_SESSION["device_ip"] = None
         ACTIVE_SESSION["verify_code"] = v_code(4)
+        self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
         self.toggle_workspace_ui_state(False)
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
@@ -238,17 +240,14 @@ class ConnectPage(QWidget):
         tag_format.setFontWeight(QFont.Weight.Bold)
 
         message_format = QTextCharFormat()
-
-        if log_level == "SUCCESS":
-            tag_format.setForeground(QColor("#16A34A"))
-        elif log_level == "INFO":
-            tag_format.setForeground(QColor("#2563EB"))
-        elif log_level == "WARN":
-            tag_format.setForeground(QColor("#D97706"))
-        elif log_level == "ERROR":
-            tag_format.setForeground(QColor("#DC2626"))
-        else:
-            tag_format.setForeground(QColor("#475569"))
+        LOG_LEVELS = {
+            "SUCCESS":QColor("#16A34A"),
+            "INFO":QColor("#2563EB"),
+            "WARN":QColor("#D97706"),
+            "ERROR":QColor("#DC2626"),
+            "DEFAULT":QColor("#475569")
+        }
+        tag_format.setForeground(LOG_LEVELS.get(log_level, "DEFAULT"))
 
         cursor.setCharFormat(timestamp_format)
         cursor.insertText(f"[{timestamp}] ")
