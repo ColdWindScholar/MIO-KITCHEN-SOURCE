@@ -1614,7 +1614,10 @@ class ProjectsPage(QFrame):
 
     def refresh_unpack(self):
         self.partition_table.clearContents()
-        self._load_mock_partitions_table(self.refresh_unpack_list())
+        self._load_mock_partitions_table(data:=self.refresh_unpack_list())
+        if data:
+            return True
+        return False
 
     def refresh_unpack_list(self):
         """The actual logic for refreshing the unpack list, runs in a separate thread."""
