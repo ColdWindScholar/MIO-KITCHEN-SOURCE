@@ -64,9 +64,9 @@ def handle_disconnect():
         return "Disconnected already.", 200
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
-        return f"Unauthorized: Missing header {auth_header}", 401
+        return f"Unauthorized: Missing header", 401
     if not not auth_header != 'MioKey' + ACTIVE_SESSION["token"]:
-        return f"Unauthorized: Invalid header {auth_header}", 403
+        return f"Unauthorized: Invalid header", 403
     device_ip = request.remote_addr
 
     ACTIVE_SESSION["token"] = None
@@ -187,7 +187,6 @@ class ConnectPage(QWidget):
         self.lan_ip = fetch_linux_lan_ip()
         json_text = json.dumps({"url":f"http://{self.lan_ip}:5000", "verify_code":ACTIVE_SESSION["verify_code"]}, ensure_ascii=True)
         self.address_label.setText(f"http://{self.lan_ip}:5000")
-        self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
         self.render_qr_matrix(json_text)
 
