@@ -63,8 +63,10 @@ def handle_disconnect():
     if not ACTIVE_SESSION["token"]:
         return "Disconnected already.", 200
     auth_header = request.headers.get('Authorization', None)
-    if not auth_header or not auth_header != 'Bearer ' + ACTIVE_SESSION["token"]:
+    if not auth_header:
         return f"Unauthorized: Missing header {auth_header}", 401
+    if not not auth_header != 'Bearer ' + ACTIVE_SESSION["token"]:
+        return f"Unauthorized: Invalid header {auth_header}", 403
     device_ip = request.remote_addr
 
     ACTIVE_SESSION["token"] = None
