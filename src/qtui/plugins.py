@@ -1248,7 +1248,7 @@ class BuiltInPlugins(QObject):
                 c = orig_size - file_size
                 progress_bar.close()
                 InfoBar.success(
-                    title="Success",
+                    title=self.tr("Success"),
                     content=self.master.tr("总共从文件末尾截去了 %d 个零字节(~ %s)") % (c, utils.hum_convert(c)),
                     position=InfoBarPosition.TOP,
                     duration=4000,
