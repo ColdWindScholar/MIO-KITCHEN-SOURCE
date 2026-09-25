@@ -1184,7 +1184,7 @@ class BuiltInPlugins:
         if dialog.exec():
             path = dialog.file_path_edit.text()
             if not os.path.exists(path) or not path.strip():
-                InfoBar.warning(self.master.tr('Please choose a path.'), self.master)
+                InfoBar.warning(title="Decrypt XTC Xml", content=self.master.tr('Please choose a path.'), parent=self.master)
                 return
             for root, _, files in os.walk(path, topdown=True):
                 for f in files:
