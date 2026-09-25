@@ -1434,7 +1434,7 @@ class ProjectsPage(QFrame):
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
                     if cfg.selinuxPatch.value:
-                        contextpatch.main(work + dname, contexts_file, context_rule_file)
+                        contextpatch.main(os.path.join(work, dname), contexts_file, context_rule_file)
                         new_rules = contextpatch.scan_context(contexts_file)
                         rules = utils.JsonEdit(context_rule_file)
                         rules.write(new_rules | rules.read())
