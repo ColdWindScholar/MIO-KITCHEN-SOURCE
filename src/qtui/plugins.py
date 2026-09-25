@@ -5,7 +5,7 @@ from shutil import rmtree
 from threading import Thread
 from typing import Any
 
-from PySide6.QtWidgets import QWidget, QFileDialog
+from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
     MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, Pivot, SegmentedWidget
@@ -1315,18 +1315,18 @@ class PluginPage(QWidget):
         self.search_bar.textChanged.connect(self.filter_plugins)
         outer_layout.addWidget(self.search_bar)
         header_layout.addWidget(self.local_install_btn)
-
+        self.stacked_widget = QStackedWidget(self)
         # 4. Scrollable Container for Cards
         # Using QFluentWidgets' ScrollArea for seamless native scrolling look
-        self.scroll_area = ScrollArea(self)
-        self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setFrameShape(ScrollArea.Shape.NoFrame)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area_installed = ScrollArea(self)
+        self.scroll_area_installed.setWidgetResizable(True)
+        self.scroll_area_installed.setFrameShape(ScrollArea.Shape.NoFrame)
+        self.scroll_area_installed.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         # Inner canvas widget holding the vertical stacked cards
-        self.scroll_content = QWidget()
-        self.scroll_content.setObjectName("ScrollContentPlugin")
-        self.cards_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_content_installed = QWidget()
+        self.scroll_content_installed.setObjectName("ScrollContentPlugin")
+        self.cards_layout = QVBoxLayout(self.scroll_content_installed)
         self.cards_layout.setContentsMargins(0, 5, 0, 0)
         self.cards_layout.setSpacing(5)
         self.cards_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -1334,9 +1334,10 @@ class PluginPage(QWidget):
         # 5. Populate Plugin Cards dynamically
         self.load_plugin_cards()
 
-        self.scroll_area.setWidget(self.scroll_content)
-        outer_layout.addWidget(self.scroll_area)
-        self.scroll_area.setStyleSheet("background: transparent")
+        self.scroll_area_installed.setWidget(self.scroll_content_installed)
+        self.scroll_area_installed.setStyleSheet("background: transparent")
+        outer_layout.addWidget(self.stacked_widget)
+
 
     def load_plugin_cards(self):
         # Clear out existing layout elements if re-loading
