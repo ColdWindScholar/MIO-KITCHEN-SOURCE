@@ -17,7 +17,7 @@ from PySide6.QtWidgets import QSizePolicy
 from qfluentwidgets import (ProgressBar, ImageLabel)
 
 import logging
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QObject
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
 from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
@@ -1021,22 +1021,23 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
 
-class BuiltInPlugins:
-    def __init__(self, master):
+class BuiltInPlugins(QObject):
+    def __init__(self, master, /):
+        super().__init__(parent=master)
         self.master = master
         self.plugins = {
-            "download_rom": {"name": self.master.tr("Download ROM"), "entry": lambda: print(1)},
-            "get_file_info": {"name": self.master.tr("Get File Info"), "entry": lambda: FileInfoMessageBox(self.master).exec()},
-            "byte_calculator": {"name": self.master.tr("Byte Calculator"), "entry": lambda: FileBytesMessageBox(self.master).exec()},
-            "allow_selinux_audit": {"name": self.master.tr("Allow Selinux Audit"), "entry": self.allow_selinux_audit},
-            "dis_avb_in_fstab": {"name": self.master.tr("Disable avb in fstab"), "entry": self.disable_avb},
-            "dis_encryption": {"name": self.master.tr("Disable Encryption"), "entry": self.dis_encryption},
-            "trim_raw_image": {"name": self.master.tr("Trim Raw Image"), "entry": self.trim_raw_image},
-            "magisk_patch": {"name": self.master.tr("Magisk Patch"), "entry": self.magisk_patch},
-            "merge_qualcomm_image": {"name": self.master.tr("Merge Qualcomm Image"), "entry": self.merge_qcom_images},
-            "merge_super": {"name": self.master.tr("Merge Super"), "entry": self.merge_super},
-            "decrypt_xtc_xml": {"name": self.master.tr("Decrypt xtc xml"), "entry": self.decrypt_xtc_xml},
-            "mtk_port_tool": {"name": self.master.tr("Mtk Port Tool"), "entry": self.mtk_port_tool},
+            "download_rom": {"name": self.tr("Download ROM"), "entry": lambda: print(1)},
+            "get_file_info": {"name": self.tr("Get File Info"), "entry": lambda: FileInfoMessageBox(self.master).exec()},
+            "byte_calculator": {"name": self.tr("Byte Calculator"), "entry": lambda: FileBytesMessageBox(self.master).exec()},
+            "allow_selinux_audit": {"name": self.tr("Allow Selinux Audit"), "entry": self.allow_selinux_audit},
+            "dis_avb_in_fstab": {"name": self.tr("Disable avb in fstab"), "entry": self.disable_avb},
+            "dis_encryption": {"name": self.tr("Disable Encryption"), "entry": self.dis_encryption},
+            "trim_raw_image": {"name": self.tr("Trim Raw Image"), "entry": self.trim_raw_image},
+            "magisk_patch": {"name": self.tr("Magisk Patch"), "entry": self.magisk_patch},
+            "merge_qualcomm_image": {"name": self.tr("Merge Qualcomm Image"), "entry": self.merge_qcom_images},
+            "merge_super": {"name": self.tr("Merge Super"), "entry": self.merge_super},
+            "decrypt_xtc_xml": {"name": self.tr("Decrypt xtc xml"), "entry": self.decrypt_xtc_xml},
+            "mtk_port_tool": {"name": self.tr("Mtk Port Tool"), "entry": self.mtk_port_tool},
         }
 
     def exec_plugin(self, plugin_id: str):
@@ -1248,7 +1249,7 @@ class BuiltInPlugins:
                 progress_bar.close()
                 InfoBar.success(
                     title="Success",
-                    content="总共从文件末尾截去了 %d 个零字节（约 %s）" % (c, utils.hum_convert(c)),
+                    content=self.master.tr("总共从文件末尾截去了 %d 个零字节(~ %s)") % (c, utils.hum_convert(c)),
                     position=InfoBarPosition.TOP,
                     duration=4000,
                     parent=self.master
