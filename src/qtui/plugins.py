@@ -1445,10 +1445,11 @@ class PluginPage(QWidget):
             plugin_info = self.built_in_plugins.plugins[plugin_id]
             plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
 
-            card = AppCard(
+            card = AppCardRich(
                 icon=plugin_icon,
                 title=plugin_title,
-                content=self.tr('Built-In Plugin'),
+                author="Mio-Kitchen",
+                tags=[self.tr('Built-In Plugin')],
                 parent=self.scroll_content_installed
             )
             card.moreButton.clicked.connect(lambda: print("None"))
