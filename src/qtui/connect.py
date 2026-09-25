@@ -92,7 +92,8 @@ def handle_incoming_phone_action(action_name):
         return "Unauthorized: Invalid key token", 403
 
     network_bridge.log_signal.emit("INFO", f"Action request '{action_name}' authorized. Processing task...")
-    network_bridge.trigger_signal.emit(action_name)
+    payload = request.get_json() or {}
+    network_bridge.trigger_signal.emit(payload)
     return f"Action '{action_name}' handled securely", 200
 
 
