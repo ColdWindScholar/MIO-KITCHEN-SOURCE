@@ -17,7 +17,7 @@ from qfluentwidgets import (
     IconWidget,
     FluentIcon, TextEdit
 )
-
+from src.core.utils import v_code
 
 class NetworkBridge(QObject):
     trigger_signal = Signal(str)
@@ -31,7 +31,8 @@ network_bridge = NetworkBridge()
 ACTIVE_SESSION = {
     "token": None,
     "device_name": None,
-    "device_ip": None
+    "device_ip": None,
+    "verify_code": v_code(4),
 }
 
 
@@ -40,6 +41,9 @@ def handle_handshake():
     if ACTIVE_SESSION["token"]:
         return "Connected by another device.", 403
     device_name = request.headers.get('X-Device-Name')
+    request_data = request.get_json() or {}
+    if request_data['verify_code'] != ACTIVE_SESSION["verify_code"]:
+        return "Invalid verification code.", 403
     device_ip = request.remote_addr
 
     generated_token = str(uuid.uuid4())
@@ -132,8 +136,11 @@ class ConnectPage(QWidget):
         left_layout.addWidget(self.qr_wrapper, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.address_label = BodyLabel(self)
-        self.address_label.setFont(QFont("Consolas", 10))
+        self.address_label.setFont(QFont("Consolas", 12))
         left_layout.addWidget(self.address_label, alignment=Qt.AlignmentFlag.AlignHCenter)
+        self.verify_code_label = BodyLabel(self)
+        self.verify_code_label.setFont(QFont("Consolas", 12))
+        left_layout.addWidget(self.verify_code_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Device connection status text widgets
         self.status_device = BodyLabel("", self)
@@ -165,6 +172,7 @@ class ConnectPage(QWidget):
         self.lan_ip = fetch_linux_lan_ip()
         self.connection_url = f"http://{self.lan_ip}:5000"
         self.address_label.setText(self.connection_url)
+        self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
         self.render_qr_matrix(self.connection_url)
 
@@ -213,6 +221,7 @@ class ConnectPage(QWidget):
         ACTIVE_SESSION["token"] = None
         ACTIVE_SESSION["device_name"] = None
         ACTIVE_SESSION["device_ip"] = None
+        ACTIVE_SESSION["verify_code"] = v_code(4)
 
         self.toggle_workspace_ui_state(False)
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
