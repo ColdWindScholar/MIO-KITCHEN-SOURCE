@@ -9,7 +9,8 @@ import requests
 from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
-    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, Pivot, SegmentedWidget
+    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, Pivot, SegmentedWidget, ToolTipPosition, \
+    ToolTipFilter
 import zipfile
 import platform
 from io import BytesIO
@@ -1021,6 +1022,70 @@ class AppCard(CardWidget):
         self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignRight)
 
 
+class AppCardRich(CardWidget):
+
+    def __init__(self, icon, title: str, author: str, description: str = "", tags: list = None, parent=None):
+        super().__init__(parent)
+        self.iconWidget = IconWidget(icon)
+        self.titleLabel = BodyLabel(title, self)
+
+        # Primary label for plugin descriptions (supports text wrapping)
+        self.descriptionLabel = CaptionLabel(description, self)
+        self.descriptionLabel.setWordWrap(True)
+
+        # Subtitle layout to group Author and Metadata info (e.g., Windows, v1.0)
+        self.metaLayout = QHBoxLayout()
+        self.metaLayout.setContentsMargins(0, 0, 0, 0)
+        self.metaLayout.setSpacing(8)
+
+        # Author attribution label
+        self.authorLabel = CaptionLabel(author, self)
+        self.authorLabel.setStyleSheet("color: gray;")
+        self.metaLayout.addWidget(self.authorLabel)
+
+        # Dynamic metadata pill tags (e.g., 'Windows', 'Mac', 'Core')
+        if tags:
+            for tag_text in tags:
+                tag_label = CaptionLabel(tag_text, self)
+                # Adds a clean borderless background pill design native to Fluent UI
+                tag_label.setStyleSheet("""
+                    background-color: rgba(0, 0, 0, 0.06); 
+                    border-radius: 4px; 
+                    padding: 1px 6px; 
+                    color: rgba(0, 0, 0, 0.6);
+                """)
+                self.metaLayout.addWidget(tag_label)
+        self.metaLayout.addStretch(1)
+
+        self.openButton = PushButton(self.tr('Run'), self)
+        self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
+
+        self.hBoxLayout = QHBoxLayout(self)
+        self.vBoxLayout = QVBoxLayout()
+
+        # Increased height from 73 to 95 to accommodate the description and tags cleanly
+        self.setFixedHeight(95)
+        self.iconWidget.setFixedSize(48, 48)
+        self.openButton.setFixedWidth(120)
+        self.hBoxLayout.setContentsMargins(20, 11, 11, 11)
+        self.hBoxLayout.setSpacing(15)
+        self.hBoxLayout.addWidget(self.iconWidget)
+
+        # Assemble text hierarchy column chronologically
+        self.vBoxLayout.setContentsMargins(0, 2, 0, 2)
+        self.vBoxLayout.setSpacing(2)
+
+        self.vBoxLayout.addWidget(self.titleLabel, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.vBoxLayout.addLayout(self.metaLayout)  # Dynamic metadata container row
+        self.vBoxLayout.addWidget(self.descriptionLabel, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        self.vBoxLayout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.hBoxLayout.addLayout(self.vBoxLayout, 1)  # Give text area stretch priority
+
+        self.hBoxLayout.addWidget(self.openButton, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        self.hBoxLayout.addWidget(self.moreButton, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+
 class BuiltInPlugins(QObject):
     def __init__(self, master, /):
         super().__init__(parent=master)
@@ -1356,6 +1421,7 @@ class PluginPage(QWidget):
             self.stacked_widget.setCurrentWidget(self.scroll_area_installed)
         else:
             self.stacked_widget.setCurrentWidget(self.scroll_area_repo)
+            self.load_plugin_cards()
         # Apply the current search filter context immediately to the new screen focus
         self.filter_plugins(self.search_bar.text())
 
@@ -1408,11 +1474,13 @@ class PluginPage(QWidget):
             plugin_title = plugin.get("name", i)
             plugin_author = plugin.get("author", "未知作者")
 
-            card = AppCard(
+            card = AppCardRich(
                 icon=plugin_icon,
                 title=plugin_title,
-                content=plugin_author,
-                parent=self.scroll_content_installed
+                author=plugin_author,
+                parent=self.scroll_content_installed,
+                description=plugin.get("describe", ""),
+                tags=[plugin.get('version', "1.0")]
             )
             menu = RoundMenu(parent=card.moreButton)
             menu.addAction(Action(FluentIcon.CLOSE, self.tr('Uninstall'),
@@ -1433,24 +1501,27 @@ class PluginPage(QWidget):
                 "type": "Installed"
             })
 
-        for item in self.get_repo_plugins():
-            card = AppCard(
-                icon=FluentIcon.DOWNLOAD,
-                title=item["name"],
-                content=item["author"],
-                parent=self.scroll_content_repo
-            )
-            card.openButton.setText(self.tr("Download"))
-            card.openButton.clicked.connect(
-                lambda state, pid=item["id"]: print(f"Downloading: {pid}"))
+        if self.SegmentedWidget.currentItem().text() == 'Repo':
+            for item in self.get_repo_plugins():
+                card = AppCardRich(
+                    icon=FluentIcon.DOWNLOAD,
+                    title=item["name"],
+                    author=item['author'],
+                    parent=self.scroll_content_repo,
+                    description=item['desc'],
+                    tags=["Windows", "v1.2.0"]
+                )
+                card.openButton.setText(self.tr("Download"))
+                card.openButton.clicked.connect(
+                    lambda state, pid=item["id"]: print(f"Downloading: {pid}"))
 
-            self.repo_layout.addWidget(card)
-            self.cards_data.append({
-                "card_widget": card,
-                "title": item["name"].lower(),
-                "author": item["author"].lower(),
-                "type": "Repo"
-            })
+                self.repo_layout.addWidget(card)
+                self.cards_data.append({
+                    "card_widget": card,
+                    "title": item["name"].lower(),
+                    "author": item["author"].lower(),
+                    "type": "Repo"
+                })
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
