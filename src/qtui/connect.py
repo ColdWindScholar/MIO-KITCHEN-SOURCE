@@ -235,7 +235,12 @@ class ConnectPage(QWidget):
             self.address_label.show()
 
     def manually_terminate_session(self):
-        handle_disconnect()
+        ACTIVE_SESSION = {
+            "token": None,
+            "device_name": None,
+            "device_ip": None,
+            "verify_code": v_code(4),
+        }
         self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
 
         self.toggle_workspace_ui_state(False)
