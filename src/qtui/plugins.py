@@ -1301,7 +1301,7 @@ class PluginPage(QWidget):
 
         # New Feature: Cloud Download Module Control Trigger
         self.SegmentedWidget = SegmentedWidget(self)
-        self.SegmentedWidget.setMaximumHeight(20)
+        self.SegmentedWidget.setMaximumHeight(25)
         self.SegmentedWidget.addItem(routeKey="Installed", text="Installed", onClick=lambda: print("Song"))
         self.SegmentedWidget.addItem(routeKey="Repo", text="Repo", onClick=lambda: print("Album"))
         self.SegmentedWidget.setCurrentItem("Installed")
