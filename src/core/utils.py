@@ -385,8 +385,8 @@ def gettype(file) -> str:
             return 'super'
     except IndexError:
         ...
-    for header, desc, *offset in formats:
-        with open(file, 'rb') as f:
+    with open(file, 'rb') as f:
+        for header, desc, *offset in formats:
             f.seek(offset[0] if offset else 0)
             if f.read(len(header)) == header:
                 return desc
