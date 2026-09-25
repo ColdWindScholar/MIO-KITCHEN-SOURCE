@@ -235,7 +235,6 @@ class ParseMessageBox(MessageBoxBase):
         super().closeEvent(event)
 
 
-
 class ModuleManager:
     def __init__(self):
         self.module_dir = os.path.join(prog_path, "bin", "module")
@@ -278,9 +277,11 @@ class ModuleManager:
                 else:
                     if self.master:
                         InfoBar.warning(self.master.tr("Manager"),
-                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.", parent=self.master)
+                                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.",
+                                        parent=self.master)
                     else:
-                        logging.warning(f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
+                        logging.warning(
+                            f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
             except Exception as e:
                 logging.error(f"Load Failed '{self.get_name(id_)}' path '{script_path}/main.py': {e}")
                 logging.exception('Bugs')
@@ -622,8 +623,6 @@ class ModuleManager:
 module_manager = ModuleManager()
 
 
-
-
 class UninstallMpk(MessageBoxBase):
     def __init__(self, id_: str, wait=False, parent=None):
         # We inherit MessageBoxBase which provides a beautifully engineered frameless window wrapper
@@ -777,7 +776,6 @@ class UninstallMpk(MessageBoxBase):
             # Replaces self.update_idletasks() to instantly force visual updates to screen
             QApplication.processEvents()
 
-
         # 3. File System Removal Process
         if os.path.exists(module_path):
             try:
@@ -916,7 +914,8 @@ class InstallMpk(MessageBoxBase):
         elif ret == module_error_codes.PlatformNotSupport:
             self.state.setText(self.tr("Unsupported System {}").format(platform.system()))
         elif ret == module_error_codes.DependsMissing:
-            self.state.setText(self.tr("%s Depends on %s，but %s not installed") % (self.mconf.get('module', 'name'), reason, reason))
+            self.state.setText(
+                self.tr("%s Depends on %s，but %s not installed") % (self.mconf.get('module', 'name'), reason, reason))
             self.installb.setText(self.tr("Retry"))
             self.installb.setEnabled(True)
         elif ret == module_error_codes.IsBroken:
@@ -1028,8 +1027,10 @@ class BuiltInPlugins(QObject):
         self.master = master
         self.plugins = {
             "download_rom": {"name": self.tr("Download ROM"), "entry": lambda: print(1)},
-            "get_file_info": {"name": self.tr("Get File Info"), "entry": lambda: FileInfoMessageBox(self.master).exec()},
-            "byte_calculator": {"name": self.tr("Byte Calculator"), "entry": lambda: FileBytesMessageBox(self.master).exec()},
+            "get_file_info": {"name": self.tr("Get File Info"),
+                              "entry": lambda: FileInfoMessageBox(self.master).exec()},
+            "byte_calculator": {"name": self.tr("Byte Calculator"),
+                                "entry": lambda: FileBytesMessageBox(self.master).exec()},
             "allow_selinux_audit": {"name": self.tr("Allow Selinux Audit"), "entry": self.allow_selinux_audit},
             "dis_avb_in_fstab": {"name": self.tr("Disable avb in fstab"), "entry": self.disable_avb},
             "dis_encryption": {"name": self.tr("Disable Encryption"), "entry": self.dis_encryption},
@@ -1186,7 +1187,8 @@ class BuiltInPlugins(QObject):
         if dialog.exec():
             path = dialog.file_path_edit.text()
             if not os.path.exists(path) or not path.strip():
-                InfoBar.warning(title="Decrypt XTC Xml", content=self.master.tr('Please choose a path.'), parent=self.master)
+                InfoBar.warning(title="Decrypt XTC Xml", content=self.master.tr('Please choose a path.'),
+                                parent=self.master)
                 return
             for root, _, files in os.walk(path, topdown=True):
                 for f in files:
@@ -1431,7 +1433,6 @@ class PluginPage(QWidget):
                 "type": "Installed"
             })
 
-
         for item in self.get_repo_plugins():
             card = AppCard(
                 icon=FluentIcon.DOWNLOAD,
@@ -1466,7 +1467,8 @@ class PluginPage(QWidget):
     def uninstall_plugin(self, plugin_id: str):
         UninstallMpk(plugin_id, True, self)
         self.load_plugin_cards()
-    def get_repo_plugins(self, force_update:bool= False):
+
+    def get_repo_plugins(self, force_update: bool = False):
         if not os.path.exists(self.local_db_path) or force_update:
             url_response = requests.get(cfg.pluginRepo + 'plugin.json', timeout=10)
             url_response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx).
@@ -1477,6 +1479,7 @@ class PluginPage(QWidget):
             if not data:
                 self.get_repo_plugins(force_update=True)
         return data
+
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self, self.tr("Choose a mpk file"), "", "MPK Files (*.mpk)"
