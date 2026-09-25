@@ -1275,7 +1275,7 @@ class PluginPage(QWidget):
     def install_mpk(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Open File",
+            self.tr("Choose a mpk file"),
             "",
             "MPK Files (*.mpk)"
         )
