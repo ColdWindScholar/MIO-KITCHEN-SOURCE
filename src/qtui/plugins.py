@@ -1500,13 +1500,21 @@ class PluginPage(QWidget):
         files = plugin_info.get("files", [])
         size = plugin_info.get("size")
         depend = plugin_info.get('depend', [])
+        card_widget = None
         for d in depend:
             if not module_manager.is_installed(d):
                 for depend_info in self.cards_data:
                     if depend_info['id'] == d:
                         self.download_plugin(depend_info)
+        for data in self.cards_data:
+            if data['id'] == plugin_info['id']:
+                card_widget = data["card_widget"]
+        if not card_widget:
+            return 1
+        card_widget.openButton.setDisabled(True)
         for i in files:
             print(i)
+        card_widget.openButton.setDisabled(False)
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
