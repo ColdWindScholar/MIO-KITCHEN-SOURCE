@@ -1176,12 +1176,17 @@ or click to select a file</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1483"/>
+        <location filename="../../src/qtui/plugins.py" line="1485"/>
         <source>Download</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1525"/>
+        <location filename="../../src/qtui/plugins.py" line="1485"/>
+        <source>Reinstall</source>
+        <translation>重装</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1563"/>
         <source>Choose a mpk file</source>
         <translation>选择一个MPK插件</translation>
     </message>

@@ -1480,7 +1480,7 @@ class PluginPage(QWidget):
                     author=item['author'],
                     parent=self.scroll_content_repo,
                     description=item['desc'],
-                    tags=[item['system'], item['version']]
+                    tags=[item['system'], item['version'], utils.hum_convert(item['size'])]
                 )
                 card.openButton.setText(self.tr("Download") if not module_manager.is_installed(item['id']) else self.tr("Reinstall"))
                 card.openButton.clicked.connect(
