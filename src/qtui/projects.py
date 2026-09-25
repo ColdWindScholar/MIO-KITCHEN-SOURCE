@@ -290,7 +290,7 @@ def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = 
             cpio_extract(os.path.join(work, name, 'ramdisk.cpio'), os.path.join(work, name, 'ramdisk'),
                          os.path.join(work, name, 'ramdisk.txt'))
         else:
-            os.chdir(os.path.join(work , name))
+            os.chdir(os.path.join(work, name))
             utils.call(['cpio', '-i', '-d', '-F', 'ramdisk.cpio', '-D', 'ramdisk'])
             os.chdir(cfg.workingFolder.value)
     print("Unpack Done!")
@@ -689,7 +689,12 @@ class ProjectsPage(QFrame):
         if projects:
             self.project_combo.setCurrentIndex(0)
             if self.unpack_rb.isChecked():
+                for item in self.format_widget.items:
+                    if self.refresh_unpack_list():
+                        break
+                    self.format_widget.setCurrentItem(item)
                 self.refresh_unpack()
+
             else:
                 self.refresh_repack()
             return
@@ -824,7 +829,7 @@ class ProjectsPage(QFrame):
         frame.addWidget(QLabel(self.tr("Partition(s)")))
         self.format_widget = SegmentedWidget(container)
         for c in ['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
-                                    'update.app']:
+                  'update.app']:
             self.format_widget.addItem(c, c, onClick=self.refresh_unpack)
         self.format_widget.setCurrentItem("new.dat.br")
         layout.addWidget(self.format_widget)
@@ -1296,7 +1301,7 @@ class ProjectsPage(QFrame):
     def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
         if isinstance(size, str): size = int(size)
         print("[ext] repacking %s" % name)
-        size = utils.GetFolderSize(os.path.join(work ,name), 4096, 3,
+        size = utils.GetFolderSize(os.path.join(work, name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
         if not UTC:
@@ -1429,7 +1434,7 @@ class ProjectsPage(QFrame):
                                   folder.replace('com.google.android.apps.nbu.', 'com.google.android.apps.nbu')])
                     except Exception:
                         logging.exception('Bugs')
-                fspatch.main(os.path.join(work , dname), os.path.join(f"{work}/config", f"{dname}_fs_config"))
+                fspatch.main(os.path.join(work, dname), os.path.join(f"{work}/config", f"{dname}_fs_config"))
                 utils.remove_duplicate(f"{work}/config/{dname}_fs_config")
                 contexts_file = f"{work}/config/{dname}_file_contexts"
                 if os.path.exists(contexts_file):
@@ -1614,10 +1619,8 @@ class ProjectsPage(QFrame):
 
     def refresh_unpack(self):
         self.partition_table.clearContents()
-        self._load_mock_partitions_table(data:=self.refresh_unpack_list())
-        if data:
-            return True
-        return False
+        self._load_mock_partitions_table(self.refresh_unpack_list())
+
 
     def refresh_unpack_list(self):
         """The actual logic for refreshing the unpack list, runs in a separate thread."""
@@ -1649,13 +1652,14 @@ class ProjectsPage(QFrame):
             for file_name in os.listdir(work):
                 if file_name.endswith(form):
                     if file_name.endswith("img"):
-                        f_type = gettype(os.path.join(work ,file_name))
+                        f_type = gettype(os.path.join(work, file_name))
                         if f_type == 'unknown':
                             f_type = form
                     else:
                         f_type = form
                     data.append(
-                        (file_name[:-len(f".{form}")], utils.hum_convert(os.path.getsize(os.path.join(work , file_name))), f_type,
+                        (file_name[:-len(f".{form}")],
+                         utils.hum_convert(os.path.getsize(os.path.join(work, file_name))), f_type,
                          "Image", "rw" if f_type == 'ext' else "ro",))
         return data
 
@@ -1797,7 +1801,7 @@ class ProjectsPage(QFrame):
                     parts["super_info"] = lpunpack.get_info(f"{work}/{i}.img")
                     lpunpack.unpack(f"{work}/{i}.img", work)
                     for file_name in os.listdir(work):
-                        file_path = os.path.join(work , file_name)
+                        file_path = os.path.join(work, file_name)
                         if file_name.endswith('_a.img'):
                             if os.path.exists(file_path) and os.path.exists(work + file_name.replace('_a', '')):
                                 if pathlib.Path(file_path).samefile(work + file_name.replace('_a', '')):
