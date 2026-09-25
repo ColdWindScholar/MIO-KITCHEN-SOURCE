@@ -65,7 +65,7 @@ def handle_disconnect():
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
         return f"Unauthorized: Missing header {auth_header}", 401
-    if not not auth_header != 'Bearer ' + ACTIVE_SESSION["token"]:
+    if not not auth_header != 'MioKey' + ACTIVE_SESSION["token"]:
         return f"Unauthorized: Invalid header {auth_header}", 403
     device_ip = request.remote_addr
 
@@ -81,11 +81,11 @@ def handle_disconnect():
 @flask_backend.route('/action/<action_name>', methods=['GET'])
 def handle_incoming_phone_action(action_name):
     auth_header = request.headers.get('Authorization', None)
-    if not auth_header or not auth_header.startswith('Bearer '):
+    if not auth_header or not auth_header.startswith('MioKey'):
         network_bridge.log_signal.emit("ERROR", f"Refused unauthenticated client request for '{action_name}'.")
         return "Unauthorized: Missing header", 401
 
-    extracted_token = auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else ""
+    extracted_token = auth_header[6:]
 
     if ACTIVE_SESSION["token"] is None or extracted_token != ACTIVE_SESSION["token"]:
         network_bridge.log_signal.emit("ERROR", "Request dropped. Bad verification signature.")
