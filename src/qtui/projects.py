@@ -447,7 +447,6 @@ class ProjectsPage(QFrame):
         print(f"Unpacking {ifile}", f'Type:[{(ftype := gettype(ifile))}]')
         # gzip
         if ftype == 'gzip':
-            print(f"Unpacking {ifile}")
             name = os.path.splitext(os.path.basename(ifile))[0]
             cfg.set(cfg.currentProjectName, name)
             self.project_combo.setText(name)
@@ -475,7 +474,7 @@ class ProjectsPage(QFrame):
             return
         # ozip
         if ftype == "ozip":
-            print("Decrypting" + ifile)
+            print(f"Decrypting {ifile}")
             ozipdecrypt.main(ifile)
             decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
             if not os.path.exists(decrypted):
@@ -489,7 +488,6 @@ class ProjectsPage(QFrame):
             return
         # tar
         if ftype == 'tar':
-            print("Unpacking" + ifile)
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             if not project_manger.exist():
                 utils.re_folder(project_manger.current_work_path())
