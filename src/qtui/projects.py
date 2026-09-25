@@ -689,10 +689,11 @@ class ProjectsPage(QFrame):
         if projects:
             self.project_combo.setCurrentIndex(0)
             if self.unpack_rb.isChecked():
-                for item in self.format_widget.items:
-                    if self.refresh_unpack_list():
-                        break
-                    self.format_widget.setCurrentItem(item)
+                if not self.refresh_unpack_list():
+                    for item in self.format_widget.items:
+                        if self.refresh_unpack_list():
+                            break
+                        self.format_widget.setCurrentItem(item)
                 self.refresh_unpack()
 
             else:
