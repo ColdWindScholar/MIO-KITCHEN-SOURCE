@@ -22,8 +22,8 @@ from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
-from qtui.apk_manager import ApkManagerPage
-from qtui.connect import ConnectPage
+from src.qtui.apk_manager import ApkManagerPage
+from src.qtui.connect import ConnectPage
 from src.core.utils import temp, v_code, prog_path
 from src.qtui.about import AboutPage
 from src.qtui.home import HomePage
@@ -133,6 +133,8 @@ def __init__qt(args):
     translator = QTranslator()
     if translator.load(cfg.language.value, os.path.join(prog_path, 'bin', 'languages')):
         app.installTranslator(translator)
+    
+    os.makedirs(os.path.dirname(tool_log), exist_ok=True)
     logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(asctime)s:%(filename)s:%(name)s:%(message)s',
                         filename=tool_log, filemode='w')
     window = MainWindow()
