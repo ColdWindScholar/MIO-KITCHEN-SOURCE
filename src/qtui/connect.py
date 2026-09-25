@@ -1,8 +1,10 @@
 import json
+import os
 import socket
 import uuid
 from datetime import datetime
 from io import BytesIO
+from platform import platform, system, machine
 from threading import Thread
 
 import qrcode
@@ -75,8 +77,21 @@ def handle_disconnect():
 
     network_bridge.connection_status_signal.emit(False, {})
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
-
     return "Disconnected already.", 200
+
+@flask_backend.route('/get_info', methods=['POST'])
+def get_device_info():
+    auth_header = request.headers.get('Authorization', None)
+    if not auth_header or not auth_header.startswith('MioKey'):
+        network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
+        return "Unauthorized: Missing header", 401
+    if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
+        network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
+        return "Unauthorized: Invalid key token", 403
+    json_text = json.dumps({"device_name": os.environ['HOSTNAME'], "system": system(), "machine":machine()},
+                           ensure_ascii=True)
+    return json_text, 200
+
 
 @flask_backend.route('/action', methods=['POST'])
 def handle_incoming_phone_action():
