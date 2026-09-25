@@ -129,7 +129,6 @@ class ConnectPage(QWidget):
         # Container elements for dynamic visibility toggle
         self.instructions = BodyLabel(
             "Scan via ImageStudio", self)
-        self.instructions.setTextColor(QColor("#0000FF"))
         self.instructions.setWordWrap(True)
         self.instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
         left_layout.addWidget(self.instructions)
@@ -153,9 +152,6 @@ class ConnectPage(QWidget):
         self.address_label = BodyLabel(self)
         self.address_label.setFont(QFont("Consolas", 12))
         left_layout.addWidget(self.address_label, alignment=Qt.AlignmentFlag.AlignHCenter)
-        self.verify_code_label = BodyLabel(self)
-        self.verify_code_label.setFont(QFont("Consolas", 12))
-        left_layout.addWidget(self.verify_code_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Device connection status text widgets
         self.status_device = BodyLabel("", self)
@@ -164,7 +160,7 @@ class ConnectPage(QWidget):
         left_layout.addWidget(self.status_ip, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Action: Break connection
-        self.disconnect_btn = PrimaryPushButton("Disconnect", self)
+        self.disconnect_btn = PrimaryPushButton(self.tr("Disconnect"), self)
         self.disconnect_btn.clicked.connect(self.manually_terminate_session)
         self.disconnect_btn.hide()
         left_layout.addWidget(self.disconnect_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
