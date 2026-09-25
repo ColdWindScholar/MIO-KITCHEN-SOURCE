@@ -447,7 +447,7 @@ class ProjectsPage(QFrame):
         print(f"Unpacking {ifile}", f'Type:[{(ftype := gettype(ifile))}]')
         # gzip
         if ftype == 'gzip':
-            print("Unpacking " + ifile)
+            print(f"Unpacking {ifile}")
             name = os.path.splitext(os.path.basename(ifile))[0]
             cfg.set(cfg.currentProjectName, name)
             self.project_combo.setText(name)
