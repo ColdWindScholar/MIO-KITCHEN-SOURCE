@@ -1330,6 +1330,8 @@ class PluginPage(QWidget):
         # Inner canvas widget holding the vertical stacked cards
         self.scroll_content_installed = QWidget()
         self.scroll_content_installed.setObjectName("ScrollContentPlugin")
+        self.scroll_content_repo= QWidget()
+        self.scroll_content_repo.setObjectName("ScrollContentPluginRepo")
         self.cards_layout = QVBoxLayout(self.scroll_content_installed)
         self.cards_layout.setContentsMargins(0, 5, 0, 0)
         self.cards_layout.setSpacing(5)
@@ -1339,7 +1341,9 @@ class PluginPage(QWidget):
         self.load_plugin_cards()
 
         self.scroll_area_installed.setWidget(self.scroll_content_installed)
+        self.scroll_area_installed.setWidget(self.scroll_content_repo)
         self.scroll_area_installed.setStyleSheet("background: transparent")
+        self.scroll_area_repo.setStyleSheet("background: transparent")
         self.stacked_widget.addWidget(self.scroll_area_installed)
         self.stacked_widget.addWidget(self.scroll_area_repo)
         self.SegmentedWidget.currentItemChanged.connect(lambda page_index:self.stacked_widget.setCurrentWidget(self.scroll_area_installed if page_index == 'Installed' else self.scroll_area_repo))
