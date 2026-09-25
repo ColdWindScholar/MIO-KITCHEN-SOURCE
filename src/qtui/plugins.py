@@ -1465,9 +1465,11 @@ class PluginPage(QWidget):
             self.installed_layout.addWidget(card)
             self.cards_data.append({
                 "card_widget": card,
-                "title": plugin_title.lower(),
-                "author": plugin_author.lower(),
-                "type": "Installed"
+                "title": plugin_title,
+                "author": plugin_author,
+                "type": "Installed",
+                "info": dict(),
+                "id":i
             })
 
         if self.SegmentedWidget.currentRouteKey() == 'Repo':
@@ -1482,17 +1484,30 @@ class PluginPage(QWidget):
                 )
                 card.openButton.setText(self.tr("Download"))
                 card.openButton.clicked.connect(
-                    lambda state, pid=item["id"]: print(f"Downloading: {pid}"))
+                    lambda state, plugin_info=item: self.download_plugin(plugin_info))
 
                 self.repo_layout.addWidget(card)
                 self.cards_data.append({
                     "card_widget": card,
-                    "title": item["name"].lower(),
-                    "author": item["author"].lower(),
-                    "type": "Repo"
+                    "title": item["name"],
+                    "author": item["author"],
+                    "type": "Repo",
+                    "info": item,
+                    "id": item['id']
                 })
-    def download_plugin(self, plugin_id):
-        pass
+
+    def download_plugin(self, plugin_info:dict):
+        files = plugin_info.get("files", [])
+        size = plugin_info.get("size")
+        depend = plugin_info.get('depend', [])
+        for d in depend:
+            if not module_manager.is_installed(d):
+                for depend_info in self.cards_data:
+                    if depend_info['id'] == d:
+                        self.download_plugin(depend_info)
+        for i in files:
+            print(i)
+
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
         query = text.strip().lower()
