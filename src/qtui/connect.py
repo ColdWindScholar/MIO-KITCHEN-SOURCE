@@ -77,10 +77,6 @@ def handle_incoming_phone_action(action_name):
     return f"Action '{action_name}' handled securely", 200
 
 
-def start_network_server():
-    flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
-
-
 def fetch_linux_lan_ip():
     try:
         temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -182,7 +178,7 @@ class ConnectPage(QWidget):
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_workspace_ui_state)
 
-        self.network_thread = Thread(target=start_network_server, daemon=True)
+        self.network_thread = Thread(target=lambda :flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
         self.network_thread.start()
 
     def render_qr_matrix(self, encoding_data_payload):
