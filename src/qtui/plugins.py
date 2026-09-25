@@ -1292,10 +1292,7 @@ class PluginPage(QWidget):
         # 2. Header Layout (Title and Description)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
-        text_header_layout.setSpacing(4)
-
         title = TitleLabel(self.tr("Plugin"))
-
         text_header_layout.addWidget(title)
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
