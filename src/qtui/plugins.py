@@ -1504,7 +1504,7 @@ class PluginPage(QWidget):
         for d in depend:
             if not module_manager.is_installed(d):
                 for depend_info in self.cards_data:
-                    if "id" not in data:
+                    if "id" not in depend_info:
                         continue
                     if depend_info['id'] == d:
                         self.download_plugin(depend_info)
