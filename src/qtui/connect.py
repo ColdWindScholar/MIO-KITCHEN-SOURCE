@@ -128,7 +128,7 @@ class ConnectPage(QWidget):
 
         # Container elements for dynamic visibility toggle
         self.instructions = BodyLabel(
-            "Scan via ImageStudio", self)
+            "Scan via ImageStudio to manage your projects and images on your Android phone.", self)
         self.instructions.setWordWrap(True)
         self.instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
         left_layout.addWidget(self.instructions)
@@ -183,7 +183,7 @@ class ConnectPage(QWidget):
         self.lan_ip = fetch_linux_lan_ip()
         json_text = json.dumps({"url":f"http://{self.lan_ip}:5000", "verify_code":ACTIVE_SESSION["verify_code"]}, ensure_ascii=True)
         self.address_label.setText(f"http://{self.lan_ip}:5000")
-
+        self.address_label.setStyleSheet("color: #555555; font-style: italic;")
         self.render_qr_matrix(json_text)
 
         # Connect core communication bridges
