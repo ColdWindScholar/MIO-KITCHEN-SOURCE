@@ -740,7 +740,7 @@ class ProjectsPage(QFrame):
         """显示创建项目对话框"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self, self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
+            show_info_bar(self.parent(), self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
         dialog = NewProjectDialog(
             title=self.tr("Rename Project"),
