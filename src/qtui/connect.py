@@ -79,10 +79,10 @@ def handle_disconnect():
     return "Disconnected already.", 200
 
 @flask_backend.route('/action', methods=['GET'])
-def handle_incoming_phone_action(action_name):
+def handle_incoming_phone_action():
     auth_header = request.headers.get('Authorization', None)
     if not auth_header or not auth_header.startswith('MioKey'):
-        network_bridge.log_signal.emit("ERROR", f"Refused unauthenticated client request for '{action_name}'.")
+        network_bridge.log_signal.emit("ERROR", f"Refused unauthenticated client request.")
         return "Unauthorized: Missing header", 401
 
     extracted_token = auth_header[6:]
@@ -91,10 +91,10 @@ def handle_incoming_phone_action(action_name):
         network_bridge.log_signal.emit("ERROR", "Request dropped. Bad verification signature.")
         return "Unauthorized: Invalid key token", 403
 
-    network_bridge.log_signal.emit("INFO", f"Action request '{action_name}' authorized. Processing task...")
+    network_bridge.log_signal.emit("INFO", f"Action request  authorized. Processing task...")
     payload = request.get_json() or {}
     network_bridge.trigger_signal.emit(payload)
-    return f"Action '{action_name}' handled securely", 200
+    return f"Action handled securely", 200
 
 
 def fetch_linux_lan_ip():
