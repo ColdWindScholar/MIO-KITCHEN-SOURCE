@@ -8,7 +8,7 @@ from typing import Any
 from PySide6.QtWidgets import QWidget, QFileDialog
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
-    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton
+    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, Pivot, SegmentedWidget
 import zipfile
 import platform
 from io import BytesIO
@@ -1295,19 +1295,19 @@ class PluginPage(QWidget):
         text_header_layout.setSpacing(4)
 
         title = TitleLabel(self.tr("Plugin"))
-        description = CaptionLabel(self.tr("Manage your additions"), self)
 
         text_header_layout.addWidget(title)
-        text_header_layout.addWidget(description)
         header_layout.addLayout(text_header_layout)
         header_layout.addStretch()
         self.local_install_btn = PushButton(FluentIcon.ADD, self.tr("Install"), self)
         self.local_install_btn.clicked.connect(self.install_mpk)
-        header_layout.addWidget(self.local_install_btn)
 
         # New Feature: Cloud Download Module Control Trigger
-        self.download_btn = PushButton(FluentIcon.DOWNLOAD, self.tr("Mpk Store"), self)
-        header_layout.addWidget(self.download_btn)
+        self.SegmentedWidget = SegmentedWidget(self)
+        self.SegmentedWidget.addItem(routeKey="Installed", text="Installed", onClick=lambda: print("Song"))
+        self.SegmentedWidget.addItem(routeKey="Store", text="Store", onClick=lambda: print("Album"))
+        self.SegmentedWidget.setCurrentItem("Installed")
+        header_layout.addWidget(self.SegmentedWidget)
         outer_layout.addLayout(header_layout)
 
         # 3. Search Bar Integration
@@ -1316,6 +1316,7 @@ class PluginPage(QWidget):
         self.search_bar.setClearButtonEnabled(True)
         self.search_bar.textChanged.connect(self.filter_plugins)
         outer_layout.addWidget(self.search_bar)
+        header_layout.addWidget(self.local_install_btn)
 
         # 4. Scrollable Container for Cards
         # Using QFluentWidgets' ScrollArea for seamless native scrolling look
