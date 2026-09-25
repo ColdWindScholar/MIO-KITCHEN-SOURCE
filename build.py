@@ -91,7 +91,7 @@ class Builder:
         with open('bin/settings.json', 'r', encoding='utf-8') as f:
             ver = json.load(f)
             ver = ver['Tool']['Version']
-        for i in ['MIO-KITCHEN-win', 'MIO-KITCHEN-linux', 'MIO-KITCHEN-linux-aarch64.zip', 'MIO-KITCHEN-macos', 'MIO-KITCHEN-macos-intel']:
+        for i in ['MIO-KITCHEN-win', 'MIO-KITCHEN-linux', 'MIO-KITCHEN-linux-aarch64', 'MIO-KITCHEN-macos', 'MIO-KITCHEN-macos-intel']:
             name_list = i.rsplit('-')
             name_list.insert(2, ver)
             name = '-'.join(name_list)
