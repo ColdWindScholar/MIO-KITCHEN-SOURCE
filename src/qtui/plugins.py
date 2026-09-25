@@ -1528,6 +1528,7 @@ class PluginPage(QWidget):
             module_manager.install(file_path)
         card_widget.openButton.setDisabled(False)
         card_widget.openButton.setText(origin_text)
+        self.load_plugin_cards()
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
