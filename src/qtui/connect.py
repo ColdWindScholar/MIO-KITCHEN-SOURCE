@@ -4,7 +4,7 @@ import socket
 import uuid
 from datetime import datetime
 from io import BytesIO
-from platform import platform, system, machine
+from platform import system, machine
 from threading import Thread
 
 import qrcode
@@ -20,7 +20,9 @@ from qfluentwidgets import (
     IconWidget,
     FluentIcon, TextEdit
 )
+
 from src.core.utils import v_code
+
 
 class NetworkBridge(QObject):
     trigger_signal = Signal(dict)
