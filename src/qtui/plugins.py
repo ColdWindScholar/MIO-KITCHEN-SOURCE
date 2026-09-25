@@ -1504,6 +1504,8 @@ class PluginPage(QWidget):
         for d in depend:
             if not module_manager.is_installed(d):
                 for depend_info in self.cards_data:
+                    if "id" not in data:
+                        continue
                     if depend_info['id'] == d:
                         self.download_plugin(depend_info)
         for data in self.cards_data:
@@ -1519,6 +1521,7 @@ class PluginPage(QWidget):
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                 card_widget.openButton.setText(f"{percentage} %")
+                print(percentage)
         card_widget.openButton.setDisabled(False)
         card_widget.openButton.setText(origin_text)
 
