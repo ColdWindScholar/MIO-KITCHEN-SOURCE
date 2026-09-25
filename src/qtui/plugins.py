@@ -1514,11 +1514,13 @@ class PluginPage(QWidget):
         if not card_widget:
             return 1
         card_widget.openButton.setDisabled(True)
+        origin_text = card_widget.openButton.text()
         for file in files:
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                 card_widget.openButton.setText(f"{percentage} %")
         card_widget.openButton.setDisabled(False)
+        card_widget.openButton.setText(origin_text)
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
