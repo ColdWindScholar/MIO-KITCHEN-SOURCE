@@ -101,6 +101,7 @@ def get_device_info():
 @sock_app.route('/socket')
 def handle_actions(ws:Server):
     auth_header = request.headers.get('Authorization', None)
+    verify_code = ACTIVE_SESSION['verify_code']
     if not auth_header or not auth_header.startswith('MioKey'):
         network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
         return "Unauthorized: Missing header", 401
@@ -111,7 +112,7 @@ def handle_actions(ws:Server):
 
     network_bridge.log_signal.emit("INFO", "Websocket connected...")
     while True:
-        if not ACTIVE_SESSION['token']:
+        if ACTIVE_SESSION['verify_code'] != verify_code:
             network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
             ws.close(message="User Disconnect.")
             break
