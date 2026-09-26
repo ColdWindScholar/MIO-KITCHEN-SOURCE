@@ -22,6 +22,8 @@ from qfluentwidgets import (
     FluentIcon, TextEdit
 )
 from simple_websocket import Server
+from wsproto.frame_protocol import CloseReason
+
 from src.core.utils import v_code
 
 
@@ -114,7 +116,7 @@ def handle_actions(ws:Server):
     while True:
         if ACTIVE_SESSION['verify_code'] != verify_code:
             network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
-            ws.close(message="User Disconnect.")
+            ws.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.")
             break
         data = ws.receive()
         if data is None:
