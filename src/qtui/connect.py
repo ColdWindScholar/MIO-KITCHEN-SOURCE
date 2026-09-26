@@ -70,7 +70,7 @@ def handle_disconnect():
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
         return f"Unauthorized: Missing header", 401
-    if not auth_header != 'MioKey' + ACTIVE_SESSION["token"]:
+    if auth_header != 'MioKey' + ACTIVE_SESSION["token"]:
         return f"Unauthorized: Invalid header", 403
     device_ip = request.remote_addr
 
