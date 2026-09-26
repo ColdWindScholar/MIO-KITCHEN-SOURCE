@@ -76,7 +76,6 @@ def handle_disconnect():
     ACTIVE_SESSION["token"] = None
     ACTIVE_SESSION["device_name"] = None
     ACTIVE_SESSION["device_ip"] = None
-
     network_bridge.connection_status_signal.emit(False, {})
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
     return "Disconnected already.", 200
@@ -206,7 +205,7 @@ class ConnectPage(QWidget):
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute_desktop_function)
         network_bridge.log_signal.connect(self.append_native_console_log)
-        network_bridge.connection_status_signal.connect(self.toggle_workspace_ui_state)
+        network_bridge.connection_status_signal.connect(self.toggle_state)
 
         self.network_thread = Thread(target=lambda :flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
         self.network_thread.start()
@@ -221,7 +220,12 @@ class ConnectPage(QWidget):
         pil_image_layer.save(image_io_stream, format="PNG")
         qt_image_raw = QImage.fromData(image_io_stream.getvalue())
         self.qr_display_container.setPixmap(QPixmap.fromImage(qt_image_raw))
-
+    def toggle_state(self, is_connected, device_info_dict=None):
+        if not is_connected:
+            self.render_qr_matrix(
+                json.dumps({"url": f"http://{self.lan_ip}:5000", "verify_code": ACTIVE_SESSION["verify_code"]},
+                           ensure_ascii=True))
+        self.toggle_workspace_ui_state(is_connected, device_info_dict)
     def toggle_workspace_ui_state(self, is_connected, device_info_dict=None):
         """ Replaces the QR layout view space with Fluent Icon metrics natively """
         if is_connected and device_info_dict:
@@ -239,21 +243,20 @@ class ConnectPage(QWidget):
             self.disconnect_btn.hide()
             self.status_device.setText("")
             self.status_ip.setText("")
-
             self.instructions.show()
             self.qr_wrapper.show()
             self.address_label.show()
 
     def manually_terminate_session(self):
+        global ACTIVE_SESSION
         ACTIVE_SESSION = {
             "token": None,
             "device_name": None,
             "device_ip": None,
             "verify_code": v_code(4),
         }
-        self.verify_code_label.setText(ACTIVE_SESSION['verify_code'])
-
         self.toggle_workspace_ui_state(False)
+        network_bridge.connection_status_signal.emit(False, {})
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
 
     def append_native_console_log(self, log_level, message_text):
