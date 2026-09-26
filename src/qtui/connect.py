@@ -101,7 +101,7 @@ def get_device_info():
     if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
         network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
         return "Unauthorized: Invalid key token", 403
-    json_text = json.dumps({"device_name": platform.node(), "system": system(), "machine": machine()},
+    json_text = json.dumps({"device_name": platform.node(), "system": system(), "machine": machine(), "kernel":  platform.release()},
                            ensure_ascii=True)
     return json_text, 200
 
