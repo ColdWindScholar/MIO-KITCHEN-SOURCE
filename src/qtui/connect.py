@@ -43,7 +43,7 @@ ACTIVE_SESSION = {
     "device_ip": None,
     "verify_code": v_code(4),
 }
-WS = None
+WS:Server | None = None
 
 @flask_backend.route('/connect', methods=['POST'])
 def handle_handshake():
@@ -83,6 +83,10 @@ def handle_disconnect():
     ACTIVE_SESSION["device_ip"] = None
     network_bridge.connection_status_signal.emit(False, {})
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
+    if WS:
+        network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
+        WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
+
     return "Disconnected already.", 200
 
 
