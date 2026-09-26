@@ -112,12 +112,12 @@ def handle_actions(ws:Server):
     network_bridge.log_signal.emit("INFO", "Websocket connected...")
     while True:
         if not ACTIVE_SESSION['token']:
+            network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
             ws.close(message="User Disconnect.")
             break
         data = ws.receive()
         if data is None:
             break
-        ws.send('Hi, Im alive')
         ws.send(f"Echo: {data}")
         network_bridge.trigger_signal.emit(data)
 
