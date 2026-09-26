@@ -43,7 +43,7 @@ ACTIVE_SESSION = {
     "device_ip": None,
     "verify_code": v_code(4),
 }
-
+WS = None
 
 @flask_backend.route('/connect', methods=['POST'])
 def handle_handshake():
@@ -103,7 +103,6 @@ def get_device_info():
 @sock_app.route('/socket')
 def handle_actions(ws: Server):
     auth_header = request.headers.get('Authorization', None)
-    verify_code = ACTIVE_SESSION['verify_code']
     if not auth_header or not auth_header.startswith('MioKey'):
         network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
         return "Unauthorized: Missing header", 401
@@ -113,11 +112,9 @@ def handle_actions(ws: Server):
         return "Unauthorized: Invalid key token", 403
 
     network_bridge.log_signal.emit("INFO", "Websocket connected...")
+    global WS
+    WS = ws
     while True:
-        if ACTIVE_SESSION['verify_code'] != verify_code:
-            network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
-            ws.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
-            break
         data = ws.receive()
         if data is None:
             break
