@@ -1,5 +1,4 @@
 import json
-import os
 import platform
 import socket
 import uuid
@@ -13,6 +12,7 @@ from PySide6.QtCore import Signal, QObject, Qt, QSize
 from PySide6.QtGui import QPixmap, QImage, QFont, QTextCursor, QTextCharFormat, QColor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from flask import Flask, request, jsonify
+from flask_sock import Sock
 from qfluentwidgets import (
     CardWidget,
     BodyLabel,
@@ -21,7 +21,7 @@ from qfluentwidgets import (
     IconWidget,
     FluentIcon, TextEdit
 )
-
+from simple_websocket import Server
 from src.core.utils import v_code
 
 
@@ -30,9 +30,10 @@ class NetworkBridge(QObject):
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
 
-flask_backend = Flask(__name__)
-network_bridge = NetworkBridge()
 
+flask_backend = Flask(__name__)
+sock_app = Sock(flask_backend)
+network_bridge = NetworkBridge()
 
 ACTIVE_SESSION = {
     "token": None,
@@ -63,6 +64,7 @@ def handle_handshake():
 
     return jsonify({"token": generated_token}), 200
 
+
 @flask_backend.route('/disconnect', methods=['POST'])
 def handle_disconnect():
     if not ACTIVE_SESSION["token"]:
@@ -81,6 +83,7 @@ def handle_disconnect():
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
     return "Disconnected already.", 200
 
+
 @flask_backend.route('/get_info', methods=['POST'])
 def get_device_info():
     auth_header = request.headers.get('Authorization', None)
@@ -90,9 +93,29 @@ def get_device_info():
     if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
         network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
         return "Unauthorized: Invalid key token", 403
-    json_text = json.dumps({"device_name":  platform.node(), "system": system(), "machine":machine()},
+    json_text = json.dumps({"device_name": platform.node(), "system": system(), "machine": machine()},
                            ensure_ascii=True)
     return json_text, 200
+
+
+@sock_app.route('/socket')
+def handle_actions(ws:Server):
+    auth_header = request.headers.get('Authorization', None)
+    if not auth_header or not auth_header.startswith('MioKey'):
+        network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
+        return "Unauthorized: Missing header", 401
+
+    if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
+        network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
+        return "Unauthorized: Invalid key token", 403
+
+    network_bridge.log_signal.emit("INFO", "Websocket connected...")
+    while True:
+        data = ws.receive()
+        if data is None:
+            break
+        ws.send(f"Echo: {data}")
+        network_bridge.trigger_signal.emit(data)
 
 
 @flask_backend.route('/action', methods=['POST'])
@@ -188,7 +211,6 @@ class ConnectPage(QWidget):
         right_panel_container = QVBoxLayout()
         right_panel_container.setSpacing(8)
 
-
         self.console_log_view = TextEdit(self)
         self.console_log_view.setFont(QFont("Consolas", 10))
         self.console_log_view.setReadOnly(True)
@@ -198,7 +220,8 @@ class ConnectPage(QWidget):
 
         # ==================== INITIALIZATION ====================
         self.lan_ip = fetch_linux_lan_ip()
-        json_text = json.dumps({"url":f"http://{self.lan_ip}:5000", "verify_code":ACTIVE_SESSION["verify_code"]}, ensure_ascii=True)
+        json_text = json.dumps({"url": f"http://{self.lan_ip}:5000", "verify_code": ACTIVE_SESSION["verify_code"]},
+                               ensure_ascii=True)
         self.address_label.setText(f"http://{self.lan_ip}:5000")
         self.address_label.setStyleSheet("color: green; font-style: bold;")
         self.render_qr_matrix(json_text)
@@ -208,7 +231,8 @@ class ConnectPage(QWidget):
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_state)
 
-        self.network_thread = Thread(target=lambda :flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
+        self.network_thread = Thread(
+            target=lambda: flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
         self.network_thread.start()
 
     def render_qr_matrix(self, encoding_data_payload):
@@ -221,12 +245,14 @@ class ConnectPage(QWidget):
         pil_image_layer.save(image_io_stream, format="PNG")
         qt_image_raw = QImage.fromData(image_io_stream.getvalue())
         self.qr_display_container.setPixmap(QPixmap.fromImage(qt_image_raw))
+
     def toggle_state(self, is_connected, device_info_dict=None):
         if not is_connected:
             self.render_qr_matrix(
                 json.dumps({"url": f"http://{self.lan_ip}:5000", "verify_code": ACTIVE_SESSION["verify_code"]},
                            ensure_ascii=True))
         self.toggle_workspace_ui_state(is_connected, device_info_dict)
+
     def toggle_workspace_ui_state(self, is_connected, device_info_dict=None):
         """ Replaces the QR layout view space with Fluent Icon metrics natively """
         if is_connected and device_info_dict:
@@ -273,11 +299,11 @@ class ConnectPage(QWidget):
 
         message_format = QTextCharFormat()
         LOG_LEVELS = {
-            "SUCCESS":QColor("#16A34A"),
-            "INFO":QColor("#2563EB"),
-            "WARN":QColor("#D97706"),
-            "ERROR":QColor("#DC2626"),
-            "DEFAULT":QColor("#475569")
+            "SUCCESS": QColor("#16A34A"),
+            "INFO": QColor("#2563EB"),
+            "WARN": QColor("#D97706"),
+            "ERROR": QColor("#DC2626"),
+            "DEFAULT": QColor("#475569")
         }
         tag_format.setForeground(LOG_LEVELS.get(log_level, "DEFAULT"))
 
@@ -293,5 +319,5 @@ class ConnectPage(QWidget):
         self.console_log_view.setTextCursor(cursor)
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
-    def execute_desktop_function(self, action_id:dict):
+    def execute_desktop_function(self, action_id: dict):
         print(action_id)
