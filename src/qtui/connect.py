@@ -8,6 +8,7 @@ from platform import system, machine
 from threading import Thread
 
 import qrcode
+import simple_websocket
 from PySide6.QtCore import Signal, QObject, Qt, QSize
 from PySide6.QtGui import QPixmap, QImage, QFont, QTextCursor, QTextCharFormat, QColor
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
@@ -295,7 +296,10 @@ class ConnectPage(QWidget):
         global WS
         if WS:
             network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
-            WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
+            try:
+                WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
+            except simple_websocket.errors.ConnectionClosed:
+                pass
             WS = None
         self.toggle_workspace_ui_state(False)
         network_bridge.connection_status_signal.emit(False, {})
