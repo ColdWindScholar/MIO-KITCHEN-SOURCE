@@ -124,7 +124,12 @@ def handle_actions(ws: Server):
     global WS
     WS = ws
     while True:
-        data = ws.receive(15)
+        try:
+            data = ws.receive(timeout=15)
+        except Exception as e:
+            disconnect()
+            network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
+            break
         if data is None:
             disconnect()
             break
