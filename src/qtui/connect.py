@@ -114,6 +114,7 @@ def handle_actions(ws:Server):
         data = ws.receive()
         if data is None:
             break
+        ws.send('Hi, Im alive')
         ws.send(f"Echo: {data}")
         network_bridge.trigger_signal.emit(data)
 
