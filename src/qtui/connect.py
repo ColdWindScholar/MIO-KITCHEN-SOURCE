@@ -101,7 +101,7 @@ def get_device_info():
 
 
 @sock_app.route('/socket')
-def handle_actions(ws:Server):
+def handle_actions(ws: Server):
     auth_header = request.headers.get('Authorization', None)
     verify_code = ACTIVE_SESSION['verify_code']
     if not auth_header or not auth_header.startswith('MioKey'):
