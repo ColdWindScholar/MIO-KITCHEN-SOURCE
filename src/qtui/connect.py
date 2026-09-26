@@ -292,6 +292,11 @@ class ConnectPage(QWidget):
             "device_ip": None,
             "verify_code": v_code(4),
         }
+        global WS
+        if WS:
+            network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
+            WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
+            WS = None
         self.toggle_workspace_ui_state(False)
         network_bridge.connection_status_signal.emit(False, {})
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
