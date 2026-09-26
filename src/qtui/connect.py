@@ -67,6 +67,11 @@ def handle_handshake():
 
     return jsonify({"token": generated_token}), 200
 
+def disconnect():
+    ACTIVE_SESSION["token"] = None
+    ACTIVE_SESSION["device_name"] = None
+    ACTIVE_SESSION["device_ip"] = None
+    network_bridge.connection_status_signal.emit(False, {})
 
 @flask_backend.route('/disconnect', methods=['POST'])
 def handle_disconnect():
@@ -79,10 +84,7 @@ def handle_disconnect():
         return f"Unauthorized: Invalid header", 403
     device_ip = request.remote_addr
 
-    ACTIVE_SESSION["token"] = None
-    ACTIVE_SESSION["device_name"] = None
-    ACTIVE_SESSION["device_ip"] = None
-    network_bridge.connection_status_signal.emit(False, {})
+    disconnect()
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
     global WS
     if WS:
@@ -122,8 +124,9 @@ def handle_actions(ws: Server):
     global WS
     WS = ws
     while True:
-        data = ws.receive()
+        data = ws.receive(15)
         if data is None:
+            disconnect()
             break
         ws.send(f"Echo: {data}")
         network_bridge.trigger_signal.emit(data)
