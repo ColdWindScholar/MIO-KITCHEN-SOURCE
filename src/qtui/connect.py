@@ -116,7 +116,7 @@ def handle_actions(ws:Server):
     while True:
         if ACTIVE_SESSION['verify_code'] != verify_code:
             network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
-            ws.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.")
+            ws.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
             break
         data = ws.receive()
         if data is None:
