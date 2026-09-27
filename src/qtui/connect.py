@@ -33,6 +33,7 @@ class NetworkBridge(QObject):
     trigger_signal = Signal(dict)
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
+    send_ws_message = Signal(dict)
 
 
 flask_backend = Flask(__name__)
@@ -74,6 +75,7 @@ def disconnect():
     ACTIVE_SESSION["token"] = None
     ACTIVE_SESSION["device_name"] = None
     ACTIVE_SESSION["device_ip"] = None
+    network_bridge.send_ws_message.disconnect()
     network_bridge.connection_status_signal.emit(False, {})
 
 
@@ -285,6 +287,7 @@ class ConnectPage(QWidget):
                 WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
             except simple_websocket.errors.ConnectionClosed:
                 pass
+            network_bridge.send_ws_message.disconnect()
             WS = None
         self.toggle_workspace_ui_state(False)
         network_bridge.connection_status_signal.emit(False, {})
@@ -348,6 +351,7 @@ class ConnectPage(QWidget):
         network_bridge.log_signal.emit("INFO", "Websocket connected...")
         global WS
         WS = ws
+        network_bridge.send_ws_message.connect(ws.send)
         while True:
             try:
                 data = ws.receive(timeout=15)
