@@ -361,8 +361,7 @@ class ConnectPage(QWidget):
             action_data = action_data.decode('utf-8')
         # action_types:native_cmd log create_project remove_project refresh_project unpack
         # payload: {argv1, argv2}
-        d = {
-            "action": "log"
-        }
+        if action_data == '1':
+            return "1"
         json_data = json.loads(action_data)
         return "Action"
