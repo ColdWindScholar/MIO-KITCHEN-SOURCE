@@ -30,7 +30,7 @@ from src.core.utils import v_code
 
 
 class NetworkBridge(QObject):
-    trigger_signal = Signal(dict)
+    trigger_signal = Signal(str)
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
     send_ws_message = Signal(dict)
@@ -131,6 +131,35 @@ def handle_incoming_phone_action():
     payload = request.get_json() or {}
     network_bridge.trigger_signal.emit(payload)
     return f"Action handled securely", 200
+
+
+#
+@sock_app.route('/socket')
+def handle_actions(ws: Server):
+    auth_header = request.headers.get('Authorization', None)
+    if not auth_header or not auth_header.startswith('MioKey'):
+        network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
+        return "Unauthorized: Missing header", 401
+
+    if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
+        network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
+        return "Unauthorized: Invalid key token", 403
+
+    network_bridge.log_signal.emit("INFO", "Websocket connected...")
+    global WS
+    WS = ws
+    network_bridge.send_ws_message.connect(ws.send)
+    while True:
+        try:
+            data = ws.receive(timeout=15)
+        except Exception as e:
+            disconnect()
+            network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
+            break
+        if data is None:
+            disconnect()
+            break
+        network_bridge.trigger_signal.emit(data)
 
 
 def fetch_linux_lan_ip():
@@ -329,37 +358,10 @@ class ConnectPage(QWidget):
     def execute(self, action_data: str | bytes):
         if isinstance(action_data, bytes):
             action_data = action_data.decode('utf-8')
-        #action_types:native_cmd log create_project remove_project refresh_project unpack
-        #payload: {argv1, argv2}
+        # action_types:native_cmd log create_project remove_project refresh_project unpack
+        # payload: {argv1, argv2}
         d = {
             "action": "log"
         }
         json_data = json.loads(action_data)
         return "Action"
-
-    @sock_app.route('/socket')
-    def handle_actions(self, ws: Server):
-        auth_header = request.headers.get('Authorization', None)
-        if not auth_header or not auth_header.startswith('MioKey'):
-            network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
-            return "Unauthorized: Missing header", 401
-
-        if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
-            network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
-            return "Unauthorized: Invalid key token", 403
-
-        network_bridge.log_signal.emit("INFO", "Websocket connected...")
-        global WS
-        WS = ws
-        network_bridge.send_ws_message.connect(ws.send)
-        while True:
-            try:
-                data = ws.receive(timeout=15)
-            except Exception as e:
-                disconnect()
-                network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
-                break
-            if data is None:
-                disconnect()
-                break
-            ws.send(self.execute(data))
