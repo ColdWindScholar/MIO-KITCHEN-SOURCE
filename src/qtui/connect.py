@@ -327,6 +327,7 @@ class ConnectPage(QWidget):
         if isinstance(action_data, bytes):
             action_data = action_data.decode('utf-8')
         #action_types:native_cmd log create_project remove_project refresh_project unpack
+        #payload: {argv1, argv2}
         d = {
             "action": "log"
         }
