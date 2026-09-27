@@ -33,7 +33,7 @@ class NetworkBridge(QObject):
     trigger_signal = Signal(str)
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
-    send_ws_message = Signal(dict)
+    send_ws_message = Signal(str)
 
 
 flask_backend = Flask(__name__)
