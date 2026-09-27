@@ -326,6 +326,10 @@ class ConnectPage(QWidget):
     def execute(self, action_data: str | bytes):
         if isinstance(action_data, bytes):
             action_data = action_data.decode('utf-8')
+        #action_types:native_cmd log create_project remove_project refresh_project unpack
+        d = {
+            "action": "log"
+        }
         json_data = json.loads(action_data)
         return "Action"
 
