@@ -47,6 +47,7 @@ ACTIVE_SESSION = {
 }
 WS: Server | None = None
 
+
 @flask_backend.route('/connect', methods=['POST'])
 def handle_handshake():
     if ACTIVE_SESSION["token"]:
@@ -68,11 +69,13 @@ def handle_handshake():
 
     return jsonify({"token": generated_token}), 200
 
+
 def disconnect():
     ACTIVE_SESSION["token"] = None
     ACTIVE_SESSION["device_name"] = None
     ACTIVE_SESSION["device_ip"] = None
     network_bridge.connection_status_signal.emit(False, {})
+
 
 @flask_backend.route('/disconnect', methods=['POST'])
 def handle_disconnect():
@@ -105,11 +108,10 @@ def get_device_info():
     if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
         network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
         return "Unauthorized: Invalid key token", 403
-    json_text = json.dumps({"device_name": platform.node(), "system": system(), "machine": machine(), "kernel":  platform.release()},
-                           ensure_ascii=True)
+    json_text = json.dumps(
+        {"device_name": platform.node(), "system": system(), "machine": machine(), "kernel": platform.release()},
+        ensure_ascii=True)
     return json_text, 200
-
-
 
 
 @flask_backend.route('/action', methods=['POST'])
@@ -321,8 +323,11 @@ class ConnectPage(QWidget):
         self.console_log_view.setTextCursor(cursor)
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
-    def execute(self, action:dict):
-        return '12121'
+    def execute(self, action_data: str | bytes):
+        if isinstance(action_data, bytes):
+            action_data = action_data.decode('utf-8')
+        json_data = json.loads(action_data)
+        return "Action"
 
     @sock_app.route('/socket')
     def handle_actions(self, ws: Server):
