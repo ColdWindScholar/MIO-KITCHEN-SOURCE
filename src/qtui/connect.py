@@ -25,6 +25,7 @@ from qfluentwidgets import (
 from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
+from qtui.projects import ProjectsPage
 from src.core.utils import v_code
 
 
@@ -166,10 +167,10 @@ def fetch_linux_lan_ip():
 
 
 class ConnectPage(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, projectPage: ProjectsPage = None):
         super().__init__(parent)
         self.setObjectName("ConnectPage")
-
+        self.projectPage = projectPage
         base_horizontal_layout = QHBoxLayout(self)
         base_horizontal_layout.setContentsMargins(24, 24, 24, 24)
         base_horizontal_layout.setSpacing(24)

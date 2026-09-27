@@ -74,7 +74,7 @@ class MainWindow(FluentWindow):
         self.home_page = HomePage()
         self.project_page = ProjectsPage()
         self.plugin_page = PluginPage()
-        self.connect_page = ConnectPage()
+        self.connect_page = ConnectPage(projectPage=self.project_page)
         self.apk_manager = ApkManagerPage()
         self.about_page = AboutPage()
         self.settings_page = SettingsPage()
