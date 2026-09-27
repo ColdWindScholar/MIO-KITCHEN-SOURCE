@@ -110,31 +110,7 @@ def get_device_info():
     return json_text, 200
 
 
-@sock_app.route('/socket')
-def handle_actions(ws: Server):
-    auth_header = request.headers.get('Authorization', None)
-    if not auth_header or not auth_header.startswith('MioKey'):
-        network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
-        return "Unauthorized: Missing header", 401
 
-    if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
-        network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
-        return "Unauthorized: Invalid key token", 403
-
-    network_bridge.log_signal.emit("INFO", "Websocket connected...")
-    global WS
-    WS = ws
-    while True:
-        try:
-            data = ws.receive(timeout=15)
-        except Exception as e:
-            disconnect()
-            network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
-            break
-        if data is None:
-            disconnect()
-            break
-        network_bridge.trigger_signal.emit(data)
 
 @flask_backend.route('/action', methods=['POST'])
 def handle_incoming_phone_action():
@@ -245,7 +221,7 @@ class ConnectPage(QWidget):
         self.render_qr_matrix(json_text)
 
         # Connect core communication bridges
-        network_bridge.trigger_signal.connect(self.execute_desktop_function)
+        network_bridge.trigger_signal.connect(self.execute)
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_state)
 
@@ -345,5 +321,31 @@ class ConnectPage(QWidget):
         self.console_log_view.setTextCursor(cursor)
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
-    def execute_desktop_function(self, action_id: dict):
-        print(action_id)
+    def execute(self, action:dict):
+        return '12121'
+
+    @sock_app.route('/socket')
+    def handle_actions(self, ws: Server):
+        auth_header = request.headers.get('Authorization', None)
+        if not auth_header or not auth_header.startswith('MioKey'):
+            network_bridge.log_signal.emit("WARN", f"Refused unauthenticated client request.")
+            return "Unauthorized: Missing header", 401
+
+        if ACTIVE_SESSION["token"] is None or auth_header[6:] != ACTIVE_SESSION["token"]:
+            network_bridge.log_signal.emit("WARN", "Request dropped. Bad verification signature.")
+            return "Unauthorized: Invalid key token", 403
+
+        network_bridge.log_signal.emit("INFO", "Websocket connected...")
+        global WS
+        WS = ws
+        while True:
+            try:
+                data = ws.receive(timeout=15)
+            except Exception as e:
+                disconnect()
+                network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
+                break
+            if data is None:
+                disconnect()
+                break
+            ws.send(self.execute(data))
