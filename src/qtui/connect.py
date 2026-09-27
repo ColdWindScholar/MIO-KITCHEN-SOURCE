@@ -134,9 +134,7 @@ def handle_actions(ws: Server):
         if data is None:
             disconnect()
             break
-        ws.send(f"Echo: {data}")
         network_bridge.trigger_signal.emit(data)
-
 
 @flask_backend.route('/action', methods=['POST'])
 def handle_incoming_phone_action():
