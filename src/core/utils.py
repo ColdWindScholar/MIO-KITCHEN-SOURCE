@@ -166,10 +166,12 @@ def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = No
     logging.debug(f"exit_code : {ret.returncode}")
     return ret.returncode
 
+
 def re_folder(path):
     if os.path.exists(path):
         rmtree(path)
     os.makedirs(path, exist_ok=True)
+
 
 class GuoKeLogo:
     def __init__(self):
@@ -374,6 +376,7 @@ def gettype(file) -> str:
         return "fne"
     if os.path.getsize(file) < 5:
         return 'unknown'
+
     def is_super(fil) -> bool:
         with open(fil, 'rb') as file_:
             try:
@@ -493,9 +496,6 @@ def remove_duplicate(file_) -> None:
     del data
 
 
-
-
-
 def simg2img(path: str):
     """
     convert Sparse image to Raw Image
@@ -542,6 +542,7 @@ def findfile(file, dir_) -> str:
                 return f'{root}/{file}'
     return ''
 
+
 def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 2048576):
     """
     return percentage, speed, bytes_downloaded, file_size, elapsed
@@ -568,11 +569,7 @@ def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 20
         response_get = session.get(url, stream=True, timeout=10)
         response_get.raise_for_status()  # Check for HTTP errors
     except requests.exceptions.RequestException as e_get:
-        logging.error(f"Error making GET request to {url}: {e_get}")
-        # If the GET request fails, the generator needs to be interrupted.
-        # An exception can be raised, or an empty yield can be returned.
-        yield "Error", 0, 0, 0, 0  # Example of returning an error
-        return
+        raise e_get
 
     last_time = time.time()
     if file_size == 0 and size_ > 0:  # Use the provided size_ if not obtained from the header
@@ -580,42 +577,36 @@ def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 20
     file_save_path = os.path.join(path, os.path.basename(url))
     logging.info(f"Starting download: {url} to {file_save_path}, expected size: {file_size}")
 
-    try:
-        with open(file_save_path, "wb") as f:
-            bytes_downloaded = 0
-            for data in response_get.iter_content(chunk_size=chunk_size):
-                if not data:  # Check for empty data if the connection was dropped
-                    break
-                f.write(data)
-                bytes_downloaded += len(data)
+    with open(file_save_path, "wb") as f:
+        bytes_downloaded = 0
+        for data in response_get.iter_content(chunk_size=chunk_size):
+            if not data:  # Check for empty data if the connection was dropped
+                break
+            f.write(data)
+            bytes_downloaded += len(data)
 
-                current_time = time.time()
-                elapsed_total = current_time - start_time
+            current_time = time.time()
+            elapsed_total = current_time - start_time
 
-                # Speed calculation
-                # To avoid division by zero if the time interval is very small
-                time_since_last_chunk = current_time - last_time
-                speed = 0
-                if time_since_last_chunk > 0.001:  # Avoid division by a very small number
-                    speed = (len(data) / 1024) / time_since_last_chunk  # Speed of the current chunk
-                else:  # If the time interval is very small, use the average speed
-                    if elapsed_total > 0.001:
-                        speed = (bytes_downloaded / 1024) / elapsed_total
+            # Speed calculation
+            # To avoid division by zero if the time interval is very small
+            time_since_last_chunk = current_time - last_time
+            speed = 0
+            if time_since_last_chunk > 0.001:  # Avoid division by a very small number
+                speed = (len(data) / 1024) / time_since_last_chunk  # Speed of the current chunk
+            else:  # If the time interval is very small, use the average speed
+                if elapsed_total > 0.001:
+                    speed = (bytes_downloaded / 1024) / elapsed_total
 
-                last_time = current_time
+            last_time = current_time
 
-                percentage = "Unknown"  # If file_size is unknown
-                if file_size > 0:
-                    percentage_float = (bytes_downloaded / file_size) * 100
-                    percentage = int(percentage_float) if int_ else percentage_float
+            percentage = "Unknown"  # If file_size is unknown
+            if file_size > 0:
+                percentage_float = (bytes_downloaded / file_size) * 100
+                percentage = int(percentage_float) if int_ else percentage_float
 
-                yield percentage, speed, bytes_downloaded, file_size, elapsed_total
-    except IOError as e_io:
-        raise e_io
-    except Exception as e_download:  # Catch other potential errors during download
-        raise e_download
-    else:
-        logging.info(f"Finished download: {url} to {file_save_path}, total bytes: {bytes_downloaded}")
+            yield percentage, speed, bytes_downloaded, file_size, elapsed_total
+
 
 def findfolder(dir__, folder_name):
     """
@@ -724,6 +715,7 @@ class XiaomiBlkstruct:
     def __init__(self, buf: bytes):
         self.img_offset, self.blksz = struct.unpack("2I", buf)
 
+
 class GetFolderSize:
     # get-command
     # 1 - return True value of dir size
@@ -793,7 +785,6 @@ class GetFolderSize:
 
 
 def pack_zip(input_dir: str, output_zip: str):
-
     with zipfile.ZipFile(output_zip, 'w',
                          compression=zipfile.ZIP_DEFLATED) as zip_:
         for file in get_all_file_paths(input_dir):
@@ -806,6 +797,7 @@ def pack_zip(input_dir: str, output_zip: str):
                 print("写入 {} 时出现错误 ：{}".format(file, e))
     if os.path.exists(output_zip):
         print("打包 {} 成功！".format(output_zip))
+
 
 def generate_bug_report():
     output = prog_path
@@ -835,6 +827,8 @@ def generate_bug_report():
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"))
     re_folder(inner)
     print(f"\tThe Bug Report Was Saved:{bugreport}")
+
+
 class LogoDumper:
     def __init__(self, img: str, out: str, dir__: str = "pic"):
         self.magic = None
