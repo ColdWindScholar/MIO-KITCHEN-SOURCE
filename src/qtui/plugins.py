@@ -1538,12 +1538,13 @@ class PluginPage(QWidget):
             if os.path.exists(file_path) and os.path.getsize(file_path) == size:
                 module_manager.install(file_path)
                 continue
-            download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
-            for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
-                if percentage == 'Error':
-                    events.download_signal.emit(plugin_info, self.tr("Retry"), True)
-                    return 1
-                events.download_signal.emit(plugin_info, f"{percentage} %", False)
+            try:
+                download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
+                for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
+                    events.download_signal.emit(plugin_info, f"{percentage} %", False)
+            except Exception as e:
+                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                return 1
             module_manager.install(file_path)
         events.load_plugin_cards.emit()
         return None
