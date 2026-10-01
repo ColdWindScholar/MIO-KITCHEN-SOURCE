@@ -1704,7 +1704,7 @@ class ProjectsPage(QFrame):
                 except (Exception, BaseException):
                     logging.exception('Bugs')
         if not project_manger.exist() or not os.path.exists(project_manger.current_work_path()):
-            print("project's not exist")
+            events.show_info_bar.emit(self.tr("Warning"), self.tr("Project's not exist"), 3, 3000)
             return False
 
         json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
