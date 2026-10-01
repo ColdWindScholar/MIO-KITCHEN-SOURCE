@@ -1438,7 +1438,7 @@ class ProjectsPage(QFrame):
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
         if not project_manger.exist():
-            self.show_info_bar('error', "project's not exist", 1)
+            self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
             return False
         parts_dict = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
         for i in chosen_parts:
@@ -1477,13 +1477,13 @@ class ProjectsPage(QFrame):
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                     work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
                                     old_kernel=erofs_old_kernel, UTC=UTC) != 0:
-                        print("Failed to repack %s [erofs]" % dname)
+                        print("Failed to repack {} [erofs]".format(dname))
                     else:
                         if remove_source_files:
                             self.rdi(work, dname)
                         print("Packed successfully:{}".format(dname))
                         if pack_format in ["dat", "br", "sparse"]:
-                            utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
+                            utils.img2simg(project_manger.current_work_output_path() + f"{dname}.img")
                             if pack_format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
