@@ -87,11 +87,16 @@ class StreamToSignal(QObject):
     def flush(self):
         self.original_stream.flush()
 
+
 class Events(QObject):
     refresh_projects = Signal()
     set_project_name = Signal(str)
     show_info_bar = Signal(str, str, int, int)
+
+
 events = Events()
+
+
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
     send_message = Signal(str, str, int)
@@ -715,7 +720,7 @@ class ProjectsPage(QFrame):
 
         path = project_manger.get_work_path(name)
         if not path or not os.path.exists(path):
-            self.show_info_bar( self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
             return
 
         try:
@@ -785,10 +790,10 @@ class ProjectsPage(QFrame):
         try:
             project_manger.remove(project_name)
             self.show_info_bar(self.tr("Success"), self.tr("Project {} Removed.").format(project_name),
-                          bar_type=3)
+                               bar_type=3)
         except Exception as e:
             self.show_info_bar(self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e),
-                          bar_type=1)
+                               bar_type=1)
         self.refresh_projects()
 
     def build_project_section(self, parent):
@@ -1424,14 +1429,13 @@ class ProjectsPage(QFrame):
             4: InfoBarIcon.INFORMATION
         }
         InfoBar.new(icon=icon_map.get(bar_type, InfoBarIcon.INFORMATION),
-            title=title,
+                    title=title,
                     content=content,
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.BOTTOM,
                     duration=duration,
                     parent=self.parent())
-
 
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
@@ -1646,7 +1650,6 @@ class ProjectsPage(QFrame):
         self.partition_table.clearContents()
         self._load_mock_partitions_table(self.refresh_unpack_list())
 
-
     def refresh_unpack_list(self):
         """The actual logic for refreshing the unpack list, runs in a separate thread."""
         data = []
@@ -1787,7 +1790,8 @@ class ProjectsPage(QFrame):
                         else:
                             print("File May Not Extracted.")
                     else:
-                        events.show_info_bar.emit(self.tr("Error"), self.tr("transferfile of {} missing").format(i), 1, 3000)
+                        events.show_info_bar.emit(self.tr("Error"), self.tr("transferfile of {} missing").format(i), 1,
+                                                  3000)
             if os.access(f"{work}/{i}.img", os.F_OK):
                 try:
                     if i in parts:
@@ -1817,7 +1821,7 @@ class ProjectsPage(QFrame):
                         utils.simg2img(f"{work}/{i}.img")
                     except (Exception, BaseException) as e:
                         logging.exception(e)
-                        events.show_info_bar.emit(self.tr("Warning"),e,1, 3000)
+                        events.show_info_bar.emit(self.tr("Warning"), str(e), 1, 5000)
                         continue
                 if i not in parts.keys():
                     parts[i] = gettype(f"{work}/{i}.img")
@@ -1857,7 +1861,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except Exception as e:
-                            events.show_info_bar.emit(self.tr('Warning'),f"Cannot remove {i}.img",1, 3000)
+                            events.show_info_bar.emit(self.tr('Warning'), f"Cannot remove {i}.img", 1, 3000)
 
                 if file_type == 'romfs':
                     fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
@@ -1895,7 +1899,7 @@ class ProjectsPage(QFrame):
                                  work,
                                  '-x'],
                             out=True) != 0:
-                        events.show_info_bar.emit(self.tr('Error'),f"Failed to unpack {i}.img",1, 3000)
+                        events.show_info_bar.emit(self.tr('Error'), f"Failed to unpack {i}.img", 1, 3000)
                         continue
                     if os.path.exists(f'{work}/{i}'):
                         try:
@@ -1917,12 +1921,13 @@ class ProjectsPage(QFrame):
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 if file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
-                    events.show_info_bar.emit(self.tr("Warning"), self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
+                    events.show_info_bar.emit(self.tr("Warning"),
+                                              self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
         parts.clear()
-        events.show_info_bar.emit(self.tr("Success"),self.tr("Unpacking Done"), 3, 3000)
+        events.show_info_bar.emit(self.tr("Success"), self.tr("Unpacking Done"), 3, 3000)
         return True
 
     def _load_mock_partitions_table(self, mock_data):
