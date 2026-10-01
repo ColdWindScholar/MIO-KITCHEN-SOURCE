@@ -1429,7 +1429,7 @@ class ProjectsPage(QFrame):
                     position=InfoBarPosition.BOTTOM,
                     duration=duration,
                     parent=self.parent())
-    
+
 
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
