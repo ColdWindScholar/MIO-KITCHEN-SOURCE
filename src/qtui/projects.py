@@ -381,7 +381,6 @@ class ProjectsPage(QFrame):
         self.setStyleSheet("background: transparent")
         # set events
         events.refresh_projects.connect(self.refresh_projects)
-        events.set_project_name.connect(self.project_combo.setText)
 
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
@@ -640,7 +639,7 @@ class ProjectsPage(QFrame):
         project_path = project_manger.new(name)
         cfg.set(cfg.currentProjectName, name)
         events.refresh_projects.emit()
-        self.project_combo.setText(name)
+        events.set_project_name.emit(name)
         shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
         return 0
 
@@ -799,6 +798,7 @@ class ProjectsPage(QFrame):
         # 下半部分控件区域
         row1 = QHBoxLayout()
         self.project_combo = ComboBox(self.project_container)
+        events.set_project_name.connect(self.project_combo.setText)
         self.project_combo.setMinimumWidth(250)
         self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
