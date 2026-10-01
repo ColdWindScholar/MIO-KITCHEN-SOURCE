@@ -1575,8 +1575,8 @@ class ProjectsPage(QFrame):
                 utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
                 if os.path.exists(os.path.join(work, i)):
-                    print(f"Unsupported {i}:{parts_dict[i]}")
-                logging.warning(f"{i} Not Supported.")
+                    events.show_info_bar.emit(self.tr("Warning"), f"Unsupported {i}:{parts_dict[i]}", 2, 3000)
+                logging.warning(f"{i}:{parts_dict[i]} Not Supported.")
 
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
