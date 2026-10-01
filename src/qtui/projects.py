@@ -699,7 +699,6 @@ class ProjectsPage(QFrame):
                             break
                         self.format_widget.setCurrentItem(item)
                 self.refresh_unpack()
-
             else:
                 self.refresh_repack()
             return
