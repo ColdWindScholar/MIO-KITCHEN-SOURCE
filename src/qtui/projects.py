@@ -89,6 +89,7 @@ class StreamToSignal(QObject):
 
 class Events(QObject):
     refresh_projects = Signal()
+    set_project_name = Signal(str)
 events = Events()
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
@@ -380,6 +381,7 @@ class ProjectsPage(QFrame):
         self.setStyleSheet("background: transparent")
         # set events
         events.refresh_projects.connect(self.refresh_projects)
+        events.set_project_name.connect(self.project_combo.setText)
 
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
@@ -453,7 +455,7 @@ class ProjectsPage(QFrame):
         if ftype == 'gzip':
             name = os.path.splitext(os.path.basename(ifile))[0]
             cfg.set(cfg.currentProjectName, name)
-            self.project_combo.setText(name)
+            events.set_project_name.emit(name)
             if not project_manger.exist(name):
                 utils.re_folder(project_manger.current_work_path())
             output_file_name = os.path.basename(ifile)
@@ -575,7 +577,7 @@ class ProjectsPage(QFrame):
                 print("unzip done")
                 if os.path.isdir(project_manger.current_work_path()):
                     events.refresh_projects.emit()
-                    self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
+                    events.set_project_name.emit(os.path.splitext(os.path.basename(ifile))[0])
                 self.script2fs(project_manger.current_work_path())
                 events.refresh_projects.emit()
 
@@ -613,7 +615,7 @@ class ProjectsPage(QFrame):
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
             cfg.set(cfg.currentProjectName, base_name)
             events.refresh_projects.emit()
-            self.project_combo.setText(base_name)
+            events.set_project_name.emit(base_name)
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
