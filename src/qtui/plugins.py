@@ -1543,6 +1543,7 @@ class PluginPage(QWidget):
                 for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                     events.download_signal.emit(plugin_info, f"{percentage} %", False)
             except Exception as e:
+                print(e)
                 events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                 return 1
             module_manager.install(file_path)
