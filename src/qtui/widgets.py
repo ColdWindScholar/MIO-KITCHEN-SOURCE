@@ -20,40 +20,7 @@ from src.core import utils
 from src.core.utils import gettype
 
 
-def show_info_bar(parent:QWidget | None, title : str, content: str, bar_type: int = 3, duration=3000):
-    """bar_type: 1=error 2=warning 3=info"""
-    """显示提示条，根据配置决定是否显示"""
-    if True:
-        if bar_type == 1:
-            InfoBar.error(
-                title=title,
-                content=content,
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.BOTTOM,
-                duration=duration,
-                parent=parent
-            )
-        elif bar_type == 2:
-            InfoBar.warning(
-                title=title,
-                content=content,
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.BOTTOM,
-                duration=duration,
-                parent=parent
-            )
-        else:
-            InfoBar.success(
-                title=title,
-                content=content,
-                orient=Qt.Horizontal,
-                isClosable=True,
-                position=InfoBarPosition.BOTTOM,
-                duration=duration,
-                parent=parent
-            )
+
 
 class NewProjectDialog(MessageBoxBase):
     """自定义对话框，用于创建或重命名项目"""
