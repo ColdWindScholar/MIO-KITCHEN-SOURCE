@@ -1817,7 +1817,7 @@ class ProjectsPage(QFrame):
                         utils.simg2img(f"{work}/{i}.img")
                     except (Exception, BaseException) as e:
                         logging.exception(e)
-                        self.show_info_bar("warning", e, 1)
+                        events.show_info_bar.emit(self.tr("Warning"),e,1, 3000)
                         continue
                 if i not in parts.keys():
                     parts[i] = gettype(f"{work}/{i}.img")
