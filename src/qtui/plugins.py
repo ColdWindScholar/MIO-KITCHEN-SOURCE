@@ -1540,9 +1540,13 @@ class PluginPage(QWidget):
                 continue
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
+                if percentage == 'Error':
+                    events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                    return 1
                 events.download_signal.emit(plugin_info, f"{percentage} %", False)
             module_manager.install(file_path)
         events.load_plugin_cards.emit()
+        return None
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""

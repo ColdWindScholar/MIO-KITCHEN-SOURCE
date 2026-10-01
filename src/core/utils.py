@@ -611,11 +611,9 @@ def download_api(url, path=None, int_=True, size_: int = 0, chunk_size: int = 20
 
                 yield percentage, speed, bytes_downloaded, file_size, elapsed_total
     except IOError as e_io:
-        logging.error(f"IOError during download or saving file {file_save_path}: {e_io}")
-        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time  # Return an error
+        raise e_io
     except Exception as e_download:  # Catch other potential errors during download
-        logging.exception(f"Unexpected error during download of {url}: {e_download}")
-        yield "Error", 0, bytes_downloaded, file_size, time.time() - start_time
+        raise e_download
     else:
         logging.info(f"Finished download: {url} to {file_save_path}, total bytes: {bytes_downloaded}")
 
