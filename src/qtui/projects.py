@@ -1787,7 +1787,7 @@ class ProjectsPage(QFrame):
                         else:
                             print("File May Not Extracted.")
                     else:
-                        print(self.tr("transferfile's missing"))
+                        events.show_info_bar.emit(self.tr("Error"), self.tr("transferfile of {} missing").format(i), 1, 3000)
             if os.access(f"{work}/{i}.img", os.F_OK):
                 try:
                     if i in parts:
