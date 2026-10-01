@@ -1734,7 +1734,7 @@ class ProjectsPage(QFrame):
                 try:
                     utils.simg2img(f"{work}/super.img")
                 except (Exception, BaseException):
-                    self.show_info_bar("warning", f"Cannot simg2img super.img", 1)
+                    events.show_info_bar.emit(self.tr("Error"), self.tr("Cannot simg2img super.img"), 1, 3000)
             if gettype(f"{work}/super.img") == 'super':
                 # should get info here.
                 parts["super_info"] = lpunpack.get_info(os.path.join(work, "super.img"))
