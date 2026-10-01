@@ -1416,12 +1416,12 @@ class ProjectsPage(QFrame):
         return 0
 
     def show_info_bar(self, title: str, content: str, bar_type: int = 3, duration=3000):
-        """bar_type: 1=error 2=warning 3=info"""
-        """显示提示条，根据配置决定是否显示"""
+        """bar_type: 1=error 2=warning 3=SUCCESS 4=INFO"""
         icon_map = {
             1: InfoBarIcon.ERROR,
             2: InfoBarIcon.WARNING,
-            3: InfoBarIcon.SUCCESS
+            3: InfoBarIcon.SUCCESS,
+            4: InfoBarIcon.INFORMATION
         }
         InfoBar.new(icon=icon_map.get(bar_type, InfoBarIcon.INFORMATION),
             title=title,
