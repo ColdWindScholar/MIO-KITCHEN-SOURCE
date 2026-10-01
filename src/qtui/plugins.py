@@ -19,7 +19,7 @@ from PySide6.QtWidgets import QSizePolicy
 from qfluentwidgets import (ProgressBar, ImageLabel)
 
 import logging
-from PySide6.QtCore import Qt, QObject
+from PySide6.QtCore import Qt, QObject, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
 from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
@@ -989,7 +989,6 @@ class InstallMpk(MessageBoxBase):
         self.installb.setEnabled(False)
 
 
-
 class AppCardRich(CardWidget):
 
     def __init__(self, icon, title: str, author: str, description: str = "", tags: list = None, parent=None):
@@ -1310,7 +1309,7 @@ class PluginPage(QWidget):
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
-
+        self.download_signal = Signal(dict, str, bool)
         # 2. Header Layout (Title and Navigation)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
@@ -1469,7 +1468,7 @@ class PluginPage(QWidget):
                 "author": plugin_author,
                 "type": "Installed",
                 "info": dict(),
-                "id":i
+                "id": i
             })
 
         if self.SegmentedWidget.currentRouteKey() == 'Repo':
@@ -1482,7 +1481,8 @@ class PluginPage(QWidget):
                     description=item['desc'],
                     tags=[item['system'], item['version'], utils.hum_convert(item['size'])]
                 )
-                card.openButton.setText(self.tr("Download") if not module_manager.is_installed(item['id']) else self.tr("Reinstall"))
+                card.openButton.setText(
+                    self.tr("Download") if not module_manager.is_installed(item['id']) else self.tr("Reinstall"))
                 card.openButton.clicked.connect(
                     lambda state, plugin_info=item: self.download_plugin(plugin_info))
 
@@ -1496,18 +1496,8 @@ class PluginPage(QWidget):
                     "id": item['id']
                 })
 
-    def download_plugin(self, plugin_info:dict):
-        files = plugin_info.get("files", [])
-        size = plugin_info.get("size", 0)
-        depend = plugin_info.get('depend', [])
+    def set_download_status(self, plugin_info: dict, state: str = "", enable: bool = False):
         card_widget = None
-        for d in depend:
-            if not module_manager.is_installed(d):
-                for depend_info in self.cards_data:
-                    if "id" not in depend_info:
-                        continue
-                    if depend_info['id'] == d:
-                        self.download_plugin(depend_info)
         for data in self.cards_data:
             if "id" not in data:
                 continue
@@ -1515,8 +1505,22 @@ class PluginPage(QWidget):
                 card_widget = data["card_widget"]
         if not card_widget:
             return 1
-        card_widget.openButton.setDisabled(True)
-        origin_text = card_widget.openButton.text()
+        card_widget.openButton.setDisabled(not enable)
+        if state:
+            card_widget.openButton.setText(state)
+
+    def download_plugin(self, plugin_info: dict):
+        files = plugin_info.get("files", [])
+        size = plugin_info.get("size", 0)
+        depend = plugin_info.get('depend', [])
+        self.download_signal.emit(plugin_info, self.tr("Downloading..."), False)
+        for d in depend:
+            if not module_manager.is_installed(d):
+                for depend_info in self.cards_data:
+                    if "id" not in depend_info:
+                        continue
+                    if depend_info['id'] == d:
+                        self.download_plugin(depend_info)
         for file in files:
             file_path = os.path.join(temp, file)
             if os.path.exists(file_path) and os.path.getsize(file_path) == size:
@@ -1524,10 +1528,8 @@ class PluginPage(QWidget):
                 continue
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
-                card_widget.openButton.setText(f"{percentage} %")
+                self.download_signal.emit(plugin_info, f"{percentage} %", False)
             module_manager.install(file_path)
-        card_widget.openButton.setDisabled(False)
-        card_widget.openButton.setText(origin_text)
         self.load_plugin_cards()
 
     def filter_plugins(self, text):
