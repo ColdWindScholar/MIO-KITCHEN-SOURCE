@@ -1,15 +1,15 @@
 {
     "Tool": {
         "Version": "5.0.0-prewiew",
-        "AiEngine": false,
+        "AiEngine": true,
         "autoUnpack": false,
-        "checkUpdate": false,
-        "CpioImpl": "Native",
-        "currentProjectName": "tkui",
+        "checkUpdate": true,
+        "CpioImpl": "Python",
+        "currentProjectName": "UNI_CN_P720S20V1.0.0B18_DL",
         "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
-        "selinuxPatch": false,
+        "selinuxPatch": true,
         "updateURL": "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest",
         "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
     },

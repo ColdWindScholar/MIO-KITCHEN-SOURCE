@@ -87,7 +87,9 @@ class StreamToSignal(QObject):
     def flush(self):
         self.original_stream.flush()
 
-
+class Events(QObject):
+    refresh_projects = Signal()
+events = Events()
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
     send_message = Signal(str, str, int)
@@ -376,6 +378,8 @@ class ProjectsPage(QFrame):
         self.setAcceptDrops(True)
         self.initDropOverlay()
         self.setStyleSheet("background: transparent")
+        # set events
+        events.refresh_projects.connect(self.refresh_projects)
 
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
@@ -469,7 +473,7 @@ class ProjectsPage(QFrame):
             self.unpackrom(output_file_)
             if old_project_name != (new_project_name := cfg.currentProjectName.value):
                 project_manger.remove(old_project_name)
-                self.refresh_projects()
+                events.refresh_projects.emit()
             cfg.set(cfg.customProjectName, new_project_name)
             return
         # ozip
@@ -516,7 +520,7 @@ class ProjectsPage(QFrame):
             else:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
                 self.script2fs(project_manger.current_work_path())
-            self.refresh_projects()
+            events.refresh_projects.emit()
             return
         # ops
         if os.path.splitext(ifile)[1] == '.ops':
@@ -525,13 +529,14 @@ class ProjectsPage(QFrame):
                     "<filename>": ifile,
                     'outdir': os.path.join(cfg.workingFolder.value, project_manger.current_work_path())}
             opscrypto.main(args)
-            self.refresh_projects()
+            events.refresh_projects.emit()
             return
         # pac
         ftype = gettype(ifile)
         if ftype == 'pac':
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             unpac(ifile, project_manger.current_work_path(), PACMODE.EXTRACT)
+            events.refresh_projects.emit()
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
@@ -569,10 +574,10 @@ class ProjectsPage(QFrame):
                         print("cannot rename %s %s" % (member_name, e))
                 print("unzip done")
                 if os.path.isdir(project_manger.current_work_path()):
-                    self.refresh_projects()
+                    events.refresh_projects.emit()
                     self.project_combo.setText(os.path.splitext(os.path.basename(ifile))[0])
                 self.script2fs(project_manger.current_work_path())
-                self.refresh_projects()
+                events.refresh_projects.emit()
 
             if cfg.autoUnpack:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
@@ -594,7 +599,7 @@ class ProjectsPage(QFrame):
                 os.mkdir(folder)
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
-                self.refresh_projects()
+                events.refresh_projects.emit()
             except Exception as e:
                 raise e
             project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
@@ -607,13 +612,13 @@ class ProjectsPage(QFrame):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
             cfg.set(cfg.currentProjectName, base_name)
-            self.refresh_projects()
+            events.refresh_projects.emit()
             self.project_combo.setText(base_name)
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
             print("Unsupported %s [%s]" % (ifile, ftype))
-        self.refresh_projects()
+        events.refresh_projects.emit()
 
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
@@ -632,7 +637,7 @@ class ProjectsPage(QFrame):
             name += utils.v_code()
         project_path = project_manger.new(name)
         cfg.set(cfg.currentProjectName, name)
-        self.refresh_projects()
+        events.refresh_projects.emit()
         self.project_combo.setText(name)
         shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
         return 0
