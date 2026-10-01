@@ -1294,6 +1294,7 @@ class BuiltInPlugins(QObject):
 
 class Events(QObject):
     download_signal = Signal(dict, str, bool)
+    load_plugin_cards = Signal()
 
 events = Events()
 class PluginPage(QWidget):
@@ -1314,6 +1315,7 @@ class PluginPage(QWidget):
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
         events.download_signal.connect(self.set_download_status)
+        events.load_plugin_cards.connect(self.load_plugin_cards)
         # 2. Header Layout (Title and Navigation)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
@@ -1540,7 +1542,7 @@ class PluginPage(QWidget):
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                 events.download_signal.emit(plugin_info, f"{percentage} %", False)
             module_manager.install(file_path)
-        self.load_plugin_cards()
+        events.load_plugin_cards.emit()
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
