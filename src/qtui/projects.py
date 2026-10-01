@@ -90,6 +90,7 @@ class StreamToSignal(QObject):
 class Events(QObject):
     refresh_projects = Signal()
     set_project_name = Signal(str)
+    show_info_bar = Signal(str, str, int, int)
 events = Events()
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
@@ -381,6 +382,7 @@ class ProjectsPage(QFrame):
         self.setStyleSheet("background: transparent")
         # set events
         events.refresh_projects.connect(self.refresh_projects)
+        events.show_info_bar.connect(self.show_info_bar)
 
     def initDropOverlay(self):
         """Creates a hidden, full-window overlay that alerts 'Drop Here' on drag move."""
