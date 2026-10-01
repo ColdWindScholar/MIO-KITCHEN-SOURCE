@@ -47,7 +47,7 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetIte
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
-    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition
+    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon
 
 from src.core import ext4
 from src.core import imgextractor
@@ -1416,37 +1416,20 @@ class ProjectsPage(QFrame):
     def show_info_bar(self, title: str, content: str, bar_type: int = 3, duration=3000):
         """bar_type: 1=error 2=warning 3=info"""
         """显示提示条，根据配置决定是否显示"""
-        if True:
-            if bar_type == 1:
-                InfoBar.error(
-                    title=title,
+        icon_map = {
+            1: InfoBarIcon.ERROR,
+            2: InfoBarIcon.WARNING,
+            3: InfoBarIcon.SUCCESS
+        }
+        InfoBar.new(icon=icon_map.get(bar_type, InfoBarIcon.INFORMATION),
+            title=title,
                     content=content,
                     orient=Qt.Horizontal,
                     isClosable=True,
                     position=InfoBarPosition.BOTTOM,
                     duration=duration,
-                    parent=self.parent()
-                )
-            elif bar_type == 2:
-                InfoBar.warning(
-                    title=title,
-                    content=content,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.BOTTOM,
-                    duration=duration,
-                    parent=self.parent()
-                )
-            else:
-                InfoBar.success(
-                    title=title,
-                    content=content,
-                    orient=Qt.Horizontal,
-                    isClosable=True,
-                    position=InfoBarPosition.BOTTOM,
-                    duration=duration,
-                    parent=self.parent()
-                )
+                    parent=self.parent())
+    
 
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
