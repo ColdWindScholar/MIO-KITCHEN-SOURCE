@@ -47,7 +47,7 @@ from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetIte
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
-    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget
+    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition
 
 from src.core import ext4
 from src.core import imgextractor
@@ -57,7 +57,7 @@ from src.core import utils
 from src.core.payload_extract import extract_partitions_from_payload
 from src.core.pygpt.gpt_reader import GPTReader
 from src.qtui.settings import cfg
-from src.qtui.widgets import NewProjectDialog, show_info_bar, PackSettingsDialog, ConvertImageMessageBox, \
+from src.qtui.widgets import NewProjectDialog, PackSettingsDialog, ConvertImageMessageBox, \
     PackSuperMessageBox, RepackZipMessageBox
 from src.core.romfs_parse import RomfsParse
 from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
@@ -708,12 +708,12 @@ class ProjectsPage(QFrame):
     def open_dir(self):
         name = self.project_combo.currentText()
         if not project_manger.exist(name):
-            show_info_bar(self, self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(name), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(name), 2)
             return
 
         path = project_manger.get_work_path(name)
         if not path or not os.path.exists(path):
-            show_info_bar(self, self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
+            self.show_info_bar( self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
             return
 
         try:
@@ -725,7 +725,7 @@ class ProjectsPage(QFrame):
             else:
                 subprocess.Popen(['xdg-open', path])
         except Exception:
-            show_info_bar(self, self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(path), 2)
 
     def show_create_dialog(self):
         """显示创建项目对话框"""
@@ -743,7 +743,7 @@ class ProjectsPage(QFrame):
         """显示创建项目对话框"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self.parent(), self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
+            self.show_info_bar(self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
         dialog = NewProjectDialog(
             title=self.tr("Rename Project"),
@@ -768,7 +768,7 @@ class ProjectsPage(QFrame):
         """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
-            show_info_bar(self.parent(), self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
+            self.show_info_bar(self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
 
         result = MessageBox(
@@ -782,10 +782,10 @@ class ProjectsPage(QFrame):
 
         try:
             project_manger.remove(project_name)
-            show_info_bar(self.parent(), self.tr("Success"), self.tr("Project {} Removed.").format(project_name),
+            self.show_info_bar(self.tr("Success"), self.tr("Project {} Removed.").format(project_name),
                           bar_type=3)
         except Exception as e:
-            show_info_bar(self.parent(), self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e),
+            self.show_info_bar(self.tr("Error"), self.tr("Failed to remove peoject: {}").format(e),
                           bar_type=1)
         self.refresh_projects()
 
@@ -1000,7 +1000,7 @@ class ProjectsPage(QFrame):
 
     def convert_image(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self, self.tr("Warning"), self.tr("project's not exist"), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("project's not exist"), 2)
             return
         dialog = ConvertImageMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
@@ -1010,7 +1010,7 @@ class ProjectsPage(QFrame):
 
     def pack_super(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self, self.tr("Warning"), self.tr("project's not exist"), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("project's not exist"), 2)
             return
         dialog = PackSuperMessageBox(project_manger.current_work_path(), self)
         if dialog.exec_():
@@ -1094,13 +1094,13 @@ class ProjectsPage(QFrame):
 
     def pack_zip(self):
         if not project_manger.exist(cfg.currentProjectName.value):
-            show_info_bar(self.parent(), self.tr("Warning"), self.tr("project's not exist"), 2)
+            self.show_info_bar(self.tr("Warning"), self.tr("project's not exist"), 2)
             return
         dialog = RepackZipMessageBox(self.parent())
         if dialog.exec_():
             if dialog.is_add_tools_checked():
                 if not dialog.get_device_code():
-                    show_info_bar(self.parent(), self.tr("Warning"), self.tr("device code's empty"), 3)
+                    self.show_info_bar(self.tr("Warning"), self.tr("device code's empty"), 3)
                     return
                 if PackHybridRom(dialog.get_device_code()):
                     return
@@ -1219,7 +1219,7 @@ class ProjectsPage(QFrame):
                 logging.exception(e)
             print(self.tr("Repacked %s Done") % part_name)
         else:
-            show_info_bar(self, self.tr("Error"), f"Failed to repack {part_name}")
+            self.show_info_bar(self.tr("Error"), f"Failed to repack {part_name}")
         return True
 
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
@@ -1413,12 +1413,47 @@ class ProjectsPage(QFrame):
             print(self.tr("Successfully packed Boot..."))
         return 0
 
+    def show_info_bar(self, title: str, content: str, bar_type: int = 3, duration=3000):
+        """bar_type: 1=error 2=warning 3=info"""
+        """显示提示条，根据配置决定是否显示"""
+        if True:
+            if bar_type == 1:
+                InfoBar.error(
+                    title=title,
+                    content=content,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.BOTTOM,
+                    duration=duration,
+                    parent=self.parent()
+                )
+            elif bar_type == 2:
+                InfoBar.warning(
+                    title=title,
+                    content=content,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.BOTTOM,
+                    duration=duration,
+                    parent=self.parent()
+                )
+            else:
+                InfoBar.success(
+                    title=title,
+                    content=content,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.BOTTOM,
+                    duration=duration,
+                    parent=self.parent()
+                )
+
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
         if not project_manger.exist():
-            show_info_bar(self, 'error', "project's not exist", 1)
+            self.show_info_bar('error', "project's not exist", 1)
             return False
         parts_dict = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
         for i in chosen_parts:
@@ -1714,7 +1749,7 @@ class ProjectsPage(QFrame):
                 try:
                     utils.simg2img(f"{work}/super.img")
                 except (Exception, BaseException):
-                    show_info_bar(self, "warning", f"Cannot simg2img super.img", 1)
+                    self.show_info_bar("warning", f"Cannot simg2img super.img", 1)
             if gettype(f"{work}/super.img") == 'super':
                 # should get info here.
                 parts["super_info"] = lpunpack.get_info(os.path.join(work, "super.img"))
@@ -1797,7 +1832,7 @@ class ProjectsPage(QFrame):
                         utils.simg2img(f"{work}/{i}.img")
                     except (Exception, BaseException) as e:
                         logging.exception(e)
-                        show_info_bar(self, "warning", e, 1)
+                        self.show_info_bar("warning", e, 1)
                         continue
                 if i not in parts.keys():
                     parts[i] = gettype(f"{work}/{i}.img")
@@ -1837,7 +1872,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except Exception as e:
-                            show_info_bar(self, "warning", f"Cannot remove {i}.img", 1)
+                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
 
                 if file_type == 'romfs':
                     fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
@@ -1881,7 +1916,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
-                            show_info_bar(self, "warning", f"Cannot remove {i}.img", 1)
+                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
                 if file_type == 'f2fs':
                     if utils.call(
                             exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
@@ -1893,11 +1928,11 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
-                            show_info_bar(self, "warning", f"Cannot remove {i}.img", 1)
+                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 if file_type == 'unknown' and utils.is_empty_img(f"{work}/{i}.img"):
-                    show_info_bar(self, "warning", f"Unsupported file {i}.img [{file_type}]", 2)
+                    self.show_info_bar("warning", f"Unsupported file {i}.img [{file_type}]", 2)
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
