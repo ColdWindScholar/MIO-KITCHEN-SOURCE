@@ -436,13 +436,13 @@ class ProjectsPage(QFrame):
 
     def script2fs(self, path: str):
         if os.path.exists(os.path.join(path, "system", "app")):
-            if not os.path.exists(path + "/config"):
-                os.makedirs(path + "/config")
+            if not os.path.exists(f"{path}/config"):
+                os.makedirs(f"{path}/config")
             extra.script2fs_context(utils.findfile("updater-script", f"{path}/META-INF"), f"{path}/config", path)
             json_ = utils.JsonEdit(os.path.join(path, "config", "parts_info"))
             parts = json_.read()
             for v in os.listdir(path):
-                if os.path.exists(path + f"/config/{v}_fs_config"):
+                if os.path.exists(f"{path}/config/{v}_fs_config"):
                     if v not in parts.keys():
                         parts[v] = 'ext'
             json_.write(parts)
