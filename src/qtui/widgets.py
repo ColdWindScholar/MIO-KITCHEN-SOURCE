@@ -2,13 +2,13 @@ import logging
 import os
 import time
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, QThread, Signal
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLineEdit, QHBoxLayout, QButtonGroup)
-from qfluentwidgets import InfoBar, InfoBarPosition, ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
+from qfluentwidgets import ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
     RadioButton, PushButton, BodyLabel, EditableComboBox
 from qfluentwidgets import (
     MessageBoxBase,
@@ -20,7 +20,23 @@ from src.core import utils
 from src.core.utils import gettype
 
 
+class GenericTaskWorker(QThread):
+    task_finished = Signal(bool)
+    send_message = Signal(str, str, int)
 
+    def __init__(self, target_func, *args, **kwargs):
+        super().__init__()
+        self.target_func = target_func
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self):
+        try:
+            self.target_func(*self.args, **self.kwargs)
+        except Exception as e:
+            self.task_finished.emit(True)
+            raise e
+        self.task_finished.emit(True)
 
 class NewProjectDialog(MessageBoxBase):
     """自定义对话框，用于创建或重命名项目"""

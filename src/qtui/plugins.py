@@ -1,34 +1,42 @@
 import json
+import logging
 import os
+import platform
+import zipfile
+from io import BytesIO
 from io import StringIO
 from shutil import rmtree
 from threading import Thread
 from typing import Any
 
 import requests
+from PySide6.QtCore import Qt, QObject, Signal
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
-    MessageBoxBase, GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, Pivot, SegmentedWidget, ToolTipPosition, \
-    ToolTipFilter
-import zipfile
-import platform
-from io import BytesIO
-from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QSizePolicy
-from qfluentwidgets import (ProgressBar, ImageLabel)
-
-import logging
-from PySide6.QtCore import Qt, QObject, Signal
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
+    GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, SegmentedWidget
 from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
                             PushButton)
+from qfluentwidgets import (ProgressBar, ImageLabel)
+
+from qtui.widgets import GenericTaskWorker
+from src.core import images
+from src.core import imp
+from src.core import utils
 from src.core.Magisk import Magisk_patch
+from src.core.addon_register import loader, Entry
 from src.core.avb_disabler import process_fstab
+from src.core.config_parser import ConfigParser
 from src.core.encryption_disabler import process_fstab_for_encryption
-from src.porttool import MyUI
 from src.core.qsb_imger import process_by_xml
+from src.core.selinux_audit_allow import main as selinux_audit_allow
+from src.core.utils import ModuleErrorCodes, prog_path, call, temp, re_folder
+from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
+from src.porttool import MyUI
 from src.qtui.plugin_allow_selinux_audit import AllowSELinuxAuditMessageBox
 from src.qtui.plugin_byte_calc import FileBytesMessageBox
 from src.qtui.plugin_decrypt_xtc_xml import DecryptXtcXmlMessageBox
@@ -41,14 +49,6 @@ from src.qtui.plugin_merge_super import MergeImageDialog
 from src.qtui.plugin_trim_raw_image import TrimRawImageMessageBox
 from src.qtui.projects import project_manger
 from src.qtui.settings import cfg
-from src.core import images
-from src.core import imp
-from src.core import utils
-from src.core.addon_register import loader, Entry
-from src.core.config_parser import ConfigParser
-from src.core.selinux_audit_allow import main as selinux_audit_allow
-from src.core.utils import ModuleErrorCodes, prog_path, call, temp, re_folder
-from src.core.xtc_recovery_helper import decrypt as decrypt_xtc
 
 module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
@@ -1292,13 +1292,17 @@ class BuiltInPlugins(QObject):
 
             do_trim(file_path=file_path)
 
+class Events(QObject):
+    download_signal = Signal(dict, str, bool)
 
+events = Events()
 class PluginPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("PluginPage")
         self.built_in_plugins = BuiltInPlugins(self)
         self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
+        self.tasks = dict() #only to keep qthread alive
         self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
         self.initUI()
 
@@ -1309,7 +1313,7 @@ class PluginPage(QWidget):
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
-        self.download_signal = Signal(dict, str, bool)
+        events.download_signal.connect(self.set_download_status)
         # 2. Header Layout (Title and Navigation)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
@@ -1510,10 +1514,16 @@ class PluginPage(QWidget):
             card_widget.openButton.setText(state)
 
     def download_plugin(self, plugin_info: dict):
+        code = utils.v_code(10)
+        self.tasks[code] = GenericTaskWorker(self.__download_plugin, plugin_info)
+        self.tasks[code].task_finished.connect(lambda state, code=code:  self.tasks.pop(code))
+        self.tasks[code].start()
+
+    def __download_plugin(self, plugin_info: dict):
         files = plugin_info.get("files", [])
         size = plugin_info.get("size", 0)
         depend = plugin_info.get('depend', [])
-        self.download_signal.emit(plugin_info, self.tr("Downloading..."), False)
+        events.download_signal.emit(plugin_info, self.tr("Downloading..."), False)
         for d in depend:
             if not module_manager.is_installed(d):
                 for depend_info in self.cards_data:
@@ -1528,7 +1538,7 @@ class PluginPage(QWidget):
                 continue
             download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
             for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
-                self.download_signal.emit(plugin_info, f"{percentage} %", False)
+                events.download_signal.emit(plugin_info, f"{percentage} %", False)
             module_manager.install(file_path)
         self.load_plugin_cards()
 

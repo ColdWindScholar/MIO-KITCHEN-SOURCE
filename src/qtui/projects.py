@@ -58,7 +58,7 @@ from src.core.payload_extract import extract_partitions_from_payload
 from src.core.pygpt.gpt_reader import GPTReader
 from src.qtui.settings import cfg
 from src.qtui.widgets import NewProjectDialog, PackSettingsDialog, ConvertImageMessageBox, \
-    PackSuperMessageBox, RepackZipMessageBox
+    PackSuperMessageBox, RepackZipMessageBox, GenericTaskWorker
 from src.core.romfs_parse import RomfsParse
 from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core.utils import gettype, call
@@ -97,23 +97,7 @@ class Events(QObject):
 events = Events()
 
 
-class GenericTaskWorker(QThread):
-    task_finished = Signal(bool)
-    send_message = Signal(str, str, int)
 
-    def __init__(self, target_func, *args, **kwargs):
-        super().__init__()
-        self.target_func = target_func
-        self.args = args
-        self.kwargs = kwargs
-
-    def run(self):
-        try:
-            self.target_func(*self.args, **self.kwargs)
-        except Exception as e:
-            self.task_finished.emit(True)
-            raise e
-        self.task_finished.emit(True)
 
 
 class PackHybridRom:
