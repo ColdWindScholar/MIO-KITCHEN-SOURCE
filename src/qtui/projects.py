@@ -1857,7 +1857,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except Exception as e:
-                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
+                            events.show_info_bar.emit(self.tr('Warning'),f"Cannot remove {i}.img",1, 3000)
 
                 if file_type == 'romfs':
                     fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
