@@ -1916,13 +1916,13 @@ class ProjectsPage(QFrame):
                             self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
-                if file_type == 'unknown' and utils.is_empty_img(f"{work}/{i}.img"):
-                    self.show_info_bar("warning", f"Unsupported file {i}.img [{file_type}]", 2)
+                if file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
+                    events.show_info_bar.emit(self.tr("Warning"), f"Unsupported file {i}.img [{file_type}]", 2, 5000)
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
         parts.clear()
-        print(self.tr("Unpacking Done"))
+        events.show_info_bar.emit(self.tr("Success"),self.tr("Unpacking Done"), 3, 3000)
         return True
 
     def _load_mock_partitions_table(self, mock_data):
