@@ -1917,7 +1917,7 @@ class ProjectsPage(QFrame):
                 if file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 if file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
-                    events.show_info_bar.emit(self.tr("Warning"), f"Unsupported file {i}.img [{file_type}]", 2, 5000)
+                    events.show_info_bar.emit(self.tr("Warning"), self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
