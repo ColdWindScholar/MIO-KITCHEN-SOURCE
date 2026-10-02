@@ -4,7 +4,7 @@ import re
 import subprocess
 
 from hashlib import md5
-from os import walk, getcwd, chdir, symlink, readlink, name as osname, stat, unlink
+from os import walk, getcwd, chdir, readlink, name as osname, stat, unlink
 from pathlib import Path
 from shutil import rmtree, copytree
 from typing import Any, Generator
@@ -18,10 +18,8 @@ from .configs import (
 )
 from src.core.utils import img2sdat
 from src.core.imgextractor import Extractor
+from src.core.posix import symlink
 from src.core.utils import Sdat2img as sdat2img, prog_path
-
-if osname == 'nt':
-    from ctypes import windll, wintypes
 
 tool_author = 'affggh and ColdWindScholar'
 tool_version = '1.0'
@@ -617,20 +615,11 @@ class portutils:
 
     def __pack_img(self):
         def __symlink(src_: str, dest: str):
-            def setSystemAttrib(path: str) -> wintypes.BOOL:
-                return windll.kernel32.SetFileAttributesA(path.encode('gb2312'), wintypes.DWORD(0x4))
-
             print(f"Create symlink [{src_}] -> [{dest}]")
             pdest = Path(dest)
             if not pdest.parent.exists():
                 pdest.parent.mkdir(parents=True)
-            if osname == 'nt':
-                with open(dest, 'wb') as f:
-                    f.write(
-                        b"!<symlink>" + src_.encode('utf-16') + b'\0\0')
-                setSystemAttrib(dest)
-            else:
-                symlink(src_, dest)
+            symlink(src_, dest)
 
         print("Output will be packed as system image")
         updater = Path("tmp/rom/META-INF/com/google/android/updater-script")
