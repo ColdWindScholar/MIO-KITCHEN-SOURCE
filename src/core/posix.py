@@ -14,11 +14,9 @@ import os
 # See the License for the specific language governing permissions and
 # limitations under the License.
 if os.name == 'nt':
-    from ctypes.wintypes import LPCSTR, DWORD
+    from ctypes.wintypes import LPCWSTR, DWORD
     from stat import FILE_ATTRIBUTE_SYSTEM
-    from ctypes import windll
-
-from logging import exception
+    from ctypes import WinError, windll
 
 
 def symlink(link_target, target):
@@ -29,11 +27,30 @@ def symlink(link_target, target):
     elif os.name == 'nt':
         with open(target.replace('/', os.sep), 'wb') as out:
             out.write(b'!<symlink>' + link_target.encode('utf-16') + b'\x00\x00')
-            try:
-                windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
-                                                   DWORD(FILE_ATTRIBUTE_SYSTEM))
-            except Exception:
-                exception("Posix")
+        if not windll.kernel32.SetFileAttributesW(LPCWSTR(target), DWORD(FILE_ATTRIBUTE_SYSTEM)):
+            raise WinError()
+
+
+def check_erofs_symlinks(root):
+    """Reject Cygwin link markers that mkfs.erofs would pack as regular files."""
+    if os.name != 'nt':
+        return
+    if not os.path.isdir(root):
+        raise FileNotFoundError(root)
+
+    def fail_on_walk_error(error):
+        raise error
+
+    for folder, _, filenames in os.walk(root, onerror=fail_on_walk_error):
+        for name in filenames:
+            path = os.path.join(folder, name)
+            if os.path.islink(path):
+                continue
+            with open(path, 'rb') as stream:
+                if stream.read(10) != b'!<symlink>':
+                    continue
+            if not os.stat(path, follow_symlinks=False).st_file_attributes & FILE_ATTRIBUTE_SYSTEM:
+                raise ValueError(f'Cygwin symlink marker is missing the Windows System attribute: {path}')
 
 
 def readlink(path):

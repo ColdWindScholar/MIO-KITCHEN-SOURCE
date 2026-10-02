@@ -30,6 +30,7 @@ from src.core import ofp_mtk_decrypt
 from src.core import ofp_qc_decrypt
 from src.core import opscrypto
 from src.core import ozipdecrypt
+from src.core.posix import check_erofs_symlinks
 from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
 from src.core.undz import DZFileTools
@@ -1216,6 +1217,11 @@ class ProjectsPage(QFrame):
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
         if not UTC:
             UTC = int(time.time())
+        try:
+            check_erofs_symlinks(os.path.join(work, name))
+        except (OSError, ValueError) as error:
+            print(f'[erofs] Cannot repack {name}: {error}', flush=True)
+            return 1
         print("[erofs] Repacking %s - %s" % (name, f'{format_},{level}'))
         extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
         other_ = ['-E', 'legacy-compress'] if old_kernel else []
