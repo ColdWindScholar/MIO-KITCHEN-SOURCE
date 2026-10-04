@@ -380,6 +380,7 @@ class ProjectsPage(QFrame):
         self.setStyleSheet("background: transparent")
         # set events
         events.refresh_projects.connect(self.refresh_projects)
+        events.refresh_list.connect(self.refresh_list)
         events.show_info_bar.connect(self.show_info_bar)
 
     def initDropOverlay(self):
