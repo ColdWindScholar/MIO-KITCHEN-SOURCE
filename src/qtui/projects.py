@@ -234,6 +234,17 @@ class ProjectManager:
             rmtree(self.get_work_path(name))
         return not self.exist(name)
 
+    def rename(self, old_name:str, new_name:str):
+        if not self.exist(old_name):
+            return False
+        path = self.get_work_path(old_name)
+        try:
+            os.rename(path, self.get_work_path(new_name))
+        except Exception as e:
+            logging.exception('Rename')
+            return False
+        return True
+
 
 project_manger = ProjectManager()
 
@@ -736,15 +747,16 @@ class ProjectsPage(QFrame):
         if not project_name or not self.project_combo.currentText():
             self.show_info_bar(self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
             return
+        origin_name = self.project_combo.currentText()
         dialog = NewProjectDialog(
             title=self.tr("Rename Project"),
             existing_projects=list(project_manger.get_projects()),
-            initial_text=self.project_combo.currentText(),
+            initial_text=origin_name,
             parent=self.parent()
         )
         if dialog.exec():
             project_name = dialog.nameLineEdit.text().strip()
-            project_manger.new(project_name)
+            project_manger.rename(origin_name, project_name)
             self.refresh_projects()
 
     def ask_window(self, title, content):
