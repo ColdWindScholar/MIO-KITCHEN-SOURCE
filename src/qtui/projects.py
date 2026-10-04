@@ -90,6 +90,7 @@ class StreamToSignal(QObject):
 
 class Events(QObject):
     refresh_projects = Signal()
+    refresh_list = Signal()
     set_project_name = Signal(str)
     show_info_bar = Signal(str, str, int, int)
 
