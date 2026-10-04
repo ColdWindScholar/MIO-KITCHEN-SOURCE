@@ -698,22 +698,26 @@ class ProjectsPage(QFrame):
                 return
             self.start_job(self.dnd_task)
 
+    def refresh_list(self):
+        if self.unpack_rb.isChecked():
+            if not self.refresh_unpack_list():
+                for item in self.format_widget.items:
+                    if self.refresh_unpack_list():
+                        break
+                    self.format_widget.setCurrentItem(item)
+            self.refresh_unpack()
+        else:
+            self.refresh_repack()
+        return
+
+
     def refresh_projects(self):
         self.project_combo.clear()
         projects = project_manger.get_projects()
         self.project_combo.addItems(projects)
         if projects:
             self.project_combo.setCurrentIndex(0)
-            if self.unpack_rb.isChecked():
-                if not self.refresh_unpack_list():
-                    for item in self.format_widget.items:
-                        if self.refresh_unpack_list():
-                            break
-                        self.format_widget.setCurrentItem(item)
-                self.refresh_unpack()
-            else:
-                self.refresh_repack()
-            return
+            self.refresh_list()
         cfg.set(cfg.currentProjectName, 'empty_project')
         cfg.save()
 
