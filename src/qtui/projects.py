@@ -518,11 +518,10 @@ class ProjectsPage(QFrame):
         # ofp
         if os.path.splitext(ifile)[1] == '.ofp':
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
-            if self.ask_window("Question", "Is it a mtk ofp"):
-                ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
-            else:
+            try:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
-                self.script2fs(project_manger.current_work_path())
+            except:
+                ofp_mtk_decrypt.main(ifile, project_manger.current_work_path())
             events.refresh_projects.emit()
             return
         # ops
@@ -559,6 +558,16 @@ class ProjectsPage(QFrame):
         if ftype == 'zip':
             cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
             with zipfile.ZipFile(ifile, 'r') as fz:
+                if len(fz.namelist()) == 1:
+                    for fi in fz.namelist():
+                        print(f"Extracting {fi}")
+                        try:
+                            fz.extract(fi, utils.temp)
+                        except Exception as e:
+                            print("cannot rename %s %s" % (fi, e))
+                    self.unpackrom(os.path.join(utils.temp, fi))
+                    print("unzip done")
+                    return
                 for fi in fz.namelist():
                     try:
                         member_name = fi.encode('cp437').decode('gbk')
