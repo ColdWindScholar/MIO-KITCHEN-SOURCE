@@ -482,9 +482,9 @@ class ProjectsPage(QFrame):
         if ftype == "ozip":
             print(f"Decrypting {ifile}")
             ozipdecrypt.main(ifile)
-            decrypted = os.path.dirname(ifile) + os.sep + os.path.basename(ifile)[:-4] + "zip"
+            decrypted = os.path.join(os.path.dirname(ifile), os.path.basename(ifile)[:-4] + ".zip")
             if not os.path.exists(decrypted):
-                print(f"{ifile} decrypt Fail!!!")
+                events.show_info_bar.emit(self.tr("Error"), f"{ifile} decrypt Fail!!!", 1, 3000)
                 return
             self.unpackrom(decrypted)
             try:
