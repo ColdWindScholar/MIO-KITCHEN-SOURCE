@@ -1856,7 +1856,7 @@ class ProjectsPage(QFrame):
                                 os.remove(file_path)
                     json_.write(parts)
                     parts.clear()
-                if (file_type := gettype(f"{work}/{i}.img")) == "ext":
+                elif (file_type := gettype(f"{work}/{i}.img")) == "ext":
                     with open(f"{work}/{i}.img", 'rb+') as e:
                         mount = ext4.Volume(e).get_mount_point
                         if mount[:1] == '/':
@@ -1874,20 +1874,20 @@ class ProjectsPage(QFrame):
                         except Exception as e:
                             events.show_info_bar.emit(self.tr('Warning'), f"Cannot remove {i}.img", 1, 3000)
 
-                if file_type == 'romfs':
+                elif file_type == 'romfs':
                     fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
                     fs.extract(work)
-                if file_type in ['rkfw', 'rkaf']:
+                elif file_type in ['rkfw', 'rkaf']:
                     utils.call(['afptool', 'unpack', f"{project_manger.current_work_path()}/{i}.img", work])
-                if file_type == 'guoke_logo':
+                elif file_type == 'guoke_logo':
                     utils.GuoKeLogo().unpack(os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                              f'{work}/{i}')
-                if file_type == 'splash':
+                elif file_type == 'splash':
                     if not os.path.exists(splash_out_dir := os.path.join(work, i)):
                         os.makedirs(splash_out_dir, True)
                     process_splashimg(os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                       f"{work}/{i}/splash.png")
-                if file_type == 'gpt':
+                elif file_type == 'gpt':
                     reader = GPTReader(os.path.join(project_manger.current_work_path(), f'{i}.img'), sector_size=512)
                     for partition in reader.partition_table.valid_entries():
                         print('guid/type={} first-block={} size={} name={}'.format(
@@ -1903,7 +1903,7 @@ class ProjectsPage(QFrame):
                                                                                  partition.length):
                                     fout.write(block)
 
-                if file_type == "erofs":
+                elif file_type == "erofs":
                     if utils.call(
                             exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                  '-o',
@@ -1917,7 +1917,7 @@ class ProjectsPage(QFrame):
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
                             self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
-                if file_type == 'f2fs':
+                elif file_type == 'f2fs':
                     if utils.call(
                             exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                  "-o", work],
@@ -1929,9 +1929,9 @@ class ProjectsPage(QFrame):
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
                             self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
-                if file_type == 'amlogic':
+                elif file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
-                if file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
+                elif file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
                     events.show_info_bar.emit(self.tr("Warning"),
                                               self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
         if not os.path.exists(f"{work}/config"):
