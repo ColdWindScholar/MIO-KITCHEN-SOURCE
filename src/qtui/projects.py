@@ -716,6 +716,9 @@ class ProjectsPage(QFrame):
 
     def open_dir(self):
         name = self.project_combo.currentText()
+        if not name:
+            self.show_info_bar(self.tr("Warning"), self.tr("Please select a project."), 2)
+            return 
         if not project_manger.exist(name):
             self.show_info_bar(self.tr("Warning"), self.tr("Cannot open folder:\n{}").format(name), 2)
             return
