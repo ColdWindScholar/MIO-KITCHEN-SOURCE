@@ -665,7 +665,7 @@ class ProjectsPage(QFrame):
                     exe=['dtc', '-@', '-I', 'dts', '-O', 'dtb', os.path.join(work, 'dtbo', 'dts', dts), '-o',
                          os.path.join(work, 'dtbo', 'dtbo', 'dtbo.' + os.path.basename(dts).rsplit('.', 1)[1])],
                     out=False)
-        print(f"Generating:dtbo.img")
+        print("Generating:dtbo.img")
         list_ = [os.path.join(work, "dtbo", "dtbo", f) for f in os.listdir(f"{work}/dtbo/dtbo") if
                  f.startswith("dtbo.")]
         mkdtboimg.create_dtbo(os.path.join(project_manger.current_work_output_path(), "dtbo.img"),
