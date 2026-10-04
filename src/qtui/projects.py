@@ -612,7 +612,7 @@ class ProjectsPage(QFrame):
                 events.refresh_projects.emit()
             except Exception as e:
                 raise e
-            project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(folder + '/Source/')
+            project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(f'{folder}/Source/')
             copy(ifile, project_dir)
             # File Rename
             if os.path.exists(os.path.join(project_dir, file_name)):
