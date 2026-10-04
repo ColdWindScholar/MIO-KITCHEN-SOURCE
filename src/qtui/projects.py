@@ -720,8 +720,9 @@ class ProjectsPage(QFrame):
         if projects:
             self.project_combo.setCurrentIndex(0)
             self.refresh_list()
-        cfg.set(cfg.currentProjectName, 'empty_project')
-        cfg.save()
+        else:
+            cfg.set(cfg.currentProjectName, 'empty_project')
+            cfg.save()
 
     def open_dir(self):
         name = self.project_combo.currentText()
