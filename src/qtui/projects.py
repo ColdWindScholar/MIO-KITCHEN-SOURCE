@@ -1822,9 +1822,11 @@ class ProjectsPage(QFrame):
                     parts[i] = gettype(f"{work}/{i}.img")
                 if gettype(f"{work}/{i}.img") == 'dtbo':
                     un_dtbo(i)
+                    events.refresh_list.emit()
                     continue
                 if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
                     unpack_boot(i)
+                    events.refresh_list.emit()
                     continue
                 if i == 'logo':
                     try:
