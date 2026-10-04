@@ -97,9 +97,6 @@ class Events(QObject):
 events = Events()
 
 
-
-
-
 class PackHybridRom:
     def __init__(self, right_device):
         if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
@@ -234,7 +231,7 @@ class ProjectManager:
             rmtree(self.get_work_path(name))
         return not self.exist(name)
 
-    def rename(self, old_name:str, new_name:str):
+    def rename(self, old_name: str, new_name: str):
         if not self.exist(old_name):
             return False
         path = self.get_work_path(old_name)
@@ -1090,7 +1087,8 @@ class ProjectsPage(QFrame):
 
         if call(command, debug_binary=False) == 0:
             if os.access(output_super_path, os.F_OK):
-                events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3, 3000)
+                events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3,
+                                          3000)
                 if del_:
                     for img in part_list:
                         if os.path.exists(f"{work}/{img}.img"):
