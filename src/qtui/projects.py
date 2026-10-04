@@ -615,6 +615,8 @@ class ProjectsPage(QFrame):
                 project_manger.current_work_path()
                 project_manger.current_work_output_path()
                 events.refresh_projects.emit()
+                events.set_project_name.emit(base_name)
+                events.refresh_list.emit()
             except Exception as e:
                 raise e
             project_dir = str(folder) if cfg.projectStructure.value != 'Split' else str(f'{folder}/Source/')
@@ -627,13 +629,13 @@ class ProjectsPage(QFrame):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
             cfg.set(cfg.currentProjectName, base_name)
-            events.refresh_projects.emit()
             events.set_project_name.emit(base_name)
+            events.refresh_list.emit()
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
             events.show_info_bar.emit(self.tr("Warning"), "Unsupported %s [%s]" % (ifile, ftype), 2, 3000)
-        events.refresh_projects.emit()
+        events.refresh_list.emit()
 
     def copy_project(self, dir_path: str):
         name = os.path.basename(dir_path)
