@@ -930,7 +930,7 @@ class ProjectsPage(QFrame):
                                 except (IOError, PermissionError, FileNotFoundError):
                                     logging.exception('Bugs')
                         else:
-                            print("transferpath 不存在")
+                            print("transferpath is not exists")
                     if os.path.exists(f'{work}/{basename}.img'):
                         utils.img2simg(f'{work}/{basename}.img')
                 if src_format == 'raw':
@@ -966,7 +966,7 @@ class ProjectsPage(QFrame):
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     logging.exception('Bugs')
                         else:
-                            print("transferfile 不存在")
+                            print("transferfile is not exists.")
                 if src_format == 'sparse':
                     utils.simg2img(f'{work}/{i}')
             elif dst_format == 'dat':
