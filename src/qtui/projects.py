@@ -1886,6 +1886,8 @@ class ProjectsPage(QFrame):
                 elif file_type == 'romfs':
                     fs = RomfsParse(project_manger.current_work_path() + f"{i}.img")
                     fs.extract(work)
+                elif file_type == 'fne':
+                    continue
                 elif file_type in ['rkfw', 'rkaf']:
                     utils.call(['afptool', 'unpack', f"{project_manger.current_work_path()}/{i}.img", work])
                 elif file_type == 'guoke_logo':
