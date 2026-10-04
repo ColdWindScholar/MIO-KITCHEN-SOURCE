@@ -627,7 +627,7 @@ class ProjectsPage(QFrame):
             if cfg.autoUnpack.value:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
         else:
-            print("Unsupported %s [%s]" % (ifile, ftype))
+            events.show_info_bar.emit(self.tr("Warning"), "Unsupported %s [%s]" % (ifile, ftype), 2, 3000)
         events.refresh_projects.emit()
 
     def copy_project(self, dir_path: str):
