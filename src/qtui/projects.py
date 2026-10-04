@@ -1822,8 +1822,10 @@ class ProjectsPage(QFrame):
                     parts[i] = gettype(f"{work}/{i}.img")
                 if gettype(f"{work}/{i}.img") == 'dtbo':
                     un_dtbo(i)
+                    continue
                 if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
                     unpack_boot(i)
+                    continue
                 if i == 'logo':
                     try:
                         utils.LogoDumper(f"{work}/{i}.img", f'{work}/{i}').check_img(f"{work}/{i}.img")
