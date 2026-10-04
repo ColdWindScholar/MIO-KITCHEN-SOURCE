@@ -566,6 +566,7 @@ class ProjectsPage(QFrame):
                         except Exception as e:
                             print("cannot rename %s %s" % (fi, e))
                     self.unpackrom(os.path.join(utils.temp, fi))
+                    os.remove(os.path.join(utils.temp, fi))
                     print("unzip done")
                     return
                 for fi in fz.namelist():
