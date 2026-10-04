@@ -1080,7 +1080,7 @@ class ProjectsPage(QFrame):
 
         if call(command, debug_binary=False) == 0:
             if os.access(output_super_path, os.F_OK):
-                print(self.tr("Pack Done！Output：%s") % output_super_path)
+                events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3, 3000)
                 if del_:
                     for img in part_list:
                         if os.path.exists(f"{work}/{img}.img"):
@@ -1089,10 +1089,10 @@ class ProjectsPage(QFrame):
                             except Exception:
                                 logging.exception('Bugs')
             else:
-                print(self.tr("Failed to pack super!"))
+                events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to pack super!"), 1, 3000)
             return 1
         else:
-            print(self.tr("Failed to pack super!"))
+            events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to pack super!"), 1, 3000)
             return 1
 
     def pack_zip(self):
