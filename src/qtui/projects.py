@@ -514,8 +514,10 @@ class ProjectsPage(QFrame):
             return
         # ofp
         if os.path.splitext(ifile)[1] == '.ofp':
-            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
-            events.set_project_name.emit(os.path.basename(ifile).split('.')[0])
+            project_name = os.path.splitext(os.path.basename(ifile))[0]
+            cfg.set(cfg.currentProjectName, project_name)
+            project_manger.new(project_name)
+            events.set_project_name.emit(project_name)
             try:
                 ofp_qc_decrypt.main(ifile, project_manger.current_work_path())
             except:
