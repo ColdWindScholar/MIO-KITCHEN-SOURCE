@@ -1775,6 +1775,7 @@ class ProjectsPage(QFrame):
             if os.access(f"{work}/{i}.zst", os.F_OK):
                 print(f"Decompressing {i}.zst")
                 utils.call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
+                events.refresh_list.emit()
                 return True
             if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
                 print(f"Decompressing {i}.new.dat.xz")
@@ -1809,6 +1810,7 @@ class ProjectsPage(QFrame):
                     else:
                         events.show_info_bar.emit(self.tr("Error"), self.tr("transferfile of {} missing").format(i), 1,
                                                   3000)
+                events.refresh_list.emit()
             if os.access(f"{work}/{i}.img", os.F_OK):
                 try:
                     if i in parts:
@@ -1940,6 +1942,7 @@ class ProjectsPage(QFrame):
                 elif file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
                     events.show_info_bar.emit(self.tr("Warning"),
                                               self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
+                events.refresh_list.emit()
         if not os.path.exists(f"{work}/config"):
             os.makedirs(f"{work}/config")
         json_.write(parts)
@@ -1948,7 +1951,6 @@ class ProjectsPage(QFrame):
         return True
 
     def _load_mock_partitions_table(self, mock_data):
-        """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
         self.partition_table.setRowCount(len(mock_data))
         for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
             name_item = QTableWidgetItem(name)
