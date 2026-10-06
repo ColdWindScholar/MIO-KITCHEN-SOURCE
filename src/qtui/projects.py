@@ -990,7 +990,7 @@ class ProjectsPage(QFrame):
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     logging.exception('Bugs')
                         else:
-                            print("transferfile is not exists.")
+                            print(f"transferfile of {basename} is not exists.")
                 if src_format == 'sparse':
                     utils.simg2img(f'{work}/{i}')
             elif dst_format == 'dat':
@@ -1689,7 +1689,7 @@ class ProjectsPage(QFrame):
         elif form == 'super':
             if os.path.exists(f"{work}/super.img"):
                 if gettype(f"{work}/super.img") == 'sparse':
-                    print("The image is sparse, pls convert it to raw first.")
+                    events.show_info_bar.emit(self.tr("Warning"), self.tr("The image is sparse, pls convert it to raw first."), 2, 3500)
                     return data
                 for i in lpunpack.get_parts(f"{work}/super.img"):
                     data.append((i, "Unknown", "Raw", "Unknown", "Unknown"))

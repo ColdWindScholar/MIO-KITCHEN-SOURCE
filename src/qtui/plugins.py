@@ -236,8 +236,9 @@ class ParseMessageBox(MessageBoxBase):
         super().closeEvent(event)
 
 
-class ModuleManager:
-    def __init__(self):
+class ModuleManager(QObject):
+    def __init__(self, /):
+        super().__init__()
         self.module_dir = os.path.join(prog_path, "bin", "module")
         self.addon_loader = loader
         self.addon_entries = Entry
@@ -359,7 +360,7 @@ class ModuleManager:
             else:
                 return 2
         else:
-            logging.warning("Cannot exec gui plugin, bcs master not set or json not exists.")
+            events.show_info_bar.emit(self.tr('Warning'), self.tr("Cannot exec gui plugin, bcs master not set or json not exists."), 2, 3000)
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
@@ -381,7 +382,7 @@ class ModuleManager:
             norm_module_exec = os.path.normpath(module_exec).replace(os.sep, '/')
             norm_main_sh_path = os.path.normpath(main_sh_path).replace(os.sep, '/')
             exports['tool_bin'] = norm_tool_bin
-            exports['version'] = "b"
+            exports['version'] = cfg.Version.value
             exports['language'] = cfg.language.value
             exports['bin'] = norm_script_path
             exports['moddir'] = norm_module_dir
@@ -601,7 +602,7 @@ class ModuleManager:
                     resource_zip_file.write(str(item_path_abs), arcname=arcname)
                 except Exception as e:
                     logging.exception(f'Error writing {item_path_abs} to resource zip')
-                    print("写入 {} 时出现错误 ：{}".format(item_path_abs, e))
+                    print("Error caused while writing {} ：{}".format(item_path_abs, e))
 
         resource_zip_content = buffer_resource_zip.getvalue()
         buffer_resource_zip.close()
@@ -1183,7 +1184,7 @@ class BuiltInPlugins(QObject):
                 if name in fstab_files:
                     for fstab_path in fstab_files[name]:
                         process_fstab_for_encryption(fstab_path)
-                        InfoBar.success("Disabled encryption", f"Patched fstab at {name}", parent=self.master)
+                        InfoBar.success(self.tr("Disabled encryption"), f"Patched fstab at {name}", parent=self.master)
 
     def disable_avb(self):
         dialog = DisableAvbMessageBox(self.master)
@@ -1295,6 +1296,8 @@ class BuiltInPlugins(QObject):
 class Events(QObject):
     download_signal = Signal(dict, str, bool)
     load_plugin_cards = Signal()
+    show_info_bar = Signal(str, str, int, int)
+
 
 events = Events()
 class PluginPage(QWidget):
@@ -1316,6 +1319,7 @@ class PluginPage(QWidget):
         outer_layout.setSpacing(20)
         events.download_signal.connect(self.set_download_status)
         events.load_plugin_cards.connect(self.load_plugin_cards)
+        events.show_info_bar.connect(self.show_info_bar)
         # 2. Header Layout (Title and Navigation)
         header_layout = QHBoxLayout()
         text_header_layout = QVBoxLayout()
@@ -1387,7 +1391,22 @@ class PluginPage(QWidget):
 
         # 5. Populate Cards Dynamically
         self.load_plugin_cards()
-
+    def show_info_bar(self, title: str, content: str, bar_type: int = 3, duration=5000):
+        """bar_type: 1=error 2=warning 3=SUCCESS 4=INFO"""
+        icon_map = {
+            1: InfoBarIcon.ERROR,
+            2: InfoBarIcon.WARNING,
+            3: InfoBarIcon.SUCCESS,
+            4: InfoBarIcon.INFORMATION
+        }
+        InfoBar.new(icon=icon_map.get(bar_type, InfoBarIcon.INFORMATION),
+                    title=title,
+                    content=content,
+                    orient=Qt.Horizontal,
+                    isClosable=True,
+                    position=InfoBarPosition.TOP_RIGHT,
+                    duration=duration,
+                    parent=self.parent())
     def on_tab_changed(self, route_key):
         """Manages stacked views changing and applies active filtering rules"""
         if route_key == 'Installed':

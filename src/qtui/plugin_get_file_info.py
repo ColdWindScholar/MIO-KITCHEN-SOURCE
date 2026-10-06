@@ -111,10 +111,10 @@ class FileInfoMessageBox(MessageBoxBase):
 
         # 3. Metadata fields
         self.rows = {
-            "Name": FileInfoRow("Name:"),
-            "Path": FileInfoRow("Path:"),
-            "Type": FileInfoRow("Type:"),
-            "Size": FileInfoRow("Size:"),
+            "Name": FileInfoRow(self.tr("Name:")),
+            "Path": FileInfoRow(self.tr("Path:")),
+            "Type": FileInfoRow(self.tr("Type:")),
+            "Size": FileInfoRow(self.tr("Size:")),
             "Size(B)": FileInfoRow("Size(B):"),
             "Time": FileInfoRow("Time:"),
             "MD5": FileInfoRow("MD5:"),
@@ -125,7 +125,7 @@ class FileInfoMessageBox(MessageBoxBase):
             self.viewLayout.addLayout(row)
 
         # Configure action buttons
-        self.yesButton.setText("Close")
+        self.yesButton.setText(self.tr("Close"))
         self.cancelButton.hide() # Hide the cancel button if it is not needed
 
         # Enforce dialog width rules
