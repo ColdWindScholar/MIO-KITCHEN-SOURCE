@@ -106,7 +106,7 @@
 <context>
     <name>AppCardRich</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1028"/>
+        <location filename="../../src/qtui/plugins.py" line="1027"/>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -114,67 +114,67 @@
 <context>
     <name>BuiltInPlugins</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1062"/>
+        <location filename="../../src/qtui/plugins.py" line="1061"/>
         <source>Download ROM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1063"/>
+        <location filename="../../src/qtui/plugins.py" line="1062"/>
         <source>Get File Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1065"/>
+        <location filename="../../src/qtui/plugins.py" line="1064"/>
         <source>Byte Calculator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1067"/>
+        <location filename="../../src/qtui/plugins.py" line="1066"/>
         <source>Allow Selinux Audit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1068"/>
+        <location filename="../../src/qtui/plugins.py" line="1067"/>
         <source>Disable avb in fstab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1069"/>
+        <location filename="../../src/qtui/plugins.py" line="1068"/>
         <source>Disable Encryption</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1070"/>
+        <location filename="../../src/qtui/plugins.py" line="1069"/>
         <source>Trim Raw Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1071"/>
+        <location filename="../../src/qtui/plugins.py" line="1070"/>
         <source>Magisk Patch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1072"/>
+        <location filename="../../src/qtui/plugins.py" line="1071"/>
         <source>Merge Qualcomm Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1073"/>
+        <location filename="../../src/qtui/plugins.py" line="1072"/>
         <source>Merge Super</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1074"/>
+        <location filename="../../src/qtui/plugins.py" line="1073"/>
         <source>Decrypt xtc xml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1075"/>
+        <location filename="../../src/qtui/plugins.py" line="1074"/>
         <source>Mtk Port Tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1287"/>
+        <location filename="../../src/qtui/plugins.py" line="1286"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
@@ -182,7 +182,7 @@
 <context>
     <name>ConnectPage</name>
     <message>
-        <location filename="../../src/qtui/connect.py" line="163"/>
+        <location filename="../../src/qtui/connect.py" line="231"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -190,27 +190,27 @@
 <context>
     <name>ConvertImageMessageBox</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="179"/>
+        <location filename="../../src/qtui/widgets.py" line="162"/>
         <source>Convert image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="180"/>
+        <location filename="../../src/qtui/widgets.py" line="163"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="181"/>
+        <location filename="../../src/qtui/widgets.py" line="164"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="202"/>
+        <location filename="../../src/qtui/widgets.py" line="185"/>
         <source>Select all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="204"/>
+        <location filename="../../src/qtui/widgets.py" line="187"/>
         <source>search...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -545,22 +545,22 @@ or click to select a file</source>
 <context>
     <name>InputDialog</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="120"/>
+        <location filename="../../src/qtui/widgets.py" line="103"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="124"/>
+        <location filename="../../src/qtui/widgets.py" line="107"/>
         <source>invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="149"/>
+        <location filename="../../src/qtui/widgets.py" line="132"/>
         <source>Cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="155"/>
+        <location filename="../../src/qtui/widgets.py" line="138"/>
         <source>Contain invalid chars</source>
         <translation type="unfinished"></translation>
     </message>
@@ -859,17 +859,17 @@ or click to select a file</source>
 <context>
     <name>NewProjectDialog</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="66"/>
+        <location filename="../../src/qtui/widgets.py" line="49"/>
         <source>Enter project name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="70"/>
+        <location filename="../../src/qtui/widgets.py" line="53"/>
         <source>Project name is invalid or already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="95"/>
+        <location filename="../../src/qtui/widgets.py" line="78"/>
         <source>The project name cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -877,112 +877,112 @@ or click to select a file</source>
 <context>
     <name>PackSettingsDialog</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="348"/>
+        <location filename="../../src/qtui/widgets.py" line="331"/>
         <source>Pack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="349"/>
+        <location filename="../../src/qtui/widgets.py" line="332"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="379"/>
+        <location filename="../../src/qtui/widgets.py" line="362"/>
         <source>EXT4 Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="384"/>
+        <location filename="../../src/qtui/widgets.py" line="367"/>
         <source>Packing with:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="388"/>
+        <location filename="../../src/qtui/widgets.py" line="371"/>
         <source>Size Handle:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="390"/>
+        <location filename="../../src/qtui/widgets.py" line="373"/>
         <source>Calculate Auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="390"/>
+        <location filename="../../src/qtui/widgets.py" line="373"/>
         <source>Origin Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="407"/>
+        <location filename="../../src/qtui/widgets.py" line="390"/>
         <source>EROFS Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="410"/>
+        <location filename="../../src/qtui/widgets.py" line="393"/>
         <source>Compression Method:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="417"/>
+        <location filename="../../src/qtui/widgets.py" line="400"/>
         <source>Support old kernel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="428"/>
+        <location filename="../../src/qtui/widgets.py" line="411"/>
         <source>EROFS Level: 8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="433"/>
+        <location filename="../../src/qtui/widgets.py" line="416"/>
         <source>EROFS Level: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="448"/>
+        <location filename="../../src/qtui/widgets.py" line="431"/>
         <source>F2FS Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="456"/>
+        <location filename="../../src/qtui/widgets.py" line="439"/>
         <source>Readonly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="462"/>
+        <location filename="../../src/qtui/widgets.py" line="445"/>
         <source>Compression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="482"/>
+        <location filename="../../src/qtui/widgets.py" line="465"/>
         <source>Others</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="486"/>
+        <location filename="../../src/qtui/widgets.py" line="469"/>
         <source>Brotli Level: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="490"/>
+        <location filename="../../src/qtui/widgets.py" line="473"/>
         <source>Brotli Level: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="526"/>
+        <location filename="../../src/qtui/widgets.py" line="509"/>
         <source>Fs Convert</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="548"/>
+        <location filename="../../src/qtui/widgets.py" line="531"/>
         <source>Process Vbmeta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="554"/>
+        <location filename="../../src/qtui/widgets.py" line="537"/>
         <source>Remove source files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="519"/>
+        <location filename="../../src/qtui/widgets.py" line="502"/>
         <source>Format:</source>
         <translation></translation>
     </message>
@@ -990,80 +990,80 @@ or click to select a file</source>
 <context>
     <name>PackSuperMessageBox</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="619"/>
+        <location filename="../../src/qtui/widgets.py" line="602"/>
         <source>Pack Super</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="623"/>
+        <location filename="../../src/qtui/widgets.py" line="606"/>
         <source>Super Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="636"/>
+        <location filename="../../src/qtui/widgets.py" line="619"/>
         <source>Attribute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="649"/>
+        <location filename="../../src/qtui/widgets.py" line="632"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="652"/>
+        <location filename="../../src/qtui/widgets.py" line="635"/>
         <source>Group Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="658"/>
+        <location filename="../../src/qtui/widgets.py" line="641"/>
         <source>Super Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="666"/>
+        <location filename="../../src/qtui/widgets.py" line="649"/>
         <source>Partition(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="673"/>
-        <location filename="../../src/qtui/widgets.py" line="674"/>
+        <location filename="../../src/qtui/widgets.py" line="656"/>
+        <location filename="../../src/qtui/widgets.py" line="657"/>
         <source>Enable Sparse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="679"/>
-        <location filename="../../src/qtui/widgets.py" line="680"/>
+        <location filename="../../src/qtui/widgets.py" line="662"/>
+        <location filename="../../src/qtui/widgets.py" line="663"/>
         <source>Remove source files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="683"/>
+        <location filename="../../src/qtui/widgets.py" line="666"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="687"/>
-        <location filename="../../src/qtui/widgets.py" line="763"/>
+        <location filename="../../src/qtui/widgets.py" line="670"/>
+        <location filename="../../src/qtui/widgets.py" line="746"/>
         <source>Generate LIST</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="693"/>
+        <location filename="../../src/qtui/widgets.py" line="676"/>
         <source>Pack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="694"/>
+        <location filename="../../src/qtui/widgets.py" line="677"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="742"/>
+        <location filename="../../src/qtui/widgets.py" line="725"/>
         <source>Running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="758"/>
+        <location filename="../../src/qtui/widgets.py" line="741"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1109,62 +1109,72 @@ or click to select a file</source>
 <context>
     <name>PluginPage</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1317"/>
+        <location filename="../../src/qtui/plugins.py" line="1322"/>
         <source>Plugin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1330"/>
+        <location filename="../../src/qtui/plugins.py" line="1335"/>
         <source>Install</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1337"/>
+        <location filename="../../src/qtui/plugins.py" line="1342"/>
         <source>Search plugins...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1455"/>
+        <location filename="../../src/qtui/plugins.py" line="1460"/>
         <source>Uninstall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1457"/>
+        <location filename="../../src/qtui/plugins.py" line="1462"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1420"/>
+        <location filename="../../src/qtui/plugins.py" line="1425"/>
         <source>Built-In Plugin</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1325"/>
+        <location filename="../../src/qtui/plugins.py" line="1330"/>
         <source>Installed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1326"/>
+        <location filename="../../src/qtui/plugins.py" line="1331"/>
         <source>Repo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1459"/>
+        <location filename="../../src/qtui/plugins.py" line="1464"/>
         <source>Edit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1485"/>
+        <location filename="../../src/qtui/plugins.py" line="1491"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1485"/>
+        <location filename="../../src/qtui/plugins.py" line="1491"/>
         <source>Reinstall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1563"/>
+        <location filename="../../src/qtui/plugins.py" line="1528"/>
+        <source>Downloading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1547"/>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1583"/>
         <source>Choose a mpk file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1172,301 +1182,372 @@ or click to select a file</source>
 <context>
     <name>ProjectsPage</name>
     <message>
-        <location filename="../../src/qtui/projects.py" line="382"/>
+        <location filename="../../src/qtui/projects.py" line="388"/>
         <source>Drop Here</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="622"/>
+        <location filename="../../src/qtui/projects.py" line="644"/>
         <source>No Such Folder.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="678"/>
+        <location filename="../../src/qtui/projects.py" line="701"/>
         <source>file not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="706"/>
-        <location filename="../../src/qtui/projects.py" line="711"/>
-        <location filename="../../src/qtui/projects.py" line="723"/>
+        <location filename="../../src/qtui/projects.py" line="637"/>
+        <location filename="../../src/qtui/projects.py" line="733"/>
+        <location filename="../../src/qtui/projects.py" line="736"/>
         <location filename="../../src/qtui/projects.py" line="741"/>
-        <location filename="../../src/qtui/projects.py" line="766"/>
-        <location filename="../../src/qtui/projects.py" line="997"/>
-        <location filename="../../src/qtui/projects.py" line="1007"/>
-        <location filename="../../src/qtui/projects.py" line="1091"/>
-        <location filename="../../src/qtui/projects.py" line="1097"/>
+        <location filename="../../src/qtui/projects.py" line="753"/>
+        <location filename="../../src/qtui/projects.py" line="771"/>
+        <location filename="../../src/qtui/projects.py" line="797"/>
+        <location filename="../../src/qtui/projects.py" line="1030"/>
+        <location filename="../../src/qtui/projects.py" line="1040"/>
+        <location filename="../../src/qtui/projects.py" line="1125"/>
+        <location filename="../../src/qtui/projects.py" line="1131"/>
+        <location filename="../../src/qtui/projects.py" line="1603"/>
+        <location filename="../../src/qtui/projects.py" line="1731"/>
+        <location filename="../../src/qtui/projects.py" line="1851"/>
+        <location filename="../../src/qtui/projects.py" line="1891"/>
+        <location filename="../../src/qtui/projects.py" line="1953"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="706"/>
-        <location filename="../../src/qtui/projects.py" line="711"/>
-        <location filename="../../src/qtui/projects.py" line="723"/>
+        <location filename="../../src/qtui/projects.py" line="736"/>
+        <location filename="../../src/qtui/projects.py" line="741"/>
+        <location filename="../../src/qtui/projects.py" line="753"/>
         <source>Cannot open folder:
 {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="728"/>
+        <location filename="../../src/qtui/projects.py" line="758"/>
         <source>New Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="741"/>
-        <location filename="../../src/qtui/projects.py" line="766"/>
+        <location filename="../../src/qtui/projects.py" line="771"/>
+        <location filename="../../src/qtui/projects.py" line="797"/>
         <source>Select a project first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="744"/>
+        <location filename="../../src/qtui/projects.py" line="775"/>
         <source>Rename Project</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="770"/>
+        <location filename="../../src/qtui/projects.py" line="801"/>
         <source>Confirm Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="771"/>
+        <location filename="../../src/qtui/projects.py" line="802"/>
         <source>Remove &apos;{}&apos; ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="780"/>
+        <location filename="../../src/qtui/projects.py" line="811"/>
+        <location filename="../../src/qtui/projects.py" line="1107"/>
+        <location filename="../../src/qtui/projects.py" line="1960"/>
         <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="780"/>
+        <location filename="../../src/qtui/projects.py" line="811"/>
         <source>Project {} Removed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="783"/>
-        <location filename="../../src/qtui/projects.py" line="1216"/>
+        <location filename="../../src/qtui/projects.py" line="487"/>
+        <location filename="../../src/qtui/projects.py" line="650"/>
+        <location filename="../../src/qtui/projects.py" line="814"/>
+        <location filename="../../src/qtui/projects.py" line="1117"/>
+        <location filename="../../src/qtui/projects.py" line="1120"/>
+        <location filename="../../src/qtui/projects.py" line="1250"/>
+        <location filename="../../src/qtui/projects.py" line="1424"/>
+        <location filename="../../src/qtui/projects.py" line="1431"/>
+        <location filename="../../src/qtui/projects.py" line="1466"/>
+        <location filename="../../src/qtui/projects.py" line="1761"/>
+        <location filename="../../src/qtui/projects.py" line="1815"/>
+        <location filename="../../src/qtui/projects.py" line="1931"/>
+        <location filename="../../src/qtui/projects.py" line="1943"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="783"/>
+        <location filename="../../src/qtui/projects.py" line="650"/>
+        <source>The same project exists already.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="733"/>
+        <source>Please select a project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="814"/>
         <source>Failed to remove peoject: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="796"/>
+        <location filename="../../src/qtui/projects.py" line="829"/>
         <source>No Project Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="800"/>
+        <location filename="../../src/qtui/projects.py" line="833"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="809"/>
+        <location filename="../../src/qtui/projects.py" line="842"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="810"/>
+        <location filename="../../src/qtui/projects.py" line="843"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="811"/>
+        <location filename="../../src/qtui/projects.py" line="844"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="812"/>
+        <location filename="../../src/qtui/projects.py" line="845"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="828"/>
+        <location filename="../../src/qtui/projects.py" line="861"/>
         <source>Partition(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="838"/>
+        <location filename="../../src/qtui/projects.py" line="871"/>
         <source>Execute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="859"/>
+        <location filename="../../src/qtui/projects.py" line="892"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="862"/>
+        <location filename="../../src/qtui/projects.py" line="895"/>
         <source>Search partitions...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="867"/>
+        <location filename="../../src/qtui/projects.py" line="900"/>
         <source>NAME</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="867"/>
+        <location filename="../../src/qtui/projects.py" line="900"/>
         <source>SIZE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="867"/>
+        <location filename="../../src/qtui/projects.py" line="900"/>
         <source>FS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="867"/>
+        <location filename="../../src/qtui/projects.py" line="900"/>
         <source>IMAGE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="867"/>
+        <location filename="../../src/qtui/projects.py" line="900"/>
         <source>ATTRIBUTES</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="868"/>
+        <location filename="../../src/qtui/projects.py" line="901"/>
         <source>Unpack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="869"/>
+        <location filename="../../src/qtui/projects.py" line="902"/>
         <source>Repack</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="903"/>
-        <location filename="../../src/qtui/projects.py" line="907"/>
-        <location filename="../../src/qtui/projects.py" line="911"/>
-        <location filename="../../src/qtui/projects.py" line="934"/>
-        <location filename="../../src/qtui/projects.py" line="938"/>
-        <location filename="../../src/qtui/projects.py" line="946"/>
-        <location filename="../../src/qtui/projects.py" line="969"/>
-        <location filename="../../src/qtui/projects.py" line="972"/>
+        <location filename="../../src/qtui/projects.py" line="936"/>
+        <location filename="../../src/qtui/projects.py" line="940"/>
+        <location filename="../../src/qtui/projects.py" line="944"/>
+        <location filename="../../src/qtui/projects.py" line="967"/>
+        <location filename="../../src/qtui/projects.py" line="971"/>
+        <location filename="../../src/qtui/projects.py" line="979"/>
+        <location filename="../../src/qtui/projects.py" line="1002"/>
+        <location filename="../../src/qtui/projects.py" line="1005"/>
         <source>Unpacking:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="982"/>
+        <location filename="../../src/qtui/projects.py" line="1015"/>
         <source>Decompressing:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="993"/>
+        <location filename="../../src/qtui/projects.py" line="1026"/>
         <source>Done!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="997"/>
-        <location filename="../../src/qtui/projects.py" line="1007"/>
-        <location filename="../../src/qtui/projects.py" line="1091"/>
+        <location filename="../../src/qtui/projects.py" line="1030"/>
+        <location filename="../../src/qtui/projects.py" line="1040"/>
+        <location filename="../../src/qtui/projects.py" line="1125"/>
+        <location filename="../../src/qtui/projects.py" line="1466"/>
         <source>project&apos;s not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1074"/>
+        <location filename="../../src/qtui/projects.py" line="1107"/>
         <source>Pack Done！Output：%s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1083"/>
-        <location filename="../../src/qtui/projects.py" line="1086"/>
+        <location filename="../../src/qtui/projects.py" line="1117"/>
+        <location filename="../../src/qtui/projects.py" line="1120"/>
         <source>Failed to pack super!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1097"/>
+        <location filename="../../src/qtui/projects.py" line="1131"/>
         <source>device code&apos;s empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1114"/>
+        <location filename="../../src/qtui/projects.py" line="1148"/>
         <source>Others</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1121"/>
+        <location filename="../../src/qtui/projects.py" line="1155"/>
         <source>Format Convertion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1141"/>
+        <location filename="../../src/qtui/projects.py" line="1175"/>
         <source>Work path does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1141"/>
+        <location filename="../../src/qtui/projects.py" line="1175"/>
         <source>Projects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1158"/>
+        <location filename="../../src/qtui/projects.py" line="1192"/>
         <source>origin logo missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1205"/>
-        <location filename="../../src/qtui/projects.py" line="1214"/>
+        <location filename="../../src/qtui/projects.py" line="1239"/>
+        <location filename="../../src/qtui/projects.py" line="1248"/>
         <source>Repacked %s Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1235"/>
+        <location filename="../../src/qtui/projects.py" line="1269"/>
         <source>Warning:file_context not found!!!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1346"/>
+        <location filename="../../src/qtui/projects.py" line="1380"/>
         <source>Origin boot is lost.Cannot repack boot.img.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1407"/>
+        <location filename="../../src/qtui/projects.py" line="1388"/>
+        <source>Repack Rk resource...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1390"/>
+        <source>Repack Rk resource successfully...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1424"/>
+        <source>Failed to repack ramdisk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1429"/>
+        <source>Successfully packed Ramdisk..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1431"/>
+        <source>Failed to Pack boot...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1441"/>
         <source>Successfully packed Boot...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1487"/>
+        <location filename="../../src/qtui/projects.py" line="1538"/>
         <source>Packed successfully: {}!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1527"/>
+        <location filename="../../src/qtui/projects.py" line="1578"/>
         <source>Failed to pack %s!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1539"/>
+        <location filename="../../src/qtui/projects.py" line="1590"/>
         <source>Packed {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1606"/>
+        <location filename="../../src/qtui/projects.py" line="1657"/>
         <source>Origin Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1764"/>
-        <source>transferfile&apos;s missing</source>
+        <location filename="../../src/qtui/projects.py" line="1731"/>
+        <source>Project&apos;s not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1899"/>
+        <location filename="../../src/qtui/projects.py" line="1761"/>
+        <source>Cannot simg2img super.img</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1815"/>
+        <source>transferfile of {} missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1954"/>
+        <source>Unsupported file {}.img [{}]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/projects.py" line="1960"/>
         <source>Unpacking Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="813"/>
+        <location filename="../../src/qtui/projects.py" line="846"/>
         <source>Pack Zip</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/projects.py" line="1119"/>
+        <location filename="../../src/qtui/projects.py" line="1153"/>
         <source>Pack Super</source>
         <translation></translation>
     </message>
@@ -1474,32 +1555,32 @@ or click to select a file</source>
 <context>
     <name>RepackZipMessageBox</name>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="888"/>
+        <location filename="../../src/qtui/widgets.py" line="871"/>
         <source>Pack ZIP</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="892"/>
+        <location filename="../../src/qtui/widgets.py" line="875"/>
         <source>Repack ZIP?</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="901"/>
+        <location filename="../../src/qtui/widgets.py" line="884"/>
         <source>Pack Hybrid Rom?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="912"/>
+        <location filename="../../src/qtui/widgets.py" line="895"/>
         <source>Enter device code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="922"/>
+        <location filename="../../src/qtui/widgets.py" line="905"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/widgets.py" line="921"/>
+        <location filename="../../src/qtui/widgets.py" line="904"/>
         <source>OK</source>
         <translation></translation>
     </message>
@@ -1712,30 +1793,30 @@ or click to select a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1198"/>
+        <location filename="../../src/qtui/plugins.py" line="1197"/>
         <source>Disabled Avb</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1223"/>
+        <location filename="../../src/qtui/plugins.py" line="1222"/>
         <source>Please choose a path.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1230"/>
-        <location filename="../../src/qtui/plugins.py" line="1253"/>
+        <location filename="../../src/qtui/plugins.py" line="1229"/>
+        <location filename="../../src/qtui/plugins.py" line="1252"/>
         <source>Processing File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1288"/>
+        <location filename="../../src/qtui/plugins.py" line="1287"/>
         <source>总共从文件末尾截去了 %d 个零字节(~ %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1116"/>
-        <location filename="../../src/qtui/plugins.py" line="1121"/>
-        <location filename="../../src/qtui/plugins.py" line="1156"/>
+        <location filename="../../src/qtui/plugins.py" line="1115"/>
+        <location filename="../../src/qtui/plugins.py" line="1120"/>
+        <location filename="../../src/qtui/plugins.py" line="1155"/>
         <source>Magisk Patch</source>
         <translation></translation>
     </message>

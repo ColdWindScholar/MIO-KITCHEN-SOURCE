@@ -647,7 +647,7 @@ class ProjectsPage(QFrame):
             return self.unpackrom(dir_path)
         if os.path.exists(project_manger.get_work_path(name)) and os.path.samefile(project_manger.get_work_path(name),
                                                                                    os.path.abspath(dir_path)):
-            print("Same File!")
+            events.show_info_bar.emit(self.tr('Error'), self.tr("The same project exists already."), 2, 3000)
             return 1
 
         if project_manger.exist(name):
@@ -690,7 +690,8 @@ class ProjectsPage(QFrame):
                 if hasattr(fi, 'decode'):
                     fi = fi.decode('gbk')
             except (Exception, BaseException):
-                logging.exception('fI')
+                logging.exception('Decode file name')
+                return 1
             if os.path.exists(fi):
                 if os.path.isfile(fi):
                     self.dnd_task = GenericTaskWorker(self.unpackrom, fi)
@@ -723,7 +724,7 @@ class ProjectsPage(QFrame):
             self.project_combo.setCurrentIndex(0)
             self.refresh_list()
         else:
-            cfg.set(cfg.currentProjectName, 'empty_project')
+            cfg.set(cfg.currentProjectName, '')
             cfg.save()
 
     def open_dir(self):
@@ -1384,9 +1385,9 @@ class ProjectsPage(QFrame):
             print(f"Cannot Find {name}...")
             return 1
         if os.path.isfile(f'{source}/second_order'):
-            print("Repack Rk resource...")
+            print(self.tr("Repack Rk resource..."))
             rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
-            print("Repack Rk resource successfully...")
+            print(self.tr("Repack Rk resource successfully..."))
         if os.path.isdir(f"{source}/ramdisk"):
             if cfg.cpioImpl.value == 'Python':
                 cpio_repack(f"{source}/ramdisk", f"{source}/ramdisk.txt", f"{source}/ramdisk-new.cpio")
@@ -1420,14 +1421,14 @@ class ProjectsPage(QFrame):
                 if os.path.exists('ramdisk-new.cpio'):
                     os.rename("ramdisk-new.cpio", "ramdisk.cpio")
                 else:
-                    print("Failed to repack ramdisk.")
+                    events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to repack ramdisk."), 1, 3000)
                     return 1
             print(f"Ramdisk Compression:{comp}")
             if comp == "unknown":
                 flag = "-n"
-            print("Successfully packed Ramdisk..")
+            print(self.tr("Successfully packed Ramdisk.."))
         if call(['magiskboot', 'repack', flag, boot]) != 0:
-            print("Failed to Pack boot...")
+            events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to Pack boot..."), 1, 3000)
             os.chdir(cfg.workingFolder.value)
         else:
             os.remove(boot)
