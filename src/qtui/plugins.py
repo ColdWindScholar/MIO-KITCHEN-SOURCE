@@ -18,7 +18,7 @@ from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
     SearchLineEdit, TitleLabel, TransparentDropDownToolButton, RoundMenu, Action, InfoBar, InfoBarPosition, \
-    GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, SegmentedWidget
+    GroupHeaderCardWidget, LineEdit, SwitchButton, RadioButton, SegmentedWidget, InfoBarIcon
 from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBrowser,
                             PushButton)
 from qfluentwidgets import (ProgressBar, ImageLabel)
@@ -77,10 +77,11 @@ class ParseMessageBox(MessageBoxBase):
         try:
             with open(path, 'r', encoding='UTF-8') as f:
                 data = json.load(f)
-        except Exception as e:
+        except Exception:
             logging.exception("Parser")
             InfoBar.error("Parser", self.tr("JSON load failed"), parent=self.parent())
             self.reject()
+            logging.exception('Parser')
             return
 
         info = data['main']['info']
@@ -279,11 +280,11 @@ class ModuleManager(QObject):
                 else:
                     if self.master:
                         InfoBar.warning(self.master.tr("Manager"),
-                                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.",
+                                        f"Can't registry Module {self.get_name(id_)} as Plugin, Check if entrances or main function in it.",
                                         parent=self.master)
                     else:
                         logging.warning(
-                            f"Can't registry Module {self.get_name(id_)} as Plugin, Check if enterances or main function in it.")
+                            f"Can't registry Module {self.get_name(id_)} as Plugin, Check if entrances or main function in it.")
             except Exception as e:
                 logging.error(f"Load Failed '{self.get_name(id_)}' path '{script_path}/main.py': {e}")
                 logging.exception('Bugs')
@@ -314,12 +315,12 @@ class ModuleManager(QObject):
         if not id_:
             return 0
         if not cfg.currentProjectName.value:
-            InfoBar.warning("Run Plugin", "Please set a project", parent=self.master)
+            InfoBar.warning(self.tr("Run Plugin"), self.tr("Please set a project"), parent=self.master)
             return 1
         if id_:
             value = id_
         else:
-            InfoBar.warning("Run Plugin", "id is invalid", parent=self.master)
+            InfoBar.warning(self.tr("Run Plugin"), self.tr("id is invalid"), parent=self.master)
             return 1
         script_path = os.path.join(self.module_dir, value)
 
@@ -360,7 +361,7 @@ class ModuleManager(QObject):
             else:
                 return 2
         else:
-            events.show_info_bar.emit(self.tr('Warning'), self.tr("Cannot exec gui plugin, bcs master not set or json not exists."), 2, 3000)
+            events.show_info_bar.emit(self.tr('Warning'), self.tr("Cannot execute gui plugin, because master not set or json not exists."), 2, 3000)
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
@@ -402,14 +403,14 @@ class ModuleManager(QObject):
         elif self.is_virtual(id_):
             self.addon_loader.run(id_, Entry.main, mapped_args=values)
         elif not os.path.exists(os.path.join(self.module_dir, value)):
-            print("{} 未完全安装或损坏".format(value))
-
+            events.show_info_bar.emit(self.tr("Warning"), self.tr("{} is not installed or broken.").format(value), 2, 3500)
         else:
             print("此插件不可运行 {}".format(self.get_name(id_)))
         return 0
 
     @staticmethod
     def check_mpk(mpk):  # Move check progress from InstallMpk to this
+        #todo: move some logic of check mpk from install to this.
         if not mpk or not os.path.exists(mpk) or not zipfile.is_zipfile(mpk):
             return module_error_codes.IsBroken, ''
         try:
