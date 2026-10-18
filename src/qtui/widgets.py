@@ -2,9 +2,13 @@ import logging
 import os
 import time
 
-from PySide6.QtCore import QTimer, QThread, Signal
+from PySide6.QtCore import QTimer, QThread
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor
+from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLineEdit, QHBoxLayout, QButtonGroup)
@@ -560,10 +564,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.content_widget.adjustSize()
         self.widget.adjustSize()
 
-from PySide6.QtWidgets import QLabel
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Signal
-from PySide6.QtGui import QCursor
+
 
 
 class ClickableLabel(QLabel):
