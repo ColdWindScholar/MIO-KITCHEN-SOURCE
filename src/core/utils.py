@@ -71,7 +71,7 @@ else:
 
 temp = os.path.join(prog_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}.log'
-project_name = None
+tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 # [header, desc, offset (if exist)]
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],

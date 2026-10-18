@@ -13,18 +13,21 @@
 # limitations under the License.
 import logging
 import os
+import pathlib
 import platform
+import subprocess
 import sys
+import threading
 import time
 
-from PySide6.QtCore import Qt, QSize, QTranslator
+from PySide6.QtCore import Qt, QSize, QTranslator, QObject
 from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.qtui.apk_manager import ApkManagerPage
 from src.qtui.connect import ConnectPage
-from src.core.utils import temp, v_code, prog_path
+from src.core.utils import temp, v_code, prog_path, tool_self
 from src.qtui.about import AboutPage
 from src.qtui.home import HomePage
 from src.qtui.plugins import PluginPage
@@ -46,6 +49,29 @@ if sys.platform == "linux" or sys.platform == "linux2":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 
+def restart():
+    def _inner():
+        argv = [sys.executable]
+        if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
+            # only needed when running within a Python intepreter
+            argv.append(tool_self)
+        argv.extend(sys.argv[1:])
+        p = subprocess.Popen(argv)
+        p.wait()
+        sys.exit(p.returncode)
+
+    er = QApplication.instance()
+    try:
+        for i in er.findChildren(QObject):
+            try:
+                i.deleteLater()
+            except (ValueError, AttributeError):
+                logging.exception('Restart')
+        er.deleteLater()
+    except (Exception, BaseException):
+        logging.exception('Restart')
+
+    threading.Thread(target=_inner).start()
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -139,6 +165,7 @@ def __init__qt(args):
                         filename=tool_log, filemode='w')
     window = MainWindow()
     window.load_language()
+    cfg.language.valueChanged.connect(restart)
     window.show()
     if pyi_splash_available:
         pyi_splash.close()
