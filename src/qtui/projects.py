@@ -561,7 +561,7 @@ class ProjectsPage(QFrame):
             return
         # zip
         if ftype == 'zip':
-            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
+            project_name = os.path.splitext(os.path.basename(ifile))[0]
             with zipfile.ZipFile(ifile, 'r') as fz:
                 if len(fz.namelist()) == 1:
                     for fi in fz.namelist():
@@ -590,12 +590,11 @@ class ProjectsPage(QFrame):
                     except Exception as e:
                         print("cannot rename %s %s" % (member_name, e))
                 print("unzip done")
-                if os.path.isdir(project_manger.current_work_path()):
-                    events.refresh_projects.emit()
-                    events.set_project_name.emit(os.path.splitext(os.path.basename(ifile))[0])
                 self.script2fs(project_manger.current_work_path())
-                events.refresh_projects.emit()
-
+            events.refresh_projects.emit()
+            cfg.set(cfg.currentProjectName, project_name)
+            events.set_project_name.emit(project_name)
+            events.refresh_list.emit()
             if cfg.autoUnpack:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
