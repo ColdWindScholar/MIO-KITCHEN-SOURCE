@@ -1424,10 +1424,8 @@ class PluginPage(QWidget):
 
     def load_plugin_cards(self):
         # 1. Memory Cleanups for Layout Hierarchies
-        if self.SegmentedWidget.currentRouteKey() != 'Repo':
-            self._clear_layout(self.repo_layout)
-        else:
-            self._clear_layout(self.installed_layout)
+        self._clear_layout(self.repo_layout)
+        self._clear_layout(self.installed_layout)
         self.cards_data.clear()
 
         # 2. Populate INSTALLED Page: Built-In Modules
