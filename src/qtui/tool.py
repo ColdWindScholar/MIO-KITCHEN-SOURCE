@@ -57,8 +57,8 @@ def restart():
             argv.append(tool_self)
         argv.extend(sys.argv[1:])
         p = subprocess.Popen(argv)
-        if p is not None:
-            sys.exit(0)
+        p.wait()
+        sys.exit(p.returncode)
 
     er = QApplication.instance()
     try:
