@@ -24,7 +24,6 @@ from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBro
 from qfluentwidgets import (ProgressBar, ImageLabel)
 
 from qtui.widgets import GenericTaskWorker
-from src.core import images
 from src.core import imp
 from src.core import utils
 from src.core.Magisk import Magisk_patch
@@ -964,11 +963,9 @@ class InstallMpk(MessageBoxBase):
                 except (Exception, KeyError):
                     logging.exception('Bugs')
                     self.pyt = QPixmap()
-                    self.pyt.loadFromData(images.none_byte)
         except (Exception, BaseException):
             logging.exception('Bugs')
             self.pyt = QPixmap()
-            self.pyt.loadFromData(images.none_byte)
 
         # 更新 Fluent UI 组件展示
         self.name_label.setText(self.mconf.get('module', 'name'))
@@ -980,7 +977,6 @@ class InstallMpk(MessageBoxBase):
     def unavailable(self):
         """异常和包损坏时的界面安全降级逻辑"""
         self.pyt = QPixmap()
-        self.pyt.loadFromData(images.error_logo_byte)
 
         self.name_label.setText(self.tr("PLease select a plugin"))
         self.name_label.setTextColor(QColor("#ffcc00"), QColor("#ffcc00"))
