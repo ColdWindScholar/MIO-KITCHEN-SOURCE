@@ -31,12 +31,11 @@ import zipfile
 from difflib import SequenceMatcher
 from enum import IntEnum
 from lzma import LZMADecompressor
-from os import getcwd, cpu_count
+from os import getcwd
 from os.path import exists
 from random import randint, choice
 from shutil import rmtree
 from subprocess import Popen
-from threading import Thread
 
 import requests
 
