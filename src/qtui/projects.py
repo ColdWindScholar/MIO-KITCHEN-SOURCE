@@ -581,7 +581,7 @@ class ProjectsPage(QFrame):
                             member_name = fi.encode('cp437').decode('utf-8')
                         except (Exception, BaseException):
                             member_name = fi
-                    print("Extracting " + member_name)
+                    print(f"Extracting {member_name}")
                     try:
                         fz.extract(fi, project_manger.current_work_path())
                         if fi != member_name:
