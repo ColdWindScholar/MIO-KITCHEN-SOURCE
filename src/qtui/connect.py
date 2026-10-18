@@ -4,7 +4,6 @@ import socket
 import uuid
 from datetime import datetime
 from io import BytesIO
-from multiprocessing import Process
 from platform import system, machine
 from threading import Thread
 
@@ -259,7 +258,8 @@ class ConnectPage(QWidget):
         network_bridge.trigger_signal.connect(self.execute)
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_state)
-        self.network_thread = Process(
+
+        self.network_thread = Thread(
             target=lambda: flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
         self.network_thread.start()
 
