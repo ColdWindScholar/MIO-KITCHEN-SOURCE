@@ -361,7 +361,7 @@ class ModuleManager(QObject):
             else:
                 return 2
         else:
-            events.show_info_bar.emit(self.tr('Warning'), self.tr("Cannot execute gui plugin, because master not set or json not exists."), 2, 3000)
+            logging.warning("Cannot execute gui plugin, because master not set or json not exists.")
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
