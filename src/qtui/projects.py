@@ -562,6 +562,7 @@ class ProjectsPage(QFrame):
         # zip
         if ftype == 'zip':
             project_name = os.path.splitext(os.path.basename(ifile))[0]
+            cfg.set(cfg.currentProjectName, project_name)
             with zipfile.ZipFile(ifile, 'r') as fz:
                 if len(fz.namelist()) == 1:
                     for fi in fz.namelist():
@@ -592,7 +593,6 @@ class ProjectsPage(QFrame):
                 print("unzip done")
                 self.script2fs(project_manger.current_work_path())
             events.refresh_projects.emit()
-            cfg.set(cfg.currentProjectName, project_name)
             events.set_project_name.emit(project_name)
             events.refresh_list.emit()
             if cfg.autoUnpack:
