@@ -23,6 +23,7 @@ from qfluentwidgets import (
     FluentIcon, TextEdit
 )
 from simple_websocket import Server
+from werkzeug.serving import make_server
 from wsproto.frame_protocol import CloseReason
 
 from qtui.projects import ProjectsPage
@@ -258,10 +259,13 @@ class ConnectPage(QWidget):
         network_bridge.trigger_signal.connect(self.execute)
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_state)
-
+        self.flask_server = make_server(host='0.0.0.0', port=5000,app=flask_backend, threaded=True)
         self.network_thread = Thread(
-            target=lambda: flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
+            target=self.flask_server.serve_forever,
+            daemon=True
+        )
         self.network_thread.start()
+
 
     def render_qr_matrix(self, encoding_data_payload):
         qr_generator = qrcode.QRCode(version=1, box_size=10, border=0)
