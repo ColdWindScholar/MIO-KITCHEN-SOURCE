@@ -1,11 +1,11 @@
 {
     "Tool": {
-        "Version": "5.0.0-prewiew",
+        "Version": "5.0.1-preview",
         "AiEngine": true,
         "autoUnpack": false,
         "checkUpdate": true,
         "CpioImpl": "Python",
-        "currentProjectName": "tkui",
+        "currentProjectName": "test",
         "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
