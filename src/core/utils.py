@@ -972,7 +972,7 @@ class MkcSuggest:
 
     def get(self, language: str, prompt: str):
         similarity = 0
-        text = lang.no_idea.format(prompt)
+        text = f"No idea about: {prompt}"
         detail = 'Unknown'
         if prompt:
             for i in self.library.keys():
