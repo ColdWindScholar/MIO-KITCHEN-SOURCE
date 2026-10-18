@@ -328,7 +328,7 @@ class ModuleManager(QObject):
             info_json_path = os.path.join(script_path, "info.json")
             if not os.path.exists(info_json_path):
                 logging.error(f"run: info.json not found for plugin {id_} at {info_json_path}")
-                print(f"Plugin {name} configuration is missing.")
+                events.show_info_bar.emit(self.tr("Warning"), self.tr(f"Plugin {name} configuration is missing."), 2, 3500)
                 return 3
 
             try:
