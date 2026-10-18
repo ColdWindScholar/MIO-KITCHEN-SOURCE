@@ -1168,7 +1168,7 @@ class BuiltInPlugins(QObject):
                 # I log the error and inform the user of failure.
                 print(f'Merge failed: {e}')
                 logging.exception('MergeQC RAWPROGRAM error')
-                InfoBar.warning("Warning", f'Image merging failed: {str(e)}',
+                InfoBar.warning(self.tr("Warning"), f'Image merging failed: {str(e)}',
                                 parent=self.master)  # Displaying the error message to the user.
             # No explicit return None needed here as the function naturally returns None if no other return is hit.
 
