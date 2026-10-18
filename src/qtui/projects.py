@@ -43,7 +43,7 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt, QThread, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
