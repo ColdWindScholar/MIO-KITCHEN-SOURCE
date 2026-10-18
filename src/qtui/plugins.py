@@ -405,7 +405,8 @@ class ModuleManager(QObject):
         elif not os.path.exists(os.path.join(self.module_dir, value)):
             events.show_info_bar.emit(self.tr("Warning"), self.tr("{} is not installed or broken.").format(value), 2, 3500)
         else:
-            print("此插件不可运行 {}".format(self.get_name(id_)))
+            events.show_info_bar.emit(self.tr("Warning"), self.tr("{} is not executable").format(self.get_name(id_)), 2,
+                                      3500)
         return 0
 
     @staticmethod
