@@ -510,7 +510,7 @@ class ProjectsPage(QFrame):
                 utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
             for i in os.listdir(project_manger.current_work_path()):
-                file = project_manger.current_work_path() + os.sep + i
+                file = os.path.join(project_manger.current_work_path(), i)
                 if not os.path.isfile(file):
                     continue
                 if i.endswith('.dz') and gettype(file) == 'dz':
