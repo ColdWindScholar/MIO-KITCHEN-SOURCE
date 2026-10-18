@@ -1563,7 +1563,8 @@ class PluginPage(QWidget):
                 events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                 return 1
             module_manager.install(file_path)
-        events.load_plugin_cards.emit()
+        if self.SegmentedWidget.currentRouteKey() != 'Repo':
+            events.load_plugin_cards.emit()
         return None
 
     def filter_plugins(self, text):
