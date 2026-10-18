@@ -120,7 +120,8 @@ class PackHybridRom:
             lines.insert(45, f'right_device="{right_device}"\n')
             add_line = self.get_line_num(lines, '#Other images')
             for t in os.listdir(f"{dir_}/images"):
-                if t.endswith('.img') and not os.path.isdir(dir_ + t):
+                dir_t = os.path.join(dir_, t)
+                if t.endswith('.img') and not os.path.isdir(dir_t):
                     print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(os.path.join(f'{dir_}/images', t)) > 209715200:
                         self.zstd_compress(os.path.join(f'{dir_}/images', t))
@@ -130,10 +131,11 @@ class PackHybridRom:
                         lines.insert(add_line,
                                      f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
             for t in os.listdir(dir_):
-                if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
+                dir_t = os.path.join(dir_, t)
+                if not t.startswith("preloader_") and not os.path.isdir(dir_t) and t.endswith('.img'):
                     print(f"Add Flash method {t} to update-binary")
-                    if os.path.getsize(dir_ + t) > 209715200:
-                        self.zstd_compress(dir_ + t)
+                    if os.path.getsize(dir_t) > 209715200:
+                        self.zstd_compress(dir_t)
                         shutil.move(os.path.join(dir_, f"{t}.zst"), os.path.join(f"{dir_}/images", f"{t}.zst"))
                         lines.insert(add_line,
                                      f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
