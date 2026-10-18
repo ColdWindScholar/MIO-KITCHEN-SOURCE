@@ -1143,10 +1143,9 @@ class BuiltInPlugins(QObject):
                             output_file = os.path.join(prog_path,
                                                        f"{name_part}_{utils.v_code()}_magisk_patched.img")
                         os.rename(m.output, output_file)  # Move the patched file to the final destination.
-                        print(f"Done! Patched Boot: {output_file}")
-                        InfoBar.success("Magisk Patch", f"Patched Boot:\n{output_file}", parent=self.master)
+                        InfoBar.success(self.tr("Magisk Patch"), f"Patched Boot:\n{output_file}", parent=self.master)
                     else:
-                        InfoBar.warning("Magisk Patch", "Magisk patching process did not produce an output file.",
+                        InfoBar.warning(self.tr("Magisk Patch"), self.tr("Magisk patching process did not produce an output file."),
                                         parent=self.master)
             except Exception as e:
                 # I log any exceptions during patching and inform the user.
