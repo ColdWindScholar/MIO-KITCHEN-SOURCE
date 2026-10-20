@@ -2,9 +2,13 @@ import logging
 import os
 import time
 
-from PySide6.QtCore import QTimer, QThread, Signal
+from PySide6.QtCore import QTimer, QThread
+from PySide6.QtCore import Qt
+from PySide6.QtCore import Signal
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor
+from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QLineEdit, QHBoxLayout, QButtonGroup)
@@ -81,12 +85,12 @@ class NewProjectDialog(MessageBoxBase):
 
         invalid_chars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|']
         if any(char in project_name for char in invalid_chars):
-            self.errorLabel.setText("名称包含非法字符")
+            self.errorLabel.setText(self.tr("The name contains illegal characters"))
             self.errorLabel.show()
             return False
 
         if project_name in self.existing_projects:
-            self.errorLabel.setText("项目名称已存在")
+            self.errorLabel.setText(self.tr("The project name already exists"))
             self.errorLabel.show()
             return False
 
@@ -560,10 +564,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.content_widget.adjustSize()
         self.widget.adjustSize()
 
-from PySide6.QtWidgets import QLabel
-from PySide6.QtCore import Qt
-from PySide6.QtCore import Signal
-from PySide6.QtGui import QCursor
+
 
 
 class ClickableLabel(QLabel):

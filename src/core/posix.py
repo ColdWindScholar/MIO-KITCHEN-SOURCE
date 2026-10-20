@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 
 # Copyright (C) 2022-2025 The MIO-KITCHEN-SOURCE Project
 #
@@ -14,11 +16,48 @@ import os
 # See the License for the specific language governing permissions and
 # limitations under the License.
 if os.name == 'nt':
-    from ctypes.wintypes import LPCSTR, DWORD
+    from ctypes.wintypes import LPCWSTR, DWORD
     from stat import FILE_ATTRIBUTE_SYSTEM
-    from ctypes import windll
+    from ctypes import WinError, windll
 
-from logging import exception
+
+_CYGWIN_MAGIC = b'!<symlink>'
+
+
+def _cygwin_marker(path):
+    """Return the link target for a valid marker, or None for another file."""
+    with open(path, 'rb') as stream:
+        if stream.read(len(_CYGWIN_MAGIC)) != _CYGWIN_MAGIC:
+            return None
+        raw = stream.read(16385)
+    if (len(raw) > 16384 or len(raw) < 4 or len(raw) % 2
+            or not raw.startswith(b'\xff\xfe') or not raw.endswith(b'\x00\x00')):
+        raise ValueError(f'Malformed Cygwin symlink marker: {path}')
+    try:
+        target = raw.decode('utf-16')
+    except UnicodeDecodeError as error:
+        raise ValueError(f'Malformed Cygwin symlink marker: {path}') from error
+    if not target.endswith('\x00') or not target[:-1] or '\x00' in target[:-1]:
+        raise ValueError(f'Malformed Cygwin symlink marker: {path}')
+    return target[:-1]
+
+
+def _windows_attributes(path):
+    attributes = windll.kernel32.GetFileAttributesW(LPCWSTR(os.fspath(path)))
+    if attributes in (-1, 0xffffffff):
+        raise WinError()
+    return attributes
+
+
+def _set_windows_attributes(path, attributes):
+    if not windll.kernel32.SetFileAttributesW(LPCWSTR(os.fspath(path)), DWORD(attributes)):
+        raise WinError()
+
+
+def _temporary_sibling(path):
+    descriptor, name = tempfile.mkstemp(prefix='.mio-symlink-', dir=os.path.dirname(path))
+    os.close(descriptor)
+    return name
 
 
 def symlink(link_target, target):
@@ -27,13 +66,77 @@ def symlink(link_target, target):
     if os.name == 'posix':
         os.symlink(link_target, target)
     elif os.name == 'nt':
-        with open(target.replace('/', os.sep), 'wb') as out:
-            out.write(b'!<symlink>' + link_target.encode('utf-16') + b'\x00\x00')
+        target = target.replace('/', os.sep)
+        temporary = _temporary_sibling(target)
+        try:
+            with open(temporary, 'wb') as out:
+                out.write(_CYGWIN_MAGIC + link_target.encode('utf-16') + b'\x00\x00')
+            _set_windows_attributes(temporary, FILE_ATTRIBUTE_SYSTEM)
+            os.replace(temporary, target)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
+
+
+def repair_erofs_symlinks(root):
+    """Restore valid Cygwin markers without changing hard-linked source files."""
+    if os.name != 'nt':
+        return 0
+    if not os.path.isdir(root):
+        raise FileNotFoundError(root)
+
+    repaired = 0
+
+    def fail_on_walk_error(error):
+        raise error
+
+    for folder, _, filenames in os.walk(root, onerror=fail_on_walk_error):
+        for name in filenames:
+            path = os.path.join(folder, name)
+            if os.path.islink(path) or _cygwin_marker(path) is None:
+                continue
+            attributes = _windows_attributes(path)
+            if attributes & FILE_ATTRIBUTE_SYSTEM:
+                continue
+            temporary = _temporary_sibling(path)
             try:
-                windll.kernel32.SetFileAttributesA(LPCSTR(target.encode()),
-                                                   DWORD(FILE_ATTRIBUTE_SYSTEM))
-            except Exception:
-                exception("Posix")
+                shutil.copy2(path, temporary)
+                with open(path, 'rb') as source, open(temporary, 'rb') as copy:
+                    unchanged = source.read() == copy.read()
+                if not unchanged:
+                    raise ValueError(f'Cygwin symlink marker changed during repair: {path}')
+                # FILE_ATTRIBUTE_NORMAL must not be combined with other attributes.
+                _set_windows_attributes(temporary, (attributes & ~0x80) | FILE_ATTRIBUTE_SYSTEM)
+                if not _windows_attributes(temporary) & FILE_ATTRIBUTE_SYSTEM:
+                    raise ValueError(f'Cygwin symlink marker repair did not set System: {path}')
+                os.replace(temporary, path)
+                repaired += 1
+            finally:
+                if os.path.exists(temporary):
+                    os.unlink(temporary)
+    check_erofs_symlinks(root)
+    return repaired
+
+
+def check_erofs_symlinks(root):
+    """Reject Cygwin link markers that mkfs.erofs would pack as regular files."""
+    if os.name != 'nt':
+        return
+    if not os.path.isdir(root):
+        raise FileNotFoundError(root)
+
+    def fail_on_walk_error(error):
+        raise error
+
+    for folder, _, filenames in os.walk(root, onerror=fail_on_walk_error):
+        for name in filenames:
+            path = os.path.join(folder, name)
+            if os.path.islink(path):
+                continue
+            if _cygwin_marker(path) is None:
+                continue
+            if not _windows_attributes(path) & FILE_ATTRIBUTE_SYSTEM:
+                raise ValueError(f'Cygwin symlink marker is missing the Windows System attribute: {path}')
 
 
 def readlink(path):

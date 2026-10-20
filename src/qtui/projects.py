@@ -30,6 +30,7 @@ from src.core import ofp_mtk_decrypt
 from src.core import ofp_qc_decrypt
 from src.core import opscrypto
 from src.core import ozipdecrypt
+from src.core.posix import repair_erofs_symlinks
 from src.core.ntpiutils import extractor as ntpiextractor
 from src.core.ntpiutils import parser as ntpiparser
 from src.core.undz import DZFileTools
@@ -119,7 +120,8 @@ class PackHybridRom:
             lines.insert(45, f'right_device="{right_device}"\n')
             add_line = self.get_line_num(lines, '#Other images')
             for t in os.listdir(f"{dir_}/images"):
-                if t.endswith('.img') and not os.path.isdir(dir_ + t):
+                dir_t = os.path.join(dir_, t)
+                if t.endswith('.img') and not os.path.isdir(dir_t):
                     print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(os.path.join(f'{dir_}/images', t)) > 209715200:
                         self.zstd_compress(os.path.join(f'{dir_}/images', t))
@@ -129,10 +131,11 @@ class PackHybridRom:
                         lines.insert(add_line,
                                      f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
             for t in os.listdir(dir_):
-                if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
+                dir_t = os.path.join(dir_, t)
+                if not t.startswith("preloader_") and not os.path.isdir(dir_t) and t.endswith('.img'):
                     print(f"Add Flash method {t} to update-binary")
-                    if os.path.getsize(dir_ + t) > 209715200:
-                        self.zstd_compress(dir_ + t)
+                    if os.path.getsize(dir_t) > 209715200:
+                        self.zstd_compress(dir_t)
                         shutil.move(os.path.join(dir_, f"{t}.zst"), os.path.join(f"{dir_}/images", f"{t}.zst"))
                         lines.insert(add_line,
                                      f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
@@ -507,7 +510,7 @@ class ProjectsPage(QFrame):
                 utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
             for i in os.listdir(project_manger.current_work_path()):
-                file = project_manger.current_work_path() + os.sep + i
+                file = os.path.join(project_manger.current_work_path(), i)
                 if not os.path.isfile(file):
                     continue
                 if i.endswith('.dz') and gettype(file) == 'dz':
@@ -558,7 +561,8 @@ class ProjectsPage(QFrame):
             return
         # zip
         if ftype == 'zip':
-            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
+            project_name = os.path.splitext(os.path.basename(ifile))[0]
+            cfg.set(cfg.currentProjectName, project_name)
             with zipfile.ZipFile(ifile, 'r') as fz:
                 if len(fz.namelist()) == 1:
                     for fi in fz.namelist():
@@ -569,7 +573,6 @@ class ProjectsPage(QFrame):
                             print("cannot rename %s %s" % (fi, e))
                     self.unpackrom(os.path.join(utils.temp, fi))
                     os.remove(os.path.join(utils.temp, fi))
-                    print("unzip done")
                     return
                 for fi in fz.namelist():
                     try:
@@ -579,7 +582,7 @@ class ProjectsPage(QFrame):
                             member_name = fi.encode('cp437').decode('utf-8')
                         except (Exception, BaseException):
                             member_name = fi
-                    print("Extracting " + member_name)
+                    print(f"Extracting {member_name}")
                     try:
                         fz.extract(fi, project_manger.current_work_path())
                         if fi != member_name:
@@ -588,12 +591,10 @@ class ProjectsPage(QFrame):
                     except Exception as e:
                         print("cannot rename %s %s" % (member_name, e))
                 print("unzip done")
-                if os.path.isdir(project_manger.current_work_path()):
-                    events.refresh_projects.emit()
-                    events.set_project_name.emit(os.path.splitext(os.path.basename(ifile))[0])
                 self.script2fs(project_manger.current_work_path())
-                events.refresh_projects.emit()
-
+            events.refresh_projects.emit()
+            events.set_project_name.emit(project_name)
+            events.refresh_list.emit()
             if cfg.autoUnpack:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
@@ -1253,6 +1254,13 @@ class ProjectsPage(QFrame):
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
         if not UTC:
             UTC = int(time.time())
+        try:
+            repaired = repair_erofs_symlinks(os.path.join(work, name))
+        except (OSError, ValueError) as error:
+            print(f'[erofs] Cannot repack {name}: {error}', flush=True)
+            return 1
+        if repaired:
+            print(f'[erofs] Restored {repaired} Windows symlink markers in {name}', flush=True)
         print("[erofs] Repacking %s - %s" % (name, f'{format_},{level}'))
         extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
         other_ = ['-E', 'legacy-compress'] if old_kernel else []
@@ -1930,6 +1938,13 @@ class ProjectsPage(QFrame):
                             out=True) != 0:
                         events.show_info_bar.emit(self.tr('Error'), f"Failed to unpack {i}.img", 1, 3000)
                         continue
+                    try:
+                        repaired = repair_erofs_symlinks(os.path.join(work, i))
+                    except (OSError, ValueError) as error:
+                        print(f'[erofs] Unpacked {i} has invalid symlinks: {error}', flush=True)
+                        continue
+                    if repaired:
+                        print(f'[erofs] Restored {repaired} Windows symlink markers in unpacked {i}', flush=True)
                     if os.path.exists(f'{work}/{i}'):
                         try:
                             os.remove(f"{work}/{i}.img")

@@ -31,12 +31,11 @@ import zipfile
 from difflib import SequenceMatcher
 from enum import IntEnum
 from lzma import LZMADecompressor
-from os import getcwd, cpu_count
+from os import getcwd
 from os.path import exists
 from random import randint, choice
 from shutil import rmtree
 from subprocess import Popen
-from threading import Thread
 
 import requests
 
@@ -72,7 +71,7 @@ else:
 
 temp = os.path.join(prog_path, "bin", "temp").replace(os.sep, '/')
 tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}.log'
-project_name = None
+tool_self = os.path.normpath(os.path.abspath(sys.argv[0]))
 # [header, desc, offset (if exist)]
 formats = ([b'PK', "zip"], [b'OPPOENCRYPT!', "ozip"], [b'7z', "7z"], [b'\x53\xef', 'ext', 1080],
            [b'\x3a\xff\x26\xed', "sparse"], [b'\xe2\xe1\xf5\xe0', "erofs", 1024], [b"CrAU", "payload"],
@@ -120,7 +119,7 @@ else:
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
 
 
-def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = None, debug_binary: bool = False):
+def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = None):
     def output(inp: subprocess.CalledProcessError | Popen[bytes]):
         for i in iter(inp.stdout.readline, b""):
             try:
@@ -143,12 +142,7 @@ def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = No
         if os.name == 'posix':
             cmd = cmd.split()
     conf = subprocess.CREATE_NO_WINDOW if os.name != 'posix' else 0
-    if debug_binary:
-        if os.name == 'nt':
-            strace_path = f"{tool_bin}/strace.exe"
-        else:
-            strace_path = "strace"
-        cmd = [strace_path, *cmd]
+
     try:
         ret = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT, creationflags=conf, env=env)
@@ -977,7 +971,7 @@ class MkcSuggest:
 
     def get(self, language: str, prompt: str):
         similarity = 0
-        text = lang.no_idea.format(prompt)
+        text = f"No idea about: {prompt}"
         detail = 'Unknown'
         if prompt:
             for i in self.library.keys():
