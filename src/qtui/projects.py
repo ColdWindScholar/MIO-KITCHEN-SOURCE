@@ -45,7 +45,7 @@ from src.core.rsceutil import unpack as rsceutil_unpack
 
 from PySide6.QtCore import Qt, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
-    QHeaderView, QFrame
+    QHeaderView, QFrame, QAbstractItemView
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
     TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon
@@ -876,8 +876,8 @@ class ProjectsPage(QFrame):
         frame.addWidget(self.execute_btn)
         layout.addLayout(frame)
 
-        # 高级现代列数据集表格（参照上一轮设计的现代化 List 样式）
         self.partition_table = TableWidget(container)
+        self.partition_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.partition_table.setColumnCount(5)
         self.partition_table.setMinimumHeight(370)
 
