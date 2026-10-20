@@ -268,7 +268,7 @@ class Extractor:
             os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
-        self.CONFIG_DIR = work + os.sep + 'config'
+        self.CONFIG_DIR = os.path.join(work, 'config')
         with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
             mount = ext4.Volume(file).get_mount_point
             if mount[:1] == '/':
