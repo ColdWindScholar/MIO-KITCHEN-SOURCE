@@ -1732,6 +1732,7 @@ class ProjectsPage(QFrame):
             return False
 
         json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
+        # add a file lock here.
         parts = json_.read()
         if not chose:
             return False
