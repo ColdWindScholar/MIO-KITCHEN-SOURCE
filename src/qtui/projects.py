@@ -1828,7 +1828,7 @@ class ProjectsPage(QFrame):
                     events.refresh_list.emit()
                     continue
                 if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
-                    unpack_boot(i)
+                    unpack_boot(i, boot=f"{work}/{i}.img")
                     events.refresh_list.emit()
                     continue
                 if i == 'logo':
