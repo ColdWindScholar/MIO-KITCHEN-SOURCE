@@ -1738,7 +1738,6 @@ class ProjectsPage(QFrame):
             return False
         if form == 'payload':
             time_start = time.time()
-            print("Unpacking payload...")
             with open(f"{work}/payload.bin", "rb") as f:
                 extract_partitions_from_payload(
                     f,
