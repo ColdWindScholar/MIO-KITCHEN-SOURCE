@@ -43,7 +43,7 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject, QPoint
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame, QAbstractItemView
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
@@ -857,7 +857,6 @@ class ProjectsPage(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(14)
 
-        # 标题放外面
         frame = QHBoxLayout()
         frame.addWidget(QLabel(self.tr("Partition(s)")))
         self.format_widget = SegmentedWidget(container)
@@ -880,6 +879,8 @@ class ProjectsPage(QFrame):
         self.partition_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.partition_table.setColumnCount(5)
         self.partition_table.setMinimumHeight(370)
+        self.partition_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.partition_table.customContextMenuRequested.connect(self.show_right_click_menu)
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
@@ -888,7 +889,6 @@ class ProjectsPage(QFrame):
             self.partition_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
         layout.addWidget(self.partition_table)
 
-        # 全选与搜索框
         row1 = QHBoxLayout()
         self.select_all_cb = CheckBox(self.tr("Select All"), container)
         self.select_all_cb.stateChanged.connect(self._toggle_select_all_partitions)
@@ -911,6 +911,35 @@ class ProjectsPage(QFrame):
         layout.addLayout(row1)
 
         self.scroll_layout.addWidget(container)
+
+    def show_right_click_menu(self, pos: QPoint):
+        # 3. Get the specific item under the cursor position
+        item = self.partition_table.itemAt(pos)
+        if not item:
+            return  # Clicked on empty space inside the table view, don't show menu
+
+        # Get the row index of the clicked item
+        row = self.partition_table.row(item)
+
+        # 4. Create the Fluent Design Context Menu
+        menu = RoundMenu(parent=self.partition_table)
+
+        # 5. Create actions using Fluent Icons (FIF)
+        unpack_action = Action(FIF.DEVELOPER_TOOLS, 'Unpack Image', self)
+        copy_action = Action(FIF.COPY, f'Copy "{item.text()}"', self)
+        info_action = Action(FIF.INFO, 'View Hex Metadata', self)
+        delete_action = Action(FIF.DELETE, 'Remove from List', self)
+
+
+
+        # 7. Add actions and separation blocks to the Fluent UI menu
+        menu.addAction(unpack_action)
+        menu.addAction(copy_action)
+        menu.addAction(info_action)
+        menu.addSeparator()
+        menu.addAction(delete_action)
+
+        menu.exec(self.partition_table.mapToGlobal(pos))
 
     def _toggle_select_all_partitions(self, state):
         """Toggles check state of all visible rows based on the Select All checkbox."""
