@@ -1973,12 +1973,9 @@ class ProjectsPage(QFrame):
             # 高级彩色高亮标签
             badge = QLabel(img_type)
             badge.setAlignment(Qt.AlignCenter)
-            if img_type == "Build":
-                badge.setStyleSheet(
-                    "color: #a78bfa; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
-            else:
-                badge.setStyleSheet(
-                    "color: #f59e0b; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
+            badge.setStyleSheet(
+                    f"color: {'#a78bfa' if img_type == "Build" else '#f59e0b'}; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
+
             self.partition_table.setCellWidget(row_idx, 3, badge)
 
             attr_item = QTableWidgetItem(attrs)
