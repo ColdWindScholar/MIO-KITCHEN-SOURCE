@@ -2014,7 +2014,6 @@ class ProjectsPage(QFrame):
             self.partition_table.setItem(row_idx, 1, QTableWidgetItem(size))
             self.partition_table.setItem(row_idx, 2, QTableWidgetItem(fs))
 
-            # 高级彩色高亮标签
             badge = QLabel(img_type)
             badge.setAlignment(Qt.AlignCenter)
             badge.setStyleSheet(
