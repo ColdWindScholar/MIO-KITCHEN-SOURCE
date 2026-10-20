@@ -42,7 +42,7 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt, QThread, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
@@ -100,7 +100,7 @@ events = Events()
 
 class PackHybridRom:
     def __init__(self, right_device):
-        if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
+        if os.path.exists(dir_ := os.path.join(project_manger.current_work_output_path(), "firmware-update")):
             os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
         if not os.path.exists(f"{dir_}/images"):
             os.makedirs(f'{dir_}/images')
@@ -624,7 +624,7 @@ class ProjectsPage(QFrame):
             # File Rename
             if os.path.exists(os.path.join(project_dir, file_name)):
                 if not '.' in file_name:
-                    shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name + ".img"))
+                    shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, f"{file_name}.img"))
                 if file_name.endswith(".bin") or file_name.endswith(".IMG") or file_name.endswith(".BIN"):
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
@@ -1465,7 +1465,7 @@ class ProjectsPage(QFrame):
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
             return False
-        parts_dict = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
+        parts_dict = utils.JsonEdit((work := os.path.join(project_manger.current_work_path()), "config/parts_info")).read()
         for i in chosen_parts:
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
@@ -1527,7 +1527,7 @@ class ProjectsPage(QFrame):
                             self.rdi(work, dname)
                         print("Packed successfully: {}!".format(dname))
                         if pack_format in ["dat", "br", "sparse"]:
-                            utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
+                            utils.img2simg(os.path.join(project_manger.current_work_output_path(), f"{dname}.img"))
                             if pack_format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
