@@ -58,37 +58,38 @@ class Extractor:
             'x': 1
         }
         for n, sym in enumerate(arg):
-            if n == 0 and perms.get(sym):
-                o = perms.get(sym)
-            elif n == 1 and perms.get(sym):
-                o += perms.get(sym)
+            perms_get = perms.get(sym, 0) or 0
+            if n == 0 and perms_get:
+                o = perms_get
+            elif n == 1 and perms_get:
+                o += perms_get
             elif n == 2:
                 if sym == 'S':
                     s = 4
-                elif perms.get(sym):
-                    o += perms.get(sym)
+                elif perms_get:
+                    o += perms_get
                 elif sym == 's':
                     s += 4
                     o += 1
-            elif n == 3 and perms.get(sym):
-                g = perms.get(sym)
-            elif n == 4 and perms.get(sym):
-                g += perms.get(sym)
+            elif n == 3 and perms_get:
+                g = perms_get
+            elif n == 4 and perms_get:
+                g += perms_get
             if n == 5:
-                if perms.get(sym):
-                    g += perms.get(sym)
+                if perms_get:
+                    g += perms_get
                 elif sym == 'S':
                     s += 2
                 elif sym == 's':
                     s += 2
                     g += 1
-            elif n == 6 and perms.get(sym):
-                w = perms.get(sym)
-            elif n == 7 and perms.get(sym):
-                w += perms.get(sym)
+            elif n == 6 and perms_get:
+                w = perms_get
+            elif n == 7 and perms_get:
+                w += perms_get
             elif n == 8:
-                if perms.get(sym):
-                    w += perms.get(sym)
+                if perms_get:
+                    w += perms_get
                 elif sym == 'T':
                     s += 1
                 elif sym == 't':
