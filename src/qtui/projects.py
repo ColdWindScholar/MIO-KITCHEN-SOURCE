@@ -1132,7 +1132,7 @@ class ProjectsPage(QFrame):
         output_super_path = f'{output_dir}/super.img'
         command += ['--out', output_super_path]
 
-        if call(command, debug_binary=False) == 0:
+        if call(command) == 0:
             if os.access(output_super_path, os.F_OK):
                 events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3,
                                           3000)
