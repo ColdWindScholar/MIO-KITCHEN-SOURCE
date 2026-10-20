@@ -1731,7 +1731,7 @@ class ProjectsPage(QFrame):
             events.show_info_bar.emit(self.tr("Warning"), self.tr("Project's not exist"), 3, 3000)
             return False
 
-        json_ = utils.JsonEdit((work := os.path.join(project_manger.current_work_path()), "config/parts_info"))
+        json_ = utils.JsonEdit(os.path.join(work := project_manger.current_work_path(), "config/parts_info"))
         # add a file lock here.
         parts = json_.read()
         if not chose:
