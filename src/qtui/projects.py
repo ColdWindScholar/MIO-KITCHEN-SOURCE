@@ -925,8 +925,8 @@ class ProjectsPage(QFrame):
         menu = RoundMenu(parent=self.partition_table)
 
         # 5. Create actions using Fluent Icons (FIF)
-        unpack_action = Action(FIF.DEVELOPER_TOOLS, 'Unpack Image', self)
-        copy_action = Action(FIF.COPY, f'Copy "{item.text()}"', self)
+        unpack_action = Action(FIF.PLAY, 'Unpack Image', self)
+        copy_action = Action(FIF.COPY, f'Copy "{row}"', self)
         info_action = Action(FIF.INFO, 'View Hex Metadata', self)
         delete_action = Action(FIF.DELETE, 'Remove from List', self)
 
