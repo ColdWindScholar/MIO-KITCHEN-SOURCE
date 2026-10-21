@@ -915,18 +915,21 @@ class ProjectsPage(QFrame):
     def show_right_click_menu(self, pos: QPoint):
         # 3. Get the specific item under the cursor position
         item = self.partition_table.itemAt(pos)
+
         if not item:
             return  # Clicked on empty space inside the table view, don't show menu
 
         # Get the row index of the clicked item
         row = self.partition_table.row(item)
+        item_full = self.partition_table.item(row, 0)
+
 
         # 4. Create the Fluent Design Context Menu
         menu = RoundMenu(parent=self.partition_table)
 
         # 5. Create actions using Fluent Icons (FIF)
         unpack_action = Action(FIF.PLAY, 'Unpack Image', self)
-        copy_action = Action(FIF.COPY, f'Copy "{row}"', self)
+        copy_action = Action(FIF.COPY, f'Copy "{item_full.text()}"', self)
         info_action = Action(FIF.INFO, 'View Hex Metadata', self)
         delete_action = Action(FIF.DELETE, 'Remove from List', self)
 
