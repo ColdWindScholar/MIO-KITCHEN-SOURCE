@@ -1185,7 +1185,7 @@ class ProjectsPage(QFrame):
 
         self.super_btn = PushButton(self.tr("Pack Super"), container, FIF.ALBUM)
         self.super_btn.clicked.connect(self.pack_super)
-        self.format_conv_btn = PushButton(self.tr("Format Convertion"), container, FIF.EMBED)
+        self.format_conv_btn = PushButton(self.tr("Format convertion"), container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
 
         for btn in [self.super_btn, self.format_conv_btn]:
