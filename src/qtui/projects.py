@@ -1374,8 +1374,9 @@ class ProjectsPage(QFrame):
         size = utils.GetFolderSize(os.path.join(work, name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
-        if not UTC:
-            UTC = int(time.time())
+        utc_time = UTC
+        if not utc_time:
+            utc_time = int(time.time())
         if call(
                 ['mke2fs', '-O',
                  '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L',
@@ -1386,7 +1387,7 @@ class ProjectsPage(QFrame):
             print(f"packing {name} failed [mke2fs]")
             return 1
         ret = call(
-            ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
+            ['e2fsdroid', '-e', '-T', f'{utc_time}', '-S', f'{work}/config/{name}_file_contexts', '-C',
              f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
              f'{work_output}/{name}_new.img'])
         if ret != 0:
