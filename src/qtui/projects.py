@@ -1368,8 +1368,7 @@ class ProjectsPage(QFrame):
                      f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC),
                      f'{work_output}/{name}.img'])
 
-    def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
-        if isinstance(size, str): size = int(size)
+    def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int|None = None):
         print("[ext] repacking %s" % name)
         size = utils.GetFolderSize(os.path.join(work, name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
