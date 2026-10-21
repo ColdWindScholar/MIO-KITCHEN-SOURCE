@@ -801,7 +801,7 @@ class ProjectsPage(QFrame):
         result = MessageBox(
             self.tr('Confirm Delete'),
             self.tr("Remove '{}' ?").format(project_name),
-            self.parent()
+            parent=self.parent()
         ).exec()
 
         if result != 1:
