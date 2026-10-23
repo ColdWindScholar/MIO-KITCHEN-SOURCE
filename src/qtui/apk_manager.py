@@ -1,10 +1,10 @@
 import logging
 import os
 
+from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
+from PySide6.QtGui import QColor, QImage, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import QFileDialog, QGridLayout, QHBoxLayout, QVBoxLayout, QWidget
 from androguard.core.apk import APK
-from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal, QUrl
-from PySide6.QtGui import QColor, QDesktopServices, QImage, QPainter, QPen, QPixmap
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import (
     BodyLabel,
     CaptionLabel,
@@ -15,7 +15,6 @@ from qfluentwidgets import (
     MessageBox,
     PushButton,
     ScrollArea,
-    SearchLineEdit,
     StrongBodyLabel,
     SubtitleLabel,
     themeColor,
@@ -116,7 +115,7 @@ class ApkScanThread(QThread):
 class ApkCard(CardWidget):
     selected = Signal(str)
 
-    def __init__(self, path, record, detail_callback, remove_callback, parent=None):
+    def __init__(self, path, record, parent=None):
         super().__init__(parent)
         self.path = path
         self.setObjectName("ApkCard")
@@ -124,7 +123,7 @@ class ApkCard(CardWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(12, 8, 12, 8)
         layout.setSpacing(8)
-        self.setMinimumHeight(92)
+        self.setMinimumHeight(78)
 
         self.checkbox = CheckBox(self)
         layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -146,33 +145,21 @@ class ApkCard(CardWidget):
         labels = QVBoxLayout()
         labels.setSpacing(3)
         name_label = StrongBodyLabel(record["name"], self)
-        name_label.setWordWrap(True)
+        name_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        name_label.setToolTip(record["name"])
+        name_label.setWordWrap(False)
         name_label.setMinimumWidth(0)
         labels.addWidget(name_label)
         package_label = CaptionLabel(record["package"] or self.tr("Unknown package"), self)
         package_label.setMinimumWidth(0)
         package_label.setToolTip(record["package"])
         labels.addWidget(package_label)
-        author_label = CaptionLabel(
-            self.tr("Author: {}").format(record["author"] or self.tr("Unknown")), self
-        )
-        author_label.setMinimumWidth(0)
-        labels.addWidget(author_label)
         size_sdk = self.tr("{} • SDK {}").format(
             self._format_size(record["size"]), record["target_sdk"] or "?"
         )
         size_label = CaptionLabel(size_sdk, self)
         labels.addWidget(size_label)
         layout.addLayout(labels, 1)
-
-        detail_button = PushButton(self.tr("Detail"), self)
-        detail_button.setFixedWidth(80)
-        detail_button.clicked.connect(lambda checked=False: detail_callback(path))
-        layout.addWidget(detail_button)
-        remove_button = PushButton(self.tr("Remove"), self)
-        remove_button.setFixedWidth(92)
-        remove_button.clicked.connect(lambda checked=False: remove_callback(path))
-        layout.addWidget(remove_button)
 
     @staticmethod
     def _format_size(size):
@@ -209,6 +196,7 @@ class ApkManagerPage(QWidget):
         self._generation = 0
         self._selected_path = None
         self._project_path = ""
+        self._scan_path = ""
         self.setup_ui()
         cfg.currentProjectName.valueChanged.connect(self.refresh_apks)
         app = QCoreApplication.instance()
@@ -225,19 +213,16 @@ class ApkManagerPage(QWidget):
         self.status_label = BodyLabel(self)
         toolbar.addWidget(self.status_label)
         toolbar.addStretch(1)
-        self.open_directory_button = PushButton(self.tr("Open Directory"), self)
-        self.open_directory_button.clicked.connect(self.open_project_directory)
-        toolbar.addWidget(self.open_directory_button)
+        self.scan_directory_button = PushButton(self.tr("Scan a dir"), self)
+        self.scan_directory_button.clicked.connect(self.choose_scan_directory)
+        toolbar.addWidget(self.scan_directory_button)
+        self.import_debloat_button = PushButton(self.tr("Import debloat list"), self)
+        self.import_debloat_button.clicked.connect(self.import_debloat_list)
+        toolbar.addWidget(self.import_debloat_button)
         self.remove_selected_button = PushButton(self.tr("Remove Selected"), self)
-        self.remove_selected_button.setFixedWidth(112)
-        self.remove_selected_button.setEnabled(False)
         self.remove_selected_button.clicked.connect(self.remove_selected)
+        self.remove_selected_button.hide()
         toolbar.addWidget(self.remove_selected_button)
-        self.search_entry = SearchLineEdit(self)
-        self.search_entry.setPlaceholderText(self.tr("Search apps and packages..."))
-        self.search_entry.setFixedWidth(250)
-        self.search_entry.textChanged.connect(self.filter_apks)
-        toolbar.addWidget(self.search_entry)
         main_layout.addLayout(toolbar)
 
         content_layout = QHBoxLayout()
@@ -245,10 +230,14 @@ class ApkManagerPage(QWidget):
 
         self.list_area = ScrollArea(self)
         self.list_area.setWidgetResizable(True)
+        self.list_area.setStyleSheet("background: transparent; border: none;")
+        self.list_area.viewport().setStyleSheet("background: transparent;")
         self.list_container = QWidget()
-        self.list_layout = QVBoxLayout(self.list_container)
+        self.list_container.setStyleSheet("background: transparent;")
+        self.list_layout = QGridLayout(self.list_container)
         self.list_layout.setContentsMargins(4, 4, 4, 4)
-        self.list_layout.setSpacing(10)
+        self.list_layout.setHorizontalSpacing(12)
+        self.list_layout.setVerticalSpacing(12)
         self.list_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.list_area.setWidget(self.list_container)
         content_layout.addWidget(self.list_area, 3)
@@ -256,7 +245,7 @@ class ApkManagerPage(QWidget):
         self.details_panel = CardWidget(self)
         self.details_panel.setObjectName("ApkDetailsPanel")
         self.details_panel.setMinimumWidth(300)
-        self.details_panel.setMaximumWidth(430)
+        self.details_panel.setMaximumWidth(360)
         details_layout = QVBoxLayout(self.details_panel)
         details_layout.setContentsMargins(22, 20, 22, 20)
         details_layout.setSpacing(12)
@@ -278,14 +267,9 @@ class ApkManagerPage(QWidget):
         details_layout.addWidget(self.detail_min_sdk)
         self.detail_target_sdk = CaptionLabel("", self.details_panel)
         details_layout.addWidget(self.detail_target_sdk)
-        details_layout.addWidget(StrongBodyLabel(self.tr("Author"), self.details_panel))
-        self.detail_author = BodyLabel("", self.details_panel)
-        self.detail_author.setWordWrap(True)
-        details_layout.addWidget(self.detail_author)
         details_layout.addWidget(StrongBodyLabel(self.tr("Permissions"), self.details_panel))
         self.permissions_list = ListWidget(self.details_panel)
         details_layout.addWidget(self.permissions_list, 1)
-        self.details_panel.hide()
         content_layout.addWidget(self.details_panel, 2)
         main_layout.addLayout(content_layout, 1)
 
@@ -311,11 +295,26 @@ class ApkManagerPage(QWidget):
             os.path.join(cfg.workingFolder.value, project_name) if project_name else ""
         )
         if not project_name or not os.path.isdir(self._project_path):
+            self._scan_path = ""
             self.status_label.setText(self.tr("Select a project to list its APK files."))
             return
 
+        self._scan_path = self._project_path
+        self._start_scan(self._scan_path, generation)
+
+    def _start_scan(self, directory, generation=None):
+        if generation is None:
+            self._generation += 1
+            generation = self._generation
+            for worker in tuple(self._workers):
+                worker.requestInterruption()
+            self.apk_records.clear()
+            self._selected_path = None
+            self.details_panel.hide()
+            self._clear_cards()
+
         self.status_label.setText(self.tr("Loading APK files..."))
-        worker = ApkScanThread(self._project_path, generation)
+        worker = ApkScanThread(directory, generation)
         self._workers.add(worker)
         worker.apk_loaded.connect(self._on_apk_loaded)
         worker.progress_changed.connect(self._on_scan_progress)
@@ -358,39 +357,25 @@ class ApkManagerPage(QWidget):
             widget = item.widget()
             if widget:
                 widget.deleteLater()
-
-    def filter_apks(self, query):
-        query = query.strip().casefold()
-        self._clear_cards()
-        for path, record in self.apk_records.items():
-            searchable = " ".join(
-                (record["name"], record["filename"], record["author"], record["package"], path)
-            ).casefold()
-            if query and query not in searchable:
-                continue
-            self._add_card(path, record)
-        if self._selected_path not in self.card_widgets:
-            if self.card_widgets:
-                self.show_details(next(iter(self.card_widgets)))
-            else:
-                self._selected_path = None
-                self.details_panel.hide()
+        self._update_remove_selected_button()
 
     def _add_card(self, path, record):
-        query = self.search_entry.text().strip().casefold()
-        searchable = " ".join(
-            (record["name"], record["filename"], record["author"], record["package"], path)
-        ).casefold()
-        if query and query not in searchable:
-            return
-        card = ApkCard(path, record, self.show_details, self.remove_apk, self.list_container)
+        card = ApkCard(path, record, self.list_container)
         card.selected.connect(self.show_details)
         card.checkbox.toggled.connect(self._update_remove_selected_button)
         self.card_widgets[path] = card
         card.setObjectName("ApkCard")
         self._style_card(card, selected=path == self._selected_path)
-        self.list_layout.addWidget(card)
-        self._update_remove_selected_button()
+        self._relayout_cards()
+
+    def _relayout_cards(self):
+        columns = min(3, max(1, self.list_area.viewport().width() // 260))
+        for index, card in enumerate(self.card_widgets.values()):
+            self.list_layout.addWidget(card, index // columns, index % columns)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._relayout_cards()
 
     @staticmethod
     def _style_card(card, selected):
@@ -399,7 +384,7 @@ class ApkManagerPage(QWidget):
 
     def _update_remove_selected_button(self, *_):
         selected = any(card.checkbox.isChecked() for card in self.card_widgets.values())
-        self.remove_selected_button.setEnabled(selected)
+        self.remove_selected_button.setVisible(selected)
 
     def remove_selected(self):
         selected_paths = [
@@ -425,7 +410,10 @@ class ApkManagerPage(QWidget):
         if self._selected_path in selected_paths:
             self._selected_path = None
             self.details_panel.hide()
-        self.refresh_apks()
+        if self._scan_path and os.path.isdir(self._scan_path):
+            self._start_scan(self._scan_path)
+        else:
+            self.refresh_apks()
 
     def show_details(self, path):
         record = self.apk_records.get(path)
@@ -442,11 +430,7 @@ class ApkManagerPage(QWidget):
         self.detail_target_sdk.setText(
             self.tr("Target SDK Version: {}").format(record["target_sdk"] or "?")
         )
-        self.detail_author.setText(record["author"] or self.tr("Unknown"))
-        if record["error"]:
-            self.detail_author.setToolTip(record["error"])
-        else:
-            self.detail_author.setToolTip("")
+        self.detail_name.setToolTip(record["error"])
         self.permissions_list.clear()
         self.permissions_list.addItems(record["permissions"])
         if record["icon_data"]:
@@ -462,31 +446,56 @@ class ApkManagerPage(QWidget):
                 return
         self.detail_icon.clear()
 
-    def remove_apk(self, path):
-        dialog = MessageBox(
-            self.tr("Remove APK"),
-            self.tr("Permanently delete {}?").format(os.path.basename(path)),
-            self,
+    def choose_scan_directory(self):
+        directory = QFileDialog.getExistingDirectory(
+            self, self.tr("Scan a directory"), self._scan_path or self._project_path or os.getcwd()
         )
-        if dialog.exec() != 1:
+        if directory:
+            self._scan_path = directory
+            self._start_scan(directory)
+
+    def import_debloat_list(self):
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            self.tr("Import debloat list"),
+            self._scan_path or self._project_path or os.getcwd(),
+            self.tr("Text files (*.txt *.list);;All files (*)"),
+        )
+        if not filename:
             return
         try:
-            os.remove(path)
-        except OSError as error:
+            with open(filename, "r", encoding="utf-8-sig") as file:
+                entries = {
+                    line.strip().casefold()
+                    for line in file
+                    if line.strip() and not line.lstrip().startswith(("#", "//"))
+                }
+        except (OSError, UnicodeError) as error:
             InfoBar.error(
-                self.tr("Remove APK"),
-                self.tr("Could not delete APK: {}").format(error),
+                self.tr("Import debloat list"),
+                self.tr("Could not read debloat list: {}").format(error),
                 parent=self,
             )
             return
-        if self._selected_path == path:
-            self._selected_path = None
-            self.details_panel.hide()
-        self.refresh_apks()
 
-    def open_project_directory(self):
-        if self._project_path and os.path.isdir(self._project_path):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(self._project_path))
+        matched = 0
+        for record in self.apk_records.values():
+            keys = {
+                record["package"].casefold(),
+                record["filename"].casefold(),
+                os.path.splitext(record["filename"])[0].casefold(),
+            }
+            if keys & entries:
+                card = self.card_widgets.get(record["path"])
+                if card:
+                    card.checkbox.setChecked(True)
+                matched += 1
+        if not matched:
+            InfoBar.warning(
+                self.tr("Import debloat list"),
+                self.tr("No APKs matched the imported list."),
+                parent=self,
+            )
 
     def closeEvent(self, event):
         self._stop_workers()
