@@ -115,8 +115,8 @@ class FileInfoMessageBox(MessageBoxBase):
             "Path": FileInfoRow(self.tr("Path:")),
             "Type": FileInfoRow(self.tr("Type:")),
             "Size": FileInfoRow(self.tr("Size:")),
-            "Size(B)": FileInfoRow("Size(B):"),
-            "Time": FileInfoRow("Time:"),
+            "Size(B)": FileInfoRow(self.tr("Size(B):")),
+            "Time": FileInfoRow(self.tr("Time:")),
             "MD5": FileInfoRow("MD5:"),
             "SHA256": FileInfoRow("SHA256:")
         }
