@@ -106,281 +106,281 @@
 <context>
     <name>ApkManagerPage</name>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="211"/>
-        <location filename="../../src/qtui/apk_manager.py" line="259"/>
+        <location filename="../../src/qtui/apk_manager.py" line="210"/>
+        <location filename="../../src/qtui/apk_manager.py" line="255"/>
         <source>Apps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="216"/>
+        <location filename="../../src/qtui/apk_manager.py" line="215"/>
         <source>Search name or package</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="221"/>
+        <location filename="../../src/qtui/apk_manager.py" line="220"/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="234"/>
-        <location filename="../../src/qtui/apk_manager.py" line="571"/>
+        <location filename="../../src/qtui/apk_manager.py" line="233"/>
+        <location filename="../../src/qtui/apk_manager.py" line="547"/>
         <source>All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="236"/>
-        <location filename="../../src/qtui/apk_manager.py" line="733"/>
-        <location filename="../../src/qtui/apk_manager.py" line="748"/>
-        <location filename="../../src/qtui/apk_manager.py" line="768"/>
+        <location filename="../../src/qtui/apk_manager.py" line="279"/>
+        <location filename="../../src/qtui/apk_manager.py" line="709"/>
+        <location filename="../../src/qtui/apk_manager.py" line="724"/>
+        <location filename="../../src/qtui/apk_manager.py" line="744"/>
         <source>Import debloat list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="265"/>
+        <location filename="../../src/qtui/apk_manager.py" line="261"/>
         <source>SELECTIONS AND LISTS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="267"/>
+        <location filename="../../src/qtui/apk_manager.py" line="263"/>
         <source>Presets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="268"/>
+        <location filename="../../src/qtui/apk_manager.py" line="264"/>
         <source>External list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="277"/>
+        <location filename="../../src/qtui/apk_manager.py" line="273"/>
         <source>Name this selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="279"/>
+        <location filename="../../src/qtui/apk_manager.py" line="275"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="285"/>
+        <location filename="../../src/qtui/apk_manager.py" line="284"/>
         <source>SELECTED APK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="289"/>
+        <location filename="../../src/qtui/apk_manager.py" line="288"/>
         <source>Select an APK</source>
         <translation>选择Apk</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="299"/>
+        <location filename="../../src/qtui/apk_manager.py" line="298"/>
         <source>APK METADATA</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="315"/>
+        <location filename="../../src/qtui/apk_manager.py" line="314"/>
         <source>Permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="323"/>
+        <location filename="../../src/qtui/apk_manager.py" line="322"/>
         <source>ACTIONS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="326"/>
+        <location filename="../../src/qtui/apk_manager.py" line="325"/>
         <source>Remove 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="330"/>
+        <location filename="../../src/qtui/apk_manager.py" line="329"/>
         <source>Restore 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="333"/>
+        <location filename="../../src/qtui/apk_manager.py" line="332"/>
         <source>No APKs are currently available to restore.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="358"/>
+        <location filename="../../src/qtui/apk_manager.py" line="357"/>
         <source>NAME</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="359"/>
+        <location filename="../../src/qtui/apk_manager.py" line="358"/>
         <source>PACKAGE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="360"/>
+        <location filename="../../src/qtui/apk_manager.py" line="359"/>
         <source>PARTITION</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="361"/>
+        <location filename="../../src/qtui/apk_manager.py" line="360"/>
         <source>TYPE</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="362"/>
+        <location filename="../../src/qtui/apk_manager.py" line="361"/>
         <source>SIZE</source>
         <translation>大小</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="363"/>
+        <location filename="../../src/qtui/apk_manager.py" line="362"/>
         <source>RISK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="437"/>
+        <location filename="../../src/qtui/apk_manager.py" line="413"/>
         <source>Save the selected APK packages to a named list for later reference.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="439"/>
+        <location filename="../../src/qtui/apk_manager.py" line="415"/>
         <source>Import a package list and select matching APKs in this project.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="474"/>
+        <location filename="../../src/qtui/apk_manager.py" line="450"/>
         <source>Select a project to list its APK files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="492"/>
+        <location filename="../../src/qtui/apk_manager.py" line="468"/>
         <source>Loading APKs...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="513"/>
+        <location filename="../../src/qtui/apk_manager.py" line="489"/>
         <source>{} APKs read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="522"/>
+        <location filename="../../src/qtui/apk_manager.py" line="498"/>
         <source>APK scan failed: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="527"/>
+        <location filename="../../src/qtui/apk_manager.py" line="503"/>
         <source>{} shown, {} • {} APK(s) read</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="548"/>
+        <location filename="../../src/qtui/apk_manager.py" line="524"/>
         <source>root</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="553"/>
+        <location filename="../../src/qtui/apk_manager.py" line="529"/>
         <source>Privileged</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="555"/>
+        <location filename="../../src/qtui/apk_manager.py" line="531"/>
         <source>App</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="556"/>
+        <location filename="../../src/qtui/apk_manager.py" line="532"/>
         <source>APK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="620"/>
-        <location filename="../../src/qtui/apk_manager.py" line="703"/>
+        <location filename="../../src/qtui/apk_manager.py" line="596"/>
+        <location filename="../../src/qtui/apk_manager.py" line="679"/>
         <source>Unknown package</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="626"/>
+        <location filename="../../src/qtui/apk_manager.py" line="602"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="628"/>
+        <location filename="../../src/qtui/apk_manager.py" line="604"/>
         <source>Manifest unavailable; risk was not analyzed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="630"/>
+        <location filename="../../src/qtui/apk_manager.py" line="606"/>
         <source>Risk analysis is not available for APK files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="667"/>
+        <location filename="../../src/qtui/apk_manager.py" line="643"/>
         <source>Remove {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="675"/>
-        <location filename="../../src/qtui/apk_manager.py" line="688"/>
+        <location filename="../../src/qtui/apk_manager.py" line="651"/>
+        <location filename="../../src/qtui/apk_manager.py" line="664"/>
         <source>Remove APKs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="676"/>
+        <location filename="../../src/qtui/apk_manager.py" line="652"/>
         <source>Permanently delete {} selected APK(s)?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="720"/>
+        <location filename="../../src/qtui/apk_manager.py" line="696"/>
         <source>Version: {}</source>
         <translation>版本：{}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="721"/>
+        <location filename="../../src/qtui/apk_manager.py" line="697"/>
         <source>Min. SDK Version: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="723"/>
+        <location filename="../../src/qtui/apk_manager.py" line="699"/>
         <source>Target SDK Version: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="735"/>
+        <location filename="../../src/qtui/apk_manager.py" line="711"/>
         <source>Text files (*.txt *.list);;All files (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="749"/>
+        <location filename="../../src/qtui/apk_manager.py" line="725"/>
         <source>Could not read debloat list: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="769"/>
+        <location filename="../../src/qtui/apk_manager.py" line="745"/>
         <source>No APKs matched the imported list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="781"/>
-        <location filename="../../src/qtui/apk_manager.py" line="803"/>
-        <location filename="../../src/qtui/apk_manager.py" line="809"/>
+        <location filename="../../src/qtui/apk_manager.py" line="757"/>
+        <location filename="../../src/qtui/apk_manager.py" line="779"/>
+        <location filename="../../src/qtui/apk_manager.py" line="785"/>
         <source>Save selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="782"/>
+        <location filename="../../src/qtui/apk_manager.py" line="758"/>
         <source>Select at least one APK first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="788"/>
+        <location filename="../../src/qtui/apk_manager.py" line="764"/>
         <source>Save selection list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="793"/>
+        <location filename="../../src/qtui/apk_manager.py" line="769"/>
         <source>Text files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="804"/>
+        <location filename="../../src/qtui/apk_manager.py" line="780"/>
         <source>Could not save selection list: {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/qtui/apk_manager.py" line="810"/>
+        <location filename="../../src/qtui/apk_manager.py" line="786"/>
         <source>Saved {} APK package(s).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -395,7 +395,7 @@
 <context>
     <name>AppCardRich</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1026"/>
+        <location filename="../../src/qtui/plugins.py" line="1029"/>
         <source>Run</source>
         <translation>运行</translation>
     </message>
@@ -403,84 +403,100 @@
 <context>
     <name>BuiltInPlugins</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1060"/>
+        <location filename="../../src/qtui/plugins.py" line="1264"/>
         <source>Download ROM</source>
         <translation>下载ROM</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1061"/>
+        <location filename="../../src/qtui/plugins.py" line="1265"/>
         <source>Get File Info</source>
         <translation>获取文件信息</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1063"/>
+        <location filename="../../src/qtui/plugins.py" line="1267"/>
         <source>Byte Calculator</source>
         <translation>字节计算器</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1065"/>
+        <location filename="../../src/qtui/plugins.py" line="1269"/>
         <source>Allow Selinux Audit</source>
         <translation>允许Selinux审计</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1066"/>
+        <location filename="../../src/qtui/plugins.py" line="1270"/>
         <source>Disable avb in fstab</source>
         <translation>禁用FSTAB内的AVB</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1067"/>
+        <location filename="../../src/qtui/plugins.py" line="1271"/>
         <source>Disable Encryption</source>
         <translation>禁用DATA加密</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1068"/>
+        <location filename="../../src/qtui/plugins.py" line="1272"/>
         <source>Trim Raw Image</source>
         <translation>裁剪Raw镜像</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1069"/>
-        <location filename="../../src/qtui/plugins.py" line="1146"/>
-        <location filename="../../src/qtui/plugins.py" line="1148"/>
+        <location filename="../../src/qtui/plugins.py" line="1273"/>
+        <location filename="../../src/qtui/plugins.py" line="1363"/>
+        <location filename="../../src/qtui/plugins.py" line="1365"/>
         <source>Magisk Patch</source>
         <translation>面具修补</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1070"/>
+        <location filename="../../src/qtui/plugins.py" line="1274"/>
         <source>Merge Qualcomm Image</source>
         <translation>合并高通镜像</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1071"/>
+        <location filename="../../src/qtui/plugins.py" line="1275"/>
         <source>Merge Super</source>
         <translation>合并Super</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1072"/>
+        <location filename="../../src/qtui/plugins.py" line="1276"/>
         <source>Decrypt xtc xml</source>
         <translation>解密小天才XML</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1073"/>
+        <location filename="../../src/qtui/plugins.py" line="1277"/>
         <source>Mtk Port Tool</source>
         <translation>MTK移植工具</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1148"/>
+        <location filename="../../src/qtui/plugins.py" line="1288"/>
+        <source>{plugin_id} is not callable!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1298"/>
+        <source>Download complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1299"/>
+        <source>ROM saved to {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1365"/>
         <source>Magisk patching process did not produce an output file.</source>
         <translation>Magisk补丁处理过程未生成输出文件。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1171"/>
+        <location filename="../../src/qtui/plugins.py" line="1287"/>
+        <location filename="../../src/qtui/plugins.py" line="1388"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1184"/>
+        <location filename="../../src/qtui/plugins.py" line="1401"/>
         <source>Disabled encryption</source>
         <translation>已禁用加密</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1284"/>
+        <location filename="../../src/qtui/plugins.py" line="1501"/>
         <source>Success</source>
         <translation>成功</translation>
     </message>
@@ -792,7 +808,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="119"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>时间：</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="128"/>
@@ -931,60 +947,60 @@ or click to select a file</source>
 <context>
     <name>InstallMpk</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="883"/>
+        <location filename="../../src/qtui/plugins.py" line="885"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="886"/>
+        <location filename="../../src/qtui/plugins.py" line="888"/>
         <source>Install</source>
         <translation>安装</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="898"/>
-        <location filename="../../src/qtui/plugins.py" line="903"/>
-        <location filename="../../src/qtui/plugins.py" line="930"/>
+        <location filename="../../src/qtui/plugins.py" line="900"/>
+        <location filename="../../src/qtui/plugins.py" line="905"/>
+        <location filename="../../src/qtui/plugins.py" line="933"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="918"/>
+        <location filename="../../src/qtui/plugins.py" line="920"/>
         <source>Unsupported System {}</source>
         <translation>不支持的系统： {}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="921"/>
+        <location filename="../../src/qtui/plugins.py" line="923"/>
         <source>%s Depends on %s，but %s not installed</source>
         <translation>%s 依赖于 %s，但是 %s 没有安装</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="922"/>
-        <location filename="../../src/qtui/plugins.py" line="926"/>
+        <location filename="../../src/qtui/plugins.py" line="924"/>
+        <location filename="../../src/qtui/plugins.py" line="928"/>
         <source>Retry</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="925"/>
+        <location filename="../../src/qtui/plugins.py" line="927"/>
         <source>The plugin&apos;s broken.</source>
         <translation>该插件已损坏。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="929"/>
+        <location filename="../../src/qtui/plugins.py" line="932"/>
         <source>Installed</source>
         <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="973"/>
+        <location filename="../../src/qtui/plugins.py" line="976"/>
         <source>Author：{}</source>
         <translation>作者：{}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="974"/>
+        <location filename="../../src/qtui/plugins.py" line="977"/>
         <source>Version：{}</source>
         <translation>版本：{}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="981"/>
+        <location filename="../../src/qtui/plugins.py" line="984"/>
         <source>PLease select a plugin</source>
         <translation>请选择一个插件</translation>
     </message>
@@ -1169,40 +1185,40 @@ or click to select a file</source>
 <context>
     <name>ModuleManager</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="317"/>
-        <location filename="../../src/qtui/plugins.py" line="322"/>
+        <location filename="../../src/qtui/plugins.py" line="319"/>
+        <location filename="../../src/qtui/plugins.py" line="324"/>
         <source>Run Plugin</source>
         <translation>运行插件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="317"/>
+        <location filename="../../src/qtui/plugins.py" line="319"/>
         <source>Please set a project</source>
         <translation>请设置一个项目</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="322"/>
+        <location filename="../../src/qtui/plugins.py" line="324"/>
         <source>id is invalid</source>
         <translation>id无效</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="331"/>
-        <location filename="../../src/qtui/plugins.py" line="405"/>
+        <location filename="../../src/qtui/plugins.py" line="333"/>
         <location filename="../../src/qtui/plugins.py" line="407"/>
+        <location filename="../../src/qtui/plugins.py" line="409"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="331"/>
+        <location filename="../../src/qtui/plugins.py" line="333"/>
         <source>Plugin {name} configuration is missing.</source>
         <translation>插件{name}的配置缺失。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="405"/>
+        <location filename="../../src/qtui/plugins.py" line="407"/>
         <source>{} is not installed or broken.</source>
         <translation>{} 未安装或已损坏。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="407"/>
+        <location filename="../../src/qtui/plugins.py" line="409"/>
         <source>{} is not executable</source>
         <translation>{} 不可执行</translation>
     </message>
@@ -1485,37 +1501,37 @@ or click to select a file</source>
 <context>
     <name>ParseMessageBox</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="81"/>
+        <location filename="../../src/qtui/plugins.py" line="83"/>
         <source>JSON load failed</source>
         <translation>JSON加载失败</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="90"/>
+        <location filename="../../src/qtui/plugins.py" line="92"/>
         <source>Dynamic Panel</source>
         <translation>动态面</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="101"/>
+        <location filename="../../src/qtui/plugins.py" line="103"/>
         <source>Group Panel</source>
         <translation>组面</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="129"/>
+        <location filename="../../src/qtui/plugins.py" line="131"/>
         <source>Run</source>
         <translation>运行</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="157"/>
+        <location filename="../../src/qtui/plugins.py" line="159"/>
         <source>Choose</source>
         <translation>选择</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="163"/>
+        <location filename="../../src/qtui/plugins.py" line="165"/>
         <source>Choose a file</source>
         <translation>选择一个文件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="230"/>
+        <location filename="../../src/qtui/plugins.py" line="232"/>
         <source>Unsupported Widget：{}</source>
         <translation>不支持的控件：{}</translation>
     </message>
@@ -1525,17 +1541,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="348"/>
         <source>Partition details</source>
-        <translation type="unfinished"></translation>
+        <translation>分区详情</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="351"/>
         <source>Image and filesystem metadata for this partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>此分区的映像和文件系统元数据。</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="358"/>
         <source>Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>概况</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="361"/>
@@ -1576,7 +1592,7 @@ or click to select a file</source>
 <context>
     <name>PluginPage</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1323"/>
+        <location filename="../../src/qtui/plugins.py" line="1544"/>
         <source>Plugin</source>
         <translation>插件</translation>
     </message>
@@ -1585,7 +1601,7 @@ or click to select a file</source>
         <translation type="vanished">管理你的扩展组件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1336"/>
+        <location filename="../../src/qtui/plugins.py" line="1557"/>
         <source>Install</source>
         <translation>安装</translation>
     </message>
@@ -1594,72 +1610,103 @@ or click to select a file</source>
         <translation type="vanished">Mpk Store</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1331"/>
+        <location filename="../../src/qtui/plugins.py" line="1552"/>
         <source>Installed</source>
         <translation>已安装</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1332"/>
+        <location filename="../../src/qtui/plugins.py" line="1553"/>
         <source>Repo</source>
         <translation>仓库</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1343"/>
+        <location filename="../../src/qtui/plugins.py" line="1564"/>
         <source>Search plugins...</source>
         <translation>搜索插件...</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1441"/>
+        <location filename="../../src/qtui/plugins.py" line="1660"/>
         <source>Built-In Plugin</source>
         <translation>内置插件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1476"/>
+        <location filename="../../src/qtui/plugins.py" line="1693"/>
         <source>Uninstall</source>
         <translation>卸载</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1478"/>
+        <location filename="../../src/qtui/plugins.py" line="1695"/>
         <source>Export</source>
         <translation>导出</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1480"/>
+        <location filename="../../src/qtui/plugins.py" line="1697"/>
         <source>Edit</source>
         <translation>编辑</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1507"/>
+        <location filename="../../src/qtui/plugins.py" line="1725"/>
         <source>Download</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1507"/>
+        <location filename="../../src/qtui/plugins.py" line="1725"/>
         <source>Reinstall</source>
         <translation>重装</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1544"/>
+        <location filename="../../src/qtui/plugins.py" line="1774"/>
+        <source>Success</source>
+        <translation>成功</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1775"/>
+        <source>{} installed successfully.</source>
+        <translation>{} 已成功安装。</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1788"/>
+        <source>Dependency cycle detected while installing {}.</source>
+        <translation>安装 {} 时检测到依赖循环。</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1794"/>
         <source>Downloading...</source>
         <translation>正在下载...</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1562"/>
+        <location filename="../../src/qtui/plugins.py" line="1787"/>
+        <location filename="../../src/qtui/plugins.py" line="1803"/>
+        <location filename="../../src/qtui/plugins.py" line="1828"/>
+        <location filename="../../src/qtui/plugins.py" line="1837"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1562"/>
+        <location filename="../../src/qtui/plugins.py" line="1804"/>
+        <source>Dependency {} for {} is not available in the plugin repository.</source>
+        <translation>插件存储库中没有依赖项{},{}。</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1828"/>
         <source>Failed to download {}, reason: {}</source>
         <translation>下载{}失败，原因：{}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1564"/>
+        <location filename="../../src/qtui/plugins.py" line="1808"/>
+        <location filename="../../src/qtui/plugins.py" line="1812"/>
+        <location filename="../../src/qtui/plugins.py" line="1830"/>
+        <location filename="../../src/qtui/plugins.py" line="1841"/>
         <source>Retry</source>
         <translation>重试</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1600"/>
+        <location filename="../../src/qtui/plugins.py" line="1838"/>
+        <source>Failed to install {}: {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1880"/>
         <source>Choose a mpk file</source>
         <translation>选择一个MPK插件</translation>
     </message>
@@ -1890,7 +1937,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1028"/>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>查看详情</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1030"/>
@@ -1935,7 +1982,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1095"/>
         <source>Metadata unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>元数据不可用</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1121"/>
@@ -2162,6 +2209,112 @@ or click to select a file</source>
     </message>
 </context>
 <context>
+    <name>RomDownloadDialog</name>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1121"/>
+        <source>Download ROM</source>
+        <translation>下载ROM</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1127"/>
+        <source>Download a ROM from a direct HTTP or HTTPS link to your computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1133"/>
+        <source>Download URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1136"/>
+        <source>Direct HTTP or HTTPS ROM download URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1141"/>
+        <source>Save ROM as...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1142"/>
+        <source>Browse</source>
+        <translation>浏览</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1146"/>
+        <source>Save location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1153"/>
+        <source>Enter a direct download URL and choose a destination.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1157"/>
+        <location filename="../../src/qtui/plugins.py" line="1240"/>
+        <source>Download</source>
+        <translation>下载</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1159"/>
+        <location filename="../../src/qtui/plugins.py" line="1241"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1167"/>
+        <source>Save ROM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1167"/>
+        <source>ROM files (*.zip *.img);;All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1177"/>
+        <source>Enter a valid HTTP or HTTPS URL.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1180"/>
+        <source>Choose where to save the ROM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1195"/>
+        <source>Connecting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1203"/>
+        <source>{} of {} downloaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1207"/>
+        <source>{} downloaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1220"/>
+        <source>Download failed: {}</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1228"/>
+        <source>Download canceled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/plugins.py" line="1247"/>
+        <location filename="../../src/qtui/plugins.py" line="1254"/>
+        <source>Canceling download...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SettingsPage</name>
     <message>
         <location filename="../../src/qtui/settings.py" line="32"/>
@@ -2324,47 +2477,47 @@ or click to select a file</source>
 <context>
     <name>UninstallMpk</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="670"/>
+        <location filename="../../src/qtui/plugins.py" line="672"/>
         <source>Unknown Plugin</source>
         <translation>未知插件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="673"/>
+        <location filename="../../src/qtui/plugins.py" line="675"/>
         <source>Please select a plugin!</source>
         <translation>请选择一个插件！</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="675"/>
+        <location filename="../../src/qtui/plugins.py" line="677"/>
         <source>Plugin &apos;{}&apos; not found or cannot be uninstalled.</source>
         <translation>插件 &apos;{}&apos; 未找到或无法被卸载。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="677"/>
+        <location filename="../../src/qtui/plugins.py" line="679"/>
         <source>Plugin &apos;{}&apos; is virtual and cannot be uninstalled this way.</source>
         <translation>虚拟插件 &apos;{}&apos; 无法被卸载。</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="679"/>
+        <location filename="../../src/qtui/plugins.py" line="681"/>
         <source>Are you sure you want to uninstall plugin &apos;{}&apos;?</source>
         <translation>确定要卸载  &apos;{}&apos; 吗?</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="689"/>
+        <location filename="../../src/qtui/plugins.py" line="691"/>
         <source>The following dependent plugins will also be removed:</source>
         <translation>以下依赖它的插件也将被卸载：</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="718"/>
+        <location filename="../../src/qtui/plugins.py" line="720"/>
         <source>Uninstall</source>
         <translation>卸载</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="778"/>
+        <location filename="../../src/qtui/plugins.py" line="780"/>
         <source>Uninstalling：{}</source>
         <translation>正在卸载：{}</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="814"/>
+        <location filename="../../src/qtui/plugins.py" line="816"/>
         <source>Uninstall {} Done！</source>
         <translation>卸载在 {} 完成！</translation>
     </message>
@@ -2372,7 +2525,7 @@ or click to select a file</source>
 <context>
     <name>self.master</name>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="281"/>
+        <location filename="../../src/qtui/plugins.py" line="283"/>
         <source>Manager</source>
         <translation>管理器</translation>
     </message>
@@ -2405,9 +2558,9 @@ or click to select a file</source>
         <translation type="vanished">裁剪Raw镜像</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1114"/>
-        <location filename="../../src/qtui/plugins.py" line="1119"/>
-        <location filename="../../src/qtui/plugins.py" line="1153"/>
+        <location filename="../../src/qtui/plugins.py" line="1331"/>
+        <location filename="../../src/qtui/plugins.py" line="1336"/>
+        <location filename="../../src/qtui/plugins.py" line="1370"/>
         <source>Magisk Patch</source>
         <translation>面具修补</translation>
     </message>
@@ -2428,23 +2581,23 @@ or click to select a file</source>
         <translation type="vanished">MTK移植工具</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1195"/>
+        <location filename="../../src/qtui/plugins.py" line="1412"/>
         <source>Disabled Avb</source>
         <translation>禁用AVB</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1220"/>
+        <location filename="../../src/qtui/plugins.py" line="1437"/>
         <source>Please choose a path.</source>
         <translation>请选择一个插件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1227"/>
-        <location filename="../../src/qtui/plugins.py" line="1250"/>
+        <location filename="../../src/qtui/plugins.py" line="1444"/>
+        <location filename="../../src/qtui/plugins.py" line="1467"/>
         <source>Processing File</source>
         <translation>正在处理文件</translation>
     </message>
     <message>
-        <location filename="../../src/qtui/plugins.py" line="1285"/>
+        <location filename="../../src/qtui/plugins.py" line="1502"/>
         <source>总共从文件末尾截去了 %d 个零字节(~ %s)</source>
         <translation type="unfinished"></translation>
     </message>
