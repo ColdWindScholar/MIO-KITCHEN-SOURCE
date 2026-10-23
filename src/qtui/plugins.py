@@ -1283,7 +1283,11 @@ class BuiltInPlugins(QObject):
             return
         entry = self.plugins[plugin_id]["entry"]
         if not callable(entry):
-            print(f"{plugin_id} is not callable!")
+            events.show_info_bar.emit(
+                self.tr("Warning"),
+                self.tr(f"{plugin_id} is not callable!"),
+                2, 5000
+            )
             return
         entry()
 
