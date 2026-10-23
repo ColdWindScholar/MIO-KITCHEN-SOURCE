@@ -238,7 +238,6 @@ def update(args):
                     groups = re.search(g, name)
                     if groups:
                         groups = groups.groups()
-                    if groups:
                         break
 
                 if not groups:
