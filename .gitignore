@@ -9,3 +9,5 @@ src/core/ntpiutils/__pycache__/
 src/porttool/__pycache__/
 src/tkui/__pycache__/
 tool.spec
+/bin/temp
+*.pyc

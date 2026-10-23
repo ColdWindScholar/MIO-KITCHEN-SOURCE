@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import traceback
 
 from PySide6.QtCore import QTimer, QThread, Signal
 from PySide6.QtCore import Slot
@@ -15,6 +16,7 @@ from qfluentwidgets import (
 )
 from qfluentwidgets import (SwitchButton, Slider,
                             CaptionLabel)
+from qfluentwidgets.common.smooth_scroll import SmoothMode
 
 from src.core import utils
 from src.core.utils import gettype
@@ -23,6 +25,7 @@ from src.core.utils import gettype
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
     send_message = Signal(str, str, int)
+    error = Signal(str)
 
     def __init__(self, target_func, *args, **kwargs):
         super().__init__()
@@ -33,9 +36,15 @@ class GenericTaskWorker(QThread):
     def run(self):
         try:
             self.target_func(*self.args, **self.kwargs)
-        except Exception as e:
-            self.task_finished.emit(True)
-            raise e
+        except Exception:
+            # Report the failure through a signal instead of re-raising it in
+            # the thread. Re-raising printed the traceback to the terminal
+            # (after stdout/stderr had already been restored) so the log and
+            # the UI never showed what went wrong.
+            logging.exception("Background task failed")
+            self.error.emit(traceback.format_exc())
+            self.task_finished.emit(False)
+            return
         self.task_finished.emit(True)
 
 class NewProjectDialog(MessageBoxBase):
@@ -317,8 +326,10 @@ class PackSettingsDialog(MessageBoxBase):
     支持嵌套分组、多状态滑动条，以及随开关状态动态显示/隐藏的隐藏组合框面板。
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, fs_type: str | None = None, part_name: str | None = None,
+                 erofs_old_kernel: bool = False, boot_cmdline: str | None = None):
         super().__init__(parent)
+        self._fs_type = (fs_type or '').lower()
 
         # 1. 创建核心自定义内容容器组件
         self.content_widget = QWidget(self)
@@ -327,7 +338,35 @@ class PackSettingsDialog(MessageBoxBase):
         # 2. 将自定义容器直接安装进 MessageBoxBase 核心中
         self.viewLayout.addWidget(self.content_widget)
 
-        # 3. 配置底部的标准基础控制按钮文本
+        # Keep the legacy-compress flag from the original image (compatibility);
+        # the compression algorithm defaults to lz4 for speed.
+        if erofs_old_kernel:
+            self.support_old_kernel_switch.setChecked(True)
+        if boot_cmdline is not None:
+            self.cmdline_edit.setText(boot_cmdline)
+
+        # 3. 显示正在打包的分区，并只保留与该文件系统相关的设置分组，
+        #    避免把 erofs 设置应用到 ext 分区（反之亦然）。
+        if part_name or self._fs_type:
+            self.titleLabel = SubtitleLabel(
+                self.tr("Repack {name} [{fs}]").format(name=part_name or '', fs=self._fs_type or '?'), self)
+            self.viewLayout.insertWidget(0, self.titleLabel)
+        if self._fs_type in ('ext', 'erofs', 'f2fs'):
+            self.ext4_container.setVisible(self._fs_type == 'ext')
+            self.erofs_container.setVisible(self._fs_type == 'erofs')
+            self.f2fs_container.setVisible(self._fs_type == 'f2fs')
+        elif self._fs_type == 'unknown':
+            # The packer falls back to the ext4 path for unknown types.
+            self.erofs_container.setVisible(False)
+            self.f2fs_container.setVisible(False)
+        elif self._fs_type in ('boot', 'vendor_boot', 'dtbo', 'splash', 'logo', 'guoke_logo'):
+            # These are not packed from a filesystem tree.
+            self.ext4_container.setVisible(False)
+            self.erofs_container.setVisible(False)
+            self.f2fs_container.setVisible(False)
+        self.boot_container.setVisible(self._fs_type in ('boot', 'vendor_boot'))
+
+        # 4. 配置底部的标准基础控制按钮文本
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
 
@@ -355,6 +394,7 @@ class PackSettingsDialog(MessageBoxBase):
         # 📂 1. EXT4设置 分组
         # =========================================================================
         ext4_container = QWidget(self.content_widget)
+        self.ext4_container = ext4_container
         ext4_layout = QVBoxLayout(ext4_container)
         ext4_layout.setContentsMargins(0, 0, 0, 0)
         ext4_layout.setSpacing(8)
@@ -371,6 +411,9 @@ class PackSettingsDialog(MessageBoxBase):
         self.size_handle_label = self._create_field_label(self.tr("Size Handle:"))
         self.size_handle_combo = ComboBox(ext4_container)
         self.size_handle_combo.addItems([self.tr("Calculate Auto"), self.tr("Origin Size")])
+        # Default to the original partition size: Samsung devices validate the
+        # ext4 size at boot and won't boot if it differs (issue #136).
+        self.size_handle_combo.setCurrentIndex(1)
 
         ext4_grid.addWidget(self.pack_method_label)
         ext4_grid.addWidget(self.pack_method_combo, 1)
@@ -383,6 +426,7 @@ class PackSettingsDialog(MessageBoxBase):
         # 📦 2. EROFS打包 分组
         # =========================================================================
         erofs_container = QWidget(self.content_widget)
+        self.erofs_container = erofs_container
         erofs_layout = QVBoxLayout(erofs_container)
         erofs_layout.setContentsMargins(0, 0, 0, 0)
         erofs_layout.setSpacing(10)
@@ -393,7 +437,8 @@ class PackSettingsDialog(MessageBoxBase):
         self.compress_algo_label = self._create_field_label(self.tr("Compression Method:"))
         self.compress_algo_combo = ComboBox(erofs_container)
         self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
-        self.compress_algo_combo.setText("lz4hc")
+        # lz4 is the default: ~1.8x faster than lz4hc for only ~4% larger image.
+        self.compress_algo_combo.setCurrentIndex(0)
         self.support_old_kernel_switch = SwitchButton(parent=erofs_container)
         self.support_old_kernel_switch.setOffText("")
         self.support_old_kernel_switch.setOnText("")
@@ -408,11 +453,13 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_layout.addLayout(erofs_row1)
 
         erofs_row2 = QHBoxLayout()
-        self.erofs_level_label = QLabel(self.tr("EROFS Level: 8"), erofs_container)
+        self.erofs_level_label = QLabel(self.tr("EROFS Level: 9"), erofs_container)
         self.erofs_level_label.setStyleSheet("color: #ffffff; font-size: 13px; min-width: 90px;")
         self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_container)
-        self.erofs_slider.setRange(0, 20)
-        self.erofs_slider.setValue(8)
+        self.erofs_slider.setRange(0, 12)
+        self.erofs_slider.setValue(9)
+        # Keep the label in sync with the actual slider value from the start.
+        self.erofs_level_label.setText(self.tr("EROFS Level: {}".format(self.erofs_slider.value())))
         self.erofs_slider.valueChanged.connect(lambda v: self.erofs_level_label.setText(self.tr("EROFS Level: {}".format(v))))
 
         erofs_row2.addWidget(self.erofs_level_label)
@@ -424,6 +471,7 @@ class PackSettingsDialog(MessageBoxBase):
         # ⚙️ 3. F2FS设置 分组
         # =========================================================================
         f2fs_container = QWidget(self.content_widget)
+        self.f2fs_container = f2fs_container
         f2fs_layout = QVBoxLayout(f2fs_container)
         f2fs_layout.setContentsMargins(0, 0, 0, 0)
         f2fs_layout.setSpacing(8)
@@ -453,6 +501,35 @@ class PackSettingsDialog(MessageBoxBase):
         f2fs_row.addStretch(1)
         f2fs_layout.addLayout(f2fs_row)
         main_layout.addWidget(f2fs_container)
+
+        # =========================================================================
+        # 🥾 4. Boot 设置 分组（仅 boot / vendor_boot 显示）
+        # =========================================================================
+        boot_container = QWidget(self.content_widget)
+        self.boot_container = boot_container
+        boot_layout = QVBoxLayout(boot_container)
+        boot_layout.setContentsMargins(0, 0, 0, 0)
+        boot_layout.setSpacing(10)
+
+        boot_layout.addWidget(self._create_group_title(self.tr("Boot")))
+
+        boot_row = QHBoxLayout()
+        boot_row.setSpacing(12)
+        self.cmdline_override_switch = SwitchButton(boot_container)
+        self.cmdline_override_switch.setOnText("")
+        self.cmdline_override_switch.setOffText("")
+        self.cmdline_override_lbl = QLabel(self.tr("Override cmdline"), boot_container)
+        self.cmdline_override_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
+        self.cmdline_edit = LineEdit(boot_container)
+        self.cmdline_edit.setPlaceholderText(self.tr("leave empty for no cmdline"))
+        self.cmdline_edit.setEnabled(False)
+        self.cmdline_override_switch.checkedChanged.connect(self.cmdline_edit.setEnabled)
+        boot_row.addWidget(self.cmdline_override_switch)
+        boot_row.addWidget(self.cmdline_override_lbl)
+        boot_row.addWidget(self.cmdline_edit, 1)
+        boot_layout.addLayout(boot_row)
+        main_layout.addWidget(boot_container)
+        boot_container.setVisible(False)
 
         # =========================================================================
         # 🛠️ 4. 其他设置 分组
@@ -611,8 +688,8 @@ class PackSuperMessageBox(MessageBoxBase):
             rb = RadioButton(text, self)
             self.type_group.addButton(rb, value)
             lf1_layout.addWidget(rb)
-        if self.type_group.button(1):
-            self.type_group.button(1).setChecked(True)
+        if self.type_group.button(2):
+            self.type_group.button(2).setChecked(True)
         self.viewLayout.addLayout(lf1_layout)
 
         # 3. Attributes Section
@@ -623,7 +700,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.rb_none = RadioButton("None", self)
         self.attrib_group.addButton(self.rb_readonly, 0)
         self.attrib_group.addButton(self.rb_none, 1)
-        self.rb_readonly.setChecked(True)
+        self.rb_none.setChecked(True)
         lf1_r_layout.addWidget(self.rb_readonly)
         lf1_r_layout.addWidget(self.rb_none)
         self.viewLayout.addLayout(lf1_r_layout)
@@ -649,9 +726,16 @@ class PackSuperMessageBox(MessageBoxBase):
         self.viewLayout.addWidget(BodyLabel(self.tr("Partition(s)"), self))
         self.tl = ListWidget(self)
         self.tl.setMinimumHeight(180)
+        try:
+            self.tl.scrollDelegate.verticalSmoothScroll.setSmoothMode(SmoothMode.NO_SMOOTH)
+        except AttributeError:
+            pass
         self.viewLayout.addWidget(self.tl)
 
         # 6. Checkboxes & Action Layout Configurations
+        # Keep the same gap above "Enable Sparse" as the rows below have, so it
+        # doesn't visually collide with the partition list.
+        self.viewLayout.addSpacing(12)
         self.switch_sparse = SwitchButton(self)
         self.switch_sparse.setOffText(self.tr("Enable Sparse"))
         self.switch_sparse.setOnText(self.tr("Enable Sparse"))
@@ -661,7 +745,13 @@ class PackSuperMessageBox(MessageBoxBase):
         self.switch_delete = SwitchButton(self)
         self.switch_delete.setOffText(self.tr("Remove source files"))
         self.switch_delete.setOnText(self.tr("Remove source files"))
+        self.switch_delete.setChecked(False)
         t_frame_layout.addWidget(self.switch_delete)
+
+        self.btn_select_all = PushButton(self.tr("Select All"), self)
+        self.btn_select_all.clicked.connect(self.toggle_select_all)
+        self.tl.itemChanged.connect(self._sync_select_all_button)
+        t_frame_layout.addWidget(self.btn_select_all)
 
         self.btn_refresh = PushButton(self.tr("Refresh"), self)
         self.btn_refresh.clicked.connect(self.refresh)
@@ -692,6 +782,21 @@ class PackSuperMessageBox(MessageBoxBase):
             if item.checkState() == Qt.Checked:
                 checked_names.append(item.data(Qt.UserRole))
         return checked_names
+
+    def toggle_select_all(self):
+        """Check every listed partition, or clear them all if they already are."""
+        items = [self.tl.item(i) for i in range(self.tl.count())]
+        all_checked = bool(items) and all(item.checkState() == Qt.Checked for item in items)
+        state = Qt.Unchecked if all_checked else Qt.Checked
+        for item in items:
+            item.setCheckState(state)
+        self._sync_select_all_button()
+
+    def _sync_select_all_button(self, *_):
+        """Keep the button label in sync with the actual check states."""
+        items = [self.tl.item(i) for i in range(self.tl.count())]
+        all_checked = bool(items) and all(item.checkState() == Qt.Checked for item in items)
+        self.btn_select_all.setText(self.tr("Deselect All") if all_checked else self.tr("Select All"))
 
     def verify_size(self):
         selected_lbs = self.get_selected_items()
@@ -750,6 +855,7 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def refresh(self):
         self.tl.clear()
+        self.btn_select_all.setText(self.tr("Select All"))
         if not os.path.exists(self.work):
             return
 
@@ -757,6 +863,9 @@ class PackSuperMessageBox(MessageBoxBase):
             if file_name.endswith(".img"):
                 img_path = os.path.join(self.work, file_name)
                 name = file_name[:-4]
+                if name == 'super':
+                    # The source super image isn't a logical partition to pack.
+                    continue
                 is_checked = name in self.selected
                 item_text = ""
 
@@ -795,12 +904,16 @@ class PackSuperMessageBox(MessageBoxBase):
                 for i in data.get('group_table', []):
                     name = i.get('name')
                     if isinstance(name, str) and name != 'default':
-                        index = self.show_group_name.findText(name)
+                        # A/B super groups are named "<group>_a" / "<group>_b".
+                        # Prefer the slot-less base name instead of ending on
+                        # whichever slot happened to come last (usually "_b").
+                        base = name[:-2] if name.endswith(('_a', '_b')) else name
+                        index = self.show_group_name.findText(base)
                         if index >= 0:
                             self.show_group_name.setCurrentIndex(index)
                         else:
-                            self.show_group_name.addItem(name)
-                            self.show_group_name.setCurrentText(name)
+                            self.show_group_name.addItem(base)
+                            self.show_group_name.setCurrentText(base)
 
                 selected = []
                 for i in data.get('partition_table', []):

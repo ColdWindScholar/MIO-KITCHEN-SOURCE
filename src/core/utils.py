@@ -120,13 +120,16 @@ else:
 tool_bin = os.path.join(prog_path, 'bin', platform.system(), platform.machine()) + os.sep
 
 
-def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = None, debug_binary: bool = False):
+def call(exe, extra_path=True, out: bool = True, env: dict[str, str] | None = None, debug_binary: bool = False,
+         out_filter=None):
     def output(inp: subprocess.CalledProcessError | Popen[bytes]):
         for i in iter(inp.stdout.readline, b""):
             try:
                 out_put = i.decode("utf-8").strip()
             except (Exception, BaseException):
                 out_put = i.decode("gbk").strip()
+            if out_filter is not None and not out_filter(out_put):
+                continue
             if out:
                 print(out_put)
             else:
@@ -315,7 +318,11 @@ class Sdat2img:
         with open(self.transfer_list_file, 'r', encoding='utf-8') as trans_list:
             # First line in transfer list is the version number
             # Second line in transfer list is the total number of blocks we expect to write
-            if (version := int(trans_list.readline())) >= 2 & (new_blocks := int(trans_list.readline())):
+            version = int(trans_list.readline())
+            new_blocks = int(trans_list.readline())
+            # `2 & new_blocks` used to bind tighter than `>=`, so version 1 lists
+            # with an even block count wrongly skipped the stash header lines.
+            if version >= 2:
                 # Third line is how many stash entries are needed simultaneously
                 trans_list.readline()
                 # Fourth line is the maximum number of blocks that will be stashed simultaneously
@@ -489,7 +496,10 @@ def remove_duplicate(file_) -> None:
         return
     with open(file_, 'r+', encoding='utf-8', newline='\n') as f:
         data = f.readlines()
-        data = sorted(set(data), key=data.index)
+        # dict.fromkeys() removes duplicates while preserving order in O(n).
+        # The previous implementation used sorted(set(data), key=data.index),
+        # which is O(n^2) and made repacking large partitions very slow.
+        data = list(dict.fromkeys(data))
         f.seek(0)
         f.truncate()
         f.writelines(data)
@@ -730,17 +740,42 @@ class GetFolderSize:
         self.size = 0
 
         def get_dir_size(path):
-            for root, _, files in os.walk(path):
-                for name in files:
-                    try:
-                        file_path = os.path.join(root, name)
-                        if not os.path.isfile(file_path):
-                            self.size += len(name)
-                        if os.path.exists(file_path):
-                            self.size += os.path.getsize(file_path)
-                    except (PermissionError, BaseException, Exception, FileNotFoundError):
-                        logging.exception(f"Getsize {name}")
-                        self.size += 1
+            # Use os.scandir so each entry only needs a single stat() call.
+            # os.walk + isfile() + exists() + getsize() performed 3 stats per
+            # file, which is a large overhead on partitions with many files.
+            stack = [path]
+            while stack:
+                current = stack.pop()
+                try:
+                    with os.scandir(current) as entries:
+                        for entry in entries:
+                            try:
+                                if entry.is_dir(follow_symlinks=False):
+                                    stack.append(entry.path)
+                                    continue
+                                # Match os.walk's default behaviour: symlinked
+                                # directories are neither counted nor entered.
+                                if entry.is_symlink() and entry.is_dir():
+                                    continue
+                                name = entry.name
+                                # Anything that is not a regular file gets its
+                                # name length counted as well.
+                                try:
+                                    is_file = entry.is_file()
+                                except OSError:
+                                    is_file = False
+                                if not is_file:
+                                    self.size += len(name)
+                                try:
+                                    self.size += entry.stat().st_size
+                                except (PermissionError, FileNotFoundError, OSError):
+                                    pass
+                            except (PermissionError, BaseException, Exception, FileNotFoundError):
+                                logging.exception(f"Getsize {entry.name}")
+                                self.size += 1
+                except (PermissionError, BaseException, Exception, FileNotFoundError):
+                    logging.exception(f"Getsize {current}")
+                    self.size += 1
             self.size += (self.size / 16384) * 256
             if self.size > 100 * 1024 * 1024:
                 self.size += 16 * (1024 ** 2)

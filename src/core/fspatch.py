@@ -163,4 +163,5 @@ def main(dir_path: str, fs_config: str):
     new_fs, new_add = fs_patch(scanfs(os.path.abspath(fs_config)), dir_path)
     with open(fs_config, "w", encoding='utf-8', newline='\n') as f:
         f.writelines([f"{i} {' '.join(new_fs[i])}\n" for i in sorted(new_fs.keys())])
-    print(f'FsPatcher: Added {new_add} entries')
+    if new_add:
+        print(f'FsPatcher: Added {new_add} entries')

@@ -15,6 +15,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import PushButton, TextEdit
+from qfluentwidgets.common.smooth_scroll import SmoothMode
 
 class LogMessageBoxBase(QWidget):
 
@@ -23,6 +24,14 @@ class LogMessageBoxBase(QWidget):
         self.layout = QVBoxLayout(self)
         self.text_edit = TextEdit(self)
         self.text_edit.setReadOnly(True)
+        # Use plain line-by-line scrolling. The default qfluentwidgets smooth
+        # scroll animates each wheel notch over ~400ms with acceleration, which
+        # makes the console jump around instead of stepping one line at a time.
+        try:
+            self.text_edit.scrollDelegate.verticalSmoothScroll.setSmoothMode(SmoothMode.NO_SMOOTH)
+            self.text_edit.scrollDelegate.horizonSmoothScroll.setSmoothMode(SmoothMode.NO_SMOOTH)
+        except AttributeError:
+            pass
         self.layout.addWidget(self.text_edit)
         self.button_layout = QHBoxLayout()
         self.clear_btn = PushButton(self.tr("Clear"), self)

@@ -25,7 +25,7 @@ from qfluentwidgets import (
 from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
-from qtui.projects import ProjectsPage
+from src.qtui.projects import ProjectsPage
 from src.core.utils import v_code
 
 

@@ -64,6 +64,7 @@ from src.core.romfs_parse import RomfsParse
 from src.core.splash_editor.src.logo_gen_decoder import process_splashimg
 from src.core.utils import gettype, call
 from src.core.aml_image import main as aml_main
+from qfluentwidgets.common.smooth_scroll import SmoothMode
 
 try:
     from src.core.pycase import ensure_dir_case_sensitive
@@ -97,6 +98,94 @@ class Events(QObject):
 
 
 events = Events()
+
+# Default compression levels used by mkfs.erofs when a level isn't given.
+_EROFS_DEFAULT_LEVELS = {'lz4hc': 8, 'lzma': 6, 'deflate': 6, 'zstd': 3}
+
+
+def parse_erofs_fs_options(path: str):
+    """Parse the original ``mkfs.erofs`` command from an erofs *_fs_options file.
+
+    Returns ``(algo, level, old_kernel)``. ``level`` falls back to the
+    compressor's default when the original command omitted it.
+    """
+    try:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+            lines = f.read().splitlines()
+    except OSError:
+        return None, None, False
+
+    options = ''
+    for line in lines:
+        if 'mkfs.erofs options:' in line:
+            options = line.split('mkfs.erofs options:', 1)[1].strip()
+            break
+    if not options:
+        return None, None, False
+
+    algo = None
+    level = None
+    old_kernel = False
+    tokens = options.split()
+    for idx, tok in enumerate(tokens):
+        if tok.startswith('-z') and len(tok) > 2:
+            parts = tok[2:].split(',')
+            algo = parts[0] or None
+            for part in parts[1:]:
+                part = part.strip()
+                if part.startswith('level='):
+                    part = part[len('level='):]
+                if part.isdigit():
+                    level = int(part)
+        elif tok == '-E' and idx + 1 < len(tokens):
+            old_kernel = old_kernel or 'legacy-compress' in tokens[idx + 1]
+        elif tok.startswith('-E') and 'legacy-compress' in tok:
+            old_kernel = True
+    if algo and level is None:
+        level = _EROFS_DEFAULT_LEVELS.get(algo)
+    return algo, level, old_kernel
+
+
+def read_boot_cmdline(header_path: str):
+    """Return the cmdline stored in a magiskboot ``header`` file, or ''."""
+    try:
+        with open(header_path, 'r', encoding='utf-8', errors='ignore') as f:
+            for line in f:
+                if line.startswith('cmdline='):
+                    return line[len('cmdline='):].rstrip('\n')
+    except OSError:
+        pass
+    return ''
+
+
+def zero_cpio_owner(path: str):
+    """Set uid/gid to 0 for every entry of a newc cpio archive.
+
+    The bundled cpio is statically linked, and passing ``-R 0:0`` makes it
+    call getpwnam(), which crashes with SIGFPE in static glibc (NSS modules
+    can't be dlopen'ed). So we create the archive without ``-R`` and rewrite
+    the uid/gid fields here instead.
+    """
+    if not os.path.exists(path):
+        return
+    with open(path, 'r+b') as f:
+        while True:
+            start = f.tell()
+            header = f.read(110)
+            if len(header) < 110 or header[:6] not in (b'070701', b'070702'):
+                break
+            namesize = int(header[94:102], 16)
+            filesize = int(header[54:62], 16)
+            f.seek(start + 110)
+            name = f.read(namesize)
+            f.seek(start + 22)
+            f.write(b'00000000')  # uid
+            f.seek(start + 30)
+            f.write(b'00000000')  # gid
+            data_start = start + 110 + namesize + (-(110 + namesize)) % 4
+            f.seek(data_start + filesize + (-filesize) % 4)
+            if name.rstrip(b'\x00') == b'TRAILER!!!':
+                break
 
 
 class PackHybridRom:
@@ -248,6 +337,21 @@ class ProjectManager:
 project_manger = ProjectManager()
 
 
+class ProjectComboBox(ComboBox):
+    """Project selector that re-scans the projects folder right before the
+    dropdown opens, so newly added/removed projects show up without a manual
+    refresh."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.refresh_callback = None
+
+    def _showComboMenu(self):
+        if self.refresh_callback is not None:
+            self.refresh_callback()
+        super()._showComboMenu()
+
+
 def unpack_boot(name: str = 'boot', boot: str | None = None, work: str | None = None):
     if not work:
         work = project_manger.current_work_path()
@@ -355,6 +459,9 @@ class ProjectsPage(QFrame):
         scroll_log_area = ScrollArea(self)
         scroll_log_area.setWidgetResizable(True)
         scroll_log_area.setFixedWidth(250)
+        # Step line-by-line instead of the animated smooth-scroll engine.
+        scroll_area.setSmoothMode(SmoothMode.NO_SMOOTH, Qt.Orientation.Vertical)
+        scroll_log_area.setSmoothMode(SmoothMode.NO_SMOOTH, Qt.Orientation.Vertical)
 
         main_layout.addWidget(scroll_log_area)
         main_layout.addWidget(scroll_area)
@@ -823,14 +930,14 @@ class ProjectsPage(QFrame):
         layout.setSpacing(12)
         # 下半部分控件区域
         row1 = QHBoxLayout()
-        self.project_combo = ComboBox(self.project_container)
+        self.project_combo = ProjectComboBox(self.project_container)
+        self.project_combo.refresh_callback = self.refresh_project_list
         cfg.currentProjectName.valueChanged.connect(self.project_combo.setText)
         events.set_project_name.connect(self.project_combo.setText)
         self.project_combo.setMinimumWidth(250)
         self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
-        self.project_combo.currentTextChanged.connect(
-            lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
+        self.project_combo.currentTextChanged.connect(self._on_project_changed)
         self.open_btn = PushButton(self.tr("Open"), self.project_container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
         self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
@@ -849,6 +956,38 @@ class ProjectsPage(QFrame):
         self.moreButton.setMenu(menu)
 
         return self.project_container
+
+    def _on_project_changed(self, name: str):
+        """Persist the selection and reload the partition list for it."""
+        cfg.set(cfg.currentProjectName, name)
+        if not name or not project_manger.exist(name):
+            return
+        if self.unpack_rb.isChecked():
+            self.refresh_unpack()
+        else:
+            self.refresh_repack()
+
+    def refresh_project_list(self):
+        """Re-scan the projects folder, keeping the current selection when it
+        still exists. Called right before the project dropdown opens."""
+        projects = list(project_manger.get_projects())
+        current = self.project_combo.currentText()
+        existing = [self.project_combo.items[i].text for i in range(self.project_combo.count())]
+        if existing == projects:
+            return
+
+        self.project_combo.blockSignals(True)
+        self.project_combo.clear()
+        self.project_combo.addItems(projects)
+        if current and current in projects:
+            self.project_combo.setCurrentText(current)
+        elif projects:
+            self.project_combo.setCurrentIndex(0)
+        self.project_combo.blockSignals(False)
+
+        new = self.project_combo.currentText()
+        if new != current:
+            self._on_project_changed(new)
 
     def _build_partition_section(self, parent_widget):
         """分区控制模块：标题完全独立，仅保留核心高级列表的内部深色背板"""
@@ -872,17 +1011,31 @@ class ProjectsPage(QFrame):
         self.execute_btn = PrimaryPushButton(self.tr("Execute"), container, FIF.PLAY)
         self.execute_btn.clicked.connect(self.exec_opera)
         self.execute_btn.setFixedWidth(100)
+        self.stop_btn = PushButton(self.tr("Stop"), container, FIF.CANCEL)
+        self.stop_btn.clicked.connect(self.stop_job)
+        self.stop_btn.setFixedWidth(100)
+        self.stop_btn.setEnabled(False)
+        self._stop_requested = False
         frame.addWidget(self.ring)
         frame.addWidget(self.execute_btn)
+        frame.addWidget(self.stop_btn)
         layout.addLayout(frame)
 
         # 高级现代列数据集表格（参照上一轮设计的现代化 List 样式）
         self.partition_table = TableWidget(container)
         self.partition_table.setColumnCount(5)
         self.partition_table.setMinimumHeight(370)
+        # Guard so bulk updates (load / select-all) don't feed back into the
+        # Select All checkbox sync handler.
+        self._updating_table = False
+        self.partition_table.itemChanged.connect(self._on_partition_item_changed)
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
+        try:
+            self.partition_table.scrollDelagate.verticalSmoothScroll.setSmoothMode(SmoothMode.NO_SMOOTH)
+        except AttributeError:
+            pass
         self.partition_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         for i in range(1, 5):
             self.partition_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
@@ -916,11 +1069,44 @@ class ProjectsPage(QFrame):
         """Toggles check state of all visible rows based on the Select All checkbox."""
         target_state = Qt.CheckState.Checked if state == Qt.CheckState.Checked.value else Qt.CheckState.Unchecked
 
+        self._updating_table = True
+        try:
+            for row_idx in range(self.partition_table.rowCount()):
+                if not self.partition_table.isRowHidden(row_idx):
+                    name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
+                    if name_item is not None:
+                        name_item.setCheckState(target_state)
+        finally:
+            self._updating_table = False
+
+    def _on_partition_item_changed(self, item):
+        """Keep the Select All checkbox in sync with individual row checkboxes."""
+        if self._updating_table or item.column() != 0:
+            return
+        self._sync_select_all_checkbox()
+
+    def _sync_select_all_checkbox(self):
+        """Check Select All when every visible row is checked, uncheck it when
+        none are, and show a partial state in between."""
+        total = checked = 0
         for row_idx in range(self.partition_table.rowCount()):
-            if not self.partition_table.isRowHidden(row_idx):
-                name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
-                if name_item is not None:
-                    name_item.setCheckState(target_state)
+            if self.partition_table.isRowHidden(row_idx):
+                continue
+            name_item = self.partition_table.item(row_idx, 0)
+            if name_item is None:
+                continue
+            total += 1
+            if name_item.checkState() == Qt.CheckState.Checked:
+                checked += 1
+
+        if total and checked == total:
+            new_state = Qt.CheckState.Checked
+        else:
+            new_state = Qt.CheckState.Unchecked
+
+        self.select_all_cb.blockSignals(True)
+        self.select_all_cb.setCheckState(new_state)
+        self.select_all_cb.blockSignals(False)
 
     #functions for it
     def conversion(self, src_format: str, dst_format: str, selection):
@@ -1036,6 +1222,123 @@ class ProjectsPage(QFrame):
             self.format_task = GenericTaskWorker(self.conversion, src, dst, files)
             self.start_job(self.format_task)
 
+    @staticmethod
+    def _le32(data, offset):
+        return int.from_bytes(data[offset:offset + 4], 'little')
+
+    def _log(self, message: str):
+        """Append a line to the on-screen log console (not the terminal)."""
+        try:
+            self.scroll_log_content.append_log("INFO", message)
+        except AttributeError:
+            print(message)
+
+    def super_mapper(self):
+        """Map split super images (super_*.img) to <partition>.img.
+
+        Native port of bombbox's partition mapper: it reads the LP metadata
+        (the "0PLA" header) and renames super_2.img, super_3.img, ... to the
+        partition names recorded in the metadata table, then renames the
+        metadata file to partition_table.img.
+        """
+        if not project_manger.exist(cfg.currentProjectName.value):
+            self.show_info_bar(self.tr("Warning"), self.tr("project's not exist"), 2)
+            return
+        work = project_manger.current_work_path()
+        if not os.path.isdir(work):
+            self.show_info_bar(self.tr("Warning"), self.tr("Work path does not exist"), 2)
+            return
+
+        names = os.listdir(work)
+        if not any(n.startswith('super_') and n.endswith('.img') for n in names):
+            self.show_info_bar(self.tr("Warning"), self.tr("No split super images (super_*.img) found"), 2)
+            return
+
+        # Metadata lives in super_1.img, or whichever image carries the 0PLA magic.
+        metadata_file = os.path.join(work, 'super_1.img')
+        if not os.path.exists(metadata_file):
+            metadata_file = None
+            for n in sorted(names):
+                if not n.endswith('.img'):
+                    continue
+                try:
+                    with open(os.path.join(work, n), 'rb') as fh:
+                        if b'0PLA' in fh.read(16 * 1024 * 1024):
+                            metadata_file = os.path.join(work, n)
+                            break
+                except OSError:
+                    continue
+        if not metadata_file or not os.path.exists(metadata_file):
+            self.show_info_bar(self.tr("Error"), self.tr("Could not find LP metadata (0PLA magic)."), 1)
+            return
+
+        try:
+            with open(metadata_file, 'rb') as f:
+                data = f.read(16 * 1024 * 1024)
+        except OSError as e:
+            self.show_info_bar(self.tr("Error"), str(e), 1)
+            return
+        ho = data.find(b'0PLA')
+        if ho < 0:
+            self.show_info_bar(self.tr("Error"), self.tr("0PLA magic not found."), 1)
+            return
+
+        header_size = self._le32(data, ho + 8)
+        p_off = self._le32(data, ho + 80)
+        p_num = self._le32(data, ho + 84)
+        p_size = self._le32(data, ho + 88)
+        # Partition table data lives at ho + header_size + offset.
+        table_start = ho + header_size + p_off
+        if not (0 <= table_start < len(data)) or p_num <= 0 or p_size <= 0:
+            # Older/odd layouts: fall back to locating the first entry marker.
+            search = data.find(b'odm_a')
+            if search == -1:
+                search = data.find(b'system_a')
+            if search != -1:
+                table_start = search
+
+        self._log(f"Using metadata from: {os.path.basename(metadata_file)}")
+        self._log(f"Parsing {p_num} entries...")
+        self._log("Partition mapping:")
+        current_idx = 2
+        moved = 0
+        for i in range(p_num):
+            entry_off = table_start + i * p_size
+            name = data[entry_off:entry_off + 32].split(b'\x00', 1)[0].decode('utf-8', 'ignore')
+            if not name:
+                continue
+            if self._le32(data, entry_off + 44) <= 0:
+                continue
+            clean_name = name[:-2] if name.endswith(('_a', '_b')) else name
+            old_file = os.path.join(work, f"super_{current_idx}.img")
+            new_file = os.path.join(work, f"{clean_name}.img")
+            if os.path.exists(old_file):
+                self._log(f"Mapped: super_{current_idx}.img -> {clean_name}.img")
+                os.rename(old_file, new_file)
+                moved += 1
+            elif os.path.exists(os.path.join(work, f"{name}.img")) and f"{name}.img" != f"{clean_name}.img":
+                self._log(f"Mapped: {name}.img -> {clean_name}.img")
+                os.rename(os.path.join(work, f"{name}.img"), new_file)
+                moved += 1
+            current_idx += 1
+
+        # Rename the metadata carrier to partition_table.img
+        super_1 = os.path.join(work, 'super_1.img')
+        target = os.path.join(work, 'partition_table.img')
+        src = super_1 if (os.path.basename(metadata_file) == 'super_1.img' or os.path.exists(super_1)) else metadata_file
+        if os.path.exists(src) and src != target:
+            if os.path.exists(target):
+                os.remove(target)
+            os.rename(src, target)
+            self._log(f"Mapped: {os.path.basename(src)} -> partition_table.img")
+
+        self._log("Done.")
+        self.show_info_bar(self.tr("Super_* Mapper"), self.tr("Mapped {n} partition(s).").format(n=moved), 3)
+        if self.unpack_rb.isChecked():
+            self.refresh_unpack()
+        else:
+            self.refresh_repack()
+
     def pack_super(self):
         if not project_manger.exist(cfg.currentProjectName.value):
             self.show_info_bar(self.tr("Warning"), self.tr("project's not exist"), 2)
@@ -1105,6 +1408,7 @@ class ProjectsPage(QFrame):
 
         if call(command, debug_binary=False) == 0:
             if os.access(output_super_path, os.F_OK):
+                print(self.tr("Pack Done! Output: %s") % output_super_path)
                 events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3,
                                           3000)
                 if del_:
@@ -1115,9 +1419,11 @@ class ProjectsPage(QFrame):
                             except Exception:
                                 logging.exception('Bugs')
             else:
+                print(self.tr("Failed to pack super!"))
                 events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to pack super!"), 1, 3000)
             return 1
         else:
+            print(self.tr("Failed to pack super!"))
             events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to pack super!"), 1, 3000)
             return 1
 
@@ -1155,8 +1461,10 @@ class ProjectsPage(QFrame):
         self.super_btn.clicked.connect(self.pack_super)
         self.format_conv_btn = PushButton(self.tr("Format Convertion"), container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
+        self.super_mapper_btn = PushButton(self.tr("Super_* Mapper"), container, FIF.TILES)
+        self.super_mapper_btn.clicked.connect(self.super_mapper)
 
-        for btn in [self.super_btn, self.format_conv_btn]:
+        for btn in [self.super_btn, self.format_conv_btn, self.super_mapper_btn]:
             btn.setMinimumWidth(105)
             tools_layout.addWidget(btn)
 
@@ -1261,21 +1569,29 @@ class ProjectsPage(QFrame):
             return 1
         if repaired:
             print(f'[erofs] Restored {repaired} Windows symlink markers in {name}', flush=True)
-        print("[erofs] Repacking %s - %s" % (name, f'{format_},{level}'))
         extra_ = f'{format_},{level}' if format_ != 'lz4' else format_
+        # Print the spec actually used (lz4 ignores the level).
+        print("\n[erofs] Repacking %s - %s" % (name, extra_))
         other_ = ['-E', 'legacy-compress'] if old_kernel else []
-        cmd = ['mkfs.erofs', *other_, f'-z{extra_}', '-T', f'{UTC}', f'--mount-point=/{name}',
+        # NOTE: erofs-utils issue #58 (https://github.com/erofs/erofs-utils/issues/58)
+        # makes mkfs.erofs segfault when both --fs-config-file and
+        # --file-contexts are used on big trees. The fix is upstream in the
+        # erofs-utils tree, so the bundled mkfs.erofs must be upgraded to a
+        # build that includes it. Until then we keep the verbose output and
+        # filter the per-file "Processing <path> ..." flood below.
+        cmd = ['mkfs.erofs', *other_, f'-z{extra_}', '-T', f'{UTC}',
+               f'--mount-point=/{name}',
                f'--product-out={work}',
                f'--fs-config-file={work}/config/{name}_fs_config',
                f'--file-contexts={work}/config/{name}_file_contexts',
                f'{work_output}/{name}.img', f'{work}/{name}/']
-        return call(cmd, out=True)
+        return call(cmd, out=True, out_filter=lambda line: not line.startswith('Processing '))
 
     def make_ext4fs(self, name: str, work: str, work_output, sparse: bool = False, size: int = 0, UTC: int = None,
                     has_contexts: bool = True):
         if not has_contexts:
             print("make_ext4fs", self.tr('Warning:file_context not found!!!'))
-        print(f"packing {name} [ext]")
+        print(f"\npacking {name} [ext]")
         if not UTC:
             UTC = int(time.time())
         if not size:
@@ -1290,7 +1606,7 @@ class ProjectsPage(QFrame):
 
     def make_f2fs(self, name: str, work: str, work_output: str, UTC: int | None = None, readonly: bool = False,
                   compress: bool = False):
-        print("[f2fs] repacking %s" % name)
+        print("\n[f2fs] repacking %s" % name)
         size = utils.GetFolderSize(work + name, 1, 1).rsize_v
         part_uuid = str(uuid.uuid4())
         print(f"{name} - {size} - {part_uuid}")
@@ -1341,7 +1657,7 @@ class ProjectsPage(QFrame):
 
     def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
         if isinstance(size, str): size = int(size)
-        print("[ext] repacking %s" % name)
+        print("\n[ext] repacking %s" % name)
         size = utils.GetFolderSize(os.path.join(work, name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
@@ -1379,7 +1695,30 @@ class ProjectsPage(QFrame):
             os.rename(f"{work_output}/{name}_new.img", f"{work_output}/{name}.img")
         return 0
 
-    def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None) -> int:
+    @staticmethod
+    def _set_boot_cmdline(source: str, cmdline: str):
+        """Force the boot cmdline by writing it into the unpacked header file.
+
+        magiskboot reads the cmdline from ``header`` when it exists and falls
+        back to the original image otherwise, so an empty cmdline is honoured
+        only if the header file explicitly contains ``cmdline=``.
+        """
+        header_path = os.path.join(source, 'header')
+        lines = []
+        if os.path.exists(header_path):
+            with open(header_path, 'r', encoding='utf-8', errors='ignore') as f:
+                lines = f.read().splitlines()
+        for idx, line in enumerate(lines):
+            if line.startswith('cmdline='):
+                lines[idx] = f'cmdline={cmdline}'
+                break
+        else:
+            lines.insert(0, f'cmdline={cmdline}')
+        with open(header_path, 'w', encoding='utf-8', newline='\n') as f:
+            f.write('\n'.join(lines) + '\n')
+
+    def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None,
+                    cmdline: str | None = None) -> int:
         work = project_manger.current_work_path()
         flag = ''
         if boot is None:
@@ -1392,6 +1731,8 @@ class ProjectsPage(QFrame):
         if not os.path.exists(source):
             print(f"Cannot Find {name}...")
             return 1
+        if cmdline is not None:
+            self._set_boot_cmdline(source, cmdline)
         if os.path.isfile(f'{source}/second_order'):
             print(self.tr("Repack Rk resource..."))
             rsceutil_repack(f"{source}/second_dump", f"{source}/second", f"{source}/second_order")
@@ -1406,7 +1747,15 @@ class ProjectsPage(QFrame):
                     cpio = cpio.replace("\\", '/')
 
                 os.chdir(f"{source}/ramdisk")
-                call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -R 0:0 -o -F ../ramdisk-new.cpio"])
+                # No -R here: it crashes the statically linked cpio. Ownership
+                # is fixed up by zero_cpio_owner() afterwards.
+                call(exe=["busybox", "ash", "-c", f"find | sed 1d | {cpio} -H newc -o -F ../ramdisk-new.cpio"])
+                os.chdir(source)
+                zero_cpio_owner(f"{source}/ramdisk-new.cpio")
+            if not (os.path.exists(f"{source}/ramdisk-new.cpio") and os.path.getsize(f"{source}/ramdisk-new.cpio")):
+                print("Failed to repack ramdisk: ramdisk-new.cpio was not created.")
+                os.chdir(cfg.workingFolder.value)
+                return 1
             with open(f"{source}/comp", "r", encoding='utf-8') as compf:
                 comp = compf.read()
             print(f"Compressing:{comp}")
@@ -1414,7 +1763,8 @@ class ProjectsPage(QFrame):
             if comp != "unknown":
                 if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
                     print("Failed to pack Ramdisk...")
-                    os.remove("ramdisk-new.cpio")
+                    with suppress(OSError):
+                        os.remove("ramdisk-new.cpio")
                 else:
                     try:
                         os.remove("ramdisk.cpio")
@@ -1435,18 +1785,36 @@ class ProjectsPage(QFrame):
             if comp == "unknown":
                 flag = "-n"
             print(self.tr("Successfully packed Ramdisk.."))
-        if call(['magiskboot', 'repack', flag, boot]) != 0:
+        # magiskboot reads the unpacked components from the current directory
+        # and writes its output relative to it. Run it from the source dir and
+        # pass an explicit output path: previously this relied on the cwd being
+        # the source dir, which isn't the case when there is no ramdisk folder,
+        # so "new-boot.img" was written elsewhere and the rename below failed.
+        os.chdir(source)
+        new_boot = os.path.join(source, "new-boot.img")
+        with suppress(OSError):
+            os.remove(new_boot)
+        if call(['magiskboot', 'repack', flag, boot, new_boot]) != 0:
             events.show_info_bar.emit(self.tr("Error"), self.tr("Failed to Pack boot..."), 1, 3000)
             os.chdir(cfg.workingFolder.value)
-        else:
-            os.remove(boot)
-            os.rename(f"{source}/new-boot.img", project_manger.current_work_output_path() + f"/{name}.img")
-            os.chdir(cfg.workingFolder.value)
-            try:
-                rmtree(source)
-            except (Exception, BaseException):
-                print(f"Failed to remove {name}")
-            print(self.tr("Successfully packed Boot..."))
+            return 1
+        if not os.path.exists(new_boot):
+            # Some builds ignore the output argument and drop it in the cwd.
+            alt = os.path.join(os.getcwd(), "new-boot.img")
+            if os.path.exists(alt):
+                new_boot = alt
+            else:
+                print("Failed to Pack boot...")
+                os.chdir(cfg.workingFolder.value)
+                return 1
+        os.remove(boot)
+        os.rename(new_boot, project_manger.current_work_output_path() + f"/{name}.img")
+        os.chdir(cfg.workingFolder.value)
+        try:
+            rmtree(source)
+        except (Exception, BaseException):
+            print(f"Failed to remove {name}")
+        print(self.tr("Successfully packed Boot..."))
         return 0
 
     def show_info_bar(self, title: str, content: str, bar_type: int = 3, duration=5000):
@@ -1469,21 +1837,27 @@ class ProjectsPage(QFrame):
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
-                f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
+                f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size,
+                boot_cmdline: str | None = None) -> bool | None:
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
             return False
         parts_dict = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
+        if patch_vbmeta and chosen_parts:
+            # Patch vbmeta once, before the loop. It used to run for every
+            # selected partition and each call walked the whole project tree.
+            for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
+                file = utils.findfile(j, work)
+                if gettype(file) == 'vbmeta':
+                    print("Patching %s" % file)
+                    utils.Vbpatch(file).disavb()
         for i in chosen_parts:
+            if self._stop_requested:
+                print(self.tr("Stopped."))
+                return False
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
                 parts_dict[dname] = 'unknown'
-            if patch_vbmeta:
-                for j in "vbmeta.img", "vbmeta_system.img", "vbmeta_vendor.img":
-                    file = utils.findfile(j, work)
-                    if gettype(file) == 'vbmeta':
-                        print("Patching %s" % file)
-                        utils.Vbpatch(file).disavb()
             if os.access(os.path.join(f"{work}/config", f"{dname}_fs_config"), os.F_OK):
                 if os.name == 'nt':
                     try:
@@ -1514,7 +1888,7 @@ class ProjectsPage(QFrame):
                     else:
                         if remove_source_files:
                             self.rdi(work, dname)
-                        print("Packed successfully:{}".format(dname))
+                        print(f"Packed successfully: {dname}")
                         if pack_format in ["dat", "br", "sparse"]:
                             utils.img2simg(project_manger.current_work_output_path() + f"{dname}.img")
                             if pack_format == 'dat':
@@ -1597,7 +1971,7 @@ class ProjectsPage(QFrame):
                     else:
                         print(self.tr("Packed {}").format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                self.repack_boot(i)
+                self.repack_boot(i, cmdline=boot_cmdline)
             elif parts_dict[i] == 'dtbo':
                 self.pack_dtbo()
             elif parts_dict[i] == 'splash':
@@ -1623,9 +1997,28 @@ class ProjectsPage(QFrame):
         # # then set sys.stdout and back
         self.ring.show()
         self.ring.start()
+        self._stop_requested = False
+        self.stop_btn.setEnabled(True)
         worker.task_finished.connect(self.job_is_done)
+        worker.error.connect(self._on_task_error)
         worker.start()
         self.execute_btn.setEnabled(False)
+
+    def stop_job(self):
+        """Stop the running job: kill its subprocesses and set a stop flag."""
+        self._stop_requested = True
+        self.stop_btn.setEnabled(False)
+        self.scroll_log_content.append_log("WARN", self.tr("Stopping..."))
+        for pid in list(getattr(utils.states, 'open_pids', [])):
+            try:
+                utils.terminate_process(pid)
+            except Exception:
+                logging.exception('stop')
+
+    def _on_task_error(self, trace: str):
+        """Show background-task failures in the log and as an info bar."""
+        self.scroll_log_content.append_log("ERROR", trace)
+        self.show_info_bar(self.tr("Error"), self.tr("Task failed, see the log for details."), 1, 8000)
 
     def exec_opera(self):
         # then set sys.stdout
@@ -1637,36 +2030,70 @@ class ProjectsPage(QFrame):
                     unpack_list.append(item.text())
             self.my_task_worker = GenericTaskWorker(self.unpack, unpack_list, self.format_widget.currentItem().text())
         else:
-            pack_list = []
+            selected = []
             for row_idx in range(self.partition_table.rowCount()):
                 item = self.partition_table.item(row_idx, 0)
                 if item.checkState() == Qt.CheckState.Checked:
-                    pack_list.append(item.text())
-            dialog = PackSettingsDialog(self)
-            # Display modally. If the user clicks "打包" (Yes/Accept), exec() returns True/1
-            if dialog.exec():
-                self.my_task_worker = GenericTaskWorker(self.packrom,
-                                                        pack_list,
-                                                        dialog.format_combo.currentText(),
-                                                        dialog.sw_vbmeta.isChecked(),
-                                                        dialog.sw_convert.isChecked(),
-                                                        dialog.src_fs_combo.currentText(),
-                                                        dialog.dest_fs_combo.currentText(),
-                                                        dialog.sw_delete.isChecked(),
-                                                        dialog.compress_algo_combo.currentText(),
-                                                        dialog.erofs_slider.value(),
-                                                        dialog.support_old_kernel_switch.isChecked(),
-                                                        dialog.utc_input.text(),
-                                                        dialog.f2fs_readonly_switch.isChecked(),
-                                                        dialog.f2fs_compress_switch.isChecked(),
-                                                        dialog.pack_method_combo.currentText(),
-                                                        dialog.brotli_slider.value(),
-                                                        dialog.size_handle_combo.currentText() == self.tr(
-                                                            "Origin Size"),
-                                                        )
-            else:
+                    fs_item = self.partition_table.item(row_idx, 2)
+                    selected.append((item.text(), fs_item.text() if fs_item else ''))
+            if not selected:
+                self.show_info_bar(self.tr("Warning"), self.tr("Select at least one partition"), 2)
                 return
+            # Ask for repack options per selected partition, using a dialog
+            # tailored to that partition's filesystem so ext/erofs/f2fs
+            # settings can never be mixed up.
+            jobs = []
+            work = project_manger.current_work_path()
+            for name, fs_type in selected:
+                # Keep the original image's legacy-compress flag (compatibility);
+                # the compression algorithm defaults to lz4 for speed.
+                erofs_old = False
+                if (fs_type or '').lower() == 'erofs':
+                    _, _, erofs_old = parse_erofs_fs_options(
+                        f"{work}/config/{name}_fs_options")
+                boot_cmdline = None
+                if (fs_type or '').lower() in ('boot', 'vendor_boot'):
+                    boot_cmdline = read_boot_cmdline(f"{work}/{name}/header")
+                dialog = PackSettingsDialog(self, fs_type=fs_type, part_name=name,
+                                            erofs_old_kernel=erofs_old, boot_cmdline=boot_cmdline)
+                if not dialog.exec():
+                    return
+                jobs.append((name, {
+                    'pack_format': dialog.format_combo.currentText(),
+                    'patch_vbmeta': dialog.sw_vbmeta.isChecked(),
+                    'fs_conver': dialog.sw_convert.isChecked(),
+                    'origin_fs': dialog.src_fs_combo.currentText(),
+                    'modify_fs': dialog.dest_fs_combo.currentText(),
+                    'remove_source_files': dialog.sw_delete.isChecked(),
+                    'erofs_compress_format': dialog.compress_algo_combo.currentText(),
+                    'scale_erofs': dialog.erofs_slider.value(),
+                    'erofs_old_kernel': dialog.support_old_kernel_switch.isChecked(),
+                    'UTC': dialog.utc_input.text(),
+                    'f2fs_read_only': dialog.f2fs_readonly_switch.isChecked(),
+                    'f2fs_compresion': dialog.f2fs_compress_switch.isChecked(),
+                    'ext4_packer': dialog.pack_method_combo.currentText(),
+                    'scale': dialog.brotli_slider.value(),
+                    'ext4_origin_size': dialog.size_handle_combo.currentText() == self.tr("Origin Size"),
+                    'boot_cmdline': dialog.cmdline_edit.text() if dialog.cmdline_override_switch.isChecked() else None,
+                }))
+            self.my_task_worker = GenericTaskWorker(self.packrom_batch, jobs)
         self.start_job(self.my_task_worker)
+
+    def packrom_batch(self, jobs):
+        """Repack each selected partition with its own set of options."""
+        patched_vbmeta = False
+        for name, opts in jobs:
+            if self._stop_requested:
+                print(self.tr("Stopped."))
+                break
+            opts = dict(opts)
+            if patched_vbmeta and opts.get('patch_vbmeta'):
+                # vbmeta was already patched while packing an earlier
+                # partition; don't walk the whole tree again.
+                opts['patch_vbmeta'] = False
+            self.packrom([name], **opts)
+            if opts.get('patch_vbmeta'):
+                patched_vbmeta = True
 
     def job_is_done(self):
         self.ring.stop()
@@ -1674,6 +2101,15 @@ class ProjectsPage(QFrame):
         sys.stderr = sys.stderr_old
         sys.stdout = sys.stdout_old
         self.execute_btn.setEnabled(True)
+        self.stop_btn.setEnabled(False)
+        self._stop_requested = False
+        # Refresh the partition list so it reflects what just happened (e.g.
+        # unpacked images that were removed, or new repack sources), the same
+        # way the refresh action does.
+        if self.unpack_rb.isChecked():
+            self.refresh_unpack()
+        else:
+            self.refresh_repack()
 
     def refresh_unpack(self):
         self.partition_table.clearContents()
@@ -1727,6 +2163,9 @@ class ProjectsPage(QFrame):
             if item is not None:
                 cell_text = item.text().strip().lower()
                 self.partition_table.setRowHidden(row_idx, not (search_query in cell_text or not search_query))
+        # Row visibility changed, so refresh the Select All checkbox state.
+        if getattr(self, 'select_all_cb', None) is not None:
+            self._sync_select_all_checkbox()
 
     def unpack(self, chose: list | dict, form: str = '') -> bool:
         if os.name == 'nt':
@@ -1784,11 +2223,12 @@ class ProjectsPage(QFrame):
             splituapp.extract(f"{work}/UPDATE.APP", work, chose)
             return True
         for i in chose:
+            if self._stop_requested:
+                break
             if os.access(f"{work}/{i}.zst", os.F_OK):
                 print(f"Decompressing {i}.zst")
                 utils.call(['zstd', '--rm', '-d', f"{work}/{i}.zst"])
                 events.refresh_list.emit()
-                return True
             if os.access(f"{work}/{i}.new.dat.xz", os.F_OK):
                 print(f"Decompressing {i}.new.dat.xz")
                 utils.Unxz(f"{work}/{i}.new.dat.xz")
@@ -1931,7 +2371,7 @@ class ProjectsPage(QFrame):
 
                 elif file_type == "erofs":
                     if utils.call(
-                            exe=['extract.erofs', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                            exe=['extract.erofs', '-s', '-i', os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                  '-o',
                                  work,
                                  '-x'],
@@ -1952,7 +2392,8 @@ class ProjectsPage(QFrame):
                             self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
                 elif file_type == 'f2fs':
                     if utils.call(
-                            exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
+                            exe=['imgkit', 'unpack', '-l', '0', '-i',
+                                 os.path.join(project_manger.current_work_path(), f'{i}.img'),
                                  "-o", work],
                             out=True) != 0:
                         events.show_info_bar.emit(self.tr('Error'), f"Failed to unpack {i}.img", 1, 3000)
@@ -1964,7 +2405,8 @@ class ProjectsPage(QFrame):
                             self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
                 elif file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
-                elif file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):
+                img_path = f"{work}/{i}.img"
+                if file_type == 'unknown' or (os.path.exists(img_path) and utils.is_empty_img(img_path)):
                     events.show_info_bar.emit(self.tr("Warning"),
                                               self.tr("Unsupported file {}.img [{}]").format(i, file_type), 2, 5000)
                 events.refresh_list.emit()
@@ -1976,25 +2418,38 @@ class ProjectsPage(QFrame):
         return True
 
     def _load_mock_partitions_table(self, mock_data):
-        self.partition_table.setRowCount(len(mock_data))
-        for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
-            name_item = QTableWidgetItem(name)
-            name_item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            name_item.setCheckState(Qt.Unchecked)
-            self.partition_table.setItem(row_idx, 0, name_item)
-            self.partition_table.setItem(row_idx, 1, QTableWidgetItem(size))
-            self.partition_table.setItem(row_idx, 2, QTableWidgetItem(fs))
+        """装载高质感的数据集行数据（带彩色胶囊Badge标签）"""
+        # The table is rebuilt with every row unchecked, so reset the
+        # "Select All" checkbox too. Otherwise it can stay visually checked
+        # (e.g. after switching between the Repack and Unpack tabs) while no
+        # row is actually selected.
+        if getattr(self, 'select_all_cb', None) is not None and self.select_all_cb.isChecked():
+            self.select_all_cb.blockSignals(True)
+            self.select_all_cb.setChecked(False)
+            self.select_all_cb.blockSignals(False)
+        self._updating_table = True
+        try:
+            self.partition_table.setRowCount(len(mock_data))
+            for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
+                name_item = QTableWidgetItem(name)
+                name_item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                name_item.setCheckState(Qt.Unchecked)
+                self.partition_table.setItem(row_idx, 0, name_item)
+                self.partition_table.setItem(row_idx, 1, QTableWidgetItem(size))
+                self.partition_table.setItem(row_idx, 2, QTableWidgetItem(fs))
 
-            # 高级彩色高亮标签
-            badge = QLabel(img_type)
-            badge.setAlignment(Qt.AlignCenter)
-            if img_type == "Build":
-                badge.setStyleSheet(
-                    "color: #a78bfa; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
-            else:
-                badge.setStyleSheet(
-                    "color: #f59e0b; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
-            self.partition_table.setCellWidget(row_idx, 3, badge)
+                # 高级彩色高亮标签
+                badge = QLabel(img_type)
+                badge.setAlignment(Qt.AlignCenter)
+                if img_type == "Build":
+                    badge.setStyleSheet(
+                        "color: #a78bfa; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
+                else:
+                    badge.setStyleSheet(
+                        "color: #f59e0b; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
+                self.partition_table.setCellWidget(row_idx, 3, badge)
 
-            attr_item = QTableWidgetItem(attrs)
-            self.partition_table.setItem(row_idx, 4, attr_item)
+                attr_item = QTableWidgetItem(attrs)
+                self.partition_table.setItem(row_idx, 4, attr_item)
+        finally:
+            self._updating_table = False
