@@ -1550,51 +1550,10 @@ class PluginPage(QWidget):
         self.tasks[code].start()
 
     def __download_plugin(self, plugin_info: dict):
-        files = plugin_info.get("files", [])
-        size = plugin_info.get("size", 0)
-        depend = plugin_info.get('depend', [])
-        events.download_signal.emit(plugin_info, self.tr("Downloading..."), False)
-        for d in depend:
-            if not module_manager.is_installed(d):
-                for depend_info in self.cards_data:
-                    if "id" not in depend_info:
-                        continue
-                    if depend_info['id'] == d:
-                        self.download_plugin(depend_info)
-        for file in files:
-            file_path = os.path.join(temp, file)
-            if os.path.exists(file_path) and os.path.getsize(file_path) == size:
-                result, reason = module_manager.install(file_path)
-                if result != module_error_codes.Normal:
-                    events.show_info_bar.emit(
-                        self.tr("Warning"),
-                        self.tr("Failed to install {}: {}").format(plugin_info.get("name", plugin_info["id"]), reason),
-                        2, 3500
-                    )
-                    events.download_signal.emit(plugin_info, self.tr("Retry"), True)
-                    return 1
-                events.plugin_installed.emit(plugin_info['id'])
-                continue
-            try:
-                download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
-                for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
-                    events.download_signal.emit(plugin_info, f"{percentage} %", False)
-            except Exception as e:
-                events.show_info_bar.emit(self.tr("Warning"), self.tr("Failed to download {}, reason: {}").format(file, e),
-                                          2, 3500)
-                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
-                return 1
-            result, reason = module_manager.install(file_path)
-            if result != module_error_codes.Normal:
-                events.show_info_bar.emit(
-                    self.tr("Warning"),
-                    self.tr("Failed to install {}: {}").format(plugin_info.get("name", plugin_info["id"]), reason),
-                    2, 3500
-                )
-                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
-                return 1
-            events.plugin_installed.emit(plugin_info['id'])
-        self.download_status.pop(plugin_info['id'], None)
+        result = self._install_repo_plugin(plugin_info, set())
+        if not result:
+            return 1
+
         events.show_info_bar.emit(
             self.tr("Success"),
             self.tr("{} installed successfully.").format(plugin_info.get("name", plugin_info['id'])),
@@ -1602,6 +1561,75 @@ class PluginPage(QWidget):
         )
         events.load_plugin_cards.emit()
         return None
+
+    def _install_repo_plugin(self, plugin_info: dict, installing: set[str]) -> bool:
+        plugin_id = plugin_info['id']
+        if module_manager.is_installed(plugin_id):
+            return True
+        if plugin_id in installing:
+            events.show_info_bar.emit(
+                self.tr("Warning"),
+                self.tr("Dependency cycle detected while installing {}.").format(plugin_info.get("name", plugin_id)),
+                2, 3500
+            )
+            return False
+
+        installing.add(plugin_id)
+        events.download_signal.emit(plugin_info, self.tr("Downloading..."), False)
+
+        repo_plugins = {item['id']: item for item in self.get_repo_plugins()}
+        for dependency_id in plugin_info.get('depend', []):
+            if module_manager.is_installed(dependency_id):
+                continue
+            dependency_info = repo_plugins.get(dependency_id)
+            if dependency_info is None:
+                events.show_info_bar.emit(
+                    self.tr("Warning"),
+                    self.tr("Dependency {} for {} is not available in the plugin repository.").format(
+                        dependency_id, plugin_info.get("name", plugin_id)),
+                    2, 3500
+                )
+                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                installing.remove(plugin_id)
+                return False
+            if not self._install_repo_plugin(dependency_info, installing):
+                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                installing.remove(plugin_id)
+                return False
+
+        for file in plugin_info.get("files", []):
+            file_path = os.path.join(temp, file)
+            size = plugin_info.get("size", 0)
+            if not (os.path.exists(file_path) and os.path.getsize(file_path) == size):
+                try:
+                    download_generator = utils.download_api(
+                        cfg.pluginRepo.value + file, temp, size_=size, chunk_size=max(size // 4, 1)
+                    )
+                    for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
+                        events.download_signal.emit(plugin_info, f"{percentage} %", False)
+                except Exception as e:
+                    events.show_info_bar.emit(
+                        self.tr("Warning"), self.tr("Failed to download {}, reason: {}").format(file, e), 2, 3500
+                    )
+                    events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                    installing.remove(plugin_id)
+                    return False
+
+            result, reason = module_manager.install(file_path)
+            if result != module_error_codes.Normal:
+                events.show_info_bar.emit(
+                    self.tr("Warning"),
+                    self.tr("Failed to install {}: {}").format(plugin_info.get("name", plugin_id), reason),
+                    2, 3500
+                )
+                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                installing.remove(plugin_id)
+                return False
+            events.plugin_installed.emit(plugin_id)
+
+        installing.remove(plugin_id)
+        self.download_status.pop(plugin_id, None)
+        return True
 
     def filter_plugins(self, text):
         """Dynamically filters plugin records aligned exactly with active context view keys"""
