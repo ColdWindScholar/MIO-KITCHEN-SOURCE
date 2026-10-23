@@ -361,10 +361,6 @@ class PartitionDetailsDialog(MessageBoxBase):
                 self._create_section(self.tr("Ext4 filesystem"), ext4_details), 1)
         self.viewLayout.addWidget(sections)
 
-        self.copy_button = PushButton(self.tr("Copy all"), self, FIF.COPY)
-        self.copy_button.clicked.connect(lambda: QApplication.clipboard().setText(
-            "\n".join(f"{label}: {value}" for label, value in details + ext4_details)))
-        self.viewLayout.addWidget(self.copy_button)
         self.yesButton.setText(self.tr("Close"))
         self.cancelButton.hide()
         self.widget.setMinimumWidth(620)
@@ -387,6 +383,10 @@ class PartitionDetailsDialog(MessageBoxBase):
         table.verticalHeader().hide()
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        table.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        table.setContextMenuPolicy(Qt.CustomContextMenu)
+        table.customContextMenuRequested.connect(
+            lambda pos, target=table: self._show_item_context_menu(target, pos))
         table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         table.setMinimumWidth(260)
@@ -395,6 +395,40 @@ class PartitionDetailsDialog(MessageBoxBase):
             table.setItem(row, 1, QTableWidgetItem(value))
         table.setMaximumHeight(min(320, table.verticalHeader().defaultSectionSize() * (len(rows) + 1)))
         return table
+
+    def _show_item_context_menu(self, table: TableWidget, pos: QPoint):
+        item = table.itemAt(pos)
+        if item is None:
+            return
+
+        table.setCurrentCell(item.row(), item.column())
+        property_item = table.item(item.row(), 0)
+        value_item = table.item(item.row(), 1)
+        menu = RoundMenu(parent=table)
+
+        copy_cell_action = Action(FIF.COPY, self.tr("Copy cell"))
+        copy_cell_action.triggered.connect(
+            lambda: QApplication.clipboard().setText(item.text()))
+        menu.addAction(copy_cell_action)
+
+        if property_item is not None and value_item is not None:
+            copy_row_action = Action(FIF.COPY, self.tr("Copy property and value"))
+            copy_row_action.triggered.connect(lambda: QApplication.clipboard().setText(
+                f"{property_item.text()}: {value_item.text()}"))
+            menu.addAction(copy_row_action)
+
+        selected_rows = table.selectionModel().selectedRows()
+        if len(selected_rows) > 1:
+            copy_selected_action = Action(FIF.COPY, self.tr("Copy selected rows"))
+            copy_selected_action.triggered.connect(lambda: QApplication.clipboard().setText(
+                "\n".join(
+                    f"{table.item(index.row(), 0).text()}: {table.item(index.row(), 1).text()}"
+                    for index in table.selectionModel().selectedRows()
+                    if table.item(index.row(), 0) is not None and table.item(index.row(), 1) is not None
+                )))
+            menu.addAction(copy_selected_action)
+
+        menu.exec(table.mapToGlobal(pos))
 
 
 class ProjectsPage(QFrame):
