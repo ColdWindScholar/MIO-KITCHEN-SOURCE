@@ -1305,6 +1305,8 @@ class PluginPage(QWidget):
         self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
         self.tasks = dict() #only to keep qthread alive
         self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
+        self.download_status = {}
+        self.repo_cards = {}
         self.initUI()
 
         module_manager.master = self
@@ -1410,8 +1412,8 @@ class PluginPage(QWidget):
             self.stacked_widget.setCurrentWidget(self.scroll_area_installed)
         else:
             self.stacked_widget.setCurrentWidget(self.scroll_area_repo)
-            self.load_plugin_cards()
-        # Apply the current search filter context immediately to the new screen focus
+            self.load_plugin_cards(refresh_installed=False)
+            return
         self.filter_plugins(self.search_bar.text())
 
     def _clear_layout(self, layout):
@@ -1422,76 +1424,73 @@ class PluginPage(QWidget):
             if widget is not None:
                 widget.deleteLater()
 
-    def load_plugin_cards(self):
-        # 1. Memory Cleanups for Layout Hierarchies
+    def load_plugin_cards(self, refresh_installed=True):
         self._clear_layout(self.repo_layout)
-        self._clear_layout(self.installed_layout)
-        self.cards_data.clear()
+        self.repo_cards.clear()
+        if refresh_installed:
+            self._clear_layout(self.installed_layout)
+            self.cards_data = []
 
-        # 2. Populate INSTALLED Page: Built-In Modules
-        for plugin_id in self.built_in_plugins.plugins.keys():
-            plugin_icon = FluentIcon.APPLICATION
-            plugin_info = self.built_in_plugins.plugins[plugin_id]
-            plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
+            # Populate INSTALLED Page: Built-In Modules
+            for plugin_id, plugin_info in self.built_in_plugins.plugins.items():
+                plugin_title = plugin_info.get("name", plugin_info.get("id", "Unknown"))
+                card = AppCardRich(
+                    icon=FluentIcon.APPLICATION,
+                    title=plugin_title,
+                    author="Mio-Kitchen",
+                    tags=[self.tr('Built-In Plugin')],
+                    parent=self.scroll_content_installed
+                )
+                card.moreButton.clicked.connect(lambda: print("None"))
+                card.openButton.clicked.connect(
+                    lambda state, pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
+                card.clicked.connect(lambda pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
+                self.installed_layout.addWidget(card)
+                self.cards_data.append({
+                    "card_widget": card,
+                    "title": plugin_title.lower(),
+                    "author": "mio-kitchen",
+                    "type": "Installed"
+                })
 
-            card = AppCardRich(
-                icon=plugin_icon,
-                title=plugin_title,
-                author="Mio-Kitchen",
-                tags=[self.tr('Built-In Plugin')],
-                parent=self.scroll_content_installed
-            )
-            card.moreButton.clicked.connect(lambda: print("None"))
-            card.openButton.clicked.connect(
-                lambda state, pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
-            card.clicked.connect(lambda pid=plugin_id: self.built_in_plugins.exec_plugin(pid))
+            # Populate INSTALLED Page: Downloaded Local Directory Packages
+            for plugin_id in module_manager.list_packages():
+                plugin = module_manager.get_info(plugin_id)
+                plugin_icon = os.path.join(module_manager.module_dir, plugin_id, 'icon')
+                if not os.path.exists(plugin_icon):
+                    plugin_icon = FluentIcon.APPLICATION
 
-            self.installed_layout.addWidget(card)
-            self.cards_data.append({
-                "card_widget": card,
-                "title": plugin_title.lower(),
-                "author": "mio-kitchen",
-                "type": "Installed"
-            })
+                plugin_title = plugin.get("name", plugin_id)
+                plugin_author = plugin.get("author", "未知作者")
+                card = AppCardRich(
+                    icon=plugin_icon,
+                    title=plugin_title,
+                    author=plugin_author,
+                    parent=self.scroll_content_installed,
+                    description=plugin.get("describe", ""),
+                    tags=[plugin.get('version', "1.0")]
+                )
+                menu = RoundMenu(parent=card.moreButton)
+                menu.addAction(Action(FluentIcon.CLOSE, self.tr('Uninstall'),
+                                      triggered=lambda state, pid=plugin_id: self.uninstall_plugin(pid)))
+                menu.addAction(Action(FluentIcon.ZOOM_OUT, self.tr('Export'),
+                                      triggered=lambda state, pid=plugin_id: module_manager.export(pid)))
+                menu.addAction(Action(FluentIcon.EDIT, self.tr('Edit'), triggered=lambda: print("Saved")))
 
-        # 3. Populate INSTALLED Page: Downloaded Local Directory Packages
-        for i in module_manager.list_packages():
-            plugin = module_manager.get_info(i)
-            plugin_icon = os.path.join(module_manager.module_dir, i, 'icon')
-            if not os.path.exists(plugin_icon):
-                plugin_icon = FluentIcon.APPLICATION
-
-            plugin_title = plugin.get("name", i)
-            plugin_author = plugin.get("author", "未知作者")
-
-            card = AppCardRich(
-                icon=plugin_icon,
-                title=plugin_title,
-                author=plugin_author,
-                parent=self.scroll_content_installed,
-                description=plugin.get("describe", ""),
-                tags=[plugin.get('version', "1.0")]
-            )
-            menu = RoundMenu(parent=card.moreButton)
-            menu.addAction(Action(FluentIcon.CLOSE, self.tr('Uninstall'),
-                                  triggered=lambda state, pid=i: self.uninstall_plugin(pid)))
-            menu.addAction(Action(FluentIcon.ZOOM_OUT, self.tr('Export'),
-                                  triggered=lambda state, pid=i: module_manager.export(pid)))
-            menu.addAction(Action(FluentIcon.EDIT, self.tr('Edit'), triggered=lambda: print("Saved")))
-
-            card.moreButton.setMenu(menu)
-            card.openButton.clicked.connect(lambda state, pid=i: self.exec_plugin(pid))
-            card.clicked.connect(lambda pid=i: self.exec_plugin(pid))
-
-            self.installed_layout.addWidget(card)
-            self.cards_data.append({
-                "card_widget": card,
-                "title": plugin_title,
-                "author": plugin_author,
-                "type": "Installed",
-                "info": dict(),
-                "id": i
-            })
+                card.moreButton.setMenu(menu)
+                card.openButton.clicked.connect(lambda state, pid=plugin_id: self.exec_plugin(pid))
+                card.clicked.connect(lambda pid=plugin_id: self.exec_plugin(pid))
+                self.installed_layout.addWidget(card)
+                self.cards_data.append({
+                    "card_widget": card,
+                    "title": plugin_title,
+                    "author": plugin_author,
+                    "type": "Installed",
+                    "info": dict(),
+                    "id": plugin_id
+                })
+        else:
+            self.cards_data = [data for data in self.cards_data if data["type"] == "Installed"]
 
         if self.SegmentedWidget.currentRouteKey() == 'Repo':
             for item in self.get_repo_plugins():
@@ -1508,6 +1507,12 @@ class PluginPage(QWidget):
                 card.openButton.clicked.connect(
                     lambda state, plugin_info=item: self.download_plugin(plugin_info))
 
+                status = self.download_status.get(item['id'])
+                if status:
+                    state, enable = status
+                    card.openButton.setText(state)
+                    card.openButton.setDisabled(not enable)
+
                 self.repo_layout.addWidget(card)
                 self.cards_data.append({
                     "card_widget": card,
@@ -1517,15 +1522,15 @@ class PluginPage(QWidget):
                     "info": item,
                     "id": item['id']
                 })
+                self.repo_cards[item['id']] = card
+
+        self.filter_plugins(self.search_bar.text())
 
     def set_download_status(self, plugin_info: dict, state: str = "", enable: bool = False):
-        card_widget = None
-        for data in self.cards_data:
-            if "id" not in data:
-                continue
-            if data['id'] == plugin_info['id'] and data['type'] == 'Repo':
-                card_widget = data["card_widget"]
-        if not card_widget:
+        plugin_id = plugin_info['id']
+        self.download_status[plugin_id] = (state, enable)
+        card_widget = self.repo_cards.get(plugin_id)
+        if card_widget is None:
             return 1
         card_widget.openButton.setDisabled(not enable)
         if state:
@@ -1552,7 +1557,15 @@ class PluginPage(QWidget):
         for file in files:
             file_path = os.path.join(temp, file)
             if os.path.exists(file_path) and os.path.getsize(file_path) == size:
-                module_manager.install(file_path)
+                result, reason = module_manager.install(file_path)
+                if result != module_error_codes.Normal:
+                    events.show_info_bar.emit(
+                        self.tr("Warning"),
+                        self.tr("Failed to install {}: {}").format(plugin_info.get("name", plugin_info["id"]), reason),
+                        2, 3500
+                    )
+                    events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                    return 1
                 continue
             try:
                 download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
@@ -1563,7 +1576,21 @@ class PluginPage(QWidget):
                                           2, 3500)
                 events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                 return 1
-            module_manager.install(file_path)
+            result, reason = module_manager.install(file_path)
+            if result != module_error_codes.Normal:
+                events.show_info_bar.emit(
+                    self.tr("Warning"),
+                    self.tr("Failed to install {}: {}").format(plugin_info.get("name", plugin_info["id"]), reason),
+                    2, 3500
+                )
+                events.download_signal.emit(plugin_info, self.tr("Retry"), True)
+                return 1
+        self.download_status.pop(plugin_info['id'], None)
+        events.show_info_bar.emit(
+            self.tr("Success"),
+            self.tr("{} installed successfully.").format(plugin_info.get("name", plugin_info['id'])),
+            3, 5000
+        )
         events.load_plugin_cards.emit()
         return None
 
