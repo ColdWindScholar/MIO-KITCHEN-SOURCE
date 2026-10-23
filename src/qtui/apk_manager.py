@@ -4,7 +4,6 @@ import zipfile
 
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
-from androguard.core.axml import ARSCParser, AXMLPrinter
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QFileDialog,
@@ -14,6 +13,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from androguard.core.axml import ARSCParser, AXMLPrinter
 from qfluentwidgets import (
     CaptionLabel,
     CardWidget,
@@ -28,7 +28,6 @@ from qfluentwidgets import (
     StrongBodyLabel,
     TableWidget,
     TabWidget,
-    isDarkTheme,
 )
 
 from src.qtui.settings_cfg import cfg
