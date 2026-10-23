@@ -58,37 +58,38 @@ class Extractor:
             'x': 1
         }
         for n, sym in enumerate(arg):
-            if n == 0 and perms.get(sym):
-                o = perms.get(sym)
-            elif n == 1 and perms.get(sym):
-                o += perms.get(sym)
+            perms_get = perms.get(sym, 0) or 0
+            if n == 0 and perms_get:
+                o = perms_get
+            elif n == 1 and perms_get:
+                o += perms_get
             elif n == 2:
                 if sym == 'S':
                     s = 4
-                elif perms.get(sym):
-                    o += perms.get(sym)
+                elif perms_get:
+                    o += perms_get
                 elif sym == 's':
                     s += 4
                     o += 1
-            elif n == 3 and perms.get(sym):
-                g = perms.get(sym)
-            elif n == 4 and perms.get(sym):
-                g += perms.get(sym)
+            elif n == 3 and perms_get:
+                g = perms_get
+            elif n == 4 and perms_get:
+                g += perms_get
             if n == 5:
-                if perms.get(sym):
-                    g += perms.get(sym)
+                if perms_get:
+                    g += perms_get
                 elif sym == 'S':
                     s += 2
                 elif sym == 's':
                     s += 2
                     g += 1
-            elif n == 6 and perms.get(sym):
-                w = perms.get(sym)
-            elif n == 7 and perms.get(sym):
-                w += perms.get(sym)
+            elif n == 6 and perms_get:
+                w = perms_get
+            elif n == 7 and perms_get:
+                w += perms_get
             elif n == 8:
-                if perms.get(sym):
-                    w += perms.get(sym)
+                if perms_get:
+                    w += perms_get
                 elif sym == 'T':
                     s += 1
                 elif sym == 't':
@@ -267,7 +268,7 @@ class Extractor:
             os.path.basename(output_dir))
         self.OUTPUT_IMAGE_FILE = (os.path.realpath(os.path.dirname(target)) + os.sep) + os.path.basename(target)
         self.FileName = self.__out_name(os.path.basename(target), out=0)
-        self.CONFIG_DIR = work + os.sep + 'config'
+        self.CONFIG_DIR = os.path.join(work, 'config')
         with open(self.OUTPUT_IMAGE_FILE, 'rb+') as file:
             mount = ext4.Volume(file).get_mount_point
             if mount[:1] == '/':

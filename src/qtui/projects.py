@@ -43,9 +43,9 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt, QThread, Signal, QObject
+from PySide6.QtCore import Qt, Signal, QObject, QPoint
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
-    QHeaderView, QFrame
+    QHeaderView, QFrame, QAbstractItemView
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
     TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon
@@ -66,10 +66,11 @@ from src.core.utils import gettype, call
 from src.core.aml_image import main as aml_main
 from qfluentwidgets.common.smooth_scroll import SmoothMode
 
-try:
-    from src.core.pycase import ensure_dir_case_sensitive
-except ImportError:
-    ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
+if os.name == 'nt':
+    try:
+        from src.core.pycase import ensure_dir_case_sensitive
+    except ImportError:
+        ensure_dir_case_sensitive = lambda *x: print(f'Cannot sensitive {x}, Not Supported')
 context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.json")
 
 
@@ -190,7 +191,7 @@ def zero_cpio_owner(path: str):
 
 class PackHybridRom:
     def __init__(self, right_device):
-        if os.path.exists((dir_ := project_manger.current_work_output_path()) + "firmware-update"):
+        if os.path.exists(dir_ := os.path.join(project_manger.current_work_output_path(), "firmware-update")):
             os.rename(f"{dir_}/firmware-update", f"{dir_}/images")
         if not os.path.exists(f"{dir_}/images"):
             os.makedirs(f'{dir_}/images')
@@ -209,7 +210,8 @@ class PackHybridRom:
             lines.insert(45, f'right_device="{right_device}"\n')
             add_line = self.get_line_num(lines, '#Other images')
             for t in os.listdir(f"{dir_}/images"):
-                if t.endswith('.img') and not os.path.isdir(dir_ + t):
+                dir_t = os.path.join(dir_, t)
+                if t.endswith('.img') and not os.path.isdir(dir_t):
                     print(f"Add Flash method {t} to update-binary")
                     if os.path.getsize(os.path.join(f'{dir_}/images', t)) > 209715200:
                         self.zstd_compress(os.path.join(f'{dir_}/images', t))
@@ -219,10 +221,11 @@ class PackHybridRom:
                         lines.insert(add_line,
                                      f'package_extract_file "images/{t}" "/dev/block/by-name/{t[:-4]}"\n')
             for t in os.listdir(dir_):
-                if not t.startswith("preloader_") and not os.path.isdir(dir_ + t) and t.endswith('.img'):
+                dir_t = os.path.join(dir_, t)
+                if not t.startswith("preloader_") and not os.path.isdir(dir_t) and t.endswith('.img'):
                     print(f"Add Flash method {t} to update-binary")
-                    if os.path.getsize(dir_ + t) > 209715200:
-                        self.zstd_compress(dir_ + t)
+                    if os.path.getsize(dir_t) > 209715200:
+                        self.zstd_compress(dir_t)
                         shutil.move(os.path.join(dir_, f"{t}.zst"), os.path.join(f"{dir_}/images", f"{t}.zst"))
                         lines.insert(add_line,
                                      f'package_extract_zstd "images/{t}.zst" "/dev/block/by-name/{t[:-4]}"\n')
@@ -615,7 +618,7 @@ class ProjectsPage(QFrame):
                 utils.re_folder(project_manger.current_work_path())
             KDZFileTools(ifile, project_manger.current_work_path(), extract_all=True)
             for i in os.listdir(project_manger.current_work_path()):
-                file = project_manger.current_work_path() + os.sep + i
+                file = os.path.join(project_manger.current_work_path(), i)
                 if not os.path.isfile(file):
                     continue
                 if i.endswith('.dz') and gettype(file) == 'dz':
@@ -666,7 +669,8 @@ class ProjectsPage(QFrame):
             return
         # zip
         if ftype == 'zip':
-            cfg.set(cfg.currentProjectName, os.path.splitext(os.path.basename(ifile))[0])
+            project_name = os.path.splitext(os.path.basename(ifile))[0]
+            cfg.set(cfg.currentProjectName, project_name)
             with zipfile.ZipFile(ifile, 'r') as fz:
                 if len(fz.namelist()) == 1:
                     for fi in fz.namelist():
@@ -677,7 +681,6 @@ class ProjectsPage(QFrame):
                             print("cannot rename %s %s" % (fi, e))
                     self.unpackrom(os.path.join(utils.temp, fi))
                     os.remove(os.path.join(utils.temp, fi))
-                    print("unzip done")
                     return
                 for fi in fz.namelist():
                     try:
@@ -687,7 +690,7 @@ class ProjectsPage(QFrame):
                             member_name = fi.encode('cp437').decode('utf-8')
                         except (Exception, BaseException):
                             member_name = fi
-                    print("Extracting " + member_name)
+                    print(f"Extracting {member_name}")
                     try:
                         fz.extract(fi, project_manger.current_work_path())
                         if fi != member_name:
@@ -696,12 +699,10 @@ class ProjectsPage(QFrame):
                     except Exception as e:
                         print("cannot rename %s %s" % (member_name, e))
                 print("unzip done")
-                if os.path.isdir(project_manger.current_work_path()):
-                    events.refresh_projects.emit()
-                    events.set_project_name.emit(os.path.splitext(os.path.basename(ifile))[0])
                 self.script2fs(project_manger.current_work_path())
-                events.refresh_projects.emit()
-
+            events.refresh_projects.emit()
+            events.set_project_name.emit(project_name)
+            events.refresh_list.emit()
             if cfg.autoUnpack:
                 self.unpack([i.split('.')[0] for i in os.listdir(project_manger.current_work_path())])
             return
@@ -732,8 +733,8 @@ class ProjectsPage(QFrame):
             # File Rename
             if os.path.exists(os.path.join(project_dir, file_name)):
                 if not '.' in file_name:
-                    shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, file_name + ".img"))
-                if file_name.endswith(".bin") or file_name.endswith(".IMG") or file_name.endswith(".BIN"):
+                    shutil.move(os.path.join(project_dir, file_name), os.path.join(project_dir, f"{file_name}.img"))
+                if (file_name.endswith(".bin") or file_name.endswith(".IMG") or file_name.endswith(".BIN")) and gettype(os.path.join(project_dir, file_name)) != 'payload':
                     shutil.move(os.path.join(project_dir, file_name),
                                 os.path.join(project_dir, file_name[:-4] + ".img"))
             cfg.set(cfg.currentProjectName, base_name)
@@ -908,7 +909,7 @@ class ProjectsPage(QFrame):
         result = MessageBox(
             self.tr('Confirm Delete'),
             self.tr("Remove '{}' ?").format(project_name),
-            self.parent()
+            parent=self.parent()
         ).exec()
 
         if result != 1:
@@ -996,7 +997,6 @@ class ProjectsPage(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(14)
 
-        # 标题放外面
         frame = QHBoxLayout()
         frame.addWidget(QLabel(self.tr("Partition(s)")))
         self.format_widget = SegmentedWidget(container)
@@ -1021,14 +1021,16 @@ class ProjectsPage(QFrame):
         frame.addWidget(self.stop_btn)
         layout.addLayout(frame)
 
-        # 高级现代列数据集表格（参照上一轮设计的现代化 List 样式）
         self.partition_table = TableWidget(container)
+        self.partition_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.partition_table.setColumnCount(5)
         self.partition_table.setMinimumHeight(370)
         # Guard so bulk updates (load / select-all) don't feed back into the
         # Select All checkbox sync handler.
         self._updating_table = False
         self.partition_table.itemChanged.connect(self._on_partition_item_changed)
+        self.partition_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.partition_table.customContextMenuRequested.connect(self.show_right_click_menu)
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
@@ -1041,7 +1043,6 @@ class ProjectsPage(QFrame):
             self.partition_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
         layout.addWidget(self.partition_table)
 
-        # 全选与搜索框
         row1 = QHBoxLayout()
         self.select_all_cb = CheckBox(self.tr("Select All"), container)
         self.select_all_cb.stateChanged.connect(self._toggle_select_all_partitions)
@@ -1064,6 +1065,38 @@ class ProjectsPage(QFrame):
         layout.addLayout(row1)
 
         self.scroll_layout.addWidget(container)
+
+    def show_right_click_menu(self, pos: QPoint):
+        # 3. Get the specific item under the cursor position
+        item = self.partition_table.itemAt(pos)
+
+        if not item:
+            return  # Clicked on empty space inside the table view, don't show menu
+
+        # Get the row index of the clicked item
+        row = self.partition_table.row(item)
+        item_full = self.partition_table.item(row, 0)
+
+
+        # 4. Create the Fluent Design Context Menu
+        menu = RoundMenu(parent=self.partition_table)
+
+        # 5. Create actions using Fluent Icons (FIF)
+        unpack_action = Action(FIF.PLAY, 'Unpack Image', self)
+        copy_action = Action(FIF.COPY, f'Copy "{item_full.text()}"', self)
+        info_action = Action(FIF.INFO, 'View Hex Metadata', self)
+        delete_action = Action(FIF.DELETE, 'Remove from List', self)
+
+
+
+        # 7. Add actions and separation blocks to the Fluent UI menu
+        menu.addAction(unpack_action)
+        menu.addAction(copy_action)
+        menu.addAction(info_action)
+        menu.addSeparator()
+        menu.addAction(delete_action)
+
+        menu.exec(self.partition_table.mapToGlobal(pos))
 
     def _toggle_select_all_partitions(self, state):
         """Toggles check state of all visible rows based on the Select All checkbox."""
@@ -1406,7 +1439,7 @@ class ProjectsPage(QFrame):
         output_super_path = f'{output_dir}/super.img'
         command += ['--out', output_super_path]
 
-        if call(command, debug_binary=False) == 0:
+        if call(command) == 0:
             if os.access(output_super_path, os.F_OK):
                 print(self.tr("Pack Done! Output: %s") % output_super_path)
                 events.show_info_bar.emit(self.tr("Success"), self.tr("Pack Done！Output：%s") % output_super_path, 3,
@@ -1459,7 +1492,7 @@ class ProjectsPage(QFrame):
 
         self.super_btn = PushButton(self.tr("Pack Super"), container, FIF.ALBUM)
         self.super_btn.clicked.connect(self.pack_super)
-        self.format_conv_btn = PushButton(self.tr("Format Convertion"), container, FIF.EMBED)
+        self.format_conv_btn = PushButton(self.tr("Format convertion"), container, FIF.EMBED)
         self.format_conv_btn.clicked.connect(self.convert_image)
         self.super_mapper_btn = PushButton(self.tr("Super_* Mapper"), container, FIF.TILES)
         self.super_mapper_btn.clicked.connect(self.super_mapper)
@@ -1655,14 +1688,15 @@ class ProjectsPage(QFrame):
                      f'{work}/config/{name}_file_contexts', '-t', f'/{name}', '-T', str(UTC),
                      f'{work_output}/{name}.img'])
 
-    def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int = None):
+    def mke2fs(self, name: str, work: str, sparse: bool, work_output: str, size: int = 0, UTC: int|None = None):
         if isinstance(size, str): size = int(size)
         print("\n[ext] repacking %s" % name)
         size = utils.GetFolderSize(os.path.join(work, name), 4096, 3,
                                    f"{work}/dynamic_partitions_op_list").rsize_v if not size else size / 4096
         print(f"{name}:[{size}]")
-        if not UTC:
-            UTC = int(time.time())
+        utc_time = UTC
+        if not utc_time:
+            utc_time = int(time.time())
         if call(
                 ['mke2fs', '-O',
                  '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L',
@@ -1673,7 +1707,7 @@ class ProjectsPage(QFrame):
             print(f"packing {name} failed [mke2fs]")
             return 1
         ret = call(
-            ['e2fsdroid', '-e', '-T', f'{UTC}', '-S', f'{work}/config/{name}_file_contexts', '-C',
+            ['e2fsdroid', '-e', '-T', f'{utc_time}', '-S', f'{work}/config/{name}_file_contexts', '-C',
              f'{work}/config/{name}_fs_config', '-a', f'/{name}', '-f', f'{work}/{name}',
              f'{work_output}/{name}_new.img'])
         if ret != 0:
@@ -1842,7 +1876,8 @@ class ProjectsPage(QFrame):
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
             return False
-        parts_dict = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info").read()
+        work = project_manger.current_work_path()
+        parts_dict = utils.JsonEdit(os.path.join(work, "config/parts_info")).read()
         if patch_vbmeta and chosen_parts:
             # Patch vbmeta once, before the loop. It used to run for every
             # selected partition and each call walked the whole project tree.
@@ -1909,7 +1944,7 @@ class ProjectsPage(QFrame):
                             self.rdi(work, dname)
                         print("Packed successfully: {}!".format(dname))
                         if pack_format in ["dat", "br", "sparse"]:
-                            utils.img2simg(project_manger.current_work_output_path() + dname + ".img")
+                            utils.img2simg(os.path.join(project_manger.current_work_output_path(), f"{dname}.img"))
                             if pack_format == 'dat':
                                 self.datbr(project_manger.current_work_output_path(), dname, "dat",
                                            int(parts_dict.get('dat_ver', 4)))
@@ -2178,13 +2213,13 @@ class ProjectsPage(QFrame):
             events.show_info_bar.emit(self.tr("Warning"), self.tr("Project's not exist"), 3, 3000)
             return False
 
-        json_ = utils.JsonEdit((work := project_manger.current_work_path()) + "config/parts_info")
+        json_ = utils.JsonEdit(os.path.join(work := project_manger.current_work_path(), "config/parts_info"))
+        # add a file lock here.
         parts = json_.read()
         if not chose:
             return False
         if form == 'payload':
             time_start = time.time()
-            print("Unpacking payload...")
             with open(f"{work}/payload.bin", "rb") as f:
                 extract_partitions_from_payload(
                     f,
@@ -2276,7 +2311,7 @@ class ProjectsPage(QFrame):
                     events.refresh_list.emit()
                     continue
                 if gettype(f"{work}/{i}.img") in ['boot', 'vendor_boot']:
-                    unpack_boot(i)
+                    unpack_boot(i, boot=f"{work}/{i}.img")
                     events.refresh_list.emit()
                     continue
                 if i == 'logo':

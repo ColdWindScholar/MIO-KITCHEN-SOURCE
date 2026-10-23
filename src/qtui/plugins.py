@@ -24,7 +24,6 @@ from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBro
 from qfluentwidgets import (ProgressBar, ImageLabel)
 
 from src.qtui.widgets import GenericTaskWorker
-from src.core import images
 from src.core import imp
 from src.core import utils
 from src.core.Magisk import Magisk_patch
@@ -329,7 +328,7 @@ class ModuleManager(QObject):
             info_json_path = os.path.join(script_path, "info.json")
             if not os.path.exists(info_json_path):
                 logging.error(f"run: info.json not found for plugin {id_} at {info_json_path}")
-                print(f"Plugin {name} configuration is missing.")
+                events.show_info_bar.emit(self.tr("Warning"), self.tr(f"Plugin {name} configuration is missing."), 2, 3500)
                 return 3
 
             try:
@@ -361,7 +360,7 @@ class ModuleManager(QObject):
             else:
                 return 2
         else:
-            events.show_info_bar.emit(self.tr('Warning'), self.tr("Cannot execute gui plugin, because master not set or json not exists."), 2, 3000)
+            logging.warning("Cannot execute gui plugin, because master not set or json not exists.")
 
         main_sh_path = os.path.join(script_path, "main.sh")
         main_py_path = os.path.join(script_path, "main.py")
@@ -405,7 +404,8 @@ class ModuleManager(QObject):
         elif not os.path.exists(os.path.join(self.module_dir, value)):
             events.show_info_bar.emit(self.tr("Warning"), self.tr("{} is not installed or broken.").format(value), 2, 3500)
         else:
-            print("此插件不可运行 {}".format(self.get_name(id_)))
+            events.show_info_bar.emit(self.tr("Warning"), self.tr("{} is not executable").format(self.get_name(id_)), 2,
+                                      3500)
         return 0
 
     @staticmethod
@@ -963,11 +963,9 @@ class InstallMpk(MessageBoxBase):
                 except (Exception, KeyError):
                     logging.exception('Bugs')
                     self.pyt = QPixmap()
-                    self.pyt.loadFromData(images.none_byte)
         except (Exception, BaseException):
             logging.exception('Bugs')
             self.pyt = QPixmap()
-            self.pyt.loadFromData(images.none_byte)
 
         # 更新 Fluent UI 组件展示
         self.name_label.setText(self.mconf.get('module', 'name'))
@@ -979,7 +977,6 @@ class InstallMpk(MessageBoxBase):
     def unavailable(self):
         """异常和包损坏时的界面安全降级逻辑"""
         self.pyt = QPixmap()
-        self.pyt.loadFromData(images.error_logo_byte)
 
         self.name_label.setText(self.tr("PLease select a plugin"))
         self.name_label.setTextColor(QColor("#ffcc00"), QColor("#ffcc00"))
@@ -1146,10 +1143,9 @@ class BuiltInPlugins(QObject):
                             output_file = os.path.join(prog_path,
                                                        f"{name_part}_{utils.v_code()}_magisk_patched.img")
                         os.rename(m.output, output_file)  # Move the patched file to the final destination.
-                        print(f"Done! Patched Boot: {output_file}")
-                        InfoBar.success("Magisk Patch", f"Patched Boot:\n{output_file}", parent=self.master)
+                        InfoBar.success(self.tr("Magisk Patch"), f"Patched Boot:\n{output_file}", parent=self.master)
                     else:
-                        InfoBar.warning("Magisk Patch", "Magisk patching process did not produce an output file.",
+                        InfoBar.warning(self.tr("Magisk Patch"), self.tr("Magisk patching process did not produce an output file."),
                                         parent=self.master)
             except Exception as e:
                 # I log any exceptions during patching and inform the user.
@@ -1172,7 +1168,7 @@ class BuiltInPlugins(QObject):
                 # I log the error and inform the user of failure.
                 print(f'Merge failed: {e}')
                 logging.exception('MergeQC RAWPROGRAM error')
-                InfoBar.warning("Warning", f'Image merging failed: {str(e)}',
+                InfoBar.warning(self.tr("Warning"), f'Image merging failed: {str(e)}',
                                 parent=self.master)  # Displaying the error message to the user.
             # No explicit return None needed here as the function naturally returns None if no other return is hit.
 
@@ -1428,8 +1424,8 @@ class PluginPage(QWidget):
 
     def load_plugin_cards(self):
         # 1. Memory Cleanups for Layout Hierarchies
-        self._clear_layout(self.installed_layout)
         self._clear_layout(self.repo_layout)
+        self._clear_layout(self.installed_layout)
         self.cards_data.clear()
 
         # 2. Populate INSTALLED Page: Built-In Modules
@@ -1563,7 +1559,8 @@ class PluginPage(QWidget):
                 for percentage, speed_val, bytes_down, file_size_val, elapsed_val in download_generator:
                     events.download_signal.emit(plugin_info, f"{percentage} %", False)
             except Exception as e:
-                print(e)
+                events.show_info_bar.emit(self.tr("Warning"), self.tr("Failed to download {}, reason: {}").format(file, e),
+                                          2, 3500)
                 events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                 return 1
             module_manager.install(file_path)

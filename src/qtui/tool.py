@@ -13,18 +13,21 @@
 # limitations under the License.
 import logging
 import os
+import pathlib
 import platform
+import subprocess
 import sys
+import threading
 import time
 
-from PySide6.QtCore import Qt, QSize, QTranslator
+from PySide6.QtCore import Qt, QSize, QTranslator, QObject
 from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.qtui.apk_manager import ApkManagerPage
 from src.qtui.connect import ConnectPage
-from src.core.utils import temp, v_code, prog_path
+from src.core.utils import temp, v_code, prog_path, tool_self
 from src.qtui.about import AboutPage
 from src.qtui.home import HomePage
 from src.qtui.plugins import PluginPage
@@ -44,8 +47,6 @@ if platform.system() != 'Darwin':
 if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-
 
 class MainWindow(FluentWindow):
     def __init__(self):
@@ -120,6 +121,31 @@ class MainWindow(FluentWindow):
         # 默认显示主页
         self.switchTo(self.home_page)
 
+    def restart(self):
+        def _inner():
+            argv = [sys.executable]
+            if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
+                # only needed when running within a Python intepreter
+                argv.append(tool_self)
+            argv.extend(sys.argv[1:])
+            p = subprocess.Popen(argv)
+            p.wait()
+            sys.exit(p.returncode)
+
+        er = QApplication.instance()
+        try:
+            for i in er.findChildren(QObject):
+                try:
+                    i.deleteLater()
+                except (ValueError, AttributeError):
+                    logging.exception('Restart')
+            er.deleteLater()
+            self.connect_page.network_thread.terminate()
+        except (Exception, BaseException):
+            logging.exception('Restart')
+
+        threading.Thread(target=_inner).start()
+
 
 def __init__qt(args):
     tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
@@ -139,6 +165,7 @@ def __init__qt(args):
                         filename=tool_log, filemode='w')
     window = MainWindow()
     window.load_language()
+    cfg.language.valueChanged.connect(window.restart)
     window.show()
     if pyi_splash_available:
         pyi_splash.close()
