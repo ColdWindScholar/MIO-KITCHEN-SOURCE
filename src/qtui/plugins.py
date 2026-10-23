@@ -926,6 +926,7 @@ class InstallMpk(MessageBoxBase):
             self.installb.setText(self.tr("Retry"))
             self.installb.setEnabled(True)
         elif ret == module_error_codes.Normal:
+            events.plugin_installed.emit(self.mconf.get('module', 'identifier'))
             self.state.setText(self.tr("Installed"))
             self.installb.setText(self.tr("Done"))
             self.installb.setEnabled(True)
@@ -1292,6 +1293,7 @@ class BuiltInPlugins(QObject):
 
 class Events(QObject):
     download_signal = Signal(dict, str, bool)
+    plugin_installed = Signal(str)
     load_plugin_cards = Signal()
     show_info_bar = Signal(str, str, int, int)
 
@@ -1317,6 +1319,7 @@ class PluginPage(QWidget):
         outer_layout.setContentsMargins(40, 40, 40, 40)
         outer_layout.setSpacing(20)
         events.download_signal.connect(self.set_download_status)
+        events.plugin_installed.connect(self.load_installed_plugin)
         events.load_plugin_cards.connect(self.load_plugin_cards)
         events.show_info_bar.connect(self.show_info_bar)
         # 2. Header Layout (Title and Navigation)
@@ -1536,6 +1539,10 @@ class PluginPage(QWidget):
         if state:
             card_widget.openButton.setText(state)
 
+    def load_installed_plugin(self, plugin_id: str):
+        if module_manager.is_installed(plugin_id):
+            module_manager.register_plugin(plugin_id)
+
     def download_plugin(self, plugin_info: dict):
         code = utils.v_code(10)
         self.tasks[code] = GenericTaskWorker(self.__download_plugin, plugin_info)
@@ -1566,6 +1573,7 @@ class PluginPage(QWidget):
                     )
                     events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                     return 1
+                events.plugin_installed.emit(plugin_info['id'])
                 continue
             try:
                 download_generator = utils.download_api(cfg.pluginRepo.value + file, temp, size_=size, chunk_size=size // 4)
@@ -1585,6 +1593,7 @@ class PluginPage(QWidget):
                 )
                 events.download_signal.emit(plugin_info, self.tr("Retry"), True)
                 return 1
+            events.plugin_installed.emit(plugin_info['id'])
         self.download_status.pop(plugin_info['id'], None)
         events.show_info_bar.emit(
             self.tr("Success"),
