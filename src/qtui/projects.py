@@ -44,11 +44,12 @@ from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
 from PySide6.QtCore import Qt, Signal, QObject, QPoint
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame, QAbstractItemView
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
-    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon
+    TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon, \
+    MessageBoxBase, SubtitleLabel, CaptionLabel
 
 from src.core import ext4
 from src.core import imgextractor
@@ -338,6 +339,62 @@ def un_dtbo(bn: str = 'dtbo') -> None:
     except (Exception, BaseException):
         logging.exception('Bugs')
     rmtree(f"{work}/dtbo/dtbo")
+
+
+class PartitionDetailsDialog(MessageBoxBase):
+    def __init__(self, details: list[tuple[str, str]], ext4_details: list[tuple[str, str]], parent=None):
+        super().__init__(parent)
+
+        self.title_label = SubtitleLabel(self.tr("Partition details"), self)
+        self.viewLayout.addWidget(self.title_label)
+        self.viewLayout.addWidget(CaptionLabel(
+            self.tr("Image and filesystem metadata for this partition."), self))
+        self.viewLayout.setSpacing(12)
+
+        sections = QWidget(self)
+        sections_layout = QHBoxLayout(sections)
+        sections_layout.setContentsMargins(0, 0, 0, 0)
+        sections_layout.setSpacing(16)
+        sections_layout.addWidget(self._create_section(self.tr("Overview"), details), 1)
+        if ext4_details:
+            sections_layout.addWidget(
+                self._create_section(self.tr("Ext4 filesystem"), ext4_details), 1)
+        self.viewLayout.addWidget(sections)
+
+        self.copy_button = PushButton(self.tr("Copy all"), self, FIF.COPY)
+        self.copy_button.clicked.connect(lambda: QApplication.clipboard().setText(
+            "\n".join(f"{label}: {value}" for label, value in details + ext4_details)))
+        self.viewLayout.addWidget(self.copy_button)
+        self.yesButton.setText(self.tr("Close"))
+        self.cancelButton.hide()
+        self.widget.setMinimumWidth(620)
+        self.widget.setMaximumHeight(720)
+
+    def _create_section(self, title: str, rows: list[tuple[str, str]]) -> QWidget:
+        section = QWidget(self)
+        layout = QVBoxLayout(section)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+        layout.addWidget(SubtitleLabel(title, section))
+        layout.addWidget(self._create_table(rows))
+        return section
+
+    def _create_table(self, rows: list[tuple[str, str]]) -> TableWidget:
+        table = TableWidget(self)
+        table.setColumnCount(2)
+        table.setRowCount(len(rows))
+        table.setHorizontalHeaderLabels([self.tr("Property"), self.tr("Value")])
+        table.verticalHeader().hide()
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        table.setMinimumWidth(260)
+        for row, (label, value) in enumerate(rows):
+            table.setItem(row, 0, QTableWidgetItem(label))
+            table.setItem(row, 1, QTableWidgetItem(value))
+        table.setMaximumHeight(min(320, table.verticalHeader().defaultSectionSize() * (len(rows) + 1)))
+        return table
 
 
 class ProjectsPage(QFrame):
@@ -913,36 +970,97 @@ class ProjectsPage(QFrame):
         self.scroll_layout.addWidget(container)
 
     def show_right_click_menu(self, pos: QPoint):
-        # 3. Get the specific item under the cursor position
         item = self.partition_table.itemAt(pos)
-
         if not item:
-            return  # Clicked on empty space inside the table view, don't show menu
+            return
 
-        # Get the row index of the clicked item
         row = self.partition_table.row(item)
-        item_full = self.partition_table.item(row, 0)
+        name_item = self.partition_table.item(row, 0)
+        if name_item is None:
+            return
 
-
-        # 4. Create the Fluent Design Context Menu
+        name = name_item.text()
         menu = RoundMenu(parent=self.partition_table)
+        if self.unpack_rb.isChecked():
+            image_action = Action(FIF.PLAY, self.tr('Unpack Image'), self)
+            image_action.triggered.connect(lambda: self._unpack_partition_from_menu(name))
+        else:
+            image_action = Action(FIF.EMBED, self.tr('Pack Image'), self)
+            image_action.triggered.connect(lambda: self._pack_partition_from_menu(name))
+        image_action.setEnabled(self.execute_btn.isEnabled())
 
-        # 5. Create actions using Fluent Icons (FIF)
-        unpack_action = Action(FIF.PLAY, 'Unpack Image', self)
-        copy_action = Action(FIF.COPY, f'Copy "{item_full.text()}"', self)
-        info_action = Action(FIF.INFO, 'View Hex Metadata', self)
-        delete_action = Action(FIF.DELETE, 'Remove from List', self)
+        copy_action = Action(FIF.COPY, self.tr('Copy "{}"').format(name), self)
+        copy_action.triggered.connect(lambda: QApplication.clipboard().setText(name))
+        info_action = Action(FIF.INFO, self.tr('View Details'), self)
+        info_action.triggered.connect(lambda: self._show_partition_details(row))
+        remove_action = Action(FIF.DELETE, self.tr('Remove from List'), self)
+        remove_action.triggered.connect(lambda: self.partition_table.removeRow(row))
 
-
-
-        # 7. Add actions and separation blocks to the Fluent UI menu
-        menu.addAction(unpack_action)
+        menu.addAction(image_action)
         menu.addAction(copy_action)
         menu.addAction(info_action)
         menu.addSeparator()
-        menu.addAction(delete_action)
+        menu.addAction(remove_action)
 
         menu.exec(self.partition_table.mapToGlobal(pos))
+
+    def _unpack_partition_from_menu(self, name: str):
+        self.my_task_worker = GenericTaskWorker(
+            self.unpack, [name], self.format_widget.currentItem().text())
+        self.start_job(self.my_task_worker)
+
+    def _pack_partition_from_menu(self, name: str):
+        dialog = PackSettingsDialog(self)
+        if not dialog.exec():
+            return
+
+        self.my_task_worker = GenericTaskWorker(
+            self.packrom,
+            [name],
+            dialog.format_combo.currentText(),
+            dialog.sw_vbmeta.isChecked(),
+            dialog.sw_convert.isChecked(),
+            dialog.src_fs_combo.currentText(),
+            dialog.dest_fs_combo.currentText(),
+            dialog.sw_delete.isChecked(),
+            dialog.compress_algo_combo.currentText(),
+            dialog.erofs_slider.value(),
+            dialog.support_old_kernel_switch.isChecked(),
+            dialog.utc_input.text(),
+            dialog.f2fs_readonly_switch.isChecked(),
+            dialog.f2fs_compress_switch.isChecked(),
+            dialog.pack_method_combo.currentText(),
+            dialog.brotli_slider.value(),
+            dialog.size_handle_combo.currentText() == self.tr("Origin Size"),
+        )
+        self.start_job(self.my_task_worker)
+
+    def _show_partition_details(self, row: int):
+        labels = (self.tr("Name"), self.tr("Size"), self.tr("File system"),
+                  self.tr("Image type"), self.tr("Attributes"))
+        values = [
+            self.partition_table.item(row, column).text()
+            if self.partition_table.item(row, column)
+            else self.partition_table.cellWidget(row, column).text()
+            if self.partition_table.cellWidget(row, column)
+            else self.tr("Unknown")
+            for column in range(len(labels))
+        ]
+        details = list(zip(labels, values))
+        details.append((self.tr("Operation"), self.format_widget.currentItem().text()))
+
+        ext4_details = []
+        image_path = os.path.join(project_manger.current_work_path(), f"{values[0]}.img")
+        if values[2].lower() in ("ext", "ext2", "ext3", "ext4") and os.path.isfile(image_path):
+            try:
+                with open(image_path, "rb") as image:
+                    ext4_details = [
+                        (str(key), str(value)) for key, value in ext4.Volume(image).get_info_list
+                    ]
+            except (OSError, ext4.Ext4Error, ValueError) as error:
+                ext4_details = [(self.tr("Metadata unavailable"), str(error))]
+
+        PartitionDetailsDialog(details, ext4_details, self).exec()
 
     def _toggle_select_all_partitions(self, state):
         """Toggles check state of all visible rows based on the Select All checkbox."""
