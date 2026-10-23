@@ -256,7 +256,7 @@ def update(args):
                     arch = arch_list.get(arch, arch)
                 yellow(f"\nVersion:{version}\nGitid:{gitid}\nSystem:{system}\nArch:{arch}")
                 if os.path.exists(downloaded_file):
-                    if not zipfile.is_zipfile(downloaded_file) and not content.get("is_binary", False):
+                    if not zipfile.is_zipfile(downloaded_file) and not content.get("is_binary", False) and not downloaded_file.endswith('.tar.gz'):
                         LOGE("Not Update it.Skip")
                         continue
                 else:
