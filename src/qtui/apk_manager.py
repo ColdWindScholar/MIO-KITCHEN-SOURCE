@@ -405,30 +405,7 @@ class ApkManagerPage(QWidget):
         self._update_status()
 
     def _apply_theme(self, *_):
-        dark = isDarkTheme()
-        page = "#171b25" if dark else "#f3f4f7"
-        panel = "#1e2330" if dark else "#ffffff"
-        surface = "#252b38" if dark else "#ffffff"
-        muted = "#9ba3b2" if dark else "#697386"
-        border = "#303746" if dark else "#dfe3ea"
-        text = "#e7eaf0" if dark else "#202633"
-        selected = "#303746" if dark else "#e8edf5"
-        self.setStyleSheet(
-            f"""
-            QWidget#ApkManagerPage {{ background-color: {page}; }}
-            QWidget#InventoryPanel {{ background-color: {panel}; border-radius: 16px; }}
-            QWidget#DetailsPanel {{ background-color: {page}; }}
-            QTableWidget {{ background-color: {panel}; color: {text}; border: none; }}
-            QTableWidget::item {{ border: none; padding: 4px 8px; }}
-            QTableWidget::item:selected {{ background-color: {selected}; }}
-            QHeaderView::section {{ background-color: {panel}; color: {muted}; border: none; padding: 8px; }}
-            QLineEdit {{ background-color: {surface}; color: {text}; border: 1px solid {border}; border-radius: 9px; padding: 7px 10px; }}
-            """
-        )
-        for card in (self.selected_card, self.metadata_card, self.actions_card):
-            card.setStyleSheet(
-                f"CardWidget {{ background-color: {surface}; border: 1px solid {border}; border-radius: 12px; }}"
-            )
+        pass
         self._render_table()
 
     def _set_list_mode(self, mode):
