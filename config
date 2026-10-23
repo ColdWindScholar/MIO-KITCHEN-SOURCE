@@ -241,7 +241,7 @@ def update(args):
                         break
 
                 if not groups:
-                    print(f"Cannot Update {name}")
+                    LOGE(f"Cannot Update {name}")
                     return
                 if len(groups) == 2:
                     version, gitid, build_time = ['U', 'U', 'U']
