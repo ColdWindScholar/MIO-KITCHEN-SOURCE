@@ -233,9 +233,6 @@ class ApkManagerPage(QWidget):
         self.partition_tabs.currentChanged.connect(self._on_partition_tab_changed)
         self._add_partition_tab("", self.tr("All"))
         filter_toolbar.addWidget(self.partition_tabs, 1)
-        self.import_debloat_button = PushButton(self.tr("Import debloat list"), self)
-        self.import_debloat_button.clicked.connect(self.import_debloat_list)
-        filter_toolbar.addWidget(self.import_debloat_button)
         inventory_layout.addLayout(filter_toolbar)
 
         self.table = self._tables[""]
@@ -280,6 +277,9 @@ class ApkManagerPage(QWidget):
         self.save_list_button.clicked.connect(self.save_selection_list)
         save_row.addWidget(self.save_list_button)
         list_layout.addLayout(save_row)
+        self.import_debloat_button = PushButton(self.tr("Import debloat list"), list_card)
+        self.import_debloat_button.clicked.connect(self.import_debloat_list)
+        list_layout.addWidget(self.import_debloat_button)
         details_layout.addWidget(list_card)
 
         details_layout.addWidget(CaptionLabel(self.tr("SELECTED APK"), self.details_panel))
