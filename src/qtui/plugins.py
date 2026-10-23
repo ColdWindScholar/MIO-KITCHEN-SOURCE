@@ -23,7 +23,7 @@ from qfluentwidgets import (MessageBoxBase, SubtitleLabel, CaptionLabel, TextBro
                             PushButton)
 from qfluentwidgets import (ProgressBar, ImageLabel)
 
-from qtui.widgets import GenericTaskWorker
+from src.qtui.widgets import GenericTaskWorker
 from src.core import imp
 from src.core import utils
 from src.core.Magisk import Magisk_patch
