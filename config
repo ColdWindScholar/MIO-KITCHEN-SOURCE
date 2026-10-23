@@ -234,8 +234,10 @@ def update(args):
                 downloaded_file = os.path.join(temp, name)
                 groups = None
                 for g in content.get('name_pattern', ["*$"]):
-                    groups = re.search(g, name).groups()
                     print(g, name)
+                    groups = re.search(g, name)
+                    if groups:
+                        groups = groups.groups()
                     if groups:
                         break
 
