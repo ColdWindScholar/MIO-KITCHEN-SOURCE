@@ -199,8 +199,23 @@
 <context>
     <name>ConnectPage</name>
     <message>
+        <location filename="../../src/qtui/connect.py" line="194"/>
+        <source>Connect ImageStudio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/connect.py" line="199"/>
+        <source>Scan via ImageStudio to manage your projects and images on your Android phone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../src/qtui/connect.py" line="231"/>
         <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/connect.py" line="315"/>
+        <source>Close websocket connect.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

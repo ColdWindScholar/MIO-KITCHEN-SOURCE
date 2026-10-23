@@ -206,9 +206,24 @@
 <context>
     <name>ConnectPage</name>
     <message>
+        <location filename="../../src/qtui/connect.py" line="194"/>
+        <source>Connect ImageStudio</source>
+        <translation>连接 ImageStudio</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/connect.py" line="199"/>
+        <source>Scan via ImageStudio to manage your projects and images on your Android phone.</source>
+        <translation>通过ImageStudio扫描，在Android手机上管理您的项目和映像。</translation>
+    </message>
+    <message>
         <location filename="../../src/qtui/connect.py" line="231"/>
         <source>Disconnect</source>
         <translation>断开连接</translation>
+    </message>
+    <message>
+        <location filename="../../src/qtui/connect.py" line="315"/>
+        <source>Close websocket connect.</source>
+        <translation>关闭websocket连接。</translation>
     </message>
 </context>
 <context>
