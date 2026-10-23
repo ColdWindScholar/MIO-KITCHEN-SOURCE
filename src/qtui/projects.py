@@ -2133,7 +2133,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
-                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
+                            self.show_info_bar(self.tr("Warning"), f"Cannot remove {i}.img", 1)
                 elif file_type == 'f2fs':
                     if utils.call(
                             exe=['imgkit', 'unpack', "-i", os.path.join(project_manger.current_work_path(), f'{i}.img'),
@@ -2145,7 +2145,7 @@ class ProjectsPage(QFrame):
                         try:
                             os.remove(f"{work}/{i}.img")
                         except (Exception, BaseException):
-                            self.show_info_bar("warning", f"Cannot remove {i}.img", 1)
+                            self.show_info_bar(self.tr("Warning"), f"Cannot remove {i}.img", 1)
                 elif file_type == 'amlogic':
                     aml_main(os.path.join(project_manger.current_work_path(), f'{i}.img'), work)
                 elif file_type == 'unknown' or utils.is_empty_img(f"{work}/{i}.img"):

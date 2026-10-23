@@ -3,19 +3,23 @@ import os
 
 from androguard.core.apk import APK
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal, QUrl
-from PySide6.QtGui import QDesktopServices, QImage, QPixmap
-from PySide6.QtWidgets import (
-    QCheckBox,
-    QFrame,
-    QHBoxLayout,
-    QLabel,
-    QListWidget,
-    QMessageBox,
-    QScrollArea,
-    QVBoxLayout,
-    QWidget,
+from PySide6.QtGui import QColor, QDesktopServices, QImage, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
+from qfluentwidgets import (
+    BodyLabel,
+    CaptionLabel,
+    CardWidget,
+    CheckBox,
+    InfoBar,
+    ListWidget,
+    MessageBox,
+    PushButton,
+    ScrollArea,
+    SearchLineEdit,
+    StrongBodyLabel,
+    SubtitleLabel,
+    themeColor,
 )
-from qfluentwidgets import BodyLabel, PushButton, SearchLineEdit, SubtitleLabel
 
 from src.qtui.settings_cfg import cfg
 
@@ -79,7 +83,7 @@ def read_apk(path):
 
 class ApkScanThread(QThread):
     apk_loaded = Signal(int, dict)
-    progress_changed = Signal(int)
+    progress_changed = Signal(int, int)
     scan_finished = Signal(int, int, str)
 
     def __init__(self, project_path, generation, parent=None):
@@ -102,31 +106,32 @@ class ApkScanThread(QThread):
                     path = os.path.join(root, filename)
                     self.apk_loaded.emit(self.generation, read_apk(path))
                     total += 1
-                    self.progress_changed.emit(total)
+                    self.progress_changed.emit(self.generation, total)
         except OSError as error:
             self.scan_finished.emit(self.generation, total, str(error))
             return
         self.scan_finished.emit(self.generation, total, "")
 
 
-class ApkCard(QFrame):
+class ApkCard(CardWidget):
     selected = Signal(str)
 
     def __init__(self, path, record, detail_callback, remove_callback, parent=None):
         super().__init__(parent)
         self.path = path
         self.setObjectName("ApkCard")
-        self.setFrameShape(QFrame.Shape.StyledPanel)
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 10, 12, 10)
-        layout.setSpacing(10)
+        layout.setContentsMargins(12, 8, 12, 8)
+        layout.setSpacing(8)
+        self.setMinimumHeight(92)
 
-        self.checkbox = QCheckBox(self)
+        self.checkbox = CheckBox(self)
         layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        icon_label = QLabel(self)
+        icon_label = BodyLabel(self)
         icon_label.setFixedSize(48, 48)
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if record["icon_data"]:
             image = QImage.fromData(record["icon_data"])
             if not image.isNull():
@@ -140,24 +145,32 @@ class ApkCard(QFrame):
 
         labels = QVBoxLayout()
         labels.setSpacing(3)
-        name_label = BodyLabel(record["name"], self)
+        name_label = StrongBodyLabel(record["name"], self)
         name_label.setWordWrap(True)
+        name_label.setMinimumWidth(0)
         labels.addWidget(name_label)
-        package_label = QLabel(record["package"] or self.tr("Unknown package"), self)
-        package_label.setStyleSheet("color: gray;")
+        package_label = CaptionLabel(record["package"] or self.tr("Unknown package"), self)
+        package_label.setMinimumWidth(0)
+        package_label.setToolTip(record["package"])
         labels.addWidget(package_label)
+        author_label = CaptionLabel(
+            self.tr("Author: {}").format(record["author"] or self.tr("Unknown")), self
+        )
+        author_label.setMinimumWidth(0)
+        labels.addWidget(author_label)
         size_sdk = self.tr("{} • SDK {}").format(
             self._format_size(record["size"]), record["target_sdk"] or "?"
         )
-        size_label = QLabel(size_sdk, self)
-        size_label.setStyleSheet("color: gray;")
+        size_label = CaptionLabel(size_sdk, self)
         labels.addWidget(size_label)
         layout.addLayout(labels, 1)
 
         detail_button = PushButton(self.tr("Detail"), self)
+        detail_button.setFixedWidth(80)
         detail_button.clicked.connect(lambda checked=False: detail_callback(path))
         layout.addWidget(detail_button)
         remove_button = PushButton(self.tr("Remove"), self)
+        remove_button.setFixedWidth(92)
         remove_button.clicked.connect(lambda checked=False: remove_callback(path))
         layout.addWidget(remove_button)
 
@@ -170,6 +183,15 @@ class ApkCard(QFrame):
                 return f"{value:.1f} {unit}"
             value /= 1024
         return f"{value:.1f} GB"
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        if self.property("selected"):
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            painter.setPen(QPen(QColor(themeColor()), 1.5))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawRoundedRect(self.rect().adjusted(1, 1, -2, -2), 6, 6)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
@@ -207,6 +229,7 @@ class ApkManagerPage(QWidget):
         self.open_directory_button.clicked.connect(self.open_project_directory)
         toolbar.addWidget(self.open_directory_button)
         self.remove_selected_button = PushButton(self.tr("Remove Selected"), self)
+        self.remove_selected_button.setFixedWidth(112)
         self.remove_selected_button.setEnabled(False)
         self.remove_selected_button.clicked.connect(self.remove_selected)
         toolbar.addWidget(self.remove_selected_button)
@@ -220,9 +243,8 @@ class ApkManagerPage(QWidget):
         content_layout = QHBoxLayout()
         content_layout.setSpacing(14)
 
-        self.list_area = QScrollArea(self)
+        self.list_area = ScrollArea(self)
         self.list_area.setWidgetResizable(True)
-        self.list_area.setFrameShape(QFrame.Shape.NoFrame)
         self.list_container = QWidget()
         self.list_layout = QVBoxLayout(self.list_container)
         self.list_layout.setContentsMargins(4, 4, 4, 4)
@@ -231,15 +253,14 @@ class ApkManagerPage(QWidget):
         self.list_area.setWidget(self.list_container)
         content_layout.addWidget(self.list_area, 3)
 
-        self.details_panel = QFrame(self)
+        self.details_panel = CardWidget(self)
         self.details_panel.setObjectName("ApkDetailsPanel")
-        self.details_panel.setFrameShape(QFrame.Shape.StyledPanel)
         self.details_panel.setMinimumWidth(300)
         self.details_panel.setMaximumWidth(430)
         details_layout = QVBoxLayout(self.details_panel)
         details_layout.setContentsMargins(22, 20, 22, 20)
         details_layout.setSpacing(12)
-        self.detail_icon = QLabel(self.details_panel)
+        self.detail_icon = BodyLabel(self.details_panel)
         self.detail_icon.setFixedSize(80, 80)
         self.detail_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
         details_layout.addWidget(self.detail_icon, 0, Qt.AlignmentFlag.AlignHCenter)
@@ -251,22 +272,23 @@ class ApkManagerPage(QWidget):
         self.detail_package.setWordWrap(True)
         self.detail_package.setAlignment(Qt.AlignmentFlag.AlignCenter)
         details_layout.addWidget(self.detail_package)
-        self.detail_version = QLabel("", self.details_panel)
+        self.detail_version = CaptionLabel("", self.details_panel)
         details_layout.addWidget(self.detail_version)
-        self.detail_min_sdk = QLabel("", self.details_panel)
+        self.detail_min_sdk = CaptionLabel("", self.details_panel)
         details_layout.addWidget(self.detail_min_sdk)
-        self.detail_target_sdk = QLabel("", self.details_panel)
+        self.detail_target_sdk = CaptionLabel("", self.details_panel)
         details_layout.addWidget(self.detail_target_sdk)
-        details_layout.addWidget(BodyLabel(self.tr("Author"), self.details_panel))
-        self.detail_author = QLabel("", self.details_panel)
+        details_layout.addWidget(StrongBodyLabel(self.tr("Author"), self.details_panel))
+        self.detail_author = BodyLabel("", self.details_panel)
         self.detail_author.setWordWrap(True)
         details_layout.addWidget(self.detail_author)
-        details_layout.addWidget(BodyLabel(self.tr("Permissions"), self.details_panel))
-        self.permissions_list = QListWidget(self.details_panel)
+        details_layout.addWidget(StrongBodyLabel(self.tr("Permissions"), self.details_panel))
+        self.permissions_list = ListWidget(self.details_panel)
         details_layout.addWidget(self.permissions_list, 1)
         self.details_panel.hide()
         content_layout.addWidget(self.details_panel, 2)
         main_layout.addLayout(content_layout, 1)
+
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -310,7 +332,10 @@ class ApkManagerPage(QWidget):
         if self._selected_path is None and record["path"] in self.card_widgets:
             self.show_details(record["path"])
 
-    def _on_scan_progress(self, generation, count):
+    def _on_scan_progress(self, generation, count=None):
+        if count is None:
+            count = generation
+            generation = self._generation
         if generation == self._generation:
             self.status_label.setText(self.tr("Loading APKs... {} found").format(count))
 
@@ -369,16 +394,12 @@ class ApkManagerPage(QWidget):
 
     @staticmethod
     def _style_card(card, selected):
-        border_color = "#1683d8" if selected else "#444"
-        card.setStyleSheet(
-            f"QFrame#ApkCard {{ border: 1px solid {border_color}; border-radius: 6px; }}"
-            "QFrame#ApkCard:hover { border: 1px solid #1683d8; }"
-        )
+        card.setProperty("selected", selected)
+        card.update()
 
     def _update_remove_selected_button(self, *_):
-        self.remove_selected_button.setEnabled(
-            any(card.checkbox.isChecked() for card in self.card_widgets.values())
-        )
+        selected = any(card.checkbox.isChecked() for card in self.card_widgets.values())
+        self.remove_selected_button.setEnabled(selected)
 
     def remove_selected(self):
         selected_paths = [
@@ -386,14 +407,12 @@ class ApkManagerPage(QWidget):
         ]
         if not selected_paths:
             return
-        answer = QMessageBox.question(
-            self,
+        dialog = MessageBox(
             self.tr("Remove APKs"),
             self.tr("Permanently delete {} selected APK(s)?").format(len(selected_paths)),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            self,
         )
-        if answer != QMessageBox.StandardButton.Yes:
+        if dialog.exec() != 1:
             return
         errors = []
         for path in selected_paths:
@@ -402,9 +421,7 @@ class ApkManagerPage(QWidget):
             except OSError as error:
                 errors.append(f"{path}: {error}")
         if errors:
-            QMessageBox.critical(
-                self, self.tr("Remove APKs"), "\n".join(errors)
-            )
+            InfoBar.error(self.tr("Remove APKs"), "\n".join(errors), parent=self)
         if self._selected_path in selected_paths:
             self._selected_path = None
             self.details_panel.hide()
@@ -446,20 +463,20 @@ class ApkManagerPage(QWidget):
         self.detail_icon.clear()
 
     def remove_apk(self, path):
-        answer = QMessageBox.question(
-            self,
+        dialog = MessageBox(
             self.tr("Remove APK"),
             self.tr("Permanently delete {}?").format(os.path.basename(path)),
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
+            self,
         )
-        if answer != QMessageBox.StandardButton.Yes:
+        if dialog.exec() != 1:
             return
         try:
             os.remove(path)
         except OSError as error:
-            QMessageBox.critical(
-                self, self.tr("Remove APK"), self.tr("Could not delete APK: {}").format(error)
+            InfoBar.error(
+                self.tr("Remove APK"),
+                self.tr("Could not delete APK: {}").format(error),
+                parent=self,
             )
             return
         if self._selected_path == path:
