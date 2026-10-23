@@ -191,12 +191,12 @@ class ConnectPage(QWidget):
         left_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Header Typography Node
-        self.title_label = TitleLabel("Connect ImageStudio", self)
+        self.title_label = TitleLabel(self.tr("Connect ImageStudio"), self)
         left_layout.addWidget(self.title_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Container elements for dynamic visibility toggle
         self.instructions = BodyLabel(
-            "Scan via ImageStudio to manage your projects and images on your Android phone.", self)
+           self.tr("Scan via ImageStudio to manage your projects and images on your Android phone."), self)
         self.instructions.setWordWrap(True)
         self.instructions.setAlignment(Qt.AlignmentFlag.AlignCenter)
         left_layout.addWidget(self.instructions)
@@ -312,7 +312,7 @@ class ConnectPage(QWidget):
         }
         global WS
         if WS:
-            network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
+            network_bridge.log_signal.emit("INFO", self.tr("Close websocket connect."))
             try:
                 WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
             except simple_websocket.errors.ConnectionClosed:
