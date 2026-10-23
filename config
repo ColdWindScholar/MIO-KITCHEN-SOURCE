@@ -283,10 +283,12 @@ def update(args):
                     with tarfile.open(downloaded_file, "r:gz") as tar:
                         for t_info in tar.getmembers():
                             t_name = t_info.name
+                            if t_name == '.':continue
                             if content.get('rename_pattern'):
                                 real_name = content.get('name')
                                 if system == 'Windows' and not real_name.endswith('.exe'):
                                     real_name += '.exe'
+                                print(f"File name: {t_name}")
                                 caught_name = re.search(content.get('rename_pattern', "*$"), t_name).groups()
                                 if not len(caught_name):
                                     return
