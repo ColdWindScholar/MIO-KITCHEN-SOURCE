@@ -254,6 +254,7 @@ def update(args):
                     arch = 'arm64'
                 else:
                     arch = arch_list.get(arch, arch)
+                system = system.capitalize()
                 yellow(f"\nVersion:{version}\nGitid:{gitid}\nSystem:{system}\nArch:{arch}")
                 if os.path.exists(downloaded_file):
                     if not zipfile.is_zipfile(downloaded_file) and not content.get("is_binary", False) and not downloaded_file.endswith('.tar.gz'):
@@ -296,8 +297,12 @@ def update(args):
                                 if caught_name:
                                     log(f'Will rename {t_name} to {real_name}')
                                     t_info.name = real_name
-                            if os.path.exists(f'bin/{system}/{arch}/{t_name}'):
+                            tt_name = t_name[2:]
+                            if os.path.exists(f'bin/{system}/{arch}/{real_name}'):
                                 tar.extract(t_info, path=f'bin/{system}/{arch}')
+                                if os.path.exists(f'bin/{system}/{arch}/{tt_name}'):
+                                    os.rename(f'bin/{system}/{arch}/{tt_name}', f'bin/{system}/{arch}/{real_name}')
+                                    green(f"Renamed {t_name}")
                                 green(f"Update {t_name}")
                 else:
                     with zipfile.ZipFile(downloaded_file) as z:
