@@ -15,7 +15,7 @@ import requests
 from PySide6.QtCore import Qt, QObject, Signal, QThread
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QPixmap
-from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QDialog
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
 from PySide6.QtWidgets import QSizePolicy
 from PySide6.QtWidgets import QWidget, QFileDialog, QStackedWidget
 from qfluentwidgets import IconWidget, CardWidget, BodyLabel, FluentIcon, ScrollArea, \
@@ -1111,45 +1111,56 @@ class RomDownloadWorker(QThread):
                     logging.exception("Failed to remove incomplete ROM download")
 
 
-class RomDownloadDialog(QDialog):
+class RomDownloadDialog(MessageBoxBase):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(self.tr("Download ROM"))
-        self.setMinimumWidth(520)
         self.download_path = ""
         self.worker = None
         self.cancel_event = None
 
-        layout = QVBoxLayout(self)
-        self.url_edit = LineEdit(self)
+        self.title_label = BodyLabel(self.tr("Download ROM"), self)
+        self.title_label.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.viewLayout.addWidget(self.title_label)
+        self.viewLayout.setSpacing(14)
+
+        description = BodyLabel(
+            self.tr("Download a ROM from a direct HTTP or HTTPS link to your computer."),
+            self
+        )
+        description.setWordWrap(True)
+        self.viewLayout.addWidget(description)
+
+        url_label = BodyLabel(self.tr("Download URL"), self)
+        self.viewLayout.addWidget(url_label)
+        self.url_edit = LineEdit()
         self.url_edit.setPlaceholderText(self.tr("Direct HTTP or HTTPS ROM download URL"))
-        layout.addWidget(self.url_edit)
+        self.viewLayout.addWidget(self.url_edit)
 
         destination_layout = QHBoxLayout()
-        self.destination_edit = LineEdit(self)
+        self.destination_edit = LineEdit()
         self.destination_edit.setPlaceholderText(self.tr("Save ROM as..."))
         self.browse_button = PushButton(self.tr("Browse"), self)
         self.browse_button.clicked.connect(self.choose_destination)
-        destination_layout.addWidget(self.destination_edit)
+        destination_layout.addWidget(self.destination_edit, 1)
         destination_layout.addWidget(self.browse_button)
-        layout.addLayout(destination_layout)
+        self.viewLayout.addWidget(BodyLabel(self.tr("Save location"), self))
+        self.viewLayout.addLayout(destination_layout)
 
         self.progress_bar = ProgressBar(self)
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
-        layout.addWidget(self.progress_bar)
+        self.viewLayout.addWidget(self.progress_bar)
         self.status_label = CaptionLabel(self.tr("Enter a direct download URL and choose a destination."), self)
-        layout.addWidget(self.status_label)
+        self.status_label.setWordWrap(True)
+        self.viewLayout.addWidget(self.status_label)
 
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        self.download_button = PushButton(self.tr("Download"), self)
-        self.download_button.clicked.connect(self.start_download)
-        self.cancel_button = PushButton(self.tr("Cancel"), self)
-        self.cancel_button.clicked.connect(self.cancel_download)
-        button_layout.addWidget(self.download_button)
-        button_layout.addWidget(self.cancel_button)
-        layout.addLayout(button_layout)
+        self.yesButton.setText(self.tr("Download"))
+        self.yesButton.clicked.connect(self.start_download)
+        self.cancelButton.setText(self.tr("Cancel"))
+        self.widget.setMinimumWidth(520)
+
+    def validate(self):
+        return False
 
     def choose_destination(self):
         destination, _ = QFileDialog.getSaveFileName(
@@ -1176,7 +1187,7 @@ class RomDownloadDialog(QDialog):
         self.worker.completed.connect(self.download_completed)
         self.worker.failed.connect(self.download_failed)
         self.worker.canceled.connect(self.download_canceled)
-        self.download_button.setEnabled(False)
+        self.yesButton.setEnabled(False)
         self.browse_button.setEnabled(False)
         self.url_edit.setEnabled(False)
         self.destination_edit.setEnabled(False)
@@ -1221,28 +1232,28 @@ class RomDownloadDialog(QDialog):
             self.reject()
 
     def _set_controls_enabled(self, enabled: bool):
-        self.download_button.setEnabled(enabled)
+        self.yesButton.setEnabled(enabled)
         self.browse_button.setEnabled(enabled)
         self.url_edit.setEnabled(enabled)
         self.destination_edit.setEnabled(enabled)
-        self.cancel_button.setEnabled(True)
-        self.cancel_button.setText(self.tr("Cancel"))
+        self.cancelButton.setEnabled(True)
+        self.yesButton.setText(self.tr("Download"))
+        self.cancelButton.setText(self.tr("Cancel"))
 
     def cancel_download(self):
         if self.worker and self.worker.isRunning():
             self.cancel_event.set()
-            self.cancel_button.setEnabled(False)
+            self.cancelButton.setEnabled(False)
             self.status_label.setText(self.tr("Canceling download..."))
             return
         self.reject()
 
-    def closeEvent(self, event):
+    def reject(self):
         if self.worker and self.worker.isRunning():
             self.cancel_event.set()
             self.status_label.setText(self.tr("Canceling download..."))
-            event.ignore()
             return
-        super().closeEvent(event)
+        super().reject()
 
 
 class BuiltInPlugins(QObject):
@@ -1278,7 +1289,7 @@ class BuiltInPlugins(QObject):
 
     def download_rom(self):
         dialog = RomDownloadDialog(self.master)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
+        if dialog.exec():
             InfoBar.success(
                 self.tr("Download complete"),
                 self.tr("ROM saved to {}").format(dialog.download_path),
