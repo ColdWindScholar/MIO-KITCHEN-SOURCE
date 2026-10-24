@@ -1,6 +1,9 @@
 import logging
 import os
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+logging.getLogger("androguard").setLevel(logging.CRITICAL)
 
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
@@ -148,6 +151,7 @@ class ApkScanThread(QThread):
     def run(self):
         total = 0
         try:
+            apk_paths = []
             for root, directories, filenames in os.walk(self.project_path):
                 if self.isInterruptionRequested():
                     break
@@ -157,8 +161,16 @@ class ApkScanThread(QThread):
                         break
                     if not filename.lower().endswith(".apk"):
                         continue
-                    path = os.path.join(root, filename)
-                    self.apk_loaded.emit(self.generation, read_apk(path))
+                    apk_paths.append(os.path.join(root, filename))
+            if self.isInterruptionRequested():
+                self.scan_finished.emit(self.generation, total, "")
+                return
+            with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 4)) as executor:
+                futures = [executor.submit(read_apk, path) for path in apk_paths]
+                for future in as_completed(futures):
+                    if self.isInterruptionRequested():
+                        break
+                    self.apk_loaded.emit(self.generation, future.result())
                     total += 1
                     self.progress_changed.emit(self.generation, total)
         except OSError as error:
@@ -183,6 +195,7 @@ class ApkManagerPage(QWidget):
         self._selected_path = None
         self._project_path = ""
         self._scan_path = ""
+        self._restore_directory = ""
         self.setup_ui()
         cfg.currentProjectName.valueChanged.connect(self.refresh_apks)
         cfg.themeChanged.connect(self._apply_theme)
@@ -330,6 +343,7 @@ class ApkManagerPage(QWidget):
         self.restore_button.setIcon(FIF.RETURN.icon())
         self.restore_button.setEnabled(False)
         self.restore_button.setToolTip(self.tr("No APKs are currently available to restore."))
+        self.restore_button.clicked.connect(self.restore_apks)
         action_buttons.addWidget(self.restore_button, 1)
         actions_layout.addLayout(action_buttons)
         details_layout.addWidget(self.actions_card)
@@ -447,10 +461,14 @@ class ApkManagerPage(QWidget):
         self.project_badge.setText(project_name)
         if not project_name or not os.path.isdir(self._project_path):
             self._scan_path = ""
+            self._restore_directory = ""
+            self._update_restore_button()
             self.status_label.setText(self.tr("Select a project to list its APK files."))
             return
 
         self._scan_path = self._project_path
+        self._restore_directory = os.path.join(self._project_path, ".apk_manager_restore")
+        self._update_restore_button()
         self._start_scan(self._scan_path, generation)
 
     def _start_scan(self, directory, generation=None):
@@ -496,6 +514,7 @@ class ApkManagerPage(QWidget):
         self._update_status()
         if error:
             self.scan_status_label.setText(self.tr("APK scan failed: {}").format(error))
+        self._update_restore_button()
 
     def _update_status(self):
         visible_size = sum(self.apk_records[path]["size"] for path in self._row_paths)
@@ -643,13 +662,35 @@ class ApkManagerPage(QWidget):
         self.remove_selected_button.setText(self.tr("Remove {}").format(selected_count))
         self.remove_selected_button.setEnabled(selected_count > 0)
 
+    def _available_restore_paths(self):
+        if not self._restore_directory or not os.path.isdir(self._restore_directory):
+            return []
+        paths = []
+        for root, _, filenames in os.walk(self._restore_directory):
+            paths.extend(
+                os.path.join(root, filename)
+                for filename in filenames
+                if filename.lower().endswith(".apk")
+            )
+        return paths
+
+    def _update_restore_button(self):
+        count = len(self._available_restore_paths())
+        self.restore_button.setText(self.tr("Restore {}").format(count))
+        self.restore_button.setEnabled(count > 0)
+        self.restore_button.setToolTip(
+            self.tr("Restore APKs moved here from this project.")
+            if count
+            else self.tr("No APKs are currently available to restore.")
+        )
+
     def remove_selected(self):
         selected_paths = list(self._checked_paths)
         if not selected_paths:
             return
         dialog = MessageBox(
             self.tr("Remove APKs"),
-            self.tr("Permanently delete {} selected APK(s)?").format(len(selected_paths)),
+            self.tr("Move {} selected APK(s) to the restore area?").format(len(selected_paths)),
             self,
         )
         if dialog.exec() != 1:
@@ -657,7 +698,14 @@ class ApkManagerPage(QWidget):
         errors = []
         for path in selected_paths:
             try:
-                os.remove(path)
+                relative_path = os.path.relpath(path, self._project_path)
+                restore_path = os.path.join(self._restore_directory, relative_path)
+                if os.path.commonpath((self._project_path, path)) != self._project_path:
+                    raise OSError(self.tr("APK is outside the current project."))
+                if os.path.exists(restore_path):
+                    raise FileExistsError(restore_path)
+                os.makedirs(os.path.dirname(restore_path), exist_ok=True)
+                os.replace(path, restore_path)
             except OSError as error:
                 errors.append(f"{path}: {error}")
         if errors:
@@ -665,6 +713,36 @@ class ApkManagerPage(QWidget):
         if self._selected_path in selected_paths:
             self._selected_path = None
         self._checked_paths.difference_update(selected_paths)
+        if self._scan_path and os.path.isdir(self._scan_path):
+            self._start_scan(self._scan_path)
+        else:
+            self.refresh_apks()
+
+    def restore_apks(self):
+        restore_paths = self._available_restore_paths()
+        if not restore_paths:
+            self._update_restore_button()
+            return
+        dialog = MessageBox(
+            self.tr("Restore APKs"),
+            self.tr("Restore {} APK(s) to their original locations?").format(len(restore_paths)),
+            self,
+        )
+        if dialog.exec() != 1:
+            return
+        errors = []
+        for source in restore_paths:
+            relative_path = os.path.relpath(source, self._restore_directory)
+            destination = os.path.join(self._project_path, relative_path)
+            try:
+                if os.path.exists(destination):
+                    raise FileExistsError(destination)
+                os.makedirs(os.path.dirname(destination), exist_ok=True)
+                os.replace(source, destination)
+            except OSError as error:
+                errors.append(f"{destination}: {error}")
+        if errors:
+            InfoBar.error(self.tr("Restore APKs"), "\n".join(errors), parent=self)
         if self._scan_path and os.path.isdir(self._scan_path):
             self._start_scan(self._scan_path)
         else:
