@@ -975,6 +975,7 @@ class ProjectsPage(QFrame):
 
         self.partition_table.verticalHeader().setVisible(False)
         self.partition_table.setSelectionBehavior(TableWidget.SelectRows)
+        self.partition_table.itemChanged.connect(self._sync_select_all_partitions)
         self.partition_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         for i in range(1, 5):
             self.partition_table.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
@@ -1016,10 +1017,10 @@ class ProjectsPage(QFrame):
         name = name_item.text()
         menu = RoundMenu(parent=self.partition_table)
         if self.unpack_rb.isChecked():
-            image_action = Action(FIF.PLAY, self.tr('Unpack Image'), self)
+            image_action = Action(FIF.PLAY, self.tr('Unpack {}').format(name), self)
             image_action.triggered.connect(lambda: self._unpack_partition_from_menu(name))
         else:
-            image_action = Action(FIF.EMBED, self.tr('Pack Image'), self)
+            image_action = Action(FIF.EMBED, self.tr('Pack {}').format(name), self)
             image_action.triggered.connect(lambda: self._pack_partition_from_menu(name))
         image_action.setEnabled(self.execute_btn.isEnabled())
 
@@ -1099,12 +1100,34 @@ class ProjectsPage(QFrame):
     def _toggle_select_all_partitions(self, state):
         """Toggles check state of all visible rows based on the Select All checkbox."""
         target_state = Qt.CheckState.Checked if state == Qt.CheckState.Checked.value else Qt.CheckState.Unchecked
+        was_blocked = self.partition_table.blockSignals(True)
+        try:
+            for row_idx in range(self.partition_table.rowCount()):
+                if not self.partition_table.isRowHidden(row_idx):
+                    name_item = self.partition_table.item(row_idx, 0)
+                    if name_item is not None:
+                        name_item.setCheckState(target_state)
+        finally:
+            self.partition_table.blockSignals(was_blocked)
 
-        for row_idx in range(self.partition_table.rowCount()):
-            if not self.partition_table.isRowHidden(row_idx):
-                name_item = self.partition_table.item(row_idx, 0)  # Column 0 has the checkbox
-                if name_item is not None:
-                    name_item.setCheckState(target_state)
+    def _sync_select_all_partitions(self, item):
+        if item.column() != 0:
+            return
+
+        visible_items = [
+            self.partition_table.item(row_idx, 0)
+            for row_idx in range(self.partition_table.rowCount())
+            if not self.partition_table.isRowHidden(row_idx)
+            and self.partition_table.item(row_idx, 0) is not None
+        ]
+        all_selected = bool(visible_items) and all(
+            row_item.checkState() == Qt.CheckState.Checked for row_item in visible_items
+        )
+        was_blocked = self.select_all_cb.blockSignals(True)
+        try:
+            self.select_all_cb.setChecked(all_selected)
+        finally:
+            self.select_all_cb.blockSignals(was_blocked)
 
     #functions for it
     def conversion(self, src_format: str, dst_format: str, selection):
