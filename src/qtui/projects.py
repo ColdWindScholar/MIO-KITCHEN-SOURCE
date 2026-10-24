@@ -206,6 +206,8 @@ class PartitionListWorker(QThread):
         return data, ""
 
 
+
+
 class PackHybridRom:
     def __init__(self, right_device):
         if os.path.exists(dir_ := os.path.join(project_manger.current_work_output_path(), "firmware-update")):
