@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qfluentwidgets import isDarkTheme, setThemeColor
+from qfluentwidgets import PushButton, isDarkTheme, setThemeColor
 from shiboken6 import isValid
 
 from src.core.utils import prog_path
@@ -40,11 +40,12 @@ from src.qtui.widgets import ClickableLabel
 class _SummaryWorker(QThread):
     completed = Signal(object)
 
-    def __init__(self, project_name, project_path, working_folder):
+    def __init__(self, project_name, project_path, working_folder, include_heavy):
         super().__init__()
         self.project_name = project_name
         self.project_path = project_path
         self.working_folder = working_folder
+        self.include_heavy = include_heavy
 
     def run(self):
         result = {
@@ -58,6 +59,7 @@ class _SummaryWorker(QThread):
             "partition_count": 0,
             "partition_names": [],
             "android_info": {},
+            "details_scanned": self.include_heavy,
         }
         try:
             if os.path.isdir(self.working_folder):
@@ -85,28 +87,29 @@ class _SummaryWorker(QThread):
                             result["partition_count"] = len(parts_info)
                     except (OSError, ValueError):
                         logging.exception("Unable to read project partition summary: %s", parts_info_path)
-                size = 0
-                item_count = 0
-                build_prop_paths = []
-                for root, directories, files in os.walk(self.project_path, onerror=self._log_walk_error):
-                    if self.isInterruptionRequested():
-                        return
-                    directories[:] = [name for name in directories if not os.path.islink(os.path.join(root, name))]
-                    if "build.prop" in files:
-                        build_prop_paths.append(os.path.join(root, "build.prop"))
-                    for filename in files:
-                        file_path = os.path.join(root, filename)
-                        try:
-                            if not os.path.islink(file_path):
-                                size += os.path.getsize(file_path)
-                                item_count += 1
-                        except OSError:
-                            logging.exception("Unable to read project file metadata: %s", file_path)
-                result["project_size"] = size
-                result["item_count"] = item_count
-                if build_prop_paths:
-                    build_prop_paths.sort(key=lambda path: self._build_prop_priority(path))
-                    result["android_info"] = self._read_android_info(build_prop_paths[0])
+                if self.include_heavy:
+                    size = 0
+                    item_count = 0
+                    build_prop_paths = []
+                    for root, directories, files in os.walk(self.project_path, onerror=self._log_walk_error):
+                        if self.isInterruptionRequested():
+                            return
+                        directories[:] = [name for name in directories if not os.path.islink(os.path.join(root, name))]
+                        if "build.prop" in files:
+                            build_prop_paths.append(os.path.join(root, "build.prop"))
+                        for filename in files:
+                            file_path = os.path.join(root, filename)
+                            try:
+                                if not os.path.islink(file_path):
+                                    size += os.path.getsize(file_path)
+                                    item_count += 1
+                            except OSError:
+                                logging.exception("Unable to read project file metadata: %s", file_path)
+                    result["project_size"] = size
+                    result["item_count"] = item_count
+                    if build_prop_paths:
+                        build_prop_paths.sort(key=lambda path: self._build_prop_priority(path))
+                        result["android_info"] = self._read_android_info(build_prop_paths[0])
         except OSError:
             logging.exception("Unable to read the current project summary: %s", self.project_path)
 
@@ -182,8 +185,9 @@ class HomePage(QWidget):
         self._init_ui()
         cfg.themeChanged.connect(self._apply_theme)
         self._apply_theme()
-        cfg.workingFolder.valueChanged.connect(self.refresh_summary)
-        self.refresh_summary()
+        cfg.currentProjectName.valueChanged.connect(self._on_project_changed)
+        cfg.workingFolder.valueChanged.connect(self._on_project_changed)
+        self._on_project_changed()
 
     def _init_ui(self):
         main_layout = QVBoxLayout(self)
@@ -254,6 +258,18 @@ class HomePage(QWidget):
         dashboard.setSpacing(10)
         content.addLayout(dashboard, 1)
         main_layout.addLayout(content, 1)
+
+        summary_controls = QHBoxLayout()
+        self.summary_status = QLabel()
+        self.summary_status.setWordWrap(True)
+        self._set_theme_style(
+            self.summary_status, "color: #E8B75A;", "color: #946200;", "font-size: 13px;"
+        )
+        self.refresh_summary_btn = PushButton(self.tr("Scan detailed info"), self)
+        self.refresh_summary_btn.clicked.connect(lambda: self.refresh_summary(include_heavy=True))
+        summary_controls.addWidget(self.summary_status, 1)
+        summary_controls.addWidget(self.refresh_summary_btn)
+        dashboard.addLayout(summary_controls)
 
         stats = QGridLayout()
         stats.setHorizontalSpacing(12)
@@ -370,38 +386,57 @@ class HomePage(QWidget):
         card_layout.addLayout(header)
         return card
 
+    def _on_project_changed(self, *_args):
+        for thread in tuple(self._summary_threads):
+            if thread.isRunning():
+                thread.requestInterruption()
+        self.refresh_summary(include_heavy=False)
 
-
-    def refresh_summary(self, *_args):
+    def refresh_summary(self, include_heavy=False):
         project_name = cfg.currentProjectName.value
         working_folder = cfg.workingFolder.value
         project_path = os.path.join(working_folder, project_name) if project_name else ""
+        self.refresh_summary_btn.setEnabled(False)
+        self.summary_status.setText(
+            self.tr("Scanning project files...") if include_heavy
+            else self.tr("Refreshing basic project information...")
+        )
         for key in ("project_size", "free_space", "project_count"):
             self.summary_values[key].setText(self.tr("Loading..."))
         self._set_detail_rows([
             (self.tr("Name"), project_name or self.tr("No project selected")),
             (self.tr("Created time"), self.tr("Loading...")),
-            (self.tr("Files"), self.tr("Loading...")),
+            (self.tr("Files"), self.tr("Scanning...") if include_heavy else self.tr("Not scanned")),
             (self.tr("Path"), project_path or "—"),
         ])
         self.partition_count_label.setText(self.tr("Loading..."))
         self.partition_names_label.setText(self.tr("Loading..."))
-        self._set_device_rows(None)
+        if include_heavy:
+            self._set_device_rows(None)
 
         for thread in tuple(self._summary_threads):
             if thread.isRunning():
                 thread.requestInterruption()
 
-        worker = _SummaryWorker(project_name, project_path, working_folder)
+        worker = _SummaryWorker(project_name, project_path, working_folder, include_heavy)
         worker.setParent(self)
         self._summary_threads.add(worker)
         worker.completed.connect(self._apply_summary)
         worker.finished.connect(lambda thread=worker: self._discard_summary_thread(thread))
+        worker.finished.connect(self._summary_finished)
         worker.finished.connect(worker.deleteLater)
         worker.start()
 
     def _discard_summary_thread(self, thread):
         self._summary_threads.discard(thread)
+
+    def _summary_finished(self):
+        if not any(worker.isRunning() for worker in self._summary_threads):
+            self.refresh_summary_btn.setEnabled(True)
+            if self.summary_status.text() in (
+                    self.tr("Refreshing basic project information..."),
+                    self.tr("Scanning project files...")):
+                self.summary_status.setText(self.tr("Refresh did not complete. Please try again."))
 
     def _apply_summary(self, result):
         if (
@@ -409,9 +444,14 @@ class HomePage(QWidget):
             or result["working_folder"] != cfg.workingFolder.value
         ):
             return
+        self.summary_status.setText(
+            self.tr("Project information is up to date.") if result["details_scanned"]
+            else self.tr("Basic information updated. Scan detailed info for file count, size, and device details.")
+        )
         self.summary_values["project_count"].setText(str(result["project_count"]))
         self.summary_values["project_size"].setText(
             self._format_size(result["project_size"]) if result["project_size"] is not None
+            else self.tr("Not scanned") if not result["details_scanned"]
             else self.tr("No project")
         )
         created_time = (
@@ -424,7 +464,9 @@ class HomePage(QWidget):
         self._set_detail_rows([
             (self.tr("Name"), result["project_name"] or self.tr("No project selected")),
             (self.tr("Created time"), created_time),
-            (self.tr("Files"), str(result["item_count"]) if result["project_size"] is not None else "—"),
+            (self.tr("Files"), str(result["item_count"]) if result["details_scanned"]
+             and result["project_size"] is not None else self.tr("Not scanned")
+             if not result["details_scanned"] else "—"),
             (self.tr("Path"), os.path.join(result["working_folder"], result["project_name"])
              if result["project_name"] else "—"),
         ])
@@ -434,7 +476,13 @@ class HomePage(QWidget):
         else:
             self.partition_count_label.setText("0")
             self.partition_names_label.setText(self.tr("No partition metadata available"))
-        self._set_device_rows(result["android_info"])
+        if result["details_scanned"]:
+            self._set_device_rows(result["android_info"])
+        else:
+            self._set_grid_rows(
+                self.device_grid,
+                [(self.tr("Android device"), self.tr("Scan detailed info to find build.prop"))],
+            )
 
     def _set_detail_rows(self, rows):
         while self.details_grid.count():
