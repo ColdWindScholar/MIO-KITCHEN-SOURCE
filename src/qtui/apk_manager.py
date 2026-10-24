@@ -2,8 +2,6 @@ import logging
 import os
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from loguru import logger
-logger.remove()
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
 from PySide6.QtWidgets import (
@@ -15,7 +13,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from androguard.core.axml import ARSCParser, AXMLPrinter
 from qfluentwidgets import (
     CaptionLabel,
     CardWidget,
@@ -49,14 +46,25 @@ def read_apk(path):
         "icon_data": b"",
         "size": 0,
         "error": "",
-        "details_loaded": False,
     }
     try:
+        from androguard.core.axml import AXMLPrinter
+
         record["size"] = os.path.getsize(path)
         with zipfile.ZipFile(path) as archive:
             manifest = AXMLPrinter(archive.read("AndroidManifest.xml")).get_xml_obj()
             android_ns = "{http://schemas.android.com/apk/res/android}"
             record["package"] = manifest.get("package", "")
+            record["version"] = manifest.get(android_ns + "versionName", "")
+            uses_sdk = manifest.find("uses-sdk")
+            if uses_sdk is not None:
+                record["min_sdk"] = uses_sdk.get(android_ns + "minSdkVersion", "")
+                record["target_sdk"] = uses_sdk.get(android_ns + "targetSdkVersion", "")
+            for element in manifest:
+                if element.tag.startswith("uses-permission"):
+                    permission = element.get(android_ns + "name", "")
+                    if permission and permission not in record["permissions"]:
+                        record["permissions"].append(permission)
             application = manifest.find("application")
             if application is not None:
                 label = application.get(android_ns + "label", "")
@@ -86,6 +94,8 @@ def read_apk_icon(archive, application_icon, package_name):
 
     if "resources.arsc" not in archive.namelist():
         return b""
+    from androguard.core.axml import ARSCParser
+
     resources = ARSCParser(archive.read("resources.arsc"))
     try:
         resource_id, _ = ARSCParser.parse_id(application_icon)
@@ -114,31 +124,8 @@ def read_apk_icon(archive, application_icon, package_name):
     return archive.read(selected_path)
 
 
-def read_apk_details(path):
-    android_ns = "{http://schemas.android.com/apk/res/android}"
-    with zipfile.ZipFile(path) as archive:
-        manifest = AXMLPrinter(archive.read("AndroidManifest.xml")).get_xml_obj()
-
-    application = manifest.find("application")
-    label = application.get(android_ns + "label", "") if application is not None else ""
-    permissions = []
-    for element in manifest:
-        if element.tag.startswith("uses-permission"):
-            permission = element.get(android_ns + "name", "")
-            if permission and permission not in permissions:
-                permissions.append(permission)
-    uses_sdk = manifest.find("uses-sdk")
-    return {
-        "name": label if label and not label.startswith("@") else "",
-        "version": manifest.get(android_ns + "versionName", ""),
-        "min_sdk": uses_sdk.get(android_ns + "minSdkVersion", "") if uses_sdk is not None else "",
-        "target_sdk": uses_sdk.get(android_ns + "targetSdkVersion", "") if uses_sdk is not None else "",
-        "permissions": permissions,
-    }
-
-
 class ApkScanThread(QThread):
-    apk_loaded = Signal(int, dict)
+    apks_loaded = Signal(int, list)
     progress_changed = Signal(int, int)
     scan_finished = Signal(int, int, str)
 
@@ -166,11 +153,18 @@ class ApkScanThread(QThread):
                 return
             with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 4)) as executor:
                 futures = [executor.submit(read_apk, path) for path in apk_paths]
+                batch = []
                 for future in as_completed(futures):
                     if self.isInterruptionRequested():
                         break
-                    self.apk_loaded.emit(self.generation, future.result())
+                    batch.append(future.result())
                     total += 1
+                    if len(batch) >= 32:
+                        self.apks_loaded.emit(self.generation, batch)
+                        batch = []
+                        self.progress_changed.emit(self.generation, total)
+                if batch:
+                    self.apks_loaded.emit(self.generation, batch)
                     self.progress_changed.emit(self.generation, total)
         except OSError as error:
             self.scan_finished.emit(self.generation, total, str(error))
@@ -191,6 +185,7 @@ class ApkManagerPage(QWidget):
         self._tab_partitions = []
         self._workers = set()
         self._generation = 0
+        self._has_scanned = False
         self._selected_path = None
         self._project_path = ""
         self._scan_path = ""
@@ -201,7 +196,6 @@ class ApkManagerPage(QWidget):
         app = QCoreApplication.instance()
         if app is not None:
             app.aboutToQuit.connect(self._stop_workers)
-        self.refresh_apks()
 
     def setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -411,9 +405,12 @@ class ApkManagerPage(QWidget):
     def _on_partition_tab_changed(self, index):
         if not 0 <= index < len(self._tab_partitions):
             return
+        previous_table = self.table
         self._active_partition = self._tab_partitions[index]
         self.table = self._tables[self._active_partition]
         self._row_paths = self._table_rows[self.table]
+        if self.table is not previous_table:
+            self._render_table()
         self._update_status()
 
     def _apply_theme(self, *_):
@@ -439,12 +436,13 @@ class ApkManagerPage(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
-        if not self.apk_records and not any(worker.isRunning() for worker in self._workers):
+        if not self._has_scanned and not any(worker.isRunning() for worker in self._workers):
             self.refresh_apks()
 
     def refresh_apks(self, *_):
         self._generation += 1
         generation = self._generation
+        self._has_scanned = False
         for worker in tuple(self._workers):
             worker.requestInterruption()
 
@@ -459,6 +457,7 @@ class ApkManagerPage(QWidget):
         )
         self.project_badge.setText(project_name)
         if not project_name or not os.path.isdir(self._project_path):
+            self._has_scanned = True
             self._scan_path = ""
             self._restore_directory = ""
             self._update_restore_button()
@@ -481,25 +480,32 @@ class ApkManagerPage(QWidget):
             self._selected_path = None
             self._clear_table()
         self._scan_path = directory
+        self._has_scanned = False
         self.project_badge.setText(os.path.basename(os.path.normpath(directory)))
         self.status_label.setText(self.tr("Loading APKs..."))
         self.scan_status_label.clear()
         worker = ApkScanThread(directory, generation)
         self._workers.add(worker)
-        worker.apk_loaded.connect(self._on_apk_loaded)
+        worker.apks_loaded.connect(self._on_apks_loaded)
         worker.progress_changed.connect(self._on_scan_progress)
         worker.scan_finished.connect(self._on_scan_finished)
         worker.finished.connect(lambda current=worker: self._workers.discard(current))
         worker.finished.connect(worker.deleteLater)
         worker.start()
 
-    def _on_apk_loaded(self, generation, record):
+    def _on_apks_loaded(self, generation, records):
         if generation != self._generation:
             return
-        self.apk_records[record["path"]] = record
-        self._append_row(self.table, record["path"], record)
-        if self._selected_path is None:
-            self.show_details(record["path"])
+        self.table.setUpdatesEnabled(False)
+        try:
+            for record in records:
+                self.apk_records[record["path"]] = record
+                self._append_row(self.table, record["path"], record)
+            if self._selected_path is None and records:
+                self.show_details(records[0]["path"])
+        finally:
+            self.table.setUpdatesEnabled(True)
+        self._update_status()
 
     def _on_scan_progress(self, generation, count):
         if generation == self._generation:
@@ -508,6 +514,7 @@ class ApkManagerPage(QWidget):
     def _on_scan_finished(self, generation, count, error):
         if generation != self._generation:
             return
+        self._has_scanned = True
         self._update_partition_filters()
         self._render_table()
         self._update_status()
@@ -629,14 +636,14 @@ class ApkManagerPage(QWidget):
         if not hasattr(self, "partition_tabs"):
             return
         selected_path = self._selected_path
-        for table in self._tables.values():
-            table.blockSignals(True)
-            table.setRowCount(0)
-            table.blockSignals(False)
-            self._table_rows[table] = []
-            for path, record in self.apk_records.items():
-                self._append_row(table, path, record)
-        self._row_paths = self._table_rows.get(self.table, [])
+        table = self.table
+        table.blockSignals(True)
+        table.setRowCount(0)
+        table.blockSignals(False)
+        self._table_rows[table] = []
+        for path, record in self.apk_records.items():
+            self._append_row(table, path, record)
+        self._row_paths = self._table_rows[table]
         self._update_status()
         if selected_path in self._row_paths:
             self.table.selectRow(self._row_paths.index(selected_path))
@@ -759,16 +766,6 @@ class ApkManagerPage(QWidget):
         except ValueError:
             display_path = path
         self.detail_path.setText(display_path)
-        if not record["details_loaded"]:
-            try:
-                details = read_apk_details(path)
-                for key, value in details.items():
-                    if value or key == "permissions":
-                        record[key] = value
-            except Exception as error:
-                record["error"] = str(error)
-                logging.warning("Unable to read selected APK metadata from %s: %s", path, error)
-            record["details_loaded"] = True
         self.detail_name.setText(record["name"])
         self.detail_version.setText(self.tr("Version: {}").format(record["version"] or "?"))
         self.detail_min_sdk.setText(self.tr("Min. SDK Version: {}").format(record["min_sdk"] or "?"))
