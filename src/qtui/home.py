@@ -182,7 +182,6 @@ class HomePage(QWidget):
         self._init_ui()
         cfg.themeChanged.connect(self._apply_theme)
         self._apply_theme()
-        cfg.currentProjectName.valueChanged.connect(self._on_project_changed)
         cfg.workingFolder.valueChanged.connect(self.refresh_summary)
         self.refresh_summary()
 
