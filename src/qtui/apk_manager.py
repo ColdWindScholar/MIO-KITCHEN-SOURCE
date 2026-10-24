@@ -3,7 +3,7 @@ import os
 import zipfile
 from loguru import logger
 logger.remove()
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
 from PySide6.QtWidgets import (
@@ -72,12 +72,6 @@ def read_apk(path):
                 label = application.get(android_ns + "label", "")
                 if label and not label.startswith("@"):
                     record["name"] = label
-                try:
-                    record["icon_data"] = read_apk_icon(
-                        archive, application.get(android_ns + "icon", ""), record["package"]
-                    )
-                except Exception as error:
-                    logging.debug("Unable to extract APK icon from %s: %s", path, error, exc_info=True)
         record["name"] = record["name"] or record["package"] or filename
     except Exception as error:
         record["error"] = str(error)
@@ -153,15 +147,31 @@ class ApkScanThread(QThread):
             if self.isInterruptionRequested():
                 self.scan_finished.emit(self.generation, total, "")
                 return
-            with ThreadPoolExecutor(max_workers=min(8, os.cpu_count() or 4)) as executor:
-                futures = [executor.submit(read_apk, path) for path in apk_paths]
-                batch = []
-                for future in as_completed(futures):
-                    if self.isInterruptionRequested():
+            max_workers = min(4, os.cpu_count() or 1)
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                pending = set()
+                paths = iter(apk_paths)
+                for _ in range(max_workers * 2):
+                    path = next(paths, None)
+                    if path is None:
                         break
-                    batch.append(future.result())
-                    total += 1
-                    if len(batch) >= 32:
+                    pending.add(executor.submit(read_apk, path))
+                batch = []
+                while pending:
+                    if self.isInterruptionRequested():
+                        for future in pending:
+                            future.cancel()
+                        break
+                    completed, pending = wait(pending, return_when=FIRST_COMPLETED)
+                    for future in completed:
+                        if future.cancelled():
+                            continue
+                        batch.append(future.result())
+                        total += 1
+                        path = next(paths, None)
+                        if path is not None and not self.isInterruptionRequested():
+                            pending.add(executor.submit(read_apk, path))
+                    if len(batch) >= 16:
                         self.apks_loaded.emit(self.generation, batch)
                         batch = []
                         self.progress_changed.emit(self.generation, total)
@@ -469,6 +479,9 @@ class ApkManagerPage(QWidget):
         self._scan_path = self._project_path
         self._restore_directory = os.path.join(self._project_path, ".apk_manager_restore")
         self._update_restore_button()
+        if not self.isVisible():
+            self.status_label.setText(self.tr("APK scan will start when this page is opened."))
+            return
         self._start_scan(self._scan_path, generation)
 
     def _start_scan(self, directory, generation=None):
