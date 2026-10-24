@@ -920,8 +920,7 @@ class ProjectsPage(QFrame):
         self.project_combo.setMinimumWidth(250)
         self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
-        self.project_combo.currentTextChanged.connect(
-            lambda: cfg.set(cfg.currentProjectName, self.project_combo.currentText()))
+        self.project_combo.currentTextChanged.connect(self._on_project_changed)
         self.open_btn = PushButton(self.tr("Open"), self.project_container, FIF.FOLDER)
         self.open_btn.clicked.connect(self.open_dir)
         self.moreButton = TransparentDropDownToolButton(FluentIcon.MORE)
@@ -940,6 +939,10 @@ class ProjectsPage(QFrame):
         self.moreButton.setMenu(menu)
 
         return self.project_container
+
+    def _on_project_changed(self, project_name: str):
+        cfg.set(cfg.currentProjectName, project_name)
+        self.refresh_list()
 
     def _build_partition_section(self, parent_widget):
         """分区控制模块：标题完全独立，仅保留核心高级列表的内部深色背板"""
