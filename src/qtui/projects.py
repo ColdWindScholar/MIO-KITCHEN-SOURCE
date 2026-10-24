@@ -190,12 +190,7 @@ class PartitionListWorker(QThread):
                 if not file_name.endswith(form):
                     continue
                 file_path = os.path.join(work, file_name)
-                if file_name.endswith("img"):
-                    file_type = gettype(file_path)
-                    if file_type == "unknown":
-                        file_type = form
-                else:
-                    file_type = form
+                file_type = gettype(file_path)
                 data.append((
                     file_name[:-len(f".{form}")],
                     utils.hum_convert(os.path.getsize(file_path)),
