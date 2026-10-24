@@ -137,14 +137,15 @@ class PartitionListWorker(QThread):
             logging.exception("Unable to load the project partition list")
             self.failed.emit(self.request_id, str(error))
 
-    @staticmethod
-    def _load(work, mode, form):
+    def _load(self, work, mode, form):
         data = []
         if mode == "repack":
             if not os.path.exists(work):
                 return data, ""
             parts_dict = utils.JsonEdit(os.path.join(work, "config", "parts_info")).read()
             for folder in os.listdir(work):
+                if self.isInterruptionRequested():
+                    return [], ""
                 path = os.path.join(work, folder)
                 if os.path.isdir(path) and folder in parts_dict:
                     data.append((
@@ -184,6 +185,8 @@ class PartitionListWorker(QThread):
                             for name in splituapp.get_parts(app_path))
         else:
             for file_name in os.listdir(work):
+                if self.isInterruptionRequested():
+                    return [], ""
                 if not file_name.endswith(form):
                     continue
                 file_path = os.path.join(work, file_name)
