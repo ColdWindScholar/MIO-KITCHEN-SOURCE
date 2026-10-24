@@ -233,10 +233,10 @@ class HomePage(QWidget):
         avatar_pixmap = QPixmap(os.path.join(prog_path, "bin", "kemiaojiang.png"))
         if not avatar_pixmap.isNull():
             avatar.setPixmap(avatar_pixmap.scaled(
-                274, 274, Qt.AspectRatioMode.KeepAspectRatio,
+                700, 500, Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation,
             ))
-        avatar.setFixedSize(282, 282)
+        avatar.setFixedSize(700, 500)
         avatar.setToolTip(self.tr("Click KeMiaoJiang to chat"))
         avatar.clicked.connect(self.react)
         companion.addWidget(avatar, 0, Qt.AlignmentFlag.AlignHCenter)
