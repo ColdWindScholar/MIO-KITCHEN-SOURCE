@@ -370,8 +370,7 @@ class HomePage(QWidget):
         card_layout.addLayout(header)
         return card
 
-    def _on_project_changed(self, *_args):
-        self.refresh_summary()
+
 
     def refresh_summary(self, *_args):
         project_name = cfg.currentProjectName.value
