@@ -1067,7 +1067,7 @@ class ProjectsPage(QFrame):
         row1 = QHBoxLayout()
         self.project_combo = ComboBox(self.project_container)
         cfg.currentProjectName.valueChanged.connect(self.project_combo.setText)
-        events.set_project_name.connect(self.project_combo.setText)
+        events.set_project_name.connect(elf._on_project_changed)
         self.project_combo.setMinimumWidth(250)
         self.project_combo.setPlaceholderText(self.tr("No Project Available"))
         self.project_combo.addItems(project_manger.get_projects())
