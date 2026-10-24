@@ -17,7 +17,7 @@ import platform
 import random
 import sys
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame
 from qfluentwidgets import (
@@ -26,6 +26,7 @@ from qfluentwidgets import (
 )
 
 from src.core.utils import JsonEdit, prog_path
+from src.qtui.settings_cfg import cfg
 
 
 class ClickableTitleLabel(TitleLabel):
@@ -35,7 +36,25 @@ class ClickableTitleLabel(TitleLabel):
     def __init__(self, text):
         super().__init__(text)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self._original_text = text
         self.current_color = self.COLORS[0]
+        self._click_count = 0
+        self._click_timer = QTimer(self)
+        self._click_timer.setSingleShot(True)
+        self._click_timer.timeout.connect(self._reset_click_count)
+        self._boom_timer = QTimer(self)
+        self._boom_timer.setSingleShot(True)
+        self._boom_timer.timeout.connect(self._reset_title)
+        self._boom_previous_color = self.current_color
+        self._update_color()
+
+    def _reset_click_count(self):
+        self._click_count = 0
+
+    def _reset_title(self):
+        self.setText(self._original_text)
+        self.current_color = self._boom_previous_color
+        self._reset_click_count()
         self._update_color()
 
     def _update_color(self):
@@ -55,6 +74,17 @@ class ClickableTitleLabel(TitleLabel):
                 [c for c in self.COLORS if c != self.current_color]
             )
             self._update_color()
+            self._click_count += 1
+            if self._click_count == 5:
+                self._click_count = 0
+                self._click_timer.stop()
+                self.setText("BOOM!")
+                self._boom_previous_color = self.current_color
+                self.current_color = "#FF5757"
+                self._update_color()
+                self._boom_timer.start(1400)
+            else:
+                self._click_timer.start(1500)
         super().mousePressEvent(event)
 
 
@@ -64,7 +94,22 @@ class AboutPage(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("AboutPage")
+        self._styled_widgets = []
         self.initUI()
+        cfg.themeChanged.connect(self._restore_stylesheets)
+
+    def _set_widget_style(self, widget, stylesheet):
+        widget.setStyleSheet(stylesheet)
+        self._styled_widgets.append((widget, stylesheet))
+
+    def _restore_stylesheets(self, _theme):
+        # Apply after qfluentwidgets has refreshed widget styles for the new theme.
+        QTimer.singleShot(0, self._apply_stylesheets)
+
+    def _apply_stylesheets(self):
+        self.title._update_color()
+        for widget, stylesheet in self._styled_widgets:
+            widget.setStyleSheet(stylesheet)
 
     def initUI(self):
         main_layout = QVBoxLayout(self)
@@ -101,7 +146,7 @@ class AboutPage(QFrame):
         left_layout.setSpacing(20)
 
         sys_header = CaptionLabel(self.tr("System Info"))
-        sys_header.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 14px;")
+        self._set_widget_style(sys_header, "color: #38B6FF; font-weight: 700; font-size: 14px;")
         left_layout.addWidget(sys_header)
         with open(f"{prog_path}/bin/settings.json", 'r') as f:
             ver = json.load(f)['Tool']['Version']
@@ -120,9 +165,9 @@ class AboutPage(QFrame):
 
         for row, (label, value) in enumerate(sys_info_data):
             lbl = BodyLabel(label)
-            lbl.setStyleSheet("color: #A0A0A0; font-size: 13px;")
+            self._set_widget_style(lbl, "color: #A0A0A0; font-size: 13px;")
             val_lbl = BodyLabel(value)
-            val_lbl.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 12px;")
+            self._set_widget_style(val_lbl, "color: #38B6FF; font-weight: 700; font-size: 12px;")
             val_lbl.setAlignment(Qt.AlignmentFlag.AlignRight)
 
             sys_grid.addWidget(lbl, row, 0)
@@ -140,7 +185,7 @@ class AboutPage(QFrame):
         right_layout.setSpacing(20)
 
         dep_header = CaptionLabel(self.tr("Dependencies"))
-        dep_header.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 14px;")
+        self._set_widget_style(dep_header, "color: #38B6FF; font-weight: 700; font-size: 14px;")
         right_layout.addWidget(dep_header)
 
         dep_grid = QGridLayout()
@@ -153,10 +198,10 @@ class AboutPage(QFrame):
 
         for row, (name, version) in enumerate(dependencies_version.items()):
             name_lbl = BodyLabel(name)
-            name_lbl.setStyleSheet("color: #A0A0A0; font-size: 11px;")
+            self._set_widget_style(name_lbl, "color: #A0A0A0; font-size: 11px;")
 
             ver_lbl = BodyLabel(version)
-            ver_lbl.setStyleSheet("color: #FF5757; font-weight: 700; font-size: 11px;")
+            self._set_widget_style(ver_lbl, "color: #FF5757; font-weight: 700; font-size: 11px;")
             ver_lbl.setAlignment(Qt.AlignmentFlag.AlignRight)
 
             dep_grid.addWidget(name_lbl, row, 0)
@@ -178,7 +223,7 @@ class AboutPage(QFrame):
 
         slogan_lbl = BodyLabel(self.tr("Open Source / Free / faster"))
         slogan_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        slogan_lbl.setStyleSheet("color: #38B6FF; font-weight: 700; font-size: 13px;")
+        self._set_widget_style(slogan_lbl, "color: #38B6FF; font-weight: 700; font-size: 13px;")
 
         github_lbl = HyperlinkLabel()
         github_lbl.setText(self.tr("GitHub: MIO-KITCHEN-SOURCE"))
