@@ -43,7 +43,7 @@ from shutil import rmtree
 from src.core.cpio import extract as cpio_extract
 from src.core.rsceutil import unpack as rsceutil_unpack
 
-from PySide6.QtCore import Qt, Signal, QObject, QPoint
+from PySide6.QtCore import Qt, Signal, QObject, QPoint, QThread
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QWidget, QTableWidgetItem, QLabel, \
     QHeaderView, QFrame, QAbstractItemView
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
@@ -98,6 +98,109 @@ class Events(QObject):
 
 
 events = Events()
+
+
+class PartitionListWorker(QThread):
+    loaded = Signal(int, object, str, str)
+    failed = Signal(int, str)
+
+    def __init__(self, request_id, work, mode, form, try_formats=False, parent=None):
+        super().__init__(parent)
+        self.request_id = request_id
+        self.work = work
+        self.mode = mode
+        self.form = form
+        self.try_formats = try_formats
+
+    def run(self):
+        try:
+            formats = [self.form]
+            if self.mode == "unpack" and self.try_formats:
+                formats.extend(
+                    form for form in ('new.dat.br', 'new.dat.xz', 'new.dat', 'img', 'zst',
+                                      'payload', 'super', 'update.app')
+                    if form != self.form
+                )
+            data = []
+            selected_form = self.form
+            warning = ""
+            for form in formats:
+                if self.isInterruptionRequested():
+                    return
+                data, warning = self._load(self.work, self.mode, form)
+                selected_form = form
+                if data or not self.try_formats:
+                    break
+            if not self.isInterruptionRequested():
+                self.loaded.emit(self.request_id, data, selected_form, warning)
+        except Exception as error:
+            logging.exception("Unable to load the project partition list")
+            self.failed.emit(self.request_id, str(error))
+
+    @staticmethod
+    def _load(work, mode, form):
+        data = []
+        if mode == "repack":
+            if not os.path.exists(work):
+                return data, ""
+            parts_dict = utils.JsonEdit(os.path.join(work, "config", "parts_info")).read()
+            for folder in os.listdir(work):
+                path = os.path.join(work, folder)
+                if os.path.isdir(path) and folder in parts_dict:
+                    data.append((
+                        folder,
+                        utils.hum_convert(utils.GetFolderSize(path).rsize_v),
+                        parts_dict.get(folder, "Unknown"),
+                        "Source",
+                        "rw",
+                    ))
+            return data, ""
+
+        if not os.path.isdir(work):
+            return data, ""
+        if form == "payload":
+            payload_path = os.path.join(work, "payload.bin")
+            if os.path.exists(payload_path):
+                with open(payload_path, "rb") as payload:
+                    for partition in utils.payload_reader(payload).partitions:
+                        data.append((
+                            partition.partition_name,
+                            utils.hum_convert(partition.new_partition_info.size),
+                            "Raw",
+                            "Unknown",
+                            "Unknown",
+                        ))
+        elif form == "super":
+            super_path = os.path.join(work, "super.img")
+            if os.path.exists(super_path):
+                if gettype(super_path) == "sparse":
+                    return data, "The image is sparse, pls convert it to raw first."
+                data.extend((name, "Unknown", "Raw", "Unknown", "Unknown")
+                            for name in lpunpack.get_parts(super_path))
+        elif form == "update.app":
+            app_path = os.path.join(work, "UPDATE.APP")
+            if os.path.exists(app_path):
+                data.extend((name, "Unknown", "Raw", "Unknown", "Unknown")
+                            for name in splituapp.get_parts(app_path))
+        else:
+            for file_name in os.listdir(work):
+                if not file_name.endswith(form):
+                    continue
+                file_path = os.path.join(work, file_name)
+                if file_name.endswith("img"):
+                    file_type = gettype(file_path)
+                    if file_type == "unknown":
+                        file_type = form
+                else:
+                    file_type = form
+                data.append((
+                    file_name[:-len(f".{form}")],
+                    utils.hum_convert(os.path.getsize(file_path)),
+                    file_type,
+                    "Image",
+                    "rw" if file_type == "ext" else "ro",
+                ))
+        return data, ""
 
 
 class PackHybridRom:
@@ -435,6 +538,9 @@ class ProjectsPage(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("ProjectsPage")
+        self._partition_load_id = 0
+        self._partition_list_workers = set()
+        self._applying_partition_format = False
         self.initUI()
 
     def initUI(self):
@@ -796,28 +902,24 @@ class ProjectsPage(QFrame):
             self.start_job(self.dnd_task)
 
     def refresh_list(self):
-        if self.unpack_rb.isChecked():
-            if not self.refresh_unpack_list():
-                for item in self.format_widget.items:
-                    if self.refresh_unpack_list():
-                        break
-                    self.format_widget.setCurrentItem(item)
-            self.refresh_unpack()
-        else:
-            self.refresh_repack()
+        self._schedule_partition_list_load(try_formats=self.unpack_rb.isChecked())
         return
 
 
     def refresh_projects(self):
+        was_blocked = self.project_combo.blockSignals(True)
         self.project_combo.clear()
         projects = project_manger.get_projects()
         self.project_combo.addItems(projects)
         if projects:
             self.project_combo.setCurrentIndex(0)
-            self.refresh_list()
+            self.project_combo.blockSignals(was_blocked)
+            self._on_project_changed(self.project_combo.currentText())
         else:
+            self.project_combo.blockSignals(was_blocked)
             cfg.set(cfg.currentProjectName, '')
             cfg.save()
+            self.refresh_list()
 
     def open_dir(self):
         name = self.project_combo.currentText()
@@ -943,6 +1045,46 @@ class ProjectsPage(QFrame):
     def _on_project_changed(self, project_name: str):
         cfg.set(cfg.currentProjectName, project_name)
         self.refresh_list()
+
+    def _schedule_partition_list_load(self, try_formats=False):
+        self._partition_load_id += 1
+        request_id = self._partition_load_id
+        for worker in tuple(self._partition_list_workers):
+            if worker.isRunning():
+                worker.requestInterruption()
+
+        mode = "unpack" if self.unpack_rb.isChecked() else "repack"
+        form = self.format_widget.currentItem().text() if mode == "unpack" else ""
+        work = project_manger.current_work_path()
+        self.partition_table.setRowCount(0)
+        worker = PartitionListWorker(request_id, work, mode, form, try_formats, self)
+        self._partition_list_workers.add(worker)
+        worker.loaded.connect(self._apply_partition_list)
+        worker.failed.connect(self._partition_list_load_failed)
+        worker.finished.connect(lambda worker=worker: self._partition_list_workers.discard(worker))
+        worker.finished.connect(worker.deleteLater)
+        worker.start()
+
+    def _apply_partition_list(self, request_id, data, form, warning):
+        if request_id != self._partition_load_id:
+            return
+        if self.unpack_rb.isChecked() and form != self.format_widget.currentItem().text():
+            self._applying_partition_format = True
+            try:
+                self.format_widget.setCurrentItem(form)
+            finally:
+                self._applying_partition_format = False
+        self._load_mock_partitions_table(data)
+        if warning:
+            events.show_info_bar.emit(self.tr("Warning"), self.tr(warning), 2, 3500)
+
+    def _partition_list_load_failed(self, request_id, error):
+        if request_id == self._partition_load_id:
+            self.show_info_bar(
+                self.tr("Error"),
+                self.tr("Failed to refresh partition list: {}").format(error),
+                bar_type=1,
+            )
 
     def _build_partition_section(self, parent_widget):
         """分区控制模块：标题完全独立，仅保留核心高级列表的内部深色背板"""
@@ -1413,23 +1555,8 @@ class ProjectsPage(QFrame):
         self.scroll_layout.addWidget(container)
 
     def refresh_repack(self):
-        self.partition_table.clearContents()
-        self._load_mock_partitions_table(self.refresh_repack_list())
-
-    def refresh_repack_list(self):
-        data = []
-        work = project_manger.current_work_path()
-        if not os.path.exists(work):
-            InfoBar.warning(self.tr("Projects"), self.tr("Work path does not exist"), parent=self)
-            return data
-        parts_dict = utils.JsonEdit(f"{work}/config/parts_info").read()
-        for folder in os.listdir(work):
-            if os.path.isdir(work + folder) and folder in parts_dict.keys():
-                data.append(
-                    (folder, utils.hum_convert(utils.GetFolderSize(work + folder).rsize_v),
-                     parts_dict.get(folder, 'Unknown'),
-                     "Source", "rw"))
-        return data
+        if not self._applying_partition_format:
+            self._schedule_partition_list_load()
 
     def logo_pack(self, origin_logo=None) -> int:
         work = project_manger.current_work_path()
@@ -1923,49 +2050,8 @@ class ProjectsPage(QFrame):
         self.execute_btn.setEnabled(True)
 
     def refresh_unpack(self):
-        self.partition_table.clearContents()
-        self._load_mock_partitions_table(self.refresh_unpack_list())
-
-    def refresh_unpack_list(self):
-        """The actual logic for refreshing the unpack list, runs in a separate thread."""
-        data = []
-        work = project_manger.current_work_path()
-        if not project_manger.exist():
-            return data
-
-        form = self.format_widget.currentItem().text()
-        if form == 'payload':
-            if os.path.exists(f"{work}/payload.bin"):
-                with open(f"{work}/payload.bin", 'rb') as pay:
-                    for i in utils.payload_reader(pay).partitions:
-                        data.append((i.partition_name, utils.hum_convert(i.new_partition_info.size), "Raw", "Unknown",
-                                     "Unknown"))
-
-        elif form == 'super':
-            if os.path.exists(f"{work}/super.img"):
-                if gettype(f"{work}/super.img") == 'sparse':
-                    events.show_info_bar.emit(self.tr("Warning"), self.tr("The image is sparse, pls convert it to raw first."), 2, 3500)
-                    return data
-                for i in lpunpack.get_parts(f"{work}/super.img"):
-                    data.append((i, "Unknown", "Raw", "Unknown", "Unknown"))
-        elif form == 'update.app':
-            if os.path.exists(f"{work}/UPDATE.APP"):
-                for i in splituapp.get_parts(f"{work}/UPDATE.APP"):
-                    data.append((i, "Unknown", "Raw", "Unknown", "Unknown"))
-        else:
-            for file_name in os.listdir(work):
-                if file_name.endswith(form):
-                    if file_name.endswith("img"):
-                        f_type = gettype(os.path.join(work, file_name))
-                        if f_type == 'unknown':
-                            f_type = form
-                    else:
-                        f_type = form
-                    data.append(
-                        (file_name[:-len(f".{form}")],
-                         utils.hum_convert(os.path.getsize(os.path.join(work, file_name))), f_type,
-                         "Image", "rw" if f_type == 'ext' else "ro",))
-        return data
+        if not self._applying_partition_format:
+            self._schedule_partition_list_load()
 
     def filter_tabview(self, query: str):
         search_query = query.strip().lower()
@@ -2223,21 +2309,32 @@ class ProjectsPage(QFrame):
         return True
 
     def _load_mock_partitions_table(self, mock_data):
-        self.partition_table.setRowCount(len(mock_data))
-        for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
-            name_item = QTableWidgetItem(name)
-            name_item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            name_item.setCheckState(Qt.Unchecked)
-            self.partition_table.setItem(row_idx, 0, name_item)
-            self.partition_table.setItem(row_idx, 1, QTableWidgetItem(size))
-            self.partition_table.setItem(row_idx, 2, QTableWidgetItem(fs))
+        was_blocked = self.partition_table.blockSignals(True)
+        self.partition_table.setUpdatesEnabled(False)
+        try:
+            self.partition_table.setRowCount(len(mock_data))
+            for row_idx, (name, size, fs, img_type, attrs) in enumerate(mock_data):
+                name_item = QTableWidgetItem(name)
+                name_item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                name_item.setCheckState(Qt.Unchecked)
+                self.partition_table.setItem(row_idx, 0, name_item)
+                self.partition_table.setItem(row_idx, 1, QTableWidgetItem(size))
+                self.partition_table.setItem(row_idx, 2, QTableWidgetItem(fs))
 
-            badge = QLabel(img_type)
-            badge.setAlignment(Qt.AlignCenter)
-            badge.setStyleSheet(
-                    f"color: {'#a78bfa' if img_type == "Build" else '#f59e0b'}; border-radius: 6px; font-weight: bold; font-size: 11px; margin: 3px;")
+                badge = QLabel(img_type)
+                badge.setAlignment(Qt.AlignCenter)
+                badge.setStyleSheet(
+                    f"color: {'#a78bfa' if img_type == 'Build' else '#f59e0b'}; border-radius: 6px; "
+                    "font-weight: bold; font-size: 11px; margin: 3px;"
+                )
+                self.partition_table.setCellWidget(row_idx, 3, badge)
+                self.partition_table.setItem(row_idx, 4, QTableWidgetItem(attrs))
+        finally:
+            self.partition_table.setUpdatesEnabled(True)
+            self.partition_table.blockSignals(was_blocked)
 
-            self.partition_table.setCellWidget(row_idx, 3, badge)
-
-            attr_item = QTableWidgetItem(attrs)
-            self.partition_table.setItem(row_idx, 4, attr_item)
+        was_blocked = self.select_all_cb.blockSignals(True)
+        try:
+            self.select_all_cb.setChecked(False)
+        finally:
+            self.select_all_cb.blockSignals(was_blocked)
