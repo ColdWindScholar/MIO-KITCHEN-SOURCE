@@ -1027,7 +1027,7 @@ class ProjectsPage(QFrame):
         copy_action.triggered.connect(lambda: QApplication.clipboard().setText(name))
         info_action = Action(FIF.INFO, self.tr('View Details'), self)
         info_action.triggered.connect(lambda: self._show_partition_details(row))
-        remove_action = Action(FIF.DELETE, self.tr('Remove from List'), self)
+        remove_action = Action(FIF.DELETE, self.tr('Remove'), self)
         remove_action.triggered.connect(lambda: self.partition_table.removeRow(row))
 
         menu.addAction(image_action)
