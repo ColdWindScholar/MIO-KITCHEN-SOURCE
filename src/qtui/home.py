@@ -28,7 +28,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qfluentwidgets import setThemeColor
+from qfluentwidgets import isDarkTheme, setThemeColor
+from shiboken6 import isValid
 
 from src.core.utils import prog_path
 from src.qtui.settings_cfg import cfg
@@ -176,29 +177,15 @@ class HomePage(QWidget):
         self.setObjectName("HomePage")
         setThemeColor("#0078D4")
         self._summary_threads = set()
+        self._theme_styled_widgets = []
         self._init_ui()
+        cfg.themeChanged.connect(self._apply_theme)
+        self._apply_theme()
         cfg.currentProjectName.valueChanged.connect(self.refresh_summary)
         cfg.workingFolder.valueChanged.connect(self.refresh_summary)
         self.refresh_summary()
 
     def _init_ui(self):
-        self.setStyleSheet("""
-            #HomePage {
-                background-color: #171A24;
-                color: #F1F4F8;
-                font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            }
-            #HomePage QFrame#Card {
-                background-color: #222731;
-                border: 1px solid #292F3B;
-                border-radius: 14px;
-            }
-            #HomePage QLabel {
-                border: none;
-                background: transparent;
-            }
-        """)
-
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(22, 16, 22, 16)
         main_layout.setSpacing(10)
@@ -208,9 +195,9 @@ class HomePage(QWidget):
         folder_icon = QLabel("▰")
         folder_icon.setStyleSheet("color: #7799E8; font-size: 19px;")
         title = QLabel(self.tr("Workspace"))
-        title.setStyleSheet("color: #F1F4F8; font-size: 18px; font-weight: 700;")
+        self._set_theme_style(title, "color: #F1F4F8;", "color: #20242C;", "font-size: 18px; font-weight: 700;")
         subtitle = QLabel(self.tr("summary"))
-        subtitle.setStyleSheet("color: #93A0B1; font-size: 15px;")
+        self._set_theme_style(subtitle, "color: #93A0B1;", "color: #42566B;", "font-size: 15px;")
         header.addWidget(folder_icon)
         header.addWidget(title)
         header.addWidget(subtitle)
@@ -219,21 +206,23 @@ class HomePage(QWidget):
 
         content = QHBoxLayout()
         content.setSpacing(16)
-        companion = QVBoxLayout()
+        companion_widget = QWidget()
+        companion_widget.setObjectName("CompanionPanel")
+        companion_widget.setMinimumWidth(320)
+        companion = QVBoxLayout(companion_widget)
         companion.setSpacing(14)
-        companion.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-        companion.setContentsMargins(0, 20, 0, 0)
+        companion.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        companion.setContentsMargins(12, 20, 12, 20)
         self.lbl_msg = QLabel(self.tr("Hi! What can I do for you? ✨"))
         self.lbl_msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_msg.setWordWrap(True)
-        self.lbl_msg.setStyleSheet("""
-            color: #DCC2F2;
-            background-color: #222731;
-            border: 1px solid #343B48;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 13px;
-        """)
+        self.lbl_msg.setObjectName("CompanionMessage")
+        self._set_theme_style(
+            self.lbl_msg,
+            "color: #DCC2F2; background-color: #222731; border: 1px solid #343B48;",
+            "color: #674C83; background-color: #FFFFFF; border: 1px solid #D9DDE6;",
+            "border-radius: 12px; padding: 12px; font-size: 13px;",
+        )
         companion.addWidget(self.lbl_msg)
         avatar = ClickableLabel()
         avatar_pixmap = QPixmap(os.path.join(prog_path, "bin", "kemiaojiang.png"))
@@ -248,10 +237,13 @@ class HomePage(QWidget):
         companion.addWidget(avatar, 0, Qt.AlignmentFlag.AlignHCenter)
         companion_name = QLabel("KeMiaoJiang")
         companion_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        companion_name.setStyleSheet("color: #77C7F4; font-size: 18px; font-weight: 700;")
+        self._set_theme_style(
+            companion_name, "color: #77C7F4;", "color: #1674AD;",
+            "font-size: 18px; font-weight: 700;",
+        )
         companion.addWidget(companion_name)
         companion.addStretch()
-        content.addLayout(companion, 0)
+        content.addWidget(companion_widget, 0)
 
         dashboard = QVBoxLayout()
         dashboard.setSpacing(10)
@@ -274,14 +266,14 @@ class HomePage(QWidget):
             label_row = QHBoxLayout()
             label_row.setSpacing(9)
             icon_widget = QLabel(icon)
-            icon_widget.setStyleSheet(f"color: {accent}; font-size: 17px;")
+            self._set_theme_style(icon_widget, f"color: {accent};", f"color: {accent};", "font-size: 17px;")
             label_widget = QLabel(label)
-            label_widget.setStyleSheet("color: #98A7B8; font-size: 14px;")
+            self._set_theme_style(label_widget, "color: #98A7B8;", "color: #30465C;", "font-size: 14px;")
             label_row.addWidget(icon_widget)
             label_row.addWidget(label_widget)
             label_row.addStretch()
             value_widget = QLabel("—")
-            value_widget.setStyleSheet(f"color: {accent}; font-size: 21px; font-weight: 700;")
+            self._set_theme_style(value_widget, f"color: {accent};", f"color: {accent};", "font-size: 21px; font-weight: 700;")
             value_widget.setWordWrap(True)
             card_layout.addLayout(label_row)
             card_layout.addWidget(value_widget)
@@ -302,11 +294,11 @@ class HomePage(QWidget):
 
         self.partitions_card = self._create_info_card(self.tr("Partitions"))
         self.partition_count_label = QLabel("—")
-        self.partition_count_label.setStyleSheet("color: #F1F4F8; font-size: 17px; font-weight: 700;")
+        self._set_theme_style(self.partition_count_label, "color: #F1F4F8;", "color: #20242C;", "font-size: 17px; font-weight: 700;")
         self.partitions_card.layout().addWidget(self.partition_count_label)
         self.partition_names_label = QLabel("—")
         self.partition_names_label.setWordWrap(True)
-        self.partition_names_label.setStyleSheet("color: #E7EBF1; font-size: 13px;")
+        self._set_theme_style(self.partition_names_label, "color: #E7EBF1;", "color: #343B46;", "font-size: 13px;")
         self.partitions_card.layout().addWidget(self.partition_names_label)
         dashboard.addWidget(self.partitions_card)
 
@@ -320,8 +312,43 @@ class HomePage(QWidget):
         dashboard.addWidget(self.device_card)
 
         self.project_path_label = QLabel()
-        self.project_path_label.setStyleSheet("color: #778495; font-size: 11px;")
+        self._set_theme_style(self.project_path_label, "color: #778495;", "color: #41566B;", "font-size: 11px;")
         dashboard.addWidget(self.project_path_label)
+
+    def _set_theme_style(self, widget, dark_colors, light_colors, common=""):
+        self._theme_styled_widgets.append((widget, dark_colors, light_colors, common))
+        widget.setStyleSheet(f"{dark_colors} {common}")
+
+    def _apply_theme(self, *_args):
+        dark = isDarkTheme()
+        background = "#171A24" if dark else "#F4F6FA"
+        foreground = "#F1F4F8" if dark else "#252A33"
+        card_background = "#222731" if dark else "#FFFFFF"
+        card_border = "#292F3B" if dark else "#DFE4EC"
+        self.setStyleSheet(f"""
+            #HomePage {{
+                background-color: {background};
+                color: {foreground};
+                font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            }}
+            #HomePage QFrame#Card {{
+                background-color: {card_background};
+                border: 1px solid {card_border};
+                border-radius: 14px;
+            }}
+            #HomePage QLabel {{
+                border: none;
+                background: transparent;
+            }}
+        """)
+        valid_styles = []
+        for widget, dark_colors, light_colors, common in self._theme_styled_widgets:
+            if not isValid(widget):
+                continue
+            colors = dark_colors if dark else light_colors
+            widget.setStyleSheet(f"{colors} {common}")
+            valid_styles.append((widget, dark_colors, light_colors, common))
+        self._theme_styled_widgets = valid_styles
 
     def _create_info_card(self, title):
         card = QFrame()
@@ -331,7 +358,10 @@ class HomePage(QWidget):
         card_layout.setSpacing(10)
         header = QHBoxLayout()
         heading = QLabel(f"▰  {title}")
-        heading.setStyleSheet("color: #91AFC2; font-size: 14px; font-weight: 600;")
+        self._set_theme_style(
+            heading, "color: #91AFC2;", "color: #547184;",
+            "font-size: 14px; font-weight: 600;",
+        )
         header.addWidget(heading)
         header.addStretch()
         card_layout.addLayout(header)
@@ -406,14 +436,15 @@ class HomePage(QWidget):
         while self.details_grid.count():
             item = self.details_grid.takeAt(0)
             if item.widget():
+                self._forget_theme_style(item.widget())
                 item.widget().deleteLater()
         for index, (label, value) in enumerate(rows):
             row, pair = divmod(index, 2)
             label_widget = QLabel(label)
-            label_widget.setStyleSheet("color: #91A6B5; font-size: 13px;")
+            self._set_theme_style(label_widget, "color: #91A6B5;", "color: #30465C;", "font-size: 13px;")
             value_widget = QLabel(value)
             value_widget.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            value_widget.setStyleSheet("color: #F1F4F8; font-size: 13px; font-weight: 600;")
+            self._set_theme_style(value_widget, "color: #F1F4F8;", "color: #252A33;", "font-size: 13px; font-weight: 600;")
             value_widget.setWordWrap(True)
             self.details_grid.addWidget(label_widget, row, pair * 2)
             self.details_grid.addWidget(value_widget, row, pair * 2 + 1)
@@ -435,22 +466,27 @@ class HomePage(QWidget):
             if android_info else [(self.tr("Build.prop"), self.tr("No build.prop found"))],
         )
 
-    @staticmethod
-    def _set_grid_rows(grid, rows):
+    def _set_grid_rows(self, grid, rows):
         while grid.count():
             item = grid.takeAt(0)
             if item.widget():
+                self._forget_theme_style(item.widget())
                 item.widget().deleteLater()
         for index, (label, value) in enumerate(rows):
             row, pair = divmod(index, 2)
             label_widget = QLabel(label)
-            label_widget.setStyleSheet("color: #91A6B5; font-size: 13px;")
+            self._set_theme_style(label_widget, "color: #91A6B5;", "color: #30465C;", "font-size: 13px;")
             value_widget = QLabel(value)
             value_widget.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
-            value_widget.setStyleSheet("color: #F1F4F8; font-size: 13px; font-weight: 600;")
+            self._set_theme_style(value_widget, "color: #F1F4F8;", "color: #252A33;", "font-size: 13px; font-weight: 600;")
             value_widget.setWordWrap(True)
             grid.addWidget(label_widget, row, pair * 2)
             grid.addWidget(value_widget, row, pair * 2 + 1)
+
+    def _forget_theme_style(self, widget):
+        self._theme_styled_widgets = [
+            style for style in self._theme_styled_widgets if style[0] is not widget
+        ]
 
     @staticmethod
     def _format_size(size):
