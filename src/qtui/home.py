@@ -317,9 +317,7 @@ class HomePage(QWidget):
         self.device_card.layout().addLayout(self.device_grid)
         dashboard.addWidget(self.device_card)
 
-        self.project_path_label = QLabel()
-        self._set_theme_style(self.project_path_label, "color: #778495;", "color: #41566B;", "font-size: 11px;")
-        dashboard.addWidget(self.project_path_label)
+
 
     def _set_theme_style(self, widget, dark_colors, light_colors, common=""):
         self._theme_styled_widgets.append((widget, dark_colors, light_colors, common))
@@ -380,7 +378,6 @@ class HomePage(QWidget):
         project_name = cfg.currentProjectName.value
         working_folder = cfg.workingFolder.value
         project_path = os.path.join(working_folder, project_name) if project_name else ""
-        self.project_path_label.setText(working_folder)
         for key in ("project_size", "free_space", "project_count"):
             self.summary_values[key].setText(self.tr("Loading..."))
         self._set_detail_rows([
