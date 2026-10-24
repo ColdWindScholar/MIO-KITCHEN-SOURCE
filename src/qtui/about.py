@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import math
 import os.path
 import platform
 import random
 import sys
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QCursor
-from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame
+from PySide6.QtCore import QEasingCurve, QPoint, QPointF, QPropertyAnimation, Qt, QTimer, Signal, QVariantAnimation
+from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QRadialGradient
+from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
     CardWidget
@@ -29,33 +30,101 @@ from src.core.utils import JsonEdit, prog_path
 from src.qtui.settings_cfg import cfg
 
 
+class BoomEffect(QWidget):
+    """A short animated burst overlay for the title Easter egg."""
+    COLORS = ["#38B6FF", "#FF5757", "#FFBD59", "#8C52FF", "#00FF66"]
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.hide()
+        self._progress = 0.0
+        self._center = QPointF()
+        self._particles = []
+        self._animation = QVariantAnimation(self)
+        self._animation.setDuration(720)
+        self._animation.setStartValue(0.0)
+        self._animation.setEndValue(1.0)
+        self._animation.setEasingCurve(QEasingCurve.Type.OutCubic)
+        self._animation.valueChanged.connect(self._update_progress)
+        self._animation.finished.connect(self.hide)
+
+    def start(self, center):
+        self._center = QPointF(center)
+        self._particles = [
+            (random.uniform(0, math.tau), random.uniform(65, 155),
+             QColor(random.choice(self.COLORS)), random.uniform(3, 7))
+            for _ in range(24)
+        ]
+        self._progress = 0.0
+        self.show()
+        self.raise_()
+        self._animation.start()
+
+    def _update_progress(self, value):
+        self._progress = value
+        self.update()
+
+    def paintEvent(self, event):
+        progress = self._progress
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.translate(self._center)
+
+        glow = QRadialGradient(QPointF(), 12 + progress * 90)
+        glow.setColorAt(0, QColor(255, 245, 190, int(190 * (1 - progress))))
+        glow.setColorAt(1, QColor(255, 120, 30, 0))
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(glow)
+        painter.drawEllipse(QPointF(), 12 + progress * 90, 12 + progress * 90)
+
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        for ring, color in ((0.65, QColor("#FFBD59")), (1.0, QColor("#38B6FF"))):
+            color.setAlpha(int(210 * (1 - progress)))
+            painter.setPen(QPen(color, max(1.0, 5 * (1 - progress))))
+            radius = progress * 125 * ring
+            painter.drawEllipse(QPointF(), radius, radius)
+
+        for index in range(18):
+            angle = math.tau * index / 18
+            inner = 18 + progress * 30
+            outer = inner + (1 - progress) * (35 if index % 2 else 62)
+            color = QColor(self.COLORS[index % len(self.COLORS)])
+            color.setAlpha(int(255 * (1 - progress)))
+            painter.setPen(QPen(color, max(1.0, 5 * (1 - progress))))
+            painter.drawLine(
+                QPointF(math.cos(angle) * inner, math.sin(angle) * inner),
+                QPointF(math.cos(angle) * outer, math.sin(angle) * outer),
+            )
+
+        for angle, distance, color, size in self._particles:
+            color.setAlpha(int(255 * (1 - progress)))
+            x = math.cos(angle) * distance * progress
+            y = math.sin(angle) * distance * progress
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(color)
+            particle_size = size * (1 - progress * 0.6)
+            painter.drawEllipse(QPointF(x, y), particle_size, particle_size)
+
+
 class ClickableTitleLabel(TitleLabel):
     """Modern dark-mode TitleLabel with glow effect and color cycling."""
     COLORS = ["#38B6FF", "#FF5757", "#00FF66", "#FFBD59", "#8C52FF"]
+    boom = Signal()
 
     def __init__(self, text):
         super().__init__(text)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self._original_text = text
         self.current_color = self.COLORS[0]
         self._click_count = 0
         self._click_timer = QTimer(self)
         self._click_timer.setSingleShot(True)
         self._click_timer.timeout.connect(self._reset_click_count)
-        self._boom_timer = QTimer(self)
-        self._boom_timer.setSingleShot(True)
-        self._boom_timer.timeout.connect(self._reset_title)
-        self._boom_previous_color = self.current_color
         self._update_color()
 
     def _reset_click_count(self):
         self._click_count = 0
-
-    def _reset_title(self):
-        self.setText(self._original_text)
-        self.current_color = self._boom_previous_color
-        self._reset_click_count()
-        self._update_color()
 
     def _update_color(self):
         """Update with modern glow effect using qfluentwidgets theming."""
@@ -78,11 +147,7 @@ class ClickableTitleLabel(TitleLabel):
             if self._click_count == 5:
                 self._click_count = 0
                 self._click_timer.stop()
-                self.setText("BOOM!")
-                self._boom_previous_color = self.current_color
-                self.current_color = "#FF5757"
-                self._update_color()
-                self._boom_timer.start(1400)
+                self.boom.emit()
             else:
                 self._click_timer.start(1500)
         super().mousePressEvent(event)
@@ -95,8 +160,28 @@ class AboutPage(QFrame):
         super().__init__(parent)
         self.setObjectName("AboutPage")
         self._styled_widgets = []
+        self._shake_animation = None
         self.initUI()
         cfg.themeChanged.connect(self._restore_stylesheets)
+
+    def _trigger_boom(self):
+        self._boom_effect.setGeometry(self.rect())
+        self._boom_effect.start(self.title.mapTo(self, self.title.rect().center()))
+
+        window = self.window()
+        origin = window.pos()
+        animation = QPropertyAnimation(window, b"pos", self)
+        animation.setDuration(520)
+        animation.setEasingCurve(QEasingCurve.Type.OutQuad)
+        animation.setStartValue(origin)
+        for time, offset in (
+            (0.10, (-14, 5)), (0.20, (12, -7)), (0.31, (-10, -4)),
+            (0.42, (8, 5)), (0.54, (-5, 3)), (0.67, (4, -2)),
+            (0.82, (-2, 1)), (1.0, (0, 0)),
+        ):
+            animation.setKeyValueAt(time, origin + QPoint(*offset))
+        self._shake_animation = animation
+        animation.start()
 
     def _set_widget_style(self, widget, stylesheet):
         widget.setStyleSheet(stylesheet)
@@ -123,6 +208,7 @@ class AboutPage(QFrame):
 
         self.title = ClickableTitleLabel("MIO-KITCHEN")
         self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title.boom.connect(self._trigger_boom)
         header_layout.addWidget(self.title)
 
         subtitle = BodyLabel(self.tr("- Focus on Android ROM modification -"))
@@ -238,3 +324,4 @@ class AboutPage(QFrame):
         footer_layout.addWidget(copyright_lbl)
 
         main_layout.addLayout(footer_layout)
+        self._boom_effect = BoomEffect(self)
