@@ -1,6 +1,8 @@
 import logging
 import os
 import zipfile
+from loguru import logger
+logger.remove()
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
