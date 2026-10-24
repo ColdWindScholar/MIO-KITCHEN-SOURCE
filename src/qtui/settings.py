@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QScrollArea, QFrame, QFileDialog
 from qfluentwidgets import (
     TitleLabel, SwitchSettingCard, FluentIcon, OptionsSettingCard, ComboBoxSettingCard,
-    PushSettingCard, PrimaryPushSettingCard, setTheme
+    PushSettingCard, PrimaryPushSettingCard, ExpandGroupSettingCard, setTheme
 )
 
 from src.core.utils import temp, re_folder, hum_convert
@@ -31,6 +31,17 @@ class SettingsPage(QScrollArea):
         
         title = TitleLabel(self.tr("Settings"), self.scrollWidget)
         self.scrollLayout.addWidget(title)
+
+        self.toolSettings = ExpandGroupSettingCard(
+            FluentIcon.SETTING, self.tr("Tool Settings"), parent=self.scrollWidget
+        )
+        self.patchSettings = ExpandGroupSettingCard(
+            FluentIcon.BRUSH, self.tr("Patch Settings"), parent=self.scrollWidget
+        )
+        self.otherSettings = ExpandGroupSettingCard(
+            FluentIcon.MORE, self.tr("Others"), parent=self.scrollWidget
+        )
+
         # theme
         self.theme_card = OptionsSettingCard(
             qconfig.themeMode,
@@ -39,7 +50,7 @@ class SettingsPage(QScrollArea):
             self.tr("Set Theme"),
             texts=[self.tr("Light"), self.tr("Dark"), self.tr("Follow System Settings")]
         )
-        self.scrollLayout.addWidget(self.theme_card)
+        self.toolSettings.addGroupWidget(self.theme_card)
         #languages
         self.languageCard = ComboBoxSettingCard(
             configItem=cfg.language,
@@ -48,14 +59,14 @@ class SettingsPage(QScrollArea):
             content=self.tr("Choose your Language"),
             texts=cfg.allLanguagesHum
         )
-        self.scrollLayout.addWidget(self.languageCard)
+        self.toolSettings.addGroupWidget(self.languageCard)
         #
         self.workingCard = PushSettingCard(text=self.tr("Choose"),
                                            icon=FluentIcon.DOWNLOAD,
                                            title=self.tr("Working Folder"),
                                            content=cfg.workingFolder.value)
         self.workingCard.clicked.connect(self.change_working_folder)
-        self.scrollLayout.addWidget(self.workingCard)
+        self.toolSettings.addGroupWidget(self.workingCard)
 
         #
         self.projectStructureCard = OptionsSettingCard(
@@ -65,7 +76,7 @@ class SettingsPage(QScrollArea):
             self.tr("Adjust project Structure"),
             texts=cfg.projectStructure.options
         )
-        self.scrollLayout.addWidget(self.projectStructureCard)
+        self.toolSettings.addGroupWidget(self.projectStructureCard)
         self.cpioImplCard = OptionsSettingCard(
             cfg.cpioImpl,
             FluentIcon.UNIT,
@@ -81,8 +92,8 @@ class SettingsPage(QScrollArea):
             content=hum_convert(self.get_cache_size())
         )
         self.cleanCacheCard.clicked.connect(self.clean_cache)
-        self.scrollLayout.addWidget(self.cleanCacheCard)
-        self.scrollLayout.addWidget(self.cpioImplCard)
+        self.otherSettings.addGroupWidget(self.cleanCacheCard)
+        self.toolSettings.addGroupWidget(self.cpioImplCard)
         #ai
         self.aiEngine = SwitchSettingCard(
             FluentIcon.SAVE,
@@ -91,7 +102,7 @@ class SettingsPage(QScrollArea):
             cfg.aiEngine,
             parent=self.scrollWidget
         )
-        self.scrollLayout.addWidget(self.aiEngine)
+        self.otherSettings.addGroupWidget(self.aiEngine)
         #
         self.selinuxPatch = SwitchSettingCard(
             FluentIcon.SAVE,
@@ -100,7 +111,7 @@ class SettingsPage(QScrollArea):
             cfg.selinuxPatch,
             parent=self.scrollWidget
         )
-        self.scrollLayout.addWidget(self.selinuxPatch)
+        self.patchSettings.addGroupWidget(self.selinuxPatch)
         self.autoUnpack = SwitchSettingCard(
             FluentIcon.SAVE,
             self.tr("Auto Unpack"),
@@ -108,7 +119,7 @@ class SettingsPage(QScrollArea):
             cfg.autoUnpack,
             parent=self.scrollWidget
         )
-        self.scrollLayout.addWidget(self.autoUnpack)
+        self.patchSettings.addGroupWidget(self.autoUnpack)
         self.checkUpdate = SwitchSettingCard(
             FluentIcon.SAVE,
             self.tr("Check Update"),
@@ -116,8 +127,11 @@ class SettingsPage(QScrollArea):
             cfg.checkUpdate,
             parent=self.scrollWidget
         )
-        self.scrollLayout.addWidget(self.checkUpdate)
+        self.otherSettings.addGroupWidget(self.checkUpdate)
 
+        self.scrollLayout.addWidget(self.toolSettings)
+        self.scrollLayout.addWidget(self.patchSettings)
+        self.scrollLayout.addWidget(self.otherSettings)
 
         self.scrollLayout.addStretch()
         self.setWidget(self.scrollWidget)
