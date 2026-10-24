@@ -182,7 +182,7 @@ class HomePage(QWidget):
         self._init_ui()
         cfg.themeChanged.connect(self._apply_theme)
         self._apply_theme()
-        cfg.currentProjectName.valueChanged.connect(self.refresh_summary)
+        cfg.currentProjectName.valueChanged.connect(self._on_project_changed)
         cfg.workingFolder.valueChanged.connect(self.refresh_summary)
         self.refresh_summary()
 
@@ -372,6 +372,9 @@ class HomePage(QWidget):
         card_layout.addLayout(header)
         return card
 
+    def _on_project_changed(self, *_args):
+        self.refresh_summary()
+
     def refresh_summary(self, *_args):
         project_name = cfg.currentProjectName.value
         working_folder = cfg.workingFolder.value
@@ -387,7 +390,7 @@ class HomePage(QWidget):
         ])
         self.partition_count_label.setText(self.tr("Loading..."))
         self.partition_names_label.setText(self.tr("Loading..."))
-        self._set_device_rows({})
+        self._set_device_rows(None)
 
         for thread in tuple(self._summary_threads):
             if thread.isRunning():
@@ -468,7 +471,11 @@ class HomePage(QWidget):
         self._set_grid_rows(
             self.device_grid,
             [(label, android_info.get(key, "—")) for key, label in labels]
-            if android_info else [(self.tr("Build.prop"), self.tr("No build.prop found"))],
+            [(self.tr("Android device"), self.tr("Loading..."))]
+            if android_info is None
+            else [(self.tr("Build.prop"), self.tr("No build.prop found"))]
+            if not android_info
+            else [(label, android_info.get(key, "—")) for key, label in labels],
         )
 
     def _set_grid_rows(self, grid, rows):
