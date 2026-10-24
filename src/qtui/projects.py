@@ -114,20 +114,39 @@ class PartitionListWorker(QThread):
 
     def run(self):
         try:
+            entries = None
+            if self.mode == "unpack":
+                if not os.path.isdir(self.work):
+                    self.loaded.emit(self.request_id, [], self.form, "")
+                    return
+                with os.scandir(self.work) as scan:
+                    entries = [entry.name for entry in scan]
+
             formats = [self.form]
             if self.mode == "unpack" and self.try_formats:
-                formats.extend(
-                    form for form in ('new.dat.br', 'new.dat.xz', 'new.dat', 'img', 'zst',
-                                      'payload', 'super', 'update.app')
-                    if form != self.form
-                )
+                format_order = ('new.dat.br', 'new.dat.xz', 'new.dat', 'img', 'zst',
+                                'payload', 'super', 'update.app')
+                formats = [self.form, *(form for form in format_order if form != self.form)]
+                available = set()
+                for name in entries:
+                    if name in ("payload.bin", "super.img", "UPDATE.APP"):
+                        available.add({
+                            "payload.bin": "payload",
+                            "super.img": "super",
+                            "UPDATE.APP": "update.app",
+                        }[name])
+                    for form in format_order[:5]:
+                        if name.endswith(form):
+                            available.add(form)
+                matching_formats = [form for form in formats if form in available]
+                formats = matching_formats or [self.form]
             data = []
             selected_form = self.form
             warning = ""
             for form in formats:
                 if self.isInterruptionRequested():
                     return
-                data, warning = self._load(self.work, self.mode, form)
+                data, warning = self._load(self.work, self.mode, form, entries)
                 selected_form = form
                 if data or not self.try_formats:
                     break
@@ -137,33 +156,40 @@ class PartitionListWorker(QThread):
             logging.exception("Unable to load the project partition list")
             self.failed.emit(self.request_id, str(error))
 
-    def _load(self, work, mode, form):
+    def _load(self, work, mode, form, entries=None):
         data = []
         if mode == "repack":
             if not os.path.exists(work):
                 return data, ""
             parts_dict = utils.JsonEdit(os.path.join(work, "config", "parts_info")).read()
-            for folder in os.listdir(work):
+            with os.scandir(work) as scan:
+                folders = [
+                    (entry.name, entry.path) for entry in scan
+                    if entry.name in parts_dict and entry.is_dir(follow_symlinks=False)
+                ]
+            for folder, path in folders:
                 if self.isInterruptionRequested():
                     return [], ""
-                path = os.path.join(work, folder)
-                if os.path.isdir(path) and folder in parts_dict:
-                    data.append((
-                        folder,
-                        utils.hum_convert(utils.GetFolderSize(path).rsize_v),
-                        parts_dict.get(folder, "Unknown"),
-                        "Source",
-                        "rw",
-                    ))
+                size = self._folder_size(path)
+                if size is None:
+                    return [], ""
+                data.append((
+                    folder,
+                    utils.hum_convert(size),
+                    parts_dict.get(folder, "Unknown"),
+                    "Source",
+                    "rw",
+                ))
             return data, ""
 
-        if not os.path.isdir(work):
-            return data, ""
+        entries = entries or []
         if form == "payload":
             payload_path = os.path.join(work, "payload.bin")
-            if os.path.exists(payload_path):
+            if "payload.bin" in entries:
                 with open(payload_path, "rb") as payload:
                     for partition in utils.payload_reader(payload).partitions:
+                        if self.isInterruptionRequested():
+                            return [], ""
                         data.append((
                             partition.partition_name,
                             utils.hum_convert(partition.new_partition_info.size),
@@ -173,18 +199,18 @@ class PartitionListWorker(QThread):
                         ))
         elif form == "super":
             super_path = os.path.join(work, "super.img")
-            if os.path.exists(super_path):
+            if "super.img" in entries:
                 if gettype(super_path) == "sparse":
                     return data, "The image is sparse, pls convert it to raw first."
                 data.extend((name, "Unknown", "Raw", "Unknown", "Unknown")
                             for name in lpunpack.get_parts(super_path))
         elif form == "update.app":
             app_path = os.path.join(work, "UPDATE.APP")
-            if os.path.exists(app_path):
+            if "UPDATE.APP" in entries:
                 data.extend((name, "Unknown", "Raw", "Unknown", "Unknown")
                             for name in splituapp.get_parts(app_path))
         else:
-            for file_name in os.listdir(work):
+            for file_name in entries:
                 if self.isInterruptionRequested():
                     return [], ""
                 if not file_name.endswith(form):
@@ -200,6 +226,29 @@ class PartitionListWorker(QThread):
                 ))
         return data, ""
 
+    def _folder_size(self, path):
+        size = 0
+        pending = [path]
+        while pending:
+            if self.isInterruptionRequested():
+                return None
+            current = pending.pop()
+            try:
+                with os.scandir(current) as entries:
+                    for entry in entries:
+                        try:
+                            if entry.is_dir(follow_symlinks=False):
+                                pending.append(entry.path)
+                            elif entry.is_file(follow_symlinks=True):
+                                size += entry.stat().st_size
+                        except OSError:
+                            logging.exception("Unable to read partition file metadata: %s", entry.path)
+            except OSError:
+                logging.exception("Unable to scan partition directory: %s", current)
+        size += (size / 16384) * 256
+        if size > 100 * 1024 * 1024:
+            size += 16 * (1024 ** 2)
+        return size
 
 
 
