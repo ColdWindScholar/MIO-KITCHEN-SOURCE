@@ -2,9 +2,8 @@ import logging
 import os
 import zipfile
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-logging.getLogger("androguard").setLevel(logging.CRITICAL)
-
+from loguru import logger
+logger.remove()
 from PySide6.QtCore import QCoreApplication, QThread, Qt, QSize, Signal
 from PySide6.QtGui import QImage, QIcon, QPixmap
 from PySide6.QtWidgets import (
