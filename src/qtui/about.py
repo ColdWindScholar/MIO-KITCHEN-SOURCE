@@ -234,10 +234,9 @@ class AboutPage(QFrame):
         sys_header = CaptionLabel(self.tr("System Info"))
         self._set_widget_style(sys_header, "color: #38B6FF; font-weight: 700; font-size: 14px;")
         left_layout.addWidget(sys_header)
-        with open(f"{prog_path}/bin/settings.json", 'r') as f:
-            ver = json.load(f)['Tool']['Version']
+
         sys_info_data = [
-            (self.tr("Tool Version"), ver),
+            (self.tr("Tool Version"), cfg.Version.value),
             (self.tr("Python Version"), f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"),
             (self.tr("Operating system"), platform.system()),
             (self.tr("Architecture"), platform.machine())

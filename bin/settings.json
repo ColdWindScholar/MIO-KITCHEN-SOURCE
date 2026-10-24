@@ -1,15 +1,15 @@
 {
     "Tool": {
-        "Version": "5.0.0-prewiew",
-        "AiEngine": true,
+        "Version": "5.0.1-preview",
+        "AiEngine": false,
         "autoUnpack": false,
-        "checkUpdate": true,
-        "CpioImpl": "Python",
-        "currentProjectName": "lineage-24.0-20261012-nightly-mondrian-signed",
+        "checkUpdate": false,
+        "CpioImpl": "Native",
+        "currentProjectName": "12",
         "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
-        "selinuxPatch": true,
+        "selinuxPatch": false,
         "updateURL": "https://api.github.com/repos/ColdWindScholar/MIO-KITCHEN-SOURCE/releases/latest",
         "WorkingFolder": "/home/xzz/PycharmProjects/MIO-KITCHEN-SOURCE"
     },
@@ -20,6 +20,6 @@
             "PingFang SC"
         ],
         "ThemeColor": "#ff0078d4",
-        "ThemeMode": "Dark"
+        "ThemeMode": "Auto"
     }
 }
