@@ -25,6 +25,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QLabel,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -209,10 +210,14 @@ class HomePage(QWidget):
         companion_widget = QWidget()
         companion_widget.setObjectName("CompanionPanel")
         companion_widget.setMinimumWidth(320)
+        companion_widget.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding
+        )
         companion = QVBoxLayout(companion_widget)
         companion.setSpacing(14)
-        companion.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        companion.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         companion.setContentsMargins(12, 20, 12, 20)
+        companion.addStretch()
         self.lbl_msg = QLabel(self.tr("Hi! What can I do for you? ✨"))
         self.lbl_msg.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lbl_msg.setWordWrap(True)
