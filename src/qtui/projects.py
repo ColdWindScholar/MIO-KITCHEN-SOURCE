@@ -1031,7 +1031,6 @@ class ProjectsPage(QFrame):
         remove_action.triggered.connect(lambda: self.partition_table.removeRow(row))
 
         menu.addAction(image_action)
-        menu.addAction(copy_action)
         menu.addAction(info_action)
         menu.addSeparator()
         menu.addAction(remove_action)
