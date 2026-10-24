@@ -1028,7 +1028,11 @@ class ProjectsPage(QFrame):
         info_action = Action(FIF.INFO, self.tr('View Details'), self)
         info_action.triggered.connect(lambda: self._show_partition_details(row))
         remove_action = Action(FIF.DELETE, self.tr('Remove'), self)
-        remove_action.triggered.connect(lambda: self.partition_table.removeRow(row))
+        remove_action.triggered.connect(lambda: self._remove_partition_from_disk(name))
+        if self.unpack_rb.isChecked() and self.format_widget.currentItem().text() in (
+                'payload', 'super', 'update.app'):
+            remove_action.setEnabled(False)
+            remove_action.setToolTip(self.tr("Partitions inside this container cannot be deleted individually"))
 
         menu.addAction(image_action)
         menu.addAction(info_action)
@@ -1036,6 +1040,41 @@ class ProjectsPage(QFrame):
         menu.addAction(remove_action)
 
         menu.exec(self.partition_table.mapToGlobal(pos))
+
+    def _remove_partition_from_disk(self, name: str):
+        work = os.path.abspath(project_manger.current_work_path())
+        if self.unpack_rb.isChecked():
+            form = self.format_widget.currentItem().text()
+            target = os.path.abspath(os.path.join(work, f"{name}.{form}"))
+        else:
+            target = os.path.abspath(os.path.join(work, name))
+
+        if os.path.dirname(target) != work:
+            self.show_info_bar(self.tr("Error"), self.tr("Invalid partition path"), bar_type=1)
+            return
+        if not os.path.lexists(target):
+            self.show_info_bar(self.tr("Warning"), self.tr("File does not exist: {}").format(target), bar_type=2)
+            return
+
+        result = MessageBox(
+            self.tr("Confirm Delete"),
+            self.tr("Delete '{}' from disk?").format(os.path.basename(target)),
+            parent=self
+        ).exec()
+        if result != 1:
+            return
+
+        try:
+            if os.path.islink(target) or not os.path.isdir(target):
+                os.remove(target)
+            else:
+                rmtree(target)
+        except OSError as error:
+            self.show_info_bar(self.tr("Error"), self.tr("Failed to delete '{}': {}").format(target, error),
+                               bar_type=1)
+            return
+
+        self.refresh_list()
 
     def _unpack_partition_from_menu(self, name: str):
         self.my_task_worker = GenericTaskWorker(
