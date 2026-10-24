@@ -470,7 +470,6 @@ class HomePage(QWidget):
         )
         self._set_grid_rows(
             self.device_grid,
-            [(label, android_info.get(key, "—")) for key, label in labels]
             [(self.tr("Android device"), self.tr("Loading..."))]
             if android_info is None
             else [(self.tr("Build.prop"), self.tr("No build.prop found"))]
