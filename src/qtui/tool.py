@@ -34,7 +34,16 @@ from src.qtui.plugins import PluginPage
 from src.qtui.projects import ProjectsPage
 from src.qtui.settings import SettingsPage
 from src.qtui.settings_cfg import cfg
+is_pro = False
+try:
+    from src.pro.sn import v as verify
 
+    is_pro = True
+except ImportError:
+    verify = None
+    is_pro = False
+if is_pro:
+    from src.pro.active_ui import Active
 pyi_splash_available = False
 if platform.system() != 'Darwin':
     try:
