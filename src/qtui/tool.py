@@ -102,7 +102,7 @@ class MainWindow(FluentWindow):
             self.splashScreen.finish()
         if is_pro:
             if not verify.state:
-                Active(verify, cfg, self).gui()
+                Active(verify, self).gui()
 
     def load_language(self):
         app = QApplication.instance()
