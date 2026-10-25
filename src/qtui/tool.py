@@ -100,6 +100,9 @@ class MainWindow(FluentWindow):
         # Finish splash screen if it was created
         if self.splashScreen:
             self.splashScreen.finish()
+        if is_pro:
+            if not verify.state:
+                Active(verify, cfg, self).gui()
 
     def load_language(self):
         app = QApplication.instance()
