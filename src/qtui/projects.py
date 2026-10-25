@@ -1896,7 +1896,9 @@ class ProjectsPage(QFrame):
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
             return False
-        parts_dict = utils.JsonEdit((work := os.path.join(project_manger.current_work_path()), "config/parts_info")).read()
+        parts_dict = utils.JsonEdit(
+            (os.path.join(work := project_manger.current_work_path(), "config/parts_info"))
+        ).read()
         for i in chosen_parts:
             dname = os.path.basename(i)
             if dname not in parts_dict.keys():
