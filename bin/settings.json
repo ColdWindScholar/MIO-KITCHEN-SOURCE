@@ -6,7 +6,7 @@
         "checkUpdate": false,
         "CpioImpl": "Native",
         "currentProjectName": "lineage-24.0-20261012-nightly-mondrian-signed",
-        "Language": "app_zh_CN.qm",
+        "Language": "app_ru_RU.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
         "selinuxPatch": false,
