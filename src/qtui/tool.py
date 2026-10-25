@@ -101,6 +101,8 @@ class MainWindow(FluentWindow):
         if self.splashScreen:
             self.splashScreen.finish()
         if is_pro:
+            if cfg.activeCode.value:
+                verify.verify(cfg.activeCode.value)
             if not verify.state:
                 Active(verify, self).gui()
 
