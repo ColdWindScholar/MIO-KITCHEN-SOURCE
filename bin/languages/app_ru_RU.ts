@@ -109,12 +109,12 @@
         <location filename="../../src/qtui/apk_manager.py" line="218"/>
         <location filename="../../src/qtui/apk_manager.py" line="263"/>
         <source>Apps</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Apps</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="223"/>
         <source>Search name or package</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Поиск по имени или пакету</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="228"/>
@@ -125,32 +125,32 @@
         <location filename="../../src/qtui/apk_manager.py" line="241"/>
         <location filename="../../src/qtui/apk_manager.py" line="574"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Все</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="269"/>
         <source>SELECTIONS AND LISTS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ВЫБОРКИ И СПИСКИ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="271"/>
         <source>Presets</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пресеты</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="272"/>
         <source>External list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Внешний список</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="281"/>
         <source>Name this selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Назовите эту выборку</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="283"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="287"/>
@@ -158,258 +158,258 @@
         <location filename="../../src/qtui/apk_manager.py" line="800"/>
         <location filename="../../src/qtui/apk_manager.py" line="820"/>
         <source>Import debloat list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Импортировать список для удаления</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="292"/>
         <source>SELECTED APK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ВЫБРАННЫЙ APK</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="296"/>
         <source>Select an APK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбрать APK</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="306"/>
         <source>APK METADATA</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">МЕТАДАННЫЕ APK</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="322"/>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разрешения</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="330"/>
         <source>ACTIONS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ДЕЙСТВИЯ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="333"/>
         <source>Remove 0</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить 0</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="337"/>
         <source>Restore 0</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить 0</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="340"/>
         <location filename="../../src/qtui/apk_manager.py" line="692"/>
         <source>No APKs are currently available to restore.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">В настоящее время нет доступных для восстановления APK-файлов.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="366"/>
         <source>NAME</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ИМЯ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="367"/>
         <source>PACKAGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ПАКЕТ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="368"/>
         <source>PARTITION</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">РАЗДЕЛ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="369"/>
         <source>TYPE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ТИП</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="370"/>
         <source>SIZE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">РАЗМЕР</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="371"/>
         <source>RISK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">РИСК</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="425"/>
         <source>Save the selected APK packages to a named list for later reference.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохраните выбранные APK-пакеты в именованный список для дальнейшего использования.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="427"/>
         <source>Import a package list and select matching APKs in this project.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Импортируйте список пакетов и выберите подходящие APK-файлы в этом проекте.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="466"/>
         <source>Select a project to list its APK files.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите проект, чтобы просмотреть список его APK-файлов.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="487"/>
         <source>Loading APKs...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка APK...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="514"/>
         <source>{} APKs read</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} прочитанных APK</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="524"/>
         <source>APK scan failed: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сканирование APK завершилось неудачно: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="530"/>
         <source>{} shown, {} • {} APK(s) read</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} показано, {} • {} APK(ов) прочитано</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="551"/>
         <source>root</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">root</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="556"/>
         <source>Privileged</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Привилегированный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="558"/>
         <source>App</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">App</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="559"/>
         <source>APK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">APK</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="623"/>
         <location filename="../../src/qtui/apk_manager.py" line="765"/>
         <source>Unknown package</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неизвестный пакет</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="629"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неизвестный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="631"/>
         <source>Manifest unavailable; risk was not analyzed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Манифест недоступен; риск не был проанализирован.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="633"/>
         <source>Risk analysis is not available for APK files.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Анализ рисков недоступен для APK-файлов.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="670"/>
         <source>Remove {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="687"/>
         <source>Restore {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="690"/>
         <source>Restore APKs moved here from this project.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить APK, перемещённые сюда из этого проекта.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="700"/>
         <location filename="../../src/qtui/apk_manager.py" line="720"/>
         <source>Remove APKs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить APK-файлы</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="701"/>
         <source>Move {} selected APK(s) to the restore area?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Переместить {} выбранные APK в область восстановления?</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="712"/>
         <source>APK is outside the current project.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">APK находится за пределами текущего проекта.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="735"/>
         <location filename="../../src/qtui/apk_manager.py" line="753"/>
         <source>Restore APKs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить APK-файлы</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="736"/>
         <source>Restore {} APK(s) to their original locations?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Восстановить {} APK в исходные местоположения?</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="772"/>
         <source>Version: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Версия: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="773"/>
         <source>Min. SDK Version: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Минимальная версия SDK: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="775"/>
         <source>Target SDK Version: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Целевая версия SDK: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="787"/>
         <source>Text files (*.txt *.list);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Текстовые файлы (*.txt *.list);;Все файлы (*)</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="801"/>
         <source>Could not read debloat list: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось прочитать удаляемый список: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="821"/>
         <source>No APKs matched the imported list.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ни один APK не соответствует импортированному списку.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="833"/>
         <location filename="../../src/qtui/apk_manager.py" line="855"/>
         <location filename="../../src/qtui/apk_manager.py" line="861"/>
         <source>Save selection</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить выбор</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="834"/>
         <source>Select at least one APK first.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сначала выберите хотя бы один APK.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="840"/>
         <source>Save selection list</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить список выбора</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="845"/>
         <source>Text files (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Текстовые файлы (*.txt)</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="856"/>
         <source>Could not save selection list: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось сохранить список выбора: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/apk_manager.py" line="862"/>
         <source>Saved {} APK package(s).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохраненные {} пакеты APK-файлов.</translation>
     </message>
 </context>
 <context>
@@ -424,7 +424,7 @@
     <message>
         <location filename="../../src/qtui/plugins.py" line="1029"/>
         <source>Run</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Запустить</translation>
     </message>
 </context>
 <context>
@@ -500,27 +500,27 @@
     <message>
         <location filename="../../src/qtui/plugins.py" line="1288"/>
         <source>{plugin_id} is not callable!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{plugin_id} не вызывается!</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1298"/>
         <source>Download complete</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка завершена</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1299"/>
         <source>ROM saved to {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ПЗУ сохранено в {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1365"/>
         <source>Magisk patching process did not produce an output file.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Процесс установки патчей Magisk не создал выходной файл.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1401"/>
         <source>Disabled encryption</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отключенное шифрование</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1501"/>
@@ -533,22 +533,22 @@
     <message>
         <location filename="../../src/qtui/connect.py" line="194"/>
         <source>Connect ImageStudio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Подключить ImageStudio</translation>
     </message>
     <message>
         <location filename="../../src/qtui/connect.py" line="199"/>
         <source>Scan via ImageStudio to manage your projects and images on your Android phone.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сканируйте с помощью ImageStudio, чтобы управлять своими проектами и изображениями на телефоне Android.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/connect.py" line="231"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разъединить</translation>
     </message>
     <message>
         <location filename="../../src/qtui/connect.py" line="315"/>
         <source>Close websocket connect.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Закрыть соединение по веб-сокету.</translation>
     </message>
 </context>
 <context>
@@ -556,7 +556,7 @@
     <message>
         <location filename="../../src/qtui/widgets.py" line="166"/>
         <source>Convert image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Конвертировать изображение</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="167"/>
@@ -576,7 +576,7 @@
     <message>
         <location filename="../../src/qtui/widgets.py" line="191"/>
         <source>search...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">поиск...</translation>
     </message>
 </context>
 <context>
@@ -805,37 +805,37 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="108"/>
         <source>INFO</source>
-        <translation>ИНФОРМАЦИЯ</translation>
+        <translation type="unfinished">ИНФОРМАЦИЯ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="114"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="115"/>
         <source>Path:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Патч:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="116"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тип:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="117"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Размер:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="118"/>
         <source>Size(B):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Размер(B):</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="119"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugin_get_file_info.py" line="128"/>
@@ -896,32 +896,32 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="198"/>
         <source>Workspace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Рабочее место</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="200"/>
         <source>summary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">сводка</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="241"/>
         <source>Click KeMiaoJiang to chat</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нажмите «Кэ Мяо Цзян», чтобы пообщаться</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="263"/>
         <source>Projects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проекты</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="264"/>
         <source>Project size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Размер проекта</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="265"/>
         <source>Disk space left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Оставшееся дисковое пространство</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="292"/>
@@ -931,13 +931,13 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="301"/>
         <source>Partitions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Разделы</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="311"/>
         <location filename="../../src/qtui/home.py" line="474"/>
         <source>Android device</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Android-устройство</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="385"/>
@@ -947,31 +947,31 @@ or click to select a file</source>
         <location filename="../../src/qtui/home.py" line="393"/>
         <location filename="../../src/qtui/home.py" line="474"/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="387"/>
         <location filename="../../src/qtui/home.py" line="430"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="387"/>
         <location filename="../../src/qtui/home.py" line="430"/>
         <source>No project selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проект не выбран</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="388"/>
         <location filename="../../src/qtui/home.py" line="431"/>
         <source>Created time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Время создания</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="389"/>
         <location filename="../../src/qtui/home.py" line="432"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файлы</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="390"/>
@@ -982,72 +982,72 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="420"/>
         <source>No project</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нет проекта</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="427"/>
         <source>Unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Недоступный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="441"/>
         <source>No partition metadata available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Метаданные раздела отсутствуют</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="463"/>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Модель</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="464"/>
         <source>Manufacturer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Производитель</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="465"/>
         <source>Codename</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Кодовое имя</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="466"/>
         <source>SoC / Board</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SoC / Плата</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="467"/>
         <source>Android</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Андроид</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="468"/>
         <source>API</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">API</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="469"/>
         <source>Security patch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Патч безопасности</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="470"/>
         <source>Build</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сборка</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="476"/>
         <source>Build.prop</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Build.prop</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="476"/>
         <source>No build.prop found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файл build.prop не найден</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="528"/>
         <source>{} Need me to unpack some partitions? :&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} Нужно распаковать какие-то разделы? :&gt;</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="529"/>
@@ -1057,17 +1057,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/home.py" line="530"/>
         <source>MIO-KITCHEN is active! Let&apos;s build something awesome today! Pin~</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MIO-KITCHEN активен! Давайте сегодня создадим что-нибудь потрясающее! Pin~</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="531"/>
         <source>Your ROM kitchen helper KeMiaoJiang is ready for commands! OwO</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ваш кухонный помощник из ROM KeMiaoJiang готов выполнять команды! OwO</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="532"/>
         <source>What can i do for ya~ :)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Чем я могу тебе помочь~ :)</translation>
     </message>
     <message>
         <location filename="../../src/qtui/home.py" line="533"/>
@@ -1105,17 +1105,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/widgets.py" line="111"/>
         <source>invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">недопустимый</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="136"/>
         <source>Cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не может быть пустым.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="142"/>
         <source>Contain invalid chars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Содержит недопустимые символы</translation>
     </message>
 </context>
 <context>
@@ -1123,7 +1123,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="885"/>
         <source>Ready</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Читать</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="888"/>
@@ -1140,43 +1140,43 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="920"/>
         <source>Unsupported System {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неподдерживаемая система {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="923"/>
         <source>%s Depends on %s，but %s not installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%s зависит от %s, но %s не установлен</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="924"/>
         <location filename="../../src/qtui/plugins.py" line="928"/>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Повторить попытку</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="927"/>
         <source>The plugin&apos;s broken.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Плагин не работает.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="932"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установленный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="976"/>
         <source>Author：{}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Автор: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="977"/>
         <source>Version：{}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Версия: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="984"/>
         <source>PLease select a plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пожалуйста, выберите плагин</translation>
     </message>
 </context>
 <context>
@@ -1261,12 +1261,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/tool.py" line="116"/>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Подключить</translation>
     </message>
     <message>
         <location filename="../../src/qtui/tool.py" line="117"/>
         <source>ApkManager</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Менеджер Apk</translation>
     </message>
     <message>
         <location filename="../../src/qtui/tool.py" line="118"/>
@@ -1362,17 +1362,17 @@ or click to select a file</source>
         <location filename="../../src/qtui/plugins.py" line="319"/>
         <location filename="../../src/qtui/plugins.py" line="324"/>
         <source>Run Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Запустить Плагин</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="319"/>
         <source>Please set a project</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пожалуйста, выберите проект</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="324"/>
         <source>id is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">id недействителен</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="333"/>
@@ -1384,17 +1384,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="333"/>
         <source>Plugin {name} configuration is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отсутствует конфигурация плагина {name}.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="407"/>
         <source>{} is not installed or broken.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} не установлен или поврежден.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="409"/>
         <source>{} is not executable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} не является исполняемым</translation>
     </message>
 </context>
 <context>
@@ -1470,12 +1470,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/widgets.py" line="88"/>
         <source>The name contains illegal characters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя содержит недопустимые символы</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="93"/>
         <source>The project name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя проекта уже существует</translation>
     </message>
 </context>
 <context>
@@ -1508,12 +1508,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/widgets.py" line="377"/>
         <source>Calculate Auto</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Рассчитать Авто</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="377"/>
         <source>Origin Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Исходный размер</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="394"/>
@@ -1563,7 +1563,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/widgets.py" line="473"/>
         <source>Brotli Level: 0</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Уровень Бротли: 0</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="477"/>
@@ -1578,7 +1578,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/widgets.py" line="513"/>
         <source>Fs Convert</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Конвертировать Fs</translation>
     </message>
     <message>
         <location filename="../../src/qtui/widgets.py" line="535"/>
@@ -1715,22 +1715,22 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="348"/>
         <source>Partition details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сведения о разделе</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="351"/>
         <source>Image and filesystem metadata for this partition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Метаданные образа и файловой системы для этого раздела.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="358"/>
         <source>Overview</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обзор</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="361"/>
         <source>Ext4 filesystem</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файловая система Ext4</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="364"/>
@@ -1740,27 +1740,27 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="382"/>
         <source>Property</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Свойство</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="382"/>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Значение</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="409"/>
         <source>Copy cell</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скопировать ячейку</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="415"/>
         <source>Copy property and value</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скопировать свойство и значение</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="422"/>
         <source>Copy selected rows</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скопировать выбранные строки</translation>
     </message>
 </context>
 <context>
@@ -1786,12 +1786,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1552"/>
         <source>Installed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Установленный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1553"/>
         <source>Repo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Репозиторий</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1564"/>
@@ -1821,12 +1821,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1725"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скачать</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1725"/>
         <source>Reinstall</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Переустановить</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1774"/>
@@ -1836,7 +1836,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1775"/>
         <source>{} installed successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} успешно установлено.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1787"/>
@@ -1849,17 +1849,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1788"/>
         <source>Dependency cycle detected while installing {}.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обнаружен цикл зависимостей при установке {}.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1794"/>
         <source>Downloading...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1804"/>
         <source>Dependency {} for {} is not available in the plugin repository.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Зависимость {} для {} недоступна в репозитории плагинов.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1808"/>
@@ -1867,22 +1867,22 @@ or click to select a file</source>
         <location filename="../../src/qtui/plugins.py" line="1830"/>
         <location filename="../../src/qtui/plugins.py" line="1841"/>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Повторить попытку</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1828"/>
         <source>Failed to download {}, reason: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось загрузить {}, причина: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1838"/>
         <source>Failed to install {}: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось установить {}: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1880"/>
         <source>Choose a mpk file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выбрать файл MPK</translation>
     </message>
 </context>
 <context>
@@ -1928,12 +1928,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="742"/>
         <source>The same project exists already.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Такой же проект уже существует.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="825"/>
         <source>Please select a project.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пожалуйста, выберите проект.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="828"/>
@@ -1941,7 +1941,8 @@ or click to select a file</source>
         <location filename="../../src/qtui/projects.py" line="845"/>
         <source>Cannot open folder:
 {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удается открыть папку:
+{}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="850"/>
@@ -1967,7 +1968,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="894"/>
         <source>Remove &apos;{}&apos; ?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить &apos;{}&apos; ?</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="903"/>
@@ -2050,27 +2051,27 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="992"/>
         <source>NAME</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ИМЯ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="992"/>
         <source>SIZE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">РАЗМЕР</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="992"/>
         <source>FS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FS</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="992"/>
         <source>IMAGE</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">ОБРАЗ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="992"/>
         <source>ATTRIBUTES</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">АТРИБУТ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="993"/>
@@ -2085,73 +2086,73 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1019"/>
         <source>Unpack Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Распаковать Image</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1022"/>
         <source>Pack Image</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Собрать Image</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1026"/>
         <source>Copy &quot;{}&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Копировать &quot;{}&quot;</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1028"/>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Просмотреть сведения</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1030"/>
         <source>Remove from List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить из списка</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1068"/>
         <location filename="../../src/qtui/projects.py" line="1849"/>
         <source>Origin Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Исходный размер</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1073"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1073"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Размер</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1073"/>
         <source>File system</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файловая система</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1074"/>
         <source>Image type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Тип image</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1074"/>
         <source>Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Атрибуты</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1080"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неизвестный</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1084"/>
         <source>Operation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Операция</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1095"/>
         <source>Metadata unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Метаданные недоступны</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1121"/>
@@ -2163,7 +2164,7 @@ or click to select a file</source>
         <location filename="../../src/qtui/projects.py" line="1187"/>
         <location filename="../../src/qtui/projects.py" line="1190"/>
         <source>Unpacking:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Распаковка:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1200"/>
@@ -2207,82 +2208,82 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1340"/>
         <source>Format convertion</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Преобразование формата</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1572"/>
         <source>Origin boot is lost.Cannot repack boot.img.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Исходная загрузка потеряна.Невозможно перепаковать boot.img.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1580"/>
         <source>Repack Rk resource...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Перепаковать ресурс Rk...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1582"/>
         <source>Repack Rk resource successfully...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ресурсы Rk успешно распакованы...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1616"/>
         <source>Failed to repack ramdisk.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось перепаковать ramdisk.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1621"/>
         <source>Successfully packed Ramdisk..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ramdisk успешно упакован..</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1623"/>
         <source>Failed to Pack boot...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось упаковать boot...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1633"/>
         <source>Successfully packed Boot...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Успешно упакован Boot...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1730"/>
         <source>Packed successfully: {}!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Успешно упаковано: {}!</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1770"/>
         <source>Failed to pack %s!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось упаковать %s!</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1782"/>
         <source>Packed {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Упаковано {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1884"/>
         <source>The image is sparse, pls convert it to raw first.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Изображение разреженное, пожалуйста, сначала конвертируйте его в RAW.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1923"/>
         <source>Project&apos;s not exist</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проект не существует</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1953"/>
         <source>Cannot simg2img super.img</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удается преобразовать simg2img в super.img</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="2007"/>
         <source>transferfile of {} missing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">файл передачи {} отсутствует</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="2153"/>
         <source>Unsupported file {}.img [{}]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неподдерживаемый файл {}.img [{}]</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="938"/>
@@ -2292,12 +2293,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="903"/>
         <source>Project {} Removed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проект {} удалён.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="906"/>
         <source>Failed to remove peoject: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось удалить объект: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1338"/>
@@ -2320,7 +2321,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/projects.py" line="1360"/>
         <source>Projects</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Проекты</translation>
     </message>
     <message>
         <location filename="../../src/qtui/projects.py" line="1377"/>
@@ -2391,22 +2392,22 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1127"/>
         <source>Download a ROM from a direct HTTP or HTTPS link to your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузите ПЗУ по прямой HTTP- или HTTPS-ссылке на свой компьютер.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1133"/>
         <source>Download URL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скачать URL</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1136"/>
         <source>Direct HTTP or HTTPS ROM download URL</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Прямой URL для скачивания ПЗУ по протоколу HTTP или HTTPS</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1141"/>
         <source>Save ROM as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить ROM как...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1142"/>
@@ -2416,18 +2417,18 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1146"/>
         <source>Save location</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить местоположение</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1153"/>
         <source>Enter a direct download URL and choose a destination.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Введите URL для прямой загрузки и выберите место назначения.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1157"/>
         <location filename="../../src/qtui/plugins.py" line="1240"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скачать</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1159"/>
@@ -2438,53 +2439,53 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1167"/>
         <source>Save ROM</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Сохранить ПЗУ</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1167"/>
         <source>ROM files (*.zip *.img);;All files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Файлы ПЗУ (*.zip *.img);;Все файлы (*)</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1177"/>
         <source>Enter a valid HTTP or HTTPS URL.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Введите действительный URL-адрес HTTP или HTTPS.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1180"/>
         <source>Choose where to save the ROM.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите место для сохранения ПЗУ.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1195"/>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Подключение...</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1203"/>
         <source>{} of {} downloaded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} из {} загружено</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1207"/>
         <source>{} downloaded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">{} загружено</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1220"/>
         <source>Download failed: {}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка загрузки: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1228"/>
         <source>Download canceled.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Загрузка отменена.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1247"/>
         <location filename="../../src/qtui/plugins.py" line="1254"/>
         <source>Canceling download...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отмена загрузки...</translation>
     </message>
 </context>
 <context>
@@ -2497,12 +2498,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/settings.py" line="36"/>
         <source>Tool Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройки инструментов</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="39"/>
         <source>Patch Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Настройки патча</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="42"/>
@@ -2546,7 +2547,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/settings.py" line="59"/>
         <source>Choose your Language</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выберите свой язык</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="64"/>
@@ -2566,17 +2567,17 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/settings.py" line="76"/>
         <source>Adjust project Structure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Скорректировать структуру проекта</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="83"/>
         <source>Cpio Implement</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Внедрение Cpio</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="84"/>
         <source>Native&apos;s binary, another&apos;s built-in func.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Двоичный файл нативного кода, встроенная функция другого языка.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/settings.py" line="89"/>
@@ -2663,32 +2664,32 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="672"/>
         <source>Unknown Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Неизвестный Плагин</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="675"/>
         <source>Please select a plugin!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пожалуйста, выберите плагин!</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="677"/>
         <source>Plugin &apos;{}&apos; not found or cannot be uninstalled.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Плагин &apos;{}&apos; не найден или не может быть удалён.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="679"/>
         <source>Plugin &apos;{}&apos; is virtual and cannot be uninstalled this way.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Плагин &apos;{}&apos; является виртуальным и не может быть удалён таким образом.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="681"/>
         <source>Are you sure you want to uninstall plugin &apos;{}&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вы уверены, что хотите удалить плагин &apos;{}&apos;?</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="691"/>
         <source>The following dependent plugins will also be removed:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Также будут удалены следующие зависимые плагины:</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="720"/>
@@ -2698,12 +2699,12 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="780"/>
         <source>Uninstalling：{}</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удаление: {}</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="816"/>
         <source>Uninstall {} Done！</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Удалить {} Готово!</translation>
     </message>
 </context>
 <context>
@@ -2739,7 +2740,7 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="283"/>
         <source>Manager</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Менеджер</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1331"/>
@@ -2751,23 +2752,23 @@ or click to select a file</source>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1412"/>
         <source>Disabled Avb</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Отключена функция Avb</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1437"/>
         <source>Please choose a path.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пожалуйста, выберите путь.</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1444"/>
         <location filename="../../src/qtui/plugins.py" line="1467"/>
         <source>Processing File</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обработка файла</translation>
     </message>
     <message>
         <location filename="../../src/qtui/plugins.py" line="1502"/>
         <source>总共从文件末尾截去了 %d 个零字节(~ %s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">В общей сложности из конца файла было вырезано%d нулевых байт (~ %s)</translation>
     </message>
     <message>
         <source>Merge Qualcomm Image</source>
