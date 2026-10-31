@@ -43,7 +43,7 @@ from src.core import blockimgdiff
 from src.core import sparse_img
 from src.core import update_metadata_pb2 as um
 from src.core.lpunpack import SparseImage
-
+from src.qtui.settings_cfg import cfg
 DataImage = blockimgdiff.DataImage
 
 # -----
@@ -809,7 +809,7 @@ def generate_bug_report():
         Python: {sys.version}
         Platform: {sys.platform}
         Exec Command: {sys.argv}
-        Tool Version: qt
+        Tool Version: {cfg.Version.value}
         Source code running: {states.run_source}
         python Implementation: {platform.python_implementation()}
         Uname: {platform.uname()}
