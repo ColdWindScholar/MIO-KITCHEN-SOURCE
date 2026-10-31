@@ -1868,7 +1868,7 @@ class ProjectsPage(QFrame):
             try:
                 rmtree(source)
             except (Exception, BaseException):
-                print(f"Failed to remove {name}")
+                events.append_log.emit("WARN", f"Failed to remove {name}")
             print(self.tr("Successfully packed Boot..."))
         return 0
 
