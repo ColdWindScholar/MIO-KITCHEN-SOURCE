@@ -176,7 +176,7 @@ class PartitionListWorker(QThread):
                     folder,
                     utils.hum_convert(size),
                     parts_dict.get(folder, "Unknown"),
-                    "Source",
+                    self.tr("Source"),
                     "rw",
                 ))
             return data, ""
