@@ -1894,7 +1894,7 @@ class ProjectsPage(QFrame):
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size) -> bool | None:
         if not project_manger.exist():
-            self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 1)
+            self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 2)
             return False
         parts_dict = utils.JsonEdit(
             os.path.join(work := project_manger.current_work_path(), "config/parts_info")
@@ -2120,7 +2120,7 @@ class ProjectsPage(QFrame):
                 except (Exception, BaseException):
                     logging.exception('Bugs')
         if not project_manger.exist() or not os.path.exists(project_manger.current_work_path()):
-            events.show_info_bar.emit(self.tr("Warning"), self.tr("Project's not exist"), 3, 3000)
+            events.show_info_bar.emit(self.tr("Warning"), self.tr("Project's not exist"), 2, 3000)
             return False
 
         json_ = utils.JsonEdit(os.path.join(work := project_manger.current_work_path(), "config/parts_info"))
