@@ -33,7 +33,7 @@ class LogMessageBoxBase(QWidget):
         self.button_layout.addWidget(self.export_log)
         self.layout.addLayout(self.button_layout)
         self.clear_btn.clicked.connect(self.text_edit.clear)
-        self.export_log.clicked.connect(generate_bug_report)
+        self.export_log.clicked.connect(lambda: self.append_log("INFO", f"BugReport:{generate_bug_report()}"))
 
         # 预设不同日志级别的颜色格式
         self._formats = {
