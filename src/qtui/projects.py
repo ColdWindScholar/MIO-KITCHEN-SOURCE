@@ -1429,7 +1429,7 @@ class ProjectsPage(QFrame):
                                 except (PermissionError, IOError, FileNotFoundError, IsADirectoryError):
                                     logging.exception('Bugs')
                         else:
-                            print(f"transferfile of {basename} is not exists.")
+                            events.append_log.emit("WARN", f"transferfile of {basename} is not exists.")
                 if src_format == 'sparse':
                     utils.simg2img(f'{work}/{i}')
             elif dst_format == 'dat':
