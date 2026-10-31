@@ -827,6 +827,18 @@ class LpUnpack:
 
             size -= block_size
 
+    def get_partition_size(self, partition, metadata):
+        total_size = 0
+        if partition.num_extents != 0:
+            for extent_number in range(partition.num_extents):
+                index = partition.first_extent_index + extent_number
+                extent = metadata.extents[index]
+                if extent.target_type != LP_TARGET_TYPE_LINEAR:
+                    raise LpUnpackError(f'Unsupported target type in extent: {extent.target_type}')
+                size = extent.num_sectors * LP_SECTOR_SIZE
+                total_size += size
+        return total_size
+
     def get_parts(self):
         try:
             if SparseImage(self._fd).check():
@@ -839,6 +851,7 @@ class LpUnpack:
 
             self._fd.seek(0)
             metadata = self._read_metadata()
+            return [i for i in metadata.partitions]
             return metadata.partitions
 
         except LpUnpackError as e:

@@ -201,7 +201,7 @@ class PartitionListWorker(QThread):
             if "super.img" in entries:
                 if gettype(super_path) == "sparse":
                     return data, self.tr("The image is sparse, pls convert it to raw first.")
-                data.extend((partition.name, str(partition.size()), "Inner", "Unknown", "Unknown")
+                data.extend((partition.name, partition.num_extents, "Inner", "Unknown", "Unknown")
                             for partition in lpunpack.get_parts(super_path))
         elif form == "update.app":
             app_path = os.path.join(work, "UPDATE.APP")
