@@ -192,7 +192,7 @@ class PartitionListWorker(QThread):
                         data.append((
                             partition.partition_name,
                             utils.hum_convert(partition.new_partition_info.size),
-                            "Raw",
+                            "Compressed",
                             "Unknown",
                             "Unknown",
                         ))
