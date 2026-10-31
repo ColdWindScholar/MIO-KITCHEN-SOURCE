@@ -32,6 +32,7 @@ from PySide6.QtWidgets import (
 from qfluentwidgets import PushButton, isDarkTheme, setThemeColor
 from shiboken6 import isValid
 
+from src.core import utils
 from src.core.utils import prog_path
 from src.qtui.settings_cfg import cfg
 from src.qtui.widgets import ClickableLabel
@@ -427,7 +428,7 @@ class HomePage(QWidget):
 
         self.summary_values["project_count"].setText(str(result["project_count"]))
         self.summary_values["project_size"].setText(
-            self._format_size(result["project_size"]) if result["project_size"] is not None
+            utils.hum_convert(result["project_size"]) if result["project_size"] is not None
             else self.tr("Not scanned") if not result["details_scanned"]
             else self.tr("No project")
         )
@@ -436,7 +437,7 @@ class HomePage(QWidget):
             if result["created_time"] is not None else "—"
         )
         self.summary_values["free_space"].setText(
-            self._format_size(result["free_space"]) if result["free_space"] is not None else self.tr("Unavailable")
+            utils.hum_convert(result["free_space"]) if result["free_space"] is not None else self.tr("Unavailable")
         )
         self._set_detail_rows([
             (self.tr("Name"), result["project_name"] or self.tr("No project selected")),
@@ -519,14 +520,6 @@ class HomePage(QWidget):
         self._theme_styled_widgets = [
             style for style in self._theme_styled_widgets if style[0] is not widget
         ]
-
-    @staticmethod
-    def _format_size(size):
-        size = float(size)
-        for unit in ("B", "KB", "MB", "GB", "TB", "PB"):
-            if size < 1024 or unit == "PB":
-                return f"{size:.1f} {unit}" if unit != "B" else f"{int(size)} B"
-            size /= 1024
 
     def react(self):
         current_time = datetime.datetime.now()
