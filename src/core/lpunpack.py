@@ -842,7 +842,7 @@ class LpUnpack:
 
             filter_partition = []
             for partition in metadata.partitions:
-                filter_partition.append(partition.name)
+                filter_partition.append(partition)
 
             if not filter_partition:
                 raise LpUnpackError(f'Could not find partition: {self._partition_name}')
