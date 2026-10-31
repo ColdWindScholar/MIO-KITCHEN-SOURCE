@@ -613,9 +613,10 @@ class PackSuperMessageBox(MessageBoxBase):
         self.partition_search.setClearButtonEnabled(True)
         self.partition_search.textChanged.connect(self.filter_partitions)
         partition_toolbar.addWidget(self.partition_search, 1)
-        self.select_all_button = PushButton(self.tr("Select all"), partitions_card)
-        self.select_all_button.clicked.connect(self.toggle_select_all_partitions)
-        partition_toolbar.addWidget(self.select_all_button)
+        self.select_all_checkbox = CheckBox(self.tr("Select all"), partitions_card)
+        self.select_all_checkbox.setTristate(False)
+        self.select_all_checkbox.toggled.connect(self._on_select_all_toggled)
+        partition_toolbar.addWidget(self.select_all_checkbox)
         self.btn_refresh = ToolButton(FluentIcon.SYNC, partitions_card)
         self.btn_refresh.setToolTip(self.tr("Refresh partitions"))
         self.btn_refresh.setAccessibleName(self.tr("Refresh partitions"))
@@ -667,35 +668,31 @@ class PackSuperMessageBox(MessageBoxBase):
         layout.addWidget(SubtitleLabel(title, card))
         return card, layout
 
-    def toggle_select_all_partitions(self):
-        select_all = any(
-            self.tl.item(index).checkState() != Qt.Checked
-            for index in range(self.tl.count())
-        )
+    def _on_select_all_toggled(self, select_all):
         self.tl.blockSignals(True)
         for index in range(self.tl.count()):
             self.tl.item(index).setCheckState(
                 Qt.Checked if select_all else Qt.Unchecked
             )
         self.tl.blockSignals(False)
-        self._sync_select_all_button()
+        self._sync_select_all_checkbox()
         self.verify_size()
 
     def _on_partition_item_changed(self, _item):
-        self._sync_select_all_button()
+        self._sync_select_all_checkbox()
         self.verify_size()
 
-    def _sync_select_all_button(self):
+    def _sync_select_all_checkbox(self):
         count = self.tl.count()
         checked = sum(
             self.tl.item(index).checkState() == Qt.Checked
             for index in range(count)
         )
         all_selected = count > 0 and checked == count
-        self.select_all_button.setText(
-            self.tr("Deselect all") if all_selected else self.tr("Select all")
-        )
-        self.select_all_button.setEnabled(count > 0)
+        self.select_all_checkbox.blockSignals(True)
+        self.select_all_checkbox.setChecked(all_selected)
+        self.select_all_checkbox.blockSignals(False)
+        self.select_all_checkbox.setEnabled(count > 0)
 
     def filter_partitions(self, query):
         query = query.strip().casefold()
@@ -775,7 +772,7 @@ class PackSuperMessageBox(MessageBoxBase):
     def refresh(self):
         self.tl.clear()
         if not os.path.exists(self.work):
-            self._sync_select_all_button()
+            self._sync_select_all_checkbox()
             return
 
         for file_name in os.listdir(self.work):
@@ -799,7 +796,7 @@ class PackSuperMessageBox(MessageBoxBase):
                     item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
                     self.tl.addItem(item)
         self.filter_partitions(self.partition_search.text())
-        self._sync_select_all_button()
+        self._sync_select_all_checkbox()
         self.verify_size()
 
     def read_list(self):
