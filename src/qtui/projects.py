@@ -1935,7 +1935,7 @@ class ProjectsPage(QFrame):
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                     work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
                                     old_kernel=erofs_old_kernel, UTC=UTC) != 0:
-                        print("Failed to repack {} [erofs]".format(dname))
+                        events.append_log.emit("ERROR", "Failed to repack {} [erofs]".format(dname))
                     else:
                         if remove_source_files:
                             self.rdi(work, dname)
@@ -1954,7 +1954,7 @@ class ProjectsPage(QFrame):
                     if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
                                       UTC=UTC, readonly=f2fs_read_only,
                                       compress=f2fs_compresion) != 0:
-                        print("Failed to pack %s!" % dname)
+                        events.append_log.emit("ERROR", "Failed to pack %s!" % dname)
                     else:
                         if remove_source_files:
                             self.rdi(work, dname)
@@ -2008,7 +2008,7 @@ class ProjectsPage(QFrame):
                             size=ext4_size_value,
                             UTC=UTC)
                     if exit_code:
-                        print(self.tr("Failed to pack %s!") % dname)
+                        events.append_log.emit("ERROR",self.tr("Failed to pack %s!") % dname)
                         continue
 
                     if remove_source_files:
@@ -2202,7 +2202,7 @@ class ProjectsPage(QFrame):
                             except (Exception, BaseException):
                                 logging.exception('Bugs')
                         else:
-                            print("File May Not Extracted.")
+                            events.append_log.emit("WARN","File May Not Extracted.")
                     else:
                         events.show_info_bar.emit(self.tr("Error"), self.tr("transferfile of {} missing").format(i), 1,
                                                   3000)
@@ -2325,7 +2325,7 @@ class ProjectsPage(QFrame):
                     try:
                         repaired = repair_erofs_symlinks(os.path.join(work, i))
                     except (OSError, ValueError) as error:
-                        print(f'[erofs] Unpacked {i} has invalid symlinks: {error}', flush=True)
+                        events.append_log.emit("WARN", f'[erofs] Unpacked {i} has invalid symlinks: {error}')
                         continue
                     if repaired:
                         print(f'[erofs] Restored {repaired} Windows symlink markers in unpacked {i}', flush=True)
