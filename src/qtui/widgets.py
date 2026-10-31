@@ -10,10 +10,12 @@ from PySide6.QtGui import QColor
 from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QListWidgetItem
-from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
-                               QHBoxLayout, QButtonGroup)
+from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout, QHBoxLayout,
+                               QButtonGroup, QTableWidgetItem, QHeaderView,
+                               QAbstractItemView)
 from qfluentwidgets import ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
-    RadioButton, PushButton, BodyLabel, EditableComboBox, CardWidget, FluentIcon, ToolButton
+    RadioButton, PushButton, BodyLabel, EditableComboBox, CardWidget, FluentIcon, \
+    ToolButton, TableWidget
 from qfluentwidgets import (
     MessageBoxBase,
 )
@@ -623,10 +625,26 @@ class PackSuperMessageBox(MessageBoxBase):
         self.btn_refresh.clicked.connect(self.refresh)
         partition_toolbar.addWidget(self.btn_refresh)
         partitions_layout.addLayout(partition_toolbar)
-        self.tl = ListWidget(partitions_card)
+        self.tl = TableWidget(partitions_card)
+        self.tl.setColumnCount(3)
+        self.tl.setHorizontalHeaderLabels([
+            self.tr("Name"), self.tr("Type"), self.tr("Size")
+        ])
         self.tl.setMinimumHeight(240)
-        self.tl.setMaximumHeight(280)
-        self.tl.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.tl.setMaximumHeight(300)
+        self.tl.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tl.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tl.setShowGrid(False)
+        self.tl.verticalHeader().hide()
+        self.tl.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.ResizeMode.Stretch
+        )
+        self.tl.horizontalHeader().setSectionResizeMode(
+            1, QHeaderView.ResizeMode.ResizeToContents
+        )
+        self.tl.horizontalHeader().setSectionResizeMode(
+            2, QHeaderView.ResizeMode.ResizeToContents
+        )
         self.tl.itemChanged.connect(self._on_partition_item_changed)
         partitions_layout.addWidget(self.tl)
         content_layout.addWidget(partitions_card, 3)
@@ -670,8 +688,8 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def _on_select_all_toggled(self, select_all):
         self.tl.blockSignals(True)
-        for index in range(self.tl.count()):
-            self.tl.item(index).setCheckState(
+        for row in range(self.tl.rowCount()):
+            self.tl.item(row, 0).setCheckState(
                 Qt.Checked if select_all else Qt.Unchecked
             )
         self.tl.blockSignals(False)
@@ -683,10 +701,10 @@ class PackSuperMessageBox(MessageBoxBase):
         self.verify_size()
 
     def _sync_select_all_checkbox(self):
-        count = self.tl.count()
+        count = self.tl.rowCount()
         checked = sum(
-            self.tl.item(index).checkState() == Qt.Checked
-            for index in range(count)
+            self.tl.item(row, 0).checkState() == Qt.Checked
+            for row in range(count)
         )
         all_selected = count > 0 and checked == count
         self.select_all_checkbox.blockSignals(True)
@@ -696,9 +714,13 @@ class PackSuperMessageBox(MessageBoxBase):
 
     def filter_partitions(self, query):
         query = query.strip().casefold()
-        for index in range(self.tl.count()):
-            item = self.tl.item(index)
-            item.setHidden(query not in item.text().casefold())
+        for row in range(self.tl.rowCount()):
+            name = self.tl.item(row, 0).text()
+            partition_type = self.tl.item(row, 1).text()
+            self.tl.setRowHidden(
+                row,
+                query not in f"{name} {partition_type}".casefold()
+            )
 
 
 
@@ -709,13 +731,11 @@ class PackSuperMessageBox(MessageBoxBase):
             self.super_size_edit.setText(clean_text)
 
     def get_selected_items(self):
-        """Extracts current checkable choices context keys from list layout directly."""
-        checked_names = []
-        for i in range(self.tl.count()):
-            item = self.tl.item(i)
-            if item.checkState() == Qt.Checked:
-                checked_names.append(item.data(Qt.UserRole))
-        return checked_names
+        return [
+            self.tl.item(row, 0).data(Qt.UserRole)
+            for row in range(self.tl.rowCount())
+            if self.tl.item(row, 0).checkState() == Qt.Checked
+        ]
 
     def verify_size(self):
         selected_lbs = self.get_selected_items()
@@ -768,31 +788,43 @@ class PackSuperMessageBox(MessageBoxBase):
             logging.exception('Bugs')
 
     def refresh(self):
-        self.tl.clear()
-        if not os.path.exists(self.work):
-            self._sync_select_all_checkbox()
-            return
+        self.tl.blockSignals(True)
+        try:
+            self.tl.setRowCount(0)
+            if os.path.exists(self.work):
+                for file_name in sorted(os.listdir(self.work)):
+                    if not file_name.endswith(".img"):
+                        continue
 
-        for file_name in os.listdir(self.work):
-            if file_name.endswith(".img"):
-                img_path = os.path.join(self.work, file_name)
-                name = file_name[:-4]
-                is_checked = name in self.selected
-                item_text = ""
+                    img_path = os.path.join(self.work, file_name)
+                    name = file_name[:-4]
+                    is_checked = name in self.selected
+                    if utils.is_empty_img(img_path):
+                        partition_type = self.tr("empty")
+                    else:
+                        partition_type = gettype(img_path)
+                        if partition_type not in ["ext", "erofs", "f2fs", "sparse"]:
+                            continue
 
-                if utils.is_empty_img(img_path):
-                    item_text = f"{name} [empty]"
-                else:
-                    file_type = gettype(img_path)
-                    if file_type in ["ext", "erofs", 'f2fs', 'sparse']:
-                        item_text = f"{name} [{file_type}] [{utils.hum_convert(os.path.getsize(img_path))}]"
+                    row = self.tl.rowCount()
+                    self.tl.insertRow(row)
+                    name_item = QTableWidgetItem(name)
+                    name_item.setData(Qt.ItemDataRole.UserRole, name)
+                    name_item.setFlags(
+                        name_item.flags()
+                        | Qt.ItemFlag.ItemIsEnabled
+                        | Qt.ItemFlag.ItemIsUserCheckable
+                    )
+                    name_item.setCheckState(
+                        Qt.CheckState.Checked if is_checked else Qt.CheckState.Unchecked
+                    )
+                    self.tl.setItem(row, 0, name_item)
+                    self.tl.setItem(row, 1, QTableWidgetItem(partition_type))
+                    size = os.path.getsize(img_path)
+                    self.tl.setItem(row, 2, QTableWidgetItem(utils.hum_convert(size)))
+        finally:
+            self.tl.blockSignals(False)
 
-                if item_text:
-                    item = QListWidgetItem(item_text)
-                    item.setData(Qt.UserRole, name)
-                    item.setFlags(item.flags() | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
-                    item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
-                    self.tl.addItem(item)
         self.filter_partitions(self.partition_search.text())
         self._sync_select_all_checkbox()
         self.verify_size()
