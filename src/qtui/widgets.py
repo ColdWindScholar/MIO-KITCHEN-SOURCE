@@ -722,8 +722,6 @@ class PackSuperMessageBox(MessageBoxBase):
         size = sum(
             [os.path.getsize(f"{self.work}/{i}.img") for i in selected_lbs if os.path.exists(f"{self.work}/{i}.img")])
 
-
-
         if 1:
             diff_size = size
             for i in range(20):
