@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qfluentwidgets import isDarkTheme, setThemeColor
+from qfluentwidgets import FluentIcon, IconWidget, isDarkTheme, setThemeColor
 from shiboken6 import isValid
 
 from src.core import utils
@@ -197,8 +197,8 @@ class HomePage(QWidget):
 
         header = QHBoxLayout()
         header.setSpacing(8)
-        folder_icon = QLabel("▰")
-        folder_icon.setStyleSheet("color: #7799E8; font-size: 19px;")
+        folder_icon = IconWidget(FluentIcon.FOLDER, self)
+        folder_icon.setFixedSize(20, 20)
         title = QLabel(self.tr("Workspace"))
         self._set_theme_style(title, "color: #F1F4F8;", "color: #20242C;", "font-size: 18px; font-weight: 700;")
         subtitle = QLabel(self.tr("summary"))
@@ -269,9 +269,9 @@ class HomePage(QWidget):
         stats.setHorizontalSpacing(12)
         self.summary_values = {}
         for index, (key, label, icon, accent) in enumerate((
-            ("project_count", self.tr("Projects"), "▰", "#F1F4F8"),
-            ("project_size", self.tr("Project size"), "▱", "#F1F4F8"),
-            ("free_space", self.tr("Disk space left"), "◉", "#77D6A8"),
+            ("project_count", self.tr("Projects"), FluentIcon.FOLDER, "#F1F4F8"),
+            ("project_size", self.tr("Project size"), FluentIcon.DOCUMENT, "#F1F4F8"),
+            ("free_space", self.tr("Disk space left"), FluentIcon.SAVE, "#77D6A8"),
         )):
             card = QFrame()
             card.setObjectName("Card")
@@ -280,8 +280,8 @@ class HomePage(QWidget):
             card_layout.setSpacing(7)
             label_row = QHBoxLayout()
             label_row.setSpacing(9)
-            icon_widget = QLabel(icon)
-            self._set_theme_style(icon_widget, f"color: {accent};", f"color: {accent};", "font-size: 17px;")
+            icon_widget = IconWidget(icon, card)
+            icon_widget.setFixedSize(18, 18)
             label_widget = QLabel(label)
             self._set_theme_style(label_widget, "color: #98A7B8;", "color: #30465C;", "font-size: 14px;")
             label_row.addWidget(icon_widget)
@@ -298,7 +298,7 @@ class HomePage(QWidget):
             stats.setColumnStretch(column, 1)
         dashboard.addLayout(stats)
 
-        self.details_card = self._create_info_card(self.tr("Project"))
+        self.details_card = self._create_info_card(self.tr("Project"), FluentIcon.FOLDER)
         self.details_grid = QGridLayout()
         self.details_grid.setHorizontalSpacing(22)
         self.details_grid.setVerticalSpacing(10)
@@ -307,7 +307,7 @@ class HomePage(QWidget):
         self.details_card.layout().addLayout(self.details_grid)
         dashboard.addWidget(self.details_card)
 
-        self.partitions_card = self._create_info_card(self.tr("Partitions"))
+        self.partitions_card = self._create_info_card(self.tr("Partitions"), FluentIcon.TILES)
         self.partition_count_label = QLabel("—")
         self._set_theme_style(self.partition_count_label, "color: #F1F4F8;", "color: #20242C;", "font-size: 17px; font-weight: 700;")
         self.partitions_card.layout().addWidget(self.partition_count_label)
@@ -317,7 +317,7 @@ class HomePage(QWidget):
         self.partitions_card.layout().addWidget(self.partition_names_label)
         dashboard.addWidget(self.partitions_card)
 
-        self.device_card = self._create_info_card(self.tr("Android device"))
+        self.device_card = self._create_info_card(self.tr("Android device"), FluentIcon.PHONE)
         self.device_grid = QGridLayout()
         self.device_grid.setHorizontalSpacing(22)
         self.device_grid.setVerticalSpacing(10)
@@ -363,18 +363,21 @@ class HomePage(QWidget):
             valid_styles.append((widget, dark_colors, light_colors, common))
         self._theme_styled_widgets = valid_styles
 
-    def _create_info_card(self, title):
+    def _create_info_card(self, title, icon):
         card = QFrame()
         card.setObjectName("Card")
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(16, 12, 16, 14)
         card_layout.setSpacing(10)
         header = QHBoxLayout()
-        heading = QLabel(f"▰  {title}")
+        icon_widget = IconWidget(icon, card)
+        icon_widget.setFixedSize(16, 16)
+        heading = QLabel(title)
         self._set_theme_style(
             heading, "color: #91AFC2;", "color: #547184;",
             "font-size: 14px; font-weight: 600;",
         )
+        header.addWidget(icon_widget)
         header.addWidget(heading)
         header.addStretch()
         card_layout.addLayout(header)
