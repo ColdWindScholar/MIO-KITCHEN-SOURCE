@@ -63,7 +63,6 @@
 * GUI graphical interface
 * A graphical plugin manager, plus an editor for plugin script editing. Support plugin installing and exporting
 * Quick updates, secure, stable and fast
-* Unique MSH interpreter that supports running MSH scripts
 * Provide backward compatibility with Android 8 and lower and create .img for these versions
 * Use mkc file choose api on Linux, making it easier to use
 ***
