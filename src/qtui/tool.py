@@ -18,22 +18,23 @@ import platform
 import subprocess
 import sys
 import threading
-import time
 
 from PySide6.QtCore import Qt, QSize, QTranslator, QObject
 from PySide6.QtGui import QIcon, QGuiApplication
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
+from src.core.utils import prog_path, tool_self
+from src.core.utils import tool_log
+from src.qtui.about import AboutPage
 from src.qtui.apk_manager import ApkManagerPage
 from src.qtui.connect import ConnectPage
-from src.core.utils import temp, v_code, prog_path, tool_self
-from src.qtui.about import AboutPage
 from src.qtui.home import HomePage
 from src.qtui.plugins import PluginPage
 from src.qtui.projects import ProjectsPage
 from src.qtui.settings import SettingsPage
 from src.qtui.settings_cfg import cfg
+
 is_pro = False
 try:
     from src.pro.sn import v as verify
@@ -162,7 +163,6 @@ class MainWindow(FluentWindow):
 
 
 def __init__qt(args):
-    tool_log = f'{temp}/{time.strftime("%Y%m%d_%H-%M-%S", time.localtime())}_{v_code()}.log'
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
