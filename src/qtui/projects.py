@@ -192,9 +192,9 @@ class PartitionListWorker(QThread):
                         data.append((
                             partition.partition_name,
                             utils.hum_convert(partition.new_partition_info.size),
-                            "Compressed",
-                            "Unknown",
-                            "Unknown",
+                            self.tr("Compressed"),
+                            self.tr("Unknown"),
+                            self.tr("Unknown"),
                         ))
         elif form == "super":
             super_path = os.path.join(work, "super.img")
