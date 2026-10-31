@@ -213,10 +213,8 @@ class ConvertImageMessageBox(MessageBoxBase):
         self.viewLayout.addWidget(self.list_widget)  # 插入中间的多选列表
         self.viewLayout.addLayout(self.bottom_control_layout)
 
-        # 设置对话框的整体宽度
         self.widget.setMinimumWidth(450)
 
-        # 6. 绑定内部交互信号槽
         self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
         self.search_input.textChanged.connect(self._on_search_text_changed)
         self.list_widget.itemChanged.connect(self._on_item_changed)
@@ -249,8 +247,7 @@ class ConvertImageMessageBox(MessageBoxBase):
                         file_list.append(i)
         self._populate_list(file_list)
     def _populate_list(self, items_to_show: list[str]):
-        """根据传入的列表渲染 QListWidget 项（带复选框）"""
-        self.list_widget.blockSignals(True)  # 渲染时暂时阻塞信号，防止触发频繁回调
+        self.list_widget.blockSignals(True)
         self.list_widget.clear()
         for item_text in items_to_show:
             item = QListWidgetItem(item_text)
