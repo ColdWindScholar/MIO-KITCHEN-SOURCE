@@ -41,12 +41,12 @@ from src.qtui.widgets import ClickableLabel
 class _SummaryWorker(QThread):
     completed = Signal(object)
 
-    def __init__(self, project_name, project_path, working_folder, include_heavy):
+    def __init__(self, project_name, project_path, working_folder):
         super().__init__()
         self.project_name = project_name
         self.project_path = project_path
         self.working_folder = working_folder
-        self.include_heavy = include_heavy
+        self.include_heavy = True
 
     def run(self):
         result = {
@@ -408,7 +408,7 @@ class HomePage(QWidget):
             if thread.isRunning():
                 thread.requestInterruption()
 
-        worker = _SummaryWorker(project_name, project_path, working_folder, include_heavy)
+        worker = _SummaryWorker(project_name, project_path, working_folder)
         worker.setParent(self)
         self._summary_threads.add(worker)
         worker.completed.connect(self._apply_summary)
