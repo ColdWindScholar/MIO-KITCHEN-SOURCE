@@ -1808,12 +1808,12 @@ class ProjectsPage(QFrame):
         if boot is None:
             boot = utils.findfile(f"{name}.img", work)
             if not boot:
-                print(self.tr("Origin boot is lost.Cannot repack boot.img."))
+                events.append_log.emit("ERROR", self.tr("Origin boot is lost.Cannot repack boot.img."))
                 return 1
         if source is None:
             source = os.path.join(work, name)
         if not os.path.exists(source):
-            print(f"Cannot Find {name}...")
+            events.append_log.emit("ERROR", f"Cannot Find {name}...")
             return 1
         if os.path.isfile(f'{source}/second_order'):
             print(self.tr("Repack Rk resource..."))
