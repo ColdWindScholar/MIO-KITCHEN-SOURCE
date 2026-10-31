@@ -1697,7 +1697,7 @@ class ProjectsPage(QFrame):
     def make_ext4fs(self, name: str, work: str, work_output, sparse: bool = False, size: int = 0, UTC: int = None,
                     has_contexts: bool = True):
         if not has_contexts:
-            print("make_ext4fs", self.tr('Warning:file_context not found!!!'))
+            events.append_log.emit("WARN", self.tr('make_ext4fs: file_context not found.'))
         print(f"packing {name} [ext]")
         if not UTC:
             UTC = int(time.time())
@@ -1777,7 +1777,7 @@ class ProjectsPage(QFrame):
                  '-I', '256', '-M', f'/{name}', '-m', '0', '-t', 'ext4', '-b', '4096', f'{work_output}/{name}_new.img',
                  f'{int(size)}']) != 0:
             os.remove(f'{work_output}/{name}_new.img')
-            print(f"packing {name} failed [mke2fs]")
+            events.append_log.emit("ERROR", f"packing {name} failed [mke2fs]")
             return 1
         ret = call(
             ['e2fsdroid', '-e', '-T', f'{utc_time}', '-S', f'{work}/config/{name}_file_contexts', '-C',
@@ -1785,7 +1785,7 @@ class ProjectsPage(QFrame):
              f'{work_output}/{name}_new.img'])
         if ret != 0:
             os.remove(f'{work}/{name}_new.img')
-            print(f"packing {name} failed [e2fsdroid]")
+            events.append_log.emit("ERROR", f"packing {name} failed [e2fsdroid]")
             return 1
         if sparse:
             call(['img2simg', f'{work_output}/{name}_new.img', f'{work_output}/{name}.img'])
