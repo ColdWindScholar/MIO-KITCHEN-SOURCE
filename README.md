@@ -125,7 +125,7 @@ python3 config chksupd
 <details><summary>macOS</summary>
 
 ```` shell
-brew install python3-tk python3  tcl-tk
+brew install python3
 python3 -m pip install -U --force-reinstall pip
 pip install -r requirements.txt
 ````
@@ -137,7 +137,6 @@ pip install -r requirements.txt
 ```` shell
 python3 -m pip install -U --force-reinstall pip
 pip install -r requirements.txt
-sudo apt update -y && sudo apt install python3-tk -y
 ````
 
 If using NixOS
