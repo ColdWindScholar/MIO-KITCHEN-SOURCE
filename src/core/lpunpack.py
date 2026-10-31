@@ -851,9 +851,8 @@ class LpUnpack:
 
             self._fd.seek(0)
             metadata = self._read_metadata()
-            return [i for i in metadata.partitions]
-            return metadata.partitions
-
+            for part in metadata.partitions:
+                yield part, self.get_partition_size(part, metadata)
         except LpUnpackError as e:
             print(e.message)
 
