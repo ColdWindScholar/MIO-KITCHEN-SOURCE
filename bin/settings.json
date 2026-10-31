@@ -7,7 +7,7 @@
         "checkUpdate": false,
         "CpioImpl": "Python",
         "currentProjectName": "",
-        "Language": "app_zh_CN.qm",
+        "Language": "app_en_US.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
         "selinuxPatch": false,
