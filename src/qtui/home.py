@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qfluentwidgets import PushButton, isDarkTheme, setThemeColor
+from qfluentwidgets import isDarkTheme, setThemeColor
 from shiboken6 import isValid
 
 from src.core import utils
