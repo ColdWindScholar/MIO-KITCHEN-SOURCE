@@ -835,7 +835,7 @@ class ProjectsPage(QFrame):
                             os.rename(os.path.join(project_manger.current_work_path(), fi),
                                       os.path.join(project_manger.current_work_path(), member_name))
                     except Exception as e:
-                        print("cannot rename %s %s" % (member_name, e))
+                        events.append_log.emit("ERROR", "cannot rename %s %s" % (member_name, e))
                 print("unzip done")
                 self.script2fs(project_manger.current_work_path())
             events.refresh_projects.emit()
