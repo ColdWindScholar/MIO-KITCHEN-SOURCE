@@ -43,6 +43,7 @@ from src.core import blockimgdiff
 from src.core import sparse_img
 from src.core import update_metadata_pb2 as um
 from src.core.lpunpack import SparseImage
+
 DataImage = blockimgdiff.DataImage
 
 # -----
@@ -356,10 +357,11 @@ def zero_start(file: str, c: int, buff_size: int = 8192) -> bool:
 is_empty_img = lambda file: zero_start(file, os.path.getsize(file))
 
 
-def gettype(file) -> str:
+def gettype(file: str, extra_offset: int = 0) -> str:
     """
     Return File Type:str
     :param file: file path
+    :param extra_offset: extra byte offset
     :return:
     """
 
@@ -385,7 +387,7 @@ def gettype(file) -> str:
         ...
     with open(file, 'rb') as f:
         for header, desc, *offset in formats:
-            f.seek(offset[0] if offset else 0)
+            f.seek((offset[0] if offset else 0) + extra_offset)
             if f.read(len(header)) == header:
                 return desc
 

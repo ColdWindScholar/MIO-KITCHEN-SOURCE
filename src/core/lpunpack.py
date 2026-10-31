@@ -835,6 +835,7 @@ class LpUnpack:
                 extent = metadata.extents[index]
                 if extent.target_type != LP_TARGET_TYPE_LINEAR:
                     raise LpUnpackError(f'Unsupported target type in extent: {extent.target_type}')
+                offset = extent.target_data * LP_SECTOR_SIZE
                 size = extent.num_sectors * LP_SECTOR_SIZE
                 total_size += size
         return total_size
