@@ -331,7 +331,9 @@ class PackSettingsDialog(MessageBoxBase):
         layout = QVBoxLayout(card)
         layout.setContentsMargins(14, 12, 14, 12)
         layout.setSpacing(10)
-        layout.addWidget(SubtitleLabel(title, card))
+        heading = BodyLabel(title, card)
+        heading.setStyleSheet("font-weight: 600;")
+        layout.addWidget(heading)
         return card, layout
 
     def initCustomUI(self):
@@ -529,9 +531,19 @@ class PackSuperMessageBox(MessageBoxBase):
         self._block_device_name = 'super'
 
         self.viewLayout.setSpacing(12)
-        self.widget.setMinimumWidth(620)
+        self.widget.setMinimumWidth(900)
         self.titleLabel = SubtitleLabel(self.tr("Pack Super"), self)
         self.viewLayout.addWidget(self.titleLabel)
+
+        content_layout = QHBoxLayout()
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        content_layout.setSpacing(12)
+        self.viewLayout.addLayout(content_layout, 1)
+
+        right_panel = QWidget(self)
+        right_layout = QVBoxLayout(right_panel)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(12)
 
         top_sections = QHBoxLayout()
         top_sections.setSpacing(12)
@@ -564,7 +576,7 @@ class PackSuperMessageBox(MessageBoxBase):
         attribute_options.addStretch(1)
         attribute_layout.addLayout(attribute_options)
         top_sections.addWidget(attribute_card, 1)
-        self.viewLayout.addLayout(top_sections)
+        right_layout.addLayout(top_sections)
 
         settings_card, settings_layout = self._create_section(self.tr("Settings"))
         settings_form = QGridLayout()
@@ -591,19 +603,19 @@ class PackSuperMessageBox(MessageBoxBase):
         size_row.addWidget(self.size_refresh_button)
         settings_form.addLayout(size_row, 0, 3)
         settings_layout.addLayout(settings_form)
-        self.viewLayout.addWidget(settings_card)
+        right_layout.addWidget(settings_card)
 
         partitions_card, partitions_layout = self._create_section(self.tr("Partition(s)"))
         partition_toolbar = QHBoxLayout()
+        partition_toolbar.setSpacing(10)
         self.partition_search = LineEdit(partitions_card)
         self.partition_search.setPlaceholderText(self.tr("Search partitions..."))
         self.partition_search.setClearButtonEnabled(True)
         self.partition_search.textChanged.connect(self.filter_partitions)
         partition_toolbar.addWidget(self.partition_search, 1)
-        self.select_all_checkbox = CheckBox(self.tr("Select all"), partitions_card)
-        self.select_all_checkbox.setTristate(True)
-        self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
-        partition_toolbar.addWidget(self.select_all_checkbox)
+        self.select_all_button = PushButton(self.tr("Select all"), partitions_card)
+        self.select_all_button.clicked.connect(self.toggle_select_all_partitions)
+        partition_toolbar.addWidget(self.select_all_button)
         self.btn_refresh = ToolButton(FluentIcon.SYNC, partitions_card)
         self.btn_refresh.setToolTip(self.tr("Refresh partitions"))
         self.btn_refresh.setAccessibleName(self.tr("Refresh partitions"))
@@ -611,12 +623,12 @@ class PackSuperMessageBox(MessageBoxBase):
         partition_toolbar.addWidget(self.btn_refresh)
         partitions_layout.addLayout(partition_toolbar)
         self.tl = ListWidget(partitions_card)
-        self.tl.setMinimumHeight(200)
+        self.tl.setMinimumHeight(240)
         self.tl.setMaximumHeight(280)
         self.tl.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.tl.itemChanged.connect(self._on_partition_item_changed)
         partitions_layout.addWidget(self.tl)
-        self.viewLayout.addWidget(partitions_card, 1)
+        content_layout.addWidget(partitions_card, 3)
 
         options_card, options_layout = self._create_section(self.tr("Options"))
         options_row = QHBoxLayout()
@@ -638,7 +650,9 @@ class PackSuperMessageBox(MessageBoxBase):
         self.g_b.clicked.connect(self.generate)
         actions_row.addWidget(self.g_b)
         options_layout.addLayout(actions_row)
-        self.viewLayout.addWidget(options_card)
+        right_layout.addWidget(options_card)
+        right_layout.addStretch(1)
+        content_layout.addWidget(right_panel, 2)
 
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
@@ -653,34 +667,35 @@ class PackSuperMessageBox(MessageBoxBase):
         layout.addWidget(SubtitleLabel(title, card))
         return card, layout
 
-    def _on_select_all_changed(self, state):
-        state = Qt.CheckState(state)
-        check_state = Qt.Unchecked if state == Qt.Unchecked else Qt.Checked
+    def toggle_select_all_partitions(self):
+        select_all = any(
+            self.tl.item(index).checkState() != Qt.Checked
+            for index in range(self.tl.count())
+        )
         self.tl.blockSignals(True)
         for index in range(self.tl.count()):
-            self.tl.item(index).setCheckState(check_state)
+            self.tl.item(index).setCheckState(
+                Qt.Checked if select_all else Qt.Unchecked
+            )
         self.tl.blockSignals(False)
-        self._sync_select_all_checkbox()
+        self._sync_select_all_button()
         self.verify_size()
 
     def _on_partition_item_changed(self, _item):
-        self._sync_select_all_checkbox()
+        self._sync_select_all_button()
         self.verify_size()
 
-    def _sync_select_all_checkbox(self):
+    def _sync_select_all_button(self):
         count = self.tl.count()
         checked = sum(
             self.tl.item(index).checkState() == Qt.Checked
             for index in range(count)
         )
-        state = (
-            Qt.Unchecked if not checked else
-            Qt.Checked if checked == count else
-            Qt.PartiallyChecked
+        all_selected = count > 0 and checked == count
+        self.select_all_button.setText(
+            self.tr("Deselect all") if all_selected else self.tr("Select all")
         )
-        self.select_all_checkbox.blockSignals(True)
-        self.select_all_checkbox.setCheckState(state)
-        self.select_all_checkbox.blockSignals(False)
+        self.select_all_button.setEnabled(count > 0)
 
     def filter_partitions(self, query):
         query = query.strip().casefold()
@@ -760,7 +775,7 @@ class PackSuperMessageBox(MessageBoxBase):
     def refresh(self):
         self.tl.clear()
         if not os.path.exists(self.work):
-            self._sync_select_all_checkbox()
+            self._sync_select_all_button()
             return
 
         for file_name in os.listdir(self.work):
@@ -780,11 +795,11 @@ class PackSuperMessageBox(MessageBoxBase):
                 if item_text:
                     item = QListWidgetItem(item_text)
                     item.setData(Qt.UserRole, name)
-                    item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+                    item.setFlags(item.flags() | Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
                     item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
                     self.tl.addItem(item)
         self.filter_partitions(self.partition_search.text())
-        self._sync_select_all_checkbox()
+        self._sync_select_all_button()
         self.verify_size()
 
     def read_list(self):
