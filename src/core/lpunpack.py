@@ -651,12 +651,12 @@ class SparseImage:
                         sector_base += sector_size
                 elif chunk_header.chunk_type == 0xCAC2:
                     # FILL: repeat the 4-byte fill value across the whole chunk.
-                    # Truncating here silently zeroes the data (see issues #240/#247).
+                    # Write the fill bytes directly at the current position. The old
+                    # truncate()+seek(2) pattern wrote them one chunk-length too far
+                    # and left the real region zeroed, silently corrupting FILL
+                    # blocks (see issues #240/#247).
                     data = self._read_data(chunk_data_size)
                     len_data = sector_size << 9
-                    out.truncate(out.tell() + len_data)
-                    out.seek(0, 2)
-                    output_len += len(data)
                     fill = (data + b'\x00' * 4)[:4]
                     out.write(fill * (len_data // 4) + fill[:len_data % 4])
                     output_len += len_data
