@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
                                QHBoxLayout, QButtonGroup)
 from qfluentwidgets import ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
-    RadioButton, PushButton, BodyLabel, EditableComboBox, CardWidget
+    RadioButton, PushButton, BodyLabel, EditableComboBox, CardWidget, FluentIcon, ToolButton
 from qfluentwidgets import (
     MessageBoxBase,
 )
@@ -528,88 +528,167 @@ class PackSuperMessageBox(MessageBoxBase):
         self.selected = []
         self._block_device_name = 'super'
 
-        # Window styling configuration
-        self.widget.setMinimumWidth(450)
-
-        # 1. Main Header Title
+        self.viewLayout.setSpacing(12)
+        self.widget.setMinimumWidth(620)
         self.titleLabel = SubtitleLabel(self.tr("Pack Super"), self)
         self.viewLayout.addWidget(self.titleLabel)
 
-        # 2. Partition Type Section
-        self.viewLayout.addWidget(BodyLabel(self.tr("Super Type"), self))
-        lf1_layout = QHBoxLayout()
+        top_sections = QHBoxLayout()
+        top_sections.setSpacing(12)
+        type_card, type_layout = self._create_section(self.tr("Super Type"))
         self.type_group = QButtonGroup(self)
         radios = [("A-only", 1), ("Virtual-ab", 2), ("A/B", 3)]
+        type_options = QHBoxLayout()
+        type_options.setSpacing(12)
         for text, value in radios:
-            rb = RadioButton(text, self)
+            rb = RadioButton(text, type_card)
             self.type_group.addButton(rb, value)
-            lf1_layout.addWidget(rb)
+            type_options.addWidget(rb)
         if self.type_group.button(1):
             self.type_group.button(1).setChecked(True)
-        self.viewLayout.addLayout(lf1_layout)
+        type_options.addStretch(1)
+        type_layout.addLayout(type_options)
+        top_sections.addWidget(type_card, 1)
 
-        # 3. Attributes Section
-        self.viewLayout.addWidget(BodyLabel(self.tr("Attribute"), self))
-        lf1_r_layout = QHBoxLayout()
+        attribute_card, attribute_layout = self._create_section(self.tr("Attribute"))
         self.attrib_group = QButtonGroup(self)
-        self.rb_readonly = RadioButton("Readonly", self)
-        self.rb_none = RadioButton("None", self)
+        self.rb_readonly = RadioButton(self.tr("Readonly"), attribute_card)
+        self.rb_none = RadioButton(self.tr("None"), attribute_card)
         self.attrib_group.addButton(self.rb_readonly, 0)
         self.attrib_group.addButton(self.rb_none, 1)
         self.rb_readonly.setChecked(True)
-        lf1_r_layout.addWidget(self.rb_readonly)
-        lf1_r_layout.addWidget(self.rb_none)
-        self.viewLayout.addLayout(lf1_r_layout)
+        attribute_options = QHBoxLayout()
+        attribute_options.setSpacing(12)
+        attribute_options.addWidget(self.rb_readonly)
+        attribute_options.addWidget(self.rb_none)
+        attribute_options.addStretch(1)
+        attribute_layout.addLayout(attribute_options)
+        top_sections.addWidget(attribute_card, 1)
+        self.viewLayout.addLayout(top_sections)
 
-        # 4. Settings Section
-        self.viewLayout.addWidget(BodyLabel(self.tr("Settings"), self))
-        lf2_layout = QHBoxLayout()
-
-        lf2_layout.addWidget(BodyLabel(self.tr("Group Name"), self))
-        self.show_group_name = EditableComboBox(self)
+        settings_card, settings_layout = self._create_section(self.tr("Settings"))
+        settings_form = QGridLayout()
+        settings_form.setHorizontalSpacing(12)
+        settings_form.setVerticalSpacing(8)
+        settings_form.setColumnStretch(1, 1)
+        settings_form.addWidget(BodyLabel(self.tr("Group Name"), settings_card), 0, 0)
+        self.show_group_name = EditableComboBox(settings_card)
         self.show_group_name.addItems(["qti_dynamic_partitions", "main", "mot_dp_group"])
         self.show_group_name.setCurrentIndex(0)
-        lf2_layout.addWidget(self.show_group_name)
-
-        lf2_layout.addWidget(BodyLabel(self.tr("Super Size"), self))
-        self.super_size_edit = LineEdit(self)
+        settings_form.addWidget(self.show_group_name, 0, 1)
+        settings_form.addWidget(BodyLabel(self.tr("Super Size"), settings_card), 0, 2)
+        size_row = QHBoxLayout()
+        size_row.setSpacing(6)
+        self.super_size_edit = LineEdit(settings_card)
         self.super_size_edit.setText("9126805504")
+        self.super_size_edit.setPlaceholderText(self.tr("Size in bytes"))
         self.super_size_edit.textChanged.connect(self.validate_digits)
-        lf2_layout.addWidget(self.super_size_edit)
-        self.viewLayout.addLayout(lf2_layout)
+        size_row.addWidget(self.super_size_edit, 1)
+        self.size_refresh_button = ToolButton(FluentIcon.SYNC, settings_card)
+        self.size_refresh_button.setToolTip(self.tr("Recalculate size for selected partitions"))
+        self.size_refresh_button.setAccessibleName(self.tr("Recalculate super size"))
+        self.size_refresh_button.clicked.connect(self.verify_size)
+        size_row.addWidget(self.size_refresh_button)
+        settings_form.addLayout(size_row, 0, 3)
+        settings_layout.addLayout(settings_form)
+        self.viewLayout.addWidget(settings_card)
 
-        # 5. Pack Partitions Section
-        self.viewLayout.addWidget(BodyLabel(self.tr("Partition(s)"), self))
-        self.tl = ListWidget(self)
-        self.tl.setMinimumHeight(180)
-        self.viewLayout.addWidget(self.tl)
+        partitions_card, partitions_layout = self._create_section(self.tr("Partition(s)"))
+        partition_toolbar = QHBoxLayout()
+        self.partition_search = LineEdit(partitions_card)
+        self.partition_search.setPlaceholderText(self.tr("Search partitions..."))
+        self.partition_search.setClearButtonEnabled(True)
+        self.partition_search.textChanged.connect(self.filter_partitions)
+        partition_toolbar.addWidget(self.partition_search, 1)
+        self.select_all_checkbox = CheckBox(self.tr("Select all"), partitions_card)
+        self.select_all_checkbox.setTristate(True)
+        self.select_all_checkbox.stateChanged.connect(self._on_select_all_changed)
+        partition_toolbar.addWidget(self.select_all_checkbox)
+        self.btn_refresh = ToolButton(FluentIcon.SYNC, partitions_card)
+        self.btn_refresh.setToolTip(self.tr("Refresh partitions"))
+        self.btn_refresh.setAccessibleName(self.tr("Refresh partitions"))
+        self.btn_refresh.clicked.connect(self.refresh)
+        partition_toolbar.addWidget(self.btn_refresh)
+        partitions_layout.addLayout(partition_toolbar)
+        self.tl = ListWidget(partitions_card)
+        self.tl.setMinimumHeight(200)
+        self.tl.setMaximumHeight(280)
+        self.tl.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.tl.itemChanged.connect(self._on_partition_item_changed)
+        partitions_layout.addWidget(self.tl)
+        self.viewLayout.addWidget(partitions_card, 1)
 
-        # 6. Checkboxes & Action Layout Configurations
-        self.switch_sparse = SwitchButton(self)
+        options_card, options_layout = self._create_section(self.tr("Options"))
+        options_row = QHBoxLayout()
+        options_row.setSpacing(20)
+        self.switch_sparse = SwitchButton(options_card)
         self.switch_sparse.setOffText(self.tr("Enable Sparse"))
         self.switch_sparse.setOnText(self.tr("Enable Sparse"))
-        self.viewLayout.addWidget(self.switch_sparse)
-
-        t_frame_layout = QHBoxLayout()
-        self.switch_delete = SwitchButton(self)
+        self.switch_delete = SwitchButton(options_card)
         self.switch_delete.setOffText(self.tr("Remove source files"))
         self.switch_delete.setOnText(self.tr("Remove source files"))
-        t_frame_layout.addWidget(self.switch_delete)
+        options_row.addWidget(self.switch_sparse)
+        options_row.addWidget(self.switch_delete)
+        options_row.addStretch(1)
+        options_layout.addLayout(options_row)
 
-        self.btn_refresh = PushButton(self.tr("Refresh"), self)
-        self.btn_refresh.clicked.connect(self.refresh)
-        t_frame_layout.addWidget(self.btn_refresh)
-
-        self.g_b = PushButton(self.tr("Generate LIST"), self)
+        actions_row = QHBoxLayout()
+        actions_row.addStretch(1)
+        self.g_b = PushButton(self.tr("Generate LIST"), options_card)
         self.g_b.clicked.connect(self.generate)
-        t_frame_layout.addWidget(self.g_b)
-        self.viewLayout.addLayout(t_frame_layout)
+        actions_row.addWidget(self.g_b)
+        options_layout.addLayout(actions_row)
+        self.viewLayout.addWidget(options_card)
 
-        # 7. Bottom Accept/Cancel Bar configuration setups
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
         self.read_list()
         self.refresh()
+
+    def _create_section(self, title):
+        card = CardWidget(self)
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(14, 12, 14, 12)
+        layout.setSpacing(10)
+        layout.addWidget(SubtitleLabel(title, card))
+        return card, layout
+
+    def _on_select_all_changed(self, state):
+        state = Qt.CheckState(state)
+        check_state = Qt.Unchecked if state == Qt.Unchecked else Qt.Checked
+        self.tl.blockSignals(True)
+        for index in range(self.tl.count()):
+            self.tl.item(index).setCheckState(check_state)
+        self.tl.blockSignals(False)
+        self._sync_select_all_checkbox()
+        self.verify_size()
+
+    def _on_partition_item_changed(self, _item):
+        self._sync_select_all_checkbox()
+        self.verify_size()
+
+    def _sync_select_all_checkbox(self):
+        count = self.tl.count()
+        checked = sum(
+            self.tl.item(index).checkState() == Qt.Checked
+            for index in range(count)
+        )
+        state = (
+            Qt.Unchecked if not checked else
+            Qt.Checked if checked == count else
+            Qt.PartiallyChecked
+        )
+        self.select_all_checkbox.blockSignals(True)
+        self.select_all_checkbox.setCheckState(state)
+        self.select_all_checkbox.blockSignals(False)
+
+    def filter_partitions(self, query):
+        query = query.strip().casefold()
+        for index in range(self.tl.count()):
+            item = self.tl.item(index)
+            item.setHidden(query not in item.text().casefold())
+
+
 
     def validate_digits(self, text):
         """Sanitizes line edit inputs to keep digit formatting clean."""
@@ -684,6 +763,7 @@ class PackSuperMessageBox(MessageBoxBase):
     def refresh(self):
         self.tl.clear()
         if not os.path.exists(self.work):
+            self._sync_select_all_checkbox()
             return
 
         for file_name in os.listdir(self.work):
@@ -706,6 +786,8 @@ class PackSuperMessageBox(MessageBoxBase):
                     item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
                     item.setCheckState(Qt.Checked if is_checked else Qt.Unchecked)
                     self.tl.addItem(item)
+        self.filter_partitions(self.partition_search.text())
+        self._sync_select_all_checkbox()
         self.verify_size()
 
     def read_list(self):
