@@ -11,9 +11,9 @@ from PySide6.QtGui import QCursor
 from PySide6.QtWidgets import QLabel
 from PySide6.QtWidgets import QListWidgetItem
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGridLayout,
-                               QLineEdit, QHBoxLayout, QButtonGroup)
+                               QHBoxLayout, QButtonGroup)
 from qfluentwidgets import ListWidget, CheckBox, LineEdit, ComboBox, SubtitleLabel, \
-    RadioButton, PushButton, BodyLabel, EditableComboBox
+    RadioButton, PushButton, BodyLabel, EditableComboBox, CardWidget
 from qfluentwidgets import (
     MessageBoxBase,
 )
@@ -316,8 +316,6 @@ class ConvertImageMessageBox(MessageBoxBase):
 
 
 class PackSettingsDialog(MessageBoxBase):
-
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -326,233 +324,177 @@ class PackSettingsDialog(MessageBoxBase):
         self.viewLayout.addWidget(self.content_widget)
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
-        self.widget.setMinimumWidth(580)
+        self.widget.setMinimumWidth(700)
 
-    def _create_group_title(self, text):
-        """生成分组内敛极简副标题标签"""
-        label = CaptionLabel(text, self.content_widget)
-        label.setStyleSheet("color: #71717a; font-weight: bold; font-size: 11px;")
-        return label
-
-    def _create_field_label(self, text):
-        """生成字段主文本说明标签"""
-        label = QLabel(text, self.content_widget)
-        label.setStyleSheet("color: #ffffff; font-size: 14px; font-weight: 500;")
-        return label
+    def _create_section(self, title):
+        card = CardWidget(self.content_widget)
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(14, 12, 14, 12)
+        layout.setSpacing(10)
+        layout.addWidget(SubtitleLabel(title, card))
+        return card, layout
 
     def initCustomUI(self):
         main_layout = QVBoxLayout(self.content_widget)
-        main_layout.setContentsMargins(0, 0, 0, 12)
-        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(0, 0, 0, 4)
+        main_layout.setSpacing(12)
 
-        # =========================================================================
-        # 📂 1. EXT4设置 分组
-        # =========================================================================
-        ext4_container = QWidget(self.content_widget)
-        ext4_layout = QVBoxLayout(ext4_container)
-        ext4_layout.setContentsMargins(0, 0, 0, 0)
-        ext4_layout.setSpacing(8)
+        sections = QGridLayout()
+        sections.setContentsMargins(0, 0, 0, 0)
+        sections.setHorizontalSpacing(12)
+        sections.setVerticalSpacing(12)
+        main_layout.addLayout(sections)
 
-        ext4_layout.addWidget(self._create_group_title(self.tr("EXT4 Settings")))
+        ext4_card, ext4_layout = self._create_section(self.tr("EXT4 Settings"))
+        ext4_form = QGridLayout()
+        ext4_form.setHorizontalSpacing(12)
+        ext4_form.setVerticalSpacing(8)
+        ext4_form.setColumnStretch(1, 1)
 
-        ext4_grid = QHBoxLayout()
-        ext4_grid.setSpacing(16)
-
-        self.pack_method_label = self._create_field_label(self.tr("Packing with:"))
-        self.pack_method_combo = ComboBox(ext4_container)
+        self.pack_method_label = BodyLabel(self.tr("Packing with:"), ext4_card)
+        self.pack_method_combo = ComboBox(ext4_card)
         self.pack_method_combo.addItems(["make_ext4fs", "mke2fs+e2fsdroid"])
-
-        self.size_handle_label = self._create_field_label(self.tr("Size Handle:"))
-        self.size_handle_combo = ComboBox(ext4_container)
+        self.size_handle_label = BodyLabel(self.tr("Size Handle:"), ext4_card)
+        self.size_handle_combo = ComboBox(ext4_card)
         self.size_handle_combo.addItems([self.tr("Calculate Auto"), self.tr("Origin Size")])
+        ext4_form.addWidget(self.pack_method_label, 0, 0)
+        ext4_form.addWidget(self.pack_method_combo, 0, 1)
+        ext4_form.addWidget(self.size_handle_label, 1, 0)
+        ext4_form.addWidget(self.size_handle_combo, 1, 1)
+        ext4_layout.addLayout(ext4_form)
 
-        ext4_grid.addWidget(self.pack_method_label)
-        ext4_grid.addWidget(self.pack_method_combo, 1)
-        ext4_grid.addWidget(self.size_handle_label)
-        ext4_grid.addWidget(self.size_handle_combo, 1)
-        ext4_layout.addLayout(ext4_grid)
-        main_layout.addWidget(ext4_container)
-
-        # =========================================================================
-        # 📦 2. EROFS打包 分组
-        # =========================================================================
-        erofs_container = QWidget(self.content_widget)
-        erofs_layout = QVBoxLayout(erofs_container)
-        erofs_layout.setContentsMargins(0, 0, 0, 0)
-        erofs_layout.setSpacing(10)
-
-        erofs_layout.addWidget(self._create_group_title(self.tr("EROFS Settings")))
-
-        erofs_row1 = QHBoxLayout()
-        self.compress_algo_label = self._create_field_label(self.tr("Compression Method:"))
-        self.compress_algo_combo = ComboBox(erofs_container)
+        erofs_card, erofs_layout = self._create_section(self.tr("EROFS Settings"))
+        erofs_form = QGridLayout()
+        erofs_form.setHorizontalSpacing(10)
+        erofs_form.setVerticalSpacing(8)
+        erofs_form.setColumnStretch(1, 1)
+        self.compress_algo_label = BodyLabel(self.tr("Compression Method:"), erofs_card)
+        self.compress_algo_combo = ComboBox(erofs_card)
         self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
         self.compress_algo_combo.setText("lz4hc")
-        self.support_old_kernel_switch = SwitchButton(parent=erofs_container)
+        self.support_old_kernel_switch = SwitchButton(parent=erofs_card)
         self.support_old_kernel_switch.setOffText("")
         self.support_old_kernel_switch.setOnText("")
-        self.support_old_kernel_label = QLabel(self.tr("Support old kernel"), erofs_container)
-        self.support_old_kernel_label.setStyleSheet("color: #ffffff; font-size: 13px;")
+        self.support_old_kernel_label = BodyLabel(self.tr("Support old kernel"), erofs_card)
+        erofs_form.addWidget(self.compress_algo_label, 0, 0)
+        erofs_form.addWidget(self.compress_algo_combo, 0, 1, 1, 2)
 
-        erofs_row1.addWidget(self.compress_algo_label)
-        erofs_row1.addWidget(self.compress_algo_combo, 1)
-        erofs_row1.addSpacing(24)
-        erofs_row1.addWidget(self.support_old_kernel_switch)
-        erofs_row1.addWidget(self.support_old_kernel_label)
-        erofs_layout.addLayout(erofs_row1)
-
-        erofs_row2 = QHBoxLayout()
-        self.erofs_level_label = QLabel(self.tr("EROFS Level: 8"), erofs_container)
-        self.erofs_level_label.setStyleSheet("color: #ffffff; font-size: 13px; min-width: 90px;")
-        self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_container)
+        self.erofs_level_label = BodyLabel(self.tr("EROFS Level: 8"), erofs_card)
+        self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_card)
         self.erofs_slider.setRange(0, 20)
         self.erofs_slider.setValue(8)
-        self.erofs_slider.valueChanged.connect(lambda v: self.erofs_level_label.setText(self.tr("EROFS Level: {}".format(v))))
+        self.erofs_slider.valueChanged.connect(
+            lambda value: self.erofs_level_label.setText(
+                self.tr("EROFS Level: {}").format(value)))
+        erofs_form.addWidget(self.erofs_level_label, 1, 0)
+        erofs_form.addWidget(self.erofs_slider, 1, 1, 1, 2)
+        erofs_form.addWidget(self.support_old_kernel_switch, 2, 0)
+        erofs_form.addWidget(self.support_old_kernel_label, 2, 1, 1, 2)
+        erofs_layout.addLayout(erofs_form)
 
-        erofs_row2.addWidget(self.erofs_level_label)
-        erofs_row2.addWidget(self.erofs_slider, 1)
-        erofs_layout.addLayout(erofs_row2)
-        main_layout.addWidget(erofs_container)
-
-        # =========================================================================
-        # ⚙️ 3. F2FS设置 分组
-        # =========================================================================
-        f2fs_container = QWidget(self.content_widget)
-        f2fs_layout = QVBoxLayout(f2fs_container)
-        f2fs_layout.setContentsMargins(0, 0, 0, 0)
-        f2fs_layout.setSpacing(8)
-
-        f2fs_layout.addWidget(self._create_group_title(self.tr("F2FS Settings")))
-
-        f2fs_row = QHBoxLayout()
-        f2fs_row.setSpacing(12)
-
-        self.f2fs_readonly_switch = SwitchButton(f2fs_container)
+        f2fs_card, f2fs_layout = self._create_section(self.tr("F2FS Settings"))
+        f2fs_options = QGridLayout()
+        f2fs_options.setHorizontalSpacing(8)
+        f2fs_options.setVerticalSpacing(8)
+        self.f2fs_readonly_switch = SwitchButton(f2fs_card)
         self.f2fs_readonly_switch.setOnText("")
         self.f2fs_readonly_switch.setOffText("")
-        self.f2fs_readonly_lbl = QLabel(self.tr("Readonly"), f2fs_container)
-        self.f2fs_readonly_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
-
-        self.f2fs_compress_switch = SwitchButton(f2fs_container)
+        self.f2fs_readonly_lbl = BodyLabel(self.tr("Readonly"), f2fs_card)
+        self.f2fs_compress_switch = SwitchButton(f2fs_card)
         self.f2fs_compress_switch.setOnText("")
         self.f2fs_compress_switch.setOffText("")
-        self.f2fs_compress_lbl = QLabel(self.tr("Compression"), f2fs_container)
-        self.f2fs_compress_lbl.setStyleSheet("color: #ffffff; font-size: 13px;")
+        self.f2fs_compress_lbl = BodyLabel(self.tr("Compression"), f2fs_card)
+        f2fs_options.addWidget(self.f2fs_readonly_switch, 0, 0)
+        f2fs_options.addWidget(self.f2fs_readonly_lbl, 0, 1)
+        f2fs_options.addWidget(self.f2fs_compress_switch, 1, 0)
+        f2fs_options.addWidget(self.f2fs_compress_lbl, 1, 1)
+        f2fs_options.setColumnStretch(2, 1)
+        f2fs_layout.addLayout(f2fs_options)
 
-        f2fs_row.addWidget(self.f2fs_readonly_switch)
-        f2fs_row.addWidget(self.f2fs_readonly_lbl)
-        f2fs_row.addSpacing(20)
-        f2fs_row.addWidget(self.f2fs_compress_switch)
-        f2fs_row.addWidget(self.f2fs_compress_lbl)
-        f2fs_row.addStretch(1)
-        f2fs_layout.addLayout(f2fs_row)
-        main_layout.addWidget(f2fs_container)
+        other_card, other_layout = self._create_section(self.tr("Others"))
+        other_form = QGridLayout()
+        other_form.setHorizontalSpacing(12)
+        other_form.setVerticalSpacing(8)
+        other_form.setColumnStretch(1, 1)
+        other_form.setColumnStretch(3, 1)
 
-        # =========================================================================
-        # 🛠️ 4. 其他设置 分组
-        # =========================================================================
-        other_container = QWidget(self.content_widget)
-        other_layout = QVBoxLayout(other_container)
-        other_layout.setContentsMargins(0, 0, 0, 0)
-        other_layout.setSpacing(12)
+        self.format_label = BodyLabel(self.tr("Format:"), other_card)
+        self.format_combo = ComboBox(other_card)
+        self.format_combo.addItems(["raw", "sparse", "br", "dat"])
+        self.utc_lbl = BodyLabel("UTC:", other_card)
+        self.utc_input = LineEdit(other_card)
+        self.utc_input.setText(str(int(time.time())))
+        other_form.addWidget(self.format_label, 0, 0)
+        other_form.addWidget(self.format_combo, 0, 1)
+        other_form.addWidget(self.utc_lbl, 0, 2)
+        other_form.addWidget(self.utc_input, 0, 3)
 
-        other_layout.addWidget(self._create_group_title(self.tr("Others")))
-
-        # Brotli 等级滑动条区域
-        brotli_row = QHBoxLayout()
-        self.brotli_lbl = QLabel(self.tr("Brotli Level: 0"), other_container)
-        self.brotli_lbl.setStyleSheet("color: #ffffff; font-size: 15px; font-weight: 500; min-width: 100px;")
-        self.brotli_slider = Slider(Qt.Orientation.Horizontal, other_container)
+        self.brotli_lbl = BodyLabel(self.tr("Brotli Level: 0"), other_card)
+        self.brotli_slider = Slider(Qt.Orientation.Horizontal, other_card)
         self.brotli_slider.setRange(0, 11)
-        self.brotli_slider.valueChanged.connect(lambda v: self.brotli_lbl.setText(self.tr("Brotli Level: {}").format(v)))
+        self.brotli_slider.valueChanged.connect(
+            lambda value: self.brotli_lbl.setText(
+                self.tr("Brotli Level: {}").format(value)))
+        other_form.addWidget(self.brotli_lbl, 1, 0)
+        other_form.addWidget(self.brotli_slider, 1, 1, 1, 3)
 
-        brotli_row.addWidget(self.brotli_lbl)
-        brotli_row.addWidget(self.brotli_slider, 1)
-        other_layout.addLayout(brotli_row)
-
-        # UTC 输入区域
-        utc_row = QHBoxLayout()
-        self.utc_lbl = QLabel("UTC:", other_container)
-        self.utc_lbl.setStyleSheet("color: #ffffff; font-size: 15px; min-width: 45px;")
-        self.utc_input = QLineEdit(str(int(time.time())), other_container)
-        self.utc_input.setStyleSheet("""
-            QLineEdit {
-                background-color: #2a2a2e;
-                border: 1px solid #3f3f46;
-                border-radius: 4px;
-                color: #ffffff;
-                padding: 4px 8px;
-                font-family: monospace;
-            }
-        """)
-        utc_row.addWidget(self.utc_lbl)
-        utc_row.addWidget(self.utc_input, 1)
-        other_layout.addLayout(utc_row)
-
-        # 底部复杂配置网格矩阵面板
-        grid_matrix = QGridLayout()
-        grid_matrix.setSpacing(12)
-
-        self.format_label = self._create_field_label(self.tr("Format:"))
-        self.format_combo = ComboBox(other_container)
-        self.format_combo.addItems(["raw", "sparse", "br" ,"dat"])
-
-        self.sw_convert = SwitchButton(other_container)
-        self.sw_convert.setOffText('')
+        self.sw_convert = SwitchButton(other_card)
+        self.sw_convert.setOffText("")
         self.sw_convert.setOnText('')
-        self.lbl_convert = QLabel(self.tr("Fs Convert"), other_container)
-        self.lbl_convert.setStyleSheet("color: #ffffff; font-size: 13px;")
-
-        # 💡 创建隐藏的文件系统来源与目标下拉框组合
-        self.src_fs_combo = ComboBox(other_container)
+        self.lbl_convert = BodyLabel(self.tr("Fs Convert"), other_card)
+        self.src_fs_combo = ComboBox(other_card)
         self.src_fs_combo.addItems(["ext", "f2fs", "erofs"])
-        self.src_fs_combo.setFixedWidth(85)
-
-        self.dest_fs_combo = ComboBox(other_container)
+        self.src_fs_combo.setFixedWidth(90)
+        self.dest_fs_combo = ComboBox(other_card)
         self.dest_fs_combo.addItems(["ext", "f2fs", "erofs"])
-        self.dest_fs_combo.setFixedWidth(85)
-
-        # 初始默认状态必须完全隐藏
+        self.dest_fs_combo.setFixedWidth(90)
         self.src_fs_combo.hide()
         self.dest_fs_combo.hide()
-
-        # 🔗 核心信号槽：将文件系统转换开关绑定到可见性处理器上
+        self.fs_conversion_arrow = BodyLabel("→", other_card)
+        self.fs_conversion_arrow.hide()
         self.sw_convert.checkedChanged.connect(self._on_convert_toggled)
 
-        self.sw_vbmeta = SwitchButton(other_container)
+        self.sw_vbmeta = SwitchButton(other_card)
         self.sw_vbmeta.setOffText("")
         self.sw_vbmeta.setOnText("")
-        self.lbl_vbmeta = QLabel(self.tr("Process Vbmeta"), other_container)
-        self.lbl_vbmeta.setStyleSheet("color: #ffffff; font-size: 13px;")
-
-        self.sw_delete = SwitchButton(other_container)
+        self.lbl_vbmeta = BodyLabel(self.tr("Process Vbmeta"), other_card)
+        self.sw_delete = SwitchButton(other_card)
         self.sw_delete.setOffText("")
         self.sw_delete.setOnText("")
-        self.lbl_delete = QLabel(self.tr("Remove source files"), other_container)
-        self.lbl_delete.setStyleSheet("color: #ffffff; font-size: 13px;")
+        self.lbl_delete = BodyLabel(self.tr("Remove source files"), other_card)
 
-        # 将所有控制元素对齐组装入 QGridLayout 矩阵中
-        grid_matrix.addWidget(self.format_label, 0, 0)
-        grid_matrix.addWidget(self.format_combo, 0, 1)
-        grid_matrix.addWidget(self.sw_convert, 0, 2)
-        grid_matrix.addWidget(self.lbl_convert, 0, 3)
+        conversion_row = QHBoxLayout()
+        conversion_row.setSpacing(8)
+        conversion_row.addWidget(self.sw_convert)
+        conversion_row.addWidget(self.lbl_convert)
+        conversion_row.addWidget(self.src_fs_combo)
+        conversion_row.addWidget(self.fs_conversion_arrow)
+        conversion_row.addWidget(self.dest_fs_combo)
+        conversion_row.addStretch(1)
+        other_form.addLayout(conversion_row, 2, 0, 1, 4)
 
-        # 💡 将转换下拉框追加在第0行、第4和第5列上
-        grid_matrix.addWidget(self.src_fs_combo, 0, 4)
-        grid_matrix.addWidget(self.dest_fs_combo, 0, 5)
+        other_options = QHBoxLayout()
+        other_options.setSpacing(8)
+        other_options.addWidget(self.sw_vbmeta)
+        other_options.addWidget(self.lbl_vbmeta)
+        other_options.addSpacing(16)
+        other_options.addWidget(self.sw_delete)
+        other_options.addWidget(self.lbl_delete)
+        other_options.addStretch(1)
+        other_form.addLayout(other_options, 3, 0, 1, 4)
+        other_layout.addLayout(other_form)
 
-        grid_matrix.addWidget(self.sw_vbmeta, 1, 0)
-        grid_matrix.addWidget(self.lbl_vbmeta, 1, 1)
-        grid_matrix.addWidget(self.sw_delete, 1, 2)
-        grid_matrix.addWidget(self.lbl_delete, 1, 3)
-        other_layout.addLayout(grid_matrix)
-        main_layout.addWidget(other_container)
+        sections.addWidget(ext4_card, 0, 0)
+        sections.addWidget(erofs_card, 0, 1)
+        sections.addWidget(f2fs_card, 1, 0, 1, 2)
+        sections.addWidget(other_card, 2, 0, 1, 2)
+        sections.setColumnStretch(0, 1)
+        sections.setColumnStretch(1, 1)
 
     def _on_convert_toggled(self, is_checked: bool):
         self.src_fs_combo.setVisible(is_checked)
+        self.fs_conversion_arrow.setVisible(is_checked)
         self.dest_fs_combo.setVisible(is_checked)
-        self.content_widget.adjustSize()
-        self.widget.adjustSize()
 
 
 
