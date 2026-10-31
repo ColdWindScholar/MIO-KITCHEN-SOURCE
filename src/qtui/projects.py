@@ -888,7 +888,7 @@ class ProjectsPage(QFrame):
         name = os.path.basename(dir_path)
         print("Copying ", name)
         if not os.path.exists(dir_path):
-            print(self.tr('No Such Folder.'))
+            events.append_log.emit("WARN", self.tr('No Such Folder.'))
             return 1
         if os.path.isfile(dir_path):
             return self.unpackrom(dir_path)
@@ -909,7 +909,7 @@ class ProjectsPage(QFrame):
     def pack_dtbo(self) -> bool:
         work = project_manger.current_work_path()
         if not os.path.exists(f"{work}/dtbo/dts") or not os.path.exists(f"{work}/dtbo"):
-            print("no source find")
+            events.append_log.emit("WARN", "no DTBO source find")
             return False
         utils.re_folder(f"{work}/dtbo/dtbo")
         for dts in os.listdir(f"{work}/dtbo/dts"):
