@@ -113,7 +113,7 @@ class PartitionListWorker(QThread):
 
     def run(self):
         try:
-            entries = None
+            entries = []
             if self.mode == "unpack":
                 if not os.path.isdir(self.work):
                     self.loaded.emit(self.request_id, [], self.form, "")
