@@ -323,7 +323,7 @@ class PackHybridRom:
 
 class ProjectManager:
     def __init__(self):
-        self.hide_items = ['bin', 'src', 'readmes']
+        self.hide_items = ['bin', 'src', 'readmes', "_internal"]
 
     @staticmethod
     def get_work_path(name):
