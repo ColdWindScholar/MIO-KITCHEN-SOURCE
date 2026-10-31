@@ -316,26 +316,16 @@ class ConvertImageMessageBox(MessageBoxBase):
 
 
 class PackSettingsDialog(MessageBoxBase):
-    """
-    高级打包设置自定义对话框：继承自 MessageBoxBase，
-    支持嵌套分组、多状态滑动条，以及随开关状态动态显示/隐藏的隐藏组合框面板。
-    """
+
 
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        # 1. 创建核心自定义内容容器组件
         self.content_widget = QWidget(self)
         self.initCustomUI()
-
-        # 2. 将自定义容器直接安装进 MessageBoxBase 核心中
         self.viewLayout.addWidget(self.content_widget)
-
-        # 3. 配置底部的标准基础控制按钮文本
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
-
-        # 强制约束合理的现代弹出视窗比例范围，留足横向扩展空间
         self.widget.setMinimumWidth(580)
 
     def _create_group_title(self, text):
