@@ -260,15 +260,8 @@ class HomePage(QWidget):
         main_layout.addLayout(content, 1)
 
         summary_controls = QHBoxLayout()
-        self.summary_status = QLabel()
-        self.summary_status.setWordWrap(True)
-        self._set_theme_style(
-            self.summary_status, "color: #E8B75A;", "color: #946200;", "font-size: 13px;"
-        )
-        self.refresh_summary_btn = PushButton(self.tr("Scan detailed info"), self)
-        self.refresh_summary_btn.clicked.connect(lambda: self.refresh_summary(include_heavy=True))
-        summary_controls.addWidget(self.summary_status, 1)
-        summary_controls.addWidget(self.refresh_summary_btn)
+
+
         dashboard.addLayout(summary_controls)
 
         stats = QGridLayout()
@@ -392,15 +385,11 @@ class HomePage(QWidget):
                 thread.requestInterruption()
         self.refresh_summary(include_heavy=False)
 
-    def refresh_summary(self, include_heavy=False):
+    def refresh_summary(self, include_heavy=True):
         project_name = cfg.currentProjectName.value
         working_folder = cfg.workingFolder.value
         project_path = os.path.join(working_folder, project_name) if project_name else ""
-        self.refresh_summary_btn.setEnabled(False)
-        self.summary_status.setText(
-            self.tr("Scanning project files...") if include_heavy
-            else self.tr("Refreshing basic project information...")
-        )
+
         for key in ("project_size", "free_space", "project_count"):
             self.summary_values[key].setText(self.tr("Loading..."))
         self._set_detail_rows([
@@ -423,20 +412,11 @@ class HomePage(QWidget):
         self._summary_threads.add(worker)
         worker.completed.connect(self._apply_summary)
         worker.finished.connect(lambda thread=worker: self._discard_summary_thread(thread))
-        worker.finished.connect(self._summary_finished)
         worker.finished.connect(worker.deleteLater)
         worker.start()
 
     def _discard_summary_thread(self, thread):
         self._summary_threads.discard(thread)
-
-    def _summary_finished(self):
-        if not any(worker.isRunning() for worker in self._summary_threads):
-            self.refresh_summary_btn.setEnabled(True)
-            if self.summary_status.text() in (
-                    self.tr("Refreshing basic project information..."),
-                    self.tr("Scanning project files...")):
-                self.summary_status.setText(self.tr("Refresh did not complete. Please try again."))
 
     def _apply_summary(self, result):
         if (
@@ -444,10 +424,7 @@ class HomePage(QWidget):
             or result["working_folder"] != cfg.workingFolder.value
         ):
             return
-        self.summary_status.setText(
-            self.tr("Project information is up to date.") if result["details_scanned"]
-            else self.tr("Basic information updated. Scan detailed info for file count, size, and device details.")
-        )
+
         self.summary_values["project_count"].setText(str(result["project_count"]))
         self.summary_values["project_size"].setText(
             self._format_size(result["project_size"]) if result["project_size"] is not None
