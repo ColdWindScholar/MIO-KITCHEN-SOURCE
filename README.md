@@ -170,7 +170,7 @@ python build.py
 ### Telegram Group: [Mio Android Kitchen Chat](https://t.me/mio_android_kitchen_group)
 ### Telegram Channel: [Mio Android Kitchen Updates](https://t.me/mio_android_kitchen)
 ***
-# Contributors:
+# Contributors
 ***
 ### [![contributors](https://contrib.rocks/image?repo=ColdWindScholar/MIO-KITCHEN-SOURCE&max=999&column=20)](https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE/graphs/contributors)
 ### Thanks to people like you for helping out!
