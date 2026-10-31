@@ -1836,7 +1836,7 @@ class ProjectsPage(QFrame):
             os.chdir(source)
             if comp != "unknown":
                 if call(['magiskboot', f'compress={comp}', 'ramdisk-new.cpio']) != 0:
-                    print("Failed to pack Ramdisk...")
+                    events.append_log.emit("ERROR", self.tr("Failed to pack Ramdisk..."))
                     os.remove("ramdisk-new.cpio")
                 else:
                     try:
