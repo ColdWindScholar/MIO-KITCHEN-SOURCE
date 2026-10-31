@@ -945,7 +945,7 @@ class ProjectsPage(QFrame):
                 elif os.path.isdir(fi):
                     self.dnd_task = GenericTaskWorker(self.copy_project, fi)
             else:
-                print(self.tr("file not exist"))
+                events.append_log.emit("WARN", self.tr("file not exist"))
             if not self.dnd_task:
                 return
             self.start_job(self.dnd_task)
