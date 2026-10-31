@@ -820,7 +820,7 @@ def generate_bug_report():
     pack_zip(inner, bugreport := os.path.join(output,
                                               f"Mio_Bug_Report{time.strftime('%Y%m%d_%H-%M-%S', time.localtime())}_{v_code()}.zip"))
     re_folder(inner)
-    print(f"\tThe Bug Report Was Saved:{bugreport}")
+    return bugreport
 
 
 class LogoDumper:
