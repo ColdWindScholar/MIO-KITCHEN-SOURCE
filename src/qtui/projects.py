@@ -1393,7 +1393,7 @@ class ProjectsPage(QFrame):
                                 except (IOError, PermissionError, FileNotFoundError):
                                     logging.exception('Bugs')
                         else:
-                            print("transferpath is not exists")
+                            events.append_log.emit("WARN", "transferpath is not exists")
                     if os.path.exists(f'{work}/{basename}.img'):
                         utils.img2simg(f'{work}/{basename}.img')
                 if src_format == 'raw':
