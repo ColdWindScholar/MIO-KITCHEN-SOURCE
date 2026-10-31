@@ -76,9 +76,8 @@ context_rule_file = os.path.join(cfg.workingFolder.value, 'bin', "context_rules.
 class StreamToSignal(QObject):
     text_written = Signal(str)
 
-    def __init__(self, original_stream):
+    def __init__(self):
         super().__init__()
-        self.original_stream = original_stream
 
     def write(self, text):
         if not text.strip():
@@ -87,14 +86,14 @@ class StreamToSignal(QObject):
         self.text_written.emit(text)
 
     def flush(self):
-        self.original_stream.flush()
-
+        pass
 
 class Events(QObject):
     refresh_projects = Signal()
     refresh_list = Signal()
     set_project_name = Signal(str)
     show_info_bar = Signal(str, str, int, int)
+    append_log = Signal(str, str)
 
 
 events = Events()
@@ -611,6 +610,7 @@ class ProjectsPage(QFrame):
         scroll_content = QWidget()
         self.scroll_log_content = LogMessageBoxBase(self)
         self.scroll_layout = QVBoxLayout(scroll_content)
+        events.append_log.connect(self.scroll_log_content.append_log)
 
         # 【关键优化：增加顶部与四周间距】把原本紧凑的区域整体下调，留出透气的空间
         self.scroll_layout.setContentsMargins(32, 40, 32, 32)
@@ -2039,8 +2039,8 @@ class ProjectsPage(QFrame):
     def start_job(self, worker: GenericTaskWorker):
         sys.stderr_old = sys.stderr
         sys.stdout_old = sys.stdout
-        self.stdout_redirector = StreamToSignal(sys.stdout)
-        self.stderr_redirector = StreamToSignal(sys.stderr)
+        self.stdout_redirector = StreamToSignal()
+        self.stderr_redirector = StreamToSignal()
         self.stdout_redirector.text_written.connect(lambda text: self.scroll_log_content.append_log("INFO", text))
         self.stderr_redirector.text_written.connect(lambda text: self.scroll_log_content.append_log("ERROR", text))
         sys.stdout = self.stdout_redirector

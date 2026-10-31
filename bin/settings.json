@@ -1,11 +1,12 @@
 {
     "Tool": {
         "Version": "5.0.1-preview",
+        "activeCode": "",
         "AiEngine": false,
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Native",
-        "currentProjectName": "lineage-24.0-20261012-nightly-mondrian-signed",
+        "currentProjectName": "super_dump",
         "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
