@@ -739,7 +739,7 @@ class ProjectsPage(QFrame):
             try:
                 os.remove(decrypted)
             except:
-                print(f"{ifile} remove Fail!!!")
+                events.append_log.emit("WARN", f"{ifile} remove Fail!!!")
             return
         # tar
         if ftype == 'tar':
@@ -816,7 +816,7 @@ class ProjectsPage(QFrame):
                         try:
                             fz.extract(fi, utils.temp)
                         except Exception as e:
-                            print("cannot rename %s %s" % (fi, e))
+                            events.append_log.emit("ERROR", "cannot rename %s %s" % (fi, e))
                     self.unpackrom(os.path.join(utils.temp, fi))
                     os.remove(os.path.join(utils.temp, fi))
                     return
