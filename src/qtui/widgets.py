@@ -785,7 +785,7 @@ class PackSuperMessageBox(MessageBoxBase):
                 else:
                     file_type = gettype(img_path)
                     if file_type in ["ext", "erofs", 'f2fs', 'sparse']:
-                        item_text = f"{name} [{file_type}]"
+                        item_text = f"{name} [{file_type}] [{utils.hum_convert(os.path.getsize(img_path))}]"
 
                 if item_text:
                     item = QListWidgetItem(item_text)
