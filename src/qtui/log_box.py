@@ -15,7 +15,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import PushButton, TextEdit
-
+from src.core.utils import generate_bug_report
 class LogMessageBoxBase(QWidget):
 
     def __init__(self,  parent=None):
@@ -26,11 +26,14 @@ class LogMessageBoxBase(QWidget):
         self.layout.addWidget(self.text_edit)
         self.button_layout = QHBoxLayout()
         self.clear_btn = PushButton(self.tr("Clear"), self)
+        self.export_log = PushButton(self.tr("Export"), self)
 
         self.button_layout.addStretch()
         self.button_layout.addWidget(self.clear_btn)
+        self.button_layout.addWidget(self.export_log)
         self.layout.addLayout(self.button_layout)
         self.clear_btn.clicked.connect(self.text_edit.clear)
+        self.export_log.clicked.connect(generate_bug_report)
 
         # 预设不同日志级别的颜色格式
         self._formats = {
