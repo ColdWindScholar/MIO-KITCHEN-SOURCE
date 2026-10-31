@@ -1613,7 +1613,7 @@ class ProjectsPage(QFrame):
             origin_logo = utils.findfile('logo.img', work)
         logo = f"{work}/logo-new.img"
         if not os.path.exists(dir_ := f"{work}/logo") or not os.path.exists(origin_logo):
-            print(self.tr("origin logo missing"))
+            events.append_log.emit("WARN", self.tr("origin logo missing"))
             return 1
         utils.LogoDumper(origin_logo, logo, dir_).repack()
         os.remove(origin_logo)
@@ -1680,7 +1680,7 @@ class ProjectsPage(QFrame):
         try:
             repaired = repair_erofs_symlinks(os.path.join(work, name))
         except (OSError, ValueError) as error:
-            print(f'[erofs] Cannot repack {name}: {error}', flush=True)
+            events.append_log.emit("ERROR", f'[erofs] Cannot repack {name}: {error}')
             return 1
         if repaired:
             print(f'[erofs] Restored {repaired} Windows symlink markers in {name}', flush=True)
