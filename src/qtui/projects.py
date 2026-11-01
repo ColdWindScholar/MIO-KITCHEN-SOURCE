@@ -837,7 +837,6 @@ class ProjectsPage(QFrame):
                     except Exception as e:
                         events.append_log.emit("ERROR", "cannot rename %s %s" % (member_name, e))
                 self.script2fs(project_manger.current_work_path())
-                events.show_info_bar.emit(self.tr("Unzip"), self.tr("Done!"), 3, 3000)
             events.refresh_projects.emit()
             events.set_project_name.emit(project_name)
             events.refresh_list.emit()
