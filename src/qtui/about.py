@@ -130,9 +130,9 @@ class ReleaseMessageBox(MessageBoxBase):
         self.status_label = BodyLabel("", self)
         self.viewLayout.addWidget(self.status_label)
 
-        self.download_button = PushButton(self.tr("Update now"), self)
-        self.close_button = PushButton(self.tr("Cancel"), self)
-        self.download_button.setEnabled(self.has_update and asset is not None)
+        self.yesButton.setText(self.tr("Update now"))
+        self.cancelButton.setText(self.tr("Cancel"))
+        self.yesButton.setEnabled(self.has_update and asset is not None)
         if not self.has_update:
             self.status_label.setText(self.tr("You are already using the latest version."))
         elif asset is None:
@@ -140,17 +140,12 @@ class ReleaseMessageBox(MessageBoxBase):
                 self.tr("No download is available for this platform.")
             )
 
-        button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        button_layout.addWidget(self.close_button)
-        button_layout.addWidget(self.download_button)
-        self.viewLayout.addLayout(button_layout)
-        self.yesButton.hide()
-        self.cancelButton.hide()
         self.widget.setMinimumWidth(500)
 
-        self.download_button.clicked.connect(self.start_download)
-        self.close_button.clicked.connect(self.reject)
+        self.yesButton.clicked.disconnect()
+        self.cancelButton.clicked.disconnect()
+        self.yesButton.clicked.connect(self.start_download)
+        self.cancelButton.clicked.connect(self.reject)
 
     def start_download(self):
         filename = os.path.basename(self.asset.get("name", ""))
@@ -165,8 +160,8 @@ class ReleaseMessageBox(MessageBoxBase):
         self.progress_bar.setValue(0)
         self.progress_bar.show()
         self.status_label.setText(self.tr("Starting download…"))
-        self.download_button.setEnabled(False)
-        self.close_button.setText(self.tr("Cancel download"))
+        self.yesButton.setEnabled(False)
+        self.cancelButton.setText(self.tr("Cancel download"))
 
         self.download_worker = ReleaseDownloadWorker(
             self.asset["browser_download_url"], output_path, self
@@ -176,8 +171,8 @@ class ReleaseMessageBox(MessageBoxBase):
         self.download_worker.failed.connect(self.download_failed)
         self.download_worker.cancelled.connect(self.reject)
         self.download_worker.start()
-        self.close_button.clicked.disconnect(self.reject)
-        self.close_button.clicked.connect(self.cancel_download)
+        self.cancelButton.clicked.disconnect(self.reject)
+        self.cancelButton.clicked.connect(self.cancel_download)
 
     def update_progress(self, downloaded, total):
         if total > 0:
@@ -196,23 +191,23 @@ class ReleaseMessageBox(MessageBoxBase):
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100)
         self.status_label.setText(self.tr("Downloaded to: {0}").format(output_path))
-        self.download_button.setText(self.tr("Downloaded"))
-        self.close_button.setText(self.tr("Close"))
-        self.close_button.clicked.disconnect(self.cancel_download)
-        self.close_button.clicked.connect(self.reject)
+        self.yesButton.setText(self.tr("Downloaded"))
+        self.cancelButton.setText(self.tr("Close"))
+        self.cancelButton.clicked.disconnect(self.cancel_download)
+        self.cancelButton.clicked.connect(self.reject)
 
     def download_failed(self, error):
         self.status_label.setText(self.tr("Download failed: {0}").format(error))
         self.progress_bar.hide()
-        self.download_button.setEnabled(True)
-        self.close_button.setText(self.tr("Close"))
-        self.close_button.clicked.disconnect(self.cancel_download)
-        self.close_button.clicked.connect(self.reject)
+        self.yesButton.setEnabled(True)
+        self.cancelButton.setText(self.tr("Close"))
+        self.cancelButton.clicked.disconnect(self.cancel_download)
+        self.cancelButton.clicked.connect(self.reject)
 
     def cancel_download(self):
         if self.download_worker and self.download_worker.isRunning():
             self.status_label.setText(self.tr("Cancelling download…"))
-            self.close_button.setEnabled(False)
+            self.cancelButton.setEnabled(False)
             self.download_worker.requestInterruption()
         else:
             self.reject()
@@ -374,6 +369,7 @@ class AboutPage(QFrame):
         self.setObjectName("AboutPage")
         self._styled_widgets = []
         self._shake_animation = None
+        self._release_check_worker = None
         self.initUI()
         cfg.themeChanged.connect(self._restore_stylesheets)
 
@@ -395,6 +391,28 @@ class AboutPage(QFrame):
             animation.setKeyValueAt(time, origin + QPoint(*offset))
         self._shake_animation = animation
         animation.start()
+
+    def _check_for_updates(self):
+        self.check_update_btn.setEnabled(False)
+        self._release_check_worker = ReleaseCheckWorker(self)
+        self._release_check_worker.release_fetched.connect(self._show_release)
+        self._release_check_worker.failed.connect(self._release_check_failed)
+        self._release_check_worker.finished.connect(
+            lambda: self.check_update_btn.setEnabled(True)
+        )
+        self._release_check_worker.start()
+
+    def _show_release(self, release):
+        ReleaseMessageBox(
+            release, _release_asset_for_platform(release), self
+        ).exec()
+
+    def _release_check_failed(self, error):
+        MessageBox(
+            self.tr("Update check failed"),
+            error,
+            self,
+        ).exec()
 
     def _set_widget_style(self, widget, stylesheet):
         widget.setStyleSheet(stylesheet)
@@ -528,7 +546,7 @@ class AboutPage(QFrame):
         github_lbl.setUrl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
 
         self.check_update_btn = PushButton(self.tr("Check for updates"))
-
+        self.check_update_btn.clicked.connect(self._check_for_updates)
 
         copyright_lbl = CaptionLabel(self.tr("© 2026 ColdWindScholar All Rights Reserved."))
         copyright_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
