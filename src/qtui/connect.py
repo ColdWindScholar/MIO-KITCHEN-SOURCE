@@ -332,7 +332,7 @@ class ConnectPage(QWidget):
 
         self.network_thread = Thread(target=serve, name="MioConnectServer", daemon=True)
         self.network_thread.start()
-        self.server_status_label.setText(self.tr("Server: running at {}").format(self.address_label.text()))
+        self.server_status_label.setText(self.tr("Server: Running"))
         self.server_toggle_btn.setText(self.tr("Stop Server"))
         self.server_restart_btn.setEnabled(True)
         self.append_native_console_log("SUCCESS", "Connect server started on port 5000.")
