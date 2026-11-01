@@ -27,7 +27,6 @@ from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWi
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
     CardWidget, MessageBox, MessageBoxBase, ProgressBar, PushButton, TextBrowser,
-    isDarkTheme,
 )
 
 from src.core.utils import JsonEdit, prog_path
@@ -105,13 +104,6 @@ class ReleaseMessageBox(MessageBoxBase):
         self.asset = asset
         self.download_worker = None
 
-        dark = isDarkTheme()
-        colors = {
-            "green": "#00B52A" if dark else "#14804A",
-            "orange": "#FFAE00" if dark else "#C97800",
-            "red": "#FF7676" if dark else "#C53A3A",
-        }
-
         release_name = release.get("name") or release.get("tag_name", "")
         self.has_update = not release_name.endswith(cfg.Version.value)
         self.setWindowTitle(self.tr("Check update"))
@@ -145,8 +137,9 @@ class ReleaseMessageBox(MessageBoxBase):
         )
         release_version = BodyLabel(notice, self)
         release_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        release_version.setStyleSheet(
-            f"color: {colors['green'] if not self.has_update else colors['orange']};"
+        release_version.setTextColor(
+            "#14804A" if not self.has_update else "#C97800",
+            "#00B52A" if not self.has_update else "#FFAE00",
         )
         self.viewLayout.addWidget(release_version)
 
@@ -225,7 +218,7 @@ class ReleaseMessageBox(MessageBoxBase):
     def download_completed(self, output_path):
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100)
-        self._set_status_color("#54D69A" if isDarkTheme() else "#14804A")
+        self._set_status_color("#14804A", "#54D69A")
         self.status_label.setText(self.tr("Downloaded to: {0}").format(output_path))
         self.yesButton.setText(self.tr("Downloaded"))
         self.cancelButton.setText(self.tr("Close"))
@@ -233,7 +226,7 @@ class ReleaseMessageBox(MessageBoxBase):
         self.cancelButton.clicked.connect(self.reject)
 
     def download_failed(self, error):
-        self._set_status_color("#FF7676" if isDarkTheme() else "#C53A3A")
+        self._set_status_color("#C53A3A", "#FF7676")
         self.status_label.setText(self.tr("Download failed: {0}").format(error))
         self.progress_bar.hide()
         self.yesButton.setEnabled(True)
@@ -241,8 +234,8 @@ class ReleaseMessageBox(MessageBoxBase):
         self.cancelButton.clicked.disconnect(self.cancel_download)
         self.cancelButton.clicked.connect(self.reject)
 
-    def _set_status_color(self, color):
-        self.status_label.setStyleSheet(f"color: {color};")
+    def _set_status_color(self, light, dark):
+        self.status_label.setTextColor(light, dark)
 
     def cancel_download(self):
         if self.download_worker and self.download_worker.isRunning():
