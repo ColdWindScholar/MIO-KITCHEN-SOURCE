@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 from io import BytesIO
 from platform import system, machine
-from threading import Thread
+from threading import Lock, Thread
 
 import qrcode
 import simple_websocket
@@ -37,6 +37,40 @@ class NetworkBridge(QObject):
     connection_status_signal = Signal(bool, dict)
     send_ws_message = Signal(str)
 
+    def __init__(self):
+        super().__init__()
+        self._websocket: Server | None = None
+        self._websocket_lock = Lock()
+
+    def attach_websocket(self, websocket: Server):
+        with self._websocket_lock:
+            previous = self._websocket
+            if previous is not None:
+                try:
+                    self.send_ws_message.disconnect(previous.send)
+                except (TypeError, RuntimeError):
+                    pass
+                try:
+                    previous.close(CloseReason.NORMAL_CLOSURE, message="Replaced by a new connection.")
+                except simple_websocket.errors.ConnectionClosed:
+                    pass
+
+            self._websocket = websocket
+            self.send_ws_message.connect(websocket.send)
+
+    def detach_websocket(self, websocket: Server | None = None):
+        with self._websocket_lock:
+            active_websocket = self._websocket
+            if active_websocket is None or (websocket is not None and active_websocket is not websocket):
+                return None
+
+            self._websocket = None
+            try:
+                self.send_ws_message.disconnect(active_websocket.send)
+            except (TypeError, RuntimeError):
+                pass
+            return active_websocket
+
 
 flask_backend = Flask(__name__)
 sock_app = Sock(flask_backend)
@@ -48,7 +82,23 @@ ACTIVE_SESSION = {
     "device_ip": None,
     "verify_code": v_code(4),
 }
-WS: Server | None = None
+
+
+def disconnect(close_websocket=False, websocket: Server | None = None):
+    active_websocket = network_bridge.detach_websocket(websocket)
+    if websocket is not None and active_websocket is None:
+        return False
+
+    ACTIVE_SESSION["token"] = None
+    ACTIVE_SESSION["device_name"] = None
+    ACTIVE_SESSION["device_ip"] = None
+    if close_websocket and active_websocket is not None:
+        try:
+            active_websocket.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
+        except simple_websocket.errors.ConnectionClosed:
+            pass
+    network_bridge.connection_status_signal.emit(False, {})
+    return True
 
 
 @flask_backend.route('/connect', methods=['POST'])
@@ -73,15 +123,6 @@ def handle_handshake():
     return jsonify({"token": generated_token}), 200
 
 
-def disconnect():
-    ACTIVE_SESSION["token"] = None
-    ACTIVE_SESSION["device_name"] = None
-    ACTIVE_SESSION["device_ip"] = None
-    if WS:
-        network_bridge.send_ws_message.disconnect(WS.send)
-    network_bridge.connection_status_signal.emit(False, {})
-
-
 @flask_backend.route('/disconnect', methods=['POST'])
 def handle_disconnect():
     if not ACTIVE_SESSION["token"]:
@@ -93,13 +134,8 @@ def handle_disconnect():
         return f"Unauthorized: Invalid header", 403
     device_ip = request.remote_addr
 
-    disconnect()
+    disconnect(close_websocket=True)
     network_bridge.log_signal.emit("SUCCESS", f"Disconnected by {device_ip}")
-    global WS
-    if WS:
-        network_bridge.log_signal.emit("INFO", f"Close websocket connect.")
-        WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
-        WS = None
 
     return "Disconnected already.", 200
 
@@ -149,20 +185,19 @@ def handle_actions(ws: Server):
         return "Unauthorized: Invalid key token", 403
 
     network_bridge.log_signal.emit("INFO", "Websocket connected...")
-    global WS
-    WS = ws
-    network_bridge.send_ws_message.connect(ws.send)
-    while True:
-        try:
-            data = ws.receive(timeout=15)
-        except Exception as e:
-            disconnect()
-            network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
-            break
-        if data is None:
-            disconnect()
-            break
-        network_bridge.trigger_signal.emit(data)
+    network_bridge.attach_websocket(ws)
+    try:
+        while True:
+            try:
+                data = ws.receive(timeout=15)
+            except Exception as e:
+                network_bridge.log_signal.emit("WARN", f"TCP connection collapsed {e}")
+                break
+            if data is None:
+                break
+            network_bridge.trigger_signal.emit(data)
+    finally:
+        disconnect(websocket=ws)
 
 
 def fetch_linux_lan_ip():
@@ -392,28 +427,8 @@ class ConnectPage(QWidget):
             self.address_label.show()
 
     def manually_terminate_session(self):
-        global ACTIVE_SESSION
-        ACTIVE_SESSION = {
-            "token": None,
-            "device_name": None,
-            "device_ip": None,
-            "verify_code": v_code(4),
-        }
-        global WS
-        if WS:
-            network_bridge.log_signal.emit("INFO", self.tr("Close websocket connect."))
-            try:
-                WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
-            except simple_websocket.errors.ConnectionClosed:
-                pass
-            try:
-                network_bridge.send_ws_message.disconnect(WS.send)
-            except (TypeError, RuntimeError):
-                pass
-            WS = None
-        self.refresh_qr_matrix()
-        self.toggle_workspace_ui_state(False)
-        network_bridge.connection_status_signal.emit(False, {})
+        ACTIVE_SESSION["verify_code"] = v_code(4)
+        disconnect(close_websocket=True)
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
 
     def append_native_console_log(self, log_level, message_text):
