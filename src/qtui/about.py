@@ -113,17 +113,17 @@ class ReleaseMessageBox(MessageBoxBase):
 
         app_title_row = QHBoxLayout()
         app_title_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        app_title_row.setSpacing(7)
+        app_title_row.setSpacing(8)
         app_title = TitleLabel("MIO-KITCHEN", self)
         title_font = QFont(app_title.font())
-        title_font.setPointSize(26)
-        title_font.setWeight(QFont.Weight.Normal)
-        title_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.6)
+        title_font.setPointSize(27)
+        title_font.setWeight(QFont.Weight.Medium)
+        title_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.2)
         app_title.setFont(title_font)
-        app_version = BodyLabel(cfg.Version.value, self)
+        app_version = CaptionLabel(cfg.Version.value, self)
         app_version.setTextColor("#737373", "#A0A0A0")
         app_title_row.addWidget(app_title)
-        app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignVCenter)
+        app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignBottom)
         self.viewLayout.addLayout(app_title_row)
 
 
