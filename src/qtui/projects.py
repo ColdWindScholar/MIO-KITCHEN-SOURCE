@@ -1021,7 +1021,7 @@ class ProjectsPage(QFrame):
         shutil.copytree(dir_path, project_path, dirs_exist_ok=True)
         return 0
 
-    def pack_dtbo(self, name: str = 'dtbo') -> bool:
+    def pack_dtbo(self, name: str = 'dtbo', remove_source: bool = False) -> bool:
         work = project_manger.current_work_path()
         source = f"{work}/{name}"
         if not os.path.isdir(f"{source}/dts"):
@@ -1049,7 +1049,8 @@ class ProjectsPage(QFrame):
             return False
         mkdtboimg.create_dtbo(os.path.join(project_manger.current_work_output_path(), f"{name}.img"),
                               sorted(list_, key=lambda x: int(x.rsplit('.')[1])), 4096)
-        rmtree(source)
+        if remove_source:
+            rmtree(source, ignore_errors=True)
         print(f"Pack {name} done")
         return True
 
@@ -1913,7 +1914,7 @@ class ProjectsPage(QFrame):
         if not self._applying_partition_format:
             self._schedule_partition_list_load()
 
-    def logo_pack(self, origin_logo=None) -> int:
+    def logo_pack(self, origin_logo=None, remove_source: bool = False) -> int:
         work = project_manger.current_work_path()
         if not origin_logo:
             origin_logo = utils.findfile('logo.img', work)
@@ -1924,7 +1925,8 @@ class ProjectsPage(QFrame):
         utils.LogoDumper(origin_logo, logo, dir_).repack()
         os.remove(origin_logo)
         os.rename(logo, origin_logo)
-        rmtree(dir_)
+        if remove_source:
+            rmtree(dir_, ignore_errors=True)
         return 1
 
     def datbr(self, work: str, name: str, brl: str | int, dat_ver: int = 4):
@@ -2140,7 +2142,7 @@ class ProjectsPage(QFrame):
             f.write('\n'.join(lines) + '\n')
 
     def repack_boot(self, name: str = 'boot', source: str | None = None, boot: str | None = None,
-                    cmdline: str | None = None) -> int:
+                    cmdline: str | None = None, remove_source: bool = False) -> int:
         work = project_manger.current_work_path()
         flag = ''
         if boot is None:
@@ -2229,13 +2231,14 @@ class ProjectsPage(QFrame):
                 print("Failed to Pack boot...")
                 os.chdir(cfg.workingFolder.value)
                 return 1
-        os.remove(boot)
-        os.rename(new_boot, project_manger.current_work_output_path() + f"/{name}.img")
+        output = os.path.join(project_manger.current_work_output_path(), f"{name}.img")
+        os.replace(new_boot, output)
         os.chdir(cfg.workingFolder.value)
-        try:
-            rmtree(source)
-        except (Exception, BaseException):
-            events.append_log.emit("WARN", f"Failed to remove {name}")
+        if remove_source:
+            try:
+                rmtree(source)
+            except (Exception, BaseException):
+                events.append_log.emit("WARN", f"Failed to remove {name}")
         print(self.tr("Successfully packed Boot..."))
         return 0
 
@@ -2394,13 +2397,13 @@ class ProjectsPage(QFrame):
                     else:
                         print(self.tr("Packed {}").format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                self.repack_boot(i, cmdline=boot_cmdline)
+                self.repack_boot(i, cmdline=boot_cmdline, remove_source=remove_source_files)
             elif parts_dict[i] == 'dtbo':
-                self.pack_dtbo(dname)
+                self.pack_dtbo(dname, remove_source=remove_source_files)
             elif parts_dict[i] == 'splash':
                 splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             elif parts_dict[i] == 'logo':
-                self.logo_pack()
+                self.logo_pack(remove_source=remove_source_files)
             elif parts_dict[i] == 'guoke_logo':
                 utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
