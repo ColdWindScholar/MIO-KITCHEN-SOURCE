@@ -120,7 +120,7 @@ class ReleaseMessageBox(MessageBoxBase):
         title_font.setWeight(QFont.Weight.Normal)
         title_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.6)
         app_title.setFont(title_font)
-        app_version = CaptionLabel(cfg.Version.value, self)
+        app_version = BodyLabel(cfg.Version.value, self)
         app_version.setTextColor("#737373", "#A0A0A0")
         app_title_row.addWidget(app_title)
         app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignVCenter)
