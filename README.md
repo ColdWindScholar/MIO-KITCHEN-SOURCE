@@ -119,7 +119,7 @@ python3 config chksupd
 
 ## Start To Use
 > [!NOTE]
-> Currently Only Support Python 3.8 and Newer!
+> Currently Only Support Python 3.9 and Newer!
 ### Prerequisites
 <details><summary>macOS</summary>
 
