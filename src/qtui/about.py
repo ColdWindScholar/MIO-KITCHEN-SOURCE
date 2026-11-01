@@ -110,9 +110,6 @@ class ReleaseMessageBox(MessageBoxBase):
         self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
         self.viewLayout.addWidget(self.titleLabel)
 
-        self.viewLayout.setContentsMargins(8, 0, 8, 8)
-        self.viewLayout.setSpacing(8)
-
         app_title_row = QHBoxLayout()
         app_title_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
         app_title = TitleLabel("MIO-KITCHEN", self)
