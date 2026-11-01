@@ -30,6 +30,8 @@ class Config(QConfig):
     checkUpdate = ConfigItem("Tool", 'checkUpdate', False, BoolValidator())
     projectStructure = OptionsConfigItem("Tool", "ProjectStructure", "Single", OptionsValidator(['Single', "Split"]))
     cpioImpl = OptionsConfigItem("Tool", "CpioImpl", "Native", OptionsValidator(['Native', "Python"]))
+    smoothScroll = OptionsConfigItem(
+        "Tool", "SmoothScroll", "smooth", OptionsValidator(['smooth', "normal"]))
 
 
 cfg = Config()

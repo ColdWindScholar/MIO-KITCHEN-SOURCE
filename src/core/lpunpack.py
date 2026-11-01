@@ -654,9 +654,6 @@ class SparseImage:
                     # Truncating here silently zeroes the data (see issues #240/#247).
                     data = self._read_data(chunk_data_size)
                     len_data = sector_size << 9
-                    out.truncate(out.tell() + len_data)
-                    out.seek(0, 2)
-                    output_len += len(data)
                     fill = (data + b'\x00' * 4)[:4]
                     out.write(fill * (len_data // 4) + fill[:len_data % 4])
                     output_len += len_data
