@@ -1577,10 +1577,8 @@ class ProjectsPage(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
 
-        # 标题放外面
         layout.addWidget(BodyLabel(self.tr("Others")))
 
-        # 工具按钮行
         tools_layout = QHBoxLayout()
 
         self.super_btn = PushButton(self.tr("Pack Super"), container, FIF.ALBUM)
