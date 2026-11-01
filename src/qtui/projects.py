@@ -464,10 +464,11 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
     return utils.LogoDumper(file_path, output + output_name).unpack()
 
 
-def un_dtbo(bn: str = 'dtbo') -> None:
-    if not (dtboimg := utils.findfile(f"{bn}.img", work := project_manger.current_work_path())):
-        print(f"cannot find dtbo {bn}")
-        return
+def un_dtbo(bn: str = 'dtbo', dtboimg:str|None = None) -> None:
+    if not dtboimg:
+        if not (dtboimg := utils.findfile(f"{bn}.img", work := project_manger.current_work_path())):
+            events.append_log.emit("WARN", f"cannot find dtbo {bn}")
+            return
     utils.re_folder(f"{work}/{bn}")
     utils.re_folder(f"{work}/{bn}/dtbo")
     utils.re_folder(f"{work}/{bn}/dts")
