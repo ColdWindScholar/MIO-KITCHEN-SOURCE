@@ -14,11 +14,13 @@ from PySide6.QtGui import QPixmap, QImage, QFont, QTextCursor, QTextCharFormat, 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from flask import Flask, request, jsonify
 from flask_sock import Sock
+from werkzeug.serving import make_server
 from qfluentwidgets import (
     CardWidget,
     BodyLabel,
     TitleLabel,
     PrimaryPushButton,
+    PushButton,
     IconWidget,
     FluentIcon, TextEdit
 )
@@ -254,14 +256,96 @@ class ConnectPage(QWidget):
         self.address_label.setStyleSheet("color: green; font-style: bold;")
         self.refresh_qr_matrix()
 
+        server_controls = QHBoxLayout()
+        self.server_status_label = BodyLabel(self.tr("Server: stopped"), self)
+        self.server_toggle_btn = PrimaryPushButton(self.tr("Start Server"), self)
+        self.server_toggle_btn.clicked.connect(self.toggle_server)
+        self.server_restart_btn = PushButton(self.tr("Restart Server"), self)
+        self.server_restart_btn.clicked.connect(self.restart_server)
+        self.server_restart_btn.setEnabled(False)
+        server_controls.addWidget(self.server_status_label, alignment=Qt.AlignmentFlag.AlignHCenter)
+        server_controls.addWidget(self.server_toggle_btn)
+        server_controls.addWidget(self.server_restart_btn)
+        left_layout.addLayout(server_controls)
+
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute)
         network_bridge.log_signal.connect(self.append_native_console_log)
         network_bridge.connection_status_signal.connect(self.toggle_state)
 
-        self.network_thread = Thread(
-            target=lambda: flask_backend.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False), daemon=True)
+        self.server = None
+        self.network_thread = None
+        self.start_server()
+
+    def start_server(self):
+        if self.network_thread and self.network_thread.is_alive():
+            return True
+
+        try:
+            server = make_server("0.0.0.0", 5000, flask_backend, threaded=True)
+        except OSError as error:
+            self.append_native_console_log("ERROR", f"Unable to start server: {error}")
+            self.server_status_label.setText(self.tr("Server: stopped"))
+            self.server_toggle_btn.setText(self.tr("Start Server"))
+            self.server_restart_btn.setEnabled(False)
+            return False
+
+        self.server = server
+
+        def serve():
+            try:
+                server.serve_forever()
+            except Exception as error:
+                network_bridge.log_signal.emit("ERROR", f"Server stopped unexpectedly: {error}")
+
+        self.network_thread = Thread(target=serve, name="MioConnectServer", daemon=True)
         self.network_thread.start()
+        self.server_status_label.setText(self.tr("Server: running at {}").format(self.address_label.text()))
+        self.server_toggle_btn.setText(self.tr("Stop Server"))
+        self.server_restart_btn.setEnabled(True)
+        self.append_native_console_log("SUCCESS", "Connect server started on port 5000.")
+        return True
+
+    def stop_server(self):
+        server = self.server
+        thread = self.network_thread
+        if server is None or thread is None or not thread.is_alive():
+            self.server = None
+            self.network_thread = None
+            self.server_status_label.setText(self.tr("Server: stopped"))
+            self.server_toggle_btn.setText(self.tr("Start Server"))
+            self.server_restart_btn.setEnabled(False)
+            return True
+
+        self.manually_terminate_session()
+        server.shutdown()
+        thread.join(timeout=3)
+        if thread.is_alive():
+            self.append_native_console_log("ERROR", "Connect server did not stop within 3 seconds.")
+            return False
+
+        server.server_close()
+        self.server = None
+        self.network_thread = None
+        self.server_status_label.setText(self.tr("Server: stopped"))
+        self.server_toggle_btn.setText(self.tr("Start Server"))
+        self.server_restart_btn.setEnabled(False)
+        self.append_native_console_log("INFO", "Connect server stopped.")
+        return True
+
+    def toggle_server(self):
+        if self.server and self.network_thread and self.network_thread.is_alive():
+            self.stop_server()
+        else:
+            self.start_server()
+
+    def restart_server(self):
+        if self.stop_server():
+            self.start_server()
+
+    def closeEvent(self, event):
+        self.stop_server()
+        super().closeEvent(event)
 
     def render_qr_matrix(self, encoding_data_payload):
         qr_generator = qrcode.QRCode(version=1, box_size=10, border=0)
