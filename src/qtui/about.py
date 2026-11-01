@@ -123,9 +123,7 @@ class ReleaseMessageBox(MessageBoxBase):
         self.has_update = not release_name.endswith(cfg.Version.value)
         self.setWindowTitle(self.tr("Check update"))
         self.widget.setObjectName("releaseDialog")
-        self.widget.setStyleSheet(
-            f"QWidget#releaseDialog {{ background-color: {colors['background']}; }}"
-        )
+
         self.viewLayout.setContentsMargins(8, 0, 8, 8)
         self.viewLayout.setSpacing(8)
 
