@@ -25,12 +25,12 @@ from qfluentwidgets import (
 from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
-from src.qtui.projects import ProjectsPage
+from src.qtui.projects import ProjectsPage, project_manger
 from src.core.utils import v_code
 
 
 class NetworkBridge(QObject):
-    trigger_signal = Signal(str)
+    trigger_signal = Signal(object)
     log_signal = Signal(str, str)
     connection_status_signal = Signal(bool, dict)
     send_ws_message = Signal(str)
@@ -165,13 +165,15 @@ def handle_actions(ws: Server):
 
 def fetch_linux_lan_ip():
     try:
-        temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        temp_socket.connect(("8.8.8.8", 80))
-        local_ip = temp_socket.getsockname()[0]
-        temp_socket.close()
-        return local_ip
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as temp_socket:
+            temp_socket.connect(("8.8.8.8", 80))
+            return temp_socket.getsockname()[0]
     except Exception:
         return "127.0.0.1"
+
+
+def list_project():
+    return list(project_manger.get_projects())
 
 
 class ConnectPage(QWidget):
@@ -248,11 +250,9 @@ class ConnectPage(QWidget):
 
         # ==================== INITIALIZATION ====================
         self.lan_ip = fetch_linux_lan_ip()
-        json_text = json.dumps({"url": f"http://{self.lan_ip}:5000","ws":f"ws://{self.lan_ip}:5000", "verify_code": ACTIVE_SESSION["verify_code"]},
-                               ensure_ascii=True)
         self.address_label.setText(f"http://{self.lan_ip}:5000")
         self.address_label.setStyleSheet("color: green; font-style: bold;")
-        self.render_qr_matrix(json_text)
+        self.refresh_qr_matrix()
 
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute)
@@ -274,11 +274,17 @@ class ConnectPage(QWidget):
         qt_image_raw = QImage.fromData(image_io_stream.getvalue())
         self.qr_display_container.setPixmap(QPixmap.fromImage(qt_image_raw))
 
+    def refresh_qr_matrix(self):
+        payload = {
+            "url": f"http://{self.lan_ip}:5000",
+            "ws": f"ws://{self.lan_ip}:5000",
+            "verify_code": ACTIVE_SESSION["verify_code"],
+        }
+        self.render_qr_matrix(json.dumps(payload, ensure_ascii=True))
+
     def toggle_state(self, is_connected, device_info_dict=None):
         if not is_connected:
-            self.render_qr_matrix(
-                json.dumps({"url": f"http://{self.lan_ip}:5000","ws":f"ws://{self.lan_ip}:5000", "verify_code": ACTIVE_SESSION["verify_code"]},
-                           ensure_ascii=True))
+            self.refresh_qr_matrix()
         self.toggle_workspace_ui_state(is_connected, device_info_dict)
 
     def toggle_workspace_ui_state(self, is_connected, device_info_dict=None):
@@ -319,6 +325,7 @@ class ConnectPage(QWidget):
                 pass
             network_bridge.send_ws_message.disconnect(WS.send)
             WS = None
+        self.refresh_qr_matrix()
         self.toggle_workspace_ui_state(False)
         network_bridge.connection_status_signal.emit(False, {})
         self.append_native_console_log("WARN", "Current device session closed manually by host system. Token revoked.")
@@ -356,7 +363,7 @@ class ConnectPage(QWidget):
         self.console_log_view.setTextCursor(cursor)
         self.console_log_view.moveCursor(QTextCursor.MoveOperation.End)
 
-    def execute(self, action_data: str | bytes):
+    def execute(self, action_data: str | bytes | dict):
         if isinstance(action_data, bytes):
             action_data = action_data.decode('utf-8')
         # action_types:native_cmd log create_project remove_project refresh_project unpack
@@ -364,5 +371,17 @@ class ConnectPage(QWidget):
         if action_data == '1':
             network_bridge.send_ws_message.emit('1')
             return "1"
-        json_data = json.loads(action_data)
+        try:
+            json_data = json.loads(action_data) if isinstance(action_data, str) else action_data
+        except json.JSONDecodeError as error:
+            network_bridge.log_signal.emit("WARN", f"Invalid action payload: {error}")
+            return "Invalid action payload."
+        if not isinstance(json_data, dict):
+            network_bridge.log_signal.emit("WARN", "Invalid action payload: expected an object.")
+            return "Invalid action payload."
+
+        if json_data.get("argv1") == "list_project":
+            response = json.dumps({"argv1": "list_project", "argv2": list_project()})
+            network_bridge.send_ws_message.emit(response)
+            return response
         return "Action"
