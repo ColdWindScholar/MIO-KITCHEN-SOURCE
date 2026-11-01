@@ -31,6 +31,7 @@ from qfluentwidgets import (
 
 from src.core.utils import JsonEdit, prog_path
 from src.qtui.settings_cfg import cfg
+from src.core.utils import temp
 
 
 class ReleaseCheckWorker(QThread):
@@ -178,7 +179,7 @@ class ReleaseMessageBox(MessageBoxBase):
             )
             return
 
-        output_path = os.path.join(prog_path, "bin", "temp", filename)
+        output_path = os.path.join(temp, filename)
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
         self.progress_bar.show()
