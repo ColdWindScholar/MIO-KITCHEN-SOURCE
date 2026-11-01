@@ -22,11 +22,12 @@ from PySide6.QtCore import (
     QEasingCurve, QPoint, QPointF, QPropertyAnimation, QThread, QTimer, Qt,
     Signal, QVariantAnimation,
 )
-from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QRadialGradient
+from PySide6.QtGui import QColor, QCursor, QFont, QPainter, QPen, QRadialGradient
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (
-    TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel, SubtitleLabel,
+    TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
     CardWidget, MessageBox, MessageBoxBase, ProgressBar, PushButton, TextBrowser,
+    isDarkTheme,
 )
 
 from src.core.utils import JsonEdit, prog_path
@@ -104,34 +105,118 @@ class ReleaseMessageBox(MessageBoxBase):
         self.asset = asset
         self.download_worker = None
 
+        dark = isDarkTheme()
+        colors = {
+            "accent": "#55C9F5" if dark else "#0878C9",
+            "accent_hover": "#75D8FF" if dark else "#006BB8",
+            "background": "#1D1D1F" if dark else "#F5F7FA",
+            "surface": "#1B1B1B" if dark else "#FFFFFF",
+            "title_bar": "#303034" if dark else "#E9EDF2",
+            "border": "#48484A" if dark else "#D2D7DE",
+            "text": "#EEEEEE" if dark else "#20252B",
+            "muted": "#A0A0A0" if dark else "#64717E",
+            "green": "#00B52A" if dark else "#14804A",
+            "orange": "#FFAE00" if dark else "#C97800",
+        }
+
         release_name = release.get("name") or release.get("tag_name", "")
         self.has_update = not release_name.endswith(cfg.Version.value)
-        self.viewLayout.addWidget(SubtitleLabel(self.tr("Update information"), self))
-        self.viewLayout.addWidget(
-            BodyLabel(self.tr("Current version: {0}").format(cfg.Version.value), self)
+        self.setWindowTitle(self.tr("Check update"))
+        self.widget.setObjectName("releaseDialog")
+        self.widget.setStyleSheet(
+            f"QWidget#releaseDialog {{ background-color: {colors['background']}; }}"
         )
+        self.viewLayout.setContentsMargins(8, 0, 8, 8)
+        self.viewLayout.setSpacing(8)
+
+        title_bar = QFrame(self)
+        title_bar.setObjectName("releaseTitleBar")
+        title_bar.setStyleSheet(
+            f"QFrame#releaseTitleBar {{ background-color: {colors['title_bar']};"
+            " border: none; border-radius: 0px; }"
+        )
+        title_layout = QHBoxLayout(title_bar)
+        title_layout.setContentsMargins(10, 7, 10, 7)
+        title_label = BodyLabel(self.tr("Check update"), title_bar)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet(f"color: {colors['text']}; font-weight: 700;")
+        title_layout.addWidget(title_label)
+        self.viewLayout.addWidget(title_bar)
+
+        app_title_row = QHBoxLayout()
+        app_title_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        app_title = TitleLabel("MIO-KITCHEN", self)
+        app_title.setStyleSheet(f"color: {colors['text']}; font-size: 30px;")
+        app_version = BodyLabel(cfg.Version.value, self)
+        app_version.setStyleSheet(
+            f"color: {colors['muted']}; font-size: 14px; padding-top: 9px;"
+        )
+        app_title_row.addWidget(app_title)
+        app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignBottom)
+        self.viewLayout.addLayout(app_title_row)
+
+        section_label = BodyLabel(self.tr("Update info"), self)
+        section_label.setStyleSheet(f"color: {colors['text']}; font-weight: 600;")
+        self.viewLayout.addWidget(section_label)
+
         notice = (
             self.tr("Found new version: {0}").format(release_name)
             if self.has_update
-            else self.tr("You are using the latest version: {0}").format(release_name)
+            else self.tr("Your version is already the latest!")
         )
-        self.viewLayout.addWidget(BodyLabel(notice, self))
+        release_version = BodyLabel(notice, self)
+        release_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        release_version.setStyleSheet(
+            f"color: {colors['green'] if not self.has_update else colors['orange']};"
+            "font-size: 16px; font-weight: 700; padding: 1px 0 3px;"
+        )
+        self.viewLayout.addWidget(release_version)
 
         self.release_body = TextBrowser(self)
-        self.release_body.setMarkdown(
+        self.release_body.setObjectName("releaseNotes")
+        self.release_body.setPlainText(
             release.get("body") or self.tr("No release notes provided.")
         )
-        self.release_body.setMinimumHeight(190)
+        self.release_body.setMinimumHeight(300)
+        self.release_body.setFont(QFont("monospace", 10))
+        self.release_body.setStyleSheet(
+            f"TextBrowser#releaseNotes {{ background-color: {colors['surface']};"
+            f" color: {colors['text']}; border: 1px solid {colors['border']};"
+            " border-radius: 2px; padding: 4px; }"
+        )
         self.viewLayout.addWidget(self.release_body)
 
         self.progress_bar = ProgressBar(self)
+        self.progress_bar.setStyleSheet(
+            f"ProgressBar {{ min-height: 4px; max-height: 4px; color: {colors['accent']}; }}"
+        )
         self.progress_bar.hide()
         self.viewLayout.addWidget(self.progress_bar)
         self.status_label = BodyLabel("", self)
+        self.status_label.setStyleSheet(f"color: {colors['muted']};")
         self.viewLayout.addWidget(self.status_label)
 
         self.yesButton.setText(self.tr("Update now"))
         self.cancelButton.setText(self.tr("Cancel"))
+        self.yesButton.setObjectName("updateAction")
+        self.yesButton.setStyleSheet(
+            "#updateAction {"
+            f"background-color: {colors['accent']}; color: #FFFFFF;"
+            "border: none; border-radius: 3px; padding: 7px 18px; font-weight: 700;"
+            "}"
+            "#updateAction:hover {"
+            f"background-color: {colors['accent_hover']};"
+            "}"
+            "#updateAction:disabled {"
+            f"background-color: {colors['border']}; color: {colors['muted']};"
+            "}"
+        )
+        self.cancelButton.setStyleSheet(
+            f"PushButton {{ color: {colors['muted']}; border: 1px solid {colors['border']};"
+            " border-radius: 3px; padding: 7px 18px; }"
+            f"PushButton:hover {{ color: {colors['text']};"
+            f" background-color: {colors['background']}; }}"
+        )
         self.yesButton.setEnabled(self.has_update and asset is not None)
         if not self.has_update:
             self.status_label.setText(self.tr("You are already using the latest version."))
@@ -140,7 +225,7 @@ class ReleaseMessageBox(MessageBoxBase):
                 self.tr("No download is available for this platform.")
             )
 
-        self.widget.setMinimumWidth(500)
+        self.widget.setMinimumWidth(440)
 
         self.yesButton.clicked.disconnect()
         self.cancelButton.clicked.disconnect()
@@ -161,6 +246,7 @@ class ReleaseMessageBox(MessageBoxBase):
         self.progress_bar.show()
         self.status_label.setText(self.tr("Starting download…"))
         self.yesButton.setEnabled(False)
+        self.yesButton.setText(self.tr("Downloading…"))
         self.cancelButton.setText(self.tr("Cancel download"))
 
         self.download_worker = ReleaseDownloadWorker(
@@ -190,6 +276,10 @@ class ReleaseMessageBox(MessageBoxBase):
     def download_completed(self, output_path):
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100)
+        dark = isDarkTheme()
+        self.status_label.setStyleSheet(
+            f"color: {'#54D69A' if dark else '#14804A'}; font-weight: 600;"
+        )
         self.status_label.setText(self.tr("Downloaded to: {0}").format(output_path))
         self.yesButton.setText(self.tr("Downloaded"))
         self.cancelButton.setText(self.tr("Close"))
@@ -197,6 +287,10 @@ class ReleaseMessageBox(MessageBoxBase):
         self.cancelButton.clicked.connect(self.reject)
 
     def download_failed(self, error):
+        dark = isDarkTheme()
+        self.status_label.setStyleSheet(
+            f"color: {'#FF7676' if dark else '#C53A3A'}; font-weight: 600;"
+        )
         self.status_label.setText(self.tr("Download failed: {0}").format(error))
         self.progress_bar.hide()
         self.yesButton.setEnabled(True)
