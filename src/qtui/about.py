@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import math
-import os.path
+import os
 import platform
 import random
 import sys
@@ -25,8 +25,8 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QRadialGradient
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (
-    TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
-    CardWidget, PushButton
+    TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel, SubtitleLabel,
+    CardWidget, MessageBox, MessageBoxBase, ProgressBar, PushButton, TextBrowser,
 )
 
 from src.core.utils import JsonEdit, prog_path
@@ -49,6 +49,198 @@ class ReleaseCheckWorker(QThread):
             return
 
         self.release_fetched.emit(release)
+
+
+class ReleaseDownloadWorker(QThread):
+    progress = Signal(int, int)
+    completed = Signal(str)
+    failed = Signal(str)
+    cancelled = Signal()
+
+    def __init__(self, url, output_path, parent=None):
+        super().__init__(parent)
+        self.url = url
+        self.output_path = output_path
+
+    def run(self):
+        partial_path = self.output_path + ".part"
+        try:
+            os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
+            with requests.get(self.url, stream=True, timeout=(10, 30)) as response:
+                response.raise_for_status()
+                total = int(response.headers.get("content-length", 0))
+                downloaded = 0
+                with open(partial_path, "wb") as output:
+                    for chunk in response.iter_content(chunk_size=256 * 1024):
+                        if self.isInterruptionRequested():
+                            output.close()
+                            os.remove(partial_path)
+                            self.cancelled.emit()
+                            return
+                        if chunk:
+                            output.write(chunk)
+                            downloaded += len(chunk)
+                            self.progress.emit(downloaded, total)
+                if total and downloaded != total:
+                    raise OSError(
+                        f"Incomplete download: received {downloaded} of {total} bytes"
+                    )
+            os.replace(partial_path, self.output_path)
+        except (requests.RequestException, OSError, ValueError) as error:
+            try:
+                if os.path.exists(partial_path):
+                    os.remove(partial_path)
+            except OSError as cleanup_error:
+                error = OSError(f"{error}; unable to remove partial download: {cleanup_error}")
+            self.failed.emit(str(error))
+            return
+
+        self.completed.emit(self.output_path)
+
+
+class ReleaseMessageBox(MessageBoxBase):
+    def __init__(self, release, asset, parent):
+        super().__init__(parent)
+        self.asset = asset
+        self.download_worker = None
+
+        release_name = release.get("name") or release.get("tag_name", "")
+        self.has_update = not release_name.endswith(cfg.Version.value)
+        self.viewLayout.addWidget(SubtitleLabel(self.tr("Update information"), self))
+        self.viewLayout.addWidget(
+            BodyLabel(self.tr("Current version: {0}").format(cfg.Version.value), self)
+        )
+        notice = (
+            self.tr("Found new version: {0}").format(release_name)
+            if self.has_update
+            else self.tr("You are using the latest version: {0}").format(release_name)
+        )
+        self.viewLayout.addWidget(BodyLabel(notice, self))
+
+        self.release_body = TextBrowser(self)
+        self.release_body.setMarkdown(
+            release.get("body") or self.tr("No release notes provided.")
+        )
+        self.release_body.setMinimumHeight(190)
+        self.viewLayout.addWidget(self.release_body)
+
+        self.progress_bar = ProgressBar(self)
+        self.progress_bar.hide()
+        self.viewLayout.addWidget(self.progress_bar)
+        self.status_label = BodyLabel("", self)
+        self.viewLayout.addWidget(self.status_label)
+
+        self.download_button = PushButton(self.tr("Update now"), self)
+        self.close_button = PushButton(self.tr("Cancel"), self)
+        self.download_button.setEnabled(self.has_update and asset is not None)
+        if not self.has_update:
+            self.status_label.setText(self.tr("You are already using the latest version."))
+        elif asset is None:
+            self.status_label.setText(
+                self.tr("No download is available for this platform.")
+            )
+
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()
+        button_layout.addWidget(self.close_button)
+        button_layout.addWidget(self.download_button)
+        self.viewLayout.addLayout(button_layout)
+        self.yesButton.hide()
+        self.cancelButton.hide()
+        self.widget.setMinimumWidth(500)
+
+        self.download_button.clicked.connect(self.start_download)
+        self.close_button.clicked.connect(self.reject)
+
+    def start_download(self):
+        filename = os.path.basename(self.asset.get("name", ""))
+        if not filename:
+            self.status_label.setText(
+                self.tr("The release asset has an invalid filename.")
+            )
+            return
+
+        output_path = os.path.join(prog_path, "bin", "temp", filename)
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
+        self.progress_bar.show()
+        self.status_label.setText(self.tr("Starting download…"))
+        self.download_button.setEnabled(False)
+        self.close_button.setText(self.tr("Cancel download"))
+
+        self.download_worker = ReleaseDownloadWorker(
+            self.asset["browser_download_url"], output_path, self
+        )
+        self.download_worker.progress.connect(self.update_progress)
+        self.download_worker.completed.connect(self.download_completed)
+        self.download_worker.failed.connect(self.download_failed)
+        self.download_worker.cancelled.connect(self.reject)
+        self.download_worker.start()
+        self.close_button.clicked.disconnect(self.reject)
+        self.close_button.clicked.connect(self.cancel_download)
+
+    def update_progress(self, downloaded, total):
+        if total > 0:
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setValue(min(100, downloaded * 100 // total))
+            self.status_label.setText(
+                self.tr("Downloading: {0} / {1} bytes").format(downloaded, total)
+            )
+        else:
+            self.progress_bar.setRange(0, 0)
+            self.status_label.setText(
+                self.tr("Downloading: {0} bytes").format(downloaded)
+            )
+
+    def download_completed(self, output_path):
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(100)
+        self.status_label.setText(self.tr("Downloaded to: {0}").format(output_path))
+        self.download_button.setText(self.tr("Downloaded"))
+        self.close_button.setText(self.tr("Close"))
+        self.close_button.clicked.disconnect(self.cancel_download)
+        self.close_button.clicked.connect(self.reject)
+
+    def download_failed(self, error):
+        self.status_label.setText(self.tr("Download failed: {0}").format(error))
+        self.progress_bar.hide()
+        self.download_button.setEnabled(True)
+        self.close_button.setText(self.tr("Close"))
+        self.close_button.clicked.disconnect(self.cancel_download)
+        self.close_button.clicked.connect(self.reject)
+
+    def cancel_download(self):
+        if self.download_worker and self.download_worker.isRunning():
+            self.status_label.setText(self.tr("Cancelling download…"))
+            self.close_button.setEnabled(False)
+            self.download_worker.requestInterruption()
+        else:
+            self.reject()
+
+
+def _release_asset_for_platform(release):
+    system = platform.system().lower()
+    machine = platform.machine().lower()
+    if system == "windows":
+        suffix = "-win.zip"
+    elif system == "linux":
+        suffix = "-linux.zip"
+    elif system == "darwin":
+        suffix = "-macos-intel.zip" if machine == "x86_64" else "-macos.zip"
+    else:
+        return None
+
+    package_name = (release.get("name") or "") + suffix
+    if machine not in {"amd64", "x86_64"}:
+        return None
+    return next(
+        (
+            asset for asset in release.get("assets", [])
+            if asset.get("name", "").lower() == package_name.lower()
+            and asset.get("browser_download_url")
+        ),
+        None,
+    )
 
 
 class BoomEffect(QWidget):
@@ -349,4 +541,3 @@ class AboutPage(QFrame):
 
         main_layout.addLayout(footer_layout)
         self._boom_effect = BoomEffect(self)
-
