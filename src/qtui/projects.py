@@ -592,11 +592,9 @@ class ProjectsPage(QFrame):
         self.initUI()
 
     def initUI(self):
-        # 1. 基础布局与极简深色背景
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # 使用 QFluentWidgets 原生滚动区域
         scroll_area = ScrollArea(self)
         scroll_area.setWidgetResizable(True)
         scroll_log_area = ScrollArea(self)
@@ -606,23 +604,19 @@ class ProjectsPage(QFrame):
         main_layout.addWidget(scroll_log_area)
         main_layout.addWidget(scroll_area)
 
-        # 核心滚动容器
         scroll_content = QWidget()
         self.scroll_log_content = LogMessageBoxBase(self)
         self.scroll_layout = QVBoxLayout(scroll_content)
         events.append_log.connect(self.scroll_log_content.append_log)
 
-        # 【关键优化：增加顶部与四周间距】把原本紧凑的区域整体下调，留出透气的空间
         self.scroll_layout.setContentsMargins(32, 40, 32, 32)
-        self.scroll_layout.setSpacing(10)  # 模块与模块之间拉开足够的高级感间距
+        self.scroll_layout.setSpacing(10)
         scroll_area.setWidget(scroll_content)
         scroll_log_area.setWidget(self.scroll_log_content)
 
-        # 2. 依次构建去背景、去卡片的扁平化模块
         self._build_partition_section(scroll_content)
         self._build_tools_section(scroll_content)
 
-        # 底层弹性推力
         self.scroll_layout.addStretch(1)
         self.setAcceptDrops(True)
         self.initDropOverlay()
