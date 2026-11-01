@@ -49,7 +49,7 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout, QWidget, Q
 from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollArea, \
     SearchLineEdit, FluentIcon as FIF, PrimaryPushButton, TableWidget, MessageBox, IndeterminateProgressRing, InfoBar, \
     TransparentDropDownToolButton, FluentIcon, RoundMenu, Action, SegmentedWidget, InfoBarPosition, InfoBarIcon, \
-    MessageBoxBase, SubtitleLabel, CaptionLabel
+    MessageBoxBase, SubtitleLabel, CaptionLabel, BodyLabel
 
 from src.core import ext4
 from src.core import imgextractor
@@ -1137,7 +1137,7 @@ class ProjectsPage(QFrame):
         layout.setSpacing(14)
 
         frame = QHBoxLayout()
-        frame.addWidget(QLabel(self.tr("Partition(s)")))
+        frame.addWidget(BodyLabel(self.tr("Partition(s)")))
         self.format_widget = SegmentedWidget(container)
         for c in ['new.dat.br', 'new.dat.xz', "new.dat", 'img', 'zst', 'payload', 'super',
                   'update.app']:
@@ -1578,7 +1578,7 @@ class ProjectsPage(QFrame):
         layout.setSpacing(12)
 
         # 标题放外面
-        layout.addWidget(QLabel(self.tr("Others")))
+        layout.addWidget(BodyLabel(self.tr("Others")))
 
         # 工具按钮行
         tools_layout = QHBoxLayout()
