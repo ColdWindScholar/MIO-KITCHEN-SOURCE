@@ -113,14 +113,6 @@ class ReleaseMessageBox(MessageBoxBase):
         self.viewLayout.setContentsMargins(8, 0, 8, 8)
         self.viewLayout.setSpacing(8)
 
-        title_bar = QFrame(self)
-        title_layout = QHBoxLayout(title_bar)
-        title_layout.setContentsMargins(10, 7, 10, 7)
-        title_label = BodyLabel(self.tr("Check update"), title_bar)
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_layout.addWidget(title_label)
-        self.viewLayout.addWidget(title_bar)
-
         app_title_row = QHBoxLayout()
         app_title_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
         app_title = TitleLabel("MIO-KITCHEN", self)
