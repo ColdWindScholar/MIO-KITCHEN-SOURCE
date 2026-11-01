@@ -22,7 +22,7 @@ from PySide6.QtCore import (
     QEasingCurve, QPoint, QPointF, QPropertyAnimation, QThread, QTimer, Qt,
     Signal, QVariantAnimation,
 )
-from PySide6.QtGui import QColor, QCursor, QFont, QPainter, QPalette, QPen, QRadialGradient
+from PySide6.QtGui import QColor, QCursor, QFont, QPainter, QPen, QRadialGradient
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
@@ -145,12 +145,9 @@ class ReleaseMessageBox(MessageBoxBase):
         )
         release_version = BodyLabel(notice, self)
         release_version.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        palette = release_version.palette()
-        palette.setColor(
-            QPalette.ColorRole.WindowText,
-            QColor(colors["green"] if not self.has_update else colors["orange"]),
+        release_version.setStyleSheet(
+            f"color: {colors['green'] if not self.has_update else colors['orange']};"
         )
-        release_version.setPalette(palette)
         self.viewLayout.addWidget(release_version)
 
         self.release_body = TextBrowser(self)
@@ -245,9 +242,7 @@ class ReleaseMessageBox(MessageBoxBase):
         self.cancelButton.clicked.connect(self.reject)
 
     def _set_status_color(self, color):
-        palette = self.status_label.palette()
-        palette.setColor(QPalette.ColorRole.WindowText, QColor(color))
-        self.status_label.setPalette(palette)
+        self.status_label.setStyleSheet(f"color: {color};")
 
     def cancel_download(self):
         if self.download_worker and self.download_worker.isRunning():
