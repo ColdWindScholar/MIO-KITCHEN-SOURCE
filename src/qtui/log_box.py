@@ -16,6 +16,9 @@ from PySide6.QtGui import QColor, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget
 from qfluentwidgets import PushButton, TextEdit
 from src.core.utils import generate_bug_report
+from qfluentwidgets.common.smooth_scroll import SmoothMode
+from src.qtui.settings_cfg import cfg
+
 class LogMessageBoxBase(QWidget):
 
     def __init__(self,  parent=None):
@@ -23,6 +26,10 @@ class LogMessageBoxBase(QWidget):
         self.layout = QVBoxLayout(self)
         self.text_edit = TextEdit(self)
         self.text_edit.setReadOnly(True)
+        # Follow the Smooth/Normal scrolling option from Tool Settings. With
+        # Normal the console steps one line at a time instead of animating.
+        self._apply_scroll_mode()
+        cfg.smoothScroll.valueChanged.connect(self._apply_scroll_mode)
         self.layout.addWidget(self.text_edit)
         self.button_layout = QHBoxLayout()
         self.clear_btn = PushButton(self.tr("Clear"), self)
@@ -56,6 +63,15 @@ class LogMessageBoxBase(QWidget):
             "96": QColor("#29B8DB"),  # 高亮青
             "0": None
         }
+
+    def _apply_scroll_mode(self):
+        """Apply the Smooth/Normal scrolling option from Tool Settings."""
+        mode = SmoothMode.NO_SMOOTH if cfg.smoothScroll.value == 'normal' else SmoothMode.LINEAR
+        try:
+            self.text_edit.scrollDelegate.verticalSmoothScroll.setSmoothMode(mode)
+            self.text_edit.scrollDelegate.horizonSmoothScroll.setSmoothMode(mode)
+        except AttributeError:
+            pass
 
     def _create_format(self, color: QColor) -> QTextCharFormat:
         """创建特定颜色的文本格式"""

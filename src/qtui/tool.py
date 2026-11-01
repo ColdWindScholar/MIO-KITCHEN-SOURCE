@@ -19,9 +19,9 @@ import subprocess
 import sys
 import threading
 
-from PySide6.QtCore import Qt, QSize, QTranslator, QObject
+from PySide6.QtCore import Qt, QSize, QTranslator, QObject, QEvent
 from PySide6.QtGui import QIcon, QGuiApplication
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMenu
 from qfluentwidgets import (NavigationItemPosition, SplashScreen, FluentIcon as FIF, FluentWindow)
 
 from src.core.utils import prog_path, tool_self
@@ -58,10 +58,40 @@ if sys.platform == "linux" or sys.platform == "linux2":
     if os.environ.get("XDG_SESSION_TYPE") == "wayland":
         os.environ["QT_QPA_PLATFORM"] = "xcb"
 
+class MenuDismissFilter(QObject):
+    """Close open popup menus when the user clicks outside them.
+
+    ``RoundMenu`` (and the qfluentwidgets combo-box popup) is shown
+    non-modally and normally relies on the platform popup grab to hide on an
+    outside click. On some setups that click is delivered to the widget under
+    the cursor (scroll areas, tables, ...) and the menu stays open.
+    """
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Type.MouseButtonPress:
+            if hasattr(event, "globalPosition"):
+                pos = event.globalPosition().toPoint()
+            else:
+                pos = event.globalPos()
+            menus = [
+                widget
+                for widget in QApplication.topLevelWidgets()
+                if isinstance(widget, QMenu) and widget.isVisible()
+            ]
+            if menus and not any(menu.geometry().contains(pos) for menu in menus):
+                for menu in menus:
+                    menu.close()
+        return False
+
+
 class MainWindow(FluentWindow):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon('icon.ico'))
+        app = QApplication.instance()
+        if app is not None:
+            self._menu_dismisser = MenuDismissFilter(self)
+            app.installEventFilter(self._menu_dismisser)
 
         # Create splash screen with error handling
         try:

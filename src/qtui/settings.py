@@ -94,6 +94,14 @@ class SettingsPage(QScrollArea):
         self.cleanCacheCard.clicked.connect(self.clean_cache)
         self.otherSettings.addGroupWidget(self.cleanCacheCard)
         self.toolSettings.addGroupWidget(self.cpioImplCard)
+        self.smoothScrollCard = ComboBoxSettingCard(
+            configItem=cfg.smoothScroll,
+            icon=FluentIcon.SCROLL,
+            title=self.tr("Smooth Scrolling"),
+            content=self.tr("Animate scrolling in lists and pages."),
+            texts=[self.tr("Smooth"), self.tr("Normal")]
+        )
+        self.toolSettings.addGroupWidget(self.smoothScrollCard)
         #ai
         self.aiEngine = SwitchSettingCard(
             FluentIcon.SAVE,

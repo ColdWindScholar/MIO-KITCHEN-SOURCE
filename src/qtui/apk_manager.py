@@ -1,5 +1,9 @@
+import base64
+import hashlib
+import json
 import logging
 import os
+import threading
 import zipfile
 from loguru import logger
 logger.remove()
@@ -31,6 +35,7 @@ from qfluentwidgets import (
     TabWidget,
 )
 
+from src.core.utils import temp as app_temp
 from src.qtui.settings_cfg import cfg
 
 
@@ -118,6 +123,183 @@ def read_apk_icon(archive, application_icon, package_name):
     suitable = [candidate for candidate in candidates if 0 < candidate[0] <= 480]
     _, selected_path = max(suitable or candidates, key=lambda candidate: candidate[0])
     return archive.read(selected_path)
+
+
+APK_CACHE_VERSION = 1
+
+
+def _apk_cache_file(project_path):
+    key = hashlib.sha1(os.path.abspath(project_path).encode("utf-8")).hexdigest()
+    return os.path.join(app_temp, "apk_manager", key + ".json")
+
+
+def _record_to_cache(record):
+    data = dict(record)
+    icon = data.pop("icon_data", b"")
+    data["icon"] = base64.b64encode(icon).decode("ascii") if icon else ""
+    return data
+
+
+def _record_from_cache(path, data):
+    icon = data.get("icon") or ""
+    return {
+        "path": path,
+        "filename": data.get("filename") or os.path.basename(path),
+        "name": data.get("name") or os.path.splitext(os.path.basename(path))[0],
+        "package": data.get("package", ""),
+        "version": data.get("version", ""),
+        "min_sdk": data.get("min_sdk", ""),
+        "target_sdk": data.get("target_sdk", ""),
+        "permissions": list(data.get("permissions") or []),
+        "icon_data": base64.b64decode(icon) if icon else b"",
+        "size": int(data.get("size") or 0),
+        "error": data.get("error", ""),
+    }
+
+
+def load_apk_cache(project_path):
+    """Load ``{path: (mtime_ns, size, record)}`` for a project, or ``{}``."""
+    try:
+        with open(_apk_cache_file(project_path), "r", encoding="utf-8") as file:
+            payload = json.load(file)
+    except (OSError, ValueError):
+        return {}
+    if payload.get("version") != APK_CACHE_VERSION:
+        return {}
+    if os.path.abspath(payload.get("root", "")) != os.path.abspath(project_path):
+        return {}
+    entries = {}
+    for path, entry in (payload.get("entries") or {}).items():
+        try:
+            record = _record_from_cache(path, entry.get("record") or {})
+            entries[path] = (
+                int(entry.get("mtime_ns") or 0),
+                int(entry.get("size") or 0),
+                record,
+            )
+        except (AttributeError, TypeError, ValueError):
+            continue
+    return entries
+
+
+def write_apk_cache(project_path, records):
+    """Persist APK metadata so the next visit can show the list immediately."""
+    entries = {}
+    for path, record in records.items():
+        try:
+            stat = os.stat(path)
+        except OSError:
+            continue
+        entries[path] = {
+            "mtime_ns": stat.st_mtime_ns,
+            "size": stat.st_size,
+            "record": _record_to_cache(record),
+        }
+    cache_file = _apk_cache_file(project_path)
+    tmp_file = cache_file + ".tmp"
+    try:
+        os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+        with open(tmp_file, "w", encoding="utf-8") as file:
+            json.dump(
+                {
+                    "version": APK_CACHE_VERSION,
+                    "root": os.path.abspath(project_path),
+                    "entries": entries,
+                },
+                file,
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+        os.replace(tmp_file, cache_file)
+    except OSError as error:
+        logging.warning("Unable to write APK cache %s: %s", cache_file, error)
+        try:
+            os.remove(tmp_file)
+        except OSError:
+            pass
+
+
+class ApkFlyoverThread(QThread):
+    """Check a cached project list for changes, parsing only new/modified APKs."""
+
+    records_ready = Signal(int, list)
+    progress_changed = Signal(int, int)
+    finished = Signal(int, int, str)
+
+    def __init__(self, project_path, generation, cached_entries, parent=None):
+        super().__init__(parent)
+        self.project_path = project_path
+        self.generation = generation
+        self.cached_entries = cached_entries
+
+    def run(self):
+        try:
+            apk_paths = []
+            for root, directories, filenames in os.walk(self.project_path):
+                if self.isInterruptionRequested():
+                    return
+                directories[:] = [
+                    directory for directory in directories if not directory.startswith(".")
+                ]
+                for filename in filenames:
+                    if filename.lower().endswith(".apk"):
+                        apk_paths.append(os.path.join(root, filename))
+            if self.isInterruptionRequested():
+                return
+
+            records = {}
+            changed_paths = []
+            for path in apk_paths:
+                try:
+                    stat = os.stat(path)
+                except OSError:
+                    continue
+                cached = self.cached_entries.get(path)
+                if (
+                    cached is not None
+                    and cached[0] == stat.st_mtime_ns
+                    and cached[1] == stat.st_size
+                ):
+                    records[path] = cached[2]
+                else:
+                    changed_paths.append(path)
+
+            total = len(records)
+            if changed_paths:
+                max_workers = min(4, os.cpu_count() or 1)
+                with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                    pending = set()
+                    paths = iter(changed_paths)
+                    for _ in range(max_workers * 2):
+                        path = next(paths, None)
+                        if path is None:
+                            break
+                        pending.add(executor.submit(read_apk, path))
+                    while pending:
+                        if self.isInterruptionRequested():
+                            for future in pending:
+                                future.cancel()
+                            break
+                        completed, pending = wait(pending, return_when=FIRST_COMPLETED)
+                        for future in completed:
+                            if future.cancelled():
+                                continue
+                            record = future.result()
+                            records[record["path"]] = record
+                            total += 1
+                            path = next(paths, None)
+                            if path is not None and not self.isInterruptionRequested():
+                                pending.add(executor.submit(read_apk, path))
+                        self.progress_changed.emit(self.generation, total)
+
+            if self.isInterruptionRequested():
+                return
+            if changed_paths or set(apk_paths) != set(self.cached_entries):
+                ordered = [records[path] for path in apk_paths if path in records]
+                self.records_ready.emit(self.generation, ordered)
+            self.finished.emit(self.generation, len(records), "")
+        except OSError as error:
+            self.finished.emit(self.generation, 0, str(error))
 
 
 class ApkScanThread(QThread):
@@ -448,15 +630,34 @@ class ApkManagerPage(QWidget):
 
     def showEvent(self, event):
         super().showEvent(event)
-        if not self._has_scanned and not any(worker.isRunning() for worker in self._workers):
+        if not self._has_scanned and not self._has_running_worker():
             self.refresh_apks()
+
+    def _has_running_worker(self):
+        running = False
+        for worker in tuple(self._workers):
+            try:
+                if worker.isRunning():
+                    running = True
+            except RuntimeError:
+                self._workers.discard(worker)
+        return running
+
+    def _on_worker_done(self):
+        worker = self.sender()
+        if worker is not None:
+            self._workers.discard(worker)
+            worker.deleteLater()
 
     def refresh_apks(self, *_):
         self._generation += 1
         generation = self._generation
         self._has_scanned = False
         for worker in tuple(self._workers):
-            worker.requestInterruption()
+            try:
+                worker.requestInterruption()
+            except RuntimeError:
+                self._workers.discard(worker)
 
         self.apk_records.clear()
         self._checked_paths.clear()
@@ -482,14 +683,96 @@ class ApkManagerPage(QWidget):
         if not self.isVisible():
             self.status_label.setText(self.tr("APK scan will start when this page is opened."))
             return
+        cached_entries = load_apk_cache(self._project_path)
+        if cached_entries:
+            self._show_cached_apks(cached_entries, generation)
+            return
         self._start_scan(self._scan_path, generation)
+
+    def _show_cached_apks(self, cached_entries, generation):
+        """Show the cached list at once, then verify it in the background."""
+        self.apk_records = {
+            path: record for path, (_, _, record) in cached_entries.items()
+        }
+        self._has_scanned = True
+        self._clear_table()
+        self._update_partition_filters()
+        self._render_table()
+        self._update_status()
+        self.status_label.setText(
+            self.tr("Loaded {} cached APK(s); checking for changes...").format(
+                len(self.apk_records)
+            )
+        )
+        worker = ApkFlyoverThread(self._project_path, generation, cached_entries)
+        self._workers.add(worker)
+        worker.records_ready.connect(self._on_flyover_ready)
+        worker.progress_changed.connect(self._on_flyover_progress)
+        worker.finished.connect(self._on_flyover_finished)
+        worker.finished.connect(self._on_worker_done)
+        worker.start()
+
+    def _on_flyover_ready(self, generation, records):
+        if generation != self._generation:
+            return
+        selected_path = self._selected_path
+        checked_paths = set(self._checked_paths)
+        self.apk_records = {record["path"]: record for record in records}
+        self._checked_paths = {
+            path for path in checked_paths if path in self.apk_records
+        }
+        self._selected_path = (
+            selected_path if selected_path in self.apk_records else None
+        )
+        self._clear_table()
+        self._update_partition_filters()
+        self._render_table()
+        if self._selected_path:
+            self.show_details(self._selected_path)
+        self._update_status()
+        self._update_remove_selected_button()
+
+    def _on_flyover_progress(self, generation, count):
+        if generation == self._generation:
+            self.scan_status_label.setText(
+                self.tr("{} changed APK(s) read").format(count)
+            )
+
+    def _on_flyover_finished(self, generation, count, error):
+        if generation != self._generation:
+            return
+        self._has_scanned = True
+        if error:
+            self.scan_status_label.setText(
+                self.tr("APK change check failed: {}").format(error)
+            )
+        else:
+            self.scan_status_label.setText(
+                self.tr("{} APK(s) checked").format(count)
+            )
+        self._update_status()
+        self._schedule_cache_write()
+
+    def _schedule_cache_write(self):
+        if not self._project_path:
+            return
+        project_path = self._project_path
+        records = dict(self.apk_records)
+        threading.Thread(
+            target=write_apk_cache,
+            args=(project_path, records),
+            daemon=True,
+        ).start()
 
     def _start_scan(self, directory, generation=None):
         if generation is None:
             self._generation += 1
             generation = self._generation
             for worker in tuple(self._workers):
-                worker.requestInterruption()
+                try:
+                    worker.requestInterruption()
+                except RuntimeError:
+                    self._workers.discard(worker)
             self.apk_records.clear()
             self._checked_paths.clear()
             self._selected_path = None
@@ -504,8 +787,7 @@ class ApkManagerPage(QWidget):
         worker.apks_loaded.connect(self._on_apks_loaded)
         worker.progress_changed.connect(self._on_scan_progress)
         worker.scan_finished.connect(self._on_scan_finished)
-        worker.finished.connect(lambda current=worker: self._workers.discard(current))
-        worker.finished.connect(worker.deleteLater)
+        worker.finished.connect(self._on_worker_done)
         worker.start()
 
     def _on_apks_loaded(self, generation, records):
@@ -536,6 +818,7 @@ class ApkManagerPage(QWidget):
         if error:
             self.scan_status_label.setText(self.tr("APK scan failed: {}").format(error))
         self._update_restore_button()
+        self._schedule_cache_write()
 
     def _update_status(self):
         visible_size = sum(self.apk_records[path]["size"] for path in self._row_paths)
@@ -882,5 +1165,10 @@ class ApkManagerPage(QWidget):
 
     def _stop_workers(self):
         for worker in tuple(self._workers):
-            worker.requestInterruption()
-            worker.wait()
+            try:
+                if worker.isRunning():
+                    worker.requestInterruption()
+                    worker.wait()
+            except RuntimeError:
+                pass
+            self._workers.discard(worker)
