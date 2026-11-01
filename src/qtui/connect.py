@@ -280,6 +280,9 @@ class ConnectPage(QWidget):
     def start_server(self):
         if self.network_thread and self.network_thread.is_alive():
             return True
+        if self.server:
+            self.server.server_close()
+            self.server = None
 
         try:
             server = make_server("0.0.0.0", 5000, flask_backend, threaded=True)
@@ -310,6 +313,8 @@ class ConnectPage(QWidget):
         server = self.server
         thread = self.network_thread
         if server is None or thread is None or not thread.is_alive():
+            if server:
+                server.server_close()
             self.server = None
             self.network_thread = None
             self.server_status_label.setText(self.tr("Server: stopped"))
@@ -407,7 +412,10 @@ class ConnectPage(QWidget):
                 WS.close(CloseReason.NORMAL_CLOSURE, message="User Disconnect.[Desktop]")
             except simple_websocket.errors.ConnectionClosed:
                 pass
-            network_bridge.send_ws_message.disconnect(WS.send)
+            try:
+                network_bridge.send_ws_message.disconnect(WS.send)
+            except (TypeError, RuntimeError):
+                pass
             WS = None
         self.refresh_qr_matrix()
         self.toggle_workspace_ui_state(False)

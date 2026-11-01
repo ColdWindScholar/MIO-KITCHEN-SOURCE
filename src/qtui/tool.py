@@ -137,6 +137,8 @@ class MainWindow(FluentWindow):
         self.switchTo(self.home_page)
 
     def restart(self):
+        self.connect_page.stop_server()
+
         def _inner():
             argv = [sys.executable]
             if not pathlib.Path(tool_self).samefile(pathlib.Path(argv[0])):
@@ -155,11 +157,14 @@ class MainWindow(FluentWindow):
                 except (ValueError, AttributeError):
                     logging.exception('Restart')
             er.deleteLater()
-            self.connect_page.network_thread.terminate()
         except (Exception, BaseException):
             logging.exception('Restart')
 
         threading.Thread(target=_inner).start()
+
+    def closeEvent(self, event):
+        self.connect_page.stop_server()
+        super().closeEvent(event)
 
 
 def __init__qt(args):
