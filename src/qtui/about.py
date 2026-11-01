@@ -106,7 +106,9 @@ class ReleaseMessageBox(MessageBoxBase):
 
         release_name = release.get("name") or release.get("tag_name", "")
         self.has_update = not release_name.endswith(cfg.Version.value)
-        self.setWindowTitle(self.tr("Check update"))
+        self.titleLabel = BodyLabel(self.tr("Check update"), self)
+        self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.viewLayout.addWidget(self.titleLabel)
 
         self.viewLayout.setContentsMargins(8, 0, 8, 8)
         self.viewLayout.setSpacing(8)
