@@ -315,8 +315,10 @@ class ConnectPage(QWidget):
 
         try:
             server = make_server("0.0.0.0", 5000, flask_backend, threaded=True)
-        except OSError as error:
-            self.append_native_console_log("ERROR", f"Unable to start server: {error}")
+        except (OSError, SystemExit) as error:
+            # werkzeug calls sys.exit(1) when the port is already in use.
+            message = "port 5000 is already in use" if isinstance(error, SystemExit) else str(error)
+            self.append_native_console_log("ERROR", f"Unable to start server: {message}")
             self.server_status_label.setText(self.tr("Server: stopped"))
             self.server_toggle_btn.setText(self.tr("Start Server"))
             self.server_restart_btn.setEnabled(False)

@@ -1,6 +1,7 @@
 import logging
 import os
 import time
+import traceback
 
 from PySide6.QtCore import QTimer, QThread
 from PySide6.QtCore import Qt
@@ -21,14 +22,17 @@ from qfluentwidgets import (
 )
 from qfluentwidgets import (SwitchButton, Slider,
                             CaptionLabel)
+from qfluentwidgets.common.smooth_scroll import SmoothMode
 
 from src.core import utils
 from src.core.utils import gettype
+from src.qtui.settings_cfg import cfg
 
 
 class GenericTaskWorker(QThread):
     task_finished = Signal(bool)
     send_message = Signal(str, str, int)
+    error = Signal(str)
 
     def __init__(self, target_func, *args, **kwargs):
         super().__init__()
@@ -39,9 +43,13 @@ class GenericTaskWorker(QThread):
     def run(self):
         try:
             self.target_func(*self.args, **self.kwargs)
-        except Exception as e:
-            self.task_finished.emit(True)
-            raise e
+        except Exception:
+            # Report the failure through a signal instead of re-raising it in
+            # the thread, so the UI/log can show what actually went wrong.
+            logging.exception("Background task failed")
+            self.error.emit(traceback.format_exc())
+            self.task_finished.emit(False)
+            return
         self.task_finished.emit(True)
 
 class NewProjectDialog(MessageBoxBase):
@@ -172,6 +180,9 @@ class ConvertImageMessageBox(MessageBoxBase):
         # 2. 创建源与目标格式下拉框
         self.src_combo = ComboBox(self)
         self.src_combo.addItems(["raw", "sparse", "dat", "br", "xz"])
+        # Super-unpack asks for a sparse image and needs it converted to raw
+        # first, so default the source to "sparse" instead of "raw -> raw".
+        self.src_combo.setCurrentIndex(1)
         self.src_combo.currentTextChanged.connect(self.refresh_list)
         self.src_combo.setFixedWidth(160)
 
@@ -315,8 +326,10 @@ class ConvertImageMessageBox(MessageBoxBase):
 
 
 class PackSettingsDialog(MessageBoxBase):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, fs_type: str | None = None, part_name: str | None = None,
+                 erofs_old_kernel: bool = False, boot_cmdline: str | None = None):
         super().__init__(parent)
+        self._fs_type = (fs_type or '').lower()
 
         self.content_widget = QWidget(self)
         self.initCustomUI()
@@ -324,6 +337,42 @@ class PackSettingsDialog(MessageBoxBase):
         self.yesButton.setText(self.tr("Pack"))
         self.cancelButton.setText(self.tr("Cancel"))
         self.widget.setMinimumWidth(700)
+
+        # Keep the legacy-compress flag from the original image (compatibility);
+        # the compression algorithm defaults to lz4 for speed.
+        if erofs_old_kernel:
+            self.support_old_kernel_switch.setChecked(True)
+        if boot_cmdline is not None:
+            self.cmdline_edit.setText(boot_cmdline)
+
+        # Show which partition is being packed and keep only the settings that
+        # apply to its filesystem.
+        if part_name or self._fs_type:
+            self.titleLabel = SubtitleLabel(
+                self.tr("Repack {name} [{fs}]").format(
+                    name=part_name or '', fs=self._fs_type or '?'), self)
+            self.viewLayout.insertWidget(0, self.titleLabel)
+        self._apply_fs_visibility()
+
+    def _apply_fs_visibility(self):
+        ext4 = erofs = f2fs = False
+        if self._fs_type in ('ext', 'erofs', 'f2fs'):
+            ext4 = self._fs_type == 'ext'
+            erofs = self._fs_type == 'erofs'
+            f2fs = self._fs_type == 'f2fs'
+        elif self._fs_type == 'unknown':
+            # The packer falls back to the ext4 path for unknown types.
+            ext4 = True
+        elif self._fs_type:
+            # boot/vendor_boot/dtbo/splash/... are not packed from a tree.
+            ext4 = erofs = f2fs = False
+        else:
+            # No fs_type given (single-partition dialog): show everything.
+            ext4 = erofs = f2fs = True
+        self.ext4_card.setVisible(ext4)
+        self.erofs_card.setVisible(erofs)
+        self.f2fs_card.setVisible(f2fs)
+        self.boot_card.setVisible(self._fs_type in ('boot', 'vendor_boot'))
 
     def _create_section(self, title):
         card = CardWidget(self.content_widget)
@@ -347,6 +396,7 @@ class PackSettingsDialog(MessageBoxBase):
         main_layout.addLayout(sections)
 
         ext4_card, ext4_layout = self._create_section(self.tr("EXT4 Settings"))
+        self.ext4_card = ext4_card
         ext4_form = QGridLayout()
         ext4_form.setHorizontalSpacing(12)
         ext4_form.setVerticalSpacing(8)
@@ -358,6 +408,9 @@ class PackSettingsDialog(MessageBoxBase):
         self.size_handle_label = BodyLabel(self.tr("Size Handle:"), ext4_card)
         self.size_handle_combo = ComboBox(ext4_card)
         self.size_handle_combo.addItems([self.tr("Calculate Auto"), self.tr("Origin Size")])
+        # Default to the original partition size: Samsung devices validate the
+        # ext4 size at boot and won't boot if it differs (issue #136).
+        self.size_handle_combo.setCurrentIndex(1)
         ext4_form.addWidget(self.pack_method_label, 0, 0)
         ext4_form.addWidget(self.pack_method_combo, 0, 1)
         ext4_form.addWidget(self.size_handle_label, 1, 0)
@@ -365,6 +418,7 @@ class PackSettingsDialog(MessageBoxBase):
         ext4_layout.addLayout(ext4_form)
 
         erofs_card, erofs_layout = self._create_section(self.tr("EROFS Settings"))
+        self.erofs_card = erofs_card
         erofs_form = QGridLayout()
         erofs_form.setHorizontalSpacing(10)
         erofs_form.setVerticalSpacing(8)
@@ -372,7 +426,8 @@ class PackSettingsDialog(MessageBoxBase):
         self.compress_algo_label = BodyLabel(self.tr("Compression Method:"), erofs_card)
         self.compress_algo_combo = ComboBox(erofs_card)
         self.compress_algo_combo.addItems(["lz4", "lz4hc", "lzma", "deflate", "zstd"])
-        self.compress_algo_combo.setText("lz4hc")
+        # lz4 is the default: ~1.8x faster than lz4hc for only ~4% larger image.
+        self.compress_algo_combo.setCurrentIndex(0)
         self.support_old_kernel_switch = SwitchButton(parent=erofs_card)
         self.support_old_kernel_switch.setOffText("")
         self.support_old_kernel_switch.setOnText("")
@@ -380,13 +435,16 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_form.addWidget(self.compress_algo_label, 0, 0)
         erofs_form.addWidget(self.compress_algo_combo, 0, 1, 1, 2)
 
-        self.erofs_level_label = BodyLabel(self.tr("EROFS Level: 8"), erofs_card)
+        self.erofs_level_label = BodyLabel(self.tr("EROFS Level: 9"), erofs_card)
         self.erofs_slider = Slider(Qt.Orientation.Horizontal, erofs_card)
-        self.erofs_slider.setRange(0, 20)
-        self.erofs_slider.setValue(8)
+        self.erofs_slider.setRange(0, 12)
+        self.erofs_slider.setValue(9)
         self.erofs_slider.valueChanged.connect(
             lambda value: self.erofs_level_label.setText(
                 self.tr("EROFS Level: {}").format(value)))
+        # Keep the label in sync with the actual slider value from the start.
+        self.erofs_level_label.setText(
+            self.tr("EROFS Level: {}").format(self.erofs_slider.value()))
         erofs_form.addWidget(self.erofs_level_label, 1, 0)
         erofs_form.addWidget(self.erofs_slider, 1, 1, 1, 2)
         erofs_form.addWidget(self.support_old_kernel_switch, 2, 0)
@@ -394,6 +452,7 @@ class PackSettingsDialog(MessageBoxBase):
         erofs_layout.addLayout(erofs_form)
 
         f2fs_card, f2fs_layout = self._create_section(self.tr("F2FS Settings"))
+        self.f2fs_card = f2fs_card
         f2fs_options = QGridLayout()
         f2fs_options.setHorizontalSpacing(8)
         f2fs_options.setVerticalSpacing(8)
@@ -485,10 +544,29 @@ class PackSettingsDialog(MessageBoxBase):
         other_form.addLayout(other_options, 3, 0, 1, 4)
         other_layout.addLayout(other_form)
 
+        boot_card, boot_layout = self._create_section(self.tr("Boot"))
+        self.boot_card = boot_card
+        boot_row = QHBoxLayout()
+        boot_row.setSpacing(12)
+        self.cmdline_override_switch = SwitchButton(boot_card)
+        self.cmdline_override_switch.setOnText("")
+        self.cmdline_override_switch.setOffText("")
+        self.cmdline_override_lbl = BodyLabel(self.tr("Override cmdline"), boot_card)
+        self.cmdline_edit = LineEdit(boot_card)
+        self.cmdline_edit.setPlaceholderText(self.tr("leave empty for no cmdline"))
+        self.cmdline_edit.setEnabled(False)
+        self.cmdline_override_switch.checkedChanged.connect(self.cmdline_edit.setEnabled)
+        boot_row.addWidget(self.cmdline_override_switch)
+        boot_row.addWidget(self.cmdline_override_lbl)
+        boot_row.addWidget(self.cmdline_edit, 1)
+        boot_layout.addLayout(boot_row)
+        boot_card.setVisible(False)
+
         sections.addWidget(ext4_card, 0, 0)
         sections.addWidget(erofs_card, 0, 1)
         sections.addWidget(f2fs_card, 1, 0, 1, 2)
         sections.addWidget(other_card, 2, 0, 1, 2)
+        sections.addWidget(boot_card, 3, 0, 1, 2)
         sections.setColumnStretch(0, 1)
         sections.setColumnStretch(1, 1)
 
@@ -555,8 +633,8 @@ class PackSuperMessageBox(MessageBoxBase):
             rb = RadioButton(text, type_card)
             self.type_group.addButton(rb, value)
             type_options.addWidget(rb)
-        if self.type_group.button(1):
-            self.type_group.button(1).setChecked(True)
+        if self.type_group.button(2):
+            self.type_group.button(2).setChecked(True)
         type_options.addStretch(1)
         type_layout.addLayout(type_options)
         top_sections.addWidget(type_card, 1)
@@ -567,7 +645,7 @@ class PackSuperMessageBox(MessageBoxBase):
         self.rb_none = RadioButton(self.tr("None"), attribute_card)
         self.attrib_group.addButton(self.rb_readonly, 0)
         self.attrib_group.addButton(self.rb_none, 1)
-        self.rb_readonly.setChecked(True)
+        self.rb_none.setChecked(True)
         attribute_options = QHBoxLayout()
         attribute_options.setSpacing(12)
         attribute_options.addWidget(self.rb_readonly)
@@ -629,6 +707,15 @@ class PackSuperMessageBox(MessageBoxBase):
         ])
         self.tl.setMinimumHeight(240)
         self.tl.setMaximumHeight(300)
+        try:
+            mode = (
+                SmoothMode.NO_SMOOTH
+                if cfg.smoothScroll.value == 'normal'
+                else SmoothMode.LINEAR
+            )
+            self.tl.scrollDelagate.verticalSmoothScroll.setSmoothMode(mode)
+        except AttributeError:
+            pass
         self.tl.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tl.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tl.setShowGrid(False)
@@ -795,6 +882,9 @@ class PackSuperMessageBox(MessageBoxBase):
 
                     img_path = os.path.join(self.work, file_name)
                     name = file_name[:-4]
+                    if name == 'super':
+                        # The source super image isn't a logical partition to pack.
+                        continue
                     is_checked = name in self.selected
                     if utils.is_empty_img(img_path):
                         partition_type = self.tr("empty")
@@ -846,12 +936,16 @@ class PackSuperMessageBox(MessageBoxBase):
                 for i in data.get('group_table', []):
                     name = i.get('name')
                     if isinstance(name, str) and name != 'default':
-                        index = self.show_group_name.findText(name)
+                        # A/B super groups are named "<group>_a" / "<group>_b".
+                        # Prefer the slot-less base name instead of ending on
+                        # whichever slot happened to come last (usually "_b").
+                        base = name[:-2] if name.endswith(('_a', '_b')) else name
+                        index = self.show_group_name.findText(base)
                         if index >= 0:
                             self.show_group_name.setCurrentIndex(index)
                         else:
-                            self.show_group_name.addItem(name)
-                            self.show_group_name.setCurrentText(name)
+                            self.show_group_name.addItem(base)
+                            self.show_group_name.setCurrentText(base)
 
                 selected = []
                 for i in data.get('partition_table', []):
