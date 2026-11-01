@@ -6,7 +6,7 @@
         "autoUnpack": false,
         "checkUpdate": false,
         "CpioImpl": "Python",
-        "currentProjectName": "",
+        "currentProjectName": "12",
         "Language": "app_zh_CN.qm",
         "pluginRepo": "https://raw.githubusercontent.com/ColdWindScholar/MPK_Plugins/main/",
         "ProjectStructure": "Single",
@@ -21,6 +21,6 @@
             "PingFang SC"
         ],
         "ThemeColor": "#ff0078d4",
-        "ThemeMode": "Auto"
+        "ThemeMode": "Dark"
     }
 }

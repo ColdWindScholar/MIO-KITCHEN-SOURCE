@@ -18,16 +18,35 @@ import platform
 import random
 import sys
 
-from PySide6.QtCore import QEasingCurve, QPoint, QPointF, QPropertyAnimation, Qt, QTimer, Signal, QVariantAnimation
+import requests
+from PySide6.QtCore import QEasingCurve, QPoint, QPointF, QPropertyAnimation, QThread, Qt, QTimer, Signal, QVariantAnimation
 from PySide6.QtGui import QColor, QCursor, QPainter, QPen, QRadialGradient
 from PySide6.QtWidgets import QVBoxLayout, QGridLayout, QHBoxLayout, QFrame, QWidget
 from qfluentwidgets import (
     TitleLabel, BodyLabel, CaptionLabel, HyperlinkLabel,
-    CardWidget
+    CardWidget, MessageBox, PushButton
 )
 
 from src.core.utils import JsonEdit, prog_path
 from src.qtui.settings_cfg import cfg
+
+
+class ReleaseCheckWorker(QThread):
+    release_fetched = Signal(dict)
+    failed = Signal(str)
+
+    def run(self):
+        try:
+            response = requests.get(cfg.updateURL.value, timeout=10)
+            response.raise_for_status()
+            release = response.json()
+            if not isinstance(release, dict) or not release.get("tag_name"):
+                raise ValueError("GitHub returned an invalid release response")
+        except (requests.RequestException, ValueError) as error:
+            self.failed.emit(str(error))
+            return
+
+        self.release_fetched.emit(release)
 
 
 class BoomEffect(QWidget):
@@ -314,13 +333,45 @@ class AboutPage(QFrame):
         github_lbl.setText(self.tr("GitHub: MIO-KITCHEN-SOURCE"))
         github_lbl.setUrl("https://github.com/ColdWindScholar/MIO-KITCHEN-SOURCE")
 
+        self.check_update_btn = PushButton(self.tr("Check for updates"))
+        self.check_update_btn.clicked.connect(self._check_for_updates)
+
         copyright_lbl = CaptionLabel(self.tr("© 2026 ColdWindScholar All Rights Reserved."))
         copyright_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         footer_layout.addWidget(credit_lbl)
         footer_layout.addWidget(slogan_lbl)
         footer_layout.addWidget(github_lbl)
+        footer_layout.addWidget(self.check_update_btn)
         footer_layout.addWidget(copyright_lbl)
 
         main_layout.addLayout(footer_layout)
         self._boom_effect = BoomEffect(self)
+
+    def _check_for_updates(self):
+        self.check_update_btn.setEnabled(False)
+        self._release_worker = ReleaseCheckWorker(self)
+        self._release_worker.release_fetched.connect(self._show_release)
+        self._release_worker.failed.connect(self._show_update_error)
+        self._release_worker.finished.connect(
+            lambda: self.check_update_btn.setEnabled(True)
+        )
+        self._release_worker.start()
+
+    def _show_release(self, release):
+        version = release.get("name") or release["tag_name"]
+        body = release.get("body") or self.tr("No release notes are available.")
+        dialog = MessageBox(
+            self.tr("Latest version: {}").format(version),
+            self.tr("Current version: {}\n\n{}").format(cfg.Version.value, body),
+            self,
+        )
+        dialog.exec()
+
+    def _show_update_error(self, error):
+        dialog = MessageBox(
+            self.tr("Check for updates"),
+            self.tr("Unable to check for updates: {}").format(error),
+            self,
+        )
+        dialog.exec()
