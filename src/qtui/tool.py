@@ -137,7 +137,8 @@ class MainWindow(FluentWindow):
         self.switchTo(self.home_page)
 
     def restart(self):
-        self.connect_page.stop_server()
+        if not self.connect_page.stop_server():
+            return
 
         def _inner():
             argv = [sys.executable]
