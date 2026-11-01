@@ -187,7 +187,6 @@ class ConnectPage(QWidget):
         base_horizontal_layout.setContentsMargins(24, 24, 24, 24)
         base_horizontal_layout.setSpacing(24)
 
-        # ==================== LEFT SIDE: FLUENT CARD HUB ====================
         self.left_card = CardWidget(self)
         left_layout = QVBoxLayout(self.left_card)
         left_layout.setContentsMargins(24, 24, 24, 24)
@@ -211,7 +210,6 @@ class ConnectPage(QWidget):
         self.phone_icon_widget.hide()  # Hidden initially while waiting for connection
         left_layout.addWidget(self.phone_icon_widget, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        # QR Matrix Frame Wrapper
         self.qr_wrapper = CardWidget(self)
         qr_wrapper_layout = QVBoxLayout(self.qr_wrapper)
         qr_wrapper_layout.setContentsMargins(8, 8, 8, 8)
@@ -225,13 +223,11 @@ class ConnectPage(QWidget):
         self.address_label.setFont(QFont("Consolas", 12))
         left_layout.addWidget(self.address_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        # Device connection status text widgets
         self.status_device = BodyLabel("", self)
         self.status_ip = BodyLabel("", self)
         left_layout.addWidget(self.status_device, alignment=Qt.AlignmentFlag.AlignHCenter)
         left_layout.addWidget(self.status_ip, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        # Action: Break connection
         self.disconnect_btn = PrimaryPushButton(self.tr("Disconnect"), self)
         self.disconnect_btn.clicked.connect(self.manually_terminate_session)
         self.disconnect_btn.hide()
@@ -239,7 +235,6 @@ class ConnectPage(QWidget):
 
         base_horizontal_layout.addWidget(self.left_card, stretch=2)
 
-        # ==================== RIGHT SIDE: LIVE CONSOLE LOGS ====================
         right_panel_container = QVBoxLayout()
         right_panel_container.setSpacing(8)
 
@@ -250,7 +245,6 @@ class ConnectPage(QWidget):
 
         base_horizontal_layout.addLayout(right_panel_container, stretch=3)
 
-        # ==================== INITIALIZATION ====================
         self.lan_ip = fetch_linux_lan_ip()
         self.address_label.setText(f"http://{self.lan_ip}:5000")
         self.address_label.setStyleSheet("color: green; font-style: bold;")
