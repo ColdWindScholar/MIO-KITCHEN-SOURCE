@@ -112,14 +112,19 @@ class ReleaseMessageBox(MessageBoxBase):
 
         app_title_row = QHBoxLayout()
         app_title_row.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        app_title_row.setSpacing(7)
         app_title = TitleLabel("MIO-KITCHEN", self)
-        app_version = BodyLabel(cfg.Version.value, self)
+        title_font = QFont(app_title.font())
+        title_font.setPointSize(26)
+        title_font.setWeight(QFont.Weight.Normal)
+        title_font.setLetterSpacing(QFont.SpacingType.AbsoluteSpacing, 0.6)
+        app_title.setFont(title_font)
+        app_version = CaptionLabel(cfg.Version.value, self)
+        app_version.setTextColor("#737373", "#A0A0A0")
         app_title_row.addWidget(app_title)
-        app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignBottom)
+        app_title_row.addWidget(app_version, 0, Qt.AlignmentFlag.AlignVCenter)
         self.viewLayout.addLayout(app_title_row)
 
-        section_label = BodyLabel(self.tr("Update info"), self)
-        self.viewLayout.addWidget(section_label)
 
         notice = (
             self.tr("Found new version: {0}").format(release_name)
