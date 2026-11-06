@@ -1,8 +1,9 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QHBoxLayout
 from qfluentwidgets import (
-    LineEdit, ComboBox, BodyLabel, MessageBoxBase
+    LineEdit, ComboBox, BodyLabel, MessageBoxBase, TitleLabel
 )
+
 
 class FileBytesMessageBox(MessageBoxBase):
     def __init__(self, parent=None):
@@ -16,11 +17,7 @@ class FileBytesMessageBox(MessageBoxBase):
             "PB": 1024 ** 5
         }
 
-        self._is_calculating = False  # Flag to prevent recursion
-
-        # 1. Dialog title configuration
-        self.titleLabel = BodyLabel(self.tr("Byte calculator"), self)
-        self.titleLabel.setStyleSheet("font-size: 18px; font-weight: bold;")
+        self.titleLabel = TitleLabel(self.tr("Byte calculator"), self)
         self.viewLayout.addWidget(self.titleLabel)
         self.viewLayout.setSpacing(15)
 
@@ -41,7 +38,7 @@ class FileBytesMessageBox(MessageBoxBase):
 
         # Equals separator
         equal_label = BodyLabel("=")
-        equal_label.setAlignment(Qt.AlignCenter)
+        equal_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Right field
         self.result_size = LineEdit()
@@ -70,12 +67,9 @@ class FileBytesMessageBox(MessageBoxBase):
         # Set modal window constraint boundaries
         self.widget.setMinimumWidth(540)
 
-    def calc_forward(self, text=None):
+    def calc_forward(self):
         """Calculates value conversion from left to right."""
-        if self._is_calculating:
-            return
 
-        self._is_calculating = True
         try:
             origin_unit = self.h.currentText()
             target_unit = self.f_.currentText()
@@ -86,14 +80,11 @@ class FileBytesMessageBox(MessageBoxBase):
             if self.result_size.text() != result_value_str:
                 self.result_size.setText(result_value_str)
         finally:
-            self._is_calculating = False
+            pass
 
-    def calc_reverse(self, text=None):
+    def calc_reverse(self):
         """Calculates value conversion from right to left."""
-        if self._is_calculating:
-            return
 
-        self._is_calculating = True
         try:
             origin_unit = self.f_.currentText()
             target_unit = self.h.currentText()
@@ -104,7 +95,7 @@ class FileBytesMessageBox(MessageBoxBase):
             if self.origin_size.text() != result_value_str:
                 self.origin_size.setText(result_value_str)
         finally:
-            self._is_calculating = False
+            pass
 
     def __calc(self, origin_unit: str, target_unit: str, size_str: str) -> str:
         """Core unit scaling calculation logic."""
