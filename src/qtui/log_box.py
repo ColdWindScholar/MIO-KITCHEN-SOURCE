@@ -57,7 +57,8 @@ class LogMessageBoxBase(QWidget):
             "0": None
         }
 
-    def _create_format(self, color: QColor) -> QTextCharFormat:
+    @staticmethod
+    def _create_format(color: QColor) -> QTextCharFormat:
         """创建特定颜色的文本格式"""
         fmt = QTextCharFormat()
         fmt.setForeground(color)
