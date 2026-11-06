@@ -1028,7 +1028,6 @@ class ProjectsPage(QFrame):
         return result != 1
 
     def delete_project(self):
-        """删除选中的项目并显示提示"""
         project_name = cfg.currentProjectName.value
         if not project_name or not self.project_combo.currentText():
             self.show_info_bar(self.tr("Warning"), self.tr("Select a project first"), bar_type=2)
@@ -1057,7 +1056,6 @@ class ProjectsPage(QFrame):
         layout = QVBoxLayout(self.project_container)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(12)
-        # 下半部分控件区域
         row1 = QHBoxLayout()
         self.project_combo = ComboBox(self.project_container)
         cfg.currentProjectName.valueChanged.connect(self.project_combo.setText)
