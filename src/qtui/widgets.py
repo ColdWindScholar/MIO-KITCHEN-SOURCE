@@ -372,6 +372,17 @@ class PackSettingsDialog(MessageBoxBase):
         self.erofs_card.setVisible(erofs)
         self.f2fs_card.setVisible(f2fs)
         self.boot_card.setVisible(self._fs_type in ('boot', 'vendor_boot'))
+        # When only one of the two top cards is shown, let it use the whole row
+        # instead of leaving the other half of the dialog empty.
+        if ext4 and not erofs:
+            self.sections.setColumnStretch(0, 1)
+            self.sections.setColumnStretch(1, 0)
+        elif erofs and not ext4:
+            self.sections.setColumnStretch(0, 0)
+            self.sections.setColumnStretch(1, 1)
+        else:
+            self.sections.setColumnStretch(0, 1)
+            self.sections.setColumnStretch(1, 1)
 
     def _create_section(self, title):
         card = CardWidget(self.content_widget)
@@ -389,6 +400,7 @@ class PackSettingsDialog(MessageBoxBase):
         main_layout.setSpacing(12)
 
         sections = QGridLayout()
+        self.sections = sections
         sections.setContentsMargins(0, 0, 0, 0)
         sections.setHorizontalSpacing(12)
         sections.setVerticalSpacing(12)
