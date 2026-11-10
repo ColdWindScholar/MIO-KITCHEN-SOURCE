@@ -1,6 +1,5 @@
 import logging
 import os
-import time
 import traceback
 
 from PySide6.QtCore import QTimer, QThread
@@ -483,7 +482,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.format_combo.addItems(["raw", "sparse", "br", "dat"])
         self.utc_lbl = BodyLabel("UTC:", other_card)
         self.utc_input = LineEdit(other_card)
-        self.utc_input.setText(str(int(time.time())))
+        self.utc_input.setText("0")
         other_form.addWidget(self.format_label, 0, 0)
         other_form.addWidget(self.format_combo, 0, 1)
         other_form.addWidget(self.utc_lbl, 0, 2)

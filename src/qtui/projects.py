@@ -1985,7 +1985,7 @@ class ProjectsPage(QFrame):
 
     def mkerofs(self, name: str, format_, work, work_output, level, old_kernel: bool = False, UTC: int = None):
         if not UTC:
-            UTC = int(time.time())
+            UTC = 0
         try:
             repaired = repair_erofs_symlinks(os.path.join(work, name))
         except (OSError, ValueError) as error:
@@ -2017,7 +2017,7 @@ class ProjectsPage(QFrame):
             events.append_log.emit("WARN", self.tr('make_ext4fs: file_context not found.'))
         print(f"packing {name} [ext]")
         if not UTC:
-            UTC = int(time.time())
+            UTC = 0
         if not size:
             size = utils.GetFolderSize(os.path.join(work, name), 1, 3, f"{work}/dynamic_partitions_op_list").rsize_v
         print(f"{name}:[{size}]")
@@ -2049,7 +2049,7 @@ class ProjectsPage(QFrame):
         size_f2fs = align_to_4k(size_f2fs)
 
         if not UTC:
-            UTC = int(time.time())
+            UTC = 0
         with open(f"{work + name}.img", 'wb') as f:
             f.truncate(size_f2fs)
         # /usr/bin/make_f2fs -d 0 -l odm -O extra_attr,compression,ro -U d6112980-bd3b-4b9e-bf4c-fba453cfdb42 -T 1230768000 ./Projects/Project_name/Build/odm.img -f
@@ -2087,7 +2087,7 @@ class ProjectsPage(QFrame):
         print(f"{name}:[{size}]")
         utc_time = UTC
         if not utc_time:
-            utc_time = int(time.time())
+            utc_time = 0
         if call(
                 ['mke2fs', '-O',
                  '^has_journal,^metadata_csum,extent,huge_file,^flex_bg,^64bit,uninit_bg,dir_nlink,extra_isize', '-L',
