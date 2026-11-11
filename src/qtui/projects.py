@@ -1455,7 +1455,10 @@ class ProjectsPage(QFrame):
         self.start_job(self.my_task_worker)
 
     def _pack_partition_from_menu(self, name: str):
-        dialog = PackSettingsDialog(self)
+        dname = os.path.basename(name)
+        work = project_manger.current_work_path()
+        parts_dict = utils.JsonEdit(os.path.join(work, "config/parts_info")).read()
+        dialog = PackSettingsDialog(self, fs_type=parts_dict.get(dname, ''), part_name=dname)
         if not dialog.exec():
             return
 
