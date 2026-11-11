@@ -2292,19 +2292,6 @@ class ProjectsPage(QFrame):
         except OSError:
             logging.exception('Bugs')
 
-    def _copy_diff_base(self, image_path: str, enabled: bool):
-        """Copy the current image when the packer still needs the original."""
-        if not enabled or not os.path.isfile(image_path):
-            return None
-        base = image_path + '.old'
-        try:
-            shutil.copy2(image_path, base)
-            return base
-        except OSError as error:
-            events.append_log.emit(
-                "WARN", f"Unable to copy {os.path.basename(image_path)} for diff: {error}")
-            return None
-
     def _create_diff(self, image_path: str, base: str | None):
         """Create ``partition.diff`` from the preserved image and verify it."""
         if not base or not os.path.isfile(image_path):
@@ -2383,7 +2370,8 @@ class ProjectsPage(QFrame):
                         parts_dict[dname] = modify_fs
                 work_output = project_manger.current_work_output_path()
                 image_path = os.path.join(work_output, f"{dname}.img")
-                diff_base = self._preserve_diff_base(image_path, create_diff)
+                diff_base = self._preserve_diff_base(
+                    image_path, create_diff and parts_dict[dname] in ('ext', 'erofs'))
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                     work_output=work_output, level=int(scale_erofs),
@@ -2409,13 +2397,11 @@ class ProjectsPage(QFrame):
                     if self.make_f2fs(dname, work=work, work_output=work_output,
                                       UTC=UTC, readonly=f2fs_read_only,
                                       compress=f2fs_compresion) != 0:
-                        self._restore_diff_base(image_path, diff_base)
                         events.append_log.emit("ERROR", "Failed to pack %s!" % dname)
                         continue
                     if remove_source_files:
                         self.rdi(work, dname)
                     print("Packed successfully: {}!".format(dname))
-                    self._create_diff(image_path, diff_base)
                     if pack_format in ["dat", "br", "sparse"]:
                         utils.img2simg(os.path.join(work_output, f"{dname}.img"))
                         if pack_format == 'dat':
@@ -2481,43 +2467,15 @@ class ProjectsPage(QFrame):
                     else:
                         print(self.tr("Packed {}").format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                image_path = os.path.join(project_manger.current_work_output_path(), f"{dname}.img")
-                diff_base = self._preserve_diff_base(image_path, create_diff)
-                if self.repack_boot(i, cmdline=boot_cmdline, remove_source=remove_source_files) != 0:
-                    self._restore_diff_base(image_path, diff_base)
-                    continue
-                self._create_diff(image_path, diff_base)
+                self.repack_boot(i, cmdline=boot_cmdline, remove_source=remove_source_files)
             elif parts_dict[i] == 'dtbo':
-                image_path = os.path.join(project_manger.current_work_output_path(), f"{dname}.img")
-                diff_base = self._preserve_diff_base(image_path, create_diff)
-                if not self.pack_dtbo(dname, remove_source=remove_source_files):
-                    self._restore_diff_base(image_path, diff_base)
-                    continue
-                self._create_diff(image_path, diff_base)
+                self.pack_dtbo(dname, remove_source=remove_source_files)
             elif parts_dict[i] == 'splash':
-                image_path = os.path.join(work, f"{dname}.img")
-                diff_base = self._preserve_diff_base(image_path, create_diff)
-                splash_repack(os.path.join(work, dname), image_path)
-                if os.path.isfile(image_path):
-                    self._create_diff(image_path, diff_base)
-                else:
-                    self._restore_diff_base(image_path, diff_base)
+                splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             elif parts_dict[i] == 'logo':
-                image_path = os.path.join(work, 'logo.img')
-                diff_base = self._copy_diff_base(image_path, create_diff)
                 self.logo_pack(remove_source=remove_source_files)
-                if os.path.isfile(image_path):
-                    self._create_diff(image_path, diff_base)
-                else:
-                    self._restore_diff_base(image_path, diff_base)
             elif parts_dict[i] == 'guoke_logo':
-                image_path = os.path.join(work, f"{dname}.img")
-                diff_base = self._preserve_diff_base(image_path, create_diff)
-                utils.GuoKeLogo().pack(os.path.join(work, dname), image_path)
-                if os.path.isfile(image_path):
-                    self._create_diff(image_path, diff_base)
-                else:
-                    self._restore_diff_base(image_path, diff_base)
+                utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
             else:
                 if os.path.exists(os.path.join(work, i)):
                     events.show_info_bar.emit(self.tr("Warning"), f"Unsupported {i}:{parts_dict[i]}", 2, 3000)

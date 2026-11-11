@@ -383,6 +383,9 @@ class PackSettingsDialog(MessageBoxBase):
         else:
             self.sections.setColumnStretch(0, 1)
             self.sections.setColumnStretch(1, 1)
+        supports_diff = self._fs_type in ('', 'ext', 'erofs')
+        self.sw_diff.setVisible(supports_diff)
+        self.lbl_diff.setVisible(supports_diff)
 
     def _create_section(self, title):
         card = CardWidget(self.content_widget)
