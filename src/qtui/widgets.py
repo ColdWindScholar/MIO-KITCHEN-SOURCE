@@ -553,6 +553,19 @@ class PackSettingsDialog(MessageBoxBase):
         other_options.addWidget(self.lbl_delete)
         other_options.addStretch(1)
         other_form.addLayout(other_options, 3, 0, 1, 4)
+
+        diff_options = QHBoxLayout()
+        diff_options.setSpacing(8)
+        self.sw_diff = SwitchButton(other_card)
+        self.sw_diff.setOffText("")
+        self.sw_diff.setOnText("")
+        self.lbl_diff = BodyLabel(self.tr("Create diff image"), other_card)
+        self.lbl_diff.setToolTip(self.tr(
+            "Keep the current image as .old and create <partition>.diff with only the changed blocks."))
+        diff_options.addWidget(self.sw_diff)
+        diff_options.addWidget(self.lbl_diff)
+        diff_options.addStretch(1)
+        other_form.addLayout(diff_options, 4, 0, 1, 4)
         other_layout.addLayout(other_form)
 
         boot_card, boot_layout = self._create_section(self.tr("Boot"))

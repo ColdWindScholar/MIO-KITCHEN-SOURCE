@@ -53,6 +53,7 @@ from qfluentwidgets import CheckBox, ComboBox, RadioButton, PushButton, ScrollAr
 
 from src.core import ext4
 from src.core import imgextractor
+from src.core import imgdiff_sparse
 from src.core import lpunpack
 from src.core import splituapp
 from src.core import utils
@@ -1476,6 +1477,7 @@ class ProjectsPage(QFrame):
             dialog.pack_method_combo.currentText(),
             dialog.brotli_slider.value(),
             dialog.size_handle_combo.currentText() == self.tr("Origin Size"),
+            create_diff=dialog.sw_diff.isChecked(),
         )
         self.start_job(self.my_task_worker)
 
@@ -2260,11 +2262,83 @@ class ProjectsPage(QFrame):
                     duration=duration,
                     parent=self.parent())
 
+    @staticmethod
+    def _diff_output_path(image_path: str) -> str:
+        return os.path.splitext(image_path)[0] + '.diff'
+
+    def _preserve_diff_base(self, image_path: str, enabled: bool):
+        """Move the current image aside so it can be used as the diff base."""
+        if not enabled or not os.path.isfile(image_path):
+            return None
+        base = image_path + '.old'
+        try:
+            if os.path.exists(base):
+                os.remove(base)
+            os.replace(image_path, base)
+            return base
+        except OSError as error:
+            events.append_log.emit(
+                "WARN", f"Unable to preserve {os.path.basename(image_path)} for diff: {error}")
+            return None
+
+    def _restore_diff_base(self, image_path: str, base: str | None):
+        if not base:
+            return
+        try:
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            if os.path.exists(base):
+                os.replace(base, image_path)
+        except OSError:
+            logging.exception('Bugs')
+
+    def _copy_diff_base(self, image_path: str, enabled: bool):
+        """Copy the current image when the packer still needs the original."""
+        if not enabled or not os.path.isfile(image_path):
+            return None
+        base = image_path + '.old'
+        try:
+            shutil.copy2(image_path, base)
+            return base
+        except OSError as error:
+            events.append_log.emit(
+                "WARN", f"Unable to copy {os.path.basename(image_path)} for diff: {error}")
+            return None
+
+    def _create_diff(self, image_path: str, base: str | None):
+        """Create ``partition.diff`` from the preserved image and verify it."""
+        if not base or not os.path.isfile(image_path):
+            return
+        diff_path = self._diff_output_path(image_path)
+        try:
+            report = imgdiff_sparse.diff(base, image_path, diff_path, 4096, 4096)
+            _got, _want, verified = imgdiff_sparse.verify(
+                diff_path, base, image_path, 4096)
+            if not verified:
+                with suppress(OSError):
+                    os.remove(diff_path)
+                events.append_log.emit(
+                    "ERROR", f"Diff verification failed: {os.path.basename(diff_path)}")
+                return
+            with suppress(OSError):
+                os.remove(base)
+            events.append_log.emit(
+                "INFO",
+                f"Diff image: {diff_path} ({report['changed_blocks']} blocks changed, "
+                f"{os.path.getsize(diff_path)} bytes)")
+        except (Exception, SystemExit) as error:
+            logging.exception('Diff')
+            with suppress(OSError):
+                os.remove(diff_path)
+            events.append_log.emit(
+                "ERROR",
+                f"Failed to create diff for {os.path.basename(image_path)}: {error}")
+
     def packrom(self, chosen_parts,
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size,
-                boot_cmdline: str | None = None) -> bool | None:
+                boot_cmdline: str | None = None, create_diff: bool = False) -> bool | None:
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 2)
             return False
@@ -2307,44 +2381,51 @@ class ProjectsPage(QFrame):
                 if fs_conver:
                     if parts_dict[dname] == origin_fs:
                         parts_dict[dname] = modify_fs
+                work_output = project_manger.current_work_output_path()
+                image_path = os.path.join(work_output, f"{dname}.img")
+                diff_base = self._preserve_diff_base(image_path, create_diff)
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
-                                    work_output=project_manger.current_work_output_path(), level=int(scale_erofs),
+                                    work_output=work_output, level=int(scale_erofs),
                                     old_kernel=erofs_old_kernel, UTC=UTC) != 0:
+                        self._restore_diff_base(image_path, diff_base)
                         events.append_log.emit("ERROR", "Failed to repack {} [erofs]".format(dname))
-                    else:
-                        if remove_source_files:
-                            self.rdi(work, dname)
-                        print(f"Packed successfully: {dname}")
-                        if pack_format in ["dat", "br", "sparse"]:
-                            utils.img2simg(project_manger.current_work_output_path() + f"{dname}.img")
-                            if pack_format == 'dat':
-                                self.datbr(project_manger.current_work_output_path(), dname, "dat",
-                                           int(parts_dict.get('dat_ver', 4)))
-                            elif pack_format == 'br':
-                                self.datbr(project_manger.current_work_output_path(), dname, scale,
-                                           int(parts_dict.get('dat_ver', 4)))
-                            else:
-                                print("Packed successfully: {}!".format(dname))
+                        continue
+                    if remove_source_files:
+                        self.rdi(work, dname)
+                    print(f"Packed successfully: {dname}")
+                    self._create_diff(image_path, diff_base)
+                    if pack_format in ["dat", "br", "sparse"]:
+                        utils.img2simg(work_output + f"{dname}.img")
+                        if pack_format == 'dat':
+                            self.datbr(work_output, dname, "dat",
+                                       int(parts_dict.get('dat_ver', 4)))
+                        elif pack_format == 'br':
+                            self.datbr(work_output, dname, scale,
+                                       int(parts_dict.get('dat_ver', 4)))
+                        else:
+                            print("Packed successfully: {}!".format(dname))
                 elif parts_dict[dname] == 'f2fs':
-                    if self.make_f2fs(dname, work=work, work_output=project_manger.current_work_output_path(),
+                    if self.make_f2fs(dname, work=work, work_output=work_output,
                                       UTC=UTC, readonly=f2fs_read_only,
                                       compress=f2fs_compresion) != 0:
+                        self._restore_diff_base(image_path, diff_base)
                         events.append_log.emit("ERROR", "Failed to pack %s!" % dname)
-                    else:
-                        if remove_source_files:
-                            self.rdi(work, dname)
-                        print("Packed successfully: {}!".format(dname))
-                        if pack_format in ["dat", "br", "sparse"]:
-                            utils.img2simg(os.path.join(project_manger.current_work_output_path(), f"{dname}.img"))
-                            if pack_format == 'dat':
-                                self.datbr(project_manger.current_work_output_path(), dname, "dat",
-                                           int(parts_dict.get('dat_ver', 4)))
-                            elif pack_format == 'br':
-                                self.datbr(project_manger.current_work_output_path(), dname, scale,
-                                           int(parts_dict.get('dat_ver', 4)))
-                            else:
-                                print(self.tr("Packed successfully: {}!").format(dname))
+                        continue
+                    if remove_source_files:
+                        self.rdi(work, dname)
+                    print("Packed successfully: {}!".format(dname))
+                    self._create_diff(image_path, diff_base)
+                    if pack_format in ["dat", "br", "sparse"]:
+                        utils.img2simg(os.path.join(work_output, f"{dname}.img"))
+                        if pack_format == 'dat':
+                            self.datbr(work_output, dname, "dat",
+                                       int(parts_dict.get('dat_ver', 4)))
+                        elif pack_format == 'br':
+                            self.datbr(work_output, dname, scale,
+                                       int(parts_dict.get('dat_ver', 4)))
+                        else:
+                            print(self.tr("Packed successfully: {}!").format(dname))
 
                 else:
                     ext4_size_value = 0
@@ -2368,7 +2449,7 @@ class ProjectsPage(QFrame):
                                     ext4_size_value = 0
                     if ext4_packer == "make_ext4fs":
                         exit_code = self.make_ext4fs(name=dname, work=work,
-                                                     work_output=project_manger.current_work_output_path(),
+                                                     work_output=work_output,
                                                      sparse=pack_format in ["dat", "br", "sparse"],
                                                      size=ext4_size_value,
                                                      UTC=UTC, has_contexts=os.path.exists(contexts_file))
@@ -2376,7 +2457,7 @@ class ProjectsPage(QFrame):
                     else:
                         exit_code = self.mke2fs(
                             name=dname, work=work,
-                            work_output=project_manger.current_work_output_path(),
+                            work_output=work_output,
                             sparse=pack_format in [
                                 "dat",
                                 "br",
@@ -2384,29 +2465,59 @@ class ProjectsPage(QFrame):
                             size=ext4_size_value,
                             UTC=UTC)
                     if exit_code:
+                        self._restore_diff_base(image_path, diff_base)
                         events.append_log.emit("ERROR",self.tr("Failed to pack %s!") % dname)
                         continue
 
                     if remove_source_files:
                         self.rdi(work, dname)
+                    self._create_diff(image_path, diff_base)
                     if pack_format == "dat":
-                        self.datbr(project_manger.current_work_output_path(), dname, "dat",
+                        self.datbr(work_output, dname, "dat",
                                    int(parts_dict.get('dat_ver', '4')))
                     elif pack_format == "br":
-                        self.datbr(project_manger.current_work_output_path(), dname, scale,
+                        self.datbr(work_output, dname, scale,
                                    int(parts_dict.get('dat_ver', '4')))
                     else:
                         print(self.tr("Packed {}").format(dname))
             elif parts_dict[i] in ['boot', 'vendor_boot']:
-                self.repack_boot(i, cmdline=boot_cmdline, remove_source=remove_source_files)
+                image_path = os.path.join(project_manger.current_work_output_path(), f"{dname}.img")
+                diff_base = self._preserve_diff_base(image_path, create_diff)
+                if self.repack_boot(i, cmdline=boot_cmdline, remove_source=remove_source_files) != 0:
+                    self._restore_diff_base(image_path, diff_base)
+                    continue
+                self._create_diff(image_path, diff_base)
             elif parts_dict[i] == 'dtbo':
-                self.pack_dtbo(dname, remove_source=remove_source_files)
+                image_path = os.path.join(project_manger.current_work_output_path(), f"{dname}.img")
+                diff_base = self._preserve_diff_base(image_path, create_diff)
+                if not self.pack_dtbo(dname, remove_source=remove_source_files):
+                    self._restore_diff_base(image_path, diff_base)
+                    continue
+                self._create_diff(image_path, diff_base)
             elif parts_dict[i] == 'splash':
-                splash_repack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
+                image_path = os.path.join(work, f"{dname}.img")
+                diff_base = self._preserve_diff_base(image_path, create_diff)
+                splash_repack(os.path.join(work, dname), image_path)
+                if os.path.isfile(image_path):
+                    self._create_diff(image_path, diff_base)
+                else:
+                    self._restore_diff_base(image_path, diff_base)
             elif parts_dict[i] == 'logo':
+                image_path = os.path.join(work, 'logo.img')
+                diff_base = self._copy_diff_base(image_path, create_diff)
                 self.logo_pack(remove_source=remove_source_files)
+                if os.path.isfile(image_path):
+                    self._create_diff(image_path, diff_base)
+                else:
+                    self._restore_diff_base(image_path, diff_base)
             elif parts_dict[i] == 'guoke_logo':
-                utils.GuoKeLogo().pack(os.path.join(work, dname), os.path.join(work, f"{dname}.img"))
+                image_path = os.path.join(work, f"{dname}.img")
+                diff_base = self._preserve_diff_base(image_path, create_diff)
+                utils.GuoKeLogo().pack(os.path.join(work, dname), image_path)
+                if os.path.isfile(image_path):
+                    self._create_diff(image_path, diff_base)
+                else:
+                    self._restore_diff_base(image_path, diff_base)
             else:
                 if os.path.exists(os.path.join(work, i)):
                     events.show_info_bar.emit(self.tr("Warning"), f"Unsupported {i}:{parts_dict[i]}", 2, 3000)
@@ -2502,6 +2613,7 @@ class ProjectsPage(QFrame):
                     'scale': dialog.brotli_slider.value(),
                     'ext4_origin_size': dialog.size_handle_combo.currentText() == self.tr("Origin Size"),
                     'boot_cmdline': dialog.cmdline_edit.text() if dialog.cmdline_override_switch.isChecked() else None,
+                    'create_diff': dialog.sw_diff.isChecked(),
                 }))
             self.my_task_worker = GenericTaskWorker(self.packrom_batch, jobs)
         self.start_job(self.my_task_worker)
