@@ -2328,7 +2328,7 @@ class ProjectsPage(QFrame):
                 pack_format, patch_vbmeta, fs_conver, origin_fs, modify_fs, remove_source_files,
                 erofs_compress_format, scale_erofs, erofs_old_kernel, UTC,
                 f2fs_read_only, f2fs_compresion, ext4_packer, scale, ext4_origin_size,
-                boot_cmdline: str | None = None, create_diff: bool = False) -> bool | None:
+                boot_cmdline: str | None = None, create_diff: bool = True) -> bool | None:
         if not project_manger.exist():
             self.show_info_bar(self.tr('Error'), self.tr("project's not exist"), 2)
             return False
@@ -2373,8 +2373,13 @@ class ProjectsPage(QFrame):
                         parts_dict[dname] = modify_fs
                 work_output = project_manger.current_work_output_path()
                 image_path = os.path.join(work_output, f"{dname}.img")
-                diff_base = self._preserve_diff_base(
-                    image_path, create_diff and parts_dict[dname] in ('ext', 'erofs'))
+                diff_base = None
+                if create_diff and parts_dict[dname] in ('ext', 'erofs'):
+                    if os.path.isfile(image_path):
+                        diff_base = self._preserve_diff_base(image_path, True)
+                    else:
+                        events.append_log.emit(
+                            "INFO", f"No previous {dname}.img, skipping diff")
                 if parts_dict[dname] == 'erofs':
                     if self.mkerofs(dname, str(erofs_compress_format), work=work,
                                     work_output=work_output, level=int(scale_erofs),

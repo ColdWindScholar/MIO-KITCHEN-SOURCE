@@ -562,6 +562,7 @@ class PackSettingsDialog(MessageBoxBase):
         self.sw_diff = SwitchButton(other_card)
         self.sw_diff.setOffText("")
         self.sw_diff.setOnText("")
+        self.sw_diff.setChecked(True)
         self.lbl_diff = BodyLabel(self.tr("Create diff image"), other_card)
         self.lbl_diff.setToolTip(self.tr(
             "Keep the current image as .old and create <partition>.diff with only the changed blocks."))
