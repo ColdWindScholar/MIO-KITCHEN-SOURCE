@@ -57,40 +57,16 @@ module_error_codes = ModuleErrorCodes
 
 
 class _PluginLogStream:
-    def __init__(self, output_signal):
-        self.output_signal = output_signal
+    def __init__(self, write_callback):
+        self.write_callback = write_callback
 
     def write(self, text):
         if text:
-            self.output_signal.emit(text)
+            self.write_callback(text)
         return len(text)
 
     def flush(self):
         pass
-
-
-class PluginRunWorker(QThread):
-    log_received = Signal(str)
-    run_finished = Signal(bool, str)
-
-    def __init__(self, plugin_id):
-        super().__init__()
-        self.plugin_id = plugin_id
-
-    def run(self):
-        stream = _PluginLogStream(self.log_received)
-        try:
-            with redirect_stdout(stream), redirect_stderr(stream):
-                result = module_manager.run(self.plugin_id)
-        except Exception as e:
-            logging.exception("Failed to run plugin %s", self.plugin_id)
-            self.run_finished.emit(False, str(e) or repr(e))
-            return
-
-        if isinstance(result, int) and result != 0:
-            self.run_finished.emit(False, f"Plugin exited with status {result}.")
-        else:
-            self.run_finished.emit(True, str(result) if result is not None else "")
 
 
 class ParseMessageBox(MessageBoxBase):
@@ -1560,7 +1536,6 @@ class PluginPage(QWidget):
         self.built_in_plugins = BuiltInPlugins(self)
         self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
         self.tasks = dict() #only to keep qthread alive
-        self.plugin_runs = {}
         self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
         self.download_status = {}
         self.repo_cards = {}
@@ -1924,7 +1899,6 @@ class PluginPage(QWidget):
                 self.load_plugin_cards()
 
     def exec_plugin(self, plugin_id):
-        run_id = utils.v_code(10)
         name = module_manager.get_name(plugin_id)
         running_bar = InfoBar.new(
             icon=InfoBarIcon.INFORMATION,
@@ -1936,32 +1910,39 @@ class PluginPage(QWidget):
             duration=0,
             parent=self.parent()
         )
-        worker = PluginRunWorker(plugin_id)
-        self.plugin_runs[run_id] = {"worker": worker, "bar": running_bar, "log": ""}
-        worker.log_received.connect(lambda text, run_id=run_id: self._update_plugin_log(run_id, text))
-        worker.run_finished.connect(
-            lambda success, result, run_id=run_id, name=name: self._finish_plugin_run(
-                run_id, name, success, result
-            )
-        )
-        worker.finished.connect(lambda run_id=run_id: self.plugin_runs.pop(run_id, None))
-        worker.start()
+        running_bar.repaint()
+        run_log = StringIO()
 
-    def _update_plugin_log(self, run_id: str, text: str):
-        state = self.plugin_runs.get(run_id)
-        if not state:
-            return
-        state["log"] = (state["log"] + text)[-4000:]
-        state["bar"].contentLabel.setText(state["log"] or self.tr("Plugin is running..."))
+        def update_log(text):
+            run_log.write(text)
+            content = run_log.getvalue()
+            if len(content) > 4000:
+                content = content[-4000:]
+                run_log.seek(0)
+                run_log.truncate()
+                run_log.write(content)
+            running_bar.contentLabel.setText(content or self.tr("Plugin is running..."))
+            running_bar.repaint()
 
-    def _finish_plugin_run(self, run_id: str, name: str, success: bool, result: str):
-        state = self.plugin_runs.get(run_id)
-        if not state:
-            return
-        state["bar"].close()
-        content = state["log"].strip()
-        if result:
-            content = "\n".join(part for part in (content, result) if part)
+        success = True
+        result_text = ""
+        try:
+            with redirect_stdout(_PluginLogStream(update_log)), redirect_stderr(_PluginLogStream(update_log)):
+                result = module_manager.run(plugin_id)
+            if isinstance(result, int) and not isinstance(result, bool) and result != 0:
+                success = False
+                result_text = self.tr("Plugin exited with status {}.").format(result)
+            elif result is not None:
+                result_text = str(result)
+        except Exception as e:
+            logging.exception("Failed to run plugin %s", plugin_id)
+            success = False
+            result_text = str(e) or repr(e)
+
+        running_bar.close()
+        content = run_log.getvalue().strip()
+        if result_text:
+            content = "\n".join(part for part in (content, result_text) if part)
         events.show_info_bar.emit(
             self.tr("Plugin done" if success else "Plugin failed"),
             content or self.tr("{} finished.").format(name),
