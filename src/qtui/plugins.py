@@ -87,7 +87,7 @@ class PluginShellWorker(QThread):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 env=self.environment,
-                bufsize=0
+                bufsize=4096
             )
             utils.states.open_pids.append(process.pid)
             while True:
