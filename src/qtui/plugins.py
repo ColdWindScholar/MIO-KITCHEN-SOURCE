@@ -259,6 +259,7 @@ class ModuleManager(QObject):
         self.addon_loader = loader
         self.addon_entries = Entry
         self.master = None
+        self.active_processes = {}
         Thread(target=self.load_plugins, daemon=True).start()
 
     def is_installed(self, id_) -> bool:
@@ -410,6 +411,8 @@ class ModuleManager(QObject):
 
             if on_log is not None and on_finished is not None:
                 process = QProcess(self)
+                process_id = id(process)
+                self.active_processes[process_id] = process
                 process.setProgram(os.path.join(utils.tool_bin, "busybox"))
                 process.setArguments([shell_command_prefix, '-c', full_shell_command])
                 process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
@@ -444,6 +447,9 @@ class ModuleManager(QObject):
 
                 process.readyReadStandardOutput.connect(read_output)
                 process.started.connect(track_process)
+                process.destroyed.connect(
+                    lambda _obj=None, process_id=process_id: self.active_processes.pop(process_id, None)
+                )
                 process.finished.connect(
                     lambda exit_code, _exit_status: finish(
                         exit_code == 0,
