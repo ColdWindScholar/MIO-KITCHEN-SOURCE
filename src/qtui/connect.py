@@ -531,6 +531,7 @@ class ConnectPage(QWidget):
 
         action = json_data.get("action")
         args = json_data.get("args", {})
+        print(json_data)
         if not isinstance(args, dict):
             return self.send_action_response({"done": False, "msg": "args must be an object."})
 
