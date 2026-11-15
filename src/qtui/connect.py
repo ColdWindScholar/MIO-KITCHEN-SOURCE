@@ -1,4 +1,5 @@
 import json
+import os
 import platform
 import socket
 import uuid
@@ -27,7 +28,7 @@ from qfluentwidgets import (
 from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
-from src.qtui.projects import ProjectsPage
+from src.qtui.projects import ProjectsPage, events, project_manger
 from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 from src.core.utils import v_code
 from src.qtui.mcp_server import MCPServer
@@ -509,9 +510,11 @@ class ConnectPage(QWidget):
 
     def execute(self, action_data: str | bytes | dict):
         if isinstance(action_data, bytes):
-            action_data = action_data.decode('utf-8')
-        # action_types:native_cmd log create_project remove_project refresh_project unpack
-        # payload: {argv1, argv2}
+            try:
+                action_data = action_data.decode('utf-8')
+            except UnicodeDecodeError:
+                network_bridge.log_signal.emit("WARN", "Invalid action payload: expected UTF-8.")
+                return self.send_action_response({"done": False, "msg": "Invalid action payload."})
         if action_data == '1':
             network_bridge.send_ws_message.emit('1')
             return "1"
@@ -519,13 +522,80 @@ class ConnectPage(QWidget):
             json_data = json.loads(action_data) if isinstance(action_data, str) else action_data
         except json.JSONDecodeError as error:
             network_bridge.log_signal.emit("WARN", f"Invalid action payload: {error}")
-            return "Invalid action payload."
+            return self.send_action_response({"done": False, "msg": "Invalid action payload."})
         if not isinstance(json_data, dict):
             network_bridge.log_signal.emit("WARN", "Invalid action payload: expected an object.")
-            return "Invalid action payload."
+            return self.send_action_response({"done": False, "msg": "Invalid action payload."})
 
-        if json_data.get("argv1") == "list_project":
-            response = json.dumps({"argv1": "list_project", "argv2": list_project()})
-            network_bridge.send_ws_message.emit(response)
-            return response
-        return "Action"
+
+
+        action = json_data.get("action")
+        args = json_data.get("args", {})
+        if not isinstance(args, dict):
+            return self.send_action_response({"done": False, "msg": "args must be an object."})
+
+        try:
+            if action == "list_project":
+                projects = []
+                for name in list_project():
+                    project_path = project_manger.get_work_path(name)
+                    project_stat = os.stat(project_path)
+                    size = 0
+
+                    def raise_walk_error(error):
+                        raise error
+
+                    for root, directories, filenames in os.walk(
+                        project_path, followlinks=False, onerror=raise_walk_error
+                    ):
+                        directories[:] = [
+                            directory for directory in directories
+                            if not os.path.islink(os.path.join(root, directory))
+                        ]
+                        for filename in filenames:
+                            file_path = os.path.join(root, filename)
+                            if not os.path.islink(file_path):
+                                size += os.stat(file_path, follow_symlinks=False).st_size
+
+                    created_time = getattr(project_stat, "st_birthtime", project_stat.st_ctime)
+                    projects.append({
+                        "name": name,
+                        "created_time": str(int(created_time)),
+                        "size": str(size),
+                    })
+                return self.send_action_response({"done": True, "data": projects})
+
+            if action == "create_project":
+                project_name = args.get("project_name")
+                if not isinstance(project_name, str) or not project_name.strip():
+                    return self.send_action_response(
+                        {"done": False, "msg": "project_name must be a non-empty string."}
+                    )
+
+                project_name = project_name.strip().replace(" ", "_")
+                invalid_chars = {'/', '\\', ':', '*', '?', '"', '<', '>', '|'}
+                if (
+                    project_name in {".", ".."}
+                    or project_name.startswith(".")
+                    or any(char in invalid_chars or ord(char) < 32 for char in project_name)
+                ):
+                    return self.send_action_response({"done": False, "msg": "Invalid project name."})
+                if project_name in set(list_project()):
+                    return self.send_action_response(
+                        {"done": False, "msg": "Project name already exists."}
+                    )
+
+                project_manger.new(project_name)
+                events.refresh_projects.emit()
+                return self.send_action_response({"done": True, "msg": "ok"})
+
+            return self.send_action_response({"done": False, "msg": "Unknown action."})
+        except OSError as error:
+            network_bridge.log_signal.emit("ERROR", f"Project action failed: {error}")
+            return self.send_action_response({"done": False, "msg": str(error)})
+
+    @staticmethod
+    def send_action_response(response_data):
+        response = json.dumps(response_data)
+        network_bridge.send_ws_message.emit(response)
+        return response
