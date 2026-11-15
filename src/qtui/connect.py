@@ -564,6 +564,30 @@ class ConnectPage(QWidget):
                         "size": str(size),
                     })
                 return self.send_action_response({"done": True, "data": projects})
+            if action == "rename_project":
+                project_name = args.get("project_name")
+                new_project_name = args.get("new_project_name")
+                if not isinstance(project_name, str) or not project_name.strip():
+                    return self.send_action_response(
+                        {"done": False, "msg": "project_name must be a non-empty string."}
+                    )
+
+                project_name = project_name.strip().replace(" ", "_")
+                invalid_chars = {'/', '\\', ':', '*', '?', '"', '<', '>', '|'}
+                if (
+                    project_name in {".", ".."}
+                    or project_name.startswith(".")
+                    or any(char in invalid_chars or ord(char) < 32 for char in project_name)
+                ):
+                    return self.send_action_response({"done": False, "msg": "Invalid project name."})
+                if project_name in set(list_project()):
+                    return self.send_action_response(
+                        {"done": False, "msg": "Project name already exists."}
+                    )
+
+                project_manger.rename(project_name, new_project_name)
+                events.refresh_projects.emit()
+                return self.send_action_response({"done": True, "msg": "ok"})
 
             if action == "create_project":
                 project_name = args.get("project_name")
@@ -588,6 +612,7 @@ class ConnectPage(QWidget):
                 project_manger.new(project_name)
                 events.refresh_projects.emit()
                 return self.send_action_response({"done": True, "msg": "ok"})
+
 
             return self.send_action_response({"done": False, "msg": "Unknown action."})
         except OSError as error:
