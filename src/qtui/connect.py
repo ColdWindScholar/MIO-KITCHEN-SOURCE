@@ -174,29 +174,6 @@ def handle_incoming_phone_action():
     return f"Action handled securely", 200
 
 
-@flask_backend.get('/projects')
-def get_projects_api():
-    return jsonify(list_projects())
-
-
-@flask_backend.get('/project')
-def get_active_project_api():
-    return jsonify(get_active_project())
-
-
-@flask_backend.get('/project/files')
-def get_project_files_api():
-    try:
-        files = list_project_files(
-            request.args.get("project_name"),
-            request.args.get("relative_path", ""),
-        )
-    except (OSError, ValueError) as error:
-        return jsonify({"error": str(error)}), 400
-    return jsonify(files)
-
-
-#
 @sock_app.route('/socket')
 def handle_actions(ws: Server):
     auth_header = request.headers.get('Authorization', None)
