@@ -581,7 +581,7 @@ class ConnectPage(QWidget):
                     or any(char in invalid_chars or ord(char) < 32 for char in project_name)
                 ):
                     return self.send_action_response({"done": False, "msg": "Invalid project name."})
-                if project_name not in set(list_project()):
+                if not project_manger.exist(project_name):
                     return self.send_action_response(
                         {"done": False, "msg": "Project is not exists."}
                     )
