@@ -352,6 +352,9 @@ class ConnectPage(QWidget):
         return True
 
     def stop_server(self):
+        if self.mcp_server.is_running:
+            self.stop_mcp_server()
+
         server = self.server
         thread = self.network_thread
         if server is None or thread is None or not thread.is_alive():
@@ -408,13 +411,15 @@ class ConnectPage(QWidget):
         self.append_native_console_log("SUCCESS", "MCP endpoint enabled on the Connect server at http://127.0.0.1:5000/mcp.")
 
     def stop_mcp_server(self):
+        was_running = self.mcp_server.is_running
         if not self.mcp_server.stop():
             self.append_native_console_log("ERROR", "MCP server did not stop within 3 seconds.")
             return False
 
         self.mcp_status_label.setText(self.tr("MCP Server: stopped"))
         self.mcp_start_btn.setText(self.tr("Start MCP Server"))
-        self.append_native_console_log("INFO", "MCP server stopped.")
+        if was_running:
+            self.append_native_console_log("INFO", "MCP endpoint disabled on the Connect server.")
         return True
 
     def closeEvent(self, event):
