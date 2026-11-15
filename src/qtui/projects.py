@@ -465,8 +465,9 @@ def logo_dump(file_path, output: str = None, output_name: str = "logo"):
 
 
 def un_dtbo(bn: str = 'dtbo', dtboimg:str|None = None) -> None:
+    work = project_manger.current_work_path()
     if not dtboimg:
-        if not (dtboimg := utils.findfile(f"{bn}.img", work := project_manger.current_work_path())):
+        if not (dtboimg := utils.findfile(f"{bn}.img", work)):
             events.append_log.emit("WARN", f"cannot find dtbo {bn}")
             return
     utils.re_folder(f"{work}/{bn}")
