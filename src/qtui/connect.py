@@ -27,7 +27,7 @@ from qfluentwidgets import (
 from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
-from src.qtui.projects import ProjectsPage, project_manger
+from src.qtui.projects import ProjectsPage
 from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 from src.core.utils import v_code
 from src.qtui.mcp_server import MCPServer

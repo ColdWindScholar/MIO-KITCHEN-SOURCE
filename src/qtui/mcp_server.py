@@ -1,30 +1,32 @@
 import json
-import os
-from pathlib import Path
+import threading
 
 from flask import Flask, jsonify, request
+from werkzeug.serving import make_server
 
-from src.qtui.projects import project_manger
-from src.qtui.settings_cfg import cfg
+from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 
 
+MCP_HOST = "127.0.0.1"
+MCP_PORT = 8765
 MCP_PROTOCOL_VERSION = "2025-03-26"
 
 
 class MCPServer:
-    def __init__(self, app: Flask):
-        self._app = app
-        self._enabled = False
+    def __init__(self):
+        self._server = None
+        self._thread = None
+        self._app = Flask("mio_mcp_server")
         self._tools = {
             "list_projects": {
                 "description": "List the projects available in MIO-KITCHEN.",
                 "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
-                "handler": self._list_projects,
+                "handler": lambda _arguments: list_projects(),
             },
             "get_active_project": {
                 "description": "Get the name and structure of the currently selected project.",
                 "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
-                "handler": self._get_active_project,
+                "handler": lambda _arguments: get_active_project(),
             },
             "list_project_files": {
                 "description": "List entries in a project folder; paths are relative to the project root.",
@@ -36,58 +38,19 @@ class MCPServer:
                     },
                     "additionalProperties": False,
                 },
-                "handler": self._list_project_files,
+                "handler": lambda arguments: list_project_files(
+                    arguments.get("project_name"),
+                    arguments.get("relative_path", ""),
+                ),
             },
         }
         self._app.add_url_rule("/mcp", "mcp", self._handle_request, methods=["POST"])
-
-    def _list_projects(self):
-        return sorted(project_manger.get_projects())
-
-    def _get_active_project(self):
-        name = cfg.currentProjectName.value
-        return {
-            "name": name,
-            "exists": bool(name and project_manger.exist(name)),
-            "structure": cfg.projectStructure.value,
-        }
-
-    def _list_project_files(self, arguments):
-        name = arguments.get("project_name") or cfg.currentProjectName.value
-        relative_path = arguments.get("relative_path", "")
-        if not isinstance(relative_path, str):
-            raise ValueError("relative_path must be a string.")
-
-        projects = set(project_manger.get_projects())
-        if not name or name not in projects:
-            raise ValueError(f"Unknown project: {name or '(none selected)'}")
-
-        project_root = Path(project_manger.get_work_path(name)).resolve()
-        requested_path = (project_root / relative_path).resolve()
-        try:
-            if os.path.commonpath((str(project_root), str(requested_path))) != str(project_root):
-                raise ValueError("The requested path must stay inside the project.")
-        except ValueError as error:
-            raise ValueError("The requested path must stay inside the project.") from error
-        if not requested_path.is_dir():
-            raise ValueError(f"Project directory does not exist: {relative_path or '.'}")
-
-        entries = sorted(requested_path.iterdir(), key=lambda entry: (not entry.is_dir(), entry.name.casefold()))
-        results = []
-        for entry in entries[:200]:
-            resolved_entry = entry.resolve()
-            if os.path.commonpath((str(project_root), str(resolved_entry))) != str(project_root):
-                continue
-            results.append(f"{entry.name}/" if entry.is_dir() else entry.name)
-        return results
 
     @staticmethod
     def _rpc_error(request_id, code, message):
         return jsonify({"jsonrpc": "2.0", "id": request_id, "error": {"code": code, "message": message}})
 
     def _handle_request(self):
-        if not self._enabled:
-            return jsonify({"error": "MCP is stopped. Start it from the Connect page."}), 503
         if request.remote_addr not in ("127.0.0.1", "::1"):
             return jsonify({"error": "MCP endpoint is available only on localhost."}), 403
         if not request.is_json:
@@ -131,7 +94,7 @@ class MCPServer:
 
         if method == "tools/call":
             tool_name = params.get("name")
-            arguments = params.get("arguments") or {}
+            arguments = params.get("arguments", {})
             tool = self._tools.get(tool_name) if isinstance(tool_name, str) else None
             if tool is None:
                 return jsonify(
@@ -144,7 +107,7 @@ class MCPServer:
             if not isinstance(arguments, dict):
                 return self._rpc_error(request_id, -32602, "Tool arguments must be an object.")
             try:
-                value = tool["handler"]() if tool_name != "list_project_files" else tool["handler"](arguments)
+                value = tool["handler"](arguments)
                 return jsonify(
                     {
                         "jsonrpc": "2.0",
@@ -168,14 +131,39 @@ class MCPServer:
 
     @property
     def is_running(self):
-        return self._enabled
+        return bool(self._thread and self._thread.is_alive() and self._server)
 
     def start(self):
         if self.is_running:
             return True
-        self._enabled = True
+
+        try:
+            server = make_server(MCP_HOST, MCP_PORT, self._app, threaded=True)
+        except OSError as error:
+            raise RuntimeError(f"Unable to start MCP server on {MCP_HOST}:{MCP_PORT}: {error}") from error
+
+        thread = threading.Thread(target=server.serve_forever, name="MioMCPServer", daemon=True)
+        self._server = server
+        self._thread = thread
+        thread.start()
         return True
 
     def stop(self):
-        self._enabled = False
+        server = self._server
+        thread = self._thread
+        if server is None or thread is None or not thread.is_alive():
+            if server:
+                server.server_close()
+            self._server = None
+            self._thread = None
+            return True
+
+        server.shutdown()
+        thread.join(timeout=3)
+        if thread.is_alive():
+            return False
+
+        server.server_close()
+        self._server = None
+        self._thread = None
         return True
