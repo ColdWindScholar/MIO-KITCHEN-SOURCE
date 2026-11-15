@@ -13,7 +13,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import requests
-from PySide6.QtCore import Qt, QObject, Signal, QThread
+from PySide6.QtCore import Qt, QObject, Signal, QThread, QProcess, QProcessEnvironment
 from PySide6.QtGui import QColor
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QHBoxLayout
@@ -326,7 +326,7 @@ class ModuleManager(QObject):
             logging.error(f"Error reading info file {info_file} for plugin {id_}: {e}")
             return default
 
-    def run(self, id_=None) -> int:
+    def run(self, id_=None, on_log=None, on_finished=None) -> int | None:
         if not id_:
             return 0
         if not cfg.currentProjectName.value:
@@ -407,6 +407,55 @@ class ModuleManager(QObject):
 
             shell_command_prefix = 'ash' if os.name == 'posix' else 'bash'
             full_shell_command = f"exec {norm_module_exec} {norm_main_sh_path}"
+
+            if on_log is not None and on_finished is not None:
+                process = QProcess(self)
+                process.setProgram(os.path.join(utils.tool_bin, "busybox"))
+                process.setArguments([shell_command_prefix, '-c', full_shell_command])
+                process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+                process_environment = QProcessEnvironment()
+                for key, env_value in exports.items():
+                    process_environment.insert(key, str(env_value))
+                process.setProcessEnvironment(process_environment)
+
+                def read_output():
+                    output = bytes(process.readAllStandardOutput())
+                    if output:
+                        on_log(output.decode("utf-8", errors="replace"))
+
+                completed = False
+                tracked_pid = None
+
+                def track_process():
+                    nonlocal tracked_pid
+                    tracked_pid = process.processId()
+                    utils.states.open_pids.append(tracked_pid)
+
+                def finish(success: bool, message: str):
+                    nonlocal completed
+                    if completed:
+                        return
+                    completed = True
+                    read_output()
+                    if tracked_pid in utils.states.open_pids:
+                        utils.states.open_pids.remove(tracked_pid)
+                    on_finished(success, message)
+                    process.deleteLater()
+
+                process.readyReadStandardOutput.connect(read_output)
+                process.started.connect(track_process)
+                process.finished.connect(
+                    lambda exit_code, _exit_status: finish(
+                        exit_code == 0,
+                        "" if exit_code == 0 else f"Plugin exited with status {exit_code}."
+                    )
+                )
+                process.errorOccurred.connect(
+                    lambda error: finish(False, process.errorString())
+                    if error == QProcess.ProcessError.FailedToStart else None
+                )
+                process.start()
+                return None
 
             call_result = call(["busybox", shell_command_prefix, '-c', full_shell_command], env=exports)
             return call_result
@@ -1928,7 +1977,15 @@ class PluginPage(QWidget):
         result_text = ""
         try:
             with redirect_stdout(_PluginLogStream(update_log)), redirect_stderr(_PluginLogStream(update_log)):
-                result = module_manager.run(plugin_id)
+                result = module_manager.run(
+                    plugin_id,
+                    on_log=update_log,
+                    on_finished=lambda success, result: self._finish_plugin_run(
+                        running_bar, name, run_log, success, result
+                    )
+                )
+            if result is None:
+                return
             if isinstance(result, int) and not isinstance(result, bool) and result != 0:
                 success = False
                 result_text = self.tr("Plugin exited with status {}.").format(result)
@@ -1939,10 +1996,13 @@ class PluginPage(QWidget):
             success = False
             result_text = str(e) or repr(e)
 
+        self._finish_plugin_run(running_bar, name, run_log, success, result_text)
+
+    def _finish_plugin_run(self, running_bar, name: str, run_log: StringIO, success: bool, result: str):
         running_bar.close()
         content = run_log.getvalue().strip()
-        if result_text:
-            content = "\n".join(part for part in (content, result_text) if part)
+        if result:
+            content = "\n".join(part for part in (content, result) if part)
         events.show_info_bar.emit(
             self.tr("Plugin done" if success else "Plugin failed"),
             content or self.tr("{} finished.").format(name),

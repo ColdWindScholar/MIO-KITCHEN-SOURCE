@@ -28,6 +28,7 @@ from simple_websocket import Server
 from wsproto.frame_protocol import CloseReason
 
 from src.qtui.projects import ProjectsPage, project_manger
+from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 from src.core.utils import v_code
 from src.qtui.mcp_server import MCPServer
 
@@ -173,6 +174,28 @@ def handle_incoming_phone_action():
     return f"Action handled securely", 200
 
 
+@flask_backend.get('/projects')
+def get_projects_api():
+    return jsonify(list_projects())
+
+
+@flask_backend.get('/project')
+def get_active_project_api():
+    return jsonify(get_active_project())
+
+
+@flask_backend.get('/project/files')
+def get_project_files_api():
+    try:
+        files = list_project_files(
+            request.args.get("project_name"),
+            request.args.get("relative_path", ""),
+        )
+    except (OSError, ValueError) as error:
+        return jsonify({"error": str(error)}), 400
+    return jsonify(files)
+
+
 #
 @sock_app.route('/socket')
 def handle_actions(ws: Server):
@@ -211,7 +234,7 @@ def fetch_linux_lan_ip():
 
 
 def list_project():
-    return list(project_manger.get_projects())
+    return list_projects()
 
 
 class ConnectPage(QWidget):
@@ -305,7 +328,7 @@ class ConnectPage(QWidget):
         mcp_controls.addWidget(self.mcp_status_label, alignment=Qt.AlignmentFlag.AlignHCenter)
         mcp_controls.addWidget(self.mcp_start_btn)
         left_layout.addLayout(mcp_controls)
-        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:5000/mcp", self)
+        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:8765/mcp", self)
         self.mcp_endpoint_label.setFont(QFont("Consolas", 9))
         left_layout.addWidget(self.mcp_endpoint_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -316,7 +339,7 @@ class ConnectPage(QWidget):
 
         self.server = None
         self.network_thread = None
-        self.mcp_server = MCPServer(flask_backend)
+        self.mcp_server = MCPServer()
         self.start_server()
 
     def start_server(self):
@@ -352,9 +375,6 @@ class ConnectPage(QWidget):
         return True
 
     def stop_server(self):
-        if self.mcp_server.is_running:
-            self.stop_mcp_server()
-
         server = self.server
         thread = self.network_thread
         if server is None or thread is None or not thread.is_alive():
@@ -408,7 +428,7 @@ class ConnectPage(QWidget):
 
         self.mcp_status_label.setText(self.tr("MCP Server: running"))
         self.mcp_start_btn.setText(self.tr("Stop MCP Server"))
-        self.append_native_console_log("SUCCESS", "MCP endpoint enabled on the Connect server at http://127.0.0.1:5000/mcp.")
+        self.append_native_console_log("SUCCESS", "MCP server started at http://127.0.0.1:8765/mcp.")
 
     def stop_mcp_server(self):
         was_running = self.mcp_server.is_running
@@ -419,7 +439,7 @@ class ConnectPage(QWidget):
         self.mcp_status_label.setText(self.tr("MCP Server: stopped"))
         self.mcp_start_btn.setText(self.tr("Start MCP Server"))
         if was_running:
-            self.append_native_console_log("INFO", "MCP endpoint disabled on the Connect server.")
+            self.append_native_console_log("INFO", "MCP server stopped.")
         return True
 
     def closeEvent(self, event):
