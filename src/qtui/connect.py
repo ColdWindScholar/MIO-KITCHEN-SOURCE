@@ -15,7 +15,6 @@ from PySide6.QtGui import QPixmap, QImage, QFont, QTextCursor, QTextCharFormat, 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from flask import Flask, request, jsonify
 from flask_sock import Sock
-from werkzeug.serving import make_server
 from qfluentwidgets import (
     CardWidget,
     BodyLabel,
@@ -26,12 +25,13 @@ from qfluentwidgets import (
     FluentIcon, TextEdit
 )
 from simple_websocket import Server
+from werkzeug.serving import make_server
 from wsproto.frame_protocol import CloseReason
 
-from src.qtui.projects import ProjectsPage, events, project_manger
-from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 from src.core.utils import v_code, gettype
+from src.qtui.connect_api import list_projects
 from src.qtui.mcp_server import MCPServer
+from src.qtui.projects import ProjectsPage, events, project_manger
 
 
 class NetworkBridge(QObject):
