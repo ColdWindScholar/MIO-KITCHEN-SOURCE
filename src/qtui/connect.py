@@ -587,6 +587,7 @@ class ConnectPage(QWidget):
                     )
                 project_manger.rename(project_name, new_project_name)
                 events.refresh_projects.emit()
+                self.execute({'action': 'list_project', 'args': {}})
                 return self.send_action_response({"done": True, "msg": "ok"})
 
             if action == "create_project":
