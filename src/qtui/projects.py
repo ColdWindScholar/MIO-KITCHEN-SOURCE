@@ -720,7 +720,7 @@ class ProjectsPage(QFrame):
             if old_project_name != (new_project_name := cfg.currentProjectName.value):
                 project_manger.remove(old_project_name)
                 events.refresh_projects.emit()
-            cfg.set(cfg.customProjectName, new_project_name)
+            cfg.set(cfg.currentProjectName, new_project_name)
             return
         # ozip
         if ftype == "ozip":
