@@ -590,6 +590,17 @@ class ConnectPage(QWidget):
                 self.execute({'action': 'list_project', 'args': {}})
                 return self.send_action_response({"done": True, "msg": "ok"})
 
+            if action == 'remove_project':
+                project_name = args.get("project_name")
+                if not project_manger.exist(project_name):
+                    return self.send_action_response(
+                        {"done": False, "msg": "Project is not exists."}
+                    )
+                project_manger.remove(project_name)
+                events.refresh_projects.emit()
+                return self.send_action_response({"done": True, "msg": "ok"})
+
+
             if action == "create_project":
                 project_name = args.get("project_name")
                 if not isinstance(project_name, str) or not project_name.strip():
