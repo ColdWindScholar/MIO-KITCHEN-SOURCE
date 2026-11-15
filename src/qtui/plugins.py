@@ -56,6 +56,43 @@ module_exec = os.path.join(prog_path, 'bin', "exec.sh").replace(os.sep, '/')
 module_error_codes = ModuleErrorCodes
 
 
+class _PluginLogStream:
+    def __init__(self, output_signal):
+        self.output_signal = output_signal
+
+    def write(self, text):
+        if text:
+            self.output_signal.emit(text)
+        return len(text)
+
+    def flush(self):
+        pass
+
+
+class PluginRunWorker(QThread):
+    log_received = Signal(str)
+    run_finished = Signal(bool, str)
+
+    def __init__(self, plugin_id):
+        super().__init__()
+        self.plugin_id = plugin_id
+
+    def run(self):
+        stream = _PluginLogStream(self.log_received)
+        try:
+            with redirect_stdout(stream), redirect_stderr(stream):
+                result = module_manager.run(self.plugin_id)
+        except Exception as e:
+            logging.exception("Failed to run plugin %s", self.plugin_id)
+            self.run_finished.emit(False, str(e) or repr(e))
+            return
+
+        if isinstance(result, int) and result != 0:
+            self.run_finished.emit(False, f"Plugin exited with status {result}.")
+        else:
+            self.run_finished.emit(True, str(result) if result is not None else "")
+
+
 class ParseMessageBox(MessageBoxBase):
     def __init__(self, json_file_path, parent=None):
         super().__init__(parent)
@@ -1523,6 +1560,7 @@ class PluginPage(QWidget):
         self.built_in_plugins = BuiltInPlugins(self)
         self.local_db_path = os.path.join(prog_path, 'bin', 'plugin_db.json')
         self.tasks = dict() #only to keep qthread alive
+        self.plugin_runs = {}
         self.cards_data = []  # Tracks {"card_widget": card, "title": str, "author": str, "type": "Installed"|"Repo"}
         self.download_status = {}
         self.repo_cards = {}
@@ -1886,30 +1924,47 @@ class PluginPage(QWidget):
                 self.load_plugin_cards()
 
     def exec_plugin(self, plugin_id):
-        events.show_info_bar.emit(
-            self.tr("Running plugin"),
-            self.tr("{} is running...").format(module_manager.get_name(plugin_id)),
-            4,
-            3000
+        run_id = utils.v_code(10)
+        name = module_manager.get_name(plugin_id)
+        running_bar = InfoBar.new(
+            icon=InfoBarIcon.INFORMATION,
+            title=self.tr("Running plugin"),
+            content=self.tr("{} is running...").format(name),
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP_RIGHT,
+            duration=0,
+            parent=self.parent()
         )
-        run_log = StringIO()
-        error = None
-        result = None
-        try:
-            with redirect_stdout(run_log), redirect_stderr(run_log):
-                result = module_manager.run(plugin_id)
-        except Exception as e:
-            logging.exception("Failed to run plugin %s", plugin_id)
-            error = str(e) or repr(e)
+        worker = PluginRunWorker(plugin_id)
+        self.plugin_runs[run_id] = {"worker": worker, "bar": running_bar, "log": ""}
+        worker.log_received.connect(lambda text, run_id=run_id: self._update_plugin_log(run_id, text))
+        worker.run_finished.connect(
+            lambda success, result, run_id=run_id, name=name: self._finish_plugin_run(
+                run_id, name, success, result
+            )
+        )
+        worker.finished.connect(lambda run_id=run_id: self.plugin_runs.pop(run_id, None))
+        worker.start()
 
-        if isinstance(result, int) and result != 0:
-            error = self.tr("Plugin exited with status {}.").format(result)
-        content = run_log.getvalue().strip()
-        if error:
-            content = "\n".join(part for part in (content, error) if part)
+    def _update_plugin_log(self, run_id: str, text: str):
+        state = self.plugin_runs.get(run_id)
+        if not state:
+            return
+        state["log"] = (state["log"] + text)[-4000:]
+        state["bar"].contentLabel.setText(state["log"] or self.tr("Plugin is running..."))
+
+    def _finish_plugin_run(self, run_id: str, name: str, success: bool, result: str):
+        state = self.plugin_runs.get(run_id)
+        if not state:
+            return
+        state["bar"].close()
+        content = state["log"].strip()
+        if result:
+            content = "\n".join(part for part in (content, result) if part)
         events.show_info_bar.emit(
-            self.tr("Plugin failed" if error else "Plugin done"),
-            content or self.tr("{} finished.").format(module_manager.get_name(plugin_id)),
-            1 if error else 3,
+            self.tr("Plugin done" if success else "Plugin failed"),
+            content or self.tr("{} finished.").format(name),
+            3 if success else 1,
             5000
         )
