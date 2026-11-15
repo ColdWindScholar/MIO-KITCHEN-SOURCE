@@ -97,6 +97,9 @@ class PluginShellWorker(QThread):
                 self.output_received.emit(output.decode("utf-8", errors="replace"))
             exit_code = process.wait()
         except Exception as e:
+            if process is not None and process.poll() is None:
+                process.terminate()
+                process.wait()
             self.run_finished.emit(False, str(e) or repr(e))
             return
         finally:
@@ -1967,7 +1970,7 @@ class PluginPage(QWidget):
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP_RIGHT,
-            duration=0,
+            duration=-1,
             parent=self.parent()
         )
         running_bar.repaint()
