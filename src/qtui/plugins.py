@@ -1886,22 +1886,30 @@ class PluginPage(QWidget):
                 self.load_plugin_cards()
 
     def exec_plugin(self, plugin_id):
+        events.show_info_bar.emit(
+            self.tr("Running plugin"),
+            self.tr("{} is running...").format(module_manager.get_name(plugin_id)),
+            4,
+            3000
+        )
         run_log = StringIO()
         error = None
+        result = None
         try:
             with redirect_stdout(run_log), redirect_stderr(run_log):
-                module_manager.run(plugin_id)
+                result = module_manager.run(plugin_id)
         except Exception as e:
             logging.exception("Failed to run plugin %s", plugin_id)
             error = str(e) or repr(e)
 
+        if isinstance(result, int) and result != 0:
+            error = self.tr("Plugin exited with status {}.").format(result)
         content = run_log.getvalue().strip()
         if error:
             content = "\n".join(part for part in (content, error) if part)
-        if content:
-            events.show_info_bar.emit(
-                self.tr("Plugin run failed" if error else "Plugin run log"),
-                content,
-                1 if error else 4,
-                5000
-            )
+        events.show_info_bar.emit(
+            self.tr("Plugin failed" if error else "Plugin done"),
+            content or self.tr("{} finished.").format(module_manager.get_name(plugin_id)),
+            1 if error else 3,
+            5000
+        )

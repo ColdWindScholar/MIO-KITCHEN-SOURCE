@@ -300,13 +300,14 @@ class ConnectPage(QWidget):
 
         mcp_controls = QHBoxLayout()
         self.mcp_status_label = BodyLabel(self.tr("MCP Server: stopped"), self)
-        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:8765/mcp", self)
         self.mcp_start_btn = PrimaryPushButton(self.tr("Start MCP Server"), self)
         self.mcp_start_btn.clicked.connect(self.toggle_mcp_server)
         mcp_controls.addWidget(self.mcp_status_label, alignment=Qt.AlignmentFlag.AlignHCenter)
-        mcp_controls.addWidget(self.mcp_endpoint_label)
         mcp_controls.addWidget(self.mcp_start_btn)
         left_layout.addLayout(mcp_controls)
+        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:8765/mcp", self)
+        self.mcp_endpoint_label.setFont(QFont("Consolas", 9))
+        left_layout.addWidget(self.mcp_endpoint_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute)
