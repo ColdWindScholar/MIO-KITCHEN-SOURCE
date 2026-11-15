@@ -305,7 +305,7 @@ class ConnectPage(QWidget):
         mcp_controls.addWidget(self.mcp_status_label, alignment=Qt.AlignmentFlag.AlignHCenter)
         mcp_controls.addWidget(self.mcp_start_btn)
         left_layout.addLayout(mcp_controls)
-        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:8765/mcp", self)
+        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:5000/mcp", self)
         self.mcp_endpoint_label.setFont(QFont("Consolas", 9))
         left_layout.addWidget(self.mcp_endpoint_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -316,7 +316,7 @@ class ConnectPage(QWidget):
 
         self.server = None
         self.network_thread = None
-        self.mcp_server = MCPServer()
+        self.mcp_server = MCPServer(flask_backend)
         self.start_server()
 
     def start_server(self):
@@ -405,7 +405,7 @@ class ConnectPage(QWidget):
 
         self.mcp_status_label.setText(self.tr("MCP Server: running"))
         self.mcp_start_btn.setText(self.tr("Stop MCP Server"))
-        self.append_native_console_log("SUCCESS", f"MCP server started at http://127.0.0.1:8765/mcp.")
+        self.append_native_console_log("SUCCESS", "MCP endpoint enabled on the Connect server at http://127.0.0.1:5000/mcp.")
 
     def stop_mcp_server(self):
         if not self.mcp_server.stop():

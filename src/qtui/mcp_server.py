@@ -1,25 +1,20 @@
 import json
 import os
-import threading
 from pathlib import Path
 
 from flask import Flask, jsonify, request
-from werkzeug.serving import make_server
 
 from src.qtui.projects import project_manger
 from src.qtui.settings_cfg import cfg
 
 
-MCP_HOST = "127.0.0.1"
-MCP_PORT = 8765
 MCP_PROTOCOL_VERSION = "2025-03-26"
 
 
 class MCPServer:
-    def __init__(self):
-        self._server = None
-        self._thread = None
-        self._app = Flask("mio_mcp_server")
+    def __init__(self, app: Flask):
+        self._app = app
+        self._enabled = False
         self._tools = {
             "list_projects": {
                 "description": "List the projects available in MIO-KITCHEN.",
@@ -91,6 +86,8 @@ class MCPServer:
         return jsonify({"jsonrpc": "2.0", "id": request_id, "error": {"code": code, "message": message}})
 
     def _handle_request(self):
+        if not self._enabled:
+            return jsonify({"error": "MCP is stopped. Start it from the Connect page."}), 503
         if request.remote_addr not in ("127.0.0.1", "::1"):
             return jsonify({"error": "MCP endpoint is available only on localhost."}), 403
         if not request.is_json:
@@ -112,7 +109,7 @@ class MCPServer:
             return self._rpc_error(request_id, -32600, "Invalid params."), 400
 
         if is_notification:
-            return ("", 202)
+            return "", 202
 
         if method == "initialize":
             result = {
@@ -171,39 +168,14 @@ class MCPServer:
 
     @property
     def is_running(self):
-        return bool(self._thread and self._thread.is_alive() and self._server)
+        return self._enabled
 
     def start(self):
         if self.is_running:
             return True
-
-        try:
-            server = make_server(MCP_HOST, MCP_PORT, self._app, threaded=True)
-        except OSError as error:
-            raise RuntimeError(f"Unable to start MCP server on {MCP_HOST}:{MCP_PORT}: {error}") from error
-
-        thread = threading.Thread(target=server.serve_forever, name="MioMCPServer", daemon=True)
-        self._server = server
-        self._thread = thread
-        thread.start()
+        self._enabled = True
         return True
 
     def stop(self):
-        server = self._server
-        thread = self._thread
-        if server is None or thread is None or not thread.is_alive():
-            if server:
-                server.server_close()
-            self._server = None
-            self._thread = None
-            return True
-
-        server.shutdown()
-        thread.join(timeout=3)
-        if thread.is_alive():
-            return False
-
-        server.server_close()
-        self._server = None
-        self._thread = None
+        self._enabled = False
         return True
