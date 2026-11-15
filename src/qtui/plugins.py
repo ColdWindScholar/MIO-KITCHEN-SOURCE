@@ -4,6 +4,7 @@ import os
 import platform
 import tempfile
 import zipfile
+from contextlib import redirect_stderr, redirect_stdout
 from io import BytesIO
 from io import StringIO
 from shutil import rmtree
@@ -1885,4 +1886,22 @@ class PluginPage(QWidget):
                 self.load_plugin_cards()
 
     def exec_plugin(self, plugin_id):
-        module_manager.run(plugin_id)
+        run_log = StringIO()
+        error = None
+        try:
+            with redirect_stdout(run_log), redirect_stderr(run_log):
+                module_manager.run(plugin_id)
+        except Exception as e:
+            logging.exception("Failed to run plugin %s", plugin_id)
+            error = str(e) or repr(e)
+
+        content = run_log.getvalue().strip()
+        if error:
+            content = "\n".join(part for part in (content, error) if part)
+        if content:
+            events.show_info_bar.emit(
+                self.tr("Plugin run failed" if error else "Plugin run log"),
+                content,
+                1 if error else 4,
+                5000
+            )

@@ -29,6 +29,7 @@ from wsproto.frame_protocol import CloseReason
 
 from src.qtui.projects import ProjectsPage, project_manger
 from src.core.utils import v_code
+from src.qtui.mcp_server import MCPServer
 
 
 class NetworkBridge(QObject):
@@ -297,6 +298,16 @@ class ConnectPage(QWidget):
         server_controls.addWidget(self.server_restart_btn)
         left_layout.addLayout(server_controls)
 
+        mcp_controls = QHBoxLayout()
+        self.mcp_status_label = BodyLabel(self.tr("MCP Server: stopped"), self)
+        self.mcp_endpoint_label = BodyLabel("http://127.0.0.1:8765/mcp", self)
+        self.mcp_start_btn = PrimaryPushButton(self.tr("Start MCP Server"), self)
+        self.mcp_start_btn.clicked.connect(self.toggle_mcp_server)
+        mcp_controls.addWidget(self.mcp_status_label, alignment=Qt.AlignmentFlag.AlignHCenter)
+        mcp_controls.addWidget(self.mcp_endpoint_label)
+        mcp_controls.addWidget(self.mcp_start_btn)
+        left_layout.addLayout(mcp_controls)
+
         # Connect core communication bridges
         network_bridge.trigger_signal.connect(self.execute)
         network_bridge.log_signal.connect(self.append_native_console_log)
@@ -304,6 +315,7 @@ class ConnectPage(QWidget):
 
         self.server = None
         self.network_thread = None
+        self.mcp_server = MCPServer()
         self.start_server()
 
     def start_server(self):
@@ -377,8 +389,36 @@ class ConnectPage(QWidget):
         if self.stop_server():
             self.start_server()
 
+    def toggle_mcp_server(self):
+        if self.mcp_server.is_running:
+            self.stop_mcp_server()
+            return
+
+        try:
+            self.mcp_server.start()
+        except RuntimeError as error:
+            self.mcp_status_label.setText(self.tr("MCP Server: stopped"))
+            self.mcp_start_btn.setText(self.tr("Start MCP Server"))
+            self.append_native_console_log("ERROR", str(error))
+            return
+
+        self.mcp_status_label.setText(self.tr("MCP Server: running"))
+        self.mcp_start_btn.setText(self.tr("Stop MCP Server"))
+        self.append_native_console_log("SUCCESS", f"MCP server started at http://127.0.0.1:8765/mcp.")
+
+    def stop_mcp_server(self):
+        if not self.mcp_server.stop():
+            self.append_native_console_log("ERROR", "MCP server did not stop within 3 seconds.")
+            return False
+
+        self.mcp_status_label.setText(self.tr("MCP Server: stopped"))
+        self.mcp_start_btn.setText(self.tr("Start MCP Server"))
+        self.append_native_console_log("INFO", "MCP server stopped.")
+        return True
+
     def closeEvent(self, event):
         self.stop_server()
+        self.stop_mcp_server()
         super().closeEvent(event)
 
     def render_qr_matrix(self, encoding_data_payload):

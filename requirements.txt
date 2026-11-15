@@ -1,10 +1,10 @@
 Pillow>=10.0.1
-pycryptodome>=4.1.0
+pycryptodome>=4.4.0
 Requests>2.31.0
 protobuf>=7.36.1
 pyinstaller
 future>=1.0.0
-pip>=26.2.2
+pip>=26.3
 qrcode[pil]
 zstandard
 asn1crypto
@@ -24,6 +24,7 @@ loguru
 PySide6-Fluent-Widgets[full]==1.11.3
 PySide6>=6.11.2
 flask
+mcp>=1.9.4,<2
 simple-websocket
 flask-sock
 qrcode[pil]

@@ -139,6 +139,8 @@ class MainWindow(FluentWindow):
     def restart(self):
         if not self.connect_page.stop_server():
             return
+        if not self.connect_page.stop_mcp_server():
+            return
 
         def _inner():
             argv = [sys.executable]
@@ -165,6 +167,7 @@ class MainWindow(FluentWindow):
 
     def closeEvent(self, event):
         self.connect_page.stop_server()
+        self.connect_page.stop_mcp_server()
         super().closeEvent(event)
 
 
