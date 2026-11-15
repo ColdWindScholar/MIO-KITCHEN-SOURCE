@@ -32,6 +32,7 @@ from src.qtui.projects import ProjectsPage, events, project_manger
 from src.qtui.connect_api import get_active_project, list_project_files, list_projects
 from src.core.utils import v_code
 from src.qtui.mcp_server import MCPServer
+from utils import gettype
 
 
 class NetworkBridge(QObject):
@@ -599,8 +600,17 @@ class ConnectPage(QWidget):
                 project_manger.remove(project_name)
                 events.refresh_projects.emit()
                 return self.send_action_response({"done": True, "msg": "ok"})
-
-
+            if action == 'gettype':
+                project_name = args.get("project_name")
+                file_path = args.get("path")
+                real_path = os.path.join(project_manger.get_work_path(project_name), file_path)
+                if not os.path.exists(real_path):
+                    return self.send_action_response(
+                        {"done": False, "msg": "file is not exists."}
+                    )
+                return self.send_action_response(
+                        {"done": True, "file_type": gettype(real_path)}
+                    )
             if action == "create_project":
                 project_name = args.get("project_name")
                 if not isinstance(project_name, str) or not project_name.strip():
